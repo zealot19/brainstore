@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/sales/sales.component.ts", "src/app/features/pages/sales/sales.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-sales',\n    templateUrl: './sales.component.html',\n    styleUrls: ['./sales.component.scss'],\n    imports: [RouterModule]\n})\nexport class SalesComponent {\n\n}\n", "<router-outlet></router-outlet>"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,iBAAP,MAAO,gBAAc;;qCAAd,iBAAc;EAAA;yEAAd,iBAAc,WAAA,CAAA,CAAA,WAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,wBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT3B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,gBAAc,CAAA;UAN1B;uBACa,aAAW,SAGZ,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,gBAAc,EAAA,WAAA,kBAAA,UAAA,mDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

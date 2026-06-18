@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/dashboards/dashboard.component.ts", "src/app/features/pages/dashboards/dashboard.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-dashboard',\n    templateUrl: './dashboard.component.html',\n    styleUrls: ['./dashboard.component.scss'],\n    imports: [RouterModule]\n})\nexport class DashboardComponent {\n\n}\n", "<router-outlet></router-outlet>"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,qBAAP,MAAO,oBAAkB;;qCAAlB,qBAAkB;EAAA;yEAAlB,qBAAkB,WAAA,CAAA,CAAA,eAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,4BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT/B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,oBAAkB,CAAA;UAN9B;uBACa,iBAAe,SAGhB,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,oBAAkB,EAAA,WAAA,sBAAA,UAAA,4DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

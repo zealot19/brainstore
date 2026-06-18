@@ -1,0 +1,219 @@
+<div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 class="page-title">Tooltip</h3>
+            </div>
+        </div>
+    </div>
+    <!-- /Page Header -->
+
+    <!-- start row -->
+    <div class="row">
+
+        <div class="col-xl-6">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Tooltips on links</h5>
+                </div>
+                <div class="card-body">
+                    <p>Hover over the links below to see tooltips.</p>
+                    <p class="muted mb-0">Placeholder text to demonstrate some <a href="#" class="text-primary"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                            data-bs-original-title="Default tooltip" tooltip="Default tooltip" placement="top">inline
+                            links</a> with tooltips. This is now just filler, no killer. Content placed here just to
+                        mimic the presence of <a href="#" class="text-primary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="" data-bs-original-title="Another tooltip"
+                            tooltip="Another tooltip" placement="top">real text</a>. And all that just to give you an
+                        idea of how tooltips would look when used in real-world situations. So hopefully you've now seen
+                        how <a href="#" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                            data-bs-original-title="Another one here too" tooltip="Another one here too"
+                            placement="top">these tooltips on links</a> can work in practice, once you use them on <a
+                            href="#" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                            data-bs-original-title="The last tip!" tooltip="The last tip!" placement="top">your own</a>
+                        site or project.</p>
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Disabled Elements</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Elements with the <code>disabled</code> attribute aren’t interactive, meaning
+                        users cannot focus, hover, or click them to trigger a tooltip (or popover). As a workaround,
+                        you’ll want to trigger the tooltip from a wrapper <code>&lt;div&gt;</code> or
+                        <code>&lt;span&gt;</code>, ideally made keyboard-focusable using <code>tabindex="0"</code>, and
+                        override the <code>pointer-events</code> on the disabled element.</p>
+                    <div>
+                        <span class="d-inline-block" tabindex="0">
+                            <button class="btn btn-primary pe-none" type="button" disabled>Disabled button</button>
+                        </span>
+                    </div>
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Hover Elements</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Elements with the <code>disabled</code> attribute aren’t interactive, meaning
+                        users cannot focus, hover, or click them to trigger a tooltip (or popover). As a workaround,
+                        you’ll want to trigger the tooltip from a wrapper <code>&lt;div&gt;</code> or
+                        <code>&lt;span&gt;</code>, ideally made keyboard-focusable using <code>tabindex="0"</code>, and
+                        override the <code>pointer-events</code> on the disabled element.</p>
+                    <button class="example-popover btn btn-primary" type="button" data-container="body"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Popover title"
+                        tooltip="Popover title" placement="top">Hover</button>
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+
+        </div> <!-- end col -->
+
+        <div class="col-xl-6">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Directions</h5>
+                </div>
+                <div class="card-body">
+                    <p>Hover over the buttons below to see the four tooltips directions: top, right, bottom, and left.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="" data-bs-original-title="Tooltip on top"
+                            tooltip="Tooltip on top" placement="top">
+                            Tooltip on top
+                        </button>
+                        <button type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip"
+                            data-bs-placement="right" title="" data-bs-original-title="Tooltip on right"
+                            tooltip="Tooltip on right" placement="right">
+                            Tooltip on right
+                        </button>
+                        <button type="button" class="btn btn-primary me-1" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="" data-bs-original-title="Tooltip on bottom"
+                            tooltip="Tooltip on bottom" placement="bottom">
+                            Tooltip on bottom
+                        </button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="" data-bs-original-title="Tooltip on left" tooltip="Tooltip on left"
+                            placement="left">
+                            Tooltip on left
+                        </button>
+                    </div>
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">HTML Tags</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">And with custom HTML added:</p>
+                    <ng-template #popTemplate9>
+                        <div [innerHtml]="html"></div>
+                    </ng-template>
+                    <button type="button" class="btn btn-secondary me-1" [tooltip]="popTemplate9">
+                        Tooltip with HTML
+                    </button>
+                    <ng-template #popTemplate10>
+                        <div [innerHtml]="html"></div>
+                    </ng-template>
+                    <button type="button" class="btn btn-primary me-1" [tooltip]="popTemplate10" triggers="click">
+                        Click Me
+                    </button>
+
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Color Tooltips</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">We set a custom class with ex.
+                        <code>data-bs-custom-class="primary-tooltip"</code> to scope our background-color primary
+                        appearance and use it to override a local CSS variable.
+                    </p>
+                    <div class="btn-list custom-btn-tooptip-class">
+                        <div class="tooltip-content-primary">
+                            <ng-template #popTemplate1>
+                                <div [innerHtml]="primary"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-primary" [tooltip]="popTemplate1">
+                                Primary Tooltip
+                            </button>
+                        </div>
+                        <div class="tooltip-content-secondary">
+                            <ng-template #popTemplate2>
+                                <div [innerHtml]="secondary"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-secondary" [tooltip]="popTemplate2">
+                                Secondary Tooltip
+                            </button>
+                        </div>
+                        <div class="tooltip-content-warning">
+                            <ng-template #popTemplate3>
+                                <div [innerHtml]="warning"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-warning" [tooltip]="popTemplate3">
+                                Warning Tooltip
+                            </button>
+                        </div>
+                        <div class="tooltip-content-info">
+                            <ng-template #popTemplate4>
+                                <div [innerHtml]="info"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-info" [tooltip]="popTemplate4">
+                                Info Tooltip
+                            </button>
+                        </div>
+                        <div class="tooltip-content-success">
+                            <ng-template #popTemplate5>
+                                <div [innerHtml]="success"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-success" [tooltip]="popTemplate5">
+                                Success Tooltip
+                            </button>
+                        </div>
+
+                        <div class="tooltip-content-danger">
+                            <ng-template #popTemplate6>
+                                <div [innerHtml]="danger"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-danger" [tooltip]="popTemplate6">
+                                Danger Tooltip
+                            </button>
+                        </div>
+                        <div class="tooltip-content-light">
+                            <ng-template #popTemplate7>
+                                <div [innerHtml]="light"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-light" [tooltip]="popTemplate7">
+                                Light Tooltip
+                            </button>
+                        </div>
+
+                        <div class="tooltip-content-dark">
+                            <ng-template #popTemplate8>
+                                <div [innerHtml]="dark"></div>
+                            </ng-template>
+                            <button type="button" class="btn btn-dark" [tooltip]="popTemplate8">
+                                Dark Tooltip
+                            </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end card body -->
+            </div> <!-- end card -->
+        </div> <!-- end col -->
+
+    </div>
+    <!-- end row -->
+
+</div>
+

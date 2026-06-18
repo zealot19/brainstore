@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/layouts/sidebar-one/sidebar-one.component.scss"],
+  "sourcesContent": ["#sidebar .sidebar-inner {\n  width: 100%;\n}\n\n"],
+  "mappings": ";AAAA,CAAA,QAAA,CAAA;AACE,SAAA;;",
+  "names": []
+}

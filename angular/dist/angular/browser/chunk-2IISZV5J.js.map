@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/inventory/product/product.component.ts", "src/app/features/pages/inventory/product/product.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-product',\n    templateUrl: './product.component.html',\n    styleUrls: ['./product.component.scss'],\n    imports: [RouterModule]\n})\nexport class ProductComponent {\n\n}\n", "<router-outlet></router-outlet>"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,mBAAP,MAAO,kBAAgB;;qCAAhB,mBAAgB;EAAA;yEAAhB,mBAAgB,WAAA,CAAA,CAAA,aAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,0BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV7B,MAAA,oBAAA,GAAA,eAAA;;oBDQc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,kBAAgB,CAAA;UAN5B;uBACa,eAAa,SAGd,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,kBAAgB,EAAA,WAAA,oBAAA,UAAA,iEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

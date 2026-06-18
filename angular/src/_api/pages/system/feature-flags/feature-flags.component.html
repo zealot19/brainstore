@@ -1,0 +1,47 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card flex-fill mb-0">
+      <div class="card-header">
+        <h4 class="fs-18 fw-bold">Modules disponibles</h4>
+      </div>
+      <div class="card-body">
+        @if (loading) {
+          <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+        } @else if (flags.length === 0) {
+          <p class="text-muted text-center py-4">Aucun feature flag configuré.</p>
+        } @else {
+          @for (flag of flags; track flag.id) {
+            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 border-bottom mb-3 pb-3">
+              <div class="d-flex align-items-center">
+                <span class="avatar avatar-lg border bg-light fs-24 me-2">
+                  <i class="ti ti-toggle-right text-gray-900 fs-18"
+                     [class.text-success]="flag.is_enabled"
+                     [class.text-muted]="!flag.is_enabled"></i>
+                </span>
+                <div>
+                  <h5 class="fs-16 fw-medium mb-1">{{ flag.label ?? flag.key }}</h5>
+                  @if (flag.description) {
+                    <p class="fs-13 text-muted mb-0">{{ flag.description }}</p>
+                  }
+                  <small class="text-muted font-monospace">{{ flag.key }}</small>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                @if (toggling[flag.id]) {
+                  <span class="spinner-border spinner-border-sm text-primary"></span>
+                }
+                <div class="status-toggle modal-status d-flex justify-content-between align-items-center">
+                  <input type="checkbox" [id]="'flag-' + flag.id" class="check"
+                         [checked]="flag.is_enabled"
+                         [disabled]="toggling[flag.id]"
+                         (change)="toggle(flag)">
+                  <label [for]="'flag-' + flag.id" class="checktoggle"></label>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

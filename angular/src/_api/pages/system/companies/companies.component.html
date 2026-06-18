@@ -1,0 +1,439 @@
+<!-- Page Header -->
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Institutions</h4>
+      <h6>Gérer les institutions (tenants)</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+  </ul>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-company">
+      <i class="ti ti-circle-plus me-2"></i>Nouvelle institution
+    </a>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row">
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-purple border-0">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div><p class="mb-1 text-white">Total</p><h4 class="text-white">{{ total }}</h4></div>
+        <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-building"></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-teal border-0">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div><p class="mb-1 text-white">Actives</p><h4 class="text-white">{{ totalActive }}</h4></div>
+        <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-building-check"></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-info border-0">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div><p class="mb-1 text-white">Essai</p><h4 class="text-white">{{ totalTrial }}</h4></div>
+        <span class="avatar avatar-lg bg-info-900"><i class="ti ti-building-star"></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-secondary border-0">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div><p class="mb-1 text-white">Suspendues</p><h4 class="text-white">{{ totalSuspended }}</h4></div>
+        <span class="avatar avatar-lg bg-secondary-900"><i class="ti ti-building-minus"></i></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+    <div class="search-set">
+      <div class="search-input">
+        <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+        <div class="dataTables_filter">
+          <label>
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher..." />
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+      <div class="dropdown me-2">
+        <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
+          {{ statusFilter ? statusLabel(statusFilter) : 'Tous les statuts' }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end p-3">
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter=''; applyFilter()">Tous</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='active'; applyFilter()">Actives</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='trial'; applyFilter()">Essai</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='suspended'; applyFilter()">Suspendues</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='cancelled'; applyFilter()">Résiliées</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Institution</th>
+              <th>Code</th>
+              <th>Devise</th>
+              <th>Package</th>
+              <th>Actif</th>
+              <th>Créée le</th>
+              <th class="no-sort">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of filtered; track c.id) {
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="avatar avatar-md me-2 bg-light border">
+                      @if (c.logo) { <img [src]="c.logo" alt="logo" class="w-100 h-100 object-fit-cover rounded"> }
+                      @else { <i class="ti ti-building text-muted"></i> }
+                    </span>
+                    <div>
+                      <p class="fw-medium mb-0">{{ c.name }}</p>
+                      <small class="text-muted">{{ c.slogan || c.slug }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ c.code || '—' }}</td>
+                <td>{{ c.currency_code ?? '—' }}</td>
+                <td>{{ c.package_name ?? '—' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="c.is_active ? 'bg-outline-success' : 'bg-outline-danger'">
+                    {{ c.is_active ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td>{{ c.created_at | date:'dd/MM/yyyy' }}</td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action d-flex align-items-center">
+                    <a href="javascript:void(0);"
+                       class="me-2 p-2 d-flex align-items-center border rounded"
+                       data-bs-toggle="modal" data-bs-target="#edit-company"
+                       (click)="openEdit(c)" title="Modifier">
+                      <i class="ti ti-pencil"></i>
+                    </a>
+                    @if (c.status === 'suspended') {
+                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" title="Réactiver" (click)="activate(c.id)">
+                        <i class="ti ti-player-play text-success"></i>
+                      </a>
+                    }
+                    @if (c.status === 'active' || c.status === 'trial') {
+                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" title="Suspendre"
+                         data-bs-toggle="modal" data-bs-target="#suspend-company" (click)="openSuspend(c.id)">
+                        <i class="ti ti-player-pause text-warning"></i>
+                      </a>
+                    }
+                    @if (c.status !== 'cancelled') {
+                      <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded confirm-text" title="Résilier" (click)="cancel(c.id)">
+                        <i class="ti ti-trash text-danger"></i>
+                      </a>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="text-center py-4 text-muted">Aucune institution trouvée.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Nouvelle institution -->
+<div class="modal fade" id="add-company" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle institution</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+        <div class="modal-body">
+          @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+
+          <!-- Logo -->
+          <div class="mb-3 text-center">
+            <div class="avatar avatar-xxl mb-2 bg-light border mx-auto">
+              @if (createLogoPreview) { <img [src]="createLogoPreview" class="w-100 h-100 object-fit-cover rounded"> }
+              @else { <i class="ti ti-building fs-2 text-muted"></i> }
+            </div>
+            <label class="btn btn-outline-secondary btn-sm">
+              <i class="ti ti-upload me-1"></i>Logo
+              <input type="file" accept="image/*" class="d-none" (change)="onCreateLogo($event)" />
+            </label>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Raison sociale <span class="text-danger">*</span></label>
+              <input formControlName="name" type="text" class="form-control" placeholder="Ex: Transport Abidjan SA" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Code</label>
+              <input formControlName="code" type="text" class="form-control" placeholder="Ex: TAB" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Slogan</label>
+            <input formControlName="slogan" type="text" class="form-control" placeholder="Votre partenaire de mobilité…" />
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Devise <span class="text-danger">*</span></label>
+              <select formControlName="currency" class="form-select">
+                <option value="XOF">XOF — Franc CFA BCEAO</option>
+                <option value="XAF">XAF — Franc CFA BEAC</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="USD">USD — Dollar</option>
+                <option value="GHS">GHS — Cedi</option>
+                <option value="GNF">GNF — Franc guinéen</option>
+                <option value="NGN">NGN — Naira</option>
+                <option value="MAD">MAD — Dirham</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Package</label>
+              <select formControlName="package" class="form-select">
+                <option value="">— Aucun (trial) —</option>
+                @for (p of packages; track p.id) {
+                  <option [value]="p.id">{{ p.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Forme juridique</label>
+              <input formControlName="legal_form" type="text" class="form-control" placeholder="SARL, SA…" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">RCCM</label>
+              <input formControlName="rccm" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">N° fiscal</label>
+              <input formControlName="tax_id" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input formControlName="email" type="email" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Téléphone</label>
+              <input formControlName="phone" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Site web</label>
+              <input formControlName="website" type="url" class="form-control" placeholder="https://…" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Boîte postale</label>
+              <input formControlName="postal_box" type="text" class="form-control" placeholder="BP 123" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Adresse</label>
+              <input formControlName="address_line1" type="text" class="form-control" placeholder="Rue, avenue…" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Ville</label>
+              <input formControlName="address_city" type="text" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">Code postal</label>
+              <input formControlName="address_postal_code" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="mb-3 d-flex align-items-center gap-2">
+            <div class="status-toggle">
+              <input type="checkbox" id="create-is-active" class="check" formControlName="is_active" />
+              <label for="create-is-active" class="checktoggle"></label>
+            </div>
+            <label class="form-label mb-0">Actif</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || creating">
+            @if (creating) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Modifier institution -->
+<div class="modal fade" id="edit-company" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier l'institution</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="editForm" (ngSubmit)="submitEdit()">
+        <div class="modal-body">
+          @if (editErrorMsg) { <div class="alert alert-danger py-2">{{ editErrorMsg }}</div> }
+
+          <!-- Logo -->
+          <div class="mb-3 text-center">
+            <div class="avatar avatar-xxl mb-2 bg-light border mx-auto">
+              @if (editLogoPreview) { <img [src]="editLogoPreview" class="w-100 h-100 object-fit-cover rounded"> }
+              @else { <i class="ti ti-building fs-2 text-muted"></i> }
+            </div>
+            <label class="btn btn-outline-secondary btn-sm">
+              <i class="ti ti-upload me-1"></i>Changer le logo
+              <input type="file" accept="image/*" class="d-none" (change)="onEditLogo($event)" />
+            </label>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Raison sociale <span class="text-danger">*</span></label>
+              <input formControlName="name" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Code</label>
+              <input formControlName="code" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Slogan</label>
+            <input formControlName="slogan" type="text" class="form-control" />
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Devise <span class="text-danger">*</span></label>
+              <select formControlName="currency" class="form-select">
+                <option value="XOF">XOF — Franc CFA BCEAO</option>
+                <option value="XAF">XAF — Franc CFA BEAC</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="USD">USD — Dollar</option>
+                <option value="GHS">GHS — Cedi</option>
+                <option value="GNF">GNF — Franc guinéen</option>
+                <option value="NGN">NGN — Naira</option>
+                <option value="MAD">MAD — Dirham</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Package</label>
+              <select formControlName="package" class="form-select">
+                <option value="">— Aucun —</option>
+                @for (p of packages; track p.id) {
+                  <option [value]="p.id">{{ p.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Forme juridique</label>
+              <input formControlName="legal_form" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">RCCM</label>
+              <input formControlName="rccm" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">N° fiscal</label>
+              <input formControlName="tax_id" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input formControlName="email" type="email" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Téléphone</label>
+              <input formControlName="phone" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Site web</label>
+              <input formControlName="website" type="url" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Boîte postale</label>
+              <input formControlName="postal_box" type="text" class="form-control" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Adresse</label>
+              <input formControlName="address_line1" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Ville</label>
+              <input formControlName="address_city" type="text" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">Code postal</label>
+              <input formControlName="address_postal_code" type="text" class="form-control" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || editing">
+            @if (editing) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Suspendre -->
+<div class="modal fade" id="suspend-company" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Suspendre l'institution</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="suspendForm" (ngSubmit)="submitSuspend()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Motif <span class="text-danger">*</span></label>
+            <textarea formControlName="reason" class="form-control" rows="3" placeholder="Raison de la suspension…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-warning" [disabled]="suspendForm.invalid || suspending">
+            @if (suspending) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Suspendre
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

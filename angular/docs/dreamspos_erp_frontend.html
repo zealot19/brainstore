@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamsPOS ERP — Documentation Frontend</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+    @media print {
+      .no-print { display: none; }
+      body { font-size: 12px; }
+      h1 { font-size: 22px; } h2 { font-size: 16px; } h3 { font-size: 13px; }
+      .page-break { page-break-before: always; }
+      section { page-break-inside: avoid; }
+      table { page-break-inside: avoid; }
+    }
+    .cover {
+      background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 50%, #0f3460 100%);
+      color: #fff; padding: 80px 60px; min-height: 280px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .cover .logo { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+    .cover .logo span { color: #e94560; }
+    .cover .subtitle { font-size: 18px; color: #a0b0c8; margin-top: 8px; }
+    .cover .meta { margin-top: 40px; font-size: 13px; color: #6a7f95; }
+    .cover .meta strong { color: #c9d6df; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
+    .badge-green  { background: #1a472a; color: #69db7c; }
+    .badge-blue   { background: #1c3a5e; color: #74c0fc; }
+    .badge-orange { background: #4a2800; color: #ffa94d; }
+    .badge-purple { background: #2d1b4e; color: #da77f2; }
+    .badge-red    { background: #4a0d0d; color: #f59e9e; }
+    .container { max-width: 960px; margin: 0 auto; padding: 40px 40px; }
+    h1 { font-size: 28px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin: 40px 0 20px; }
+    h2 { font-size: 20px; color: #16213e; border-left: 4px solid #e94560; padding-left: 12px; margin: 30px 0 14px; }
+    h3 { font-size: 15px; color: #0f3460; margin: 20px 0 10px; }
+    h4 { font-size: 13px; color: #444; margin: 14px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    p { margin-bottom: 10px; color: #333; }
+    ul, ol { margin: 8px 0 12px 22px; }
+    li { margin-bottom: 4px; }
+    strong { color: #0f3460; }
+    em { color: #555; font-style: normal; background: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 12px; font-family: 'Consolas', monospace; }
+    .card { background: #f8f9fc; border: 1px solid #e4e8f0; border-radius: 8px; padding: 18px 22px; margin: 12px 0; }
+    .card-title { font-size: 13px; font-weight: 700; color: #0f3460; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: #e94560; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    thead th { background: #0f3460; color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+    tbody tr:nth-child(even) { background: #f5f7fb; }
+    tbody tr:hover { background: #eef1f8; }
+    td { padding: 8px 12px; border-bottom: 1px solid #e8ecf2; color: #333; vertical-align: top; }
+    td:first-child { font-family: 'Consolas', monospace; font-size: 12px; color: #0f3460; font-weight: 500; }
+    pre, code { font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; }
+    pre { background: #1a1a2e; color: #a0c4ff; padding: 16px 20px; border-radius: 6px; overflow-x: auto; margin: 12px 0; line-height: 1.5; }
+    code { background: #eef2ff; color: #3730a3; padding: 1px 5px; border-radius: 3px; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .done   { background: #d3f9d8; color: #2b8a3e; }
+    .wip    { background: #fff3cd; color: #856404; }
+    .todo   { background: #f8d7da; color: #842029; }
+    .sep { border: none; border-top: 1px solid #e4e8f0; margin: 30px 0; }
+    .toc { background: #f0f4ff; border: 1px solid #c5d0ff; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .toc h3 { color: #0f3460; margin-bottom: 10px; }
+    .toc ol { margin-left: 18px; }
+    .toc li { margin-bottom: 4px; }
+    .toc a { color: #3730a3; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .module-card { border-left: 4px solid; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 8px 0; background: #f8f9fc; }
+    .module-card.done { border-color: #40c057; }
+    .module-card.wip  { border-color: #fab005; }
+    .module-card.todo { border-color: #e94560; }
+    .module-card h3 { margin: 0 0 4px; font-size: 14px; }
+    .module-card p  { margin: 0; font-size: 12px; color: #555; }
+    .flow-diagram { background: #0f3460; border-radius: 8px; padding: 20px; margin: 12px 0; color: #a0c4ff; font-family: monospace; font-size: 12px; line-height: 2; }
+    .flow-diagram .hl { color: #ffd43b; font-weight: bold; }
+    .flow-diagram .ok { color: #69db7c; }
+    .flow-diagram .arrow { color: #e94560; }
+    footer { background: #1a1a2e; color: #6a7f95; text-align: center; padding: 24px; font-size: 12px; margin-top: 60px; }
+    footer strong { color: #a0b0c8; }
+    .file-tree { font-family: 'Consolas', monospace; font-size: 12px; background: #1a1a2e; color: #a0c4ff; padding: 16px 20px; border-radius: 6px; line-height: 1.8; margin: 12px 0; }
+    .file-tree .dir  { color: #ffd43b; }
+    .file-tree .file { color: #a0c4ff; }
+    .file-tree .new  { color: #69db7c; }
+    .file-tree .note { color: #888; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- COUVERTURE                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="logo">Dreams<span>POS</span> ERP</div>
+  <div class="subtitle">Documentation Technique — Frontend Angular</div>
+  <div style="margin-top:30px; display:flex; gap:8px; flex-wrap:wrap;">
+    <span class="badge badge-blue">Angular 21</span>
+    <span class="badge badge-blue">TypeScript 5</span>
+    <span class="badge badge-green">Standalone Components</span>
+    <span class="badge badge-orange">JWT + 2FA</span>
+    <span class="badge badge-purple">Lazy Loading</span>
+    <span class="badge badge-green">Bootstrap 5</span>
+    <span class="badge badge-orange">Tabler Icons</span>
+  </div>
+  <div class="meta" style="margin-top:30px;">
+    <strong>Version :</strong> 1.0.0 &nbsp;|&nbsp;
+    <strong>Date :</strong> Juin 2026 &nbsp;|&nbsp;
+    <strong>Auteur :</strong> Équipe DreamsPOS &nbsp;|&nbsp;
+    <strong>Statut :</strong> En cours — Modules 5 &amp; 6 terminés
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- TABLE DES MATIÈRES                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h3>Table des matières</h3>
+  <ol>
+    <li><a href="#arch">Architecture générale</a></li>
+    <li><a href="#structure">Structure des fichiers</a></li>
+    <li><a href="#conventions">Conventions et patterns</a></li>
+    <li><a href="#interceptors">Intercepteurs HTTP</a></li>
+    <li><a href="#auth">Module 5 — Authentification</a></li>
+    <li><a href="#sysconfig">Module 6 — Config Système</a></li>
+    <li><a href="#routing">Routing et guards</a></li>
+    <li><a href="#sidebar">Sidebar et navigation</a></li>
+    <li><a href="#modules">Modules à venir</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 1. ARCHITECTURE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="arch">1. Architecture générale</h1>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>Principes directeurs</div>
+  <ul>
+    <li><strong>Standalone components</strong> — aucun NgModule, imports déclarés sur chaque composant</li>
+    <li><strong>Isolation layer</strong> — tout le code custom dans <em>src/_api/</em>, les fichiers du template touchés au minimum</li>
+    <li><strong>Lazy loading</strong> — chaque groupe de routes chargé à la demande via <em>loadComponent()</em></li>
+    <li><strong>Functional interceptors</strong> — pas de classes, fonctions pures injectées dans <em>app.config.ts</em></li>
+    <li><strong>Services providedIn: 'root'</strong> — singletons, pas de providers dans les composants</li>
+  </ul>
+</div>
+
+<div class="flow-diagram">
+  <span class="hl">Navigateur</span>
+  <span class="arrow"> → </span>
+  <span class="hl">Angular Router</span>
+  <span class="arrow"> → </span>
+  <span class="hl">authGuard</span>
+  <span class="arrow"> → </span>
+  <span class="hl">Composant (lazy)</span>
+  <span class="arrow"> → </span>
+  <span class="hl">Service (_api/services/)</span>
+  <span class="arrow"> → </span>
+  <span class="hl">HttpClient</span>
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="arrow">↑ ↓</span>
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="ok">jwtInterceptor → errorInterceptor → apiUnwrapInterceptor</span>
+</div>
+
+<h3>Stack technique</h3>
+<table>
+  <thead><tr><th>Élément</th><th>Technologie</th><th>Version</th></tr></thead>
+  <tbody>
+    <tr><td>Framework</td><td>Angular</td><td>21.x</td></tr>
+    <tr><td>Langage</td><td>TypeScript</td><td>5.x</td></tr>
+    <tr><td>CSS Framework</td><td>Bootstrap</td><td>5.x</td></tr>
+    <tr><td>Icônes</td><td>Tabler Icons (<em>ti ti-*</em>)</td><td>—</td></tr>
+    <tr><td>Template de base</td><td>DreamsPOS Admin Template</td><td>—</td></tr>
+    <tr><td>HTTP</td><td>Angular HttpClient + intercepteurs fonctionnels</td><td>—</td></tr>
+    <tr><td>Auth</td><td>JWT (access + refresh) + TOTP 2FA</td><td>—</td></tr>
+    <tr><td>Build</td><td>Angular CLI / ng serve</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 2. STRUCTURE DES FICHIERS                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="structure">2. Structure des fichiers</h1>
+
+<div class="file-tree">
+<span class="dir">src/</span>
+├── <span class="dir">_api/</span>                         <span class="note"># Isolation layer — tout notre code ici</span>
+│   ├── <span class="dir">config/</span>
+│   │   └── <span class="new">api.config.ts</span>          <span class="note"># URLs de tous les endpoints (AUTH, SYSTEM…)</span>
+│   ├── <span class="dir">interceptors/</span>
+│   │   ├── <span class="new">api-unwrap.interceptor.ts</span> <span class="note"># Désemballe { success, data } + normalise erreurs</span>
+│   │   ├── <span class="new">error.interceptor.ts</span>      <span class="note"># Refresh token automatique (401)</span>
+│   │   └── <span class="new">jwt.interceptor.ts</span>        <span class="note"># Injecte Authorization: Bearer</span>
+│   ├── <span class="dir">guards/</span>
+│   │   └── <span class="new">auth.guard.ts</span>             <span class="note"># 3 chemins : auth / lock-screen / signin</span>
+│   ├── <span class="dir">models/</span>
+│   │   ├── <span class="new">auth.models.ts</span>            <span class="note"># LoginRequest, LoginResponse, User, 2FA…</span>
+│   │   └── <span class="new">system.models.ts</span>          <span class="note"># Package, Company, Agency, Parameter, FeatureFlag</span>
+│   ├── <span class="dir">services/</span>
+│   │   ├── <span class="dir">auth/</span>
+│   │   │   └── <span class="new">auth.service.ts</span>       <span class="note"># login, 2FA, logout, refresh, reset password</span>
+│   │   └── <span class="dir">system/</span>
+│   │       ├── <span class="new">company.service.ts</span>    <span class="note"># CRUD + suspend/activate/cancel/stats</span>
+│   │       ├── <span class="new">agency.service.ts</span>     <span class="note"># CRUD + tree</span>
+│   │       ├── <span class="new">package.service.ts</span>    <span class="note"># CRUD + delete</span>
+│   │       ├── <span class="new">parameter.service.ts</span>  <span class="note"># list + bulkUpdate</span>
+│   │       └── <span class="new">feature-flag.service.ts</span> <span class="note"># list + toggle</span>
+│   └── <span class="dir">pages/</span>
+│       ├── <span class="dir">auth/</span>
+│       │   ├── <span class="new">login/</span>                <span class="note"># Page de connexion</span>
+│       │   ├── <span class="new">two-factor/</span>           <span class="note"># Vérification TOTP</span>
+│       │   ├── <span class="new">forgot-password/</span>      <span class="note"># Demande de reset</span>
+│       │   ├── <span class="new">reset-password/</span>       <span class="note"># Confirmation reset</span>
+│       │   └── <span class="new">lock-screen/</span>          <span class="note"># Écran de verrouillage</span>
+│       └── <span class="dir">system/</span>
+│           ├── <span class="new">companies/</span>            <span class="note"># Gestion des institutions</span>
+│           ├── <span class="new">agencies/</span>             <span class="note"># Gestion des agences</span>
+│           ├── <span class="new">packages/</span>             <span class="note"># Offres commerciales</span>
+│           ├── <span class="new">parameters/</span>           <span class="note"># Paramètres système (bulk edit)</span>
+│           └── <span class="new">feature-flags/</span>        <span class="note"># Activation modules par institution</span>
+├── <span class="dir">app/</span>
+│   ├── <span class="file">app.config.ts</span>              <span class="note"># Bootstrap : intercepteurs, router, providers</span>
+│   ├── <span class="dir">core/helpers/</span>
+│   │   └── <span class="file">routes.ts</span>              <span class="note"># Constantes de toutes les routes Angular</span>
+│   ├── <span class="dir">core/service/sidebar/</span>
+│   │   └── <span class="file">sidebar.service.ts</span>     <span class="note"># Définition des menus (2 blocs de layout)</span>
+│   ├── <span class="dir">features/pages/</span>
+│   │   └── <span class="file">pages.routes.ts</span>        <span class="note"># Toutes les routes lazy — notre section en bas</span>
+│   └── <span class="dir">layouts/header/</span>
+│       └── <span class="file">header.component.ts</span>    <span class="note"># Bouton logout connecté à AuthService</span>
+└── <span class="dir">environments/</span>
+    └── <span class="file">environment.ts</span>            <span class="note"># apiUrl = http://localhost:8000/api</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 3. CONVENTIONS ET PATTERNS                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="conventions">3. Conventions et patterns</h1>
+
+<h2>Pattern de page liste (tableau)</h2>
+<p>Toutes les pages de liste suivent la même structure :</p>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Composant TypeScript</div>
+    <ul>
+      <li><em>packages: T[] = []</em> — données brutes de l'API</li>
+      <li><em>filtered: T[] = []</em> — données filtrées affichées</li>
+      <li><em>loading = true</em> — spinner d'attente</li>
+      <li><em>form: FormGroup</em> — formulaire création/édition</li>
+      <li><em>editId: string | null</em> — null = création, id = édition</li>
+      <li><em>load()</em> — appel API + applyFilter()</li>
+      <li><em>applyFilter()</em> — filtre local sur search</li>
+      <li><em>openCreate() / openEdit()</em> — prépare le modal</li>
+      <li><em>submit()</em> — create ou update selon editId</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Template HTML</div>
+    <ul>
+      <li>Page header + bouton principal</li>
+      <li>4 stat cards style <em>bg-{color} border-0</em> (pattern employee)</li>
+      <li>Tableau avec <em>@for (item of filtered; track item.id)</em></li>
+      <li>Actions : <em>d-flex align-items-center border rounded</em> sur chaque <em>&lt;a&gt;</em></li>
+      <li>Icônes : <strong>Tabler CSS</strong> (<em>ti ti-pencil</em>, <em>ti ti-trash</em>…) — pas de Feather JS</li>
+      <li>Modaux Bootstrap : <em>data-bs-toggle="modal"</em></li>
+    </ul>
+  </div>
+</div>
+
+<h2>Icônes : règle importante</h2>
+<div class="card" style="border-left: 4px solid #e94560;">
+  <p>
+    Le template utilise <strong>Feather Icons</strong> (<em>data-feather="edit"</em>) qui nécessitent un appel JS
+    <em>feather.replace()</em> après chaque rendu. Dans les boucles <em>@for</em> d'Angular, cet appel
+    n'est pas déclenché automatiquement → les icônes sont invisibles.
+  </p>
+  <p style="margin-top:8px;">
+    <strong>Règle :</strong> dans tous nos composants, utiliser exclusivement les <strong>Tabler Icons CSS</strong>
+    (<em>&lt;i class="ti ti-nom"&gt;&lt;/i&gt;</em>) qui fonctionnent sans JavaScript.
+  </p>
+</div>
+
+<h2>Gestion des erreurs API</h2>
+<table>
+  <thead><tr><th>Type d'erreur backend</th><th>Format reçu</th><th>Ce qu'affiche le composant</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>ApplicationError (métier)</td>
+      <td><em>{ code: "ApplicationError", message: "..." }</em></td>
+      <td>Le <em>message</em> directement</td>
+    </tr>
+    <tr>
+      <td>Erreur DRF validation (400)</td>
+      <td><em>{ code: 400, message: "Une erreur...", details: { field: [...] } }</em></td>
+      <td>Les <em>details</em> par champ : <em>field : message</em></td>
+    </tr>
+    <tr>
+      <td>401 Unauthorized</td>
+      <td>—</td>
+      <td><em>errorInterceptor</em> tente le refresh automatiquement</td>
+    </tr>
+    <tr>
+      <td>403 Forbidden</td>
+      <td>—</td>
+      <td>Message générique (permission refusée)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 4. INTERCEPTEURS                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="interceptors">4. Intercepteurs HTTP</h1>
+
+<p>Déclarés dans <em>src/app/app.config.ts</em> dans cet ordre :</p>
+<pre>withInterceptors([jwtInterceptor, errorInterceptor, apiUnwrapInterceptor])</pre>
+
+<table>
+  <thead><tr><th>Intercepteur</th><th>Rôle</th><th>Détail</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>jwtInterceptor</td>
+      <td>Ajoute le token JWT</td>
+      <td>Injecte <em>Authorization: Bearer &lt;access&gt;</em> sur toutes les requêtes vers <em>API_BASE</em>, sauf les URLs publiques (login, refresh, reset…)</td>
+    </tr>
+    <tr>
+      <td>errorInterceptor</td>
+      <td>Refresh automatique</td>
+      <td>Sur 401, tente un refresh via <em>HttpBackend</em> (bypass intercepteurs pour éviter boucle). Utilise <em>map(res => res.data)</em> pour désemballer manuellement la réponse refresh (non interceptée par apiUnwrap). File les requêtes en attente pendant le refresh.</td>
+    </tr>
+    <tr>
+      <td>apiUnwrapInterceptor</td>
+      <td>Désemballe + normalise</td>
+      <td>
+        <strong>Success :</strong> extrait <em>body.data</em> de l'enveloppe <em>{ success, data }</em><br>
+        <strong>Erreur :</strong> extrait le message lisible depuis <em>error.error.message</em> ou formate les détails de validation DRF champ par champ
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Note : errorInterceptor utilise HttpBackend</h3>
+<div class="card">
+  <p>
+    L'<em>errorInterceptor</em> injecte <em>HttpBackend</em> (et non <em>HttpClient</em>) pour la requête de refresh,
+    afin d'éviter la dépendance circulaire. En conséquence, cette requête <strong>bypasse tous les intercepteurs</strong>
+    y compris <em>apiUnwrapInterceptor</em>. Le désemballe de la réponse refresh est donc fait manuellement :
+  </p>
+  <pre>http.post&lt;{ success: boolean; data: TokenPair }&gt;(AUTH.refresh, &#123; refresh &#125;)
+  .pipe(map(res => res.data))</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 5. MODULE AUTHENTIFICATION                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="auth">5. Module 5 — Authentification <span class="status done">Terminé</span></h1>
+
+<h2>Pages implémentées</h2>
+<table>
+  <thead><tr><th>Page</th><th>Route</th><th>Fichier</th><th>Statut</th></tr></thead>
+  <tbody>
+    <tr><td>Login</td><td>/signin</td><td>_api/pages/auth/login/</td><td><span class="status done">✓</span></td></tr>
+    <tr><td>Vérification 2FA</td><td>/two-step-verification</td><td>_api/pages/auth/two-factor/</td><td><span class="status done">✓</span></td></tr>
+    <tr><td>Mot de passe oublié</td><td>/forgot-password</td><td>_api/pages/auth/forgot-password/</td><td><span class="status done">✓</span></td></tr>
+    <tr><td>Réinitialisation</td><td>/reset-password</td><td>_api/pages/auth/reset-password/</td><td><span class="status done">✓</span></td></tr>
+    <tr><td>Écran de verrouillage</td><td>/lock-screen</td><td>_api/pages/auth/lock-screen/</td><td><span class="status done">✓</span></td></tr>
+  </tbody>
+</table>
+
+<h2>AuthService — méthodes principales</h2>
+<table>
+  <thead><tr><th>Méthode</th><th>Endpoint</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>login(email, password)</td><td>POST /auth/login/</td><td>Retourne tokens ou déclenche 2FA (<em>requires_2fa: true</em>). Stocke <em>user_id</em> temporaire pour l'étape 2FA.</td></tr>
+    <tr><td>loginWith2FA(code)</td><td>POST /auth/login/2fa/</td><td>Envoie <em>{ user_id, code }</em>. Complète la connexion.</td></tr>
+    <tr><td>logout()</td><td>POST /auth/logout/</td><td>Blackliste le refresh token. Nettoie TokenService et redirige vers /signin.</td></tr>
+    <tr><td>forgotPassword(email)</td><td>POST /auth/password-reset/</td><td>Déclenche l'envoi d'email (console backend en dev).</td></tr>
+    <tr><td>confirmReset(token, password, confirm)</td><td>POST /auth/password-reset/confirm/</td><td>Envoie <em>{ token, new_password, confirm_password }</em>.</td></tr>
+    <tr><td>unlock(password)</td><td>POST /auth/login/</td><td>Revalide le mot de passe depuis l'écran de verrouillage.</td></tr>
+  </tbody>
+</table>
+
+<h2>TokenService — stockage</h2>
+<table>
+  <thead><tr><th>Clé localStorage</th><th>Valeur</th></tr></thead>
+  <tbody>
+    <tr><td>access_token</td><td>JWT access (durée courte)</td></tr>
+    <tr><td>refresh_token</td><td>JWT refresh (durée longue)</td></tr>
+    <tr><td>user</td><td>Objet User sérialisé (profil)</td></tr>
+    <tr><td>lock_return_url</td><td>URL à restaurer après déverrouillage</td></tr>
+  </tbody>
+</table>
+
+<h2>authGuard — logique de navigation</h2>
+<div class="flow-diagram">
+  <span class="hl">Accès route protégée</span>
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ok">isAuthenticated() → true</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Accès autorisé
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="hl">getUser() → profil en cache</span> → <span class="ok">/lock-screen</span>  (tokens expirés mais profil connu)
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;└── Aucun des deux &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <span class="ok">/signin?returnUrl=...</span>
+</div>
+
+<h2>Flux 2FA</h2>
+<div class="card">
+  <ol>
+    <li>Login → backend retourne <em>{ requires_2fa: true, user_id: "uuid" }</em></li>
+    <li><em>AuthService</em> stocke <em>_pending2faUserId</em> en mémoire et redirige vers <em>/two-step-verification</em></li>
+    <li>L'utilisateur saisit le code TOTP → <em>loginWith2FA(code)</em> envoie <em>{ user_id, code }</em></li>
+    <li>Succès → tokens reçus, connexion complète</li>
+  </ol>
+</div>
+
+<h2>Points en attente (Auth)</h2>
+<ul>
+  <li>Envoi réel d'email pour reset password (backend : <em>services.py</em> TODO)</li>
+  <li>Pages de profil utilisateur (PATCH /auth/me/)</li>
+  <li>Gestion des sessions actives (/auth/sessions/)</li>
+  <li>Changement de mot de passe depuis les paramètres (/auth/change-password/)</li>
+  <li>Interface de configuration 2FA depuis les paramètres</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 6. MODULE CONFIG SYSTÈME                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="sysconfig">6. Module 6 — Config Système <span class="status wip">En cours</span></h1>
+
+<h2>Pages et routes</h2>
+<table>
+  <thead><tr><th>Page</th><th>Route Angular</th><th>Endpoint principal</th><th>Statut</th></tr></thead>
+  <tbody>
+    <tr><td>Packages</td><td>/super-admin/packages</td><td>GET/POST /system/packages/admin/</td><td><span class="status wip">Tests en cours</span></td></tr>
+    <tr><td>Companies</td><td>/super-admin/companies</td><td>GET/POST /system/companies/</td><td><span class="status wip">Tests en cours</span></td></tr>
+    <tr><td>Agences</td><td>/super-admin/agencies</td><td>GET /system/agencies/</td><td><span class="status wip">Tests en cours</span></td></tr>
+    <tr><td>Paramètres</td><td>/settings/system-settings/parameters</td><td>GET/POST /system/parameters/bulk/</td><td><span class="status todo">À tester</span></td></tr>
+    <tr><td>Feature Flags</td><td>/settings/system-settings/feature-flags</td><td>GET + POST /toggle/</td><td><span class="status todo">À tester</span></td></tr>
+  </tbody>
+</table>
+
+<h2>Navigation — Section "Config Système"</h2>
+<p>Une section dédiée <strong>Config Système</strong> a été ajoutée dans la sidebar (<em>sidebar.service.ts</em>), indépendante des menus du template. Elle apparaît dans les deux blocs de layout (vertical et horizontal).</p>
+<table>
+  <thead><tr><th>Entrée menu</th><th>Route</th></tr></thead>
+  <tbody>
+    <tr><td>Companies</td><td>/super-admin/companies</td></tr>
+    <tr><td>Agences</td><td>/super-admin/agencies</td></tr>
+    <tr><td>Packages</td><td>/super-admin/packages</td></tr>
+    <tr><td>Paramètres</td><td>/settings/system-settings/parameters</td></tr>
+    <tr><td>Feature Flags</td><td>/settings/system-settings/feature-flags</td></tr>
+  </tbody>
+</table>
+
+<h2>Page Packages — détail d'implémentation</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Fonctionnalités</div>
+    <ul>
+      <li>4 stat cards (Total / Actifs / Inactifs / Avec API)</li>
+      <li>Tableau trié par date de création desc (<em>-created_at</em>)</li>
+      <li>Recherche par nom en temps réel</li>
+      <li>Création et édition via modal Bootstrap</li>
+      <li>Toggle Actif / Accès API dans le formulaire</li>
+      <li>Désactivation (soft) via modal de confirmation</li>
+      <li>Affichage de tous les packages (actifs + inactifs) pour l'admin</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Points notables</div>
+    <ul>
+      <li>L'unicité est sur <em>name</em> (pas <em>tier</em>) — plusieurs packages peuvent partager le même tier</li>
+      <li>L'admin utilise <em>GET /packages/admin/</em> (tous), le public <em>GET /packages/</em> (actifs seulement)</li>
+      <li>La "suppression" est une désactivation (<em>is_active = False</em>) — le backend ne supprime pas physiquement</li>
+      <li>Les champs texte optionnels sont assainis (<em>?? ''</em>) avant envoi pour éviter <em>null</em> sur les <em>TextField</em> Django</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Modèles TypeScript (system.models.ts)</h2>
+<table>
+  <thead><tr><th>Interface</th><th>Champs principaux</th></tr></thead>
+  <tbody>
+    <tr><td>Package</td><td>id, name, tier, max_users, max_agencies, price_monthly, price_yearly, has_api_access, is_active, description?</td></tr>
+    <tr><td>PackageForm</td><td>name, tier, max_users, max_agencies, price_monthly, price_yearly, has_api_access, is_active, description?</td></tr>
+    <tr><td>Company</td><td>id, name, slug, email, phone, status, package?, subscription?</td></tr>
+    <tr><td>CompanyForm</td><td>name, email, phone, package_id</td></tr>
+    <tr><td>Agency</td><td>id, name, company, parent?, type, is_active</td></tr>
+    <tr><td>AgencyForm</td><td>name, company, parent?, type</td></tr>
+    <tr><td>Parameter</td><td>key, label?, value, data_type, scope, is_active</td></tr>
+    <tr><td>FeatureFlag</td><td>id, key, label?, description?, is_enabled</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 7. ROUTING                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="routing">7. Routing et guards</h1>
+
+<h2>Organisation des routes</h2>
+<table>
+  <thead><tr><th>Fichier</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td>src/app/features/pages/pages.routes.ts</td><td>Routes lazy de toutes les pages (template + nos composants)</td></tr>
+    <tr><td>src/app/core/helpers/routes.ts</td><td>Constantes string pour toutes les routes (utilisées dans sidebar et composants)</td></tr>
+  </tbody>
+</table>
+
+<h2>Constantes de routes ajoutées</h2>
+<table>
+  <thead><tr><th>Constante</th><th>Valeur</th></tr></thead>
+  <tbody>
+    <tr><td>routes.superadminCompanies</td><td>/super-admin/companies</td></tr>
+    <tr><td>routes.superadminPackages</td><td>/super-admin/packages</td></tr>
+    <tr><td>routes.superadminAgencies</td><td>/super-admin/agencies</td></tr>
+    <tr><td>routes.systemParameters</td><td>/settings/system-settings/parameters</td></tr>
+    <tr><td>routes.systemFeatureFlags</td><td>/settings/system-settings/feature-flags</td></tr>
+  </tbody>
+</table>
+
+<h2>Guards</h2>
+<table>
+  <thead><tr><th>Guard</th><th>Fichier</th><th>Comportement</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>authGuard</td>
+      <td>_api/guards/auth.guard.ts</td>
+      <td>Protège les routes authentifiées. Redirige vers /lock-screen si profil en cache mais tokens expirés, sinon vers /signin.</td>
+    </tr>
+    <tr>
+      <td>guestGuard</td>
+      <td>Template (existant)</td>
+      <td>Redirige les utilisateurs connectés qui tentent d'accéder à /signin vers le dashboard.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 8. SIDEBAR                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="sidebar">8. Sidebar et navigation</h1>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>Règle d'or</div>
+  <p>
+    Les menus du template (<em>sidebar.service.ts</em>) sont laissés intacts.
+    Nos entrées sont ajoutées dans une <strong>section dédiée "Config Système"</strong> dans les deux blocs
+    de définition de la sidebar (layout vertical ~ligne 120, layout horizontal ~ligne 2166).
+  </p>
+</div>
+
+<p>La sidebar contient deux blocs distincts (deux layouts) qui doivent être mis à jour en parallèle :</p>
+<ul>
+  <li><strong>Bloc 1</strong> (~ligne 85) : layout vertical, propriétés <em>icon2</em></li>
+  <li><strong>Bloc 2</strong> (~ligne 2126) : layout horizontal/icônes, propriétés <em>icon</em> + <em>materialicons</em> + <em>ids</em></li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 9. MODULES À VENIR                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="modules">9. Modules à venir</h1>
+
+<div class="module-card done">
+  <h3>Module 5 — Authentification ✓</h3>
+  <p>Login, 2FA, logout, lock screen, forgot/reset password, authGuard</p>
+</div>
+<div class="module-card wip">
+  <h3>Module 6 — Config Système (en cours)</h3>
+  <p>Packages, Companies, Agences, Paramètres, Feature Flags — tests en cours</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 7 — Admin RBAC</h3>
+  <p>Rôles, permissions, groupes, assignation utilisateurs</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 8 — Gestion Utilisateurs</h3>
+  <p>CRUD utilisateurs, profils, changement de mot de passe, sessions</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 9 — RH (Ressources Humaines)</h3>
+  <p>Employés, départements, postes, contrats</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 10 — Flotte</h3>
+  <p>Véhicules, types de véhicules, maintenance</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 11 — Config Transport</h3>
+  <p>Lignes, gares, arrêts, tarifs</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 12 — Voyages</h3>
+  <p>Départs, conducteurs, affectations véhicules</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 13 — Ticketing</h3>
+  <p>Réservations, billets, bagages, remboursements</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 14 — Colis</h3>
+  <p>Envois, suivi, tarification colis</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 15 — Trésorerie</h3>
+  <p>Caisses, mouvements, rapprochements</p>
+</div>
+<div class="module-card todo">
+  <h3>Module 16 — Réservation en ligne</h3>
+  <p>API publique, paiement MoMo, confirmation</p>
+</div>
+
+<hr class="sep">
+<p style="color:#888; font-size:12px; text-align:center;">
+  Ce document est mis à jour progressivement au fil du développement.<br>
+  Dernière mise à jour : Juin 2026 — Module 6 en cours de test.
+</p>
+
+</div><!-- /.container -->
+
+<footer>
+  <strong>DreamsPOS ERP</strong> — Documentation Frontend Angular &nbsp;|&nbsp;
+  Confidentiel — Usage interne &nbsp;|&nbsp;
+  Juin 2026
+</footer>
+
+</body>
+</html>

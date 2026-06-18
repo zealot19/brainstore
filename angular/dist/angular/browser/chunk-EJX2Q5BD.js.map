@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/settings/financial-settings/financial-settings.component.ts", "src/app/features/pages/settings/financial-settings/financial-settings.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-financial-settings',\n    templateUrl: './financial-settings.component.html',\n    styleUrls: ['./financial-settings.component.scss'],\n    imports: [RouterModule]\n})\nexport class FinancialSettingsComponent {\n\n}\n", "<router-outlet></router-outlet> \n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,6BAAP,MAAO,4BAA0B;;qCAA1B,6BAA0B;EAAA;yEAA1B,6BAA0B,WAAA,CAAA,CAAA,wBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,oCAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACTvC,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,4BAA0B,CAAA;UANtC;uBACa,0BAAwB,SAGzB,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,4BAA0B,EAAA,WAAA,8BAAA,UAAA,sFAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

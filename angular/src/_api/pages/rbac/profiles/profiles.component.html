@@ -1,0 +1,196 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Profils</h4>
+      <h6>Gérer les profils utilisateurs et leurs rôles</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+  </ul>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profile-modal" (click)="openCreate()">
+      <i class="ti ti-circle-plus me-2"></i>Nouveau profil
+    </a>
+  </div>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+    <div class="search-set">
+      <div class="search-input">
+        <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+        <div class="dataTables_filter">
+          <label>
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Nom…" />
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+      <div class="dropdown me-2">
+        <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
+          {{ filterCompanyId ? companyName(filterCompanyId) : 'Toutes les institutions' }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end p-3" style="max-height:260px;overflow-y:auto">
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterCompanyId=''; onCompanyFilter()">Toutes</a></li>
+          @for (c of companies; track c.id) {
+            <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterCompanyId=c.id; onCompanyFilter()">{{ c.name }}</a></li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Nom</th>
+              <th>Institution</th>
+              <th>Rôles associés</th>
+              <th>Drapeaux</th>
+              <th>Actif</th>
+              <th class="no-sort">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of filtered; track p.id) {
+              <tr>
+                <td class="fw-medium">{{ p.name }}</td>
+                <td>{{ p.company_name ?? 'Système' }}</td>
+                <td>
+                  @if (p.roles.length === 0) {
+                    <span class="text-muted">—</span>
+                  } @else {
+                    @for (r of p.roles; track r.id) {
+                      <span class="badge bg-outline-info me-1">{{ r.name }}</span>
+                    }
+                  }
+                </td>
+                <td>
+                  @if (p.is_default) { <span class="badge bg-outline-success me-1">Défaut</span> }
+                  @if (p.is_system)  { <span class="badge bg-outline-warning">Système</span> }
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="p.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
+                    {{ p.is_active ? 'Actif' : 'Inactif' }}
+                  </span>
+                </td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action d-flex align-items-center">
+                    <a href="javascript:void(0);"
+                       class="me-2 p-2 d-flex align-items-center border rounded"
+                       data-bs-toggle="modal" data-bs-target="#profile-roles-modal"
+                       (click)="openRoles(p)" title="Gérer les rôles">
+                      <i class="ti ti-users-group"></i>
+                    </a>
+                    @if (!p.is_system) {
+                      <a href="javascript:void(0);"
+                         class="me-2 p-2 d-flex align-items-center border rounded"
+                         data-bs-toggle="modal" data-bs-target="#profile-modal"
+                         (click)="openEdit(p)" title="Modifier">
+                        <i class="ti ti-pencil"></i>
+                      </a>
+                      <a href="javascript:void(0);"
+                         class="p-2 d-flex align-items-center border rounded"
+                         (click)="delete(p)" title="Supprimer">
+                        <i class="ti ti-trash text-danger"></i>
+                      </a>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="text-center py-4 text-muted">Aucun profil trouvé.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Créer / Modifier profil -->
+<div class="modal fade" id="profile-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Nouveau' }} profil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+
+          <div class="mb-3">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input formControlName="name" type="text" class="form-control" placeholder="Ex : Comptable, Caissier, Manager…" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea formControlName="description" class="form-control" rows="3" placeholder="Description optionnelle…"></textarea>
+          </div>
+
+          <div class="mb-3 d-flex align-items-center gap-2">
+            <div class="status-toggle">
+              <input type="checkbox" id="profile-is-default" class="check" formControlName="is_default" />
+              <label for="profile-is-default" class="checktoggle"></label>
+            </div>
+            <label class="form-label mb-0">Profil par défaut <small class="text-muted">(attribué automatiquement aux nouveaux utilisateurs)</small></label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            {{ editId ? 'Enregistrer' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Rôles du profil -->
+<div class="modal fade" id="profile-roles-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rôles — {{ roleProfile?.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="max-height:460px;overflow-y:auto">
+        @if (rolesErrorMsg) { <div class="alert alert-danger py-2">{{ rolesErrorMsg }}</div> }
+        @if (allRoles.length === 0) {
+          <p class="text-muted text-center py-4">Aucun rôle disponible.</p>
+        } @else {
+          @for (r of allRoles; track r.id) {
+            <label class="d-flex align-items-center gap-3 border rounded p-2 mb-2 cursor-pointer">
+              <input type="checkbox" class="form-check-input"
+                     [checked]="selectedRoleIds.has(r.id)"
+                     (change)="toggleRole(r.id)">
+              <div>
+                <span class="fw-medium">{{ r.name }}</span>
+                @if (r.is_system) { <span class="badge bg-outline-warning ms-1">Système</span> }
+                @if (r.company_name) { <span class="text-muted fs-13 ms-1">— {{ r.company_name }}</span> }
+              </div>
+            </label>
+          }
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="saveRoles()" [disabled]="savingRoles">
+          @if (savingRoles) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-device-floppy me-1"></i>Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

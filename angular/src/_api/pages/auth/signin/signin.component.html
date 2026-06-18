@@ -1,0 +1,110 @@
+<div class="account-content">
+  <div class="login-wrapper bg-img">
+    <div class="login-content authent-content">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="login-userset">
+
+          <div class="login-logo logo-normal">
+            <img src="assets/img/logo.png" alt="DreamsPOS">
+          </div>
+          <a [routerLink]="routes.adminDashboard" class="login-logo logo-white">
+            <img src="assets/img/logo-white.png" alt="">
+          </a>
+
+          <div class="login-userheading">
+            <h3>Sign In</h3>
+            <h4>Access the Dreamspos panel using your email and passcode.</h4>
+          </div>
+
+          <!-- Alerte erreur -->
+          <div class="alert alert-danger py-2 mb-3" *ngIf="errorMsg">
+            <i class="ti ti-alert-circle me-1"></i>{{ errorMsg }}
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label">Email<span class="text-danger">*</span></label>
+            <div class="input-group">
+              <input type="email" class="form-control border-end-0"
+                     formControlName="email" placeholder="admin@dreamspos.com"
+                     [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
+              <span class="input-group-text border-start-0"><i class="ti ti-mail"></i></span>
+            </div>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="mb-3">
+            <label class="form-label">Password<span class="text-danger">*</span></label>
+            <div class="pass-group">
+              <input [type]="showPassword ? 'text' : 'password'"
+                     class="pass-input form-control" formControlName="password"
+                     [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+              <span class="ti toggle-password text-gray-9"
+                    [ngClass]="showPassword ? 'ti-eye' : 'ti-eye-off'"
+                    (click)="showPassword = !showPassword"></span>
+            </div>
+          </div>
+
+          <!-- Remember me / Forgot -->
+          <div class="form-login authentication-check">
+            <div class="row">
+              <div class="col-12 d-flex align-items-center justify-content-between">
+                <div class="custom-control custom-checkbox custom-class-check">
+                  <label class="checkboxs ps-4 mb-0 pb-0 line-height-1">
+                    <input type="checkbox" class="form-control">
+                    <span class="checkmarks"></span>Remember me
+                  </label>
+                </div>
+                <div class="text-end">
+                  <a class="text-orange fs-16 fw-medium" [routerLink]="routes.forgotPassword">
+                    Forgot Password?
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton login -->
+          <div class="form-login">
+            <button type="submit" class="btn btn-login" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              Sign In
+            </button>
+          </div>
+
+          <div class="signinform">
+            <h4>New on our platform?
+              <a [routerLink]="routes.register" class="hover-a"> Create an account</a>
+            </h4>
+          </div>
+
+          <div class="form-setlogin or-text"><h4>OR</h4></div>
+
+          <div class="form-sociallink mt-2">
+            <ul class="d-flex justify-content-center row-gap-2">
+              <li>
+                <a href="javascript:void(0);" class="facebook-logo">
+                  <img src="assets/img/icons/facebook-logo.svg" alt="Facebook">
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);">
+                  <img src="assets/img/icons/google.png" alt="Google">
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);" class="apple-logo">
+                  <img src="assets/img/icons/apple-logo.svg" alt="Apple">
+                </a>
+              </li>
+            </ul>
+            <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
+              <p>Copyright &copy; 2025 DreamsPOS</p>
+            </div>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

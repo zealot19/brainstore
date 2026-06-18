@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/_api/services/auth/password.service.ts"],
+  "sourcesContent": ["import { Injectable } from '@angular/core';\nimport { HttpClient } from '@angular/common/http';\nimport { Observable } from 'rxjs';\nimport { AUTH } from '../../config/api.config';\nimport {\n  PasswordResetRequest,\n  PasswordResetConfirm,\n  ChangePasswordRequest,\n} from '../../models/auth.models';\n\n@Injectable({ providedIn: 'root' })\nexport class PasswordService {\n\n  constructor(private http: HttpClient) {}\n\n  requestReset(data: PasswordResetRequest): Observable<unknown> {\n    return this.http.post(AUTH.passwordReset, data);\n  }\n\n  confirmReset(data: PasswordResetConfirm): Observable<unknown> {\n    return this.http.post(AUTH.passwordResetConfirm, data);\n  }\n\n  changePassword(data: ChangePasswordRequest): Observable<unknown> {\n    return this.http.post(AUTH.changePassword, data);\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;AAWM,IAAO,kBAAP,MAAO,iBAAe;EAEN;EAApB,YAAoB,MAAgB;AAAhB,SAAA,OAAA;EAAmB;EAEvC,aAAa,MAA0B;AACrC,WAAO,KAAK,KAAK,KAAK,KAAK,eAAe,IAAI;EAChD;EAEA,aAAa,MAA0B;AACrC,WAAO,KAAK,KAAK,KAAK,KAAK,sBAAsB,IAAI;EACvD;EAEA,eAAe,MAA2B;AACxC,WAAO,KAAK,KAAK,KAAK,KAAK,gBAAgB,IAAI;EACjD;;qCAdW,kBAAe,mBAAA,UAAA,CAAA;EAAA;4EAAf,kBAAe,SAAf,iBAAe,WAAA,YADF,OAAM,CAAA;;;sEACnB,iBAAe,CAAA;UAD3B;WAAW,EAAE,YAAY,OAAM,CAAE;;;",
+  "names": []
+}

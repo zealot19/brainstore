@@ -1,0 +1,127 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Rôles</h4>
+      <h6>Gérer les rôles et leurs permissions</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+  </ul>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#role-modal" (click)="openCreate()">
+      <i class="ti ti-circle-plus me-2"></i>Nouveau rôle
+    </a>
+  </div>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+    <div class="search-set">
+      <div class="search-input">
+        <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+        <div class="dataTables_filter">
+          <label>
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Nom…" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Nom</th>
+              <th>Description</th>
+              <th>Permissions</th>
+              <th>Type</th>
+              <th class="no-sort">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of filtered; track r.id) {
+              <tr>
+                <td class="fw-medium">{{ r.name }}</td>
+                <td class="text-muted">{{ r.description || '—' }}</td>
+                <td>
+                  <span class="badge bg-outline-info">{{ r.permissions.length }} permission{{ r.permissions.length !== 1 ? 's' : '' }}</span>
+                </td>
+                <td>
+                  @if (r.is_system) {
+                    <span class="badge bg-outline-warning">Système</span>
+                  } @else {
+                    <span class="badge bg-outline-secondary">Standard</span>
+                  }
+                </td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action d-flex align-items-center">
+                    <a href="javascript:void(0);"
+                       class="me-2 p-2 d-flex align-items-center border rounded"
+                       (click)="goToPermissions(r)" title="Gérer les permissions">
+                      <i class="ti ti-shield-check"></i>
+                    </a>
+                    @if (!r.is_system) {
+                      <a href="javascript:void(0);"
+                         class="me-2 p-2 d-flex align-items-center border rounded"
+                         data-bs-toggle="modal" data-bs-target="#role-modal"
+                         (click)="openEdit(r)" title="Modifier">
+                        <i class="ti ti-pencil"></i>
+                      </a>
+                      <a href="javascript:void(0);"
+                         class="p-2 d-flex align-items-center border rounded"
+                         (click)="delete(r)" title="Supprimer">
+                        <i class="ti ti-trash text-danger"></i>
+                      </a>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="text-center py-4 text-muted">Aucun rôle trouvé.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Créer / Modifier rôle -->
+<div class="modal fade" id="role-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Nouveau' }} rôle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+
+          <div class="mb-3">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input formControlName="name" type="text" class="form-control" placeholder="Ex : Caissier, Comptable…" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea formControlName="description" class="form-control" rows="3" placeholder="Description optionnelle…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            {{ editId ? 'Enregistrer' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

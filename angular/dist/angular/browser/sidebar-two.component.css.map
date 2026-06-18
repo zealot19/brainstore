@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/layouts/sidebar-two/sidebar-two.component.scss"],
+  "sourcesContent": [".ng-scrollbar[_nghost-ng-c1997982448]{\n  position: inherit !important;\n}\n  \n"],
+  "mappings": ";AAAA,CAAA,YAAA,CAAA;AACE,YAAA;;",
+  "names": []
+}

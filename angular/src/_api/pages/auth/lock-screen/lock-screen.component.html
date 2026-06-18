@@ -1,0 +1,60 @@
+<div class="login-wrapper position-relative">
+  <div class="container">
+    <img class="img-fluid logo-dark mb-5" src="assets/img/logo.svg" alt="Logo">
+
+    <div class="loginbox">
+      <div class="login-right">
+        <div class="login-right-wrap">
+
+          <div class="login-info">
+            <p class="account-subtitle">Welcome back!</p>
+
+            <!-- Avatar ou initiales -->
+            <ng-container *ngIf="user?.avatar; else initials">
+              <img [src]="user!.avatar" class="img-fluid rounded-circle mb-2"
+                   style="width:80px;height:80px;object-fit:cover;" alt="Avatar">
+            </ng-container>
+            <ng-template #initials>
+              <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold mb-2"
+                   style="width:80px;height:80px;font-size:28px;margin:0 auto;">
+                {{ userInitials }}
+              </div>
+            </ng-template>
+
+            <h5>{{ user?.full_name ?? (user?.first_name + ' ' + user?.last_name) }}</h5>
+            <p class="text-muted small">{{ user?.email }}</p>
+          </div>
+
+          <!-- Erreur -->
+          <div class="alert alert-danger py-2 mb-3" *ngIf="errorMsg">
+            <i class="ti ti-alert-circle me-1"></i>{{ errorMsg }}
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="input-blocks mb-3">
+              <div class="pass-group">
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="pass-input form-control" formControlName="password"
+                       placeholder="Enter your password">
+                <span class="ti toggle-password text-gray-9"
+                      [ngClass]="showPassword ? 'ti-eye' : 'ti-eye-off'"
+                      (click)="showPassword = !showPassword"></span>
+              </div>
+            </div>
+
+            <button class="btn btn-lg btn-block btn-primary w-100"
+                    type="submit" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              Log In
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
+      <p>Copyright &copy; 2025 DreamsPOS. All rights reserved</p>
+    </div>
+  </div>
+</div>

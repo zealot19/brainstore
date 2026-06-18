@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/ui-interface/forms/form-pickers/form-pickers.component.scss"],
+  "sourcesContent": [".p-calendar .p-inputtext{\n    max-height: 37px;\n}"],
+  "mappings": ";AAAA,CAAA,WAAA,CAAA;AACI,cAAA;;",
+  "names": []
+}

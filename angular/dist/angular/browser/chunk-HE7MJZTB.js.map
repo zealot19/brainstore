@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/hrm/leaves/leaves.component.ts", "src/app/features/pages/hrm/leaves/leaves.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-leaves',\n    templateUrl: './leaves.component.html',\n    styleUrl: './leaves.component.scss',\n    imports: [RouterModule]\n})\nexport class LeavesComponent {\n\n}\n", "<router-outlet></router-outlet> \n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,kBAAP,MAAO,iBAAe;;qCAAf,kBAAe;EAAA;yEAAf,kBAAe,WAAA,CAAA,CAAA,YAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,yBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT5B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,iBAAe,CAAA;UAN3B;uBACa,cAAY,SAGb,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,iBAAe,EAAA,WAAA,mBAAA,UAAA,yDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

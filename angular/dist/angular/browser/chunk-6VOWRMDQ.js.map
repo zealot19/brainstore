@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/settings/system-settings/system-settings.component.ts", "src/app/features/pages/settings/system-settings/system-settings.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-system-settings',\n    templateUrl: './system-settings.component.html',\n    styleUrls: ['./system-settings.component.scss'],\n    imports: [RouterModule]\n})\nexport class SystemSettingsComponent {\n\n}\n", "<router-outlet></router-outlet>"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,0BAAP,MAAO,yBAAuB;;qCAAvB,0BAAuB;EAAA;yEAAvB,0BAAuB,WAAA,CAAA,CAAA,qBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,iCAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACTpC,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,yBAAuB,CAAA;UANnC;uBACa,uBAAqB,SAGtB,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,yBAAuB,EAAA,WAAA,2BAAA,UAAA,gFAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

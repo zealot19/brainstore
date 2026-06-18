@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/settings/general-settings/general-settings.component.ts", "src/app/features/pages/settings/general-settings/general-settings.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-general-settings',\n    templateUrl: './general-settings.component.html',\n    styleUrls: ['./general-settings.component.scss'],\n    imports: [RouterModule]\n})\nexport class GeneralSettingsComponent {\n\n}\n", "<router-outlet></router-outlet>"],
+  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,2BAAP,MAAO,0BAAwB;;qCAAxB,2BAAwB;EAAA;yEAAxB,2BAAwB,WAAA,CAAA,CAAA,sBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,kCAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACTrC,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,0BAAwB,CAAA;UANpC;uBACa,wBAAsB,SAGvB,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,0BAAwB,EAAA,WAAA,4BAAA,UAAA,kFAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

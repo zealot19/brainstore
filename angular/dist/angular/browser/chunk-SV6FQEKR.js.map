@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/pages/ui-interface/charts/charts.component.ts", "src/app/features/pages/ui-interface/charts/charts.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-charts',\n    templateUrl: './charts.component.html',\n    styleUrls: ['./charts.component.scss'],\n    imports: [RouterModule]\n})\nexport class ChartsComponent {\n\n   \n\n \n\n}\n", "<router-outlet></router-outlet> \n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,kBAAP,MAAO,iBAAe;;qCAAf,kBAAe;EAAA;yEAAf,kBAAe,WAAA,CAAA,CAAA,YAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,yBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV5B,MAAA,oBAAA,GAAA,eAAA;;oBDQc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,iBAAe,CAAA;UAN3B;uBACa,cAAY,SAGb,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,iBAAe,EAAA,WAAA,mBAAA,UAAA,kEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}
