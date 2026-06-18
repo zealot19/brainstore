@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Description Fonctionnelle — Administration ERP Multi-Tenant</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #1a1a2e;
+      background: #f4f6fb;
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 48px 60px;
+    }
+
+    /* ── Cover ── */
+    .cover {
+      text-align: center;
+      padding: 80px 0 60px;
+      border-bottom: 3px solid #16213e;
+      margin-bottom: 56px;
+    }
+    .cover .badge {
+      display: inline-block;
+      background: #0f3460;
+      color: #e2e8f0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .cover h1 {
+      font-size: 30px;
+      font-weight: 800;
+      color: #0f3460;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+    .cover h2 {
+      font-size: 17px;
+      font-weight: 400;
+      color: #4a5568;
+      margin-bottom: 32px;
+    }
+    .cover .meta {
+      font-size: 12px;
+      color: #718096;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    /* ── Table of Contents ── */
+    .toc {
+      background: #f7faff;
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      padding: 28px 36px;
+      margin-bottom: 48px;
+      page-break-after: always;
+    }
+    .toc h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f3460;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 8px;
+    }
+    .toc ol { padding-left: 20px; }
+    .toc li { padding: 4px 0; color: #2d3748; font-size: 13px; }
+    .toc li a { color: #0f3460; text-decoration: none; }
+    .toc li a:hover { text-decoration: underline; }
+    .toc .sub { list-style-type: disc; margin-top: 4px; padding-left: 18px; color: #4a5568; font-size: 12px; }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin: 48px 0 24px;
+      page-break-before: always;
+    }
+    .section-title:first-of-type { page-break-before: avoid; }
+    .section-title .num {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 1px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f3460;
+      margin: 24px 0 10px;
+      padding-left: 10px;
+      border-left: 3px solid #0f3460;
+    }
+
+    h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 18px 0 8px;
+    }
+
+    p { margin-bottom: 10px; color: #2d3748; }
+
+    /* ── Architecture box ── */
+    .arch-box {
+      background: #16213e;
+      color: #a0aec0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      padding: 20px 24px;
+      border-radius: 8px;
+      margin: 16px 0;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .arch-box .hl { color: #63b3ed; font-weight: bold; }
+    .arch-box .hl2 { color: #68d391; }
+    .arch-box .hl3 { color: #f6ad55; }
+    .arch-box .hl4 { color: #fc8181; }
+
+    /* ── Code block ── */
+    .code {
+      background: #1a202c;
+      color: #e2e8f0;
+      font-family: 'Courier New', monospace;
+      font-size: 11.5px;
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin: 12px 0;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.55;
+      border-left: 4px solid #0f3460;
+    }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 12.5px;
+    }
+    thead th {
+      background: #0f3460;
+      color: #fff;
+      font-weight: 700;
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 12px;
+    }
+    tbody tr:nth-child(even) { background: #f7faff; }
+    tbody tr:hover { background: #ebf4ff; }
+    tbody td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .tag {
+      display: inline-block;
+      background: #ebf8ff;
+      color: #0f3460;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-family: monospace;
+    }
+
+    /* ── Info boxes ── */
+    .info-box {
+      border-left: 4px solid #0f3460;
+      background: #ebf8ff;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 12.5px;
+      color: #2d3748;
+    }
+    .warn-box {
+      border-left: 4px solid #e53e3e;
+      background: #fff5f5;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 12.5px;
+      color: #2d3748;
+    }
+    .success-box {
+      border-left: 4px solid #38a169;
+      background: #f0fff4;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 12.5px;
+      color: #2d3748;
+    }
+
+    /* ── Level boxes (3 niveaux) ── */
+    .levels {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      border: 2px solid #0f3460;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .level {
+      padding: 14px 20px;
+      border-bottom: 1px solid #0f3460;
+    }
+    .level:last-child { border-bottom: none; }
+    .level.l1 { background: #0f3460; color: #fff; }
+    .level.l2 { background: #1a4a7a; color: #e2e8f0; }
+    .level.l3 { background: #2a5a9a; color: #dbeafe; }
+    .level strong { font-size: 13px; display: block; margin-bottom: 4px; }
+    .level span { font-size: 12px; opacity: 0.85; }
+
+    /* ── Status badges ── */
+    .badge-green  { display:inline-block; background:#c6f6d5; color:#276749; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+    .badge-blue   { display:inline-block; background:#bee3f8; color:#0f3460; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+    .badge-orange { display:inline-block; background:#feebc8; color:#7b341e; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+    .badge-red    { display:inline-block; background:#fed7d7; color:#742a2a; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+
+    /* ── Summary card grid ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .summary-card {
+      background: #f7faff;
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .summary-card .card-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f3460;
+      line-height: 1;
+    }
+    .summary-card .card-label {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Flow ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    .flow-step {
+      background: #0f3460;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .flow-arrow { color: #0f3460; font-size: 16px; font-weight: bold; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+
+    /* ── Print styles ── */
+    @media print {
+      body { background: #fff; font-size: 11px; }
+      .page { padding: 20px 30px; max-width: 100%; }
+      .section-title { page-break-before: always; }
+      .toc { page-break-after: always; }
+      .cover { page-break-after: always; }
+      .arch-box, .code { font-size: 10px; }
+      table { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════
+       COVER
+  ═══════════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="badge">ERP Multi-Tenant · Django Backend · Angular Frontend</div>
+    <h1>Description Fonctionnelle<br>Administration ERP</h1>
+    <h2>Gestion des packages, institutions, agences, profils,<br>modules, menus, permissions, utilisateurs et authentification</h2>
+    <div class="meta">
+      <strong>DreamsPOS ERP</strong> &nbsp;·&nbsp; Version 1.0 &nbsp;·&nbsp; Juin 2026<br>
+      Architecture : Services / Selectors · REST API Django → Angular · Multi-Tenant
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TABLE OF CONTENTS
+  ═══════════════════════════════════════════════ -->
+  <div class="toc">
+    <h2>Table des matières</h2>
+    <ol>
+      <li><a href="#niveaux">Vue d'ensemble — Les 3 niveaux d'administration</a></li>
+      <li><a href="#packages">Gestion des Packages</a>
+        <ul class="sub">
+          <li>Catalogue de packages · Souscriptions · Gestion des limites</li>
+        </ul>
+      </li>
+      <li><a href="#institutions">Gestion des Institutions (Tenants)</a>
+        <ul class="sub">
+          <li>Fiche institution · Configuration régionale et comptable · Statuts</li>
+        </ul>
+      </li>
+      <li><a href="#agences">Gestion des Agences / Filiales</a>
+        <ul class="sub">
+          <li>Hiérarchie · Fiche agence · Comptabilité inter-agences</li>
+        </ul>
+      </li>
+      <li><a href="#modules">Gestion des Modules</a>
+        <ul class="sub">
+          <li>Catalogue · Dépendances · Cycle de vie · Configuration par institution</li>
+        </ul>
+      </li>
+      <li><a href="#menus">Gestion des Menus</a>
+        <ul class="sub">
+          <li>Structure · Attributs · Personnalisation · Favoris</li>
+        </ul>
+      </li>
+      <li><a href="#profils">Gestion des Profils (Rôles)</a>
+        <ul class="sub">
+          <li>Types · Héritage · Clonage · Matrix de permissions</li>
+        </ul>
+      </li>
+      <li><a href="#permissions">Gestion des Permissions</a>
+        <ul class="sub">
+          <li>4 niveaux · CRUD · Champs · Record rules · Audit</li>
+        </ul>
+      </li>
+      <li><a href="#utilisateurs">Gestion des Utilisateurs</a>
+        <ul class="sub">
+          <li>Fiche · Cycle de vie · Invitation · Comptes API</li>
+        </ul>
+      </li>
+      <li><a href="#auth">Authentification</a>
+        <ul class="sub">
+          <li>Login/MDP · 2FA · JWT · SSO · Sessions · Récupération</li>
+        </ul>
+      </li>
+      <li><a href="#transversal">Fonctionnalités transversales</a>
+        <ul class="sub">
+          <li>Audit trail · Tableaux de bord · Paramètres · Notifications · Mode maintenance</li>
+        </ul>
+      </li>
+      <li><a href="#modeles">Récapitulatif — Modèles de données clés</a></li>
+    </ol>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       0. VUE D'ENSEMBLE
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="niveaux">
+    <span class="num">00</span> Vue d'ensemble — Les 3 niveaux d'administration
+  </div>
+
+  <p>L'administration de l'ERP est organisée en trois niveaux hiérarchiques distincts, chacun avec son périmètre de responsabilité et ses droits spécifiques.</p>
+
+  <div class="levels">
+    <div class="level l1">
+      <strong>NIVEAU 1 — SUPER ADMIN (Éditeur de la plateforme)</strong>
+      <span>Gère : Packages · Institutions · Paramètres globaux · Supervision de la plateforme</span>
+    </div>
+    <div class="level l2">
+      <strong>NIVEAU 2 — ADMIN INSTITUTION (Client ERP)</strong>
+      <span>Gère : Agences · Modules · Profils · Utilisateurs · Configuration de son tenant</span>
+    </div>
+    <div class="level l3">
+      <strong>NIVEAU 3 — ADMIN AGENCE (optionnel)</strong>
+      <span>Gère : Utilisateurs locaux · Configuration spécifique à l'agence</span>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="card-num">10</div>
+      <div class="card-label">Domaines fonctionnels</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-num">4</div>
+      <div class="card-label">Niveaux de permissions</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-num">3</div>
+      <div class="card-label">Méthodes 2FA supportées</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-num">∞</div>
+      <div class="card-label">Niveaux d'agences</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-num">3</div>
+      <div class="card-label">Stratégies SSO (OAuth2, SAML, LDAP)</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-num">100%</div>
+      <div class="card-label">Traçabilité audit trail</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       1. PACKAGES
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="packages">
+    <span class="num">01</span> Gestion des Packages
+  </div>
+
+  <p>Un <strong>package</strong> est l'offre commerciale souscrite par une institution. Il définit les modules accessibles, les limites d'usage et les conditions tarifaires.</p>
+
+  <h3>1.1 Catalogue de packages</h3>
+  <p>Chaque package est une offre commerciale avec les attributs suivants :</p>
+
+  <table>
+    <thead><tr><th>Attribut</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag">Nom</span></td><td>Starter / Professional / Enterprise / Custom</td></tr>
+      <tr><td><span class="tag">Modules inclus</span></td><td>Liste des modules activables avec ce package</td></tr>
+      <tr><td><span class="tag">Limites</span></td><td>Nombre max d'utilisateurs, d'agences, stockage fichiers (Go)</td></tr>
+      <tr><td><span class="tag">Durée</span></td><td>Mensuel / Annuel / Perpétuel</td></tr>
+      <tr><td><span class="tag">Prix</span></td><td>Tarification par tranche d'utilisateurs</td></tr>
+      <tr><td><span class="tag">Support</span></td><td>Niveau de support inclus (email, téléphone, dédié)</td></tr>
+      <tr><td><span class="tag">Statut</span></td><td><span class="badge-green">Actif</span> <span class="badge-orange">En test</span> <span class="badge-red">Archivé</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 Souscriptions</h3>
+  <p>Chaque institution est liée à une souscription active qui évolue dans le temps :</p>
+
+  <div class="flow">
+    <div class="flow-step">Essai</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Actif</div>
+    <div class="flow-arrow">⇄</div>
+    <div class="flow-step">Suspendu</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Résilié</div>
+  </div>
+
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Package souscrit, date de début, date d'expiration</li>
+    <li>Nombre d'utilisateurs actifs vs limite du package</li>
+    <li>Alertes automatiques à J-30, J-7 et J-0 avant expiration</li>
+    <li>Upgrade / downgrade de package possible à tout moment</li>
+    <li>Historique complet de toutes les souscriptions</li>
+  </ul>
+
+  <h3>1.3 Gestion des limites</h3>
+  <div class="warn-box">
+    <strong>Dépassement de quota :</strong> Blocage automatique à l'atteinte du quota utilisateurs. Alerte à 80% du quota de stockage. Mode dégradé (lecture seule) en cas de suspension. Fenêtre de grâce configurable après expiration.
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       2. INSTITUTIONS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="institutions">
+    <span class="num">02</span> Gestion des Institutions (Tenants)
+  </div>
+
+  <p>L'<strong>institution</strong> est l'entité racine du tenant — l'entreprise cliente qui utilise l'ERP. Toutes les données, agences et utilisateurs lui appartiennent.</p>
+
+  <h3>2.1 Informations légales</h3>
+  <table>
+    <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Raison sociale</td><td>Nom officiel de l'entité légale</td></tr>
+      <tr><td>Forme juridique</td><td>SA, SARL, SAS, Association, ONG…</td></tr>
+      <tr><td>Capital social</td><td>Montant en devise locale</td></tr>
+      <tr><td>RCCM / IFU / NIF</td><td>Numéros d'enregistrement officiels</td></tr>
+      <tr><td>CNPS / Numéro TVA</td><td>Identifiants fiscaux et sociaux</td></tr>
+      <tr><td>Secteur d'activité</td><td>Classification sectorielle</td></tr>
+      <tr><td>Date de création</td><td>Date d'incorporation légale</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 Configuration régionale</h3>
+  <table>
+    <thead><tr><th>Paramètre</th><th>Valeurs possibles</th></tr></thead>
+    <tbody>
+      <tr><td>Pays / Région</td><td>ISO 3166 — détermine les règles fiscales</td></tr>
+      <tr><td>Langue par défaut</td><td>Français, Anglais, Arabe…</td></tr>
+      <tr><td>Fuseau horaire</td><td>Africa/Abidjan, Europe/Paris…</td></tr>
+      <tr><td>Devise principale</td><td>XOF, EUR, USD, MAD…</td></tr>
+      <tr><td>Devises secondaires</td><td>Devises acceptées pour les transactions</td></tr>
+      <tr><td>Format de date</td><td>DD/MM/YYYY · MM/DD/YYYY · YYYY-MM-DD</td></tr>
+      <tr><td>Séparateurs</td><td>Décimal et milliers selon la locale</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 Configuration comptable</h3>
+  <table>
+    <thead><tr><th>Paramètre</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Plan comptable</td><td>OHADA, SYSCOHADA, PCG français, IFRS…</td></tr>
+      <tr><td>Exercice fiscal</td><td>Date de début et de fin (ex: 01/01 – 31/12)</td></tr>
+      <tr><td>Valorisation stocks</td><td>FIFO, CMUP (Coût Moyen Unitaire Pondéré)</td></tr>
+      <tr><td>Régime fiscal</td><td>Réel normal / Simplifié / Micro-entreprise</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.4 Statuts de l'institution</h3>
+  <div class="flow">
+    <div class="flow-step">En création</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Active</div>
+    <div class="flow-arrow">⇄</div>
+    <div class="flow-step">Suspendue</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Résiliée</div>
+  </div>
+
+  <div class="info-box">
+    <strong>Administrateur de l'institution :</strong> Désigné lors de la création du tenant par le Super Admin. Peut déléguer à plusieurs co-administrateurs. Le Super Admin peut prendre la main (impersonation) avec journalisation complète de l'action.
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       3. AGENCES
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="agences">
+    <span class="num">03</span> Gestion des Agences / Filiales
+  </div>
+
+  <p>Une institution peut être organisée en plusieurs entités géographiques ou fonctionnelles, formant une hiérarchie illimitée.</p>
+
+  <h3>3.1 Structure hiérarchique</h3>
+  <div class="arch-box"><span class="hl">Institution (Siège)</span>
+├── <span class="hl2">Agence Nord</span>
+│   ├── Sous-agence Ville A
+│   └── Sous-agence Ville B
+├── <span class="hl2">Agence Sud</span>
+└── <span class="hl3">Filiale XYZ</span>  ← entité légalement distincte</div>
+
+  <h3>3.2 Fiche agence</h3>
+  <table>
+    <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Nom</td><td>Nom complet de l'agence ou filiale</td></tr>
+      <tr><td>Code agence</td><td>Code unique dans l'institution (ex: AGC-NORD-01)</td></tr>
+      <tr><td>Type</td><td>Agence / Filiale / Dépôt / Entrepôt / Bureau de représentation</td></tr>
+      <tr><td>Adresse</td><td>Adresse complète, téléphone, email</td></tr>
+      <tr><td>Responsable</td><td>Lié à un utilisateur de l'institution</td></tr>
+      <tr><td>Agence mère</td><td>Parent dans la hiérarchie (null = siège)</td></tr>
+      <tr><td>Devise locale</td><td>Si différente de la devise de l'institution</td></tr>
+      <tr><td>Statut</td><td><span class="badge-green">Actif</span> <span class="badge-orange">En ouverture</span> <span class="badge-red">Fermé</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.3 Comptabilité inter-agences</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Chaque agence peut hériter du plan de comptes du siège ou avoir le sien</li>
+    <li>Consolidation financière disponible au niveau institution</li>
+    <li>Transactions inter-agences avec piste d'audit complète</li>
+    <li>Rapports disponibles par agence ou consolidés (toutes agences)</li>
+  </ul>
+
+  <h3>3.4 Accès par agence</h3>
+  <div class="info-box">
+    Un utilisateur peut être assigné à <strong>une ou plusieurs agences</strong>. À la connexion, il choisit son agence active. Les données sont automatiquement filtrées selon cette agence. Certains profils (direction, audit) voient toutes les agences sans restriction.
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       4. MODULES
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="modules">
+    <span class="num">04</span> Gestion des Modules
+  </div>
+
+  <p>Un module est une brique fonctionnelle de l'ERP, installable et configurable indépendamment par chaque institution selon son package.</p>
+
+  <h3>4.1 Catalogue de modules</h3>
+  <table>
+    <thead><tr><th>Module</th><th>Description</th><th>Dépendances</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag">core</span></td><td>Fondation — toujours actif</td><td>—</td></tr>
+      <tr><td><span class="tag">hr</span></td><td>Ressources humaines</td><td>core</td></tr>
+      <tr><td><span class="tag">payroll</span></td><td>Paie et bulletins de salaire</td><td>hr</td></tr>
+      <tr><td><span class="tag">fleet</span></td><td>Gestion de flotte de véhicules</td><td>core</td></tr>
+      <tr><td><span class="tag">finance</span></td><td>Comptabilité générale et auxiliaire</td><td>core</td></tr>
+      <tr><td><span class="tag">inventory</span></td><td>Stocks et entrepôts</td><td>core</td></tr>
+      <tr><td><span class="tag">sales</span></td><td>Ventes et CRM</td><td>core, inventory</td></tr>
+      <tr><td><span class="tag">purchase</span></td><td>Achats et approvisionnements</td><td>core, inventory</td></tr>
+      <tr><td><span class="tag">projects</span></td><td>Gestion de projets et tâches</td><td>core, hr</td></tr>
+      <tr><td><span class="tag">assets</span></td><td>Gestion des immobilisations</td><td>finance</td></tr>
+      <tr><td><span class="tag">budget</span></td><td>Budgets et prévisions financières</td><td>finance</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 Cycle de vie d'un module</h3>
+  <div class="flow">
+    <div class="flow-step">Disponible</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Installé</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Actif</div>
+    <div class="flow-arrow">⇄</div>
+    <div class="flow-step">Désactivé</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Désinstallé</div>
+  </div>
+
+  <table>
+    <thead><tr><th>Étape</th><th>Ce qui se passe</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Installation</strong></td><td>Vérifie les dépendances, exécute les migrations, charge les données initiales (types, catégories, paramètres par défaut)</td></tr>
+      <tr><td><strong>Activation</strong></td><td>Rend les fonctionnalités accessibles aux utilisateurs autorisés</td></tr>
+      <tr><td><strong>Désactivation</strong></td><td>Masque l'accès sans supprimer les données</td></tr>
+      <tr><td><strong>Désinstallation</strong></td><td>Supprime les données (confirmation obligatoire + sauvegarde recommandée)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>Règle de dépendance :</strong> L'installation d'un module installe automatiquement ses dépendances. La désinstallation d'un module est bloquée si d'autres modules en dépendent.
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       5. MENUS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="menus">
+    <span class="num">05</span> Gestion des Menus
+  </div>
+
+  <h3>5.1 Structure arborescente</h3>
+  <div class="arch-box"><span class="hl">Menu principal (sidebar Angular)</span>
+├── <span class="hl2">Module HR</span>
+│   ├── Tableau de bord RH
+│   ├── Employés
+│   │   ├── Liste des employés
+│   │   ├── Organigramme
+│   │   └── Archivés
+│   ├── Contrats
+│   └── <span class="hl3">Configuration RH</span>  ← réservé aux admins
+│       ├── Types de contrats
+│       ├── Grades et échelons
+│       └── Départements
+└── <span class="hl2">Module Finance</span>
+    └── …</div>
+
+  <h3>5.2 Attributs d'un élément de menu</h3>
+  <table>
+    <thead><tr><th>Attribut</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Libellé</td><td>Texte affiché dans l'interface (traduisible)</td></tr>
+      <tr><td>Icône</td><td>Identifiant d'icône (Material Icons / FontAwesome)</td></tr>
+      <tr><td>Type</td><td>Groupe (conteneur) / Lien (action) / Séparateur</td></tr>
+      <tr><td>Route Angular</td><td>URL de navigation dans l'application Angular</td></tr>
+      <tr><td>Module parent</td><td>Le menu disparaît si le module est désactivé</td></tr>
+      <tr><td>Permission requise</td><td>Code de permission nécessaire pour voir ce menu</td></tr>
+      <tr><td>Ordre</td><td>Position numérique dans le menu parent</td></tr>
+      <tr><td>Statut</td><td>Actif / Inactif (masqué sans être supprimé)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3 Personnalisation par institution</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Renommer les libellés des menus selon la terminologie interne</li>
+    <li>Réorganiser l'ordre d'affichage par drag &amp; drop</li>
+    <li>Masquer des menus inutilisés sans les supprimer</li>
+    <li>Créer des liens rapides vers des vues ou des rapports fréquents</li>
+  </ul>
+
+  <h3>5.4 Menus favoris utilisateur</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Épingler les menus fréquemment utilisés en accès rapide</li>
+    <li>Raccourcis personnels sur le tableau de bord</li>
+    <li>Historique des 5 dernières pages visitées</li>
+  </ul>
+
+
+  <!-- ══════════════════════════════════════════════
+       6. PROFILS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="profils">
+    <span class="num">06</span> Gestion des Profils (Rôles)
+  </div>
+
+  <p>Un <strong>profil</strong> regroupe un ensemble cohérent de permissions correspondant à un rôle métier. Il est la brique centrale du contrôle d'accès.</p>
+
+  <h3>6.1 Types de profils</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Description</th><th>Modifiable</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge-red">Système</span></td><td>Super Admin, Admin Institution, Admin Agence</td><td>Non</td></tr>
+      <tr><td><span class="badge-blue">Métier standard</span></td><td>Comptable, DRH, Caissier, Auditeur, Commercial…</td><td>Partiellement</td></tr>
+      <tr><td><span class="badge-green">Métier personnalisé</span></td><td>Créés et configurés librement par l'institution</td><td>Oui</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 Héritage de profils</h3>
+  <div class="arch-box"><span class="hl">Profil: Manager RH</span>
+├── Hérite de: <span class="hl2">Employé RH</span>  (lecture + saisie de base)
+└── Permissions additionnelles:
+    ├── Approbation des congés
+    ├── Suppression de contrats
+    └── Export des données RH</div>
+
+  <div class="info-box">
+    Un utilisateur peut avoir <strong>plusieurs profils simultanément</strong>. Les permissions sont l'union de tous ses profils, avec possibilité de retrait individuel sur certaines permissions.
+  </div>
+
+  <h3>6.3 Fonctionnalités de gestion</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li><strong>Clonage :</strong> Dupliquer un profil existant comme point de départ</li>
+    <li><strong>Comparaison :</strong> Vue diff des permissions entre deux profils</li>
+    <li><strong>Simulation :</strong> "Que voit cet utilisateur ?" — aperçu de l'interface selon profil</li>
+    <li><strong>Audit :</strong> Historique des modifications apportées au profil</li>
+  </ul>
+
+
+  <!-- ══════════════════════════════════════════════
+       7. PERMISSIONS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="permissions">
+    <span class="num">07</span> Gestion des Permissions
+  </div>
+
+  <p>Les permissions s'organisent en <strong>4 niveaux progressifs</strong>, du plus général au plus fin.</p>
+
+  <h3>7.1 Niveau 1 — Permission de module</h3>
+  <p>Accès ou non à l'ensemble d'un module. Si désactivé, aucune fonctionnalité du module n'est accessible.</p>
+
+  <h3>7.2 Niveau 2 — Permission de modèle (CRUD)</h3>
+  <div class="code">Module HR · Modèle : Employee
+┌─────────┬────────┬──────────┬───────────┬─────────┬────────┐
+│ Profil  │ Créer  │  Lire    │  Modifier │Supprimer│Exporter│
+├─────────┼────────┼──────────┼───────────┼─────────┼────────┤
+│ DRH     │  ✅   │   ✅     │    ✅     │   ✅    │  ✅   │
+│ RH Mgr  │  ✅   │   ✅     │    ✅     │   ❌    │  ✅   │
+│ RH Asst │  ✅   │   ✅     │    ❌     │   ❌    │  ❌   │
+│ Auditeur│  ❌   │   ✅     │    ❌     │   ❌    │  ✅   │
+└─────────┴────────┴──────────┴───────────┴─────────┴────────┘</div>
+
+  <p>Actions disponibles : <strong>Créer · Lire · Modifier · Supprimer · Exporter · Importer · Approuver · Imprimer</strong></p>
+
+  <h3>7.3 Niveau 3 — Permission de champ</h3>
+  <div class="code">Modèle : Employee · Champ : "salaire_base"
+┌──────────────────┬──────────┬────────────┐
+│ Profil           │ Visible  │Modifiable  │
+├──────────────────┼──────────┼────────────┤
+│ Comptable junior │   ❌     │    ❌      │  ← champ masqué
+│ RH Manager       │   ✅     │    ❌      │  ← lecture seule
+│ DRH              │   ✅     │    ✅      │  ← accès total
+└──────────────────┴──────────┴────────────┘</div>
+
+  <h3>7.4 Niveau 4 — Règles d'enregistrement (Record Rules)</h3>
+  <div class="code">Profil : Manager Agence Nord
+Règle  : Voir uniquement les employés de son agence
+Filtre : employee.agence_id = current_user.agence_active_id
+
+Profil : Responsable Commercial
+Règle  : Voir uniquement les clients qu'il a créés
+Filtre : client.created_by_id = current_user.id</div>
+
+  <div class="warn-box">
+    <strong>Sécurité multi-tenant :</strong> Une règle d'enregistrement système s'applique en premier sur tous les querysets pour garantir qu'un utilisateur ne peut jamais accéder aux données d'une autre institution, quelles que soient ses permissions.
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       8. UTILISATEURS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="utilisateurs">
+    <span class="num">08</span> Gestion des Utilisateurs
+  </div>
+
+  <h3>8.1 Fiche utilisateur</h3>
+
+  <h4>Identité</h4>
+  <table>
+    <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Nom / Prénom</td><td>Identité civile complète</td></tr>
+      <tr><td>Photo de profil</td><td>Avatar affiché dans l'interface</td></tr>
+      <tr><td>Email</td><td>Identifiant unique global (clé de connexion)</td></tr>
+      <tr><td>Téléphone</td><td>Utilisé pour le 2FA par SMS</td></tr>
+      <tr><td>Poste / Département</td><td>Informations organisationnelles</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Appartenance et accès</h4>
+  <table>
+    <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Institution</td><td>Assignée automatiquement selon le tenant</td></tr>
+      <tr><td>Agences assignées</td><td>Une ou plusieurs agences accessibles</td></tr>
+      <tr><td>Agence par défaut</td><td>Agence active au moment de la connexion</td></tr>
+      <tr><td>Profils</td><td>Un ou plusieurs profils cumulés</td></tr>
+      <tr><td>Permissions additionnelles</td><td>Droits supplémentaires au-delà des profils</td></tr>
+      <tr><td>Restrictions individuelles</td><td>Permissions retirées malgré le profil</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Préférences personnelles</h4>
+  <table>
+    <thead><tr><th>Préférence</th><th>Options</th></tr></thead>
+    <tbody>
+      <tr><td>Langue de l'interface</td><td>Français, Anglais, Arabe…</td></tr>
+      <tr><td>Fuseau horaire</td><td>Peut différer du fuseau de l'institution</td></tr>
+      <tr><td>Thème visuel</td><td>Clair / Sombre / Contraste élevé</td></tr>
+      <tr><td>Notifications</td><td>Canaux préférés : email / in-app / SMS</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.2 Cycle de vie d'un utilisateur</h3>
+  <div class="flow">
+    <div class="flow-step">Invitation</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">En attente</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Actif</div>
+    <div class="flow-arrow">⇄</div>
+    <div class="flow-step">Suspendu</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Désactivé</div>
+  </div>
+
+  <div class="info-box">
+    La désactivation conserve toutes les données historiques liées à l'utilisateur (audit trail, documents créés). Un utilisateur désactivé ne peut pas se connecter mais ses traces restent dans le système.
+  </div>
+
+  <h3>8.3 Invitation et onboarding</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Invitation individuelle par email avec lien d'activation (expirable : 48h, usage unique)</li>
+    <li>Invitation en masse par import CSV (colonnes : nom, email, profil, agence)</li>
+    <li>Email de bienvenue personnalisé avec logo de l'institution</li>
+    <li>Tutoriel guidé configurable à la première connexion</li>
+    <li>Changement de mot de passe obligatoire à l'activation</li>
+  </ul>
+
+  <h3>8.4 Comptes API / Service</h3>
+  <table>
+    <thead><tr><th>Attribut</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Type</td><td>Compte technique sans accès à l'interface Angular</td></tr>
+      <tr><td>Token d'API</td><td>Token permanent avec scope de permissions limité</td></tr>
+      <tr><td>Rotation</td><td>Renouvellement planifié ou manuel du token</td></tr>
+      <tr><td>Révocation</td><td>Désactivation immédiate en cas de compromission</td></tr>
+      <tr><td>Journalisation</td><td>Chaque appel API logué avec timestamp et endpoint</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- ══════════════════════════════════════════════
+       9. AUTHENTIFICATION
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="auth">
+    <span class="num">09</span> Authentification
+  </div>
+
+  <h3>9.1 Politique de mot de passe</h3>
+  <p>Configurable par institution depuis l'interface d'administration :</p>
+  <table>
+    <thead><tr><th>Règle</th><th>Valeur par défaut</th><th>Configurable</th></tr></thead>
+    <tbody>
+      <tr><td>Longueur minimale</td><td>8 caractères</td><td>Oui</td></tr>
+      <tr><td>Complexité</td><td>Majuscule + minuscule + chiffre + spécial</td><td>Oui</td></tr>
+      <tr><td>Historique</td><td>Interdire les 5 derniers mots de passe</td><td>Oui</td></tr>
+      <tr><td>Expiration</td><td>90 jours</td><td>Oui</td></tr>
+      <tr><td>Changement obligatoire</td><td>Première connexion</td><td>Oui</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 Protection contre les attaques</h3>
+  <table>
+    <thead><tr><th>Mécanisme</th><th>Comportement</th></tr></thead>
+    <tbody>
+      <tr><td>Tentatives échouées</td><td>Verrouillage après 5 échecs (configurable)</td></tr>
+      <tr><td>Délai progressif</td><td>1s → 2s → 4s → 8s entre chaque tentative</td></tr>
+      <tr><td>CAPTCHA</td><td>Activé après 3 échecs consécutifs</td></tr>
+      <tr><td>Alerte email</td><td>Notification à l'utilisateur en cas d'échec répété</td></tr>
+      <tr><td>Blocage IP</td><td>Blocage automatique si attaque par force brute détectée</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.3 Multi-Factor Authentication (2FA)</h3>
+  <table>
+    <thead><tr><th>Méthode</th><th>Description</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TOTP</strong></td><td>Google Authenticator, Authy (RFC 6238)</td><td><span class="badge-green">Recommandé</span></td></tr>
+      <tr><td><strong>Email OTP</strong></td><td>Code à 6 chiffres par email, TTL 10 min</td><td><span class="badge-blue">Fallback</span></td></tr>
+      <tr><td><strong>SMS OTP</strong></td><td>Code par SMS via Twilio / AWS SNS</td><td><span class="badge-orange">Optionnel</span></td></tr>
+      <tr><td><strong>Codes de secours</strong></td><td>10 codes à usage unique pour récupération</td><td><span class="badge-blue">Backup</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    Le 2FA peut être rendu <strong>obligatoire</strong> pour les profils administrateurs (configurable par institution). Les utilisateurs standard peuvent l'activer volontairement sauf si la politique l'exige.
+  </div>
+
+  <h3>9.4 Tokens JWT</h3>
+  <div class="code">POST /api/v1/auth/login/
+→ access_token   (TTL : 15 minutes)
+→ refresh_token  (TTL : 7 jours, rotation à chaque usage)
+
+POST /api/v1/auth/refresh/      ← renouvelle l'access token
+POST /api/v1/auth/logout/       ← blacklist du refresh token courant
+POST /api/v1/auth/logout-all/   ← invalide TOUTES les sessions actives
+
+Contenu du token :
+{
+  "user_id": "uuid",
+  "institution_id": "uuid",
+  "agence_active_id": "uuid",
+  "profils": ["DRH", "Admin Agence"],
+  "exp": 1750000000
+}</div>
+
+  <div class="warn-box">
+    <strong>Révocation immédiate :</strong> Tout changement de profil, suspension ou changement de mot de passe invalide immédiatement tous les tokens actifs de l'utilisateur concerné.
+  </div>
+
+  <h3>9.5 SSO — Authentification unique</h3>
+  <table>
+    <thead><tr><th>Protocole</th><th>Cas d'usage</th></tr></thead>
+    <tbody>
+      <tr><td><strong>OAuth2 / OIDC</strong></td><td>Google Workspace, Microsoft 365, Okta</td></tr>
+      <tr><td><strong>SAML 2.0</strong></td><td>Grandes entreprises avec IdP interne</td></tr>
+      <tr><td><strong>LDAP / Active Directory</strong></td><td>Annuaire d'entreprise Microsoft</td></tr>
+    </tbody>
+  </table>
+
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Mapping des groupes LDAP → Profils ERP (configurable par institution)</li>
+    <li>Provisioning automatique : création de compte à la 1ère connexion SSO</li>
+    <li>Désactivation automatique si compte désactivé dans l'annuaire source</li>
+  </ul>
+
+  <h3>9.6 Gestion des sessions</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Liste des sessions actives visible par l'utilisateur (appareil, IP, localisation, dernière activité)</li>
+    <li>Révocation d'une session à distance depuis l'interface</li>
+    <li>Timeout d'inactivité configurable (30 min par défaut)</li>
+    <li>Session unique ou multi-session selon la politique de l'institution</li>
+    <li>Alerte si connexion depuis un pays ou appareil inhabituel</li>
+  </ul>
+
+  <h3>9.7 Récupération de compte</h3>
+  <table>
+    <thead><tr><th>Situation</th><th>Procédure</th></tr></thead>
+    <tbody>
+      <tr><td>Mot de passe oublié</td><td>Lien de réinitialisation par email (expiration 1h, usage unique)</td></tr>
+      <tr><td>Compte verrouillé</td><td>Déverrouillage par admin ou auto-déverrouillage après X minutes</td></tr>
+      <tr><td>Perte du 2FA</td><td>Codes de secours pré-générés ou procédure admin manuelle</td></tr>
+      <tr><td>Changement d'email</td><td>Confirmation double (ancienne adresse + nouvelle adresse)</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- ══════════════════════════════════════════════
+       10. TRANSVERSAL
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="transversal">
+    <span class="num">10</span> Fonctionnalités Transversales d'Administration
+  </div>
+
+  <h3>10.1 Journal d'audit (Audit Trail)</h3>
+  <p>Chaque action dans le système est enregistrée de manière immuable :</p>
+
+  <div class="code">[2026-06-14 09:32:11] | Utilisateur : jean.dupont@entreprise.ci
+Action   : UPDATE  | Modèle : Employee | ID : emp-uuid-123
+Champ    : salaire_base | Avant : 350 000 XOF | Après : 420 000 XOF
+Via      : Interface web | IP : 192.168.1.10 | Agence : Agence Nord</div>
+
+  <table>
+    <thead><tr><th>Caractéristique</th><th>Détail</th></tr></thead>
+    <tbody>
+      <tr><td>Filtres disponibles</td><td>Utilisateur, modèle, action, plage de dates, agence</td></tr>
+      <tr><td>Immuabilité</td><td>Non modifiable et non supprimable par design</td></tr>
+      <tr><td>Export</td><td>PDF et Excel pour audit externe ou commissaire aux comptes</td></tr>
+      <tr><td>Rétention</td><td>Durée configurable (recommandé : 5 ans minimum)</td></tr>
+      <tr><td>Alertes</td><td>Notifications sur actions sensibles : suppression, export massif</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Tableau de bord Super Admin</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Nombre d'institutions actives / en essai / suspendues</li>
+    <li>Nombre total d'utilisateurs actifs sur la plateforme</li>
+    <li>Consommation de stockage par institution</li>
+    <li>Modules les plus installés et utilisés</li>
+    <li>Alertes : souscriptions expirant dans les 30 prochains jours</li>
+    <li>Courbe de croissance (nouvelles institutions, nouveaux utilisateurs)</li>
+  </ul>
+
+  <h3>10.3 Tableau de bord Admin Institution</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Utilisateurs actifs vs quota du package</li>
+    <li>Modules installés vs disponibles</li>
+    <li>Stockage consommé vs quota</li>
+    <li>Comptes en attente d'activation</li>
+    <li>Sessions actives en ce moment</li>
+    <li>Journal d'activité condensé des 24 dernières heures</li>
+  </ul>
+
+  <h3>10.4 Paramètres système (par institution)</h3>
+  <table>
+    <thead><tr><th>Catégorie</th><th>Paramètres configurables</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Emails</strong></td><td>SMTP personnalisé, templates d'emails modifiables (invitation, approbation, alertes)</td></tr>
+      <tr><td><strong>Notifications</strong></td><td>Canaux actifs (email / SMS / in-app / webhook), fréquence des résumés</td></tr>
+      <tr><td><strong>Documents</strong></td><td>Logo, en-tête, pied de page sur tous les PDF générés</td></tr>
+      <tr><td><strong>Sécurité</strong></td><td>Politique de mot de passe, 2FA obligatoire, timeout session</td></tr>
+      <tr><td><strong>Intégrations</strong></td><td>Clés API tierces (SMS, stockage S3, services de paiement)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.5 Gestion des notifications système</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Canal</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge-blue">Informative</span></td><td>In-app</td><td>Votre rapport mensuel est disponible</td></tr>
+      <tr><td><span class="badge-orange">Avertissement</span></td><td>In-app + Email</td><td>Quota utilisateurs à 80%</td></tr>
+      <tr><td><span class="badge-orange">Action requise</span></td><td>In-app + Email</td><td>Congé en attente d'approbation</td></tr>
+      <tr><td><span class="badge-red">Critique</span></td><td>In-app + Email + SMS</td><td>Connexion depuis un pays inhabituel</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.6 Import / Export de configuration</h3>
+  <ul style="margin: 10px 0 10px 20px; color: #2d3748;">
+    <li>Export JSON de la configuration complète (profils, menus, permissions, paramètres)</li>
+    <li>Import pour dupliquer rapidement une configuration sur une nouvelle institution</li>
+    <li>Templates préconfigurés par secteur : ONG, Commerce, Industrie, Finance</li>
+  </ul>
+
+  <h3>10.7 Mode maintenance</h3>
+  <table>
+    <thead><tr><th>Niveau</th><th>Qui active</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>Plateforme entière</td><td>Super Admin uniquement</td><td>Toutes les institutions inaccessibles sauf Super Admin</td></tr>
+      <tr><td>Institution spécifique</td><td>Admin Institution</td><td>Seul le tenant concerné est en maintenance</td></tr>
+      <tr><td>Module spécifique</td><td>Admin Institution</td><td>Un seul module rendu inaccessible temporairement</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    Le mode maintenance affiche un message personnalisé aux utilisateurs tentant de se connecter. Il peut être programmé sur un créneau horaire récurrent (ex: chaque dimanche de 02h00 à 04h00).
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       11. MODELES
+  ═══════════════════════════════════════════════ -->
+  <div class="section-title" id="modeles">
+    <span class="num">11</span> Récapitulatif — Modèles de données clés
+  </div>
+
+  <div class="arch-box"><span class="hl">Package</span>
+    └── modules_inclus[]
+    └── limites (max_users, max_agences, max_storage_gb)
+    └── <span class="hl2">Souscription</span> ──────────────────────┐
+                                                │
+<span class="hl">Institution</span> (Tenant)                        │ liée à
+    └── <span class="hl2">Company</span>                               ◄──┘
+    └── config_regionale (pays, langue, devise, TZ)
+    └── config_comptable (plan, exercice fiscal)
+    └── <span class="hl3">Agences[]</span>
+        └── Sous-agences[]  (hiérarchie infinie)
+
+<span class="hl">Module</span>
+    └── dependances[]
+    └── <span class="hl2">InstalledModule</span>  (Institution × Module)
+        └── config_module[] (paramètres spécifiques)
+
+<span class="hl">MenuItem</span>
+    └── module_parent
+    └── enfants[]  (arbre)
+    └── permission_requise
+
+<span class="hl">Profil</span>
+    └── profil_parent  (héritage)
+    └── permissions[]  ◄── <span class="hl2">Permission</span> (modele, action, champ)
+    └── menus_visibles[] ◄── <span class="hl2">MenuItem</span>
+    └── record_rules[]  ◄── <span class="hl2">RecordRule</span> (filtre dynamique)
+
+<span class="hl">Utilisateur</span>
+    └── Institution
+    └── Agences[] + agence_active
+    └── Profils[]
+    └── PermissionsAdditionnelles[]  (au-delà du profil)
+    └── Restrictions[]               (retrait individuel)
+    └── Sessions[]
+    └── <span class="hl3">AuditLogs[]</span>              (immuables)</div>
+
+  <hr>
+
+  <div class="success-box">
+    <strong>Ce document couvre l'intégralité du périmètre d'administration.</strong><br>
+    Il constitue le cahier des charges fonctionnel du module d'administration de l'ERP DreamsPOS.
+    La prochaine étape est la génération du projet Django backend avec cette structure.
+  </div>
+
+  <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0; color: #a0aec0; font-size: 11px;">
+    DreamsPOS ERP · Description Fonctionnelle Administration · Version 1.0 · Juin 2026<br>
+    Document généré automatiquement — confidentiel
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamsPOS ERP — Documentation Backend</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+    @media print {
+      .no-print { display: none; }
+      body { font-size: 12px; }
+      h1 { font-size: 22px; } h2 { font-size: 16px; } h3 { font-size: 13px; }
+      .page-break { page-break-before: always; }
+      section { page-break-inside: avoid; }
+      table { page-break-inside: avoid; }
+    }
+    .cover {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+      color: #fff; padding: 80px 60px; min-height: 280px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .cover .logo { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+    .cover .logo span { color: #e94560; }
+    .cover .subtitle { font-size: 18px; color: #a0b0c8; margin-top: 8px; }
+    .cover .meta { margin-top: 40px; font-size: 13px; color: #6a7f95; }
+    .cover .meta strong { color: #c9d6df; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
+    .badge-green  { background: #1a472a; color: #69db7c; }
+    .badge-blue   { background: #1c3a5e; color: #74c0fc; }
+    .badge-orange { background: #4a2800; color: #ffa94d; }
+    .badge-purple { background: #2d1b4e; color: #da77f2; }
+    .container { max-width: 960px; margin: 0 auto; padding: 40px 40px; }
+    h1 { font-size: 28px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 10px; margin: 40px 0 20px; }
+    h2 { font-size: 20px; color: #16213e; border-left: 4px solid #e94560; padding-left: 12px; margin: 30px 0 14px; }
+    h3 { font-size: 15px; color: #0f3460; margin: 20px 0 10px; }
+    h4 { font-size: 13px; color: #444; margin: 14px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    p { margin-bottom: 10px; color: #333; }
+    ul, ol { margin: 8px 0 12px 22px; }
+    li { margin-bottom: 4px; }
+    strong { color: #0f3460; }
+    em { color: #555; font-style: normal; background: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 12px; font-family: 'Consolas', monospace; }
+    .card { background: #f8f9fc; border: 1px solid #e4e8f0; border-radius: 8px; padding: 18px 22px; margin: 12px 0; }
+    .card-title { font-size: 13px; font-weight: 700; color: #0f3460; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: #e94560; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    thead th { background: #0f3460; color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+    tbody tr:nth-child(even) { background: #f5f7fb; }
+    tbody tr:hover { background: #eef1f8; }
+    td { padding: 8px 12px; border-bottom: 1px solid #e8ecf2; color: #333; vertical-align: top; }
+    td:first-child { font-family: 'Consolas', monospace; font-size: 12px; color: #0f3460; font-weight: 500; }
+    pre, code { font-family: 'Consolas', 'Courier New', monospace; font-size: 12px; }
+    pre { background: #1a1a2e; color: #a0c4ff; padding: 16px 20px; border-radius: 6px; overflow-x: auto; margin: 12px 0; line-height: 1.5; }
+    code { background: #eef2ff; color: #3730a3; padding: 1px 5px; border-radius: 3px; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .status-done   { background: #d3f9d8; color: #2b8a3e; }
+    .status-todo   { background: #fff3cd; color: #856404; }
+    .status-public { background: #d0ebff; color: #1864ab; }
+    .status-admin  { background: #f8d7da; color: #842029; }
+    .status-auth   { background: #e2d9f3; color: #5a2d82; }
+    .method { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: monospace; min-width: 50px; text-align: center; }
+    .get    { background: #d0ebff; color: #1864ab; }
+    .post   { background: #d3f9d8; color: #2b8a3e; }
+    .patch  { background: #fff3cd; color: #856404; }
+    .delete { background: #f8d7da; color: #842029; }
+    .arch-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 16px 0; }
+    .arch-box { background: #0f3460; color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .arch-arrow { color: #e94560; font-size: 18px; padding: 0 6px; font-weight: 700; }
+    .module-card { border-left: 4px solid; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 8px 0; background: #f8f9fc; }
+    .module-card.done { border-color: #40c057; }
+    .module-card.todo { border-color: #fd7e14; }
+    .module-card h3 { margin: 0 0 4px; font-size: 14px; }
+    .module-card p  { margin: 0; font-size: 12px; color: #555; }
+    .sep { border: none; border-top: 1px solid #e4e8f0; margin: 30px 0; }
+    footer { background: #1a1a2e; color: #6a7f95; text-align: center; padding: 24px; font-size: 12px; margin-top: 60px; }
+    footer strong { color: #a0b0c8; }
+    .toc { background: #f0f4ff; border: 1px solid #c5d0ff; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .toc h3 { color: #0f3460; margin-bottom: 10px; }
+    .toc ol { margin-left: 18px; }
+    .toc li { margin-bottom: 4px; }
+    .toc a  { color: #3730a3; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .flow-diagram { background: #0f3460; border-radius: 8px; padding: 20px; margin: 12px 0; color: #a0c4ff; font-family: monospace; font-size: 12px; line-height: 2; }
+    .flow-diagram .hl { color: #ffd43b; font-weight: bold; }
+    .flow-diagram .ok { color: #69db7c; }
+    .flow-diagram .arrow { color: #e94560; }
+  </style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="logo">Dreams<span>POS</span> ERP</div>
+  <div class="subtitle">Documentation Technique — Backend Django REST API</div>
+  <div style="margin-top:30px; display:flex; gap:8px; flex-wrap:wrap;">
+    <span class="badge badge-blue">Django 5.1.4</span>
+    <span class="badge badge-blue">DRF 3.15.2</span>
+    <span class="badge badge-green">JWT + 2FA</span>
+    <span class="badge badge-orange">Multi-tenant</span>
+    <span class="badge badge-purple">i18n fr/en/ar</span>
+    <span class="badge badge-green">OpenAPI / Swagger</span>
+    <span class="badge badge-orange">Campay MoMo</span>
+  </div>
+  <div class="meta" style="margin-top:30px;">
+    <strong>Version :</strong> 2.0.0 &nbsp;|&nbsp;
+    <strong>Date :</strong> Juin 2026 &nbsp;|&nbsp;
+    <strong>Auteur :</strong> Équipe DreamsPOS &nbsp;|&nbsp;
+    <strong>Statut :</strong> Transport &amp; Logistique — Complet
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- TABLE DES MATIÈRES                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h3>📋 Table des matières</h3>
+  <ol>
+    <li><a href="#vision">Vision du projet</a></li>
+    <li><a href="#stack">Stack technique</a></li>
+    <li><a href="#architecture">Architecture backend</a></li>
+    <li><a href="#structure">Structure du projet</a></li>
+    <li><a href="#auth">Module Authentication</a></li>
+    <li><a href="#system_config">Module System Config</a></li>
+    <li><a href="#rbac">Module Admin RBAC</a></li>
+    <li><a href="#users">Module Users</a></li>
+    <li><a href="#hr">Module RH (Human Resources)</a></li>
+    <li><a href="#fleet">Module Fleet (Gestion de flotte)</a></li>
+    <li><a href="#transport_config">Module Transport Config</a></li>
+    <li><a href="#voyage">Module Voyage (Gestion des départs)</a></li>
+    <li><a href="#ticketing">Module Ticketing (Réservations &amp; Billets)</a></li>
+    <li><a href="#parcel">Module Parcel (Colis)</a></li>
+    <li><a href="#treasury">Module Treasury (Trésorerie)</a></li>
+    <li><a href="#online_booking">Module Online Booking (API Publique)</a></li>
+    <li><a href="#urls">Récapitulatif des endpoints</a></li>
+    <li><a href="#roadmap">Roadmap des modules</a></li>
+    <li><a href="#sync_scig_sage">Module Sync SCIG — Sage 100</a></li>
+    <li><a href="#conventions">Conventions de développement</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 1. VISION                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="vision">1. Vision du projet</h1>
+
+<p>
+  <strong>DreamsPOS ERP</strong> est un système de gestion intégré (ERP) multi-tenant
+  développé avec <strong>Django REST Framework</strong> et <strong>Angular</strong>.
+  La première verticale implémentée est le secteur <strong>Transport &amp; Logistique</strong>
+  (modèle Blue Bird Express / Brainstore ERP).
+</p>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Verticale Transport (v2.0)</div>
+    <ul>
+      <li>✅ Gestion de flotte (véhicules, conducteurs, maintenance)</li>
+      <li>✅ Configuration transport (villes, terminaux, routes, tarifs)</li>
+      <li>✅ Gestion des voyages (départs, embarquement, équipage)</li>
+      <li>✅ Billetterie (réservations, billets QR, bagages)</li>
+      <li>✅ Colis (tracking REGISTERED→DELIVERED, paiement COD)</li>
+      <li>✅ Trésorerie (caisses, banques, sessions, virements)</li>
+      <li>✅ Réservation en ligne (API publique + Campay MoMo)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Fondation ERP (v1.0)</div>
+    <ul>
+      <li>✅ Authentification JWT + 2FA TOTP</li>
+      <li>✅ Multi-tenant (Company + Agencies)</li>
+      <li>✅ RBAC (Rôles, Profils, Permissions)</li>
+      <li>✅ Ressources Humaines</li>
+      <li>🔧 Finance OHADA, Inventaire, POS, CRM</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div class="card-title"><div class="dot"></div>Répertoires du projet</div>
+  <div class="grid-2" style="margin:0;">
+    <div><h4>Backend</h4><code>e:\dreamspos\backend</code></div>
+    <div><h4>Frontend</h4><code>e:\dreamspos\angular</code></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 2. STACK                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="stack">2. Stack technique</h1>
+
+<div class="grid-3">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Backend Core</div>
+    <ul>
+      <li><strong>Python</strong> 3.14</li>
+      <li><strong>Django</strong> 5.1.4</li>
+      <li><strong>DRF</strong> 3.15.2</li>
+      <li><strong>SQLite</strong> (dev) / <strong>PostgreSQL</strong> (prod)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Sécurité &amp; Paiement</div>
+    <ul>
+      <li><strong>SimpleJWT</strong> 5.3.1 + Blacklist</li>
+      <li><strong>pyotp</strong> 2.9.0 (2FA TOTP)</li>
+      <li><strong>Campay</strong> (MTN MoMo / Orange Money)</li>
+      <li>Verrouillage compte (5 tentatives)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Outils</div>
+    <ul>
+      <li><strong>drf-spectacular</strong> 0.27.2 (OpenAPI)</li>
+      <li><strong>django-modeltranslation</strong> 0.18.11</li>
+      <li><strong>Redis</strong> (cache paramètres + token Campay)</li>
+      <li><strong>python-slugify</strong> 8.0.4</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Commandes de démarrage</h3>
+<pre>
+# Windows PowerShell
+cd e:\dreamspos\backend
+$env:DJANGO_SETTINGS_MODULE = "config.settings.local"
+venv\Scripts\python.exe manage.py runserver 8000
+
+# Swagger UI    →  http://127.0.0.1:8000/api/docs/
+# Admin Django  →  http://127.0.0.1:8000/admin/
+# Identifiants dev : admin@dreamspos.com / Admin1234!
+</pre>
+
+<h3>Variables d'environnement (.env)</h3>
+<pre>
+SECRET_KEY=...
+DEBUG=True
+ALLOWED_HOSTS=*
+DATABASE_URL=sqlite:///db.sqlite3
+
+# Campay (Mobile Money)
+CAMPAY_APP_USERNAME=...
+CAMPAY_APP_PASSWORD=...
+CAMPAY_BASE_URL=https://demo.campay.net/api/   # sandbox
+CAMPAY_WEBHOOK_URL=https://votre-domaine.com/api/v1/online/webhooks/campay/
+CAMPAY_REDIRECT_URL=https://votre-app.com/booking-result
+CAMPAY_WEBHOOK_SECRET=...   # optionnel — vérification signature HMAC
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 3. ARCHITECTURE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="architecture">3. Architecture backend</h1>
+
+<h2>Pattern Services / Selectors</h2>
+<div class="arch-flow">
+  <div class="arch-box">Request HTTP</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">URLs</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Views (thin)</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Serializers</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Services / Selectors</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Models → DB</div>
+</div>
+
+<div class="grid-2" style="margin-top:16px;">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Selectors (lectures)</div>
+    <p>QuerySets, filtres, annotations, agrégations. Aucune écriture en base.</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Services (écritures)</div>
+    <p>Logique métier, <code>@transaction.atomic</code>, <code>select_for_update()</code> pour les soldes. Lève <code>ApplicationError</code>.</p>
+  </div>
+</div>
+
+<h2>Multi-tenancy — Shared Schema</h2>
+<div class="card">
+  <p>Tous les modèles métier portent un champ <code>company_id</code> (FK → <code>system_config.Company</code>). Les données d'une société ne sont jamais visibles par une autre.</p>
+  <p>Pattern <strong>company=None</strong> pour les données partagées (ex: <code>VehicleCategory</code>, <code>FareClass</code>, <code>MaintenanceType</code>) — accessibles à toutes les sociétés via <code>Q(company_id=X) | Q(company__isnull=True)</code>.</p>
+</div>
+
+<h2>BaseModel</h2>
+<div class="grid-2">
+  <div class="card">
+    <ul>
+      <li><strong>UUID</strong> pk (non devinable)</li>
+      <li><strong>created_at / updated_at</strong> auto</li>
+      <li><strong>Soft delete</strong> : <code>is_deleted</code>, <code>deleted_at</code>, <code>soft_delete(user)</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <ul>
+      <li><strong>Audit</strong> : <code>created_by</code>, <code>updated_by</code>, <code>deleted_by</code></li>
+      <li><code>OdometerLog</code> et <code>ParcelEvent</code> héritent de <code>models.Model</code> (logs immuables — pas de soft-delete)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 4. STRUCTURE                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="structure">4. Structure du projet</h1>
+
+<pre>
+e:\dreamspos\backend\
+├── config/
+│   ├── settings/base.py        ← Settings partagés
+│   ├── settings/local.py       ← Dev (DEBUG, SQLite)
+│   └── urls.py
+├── api/v1/router.py            ← Agrégateur de toutes les URLs
+├── apps/
+│   ├── core/                   ✅ BaseModel, permissions, exceptions, pagination
+│   ├── authentication/         ✅ User, JWT, 2FA, sessions — 15 ep
+│   ├── system_config/          ✅ Company, Agencies, Parameters — 26 ep
+│   ├── admin_rbac/             ✅ Roles, Profiles, Permissions — 25 ep
+│   ├── users/                  ✅ CRUD utilisateurs institution — 11 ep
+│   ├── hr/                     ✅ Employés, contrats, congés — 40 ep
+│   ├── fleet/                  ✅ Véhicules, maintenance, accidents — 43 ep
+│   ├── transport_config/       ✅ Villes, terminaux, routes, tarifs — 18 ep
+│   ├── voyage/                 ✅ Voyages, équipage, embarquement — 11 ep
+│   ├── ticketing/              ✅ Clients, réservations, billets QR, bagages — 18 ep
+│   ├── parcel/                 ✅ Colis, tracking, paiement — 16 ep
+│   ├── treasury/               ✅ Caisses, banques, sessions, transactions — 19 ep
+│   ├── online_booking/         ✅ API publique + Campay MoMo — 8 ep
+│   └── sync_scig_sage/         ✅ Sync Sage 100 — inventaire Zebra, transferts, articles — 41 ep
+├── docs/
+│   └── dreamspos_erp_backend.html
+├── locale/fr|en|ar/LC_MESSAGES/django.po
+├── .env
+└── manage.py
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 5. AUTHENTICATION                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="auth">5. Module Authentication <span class="status status-done">✅ COMPLET</span></h1>
+
+<h2>Modèles</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>User</td><td>Utilisateur étendu (AbstractUser)</td><td>UUID pk, company, default_agency, agencies (M2M), phone, avatar, job_title, language_code, timezone, is_institution_admin, is_2fa_enabled, totp_secret, must_change_password, failed_login_attempts, locked_until</td></tr>
+    <tr><td>UserAgency</td><td>Jointure User ↔ Agency</td><td>user, agency, is_primary</td></tr>
+    <tr><td>UserSession</td><td>Sessions JWT actives</td><td>user, jti, ip_address, user_agent, is_active, expires_at</td></tr>
+    <tr><td>LoginAttempt</td><td>Journal de connexion</td><td>email, ip_address, success, failure_reason, attempted_at</td></tr>
+    <tr><td>PasswordResetToken</td><td>Token reset mot de passe</td><td>user, token, expires_at (TTL 1h), usage unique</td></tr>
+  </tbody>
+</table>
+
+<h2>Endpoints — <code>/api/v1/auth/</code></h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Accès</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method post">POST</span></td><td>login/</td><td><span class="status status-public">Public</span></td><td>Connexion email + mot de passe → access + refresh ou requires_2fa</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>login/2fa/</td><td><span class="status status-public">Public</span></td><td>Validation code TOTP (étape 2)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>refresh/</td><td><span class="status status-public">Public</span></td><td>Renouvellement access token</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>logout/</td><td><span class="status status-auth">JWT</span></td><td>Révocation refresh token courant</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>logout-all/</td><td><span class="status status-auth">JWT</span></td><td>Révocation de toutes les sessions</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>me/</td><td><span class="status status-auth">JWT</span></td><td>Profil complet utilisateur connecté</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>me/</td><td><span class="status status-auth">JWT</span></td><td>Mise à jour profil (phone, avatar, langue…)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>sessions/</td><td><span class="status status-auth">JWT</span></td><td>Liste des sessions actives</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>sessions/&lt;jti&gt;/</td><td><span class="status status-auth">JWT</span></td><td>Révoquer une session spécifique</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>change-password/</td><td><span class="status status-auth">JWT</span></td><td>Changement mot de passe + révoque toutes sessions</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>password-reset/</td><td><span class="status status-public">Public</span></td><td>Demande de réinitialisation par email</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>password-reset/confirm/</td><td><span class="status status-public">Public</span></td><td>Réinitialisation via token email</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>2fa/setup/</td><td><span class="status status-auth">JWT</span></td><td>Génère secret TOTP + URI QR code</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>2fa/verify/</td><td><span class="status status-auth">JWT</span></td><td>Vérifie code TOTP + active 2FA</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>2fa/disable/</td><td><span class="status status-auth">JWT</span></td><td>Désactive 2FA (mot de passe requis)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 6. SYSTEM CONFIG                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="system_config">6. Module System Config <span class="status status-done">✅ COMPLET</span></h1>
+
+<p>Packages commerciaux, institutions (tenants), agences, paramètres système (Redis) et feature flags.</p>
+
+<h2>Modèles</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>Package</td><td>Offre commerciale</td><td>code, tier, max_users, max_agencies, price_monthly, price_yearly, has_api_access…</td></tr>
+    <tr><td>Company</td><td>Institution / Tenant</td><td>name, slug (auto), logo, legal_form, rccm, tax_id, currency, package, status (Draft/Trial/Active/Suspended/Cancelled)</td></tr>
+    <tr><td>Subscription</td><td>Souscription active</td><td>company, package, billing_cycle, started_at, expires_at, trial_ends_at</td></tr>
+    <tr><td>Agency</td><td>Agence / Filiale</td><td>company, parent (hiérarchie illimitée), name, code, agency_type, manager</td></tr>
+    <tr><td>Parameter</td><td>Paramètre clé/valeur</td><td>key, value, data_type, scope, company. Caché Redis 5 min.</td></tr>
+    <tr><td>FeatureFlag</td><td>Activation modules</td><td>key, company, is_enabled. Caché Redis 5 min.</td></tr>
+  </tbody>
+</table>
+
+<h2>Endpoints — <code>/api/v1/system/</code></h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Accès</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>packages/</td><td><span class="status status-public">Public</span></td><td>Liste des packages</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>packages/admin/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer un package</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>packages/admin/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier un package</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>companies/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste toutes les institutions</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer institution (slug auto, trial auto)</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>companies/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier institution</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/suspend/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Suspendre avec raison</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/activate/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Réactiver</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/cancel/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Résilier</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>companies/&lt;id&gt;/stats/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Statistiques nb users, agences, limites</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/change-package/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Changer de package</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>agencies/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste agences</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>agencies/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Créer agence (limite package vérifiée)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>agencies/tree/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Arborescence agences</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>agencies/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Modifier agence</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>agencies/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Supprimer (bloqué si enfants actifs)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>parameters/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste paramètres</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>parameters/bulk/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Upsert en masse</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>feature-flags/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste des feature flags</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>feature-flags/&lt;id&gt;/toggle/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Inverser état du flag</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 7. RBAC                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="rbac">7. Module Admin RBAC <span class="status status-done">✅ COMPLET</span></h1>
+<p>Hiérarchie : <strong>Modules → Menus → Permissions → Rôles → Profils → Utilisateurs</strong></p>
+
+<h2>Modèles</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>AppModule</td><td>Module fonctionnel (code, icon, order, parent, is_core)</td></tr>
+    <tr><td>Menu</td><td>Entrée Angular router (module, parent, route, menu_type, order)</td></tr>
+    <tr><td>Permission</td><td>Droit granulaire (module, code ex: hr.employee.view, category)</td></tr>
+    <tr><td>Role</td><td>Ensemble de permissions (company=null=système, is_system)</td></tr>
+    <tr><td>Profile</td><td>Template de rôles réutilisable (is_default, is_system)</td></tr>
+    <tr><td>UserRole</td><td>Rôle direct user→role avec expiration optionnelle et scope agence</td></tr>
+    <tr><td>UserProfile</td><td>Profil assigné à un utilisateur (1 seul par user/company)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 8. USERS                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1 id="users">8. Module Users <span class="status status-done">✅ COMPLET</span></h1>
+<p>CRUD utilisateurs par institution. Invitation avec <code>temp_password</code> auto-généré, activation/désactivation, gestion des agences.</p>
+
+<h2>Endpoints — <code>/api/v1/users/</code></h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Accès</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>users/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste paginée (search, is_active, agency_id)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Créer — retourne temp_password, vérifie limite package</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/stats/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Statistiques : total, actifs, verrouillés, must_change</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Profil complet + agences</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>users/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Modifier profil</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>users/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Désactiver + révoque sessions JWT</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/activate/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Réactiver</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/unlock/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Déverrouiller compte bloqué</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/reset-password/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Reset mot de passe par admin</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/&lt;id&gt;/agencies/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Agences de l'utilisateur</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>users/&lt;id&gt;/agencies/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Remplacer liste agences</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 9. HR                                                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="hr">9. Module RH (Human Resources) <span class="status status-done">✅ COMPLET</span></h1>
+<p>9 modèles, 40 endpoints. Grades, types de contrat/congé, départements (arbre), postes, employés (numéro <code>EMP-YEAR-SEQ</code> auto), contrats, soldes et workflow de congés.</p>
+
+<h2>Modèles (9)</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Configuration</div>
+    <ul style="font-size:12px;">
+      <li><strong>Grade</strong> — fourchette salariale</li>
+      <li><strong>ContractType</strong> — CDI/CDD/Alternance (system ou company)</li>
+      <li><strong>LeaveType</strong> — types de congé avec règles de solde</li>
+      <li><strong>Department</strong> — arbre (parent auto-ref)</li>
+      <li><strong>JobPosition</strong> — poste rattaché à département + grade</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Gestion</div>
+    <ul style="font-size:12px;">
+      <li><strong>Employee</strong> — dossier complet, numéro auto, FK user optionnel</li>
+      <li><strong>Contract</strong> — contrat courant, salaires, primes</li>
+      <li><strong>LeaveBalance</strong> — solde annuel par (employé, type, année)</li>
+      <li><strong>LeaveRequest</strong> — workflow PENDING→APPROVED/REJECTED/CANCELLED</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Règles métier clés</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Numéro employé</div>
+    <p><code>EMP-{YEAR}-{SEQ:04d}</code> généré avec <code>select_for_update()</code> pour éviter les doublons concurrent.</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Congés</div>
+    <p>Comptage jours ouvrables (lun–ven). Solde auto-créé (<code>get_or_create</code>). Débit à l'approbation, recréditation à l'annulation.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 10. FLEET                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="fleet">10. Module Fleet (Gestion de flotte) <span class="status status-done">✅ COMPLET</span></h1>
+
+<p>Gestion complète de la flotte : véhicules, conducteurs externes, carburant, maintenance préventive, documents, assurances, missions et accidents. <strong>43 endpoints</strong>.</p>
+
+<h2>Modèles (13)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>VehicleBrand</td><td>Marque globale (no company FK)</td><td>name, country_of_origin</td></tr>
+    <tr><td>VehicleModel</td><td>Modèle de véhicule</td><td>brand, name, vehicle_type, fuel_type, seats_capacity</td></tr>
+    <tr><td>ExternalDriver</td><td>Conducteur non-utilisateur système</td><td>company, first_name, last_name, phone, license_category (A/B/C/D/E), license_expiry</td></tr>
+    <tr><td>Vehicle</td><td>Véhicule de la flotte</td><td>company, agency, model, license_plate, year, status (AVAILABLE/ON_MISSION/IN_MAINTENANCE/OUT_OF_SERVICE), internal_driver, external_driver, current_odometer</td></tr>
+    <tr><td>OdometerLog</td><td>Log odomètre immuable (hérite Model)</td><td>vehicle, value_km, source (MANUAL/FUEL/MAINTENANCE/ASSIGNMENT), recorded_by</td></tr>
+    <tr><td>FuelLog</td><td>Ravitaillement carburant</td><td>vehicle, liters, amount, station, full_tank, odometer_km (auto-update)</td></tr>
+    <tr><td>MaintenanceType</td><td>Type de maintenance (company=null=global)</td><td>name, interval_km, interval_days (alertes prédictives)</td></tr>
+    <tr><td>MaintenanceOrder</td><td>Bon de maintenance</td><td>vehicle, type, status, odometer_at_start, cost, next_due_km, next_due_date</td></tr>
+    <tr><td>Insurance</td><td>Assurance véhicule</td><td>vehicle, policy_number, insurer, premium, start_date, end_date, <code>days_until_expiry</code> property</td></tr>
+    <tr><td>VehicleDocument</td><td>Documents réglementaires</td><td>vehicle, doc_type (CARTE_GRISE/VISITE_TECHNIQUE/…), expiry_date, <code>days_until_expiry</code> property</td></tr>
+    <tr><td>Assignment</td><td>Mission véhicule</td><td>vehicle, driver interne/externe, purpose, start/end, odometer, distance_km property</td></tr>
+    <tr><td>Accident</td><td>Accident lié à une mission</td><td>vehicle, assignment, severity (MINOR/MODERATE/MAJOR), status (REPORTED→INVESTIGATED→CLOSED), driver_name property</td></tr>
+  </tbody>
+</table>
+
+<h2>Règles métier clés</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Statut véhicule auto-géré</div>
+    <ul>
+      <li><code>start_assignment()</code> → <strong>ON_MISSION</strong></li>
+      <li><code>complete_assignment()</code> → <strong>AVAILABLE</strong> + màj odomètre</li>
+      <li><code>start_maintenance()</code> → <strong>IN_MAINTENANCE</strong></li>
+      <li><code>complete_maintenance()</code> → <strong>AVAILABLE</strong> + calcule next_due</li>
+      <li>Suppression bloquée si ON_MISSION ou IN_MAINTENANCE</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Alertes flotte</div>
+    <ul>
+      <li><code>get_fleet_alerts()</code> retourne assurances et documents expirant dans 30 j</li>
+      <li><code>get_vehicle_stats()</code> calcule TCO (coût total de possession)</li>
+      <li>Maintenance prédictive par intervalle km + jours</li>
+      <li>Intégration voyage : départ → ON_MISSION, arrivée → AVAILABLE</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Endpoints — <code>/api/v1/fleet/</code> (43)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>brands/ | brands/&lt;id&gt;/</td><td>CRUD marques (global)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>models/ | models/&lt;id&gt;/</td><td>CRUD modèles de véhicule</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>external-drivers/ | external-drivers/&lt;id&gt;/</td><td>CRUD conducteurs externes</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>vehicles/alerts/</td><td>Alertes flotte (expirations, maintenance)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>vehicles/stats/</td><td>Statistiques flotte (TCO, disponibilité)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/ | vehicles/&lt;id&gt;/</td><td>CRUD véhicules</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/odometer/</td><td>Mettre à jour odomètre</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/fuel-logs/</td><td>Logs carburant d'un véhicule</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/maintenance/</td><td>Maintenance d'un véhicule</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/maintenance/&lt;mid&gt;/start/</td><td>Démarrer maintenance → IN_MAINTENANCE</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/maintenance/&lt;mid&gt;/complete/</td><td>Terminer + calculer next_due</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/insurance/ | /&lt;iid&gt;/</td><td>CRUD assurances</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/documents/ | /&lt;did&gt;/</td><td>CRUD documents réglementaires</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/assignments/</td><td>Missions d'un véhicule</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>assignments/&lt;id&gt;/start/ | complete/</td><td>Démarrer / Terminer mission</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicles/&lt;id&gt;/accidents/</td><td>Accidents d'un véhicule</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>accidents/&lt;id&gt;/status/</td><td>Changer statut accident (REPORTED→INVESTIGATED→CLOSED)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>maintenance-types/ | fuel-logs/ | assignments/ | accidents/</td><td>Vues globales (toute la flotte)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 11. TRANSPORT CONFIG                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="transport_config">11. Module Transport Config <span class="status status-done">✅ COMPLET</span></h1>
+<p>Données de référence du système transport : villes, terminaux, routes, catégories de véhicules, classes tarifaires et tarifs. <strong>18 endpoints</strong>.</p>
+
+<h2>Modèles (7)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>City</td><td>Ville (global — pas de company FK)</td><td>name, code (unique), country</td></tr>
+    <tr><td>Terminal</td><td>Terminal/Gare d'une société</td><td>company, city, name, address, latitude, longitude. unique_together (company, city, name)</td></tr>
+    <tr><td>Route</td><td>Itinéraire entre 2 terminaux</td><td>company, from_terminal, to_terminal, distance_km, duration_minutes, name (auto-généré). unique_together (company, from_terminal, to_terminal)</td></tr>
+    <tr><td>RouteStop</td><td>Arrêts intermédiaires</td><td>route, terminal, order (unique par route), duration_from_start_min</td></tr>
+    <tr><td>VehicleCategory</td><td>Catégorie de bus/car (company=null=global)</td><td>name, total_seats, seat_rows, seat_cols, aisle_after_col, has_back_row, free_seating, has_wifi/has_ac/has_tv/has_usb/has_snack. <code>amenities_list</code> property</td></tr>
+    <tr><td>FareClass</td><td>Classe tarifaire (company=null=global)</td><td>name, description</td></tr>
+    <tr><td>Fare</td><td>Tarif (route × catégorie × classe × type passager)</td><td>route, vehicle_category, fare_class, passenger_type (ADULT/CHILD/STUDENT/SENIOR), price. unique_together (route, vehicle_category, fare_class, passenger_type)</td></tr>
+  </tbody>
+</table>
+
+<h2>Endpoints — <code>/api/v1/transport/</code> (18)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>cities/ | cities/&lt;id&gt;/</td><td>CRUD villes (global)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>terminals/ | terminals/&lt;id&gt;/</td><td>CRUD terminaux</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>routes/ | routes/&lt;id&gt;/</td><td>CRUD routes</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>routes/&lt;id&gt;/stops/</td><td>Ajouter arrêt intermédiaire (ordre unique, terminal pas déjà dans la route)</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>routes/&lt;id&gt;/stops/&lt;sid&gt;/</td><td>Supprimer arrêt</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>vehicle-categories/ | /&lt;id&gt;/</td><td>CRUD catégories (global ou company)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>fare-classes/ | /&lt;id&gt;/</td><td>CRUD classes tarifaires (global)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>fares/ | fares/&lt;id&gt;/</td><td>CRUD tarifs (route × catégorie × classe × passager)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 12. VOYAGE                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="voyage">12. Module Voyage (Gestion des départs) <span class="status status-done">✅ COMPLET</span></h1>
+<p>Création et suivi des voyages, embarquement des passagers, gestion de l'équipage. <strong>11 endpoints</strong>.</p>
+
+<h2>Modèles (2)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>Trip</td><td>Voyage programmé — unité centrale du transport</td><td>company, reference (auto: TRIP-YYYYMMDD-NNN), route, departure_datetime, estimated/actual_arrival/departure, vehicle (optionnel), vehicle_category (requis), fare_class, total_seats, free_seating, status (SCHEDULED/BOARDING/DEPARTED/ARRIVED/CANCELLED). <code>from_city</code>, <code>to_city</code> properties. <code>booked_seats</code> annoté.</td></tr>
+    <tr><td>TripCrew</td><td>Membre d'équipage affecté à un voyage</td><td>trip, user, role (DRIVER/CONDUCTOR/SUPERVISOR/OTHER), notes. unique_together (trip, user)</td></tr>
+  </tbody>
+</table>
+
+<h2>Cycle de vie d'un voyage</h2>
+<div class="flow-diagram">
+  <span class="hl">SCHEDULED</span> <span class="arrow">→</span> <span class="hl">BOARDING</span> <span class="arrow">→</span> <span class="hl">DEPARTED</span> <span class="arrow">→</span> <span class="hl">ARRIVED</span><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">CANCELLED</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">CANCELLED bloqué</span>
+</div>
+<p><strong>Intégration Fleet :</strong> <code>depart_trip()</code> → Vehicle.status = ON_MISSION | <code>arrive_trip()</code> ou <code>cancel_trip()</code> → Vehicle.status = AVAILABLE</p>
+
+<h2>Endpoints — <code>/api/v1/voyage/</code> (11)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>trips/stats/</td><td>Tableau de bord (upcoming, boarding, in_transit, arrived_today)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>trips/search/</td><td>Recherche publique (from_city, to_city, date)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>trips/</td><td>Liste paginée + création</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method patch">PATCH</span>/<span class="method delete">DELETE</span></td><td>trips/&lt;id&gt;/</td><td>Détail, mise à jour (SCHEDULED seulement), suppression</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>trips/&lt;id&gt;/board/</td><td>SCHEDULED → BOARDING (ouverture embarquement)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>trips/&lt;id&gt;/depart/</td><td>→ DEPARTED + vehicle ON_MISSION</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>trips/&lt;id&gt;/arrive/</td><td>→ ARRIVED + vehicle AVAILABLE</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>trips/&lt;id&gt;/cancel/</td><td>Annulation</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>trips/&lt;id&gt;/crew/</td><td>Équipage d'un voyage</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method delete">DELETE</span></td><td>trips/&lt;id&gt;/crew/&lt;cid&gt;/</td><td>Membre d'équipage</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 13. TICKETING                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="ticketing">13. Module Ticketing <span class="status status-done">✅ COMPLET</span></h1>
+<p>Gestion des clients, réservations, billets avec QR code, et bagages. <strong>18 endpoints</strong>.</p>
+
+<h2>Modèles (4)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>Customer</td><td>Passager non-utilisateur système</td><td>company, first_name, last_name, phone, email, id_type (CNI/PASSPORT/…), id_number, date_of_birth. <code>full_name</code> property</td></tr>
+    <tr><td>Booking</td><td>Réservation sur un voyage</td><td>company, reference (auto: BKG-YYYYMMDD-NNNN), trip (related_name="bookings"), customer, passenger_type (ADULT/CHILD/STUDENT/SENIOR), seat_number, fare, amount_paid, status (PENDING/CONFIRMED/BOARDED/CANCELLED/NO_SHOW)</td></tr>
+    <tr><td>Ticket</td><td>Billet numérique scannable</td><td>booking (OneToOne), ticket_number (auto: TKT-…), qr_code (UUID, unique), issued_at, issued_by, is_used, used_at</td></tr>
+    <tr><td>Luggage</td><td>Bagage lié à une réservation</td><td>booking, tag_number (auto: LGG-…), description, weight_kg, status (CHECKED_IN/LOADED/DELIVERED/LOST)</td></tr>
+  </tbody>
+</table>
+
+<h2>Règles métier clés</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Création réservation</div>
+    <ul>
+      <li>Vérifie places disponibles via annotation SQL en temps réel</li>
+      <li>Vérifie unicité du siège pour voyages à places assignées</li>
+      <li>Crée automatiquement le Ticket avec QR code UUID unique</li>
+      <li><code>booked_seats</code> sur Trip = Count(CONFIRMED + BOARDED)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Embarquement par scan</div>
+    <ul>
+      <li><code>board_by_qr(qr_code)</code> → CONFIRMED → BOARDED</li>
+      <li>Ticket marqué <code>is_used=True</code> + <code>used_at</code></li>
+      <li>Erreur si ticket déjà utilisé</li>
+      <li>Bagages : CHECKED_IN → LOADED → DELIVERED (transitions validées)</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Endpoints — <code>/api/v1/ticketing/</code> (18)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>bookings/stats/</td><td>Stats (total, confirmed, boarded, revenue) — filtrable par trip_id</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/scan/</td><td>Embarquement par scan QR code</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>customers/ | /&lt;id&gt;/</td><td>CRUD clients</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>bookings/ | /&lt;id&gt;/</td><td>Liste + création réservation</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/&lt;id&gt;/confirm/</td><td>PENDING → CONFIRMED + crée Ticket</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/&lt;id&gt;/board/</td><td>CONFIRMED → BOARDED + marque ticket is_used</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/&lt;id&gt;/cancel/</td><td>Annuler réservation</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/&lt;id&gt;/no-show/</td><td>CONFIRMED → NO_SHOW</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>trips/&lt;id&gt;/bookings/</td><td>Toutes réservations d'un voyage (vue embarquement)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>bookings/&lt;id&gt;/luggage/ | /&lt;lid&gt;/</td><td>CRUD bagages</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>bookings/&lt;id&gt;/luggage/&lt;lid&gt;/status/</td><td>Changer statut bagage</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 14. PARCEL                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="parcel">14. Module Parcel (Colis) <span class="status status-done">✅ COMPLET</span></h1>
+<p>Gestion du cycle de vie des colis expédiés par bus. Tracking complet + paiement COD. <strong>16 endpoints</strong>.</p>
+
+<h2>Modèles (2)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>Parcel</td><td>Colis expédié entre deux terminaux</td><td>company, reference (auto: PCL-YYYYMMDD-NNNN), from_terminal, to_terminal, trip (optionnel), sender_name/phone, recipient_name/phone/address, description, weight_kg, quantity, declared_value, shipping_amount, payment_status (UNPAID/PAID/COD), payment_mode (CASH/MOBILE_MONEY/TRANSFER), paid_at, paid_by, status (REGISTERED/SHIPPED/RECEIVED/DELIVERED/RETURNED/LOST)</td></tr>
+    <tr><td>ParcelEvent</td><td>Log de tracking immuable (hérite models.Model)</td><td>parcel, status, location, note, created_by, created_at</td></tr>
+  </tbody>
+</table>
+
+<h2>Cycle de vie</h2>
+<div class="flow-diagram">
+<span class="hl">REGISTERED</span> <span class="arrow">→</span> <span class="hl">SHIPPED</span> <span class="arrow">→</span> <span class="hl">RECEIVED</span> <span class="arrow">→</span> <span class="hl">DELIVERED</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">RETURNED</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">RETURNED</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tout état) <span class="arrow">→</span> <span class="ok">LOST</span>
+</div>
+<p><strong>COD :</strong> payment_status=COD → encaissement automatique à la livraison (<code>deliver_parcel()</code> appelle <code>record_payment()</code>).<br>
+<strong>ParcelEvent</strong> : chaque transition crée une entrée immuable de tracking.</p>
+
+<h2>Endpoints — <code>/api/v1/parcels/</code> (16)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>stats/</td><td>Stats par statut + revenus</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>trips/&lt;id&gt;/parcels/</td><td>Colis d'un voyage</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>(vide) | &lt;id&gt;/</td><td>Liste (search, status, payment_status, date) + CRUD</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/assign-trip/</td><td>Affecter à un voyage</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/ship/</td><td>REGISTERED → SHIPPED</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/receive/</td><td>SHIPPED → RECEIVED (terminal destination)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/deliver/</td><td>RECEIVED → DELIVERED (remet au destinataire + COD auto)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/return/</td><td>→ RETURNED</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/lost/</td><td>→ LOST</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;id&gt;/payment/</td><td>Enregistrer paiement (CASH/MOBILE_MONEY/TRANSFER)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>&lt;id&gt;/events/</td><td>Historique de tracking (ParcelEvent)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 15. TREASURY                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="treasury">15. Module Treasury (Trésorerie) <span class="status status-done">✅ COMPLET</span></h1>
+<p>Gestion des caisses physiques, comptes bancaires, sessions de caisse journalières, transactions financières et virements internes. <strong>19 endpoints</strong>.</p>
+
+<h2>Modèles (5)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>CashRegister</td><td>Caisse physique par terminal</td><td>company, name, terminal (optionnel), responsible (FK User), current_balance (mis à jour en temps réel), is_active</td></tr>
+    <tr><td>BankAccount</td><td>Compte bancaire société</td><td>company, bank_name, account_name, account_number, current_balance, is_active</td></tr>
+    <tr><td>CashSession</td><td>Session quotidienne d'une caisse</td><td>company, cash_register, opened_by, closed_by, opening_balance, closing_balance, expected_closing, difference, opened_at, closed_at, status (OPEN/CLOSED)</td></tr>
+    <tr><td>Transaction</td><td>Mouvement financier (revenu ou dépense)</td><td>company, reference (auto: TXN-…), transaction_type (INCOME/EXPENSE), category (TICKET_SALES/PARCEL_SHIPPING/CHARTER/FUEL/MAINTENANCE/…), account_type (CASH/BANK), cash_session, bank_account, amount, payment_mode (CASH/MOBILE_MONEY/TRANSFER/CHECK), transaction_date, trip/booking/parcel (FK optionnels)</td></tr>
+    <tr><td>Transfer</td><td>Virement interne entre comptes</td><td>company, reference (auto: TRF-…), from_cash_register/from_bank_account, to_cash_register/to_bank_account, amount, description, transfer_date, completed_by</td></tr>
+  </tbody>
+</table>
+
+<h2>Règles métier clés</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Soldes en temps réel</div>
+    <ul>
+      <li><code>create_transaction()</code> met à jour le solde caisse ou banque atomiquement avec <code>select_for_update()</code></li>
+      <li><code>delete_transaction()</code> inverse l'impact sur le solde (bloqué si session fermée)</li>
+      <li><code>close_session()</code> calcule l'écart : <code>closing_balance - expected_closing</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Virements</div>
+    <ul>
+      <li>Validation solvabilité de la source avant débit</li>
+      <li>Opération atomique : débit source + crédit destination en un seul <code>@transaction.atomic</code></li>
+      <li>Supporte caisse→caisse, caisse→banque, banque→caisse, banque→banque</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Endpoints — <code>/api/v1/treasury/</code> (19)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>stats/</td><td>Soldes total cash+banque, revenus/dépenses du jour, sessions ouvertes</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>registers/ | /&lt;id&gt;/</td><td>CRUD caisses (?active=true)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>banks/ | /&lt;id&gt;/</td><td>CRUD comptes bancaires</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>sessions/</td><td>Liste sessions (filter: register_id, status, date_from, date_to)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>sessions/open/</td><td>Ouvrir session (bloqué si session déjà ouverte sur la caisse)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>sessions/&lt;id&gt;/</td><td>Détail session</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>sessions/&lt;id&gt;/close/</td><td>Fermer + calculer écart (closing_balance - expected)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>transactions/ | /&lt;id&gt;/</td><td>Transactions (filter: type, category, account_type, session, bank, date, trip)</td></tr>
+    <tr><td><span class="method get">GET</span>/<span class="method post">POST</span></td><td>transfers/ | /&lt;id&gt;/</td><td>Virements internes</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 16. ONLINE BOOKING                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="online_booking">16. Module Online Booking (API Publique) <span class="status status-done">✅ COMPLET</span></h1>
+<p>API sans authentification pour les clients finaux : recherche de voyages, sélection de siège, paiement Mobile Money via Campay (MTN MoMo / Orange Money), callback webhook. <strong>8 endpoints (AllowAny)</strong>.</p>
+
+<h2>Modèle (1)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>OnlineBookingRequest</td><td>Demande de réservation publique en attente de paiement</td><td>company, trip, passenger_name/phone/email, passenger_type, seat_number, fare, amount, payment_method (MTN_MOMO/ORANGE_MONEY), payment_phone, payment_reference (Campay ref), payment_operator_ref, status (PENDING/PAID/FAILED/EXPIRED), expires_at (created_at + 15 min), booking (FK créé sur succès paiement)</td></tr>
+  </tbody>
+</table>
+
+<h2>Flux complet de réservation en ligne</h2>
+<div class="flow-diagram">
+<span class="ok">[1]</span> Client <span class="arrow">→</span> GET /online/&lt;company_id&gt;/trips/?from_city=X&amp;to_city=Y&amp;date=Z
+<span class="ok">[2]</span> Client <span class="arrow">→</span> GET /online/&lt;company_id&gt;/trips/&lt;id&gt;/seats/ <span class="hl"># plan de siège</span>
+<span class="ok">[3]</span> Client <span class="arrow">→</span> POST /online/&lt;company_id&gt;/trips/&lt;id&gt;/book/
+         <span class="arrow">→</span> <span class="hl">OnlineBookingRequest(PENDING)</span> créé
+         <span class="arrow">→</span> <span class="hl">CampayClient.collect()</span> appelé
+         <span class="arrow">←</span> { request_id, payment_reference, expires_at }
+
+<span class="ok">[4]</span> Campay <span class="arrow">→</span> POST /online/webhooks/campay/
+         status=SUCCESSFUL <span class="arrow">→</span> <span class="hl">confirm_payment()</span>
+           <span class="arrow">→</span> Customer.get_or_create(phone)
+           <span class="arrow">→</span> Booking + Ticket créés automatiquement
+         status=FAILED <span class="arrow">→</span> <span class="hl">fail_payment()</span>
+
+<span class="ok">[5]</span> Client <span class="arrow">→</span> GET /online/requests/&lt;request_id&gt;/
+         <span class="arrow">→</span> sync_payment_status() <span class="hl"># polling Campay si PENDING</span>
+         <span class="arrow">←</span> { status: PAID, ticket: { ticket_number, qr_code } }
+</div>
+
+<h2>CampayClient (apps/online_booking/campay/client.py)</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Authentification</div>
+    <ul>
+      <li>Token obtenu via <code>POST /token/</code> (username + password)</li>
+      <li>Mis en cache Redis pendant <strong>23 heures</strong> (clé: <code>campay_access_token</code>)</li>
+      <li>Client HTTP natif Python (<code>urllib</code> — aucune dépendance externe)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Sécurité webhook</div>
+    <ul>
+      <li>Vérification HMAC-SHA256 si <code>CAMPAY_WEBHOOK_SECRET</code> configuré</li>
+      <li>Header : <code>X-Campay-Signature</code></li>
+      <li>En-tête manquant → 403 si secret configuré</li>
+      <li>Toujours retourner HTTP 200 pour ACK (évite les retries Campay)</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Endpoints — <code>/api/v1/online/</code> (8 — AllowAny)</h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method post">POST</span></td><td>webhooks/campay/</td><td>Callback Campay — confirmation ou échec paiement</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>requests/&lt;request_id&gt;/</td><td>Statut réservation — UUID est le token d'accès</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>&lt;company_id&gt;/trips/</td><td>Recherche voyages disponibles (from_city, to_city, date)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>&lt;company_id&gt;/trips/&lt;id&gt;/</td><td>Détail voyage (places disponibles, catégorie, amenities)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>&lt;company_id&gt;/trips/&lt;id&gt;/seats/</td><td>Plan de siège (rows, cols, aisle, sièges pris)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>&lt;company_id&gt;/trips/&lt;id&gt;/book/</td><td>Initier réservation → paiement Campay</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 17. RÉCAPITULATIF ENDPOINTS                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="urls">17. Récapitulatif des endpoints</h1>
+
+<div class="grid-4">
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">15</div>
+    <div style="font-size:12px; color:#555;">Auth</div>
+    <div style="font-size:10px; color:#888;">/api/v1/auth/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">26</div>
+    <div style="font-size:12px; color:#555;">System</div>
+    <div style="font-size:10px; color:#888;">/api/v1/system/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">25</div>
+    <div style="font-size:12px; color:#555;">RBAC</div>
+    <div style="font-size:10px; color:#888;">/api/v1/rbac/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">11</div>
+    <div style="font-size:12px; color:#555;">Users</div>
+    <div style="font-size:10px; color:#888;">/api/v1/users/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">40</div>
+    <div style="font-size:12px; color:#555;">RH</div>
+    <div style="font-size:10px; color:#888;">/api/v1/hr/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">43</div>
+    <div style="font-size:12px; color:#555;">Fleet</div>
+    <div style="font-size:10px; color:#888;">/api/v1/fleet/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">18</div>
+    <div style="font-size:12px; color:#555;">Transport</div>
+    <div style="font-size:10px; color:#888;">/api/v1/transport/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">11</div>
+    <div style="font-size:12px; color:#555;">Voyage</div>
+    <div style="font-size:10px; color:#888;">/api/v1/voyage/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">18</div>
+    <div style="font-size:12px; color:#555;">Ticketing</div>
+    <div style="font-size:10px; color:#888;">/api/v1/ticketing/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">16</div>
+    <div style="font-size:12px; color:#555;">Parcel</div>
+    <div style="font-size:10px; color:#888;">/api/v1/parcels/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">19</div>
+    <div style="font-size:12px; color:#555;">Treasury</div>
+    <div style="font-size:10px; color:#888;">/api/v1/treasury/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">8</div>
+    <div style="font-size:12px; color:#555;">Online Booking</div>
+    <div style="font-size:10px; color:#888;">/api/v1/online/</div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:28px; font-weight:800; color:#e94560;">41</div>
+    <div style="font-size:12px; color:#555;">Sync Sage 100</div>
+    <div style="font-size:10px; color:#888;">/api/v1/scig/</div>
+  </div>
+</div>
+
+<div class="card" style="text-align:center; margin-top:16px; background: linear-gradient(135deg,#0f3460,#16213e); color:#fff;">
+  <div style="font-size:48px; font-weight:900; color:#e94560;">291</div>
+  <div style="font-size:16px; color:#a0b0c8;">Endpoints API au total</div>
+  <div style="font-size:12px; color:#6a7f95; margin-top:4px;">14 modules — 47 modèles Django — 16 migrations</div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div class="card-title"><div class="dot"></div>Toutes les routes — <code>/api/v1/</code></div>
+  <table style="margin:0;">
+    <thead><tr><th>Préfixe</th><th>Module</th><th>Accès</th></tr></thead>
+    <tbody>
+      <tr><td>auth/</td><td>Authentification (JWT, 2FA, sessions)</td><td>Public + JWT</td></tr>
+      <tr><td>system/</td><td>Companies, Agencies, Parameters, FeatureFlags</td><td>SuperAdmin + InstitAdmin</td></tr>
+      <tr><td>rbac/</td><td>Modules, Menus, Permissions, Roles, Profiles</td><td>SuperAdmin + InstitAdmin</td></tr>
+      <tr><td>users/</td><td>Gestion utilisateurs par institution</td><td>InstitAdmin</td></tr>
+      <tr><td>hr/</td><td>Employés, contrats, congés</td><td>InstitAdmin</td></tr>
+      <tr><td>fleet/</td><td>Véhicules, maintenance, accidents</td><td>JWT</td></tr>
+      <tr><td>transport/</td><td>Villes, terminaux, routes, tarifs</td><td>JWT</td></tr>
+      <tr><td>voyage/</td><td>Voyages, embarquement, équipage</td><td>JWT</td></tr>
+      <tr><td>ticketing/</td><td>Clients, réservations, billets QR, bagages</td><td>JWT</td></tr>
+      <tr><td>parcels/</td><td>Colis, tracking, paiement</td><td>JWT</td></tr>
+      <tr><td>treasury/</td><td>Caisses, banques, sessions, transactions</td><td>JWT</td></tr>
+      <tr><td>online/</td><td>API publique + Campay webhook</td><td><strong>Public (AllowAny)</strong></td></tr>
+      <tr><td>scig/</td><td>Sync Sage 100 — inventaire mobile, transferts, articles, connexion</td><td>JWT + FeatureFlag</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 18. ROADMAP                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="roadmap">18. Roadmap des modules</h1>
+
+<h2>Verticale Transport &amp; Logistique — Complète ✅</h2>
+
+<div class="module-card done">
+  <h3>✅ Core (<em>apps.core</em>)</h3>
+  <p>BaseModel, Address, Currency, UoM, Attachment, TenantMiddleware, permissions (IsSuperAdmin, IsInstitutionAdmin, IsAuthenticated), exceptions, responses, pagination</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Authentication (<em>apps.authentication</em>)</h3>
+  <p>User étendu (AbstractUser), JWT custom claims, 2FA TOTP (RFC 6238), verrouillage compte, sessions tracées, reset mot de passe — 15 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ System Config (<em>apps.system_config</em>)</h3>
+  <p>Packages commerciaux, Companies/Institutions (tenants), Subscriptions, Agencies (hiérarchie illimitée), Parameters (Redis), FeatureFlags (Redis) — 26 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Admin RBAC (<em>apps.admin_rbac</em>)</h3>
+  <p>AppModules, Menus Angular router, Permissions granulaires, Rôles, Profils, UserRole (avec expiration), UserProfile — 25 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Users (<em>apps.users</em>)</h3>
+  <p>CRUD utilisateurs par institution, invitation (temp_password), activation/désactivation + révocation JWT, unlock, reset password admin, gestion agences — 11 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ RH (<em>apps.hr</em>)</h3>
+  <p>Grades, types contrat/congé, départements (arbre), postes, employés (EMP-YEAR-SEQ auto), contrats, soldes de congé, workflow approbation congés — 40 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Fleet (<em>apps.fleet</em>)</h3>
+  <p>VehicleBrand, VehicleModel, ExternalDriver, Vehicle (statut auto-géré), OdometerLog, FuelLog, MaintenanceType (global), MaintenanceOrder (next_due auto), Insurance, VehicleDocument, Assignment, Accident — 43 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Transport Config (<em>apps.transport_config</em>)</h3>
+  <p>City (global), Terminal, Route + RouteStop, VehicleCategory (plan siège + amenities), FareClass (global), Fare (route × catégorie × classe × passager) — 18 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Voyage (<em>apps.voyage</em>)</h3>
+  <p>Trip (référence auto, booked_seats annoté, intégration fleet), TripCrew. Transitions SCHEDULED→BOARDING→DEPARTED→ARRIVED/CANCELLED — 11 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Ticketing (<em>apps.ticketing</em>)</h3>
+  <p>Customer, Booking (PENDING→CONFIRMED→BOARDED/CANCELLED/NO_SHOW), Ticket (QR code UUID auto), Luggage (CHECKED_IN→LOADED→DELIVERED). Embarquement par scan QR — 18 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Parcel (<em>apps.parcel</em>)</h3>
+  <p>Parcel (cycle REGISTERED→SHIPPED→RECEIVED→DELIVERED/RETURNED/LOST, COD auto), ParcelEvent (log tracking immuable). Transition atomiques, paiement intégré — 16 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Treasury (<em>apps.treasury</em>)</h3>
+  <p>CashRegister, BankAccount, CashSession (écart opening/closing), Transaction (solde en temps réel via select_for_update), Transfer (virement interne atomique) — 19 endpoints</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Online Booking (<em>apps.online_booking</em>)</h3>
+  <p>OnlineBookingRequest, CampayClient (MTN MoMo / Orange Money, token Redis 23h), webhook Campay HMAC-SHA256. Flux : recherche → siège → book → paiement → ticket QR — 8 endpoints publics</p>
+</div>
+<div class="module-card done">
+  <h3>✅ Sync SCIG — Sage 100 (<em>apps.sync_scig_sage</em>)</h3>
+  <p>Intégration SQL Server directe (pyodbc) avec Sage 100 Gestion Commerciale. SageConnection par company (mot de passe Fernet), sync articles/variants/dépôts/stocks, inventaire mobile Zebra (zones Rouge→Bleu→Vert), transferts inter-dépôts, impression étiquettes, queue offline — 41 endpoints. Accès par FeatureFlag <em>sync_scig_sage.enabled</em>.</p>
+</div>
+
+<h2 style="margin-top:30px;">Prochaines verticales ERP</h2>
+
+<div class="module-card todo">
+  <h3>🔧 Finance OHADA (<em>apps.finance</em>)</h3>
+  <p>Plan comptable OHADA, journaux comptables, écritures, rapports financiers (bilan, compte de résultat), TVA, rapprochement trésorerie</p>
+</div>
+<div class="module-card todo">
+  <h3>🔧 Inventaire / Achats / Ventes (<em>apps.inventory, apps.purchase, apps.sales</em>)</h3>
+  <p>Articles, stocks, bons de commande, factures, livraisons, fournisseurs, clients, avoirs</p>
+</div>
+<div class="module-card todo">
+  <h3>🔧 POS — Point de Vente (<em>apps.pos</em>)</h3>
+  <p>Sessions de vente, tickets de caisse, modes de paiement multiples, clôture journalière, reçus</p>
+</div>
+<div class="module-card todo">
+  <h3>🔧 CRM (<em>apps.crm</em>)</h3>
+  <p>Pipeline commercial, contacts, opportunités, activités, relances, rapports commerciaux</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 19. MODULE SYNC SCIG — SAGE 100                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="sync_scig_sage">19. Module Sync SCIG — Sage 100 <span class="status status-done">✅ COMPLET</span></h1>
+
+<p>Intégration directe SQL Server (pyodbc) avec <strong>Sage 100 Gestion Commerciale</strong>. Chaque société a sa propre connexion Sage stockée de façon sécurisée. Le module gère la synchronisation des référentiels (articles, dépôts, stocks) et les opérations terrain sur terminaux Zebra (inventaires, transferts, étiquettes). <strong>41 endpoints</strong>.</p>
+
+<h2>Architecture d'intégration</h2>
+<div class="arch-flow">
+  <div class="arch-box">Sage 100 SQL Server</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">SageClient (pyodbc)</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">mapper.py</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Django ORM (PostgreSQL)</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">API REST</div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">Terminaux Zebra</div>
+</div>
+
+<h2>Modèles (14)</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Description</th><th>Champs clés</th></tr></thead>
+  <tbody>
+    <tr><td>SageConnection</td><td>Paramètres SQL Sage par company (1:1)</td><td>company (OneToOne), server, port, database, username, password_encrypted (Fernet), last_test_success</td></tr>
+    <tr><td>Article</td><td>Article Sage (F_ARTICLE)</td><td>sage_reference, designation, barcode, family, sub_family, has_size_variant, has_color_variant</td></tr>
+    <tr><td>ArticleVariant</td><td>Variante (F_ARTGAMME — taille × couleur)</td><td>article, sage_ref_variant, size, color, barcode, price_normal, price_sale</td></tr>
+    <tr><td>Depot</td><td>Dépôt/magasin (F_DEPOT)</td><td>company, sage_depot_no, name, is_active</td></tr>
+    <tr><td>StockLevel</td><td>Stock par (variante, dépôt) (F_ARTSTOCK)</td><td>depot, variant, stock_real, stock_available, stock_transit, synced_at</td></tr>
+    <tr><td>InventorySession</td><td>Session d'inventaire physique</td><td>company, name, depot, status (OPEN/CLOSED), opened_at, closed_at, submitted_to_sage_at</td></tr>
+    <tr><td>InventoryZone</td><td>Zone de comptage (terminal Zebra)</td><td>session, name, status (ROUGE/BLEU/VERT), locked_by_device, validated_by</td></tr>
+    <tr><td>InventoryLine</td><td>Ligne comptée (variante × zone)</td><td>zone, variant, qty_theoretical, qty_counted, is_manual, last_scanned_at</td></tr>
+    <tr><td>StockTransfer</td><td>Transfert inter-dépôts</td><td>company, reference (TRF-DATE-SEQ), source_depot, destination_depot, status</td></tr>
+    <tr><td>StockTransferLine</td><td>Ligne de transfert</td><td>transfer, variant, qty_planned, qty_shipped, qty_received</td></tr>
+    <tr><td>LabelCampaign</td><td>Campagne d'étiquetage promotionnel</td><td>company, name, discount_percent, starts_at, ends_at</td></tr>
+    <tr><td>LabelPrintJob</td><td>Job d'impression étiquettes (Zebra)</td><td>campaign, print_type (NORMAL/PROMO), print_data (JSON), device_id, total_labels</td></tr>
+    <tr><td>SyncLog</td><td>Historique de synchronisation Sage</td><td>sync_type (DEPOTS/ARTICLES/STOCK/FULL), status, records_read/created/updated/failed</td></tr>
+    <tr><td>SyncQueue</td><td>File d'attente opérations offline Zebra</td><td>device_operation_id (unique, idempotent), operation_type, device_timestamp, payload (JSON), status</td></tr>
+  </tbody>
+</table>
+
+<h2>Chiffrement des mots de passe Sage</h2>
+<div class="card">
+  <p><code>sage/encryption.py</code> — Fernet (AES-128-CBC) dérivé de <code>SECRET_KEY</code> via SHA-256. Aucune clé externe à gérer.</p>
+  <pre>
+# Transparent via property — jamais exposé en clair dans l'API
+conn.password = "MonMotDePasse"          # encrypt automatique
+plaintext = conn.password                # decrypt automatique
+conn_str  = conn.build_connection_string()  # prêt pour pyodbc</pre>
+</div>
+
+<h2>SageClient — connexion multi-tenant</h2>
+<div class="card">
+  <pre>
+# Dans services.py — helper central
+def _get_sage_client(company) -> SageClient:
+    conn = SageConnection.objects.filter(company=company, is_active=True).first()
+    if not conn:
+        raise ApplicationError("Aucune connexion Sage configurée.")
+    return SageClient(conn)   # SageClient(connection=conn)
+
+# Fallback dev (settings.SAGE_SQL_*)
+client = SageClient()         # sans argument = legacy/dev</pre>
+</div>
+
+<h2>Workflow inventaire (terminaux Zebra)</h2>
+<div class="card">
+  <div class="arch-flow" style="flex-wrap:wrap; gap:6px; margin:0;">
+    <div class="arch-box" style="background:#e94560;">ROUGE — IN_PROGRESS</div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="background:#1864ab;">BLEU — SUBMITTED</div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="background:#fd7e14;">ORANGE — RECHECK</div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="background:#2b8a3e;">VERT — VALIDATED</div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box">Push Sage 100</div>
+  </div>
+  <p style="margin-top:12px; font-size:12px; color:#555;">Zone ouverte par le terminal (lock <em>device_id</em>) → scan articles → soumission → validation manager → push F_ARTSTOCK. Submit bloqué tant que toutes les zones ne sont pas VALIDATED.</p>
+</div>
+
+<h2>Règles métier clés</h2>
+<ul>
+  <li><strong>1 SageConnection par company</strong> (<code>OneToOneField</code>) — upsert via <em>upsert_sage_connection()</em></li>
+  <li><strong>Accès conditionné au FeatureFlag</strong> <code>sync_scig_sage.enabled</code> via <code>IsScigSageEnabled</code></li>
+  <li><strong>Queue offline idempotente</strong> — <code>device_operation_id</code> unique, doublons silencieusement ignorés</li>
+  <li><strong>Snapshot stock théorique</strong> à l'ouverture de zone — comparaison physique vs Sage</li>
+  <li><strong>Transfert</strong> : vérification stock disponible avant ajout de ligne (évite sur-planification)</li>
+  <li><strong>Push Sage</strong> : update atomique <code>F_ARTSTOCK.AS_StockReel</code> avec rollback pyodbc</li>
+</ul>
+
+<h2>Endpoints — <code>/api/v1/scig/</code> (41)</h2>
+<table>
+  <thead><tr><th>Méthode</th><th>URL</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>dashboard/</td><td>KPIs manager (sessions ouvertes, transferts en cours, stocks critiques)</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>connection/</td><td>Lire / créer-mettre à jour la connexion Sage 100 (server, port, db, user, pwd)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>connection/test/</td><td>Test live de connexion SQL Server — met à jour last_test_success</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>sync/trigger/</td><td>Déclencher sync Sage (DEPOTS / ARTICLES / STOCK / FULL)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>sync/logs/</td><td>Historique des synchronisations avec filtres</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>sync/queue/push/</td><td>Pousser opérations offline depuis terminal Zebra (batch idempotent)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>sync/queue/flush/</td><td>Traiter la file d'attente offline (processed/skipped/failed)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>articles/</td><td>Liste articles avec recherche/filtre famille</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>articles/&lt;id&gt;/</td><td>Détail article + variantes</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>variants/search/?q=</td><td>Recherche variante par code-barres ou référence (mobile Zebra)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>depots/</td><td>Liste des dépôts actifs</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>depots/&lt;id&gt;/stock/</td><td>Stock d'un dépôt (réel/dispo/transit)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>stock/critical/</td><td>Articles en rupture ou stock critique (seuil paramétrable)</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>inventory/</td><td>Liste / créer session d'inventaire</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>inventory/&lt;id&gt;/</td><td>Détail session + zones</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;id&gt;/submit-sage/</td><td>Push ajustements vers Sage 100 + clôture session</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>inventory/&lt;id&gt;/report/</td><td>Rapport comparatif Sage vs physique (toutes lignes)</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>inventory/&lt;id&gt;/zones/</td><td>Liste / créer zone de comptage</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/open/</td><td>Ouvrir zone → ROUGE (lock terminal)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/scan/</td><td>Scanner code-barres (incrémente qty_counted)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/manual/</td><td>Saisie manuelle quantité (écrase qty_counted)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/submit/</td><td>Soumettre zone → BLEU (mobile)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/validate/</td><td>Valider zone → VERT (dashboard manager)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/recheck/</td><td>Renvoyer en vérification → ORANGE</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/lines/</td><td>Lignes comptées avec écart Sage/physique</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>transfers/</td><td>Liste / créer transfert inter-dépôts</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>transfers/&lt;id&gt;/</td><td>Détail transfert + lignes</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>transfers/&lt;id&gt;/lines/scan/</td><td>Ajouter article par scan (DRAFT — vérifie stock dispo)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>transfers/&lt;id&gt;/validate/</td><td>DRAFT → VALIDATED</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>transfers/&lt;id&gt;/ship/</td><td>VALIDATED → SHIPPED (copie qty_planned → qty_shipped)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>transfers/&lt;id&gt;/receive/scan/</td><td>Scanner article à la réception (cumule qty_received)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>transfers/&lt;id&gt;/receive/close/</td><td>Finaliser réception → RECEIVED</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>labels/campaigns/</td><td>Liste / créer campagne d'étiquetage</td></tr>
+    <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>labels/print/</td><td>Liste / créer job d'impression étiquettes (Zebra)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 20. CONVENTIONS                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h1 id="conventions">20. Conventions de développement</h1>
+
+<h2>Règles absolues</h2>
+<div class="card">
+  <ol>
+    <li style="margin-bottom:8px;"><strong>Jamais <code>auth.User</code> dans les ForeignKey.</strong> Toujours <code>settings.AUTH_USER_MODEL</code> ou <code>"authentication.User"</code>.</li>
+    <li style="margin-bottom:8px;"><strong>Jamais d'ORM dans les views.</strong> Selectors pour les lectures, services pour les écritures.</li>
+    <li style="margin-bottom:8px;"><strong>Tous les modèles métier héritent de <code>BaseModel</code></strong> (UUID, timestamps, soft-delete, audit). Exception : logs immuables (<code>OdometerLog</code>, <code>ParcelEvent</code>) → <code>models.Model</code>.</li>
+    <li style="margin-bottom:8px;"><strong>Services Write : paramètres explicites.</strong> Pas de <code>**kwargs → objects.create()</code> — risque de conflits FK résolues.</li>
+    <li style="margin-bottom:8px;"><strong>FK optionnelles dans les WriteSerializers :</strong> <code>required=False, allow_null=True, default=None</code>.</li>
+    <li style="margin-bottom:8px;"><strong><code>select_for_update()</code></strong> pour toute mise à jour de solde (CashRegister.current_balance, BankAccount.current_balance) → prévient les race conditions.</li>
+    <li><strong>Références croisées entre modules :</strong> utiliser les strings FK (<code>"fleet.Vehicle"</code>, <code>"voyage.Trip"</code>) pour éviter les circular imports.</li>
+  </ol>
+</div>
+
+<h2>Pattern company=None (données globales partagées)</h2>
+<div class="card">
+  <p>Certains modèles de référence sont partagés entre toutes les sociétés : <code>VehicleCategory</code>, <code>FareClass</code>, <code>MaintenanceType</code>.</p>
+  <pre>
+# Dans les selectors — récupérer données system + company
+qs = VehicleCategory.objects.filter(
+    Q(company_id=company_id) | Q(company__isnull=True),
+    is_deleted=False
+)</pre>
+</div>
+
+<h2>Structure type d'une app</h2>
+<table>
+  <thead><tr><th>Fichier / Dossier</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td>apps.py</td><td>AppConfig avec <code>label</code> unique</td></tr>
+    <tr><td>models/</td><td>Un fichier par entité + <code>__init__.py</code> d'export</td></tr>
+    <tr><td>selectors/</td><td>Fonctions de lecture (QuerySets, filtres, annotations)</td></tr>
+    <tr><td>services/</td><td>Logique métier + <code>@transaction.atomic</code></td></tr>
+    <tr><td>serializers.py</td><td>Read + Write séparés quand les structures diffèrent</td></tr>
+    <tr><td>views.py</td><td>APIView thin — validation + délégation seulement</td></tr>
+    <tr><td>urls.py</td><td>Routes incluses depuis <code>api/v1/router.py</code></td></tr>
+    <tr><td>admin.py</td><td>Interface Django Admin</td></tr>
+    <tr><td>migrations/</td><td>Migrations Django générées</td></tr>
+  </tbody>
+</table>
+
+<h2>Permissions disponibles</h2>
+<table>
+  <thead><tr><th>Classe</th><th>Condition</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td>IsSuperAdmin</td><td>is_authenticated + is_staff + is_superuser</td><td>Administration plateforme (packages, companies)</td></tr>
+    <tr><td>IsInstitutionAdmin</td><td>is_superuser OU is_institution_admin</td><td>Gestion interne d'une institution</td></tr>
+    <tr><td>IsAuthenticated</td><td>is_authenticated</td><td>Tout utilisateur connecté (fleet, voyage, treasury…)</td></tr>
+    <tr><td>AllowAny</td><td>—</td><td>Endpoints publics (login, packages, online booking)</td></tr>
+  </tbody>
+</table>
+
+<h2>Références auto-générées</h2>
+<table>
+  <thead><tr><th>Module</th><th>Format</th><th>Exemple</th></tr></thead>
+  <tbody>
+    <tr><td>Fleet — Employee</td><td>EMP-{YEAR}-{SEQ:04d}</td><td>EMP-2026-0042</td></tr>
+    <tr><td>Voyage — Trip</td><td>TRIP-{YYYYMMDD}-{SEQ:03d}</td><td>TRIP-20260615-001</td></tr>
+    <tr><td>Ticketing — Booking</td><td>BKG-{YYYYMMDD}-{SEQ:04d}</td><td>BKG-20260615-0001</td></tr>
+    <tr><td>Ticketing — Ticket</td><td>TKT-{YYYYMMDD}-{SEQ:04d}</td><td>TKT-20260615-0001</td></tr>
+    <tr><td>Ticketing — Luggage</td><td>LGG-{YYYYMMDD}-{SEQ:04d}</td><td>LGG-20260615-0001</td></tr>
+    <tr><td>Parcel</td><td>PCL-{YYYYMMDD}-{SEQ:04d}</td><td>PCL-20260615-0001</td></tr>
+    <tr><td>Treasury — Transaction</td><td>TXN-{YYYYMMDD}-{SEQ:04d}</td><td>TXN-20260615-0001</td></tr>
+    <tr><td>Treasury — Transfer</td><td>TRF-{YYYYMMDD}-{SEQ:04d}</td><td>TRF-20260615-0001</td></tr>
+  </tbody>
+</table>
+
+<h2>Internationalisation (i18n)</h2>
+<div class="card">
+  <p>Toutes les chaînes utilisateur enveloppées dans <code>gettext_lazy as _</code>. Langues : <strong>Français</strong> (défaut), <strong>English</strong>, <strong>العربية</strong>.</p>
+  <pre>
+from django.utils.translation import gettext_lazy as _
+raise ApplicationError(_("No seats available on this trip."))
+  </pre>
+  <p>Interface Rosetta : <code>http://127.0.0.1:8000/rosetta/</code></p>
+</div>
+
+</div><!-- /.container -->
+
+<footer>
+  <strong>DreamsPOS ERP</strong> — Documentation Backend v2.0.0<br />
+  Mis à jour Juin 2026 &nbsp;|&nbsp; Django 5.1.4 + DRF 3.15.2 &nbsp;|&nbsp;
+  Verticale Transport &amp; Logistique complète — 291 endpoints — 14 modules — 47 modèles — 16 migrations
+</footer>
+
+</body>
+</html>

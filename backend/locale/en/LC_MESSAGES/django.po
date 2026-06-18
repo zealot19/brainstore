@@ -1,0 +1,67 @@
+# English translations — DreamsPOS ERP
+# Language: English (en)
+msgid ""
+msgstr ""
+"Project-Id-Version: DreamsPOS ERP 1.0\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Français"
+msgstr "French"
+
+msgid "English"
+msgstr "English"
+
+msgid "العربية"
+msgstr "Arabic"
+
+msgid "Fondation"
+msgstr "Foundation"
+
+msgid "Configuration système"
+msgstr "System Configuration"
+
+msgid "identifiant"
+msgstr "Identifier"
+
+msgid "actif"
+msgstr "Active"
+
+msgid "créé le"
+msgstr "Created at"
+
+msgid "modifié le"
+msgstr "Updated at"
+
+msgid "institution"
+msgstr "Institution"
+
+msgid "institutions"
+msgstr "Institutions"
+
+msgid "agence"
+msgstr "Agency"
+
+msgid "agences"
+msgstr "Agencies"
+
+msgid "package"
+msgstr "Package"
+
+msgid "packages"
+msgstr "Packages"
+
+msgid "Une erreur s'est produite."
+msgstr "An error occurred."
+
+msgid "Authentification requise."
+msgstr "Authentication required."
+
+msgid "Réservé aux super administrateurs."
+msgstr "Reserved for super administrators."
+
+msgid "Réservé aux administrateurs de l'institution."
+msgstr "Reserved for institution administrators."

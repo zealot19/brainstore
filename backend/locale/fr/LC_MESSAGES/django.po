@@ -1,0 +1,94 @@
+# Traductions françaises — DreamsPOS ERP
+# Language: French (fr)
+msgid ""
+msgstr ""
+"Project-Id-Version: DreamsPOS ERP 1.0\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Français"
+msgstr "Français"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "العربية"
+msgstr "Arabe"
+
+msgid "Fondation"
+msgstr "Fondation"
+
+msgid "Configuration système"
+msgstr "Configuration système"
+
+msgid "identifiant"
+msgstr "Identifiant"
+
+msgid "actif"
+msgstr "Actif"
+
+msgid "créé le"
+msgstr "Créé le"
+
+msgid "modifié le"
+msgstr "Modifié le"
+
+msgid "supprimé"
+msgstr "Supprimé"
+
+msgid "supprimé le"
+msgstr "Supprimé le"
+
+msgid "supprimé par"
+msgstr "Supprimé par"
+
+msgid "créé par"
+msgstr "Créé par"
+
+msgid "modifié par"
+msgstr "Modifié par"
+
+msgid "institution"
+msgstr "Institution"
+
+msgid "institutions"
+msgstr "Institutions"
+
+msgid "agence"
+msgstr "Agence"
+
+msgid "agences"
+msgstr "Agences"
+
+msgid "package"
+msgstr "Package"
+
+msgid "packages"
+msgstr "Packages"
+
+msgid "souscription"
+msgstr "Souscription"
+
+msgid "souscriptions"
+msgstr "Souscriptions"
+
+msgid "paramètre"
+msgstr "Paramètre"
+
+msgid "paramètres"
+msgstr "Paramètres"
+
+msgid "Une erreur s'est produite."
+msgstr "Une erreur s'est produite."
+
+msgid "Authentification requise."
+msgstr "Authentification requise."
+
+msgid "Réservé aux super administrateurs."
+msgstr "Réservé aux super administrateurs."
+
+msgid "Réservé aux administrateurs de l'institution."
+msgstr "Réservé aux administrateurs de l'institution."
