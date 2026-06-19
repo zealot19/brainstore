@@ -1,0 +1,278 @@
+<div class="page-header">
+  <div class="page-title">
+    <h4><i class="ti ti-plug-connected me-2"></i>Configuration Sage 100</h4>
+    <h6 class="text-muted">Connexion SCIG → Sage 100 et synchronisation des données</h6>
+  </div>
+</div>
+
+<!-- ── Connexion Sage 100 ──────────────────────────────────────────────── -->
+@if (perm.has('scig.connection.manage')) {
+  <div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="card-title mb-0">
+        <i class="ti ti-server me-2 text-primary"></i>Connexion Sage 100
+      </h5>
+      @if (connection) {
+        <span class="badge" [class]="connection.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
+          {{ connection.is_active ? 'Active' : 'Inactive' }}
+        </span>
+      }
+    </div>
+    <div class="card-body">
+
+      @if (loadingConn) {
+        <div class="text-center py-4 text-muted">
+          <div class="spinner-border spinner-border-sm me-2"></div>Chargement…
+        </div>
+      } @else {
+
+        <!-- Statut dernier test -->
+        @if (connection && connection.last_tested_at) {
+          <div class="alert py-2 mb-4 small"
+               [class]="connection.last_test_success ? 'alert-success' : 'alert-danger'">
+            <i class="ti me-2" [class]="connection.last_test_success ? 'ti-circle-check' : 'ti-circle-x'"></i>
+            <strong>Dernier test :</strong>
+            {{ connection.last_test_success ? 'Succès' : 'Échec' }}
+            le {{ connection.last_tested_at | date:'dd/MM/yy HH:mm' }}
+            @if (!connection.last_test_success && connection.last_test_error) {
+              — {{ connection.last_test_error }}
+            }
+          </div>
+        }
+        @if (connNotFound) {
+          <div class="alert alert-info py-2 mb-4 small">
+            <i class="ti ti-info-circle me-2"></i>Aucune connexion Sage 100 configurée. Renseignez les paramètres ci-dessous.
+          </div>
+        }
+
+        <!-- Formulaire -->
+        <form [formGroup]="connForm" (ngSubmit)="saveConnection()">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label fw-semibold">Serveur SQL <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="server"
+                     placeholder="ex : 192.168.1.10 ou MONSERVEUR\SQLEXPRESS">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Port <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" formControlName="port" placeholder="1433">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Base de données <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="database"
+                     placeholder="ex : CBTK_SAGE">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Utilisateur SQL <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="username"
+                     placeholder="ex : sa">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Mot de passe</label>
+              <input type="password" class="form-control" formControlName="password"
+                     placeholder="Laisser vide pour conserver l'existant">
+              <div class="form-text">Laisser vide pour ne pas modifier le mot de passe enregistré.</div>
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-1">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" formControlName="is_active" id="connActive">
+                <label class="form-check-label" for="connActive">Connexion active</label>
+              </div>
+            </div>
+          </div>
+
+          @if (saveError) {
+            <div class="alert alert-danger py-2 mt-3 small">{{ saveError }}</div>
+          }
+          @if (saveSuccess) {
+            <div class="alert alert-success py-2 mt-3 small">{{ saveSuccess }}</div>
+          }
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary" [disabled]="connForm.invalid || saving">
+              @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              <i class="ti ti-device-floppy me-1"></i>Enregistrer
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="testConnection()"
+                    [disabled]="testing || !connection">
+              @if (testing) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              <i class="ti ti-plug me-1"></i>Tester la connexion
+            </button>
+          </div>
+        </form>
+
+        <!-- Résultat du test -->
+        @if (testResult) {
+          <div class="alert mt-3 py-2 small" [class]="testResult.success ? 'alert-success' : 'alert-danger'">
+            <i class="ti me-2" [class]="testResult.success ? 'ti-circle-check' : 'ti-circle-x'"></i>
+            <strong>{{ testResult.success ? 'Connexion établie' : 'Échec' }}</strong> — {{ testResult.message }}
+            @if (testResult.latency_ms != null) {
+              <span class="ms-2 text-muted">({{ testResult.latency_ms }} ms)</span>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+}
+
+<!-- ── Déclenchement synchronisation ──────────────────────────────────────── -->
+@if (perm.has('scig.sync.trigger')) {
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="card-title mb-0">
+        <i class="ti ti-refresh me-2 text-primary"></i>Synchronisation manuelle
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">
+        Déclenche une synchronisation des données depuis Sage 100. Les résultats sont disponibles dans l'historique.
+      </p>
+
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        @for (t of syncTypes; track t.value) {
+          <button class="btn"
+                  [class]="selectedType === t.value ? 'btn-primary' : 'btn-outline-secondary'"
+                  (click)="selectedType = t.value">
+            <i class="ti me-1" [class]="t.icon"></i>{{ t.label }}
+          </button>
+        }
+      </div>
+
+      <button class="btn btn-success" (click)="triggerSync()" [disabled]="triggering">
+        @if (triggering) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        <i class="ti ti-player-play me-1"></i>Lancer {{ typeLabel(selectedType) }}
+      </button>
+
+      @if (syncError) {
+        <div class="alert alert-danger py-2 mt-3 small">{{ syncError }}</div>
+      }
+
+      <!-- Résultat sync simple -->
+      @if (syncResultSingle) {
+        <div class="mt-3">
+          <div class="alert py-2 small"
+               [class]="syncResultSingle.status === 'SUCCESS' ? 'alert-success' : syncResultSingle.status === 'FAILED' ? 'alert-danger' : 'alert-warning'">
+            <strong><i class="ti me-1" [class]="syncResultSingle.status === 'SUCCESS' ? 'ti-circle-check' : 'ti-alert-triangle'"></i>
+              {{ typeLabel(syncResultSingle.sync_type) }}</strong>
+            — {{ statusLabel(syncResultSingle.status) }} — {{ logResult(syncResultSingle) }} — {{ durationMs(syncResultSingle) }}
+            @if (syncResultSingle.error_message) {
+              <div class="mt-1 text-danger">{{ syncResultSingle.error_message }}</div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Résultat FULL -->
+      @if (syncResultFull) {
+        <div class="row g-2 mt-2">
+          @for (entry of fullEntries(); track entry.key) {
+            <div class="col-md-4">
+              <div class="card border-0 bg-light">
+                <div class="card-body py-2 px-3">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="small">{{ entry.label }}</strong>
+                    <span class="badge badge-sm" [class]="statusBadge(entry.log.status)">
+                      {{ statusLabel(entry.log.status) }}
+                    </span>
+                  </div>
+                  <div class="text-muted" style="font-size:11px">{{ logResult(entry.log) }}</div>
+                  <div class="text-muted" style="font-size:11px">{{ durationMs(entry.log) }}</div>
+                  @if (entry.log.error_message) {
+                    <div class="text-danger" style="font-size:11px">{{ entry.log.error_message }}</div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ── Historique des synchronisations ────────────────────────────────────── -->
+@if (perm.has('scig.sync.view')) {
+  <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <h5 class="card-title mb-0">
+        <i class="ti ti-history me-2 text-primary"></i>Historique
+        @if (!loadingLogs) { <span class="badge bg-secondary ms-1">{{ totalLogs }}</span> }
+      </h5>
+      <div class="d-flex gap-2 flex-wrap">
+        <select class="form-select form-select-sm" style="width:130px" [(ngModel)]="filterType" (change)="applyFilters()">
+          <option value="">Tous types</option>
+          <option value="DEPOTS">Dépôts</option>
+          <option value="ARTICLES">Articles</option>
+          <option value="STOCK">Stock</option>
+          <option value="FULL">FULL</option>
+        </select>
+        <select class="form-select form-select-sm" style="width:140px" [(ngModel)]="filterStatus" (change)="applyFilters()">
+          <option value="">Tous statuts</option>
+          <option value="SUCCESS">Succès</option>
+          <option value="FAILED">Échec</option>
+          <option value="PARTIAL">Partiel</option>
+          <option value="RUNNING">En cours</option>
+        </select>
+        <button class="btn btn-sm btn-outline-secondary" (click)="resetFilters()">
+          <i class="ti ti-x"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-primary" (click)="loadLogs()">
+          <i class="ti ti-refresh"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      @if (loadingLogs) {
+        <div class="text-center py-4 text-muted">
+          <div class="spinner-border spinner-border-sm me-2"></div>Chargement…
+        </div>
+      } @else if (logs.length === 0) {
+        <div class="text-center py-5 text-muted">
+          <i class="ti ti-history fs-1 d-block mb-2"></i>Aucune synchronisation enregistrée.
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Résultat</th>
+                <th>Durée</th>
+                <th>Déclenché par</th>
+                <th>Erreur</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (log of logs; track log.id) {
+                <tr>
+                  <td class="small text-nowrap">{{ log.started_at | date:'dd/MM/yy HH:mm' }}</td>
+                  <td><span class="badge bg-outline-primary">{{ typeLabel(log.sync_type) }}</span></td>
+                  <td><span class="badge" [class]="statusBadge(log.status)">{{ statusLabel(log.status) }}</span></td>
+                  <td class="small text-muted">
+                    <span class="text-success">+{{ log.records_created }}</span>
+                    <span class="mx-1">·</span>
+                    <span class="text-primary">↑{{ log.records_updated }}</span>
+                    @if (log.records_failed > 0) {
+                      <span class="mx-1">·</span>
+                      <span class="text-danger">✗{{ log.records_failed }}</span>
+                    }
+                  </td>
+                  <td class="small text-muted text-nowrap">{{ durationMs(log) }}</td>
+                  <td class="small text-muted">{{ log.triggered_by_name || '—' }}</td>
+                  <td class="small text-danger" style="max-width:200px">
+                    @if (log.error_message) {
+                      <span class="text-truncate d-block" [title]="log.error_message">{{ log.error_message }}</span>
+                    } @else { — }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+}

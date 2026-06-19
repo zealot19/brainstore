@@ -1,0 +1,231 @@
+<!-- En-tête (masqué à l'impression) -->
+<div class="page-header d-print-none">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Rapport d'inventaire</h4>
+      @if (session) {
+        <h6>{{ session.name }} — {{ session.depot_name }}</h6>
+      }
+    </div>
+  </div>
+  <ul class="table-top-head">
+    @if (perm.has('scig.report.export')) {
+      <li>
+        <a href="javascript:void(0);" (click)="exportPdf()" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
+          <i class="ti ti-file-type-pdf" style="font-size:1.25rem;color:#dc3545"></i>
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0);" (click)="exportExcel()" data-bs-toggle="tooltip" data-bs-placement="top" title="Excel">
+          <i class="ti ti-file-spreadsheet" style="font-size:1.25rem;color:#198754"></i>
+        </a>
+      </li>
+    }
+    <li>
+      <a href="javascript:void(0);" (click)="loadData()" data-bs-toggle="tooltip" data-bs-placement="top" title="Actualiser">
+        <i class="ti ti-refresh"></i>
+      </a>
+    </li>
+  </ul>
+  <div class="page-btn">
+    <a [routerLink]="['/scig/inventaires', sessionId]" class="btn btn-secondary w-100">
+      <i class="feather icon-arrow-left me-2"></i>Back to Session
+    </a>
+  </div>
+</div>
+
+<!-- Chargement -->
+@if (loading) {
+  <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+
+@if (error) {
+  <div class="alert alert-danger py-2">{{ error }}</div>
+}
+
+<!-- En-tête d'impression -->
+@if (!loading && session) {
+  <div class="d-none d-print-block mb-4">
+    <h3 class="mb-1">Rapport d'inventaire — {{ session.name }}</h3>
+    <p class="text-muted mb-0">
+      Dépôt : {{ session.depot_name }} ·
+      Ouvert le {{ session.opened_at | date:'dd/MM/yyyy' }}
+      @if (session.closed_at) { · Clôturé le {{ session.closed_at | date:'dd/MM/yyyy' }} }
+    </p>
+    <hr>
+  </div>
+}
+
+<!-- Contenu rapport -->
+@if (!loading && countedLines.length > 0) {
+
+  <!-- KPI globaux (masqués à l'impression) -->
+  <div class="row g-3 mb-4 d-print-none">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body py-3 text-center">
+          <div class="text-muted small mb-1">Zones inventoriées</div>
+          <div class="fw-bold fs-4">{{ zoneGroups.length }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body py-3 text-center">
+          <div class="text-muted small mb-1">Articles comptés</div>
+          <div class="fw-bold fs-4">{{ countedLines.length }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body py-3 text-center">
+          <div class="text-muted small mb-1">Qté Sage (théo.)</div>
+          <div class="fw-bold fs-4">{{ grandTotalTheoretical | number:'1.0-0' }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100" [ngClass]="grandTotalVariance === 0 ? '' : 'border-warning border-opacity-50'">
+        <div class="card-body py-3 text-center">
+          <div class="text-muted small mb-1">Écart global</div>
+          <div class="fw-bold fs-4" [ngClass]="varianceClass(grandTotalVariance)">
+            {{ grandTotalVariance > 0 ? '+' : '' }}{{ grandTotalVariance | number:'1.0-0' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau par zone -->
+  @for (group of zoneGroups; track group.zoneName) {
+    <div class="card table-list-card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <h5 class="mb-0">
+          <i class="ti ti-map-pin me-2 text-primary"></i>{{ group.zoneName }}
+        </h5>
+        <div class="d-flex gap-3 text-muted small">
+          <span>{{ group.lines.length }} article(s)</span>
+          <span>Compté : <strong class="text-dark">{{ group.totalCounted | number:'1.0-0' }}</strong></span>
+          <span>Écart :
+            <strong [ngClass]="varianceClass(group.totalVariance)">
+              {{ group.totalVariance > 0 ? '+' : '' }}{{ group.totalVariance | number:'1.0-0' }}
+            </strong>
+          </span>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table datanew mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Désignation</th>
+                <th>Référence</th>
+                <th>Taille</th>
+                <th>Couleur</th>
+                <th class="text-end">Théorique</th>
+                <th class="text-end">Compté</th>
+                <th class="text-end">Écart</th>
+                <th>Saisie</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of group.lines; track l.id) {
+                <tr>
+                  <td class="fw-medium">{{ l.article_designation }}</td>
+                  <td><span class="badge bg-outline-secondary">{{ l.article_reference }}</span></td>
+                  <td>{{ l.variant.size  || '—' }}</td>
+                  <td>{{ l.variant.color || '—' }}</td>
+                  <td class="text-end text-muted">{{ l.qty_theoretical | number:'1.0-0' }}</td>
+                  <td class="text-end fw-medium">{{ l.qty_counted | number:'1.0-0' }}</td>
+                  <td class="text-end">
+                    <span [ngClass]="varianceClass(l.variance)">
+                      {{ l.variance > 0 ? '+' : '' }}{{ l.variance | number:'1.0-0' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (l.is_manual) {
+                      <span class="badge bg-outline-warning text-dark">Manuel</span>
+                    } @else {
+                      <span class="badge bg-outline-secondary">Scan</span>
+                    }
+                  </td>
+                </tr>
+              }
+              <!-- Sous-total -->
+              <tr class="table-light fw-semibold">
+                <td colspan="4" class="text-end text-muted small">Sous-total {{ group.zoneName }}</td>
+                <td class="text-end">{{ group.totalTheoretical | number:'1.0-0' }}</td>
+                <td class="text-end">{{ group.totalCounted | number:'1.0-0' }}</td>
+                <td class="text-end">
+                  <span [ngClass]="varianceClass(group.totalVariance)">
+                    {{ group.totalVariance > 0 ? '+' : '' }}{{ group.totalVariance | number:'1.0-0' }}
+                  </span>
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Récapitulatif TOTAL INVENTAIRE -->
+  <div class="card table-list-card">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="ti ti-report-analytics me-2 text-primary"></i>TOTAL INVENTAIRE</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th>Zone</th>
+              <th class="text-end">Articles</th>
+              <th class="text-end">Théorique</th>
+              <th class="text-end">Compté</th>
+              <th class="text-end">Écart</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (group of zoneGroups; track group.zoneName) {
+              <tr>
+                <td class="fw-medium">{{ group.zoneName }}</td>
+                <td class="text-end text-muted">{{ group.lines.length }}</td>
+                <td class="text-end text-muted">{{ group.totalTheoretical | number:'1.0-0' }}</td>
+                <td class="text-end fw-medium">{{ group.totalCounted | number:'1.0-0' }}</td>
+                <td class="text-end">
+                  <span [ngClass]="varianceClass(group.totalVariance)">
+                    {{ group.totalVariance > 0 ? '+' : '' }}{{ group.totalVariance | number:'1.0-0' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="fw-bold table-secondary">
+              <td>TOTAL</td>
+              <td class="text-end">{{ countedLines.length }}</td>
+              <td class="text-end">{{ grandTotalTheoretical | number:'1.0-0' }}</td>
+              <td class="text-end">{{ grandTotalCounted | number:'1.0-0' }}</td>
+              <td class="text-end">
+                <span [ngClass]="varianceClass(grandTotalVariance)">
+                  {{ grandTotalVariance > 0 ? '+' : '' }}{{ grandTotalVariance | number:'1.0-0' }}
+                </span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Aucune donnée -->
+@if (!loading && !error && countedLines.length === 0) {
+  <div class="text-center py-5 text-muted">
+    <i class="ti ti-file-off fs-2 d-block mb-2"></i>
+    Aucune ligne de comptage pour cet inventaire.
+  </div>
+}

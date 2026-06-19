@@ -1,0 +1,425 @@
+<!-- En-tête -->
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>@if (zone) { {{ zone.name }} } @else { Zone }</h4>
+      @if (zone) {
+        <h6>
+          <span class="badge me-2" [ngClass]="statusBadge(zone.status)">{{ statusLabel(zone.status) }}</span>
+          @if (zone.locked_by_username) {
+            <span class="text-muted small"><i class="ti ti-device-tablet me-1"></i>{{ zone.locked_by_username }}</span>
+          }
+        </h6>
+      }
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" title="Actualiser">
+        <i class="ti ti-refresh"></i>
+      </a>
+    </li>
+    <li>
+      <div class="page-btn mt-0">
+        <a [routerLink]="['/scig/inventaires', sessionId]" class="btn btn-secondary w-100">
+          <i class="feather icon-arrow-left me-2"></i>Back to Zones
+        </a>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Actions principales selon statut -->
+  @if (!loadingZone && zone) {
+    <div class="page-btn d-flex gap-2">
+      @if (zone.status === 'NOT_STARTED' && perm.has('scig.zone.open')) {
+        <button class="btn btn-danger" (click)="openZone()" [disabled]="openingZone">
+          @if (openingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-player-play me-1"></i>Ouvrir la zone
+        </button>
+      }
+      @if (zone.status === 'RECHECK' && perm.has('scig.zone.open')) {
+        <button class="btn btn-warning text-dark" (click)="openZone()" [disabled]="openingZone">
+          @if (openingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-rotate-clockwise me-1"></i>Réouvrir pour correction
+        </button>
+      }
+      @if (isEditable() && perm.has('scig.zone.submit')) {
+        <button class="btn btn-primary"
+                data-bs-toggle="modal" data-bs-target="#confirm-submit-zone-modal"
+                (click)="openSubmitZoneConfirm()"
+                [disabled]="submittingZone">
+          <i class="ti ti-send me-1"></i>Soumettre pour validation
+        </button>
+      }
+      @if (zone.status === 'SUBMITTED') {
+        @if (perm.has('scig.zone.validate')) {
+          <button class="btn btn-success"
+                  data-bs-toggle="modal" data-bs-target="#confirm-validate-zone-modal"
+                  (click)="openValidateZoneConfirm()"
+                  [disabled]="validatingZone">
+            <i class="ti ti-check me-1"></i>Valider
+          </button>
+        }
+        @if (perm.has('scig.zone.recheck')) {
+          <button class="btn btn-warning text-dark"
+                  data-bs-toggle="modal" data-bs-target="#recheck-zone-modal"
+                  (click)="openRecheckModal()">
+            <i class="ti ti-rotate-clockwise me-1"></i>Recheck
+          </button>
+        }
+      }
+    </div>
+  }
+</div>
+
+<!-- Erreurs globales -->
+@if (openError)     { <div class="alert alert-danger py-2 mb-3">{{ openError }}</div> }
+@if (submitError)   { <div class="alert alert-danger py-2 mb-3">{{ submitError }}</div> }
+@if (validateError) { <div class="alert alert-danger py-2 mb-3">{{ validateError }}</div> }
+
+<!-- Note recheck visible si statut RECHECK -->
+@if (zone?.status === 'RECHECK' && zone?.recheck_note) {
+  <div class="alert alert-warning py-2 mb-3">
+    <i class="ti ti-message-circle me-2"></i>
+    <strong>Note du gestionnaire :</strong> {{ zone?.recheck_note }}
+  </div>
+}
+
+<!-- Traçabilité validation / recheck -->
+@if (zone?.validated_at) {
+  <div class="alert alert-success py-2 mb-3 small">
+    <i class="ti ti-circle-check me-2"></i>
+    <strong>Validée</strong>
+    @if (zone?.validated_by_username) { par <strong>{{ zone?.validated_by_username }}</strong> }
+    le {{ zone?.validated_at | date:'dd/MM/yy HH:mm' }}
+  </div>
+}
+@if (zone?.rechecked_at) {
+  <div class="alert alert-secondary py-2 mb-3 small">
+    <i class="ti ti-rotate-clockwise me-2"></i>
+    <strong>Recheck demandé</strong>
+    @if (zone?.rechecked_by_username) { par <strong>{{ zone?.rechecked_by_username }}</strong> }
+    le {{ zone?.rechecked_at | date:'dd/MM/yy HH:mm' }}
+  </div>
+}
+
+<!-- Zone chargement initial -->
+@if (loadingZone) {
+  <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+
+<!-- Panneau scan + saisie manuelle (uniquement si zone éditable) -->
+@if (!loadingZone && isEditable()) {
+  <div class="row mb-4">
+
+    <!-- Scan code-barres -->
+    <div class="col-lg-6 mb-3 mb-lg-0">
+      <div class="card h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-scan me-2 text-primary"></i>Scan code-barres</h6>
+        </div>
+        <div class="card-body">
+          <div class="input-group mb-2">
+            <input
+              #scanInput
+              type="text"
+              class="form-control form-control-lg"
+              placeholder="Scanner ou saisir le code-barres…"
+              [(ngModel)]="barcodeInput"
+              (keydown.enter)="onScanEnter()"
+              [disabled]="scanning"
+              autocomplete="off"
+            />
+            <span class="input-group-text">×</span>
+            <input
+              type="number"
+              class="form-control"
+              style="max-width:70px"
+              [(ngModel)]="scanQty"
+              min="1"
+              step="1"
+              title="Quantité"
+            />
+            <button class="btn btn-outline-primary" (click)="onScanEnter()" [disabled]="!barcodeInput.trim() || scanning">
+              @if (scanning) { <span class="spinner-border spinner-border-sm"></span> }
+              @else { <i class="ti ti-arrow-right"></i> }
+            </button>
+          </div>
+
+          @if (scanFeedback) {
+            <div class="alert alert-success py-2 mb-0">{{ scanFeedback }}</div>
+          }
+          @if (scanError) {
+            <div class="alert alert-danger py-2 mb-0">{{ scanError }}</div>
+          }
+          <div class="form-text text-muted mt-1">
+            Appuyez sur <kbd>Entrée</kbd> après chaque scan. Compatible scanner USB.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saisie manuelle -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-pencil me-2 text-warning"></i>Saisie manuelle</h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="manualForm" (ngSubmit)="submitManual()">
+
+            <div class="mb-2 position-relative">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="variantSearch"
+                placeholder="Référence, désignation ou code-barres…"
+                autocomplete="off"
+                (input)="onVariantSearchChange(manualForm.value.variantSearch)"
+              />
+              @if (searchingVariant) {
+                <span class="position-absolute end-0 top-50 translate-middle-y me-2">
+                  <span class="spinner-border spinner-border-sm text-muted"></span>
+                </span>
+              }
+              @if (variantResults.length > 0) {
+                <ul class="list-group position-absolute w-100 shadow z-3" style="top:100%;max-height:200px;overflow-y:auto">
+                  @for (v of variantResults; track v.id) {
+                    <li class="list-group-item list-group-item-action py-2"
+                        style="cursor:pointer"
+                        (click)="selectVariant(v)">
+                      <div class="fw-medium small">{{ v.article_designation }}</div>
+                      <div class="text-muted" style="font-size:0.75rem">
+                        {{ v.article_reference }} — {{ v.size }} {{ v.color }}
+                        @if (v.barcode) { · {{ v.barcode }} }
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+
+            @if (selectedVariant) {
+              <div class="alert alert-light py-1 mb-2 small">
+                <i class="ti ti-check text-success me-1"></i>
+                <strong>{{ selectedVariant.article_designation }}</strong>
+                — {{ selectedVariant.size }} {{ selectedVariant.color }}
+              </div>
+            }
+
+            <div class="input-group mb-2">
+              <span class="input-group-text">Qté</span>
+              <input type="number" class="form-control" formControlName="qty" min="0" step="1" />
+              <button type="submit" class="btn btn-warning text-dark"
+                      [disabled]="!selectedVariant || manualForm.invalid || savingManual">
+                @if (savingManual) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                Valider
+              </button>
+            </div>
+
+            @if (manualSuccess) { <div class="alert alert-success py-2 mb-0 small">{{ manualSuccess }}</div> }
+            @if (manualError)   { <div class="alert alert-danger  py-2 mb-0 small">{{ manualError }}</div>   }
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+}
+
+<!-- Table des lignes d'inventaire -->
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <h5 class="mb-0">Articles comptés</h5>
+    @if (displayedLines.length > 0) {
+      <div class="d-flex gap-3 text-muted small">
+        <span>Total lignes : <strong class="text-dark">{{ displayedLines.length }}</strong></span>
+        <span>Qté comptée : <strong class="text-dark">{{ totalCounted | number:'1.0-0' }}</strong></span>
+        <span>Écart global :
+          <strong [ngClass]="varianceClass(totalVariance)">
+            {{ totalVariance > 0 ? '+' : '' }}{{ totalVariance | number:'1.0-0' }}
+          </strong>
+        </span>
+      </div>
+    }
+  </div>
+  <div class="card-body p-0">
+    @if (loadingLines) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Désignation</th>
+              <th>Référence</th>
+              <th>Taille</th>
+              <th>Couleur</th>
+              <th class="text-end">Sage (théo.)</th>
+              <th class="text-end">Compté</th>
+              <th class="text-end">Écart</th>
+              <th>Saisie</th>
+              <th>Saisi par</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of displayedLines; track l.id) {
+              <tr>
+                <td class="fw-medium">{{ l.article_designation }}</td>
+                <td><span class="badge bg-outline-secondary">{{ l.article_reference }}</span></td>
+                <td>{{ l.variant.size  || '—' }}</td>
+                <td>{{ l.variant.color || '—' }}</td>
+                <td class="text-end text-muted">{{ l.qty_theoretical | number:'1.0-3' }}</td>
+                <td class="text-end fw-medium">{{ l.qty_counted | number:'1.0-3' }}</td>
+                <td class="text-end">
+                  <span [ngClass]="varianceClass(l.variance)">
+                    {{ l.variance > 0 ? '+' : '' }}{{ l.variance | number:'1.0-3' }}
+                  </span>
+                </td>
+                <td>
+                  @if (l.is_manual) {
+                    <span class="badge bg-outline-warning text-dark" title="Saisie manuelle">Manuel</span>
+                  } @else {
+                    <span class="badge bg-outline-secondary" title="Scan barcode">Scan</span>
+                  }
+                </td>
+                <td class="small text-muted">
+                  @if (l.scanned_by_username) {
+                    <div>{{ l.scanned_by_username }}</div>
+                  }
+                  @if (l.device_id) {
+                    <div class="text-nowrap overflow-hidden text-truncate" style="max-width:110px" [title]="l.device_id">
+                      <i class="ti ti-device-tablet me-1" style="font-size:10px"></i>{{ l.device_id }}
+                    </div>
+                  }
+                  @if (!l.scanned_by_username && !l.device_id) { — }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="text-center py-5 text-muted">
+                  @if (zone?.status === 'NOT_STARTED') {
+                    <div>
+                      <i class="ti ti-lock fs-2 d-block mb-2"></i>
+                      Ouvrez la zone pour charger les articles depuis Sage et commencer le comptage.
+                    </div>
+                  } @else {
+                    <div>
+                      <i class="ti ti-package fs-2 d-block mb-2"></i>
+                      Aucun article compté pour l'instant.
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Confirmer soumission zone -->
+<div class="modal fade" id="confirm-submit-zone-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center pt-0 pb-2">
+        <div class="mb-3">
+          <span class="badge bg-primary rounded-pill p-3">
+            <i class="ti ti-send fs-2"></i>
+          </span>
+        </div>
+        <h5 class="mb-2">Soumettre pour validation ?</h5>
+        <p class="text-muted mb-0">
+          La zone sera transmise au gestionnaire pour vérification.<br>
+          <small>Le comptage ne sera plus modifiable après soumission.</small>
+        </p>
+        @if (submitError) {
+          <div class="alert alert-danger py-2 mt-3 text-start">{{ submitError }}</div>
+        }
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary px-4"
+                (click)="confirmSubmitZone()"
+                [disabled]="submittingZone">
+          @if (submittingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-send me-1"></i>Soumettre
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Confirmer validation zone (gestionnaire) -->
+<div class="modal fade" id="confirm-validate-zone-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center pt-0 pb-2">
+        <div class="mb-3">
+          <span class="badge bg-success rounded-pill p-3">
+            <i class="ti ti-circle-check fs-2"></i>
+          </span>
+        </div>
+        <h5 class="mb-2">Valider définitivement la zone ?</h5>
+        <p class="text-muted mb-0">
+          Le statut passera à <span class="badge bg-outline-success">Validée</span>.<br>
+          <small>Cette action est irréversible.</small>
+        </p>
+        @if (validateError) {
+          <div class="alert alert-danger py-2 mt-3 text-start">{{ validateError }}</div>
+        }
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-success px-4"
+                (click)="confirmValidateZone()"
+                [disabled]="validatingZone">
+          @if (validatingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-check me-1"></i>Valider
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Recheck zone -->
+<div class="modal fade" id="recheck-zone-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="ti ti-rotate-clockwise text-warning me-2"></i>Renvoyer en vérification
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="recheckForm" (ngSubmit)="confirmRecheck()">
+        <div class="modal-body">
+          @if (recheckError) { <div class="alert alert-danger py-2">{{ recheckError }}</div> }
+          <p class="mb-3">
+            Cette zone sera renvoyée aux opérateurs Zebra
+            (statut → <span class="badge bg-warning text-dark">À revérifier</span>).
+          </p>
+          <div class="mb-0">
+            <label class="form-label">Note / motif (optionnel)</label>
+            <textarea formControlName="note" class="form-control" rows="3"
+                      placeholder="ex : Recompter le rayon chaussures…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-warning text-dark" [disabled]="savingRecheck">
+            @if (savingRecheck) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Renvoyer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

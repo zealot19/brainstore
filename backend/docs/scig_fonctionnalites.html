@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCIG — Fonctionnalités à implémenter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; font-size: 13px; line-height: 1.5; }
+    .cover {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+      color: #fff; padding: 60px 60px 40px;
+    }
+    .cover .logo { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+    .cover .logo span { color: #e94560; }
+    .cover .subtitle { font-size: 15px; color: #a0b0c8; margin-top: 6px; }
+    .cover .meta { margin-top: 30px; font-size: 12px; color: #6a7f95; }
+    .cover .meta strong { color: #c9d6df; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px; }
+    h1 { font-size: 22px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 8px; margin: 36px 0 16px; }
+    h2 { font-size: 15px; color: #16213e; border-left: 4px solid #e94560; padding-left: 10px; margin: 24px 0 12px; }
+    p { margin-bottom: 10px; color: #444; }
+
+    /* Legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
+    .leg { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+    /* Badges plateforme */
+    .plat { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .mob  { background: #1c3a5e; color: #74c0fc; }
+    .web  { background: #1a472a; color: #69db7c; }
+    .both { background: #2d1b4e; color: #da77f2; }
+
+    /* Statut backend */
+    .be { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .be-ok   { background: #d3f9d8; color: #2b8a3e; }
+    .be-no   { background: #f8d7da; color: #842029; }
+
+    /* Statut frontend */
+    .fe { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .fe-todo { background: #fff3cd; color: #856404; }
+    .fe-ok   { background: #d3f9d8; color: #2b8a3e; }
+    .fe-na   { background: #f1f3f5; color: #868e96; }
+
+    /* Priorité */
+    .prio { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .p1 { background: #f8d7da; color: #842029; } /* CRITIQUE */
+    .p2 { background: #fff3cd; color: #856404; } /* HAUTE */
+    .p3 { background: #d3f9d8; color: #2b8a3e; } /* NORMALE */
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 28px; font-size: 12px; }
+    thead th { background: #0f3460; color: #fff; padding: 9px 10px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+    tbody tr:nth-child(even) { background: #f8f9fc; }
+    tbody tr:hover { background: #eef1f8; }
+    td { padding: 8px 10px; border-bottom: 1px solid #e8ecf2; vertical-align: top; }
+    td.feat { font-weight: 500; color: #1a1a2e; }
+    td.note { color: #555; font-style: italic; font-size: 11px; }
+    .section-row td { background: #e8ecf5; font-weight: 700; font-size: 12px; color: #0f3460; padding: 7px 10px; border-top: 2px solid #0f3460; }
+    footer { background: #1a1a2e; color: #6a7f95; text-align: center; padding: 20px; font-size: 11px; margin-top: 60px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0 32px; }
+    .sum-card { border-radius: 8px; padding: 16px 18px; }
+    .sum-card .num { font-size: 32px; font-weight: 800; line-height: 1; }
+    .sum-card .lbl { font-size: 11px; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-blue   { background: #e7f5ff; color: #1864ab; }
+    .card-green  { background: #ebfbee; color: #2b8a3e; }
+    .card-yellow { background: #fff9db; color: #856404; }
+    .card-red    { background: #fff5f5; color: #c92a2a; }
+  </style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="logo">Dreams<span>POS</span></div>
+  <div class="subtitle">Section 19 — Sync SCIG / Sage 100 · Analyse CDC vs. Implémentation</div>
+  <div class="meta">
+    <strong>Source CDC :</strong> Cahier des Charges Fonctionnel — Application Mobile LC Waikiki – Extension Sage 100 v1.0 &nbsp;|&nbsp;
+    <strong>Date :</strong> Juin 2026 &nbsp;|&nbsp;
+    <strong>Backend API :</strong> 41 endpoints ✅ COMPLET
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Légende -->
+  <h1>Légende</h1>
+  <div class="legend">
+    <div class="leg"><div class="dot" style="background:#74c0fc"></div> <span><strong>Mobile</strong> — Terminal Zebra / Android</span></div>
+    <div class="leg"><div class="dot" style="background:#69db7c"></div> <span><strong>Web</strong> — Dashboard Angular (manager)</span></div>
+    <div class="leg"><div class="dot" style="background:#da77f2"></div> <span><strong>Les deux</strong> — Accessible mobile et web</span></div>
+    <div class="leg"><div class="dot" style="background:#2b8a3e"></div> <span><strong>API ✅</strong> — Endpoint backend existant</span></div>
+    <div class="leg"><div class="dot" style="background:#842029"></div> <span><strong>API ❌</strong> — À implémenter côté backend</span></div>
+    <div class="leg"><div class="dot" style="background:#856404"></div> <span><strong>Frontend À faire</strong> — API prête, UI manquante</span></div>
+    <div class="leg"><div class="dot" style="background:#c92a2a"></div> <span><strong>CRITIQUE</strong> — Priorité 1 (CDC)</span></div>
+    <div class="leg"><div class="dot" style="background:#856404"></div> <span><strong>HAUTE</strong> — Priorité 2</span></div>
+    <div class="leg"><div class="dot" style="background:#2b8a3e"></div> <span><strong>NORMALE</strong> — Priorité 3</span></div>
+  </div>
+
+  <!-- Résumé -->
+  <h1>Résumé</h1>
+  <div class="summary-grid">
+    <div class="sum-card card-blue">
+      <div class="num">41</div>
+      <div class="lbl">Endpoints backend</div>
+    </div>
+    <div class="sum-card card-green">
+      <div class="num">41</div>
+      <div class="lbl">Endpoints prêts (100%)</div>
+    </div>
+    <div class="sum-card card-yellow">
+      <div class="num">6</div>
+      <div class="lbl">Fonctionnalités UI à faire</div>
+    </div>
+    <div class="sum-card card-red">
+      <div class="num">1</div>
+      <div class="lbl">Fonctionnalité backend manquante</div>
+    </div>
+  </div>
+
+  <!-- Tableau principal -->
+  <h1>Tableau des fonctionnalités</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:26%">Fonctionnalité (CDC)</th>
+        <th style="width:10%">Plateforme</th>
+        <th style="width:8%">API</th>
+        <th style="width:8%">Frontend</th>
+        <th style="width:8%">Priorité</th>
+        <th style="width:40%">Notes / Endpoint(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 3 — ÉTIQUETAGE</td></tr>
+
+      <tr>
+        <td class="feat">Impression étiquettes — prix normal</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>labels/print/</code> — print_type=NORMAL. UI Zebra : choix article → génération job d'impression.</td>
+      </tr>
+      <tr>
+        <td class="feat">Impression étiquettes — prix soldé (promo)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>labels/print/</code> — print_type=PROMO. Nécessite une campagne active.</td>
+      </tr>
+      <tr>
+        <td class="feat">Gestion des campagnes d'étiquetage (créer, lister)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">GET/POST <code>labels/campaigns/</code> — dashboard manager : créer campagne promo avec %, dates début/fin.</td>
+      </tr>
+      <tr>
+        <td class="feat">Données étiquette : référence, désignation, prix, variantes</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">GET <code>articles/&lt;id&gt;/</code> + variantes. Les prix viennent exclusivement de Sage (règle métier CDC §11).</td>
+      </tr>
+      <tr>
+        <td class="feat">Recherche produit — scan code-barres</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">GET <code>variants/search/?q=&lt;barcode&gt;</code></td>
+      </tr>
+      <tr>
+        <td class="feat">Recherche produit — référence / code couleur / taille</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">GET <code>variants/search/?q=&lt;ref&gt;</code> — fallback si code-barres illisible (CDC §3).</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 4 — STOCK (CRITIQUE)</td></tr>
+
+      <tr>
+        <td class="feat">Consultation stock par dépôt (réel / dispo / transit)</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>depots/&lt;id&gt;/stock/</code> — vue web (manager) + mobile (agent terrain).</td>
+      </tr>
+      <tr>
+        <td class="feat">Consultation stock par article / variante</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>articles/&lt;id&gt;/</code> — inclut stock par variante et dépôt via StockLevel.</td>
+      </tr>
+      <tr>
+        <td class="feat">Stocks critiques / ruptures (seuil paramétrable)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>stock/critical/</code> — affiché sur dashboard manager (CDC §10 KPI).</td>
+      </tr>
+      <tr>
+        <td class="feat">Recherche stock — scan code-barres / référence / code interne</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>variants/search/?q=</code> — 3 modes de recherche (CDC §4).</td>
+      </tr>
+      <tr>
+        <td class="feat">Liste des dépôts actifs</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>depots/</code> — page web <code>/scig/depots</code> : liste des dépôts Sage avec statut et date sync. (CDC §1.1 — Bloc 1).</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 5 — INVENTAIRE (CRITIQUE ET PRIORITAIRE)</td></tr>
+
+      <tr>
+        <td class="feat">Création d'une session d'inventaire (nom, date, dépôt)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/</code> — page <code>/scig/inventaires</code> : modal création (dépôt → nom → notes). Fix bug : paramètre <code>notes</code> ajouté à <code>create_inventory_session()</code> (CDC §1.2 — Bloc 1).</td>
+      </tr>
+      <tr>
+        <td class="feat">Liste des sessions d'inventaire</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>inventory/</code> — page <code>/scig/inventaires</code> : liste, filtres statut, stats (En cours / Clôturés), lien vers détail (Bloc 1).</td>
+      </tr>
+      <tr>
+        <td class="feat">Définition des zones d'inventaire (depuis dashboard)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;id&gt;/zones/</code> — page <code>/scig/inventaires/:id</code> : modal création zone, compteurs par statut, légende cycle de vie (CDC §1.3 — Bloc 2).</td>
+      </tr>
+      <tr>
+        <td class="feat">Sélection inventaire actif + zone libre (mobile)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>inventory/</code> + GET <code>inventory/&lt;id&gt;/zones/</code> — afficher zones libres (statut GRIS).</td>
+      </tr>
+      <tr>
+        <td class="feat">Ouverture de zone → statut ROUGE (lock device)</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/open/</code> — web: <code>device_id="WEB"</code>, verrou exclusif. Snapshot stock Sage déclenché à l'ouverture (CDC §1.4 — Bloc 3).</td>
+      </tr>
+      <tr>
+        <td class="feat">Scan articles — incrément quantité comptée</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/scan/</code> — web: champ barcode auto-focalisé, compatible scanner USB, <kbd>Entrée</kbd> pour valider. Feedback immédiat (CDC §1.5 — Bloc 3).</td>
+      </tr>
+      <tr>
+        <td class="feat">Saisie manuelle de quantité</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/manual/</code> — web: recherche variante avec debounce (<code>GET variants/search/</code>), sélection + qté (CDC §1.5 — Bloc 3).</td>
+      </tr>
+      <tr>
+        <td class="feat">Transmission zone → statut BLEU (mobile)</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/submit/</code> — bouton "Soumettre pour validation" sur page zone (CDC §1.6 — Bloc 3).</td>
+      </tr>
+      <tr>
+        <td class="feat">Suivi temps réel des zones (code couleur dashboard)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Page session <code>/scig/inventaires/:id</code> : compteurs colorés ROUGE/BLEU/ORANGE/VERT/GRIS, tableau zones avec badges statut, surbrillance lignes SUBMITTED (CDC §2.1 — Bloc 2).</td>
+      </tr>
+      <tr>
+        <td class="feat">Statut GRIS — zone non commencée</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Le backend a <code>NOT_STARTED</code> = équivalent GRIS du CDC. Affiché en badge gris "Non commencée" dans le dashboard. Résolu : pas de modification modèle requise.</td>
+      </tr>
+      <tr>
+        <td class="feat">Vérification zones — comparaison Sage vs physique</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Page zone <code>/scig/inventaires/:id/zones/:zoneId</code> : table Article / Référence / Taille / Couleur / Théorique / Compté / Écart coloré (vert=0, rouge=−, orange=+) (CDC §2.2 — Bloc 3).</td>
+      </tr>
+      <tr>
+        <td class="feat">Validation zone → statut VERT (manager)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/validate/</code> — bouton vert sur page session (inline) et page zone. Ligne surlignée jaune si SUBMITTED (CDC §2.2 — Bloc 4).</td>
+      </tr>
+      <tr>
+        <td class="feat">Demande re-vérification → statut ORANGE (manager)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/recheck/</code> — modal avec champ note (motif), note affichée aux opérateurs sur page zone. Fix : bouton <strong>"Réouvrir pour correction"</strong> ajouté sur page zone pour statut RECHECK → rappelle <code>/open/</code> → zone redevient IN_PROGRESS (scan réactivé, données conservées). <code>isEditable()</code> limité à IN_PROGRESS uniquement (CDC §2.2 — Bloc 4).</td>
+      </tr>
+      <tr>
+        <td class="feat">Force-unlock zone bloquée (appareil Zebra mort)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/unlock/</code> — déverrouille une zone bloquée en IN_PROGRESS quand le terminal Zebra a planté. Remet à NOT_STARTED, efface <code>locked_by_device</code> et <code>locked_by</code>, préserve toutes les <code>InventoryLine</code> (qty_counted intact). Bouton "Déverrouiller" (icône ti-lock-open, btn-outline-danger) visible sur page session uniquement quand <code>zone.status === 'IN_PROGRESS'</code>. Modal de confirmation. Action loguée via <code>AuditLog</code>.</td>
+      </tr>
+      <tr>
+        <td class="feat">Soumission vers Sage + clôture inventaire</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;id&gt;/submit-sage/</code> — bouton "Soumettre à Sage" visible uniquement si <code>all_zones_validated=true</code> et session OPEN. Clôture → statut CLOSED, dates <code>closed_at</code> + <code>submitted_to_sage_at</code> affichées (CDC §2.3 — Bloc 5).</td>
+      </tr>
+      <tr>
+        <td class="feat">Rapport d'inventaire — écarts quantité et valeur</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>inventory/&lt;id&gt;/report/</code> — page <code>/scig/inventaires/:id/rapport</code> : tableau groupé par zone, sous-totaux par zone, récap global. Fix données : filtre <code>qty_counted &gt; 0</code> (getter <code>countedLines</code>) pour exclure le snapshot Sage vide des zones non comptées. En-tête <code>table-top-head</code> avec icônes PDF / Excel / Refresh. Fix backend : <code>zone_name</code> ajouté à <code>InventoryLineSerializer</code> (CDC §2.4 — Bloc 5).</td>
+      </tr>
+      <tr>
+        <td class="feat">Export rapport Excel / PDF</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-na">N/A (client)</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note"><strong>PDF</strong> : <code>window.print()</code> + CSS <code>@media print</code> dans <code>styles.scss</code> (A4 paysage, sidebar/header masqués, <code>table-responsive overflow:visible</code>, <code>thead</code> répété, <code>page-break-inside:avoid</code>). <strong>Excel</strong> : génération HTML table → fichier <code>.xls</code> côté client (sans librairie externe), avec en-têtes colorés, sous-totaux par zone, total global, couleurs d'écart (rouge/orange/vert). Aucun endpoint backend requis (CDC §2.4 + §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">UX — Navigation, modales de confirmation, KPI zones</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-na">N/A</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">Boutons de retour (<code>feather icon-arrow-left</code> + "Back to …" + <code>w-100</code>) sur toutes les pages SCIG. Remplacement des <code>confirm()</code> natifs par des modales Bootstrap (soumission zone, validation zone, recheck, soumission Sage, déverrouillage). KPI statuts sur page session : cartes colorées avec grande icône + compteur (GRIS/ROUGE/BLEU/ORANGE/VERT).</td>
+      </tr>
+      <tr>
+        <td class="feat">Mode offline — stockage local + sync différée (mobile)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>sync/queue/push/</code> (batch idempotent) + POST <code>sync/queue/flush/</code>. Côté app mobile : SQLite local + worker de sync (CDC §5 mode offline).</td>
+      </tr>
+      <tr>
+        <td class="feat">Résolution des conflits offline (côté serveur)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-na">N/A mobile</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Géré par <code>device_operation_id</code> unique — doublons ignorés silencieusement. Résolution déjà backend.</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <!-- MODULE 5 + 8 — RÉALISÉES (Blocs 1-5 + RBAC + Audit) -->
+      <tr class="section-row" style="background:#1a472a;color:#d3f9d8"><td colspan="6">MODULES 5 + 8 — Réalisées : Blocs 1 à 5 ✅ + RBAC dynamique ✅ + Journal d'audit Angular ✅ (MODULE WEB COMPLET)</td></tr>
+      <tr>
+        <td colspan="6" class="note" style="padding:12px 10px">
+          <strong>Bloc 1 — Dépôts &amp; Sessions :</strong>
+          Page <code>/scig/depots</code> (liste dépôts Sage) ·
+          Page <code>/scig/inventaires</code> (liste + création session : dépôt → nom → notes) ·
+          Fix backend : paramètre <code>notes</code> ajouté à <code>create_inventory_session()</code>.
+          <br/><br/>
+          <strong>Bloc 2 — Zones (dashboard web) :</strong>
+          Page <code>/scig/inventaires/:id</code> : détail session, KPI statuts colorés (cartes avec grande icône + compteur),
+          création zones (modal, nom unique par session), tableau zones avec badges colorés.
+          <br/><br/>
+          <strong>Bloc 3 — Opération zone (scan + saisie manuelle) :</strong>
+          Page <code>/scig/inventaires/:id/zones/:zoneId</code> :
+          ouverture zone web (<code>device_id="WEB"</code>, snapshot Sage déclenché) ·
+          scan barcode (champ auto-focalisé, scanner USB, <kbd>Entrée</kbd>) ·
+          saisie manuelle (recherche variante debounce 350ms, <code>GET variants/search/</code>) ·
+          table lignes filtrée <code>qty_counted &gt; 0</code> (tous statuts — exclut le snapshot Sage vide) ·
+          bouton "Soumettre pour validation".
+          <br/><br/>
+          <strong>Bloc 4 — Validation, Recheck &amp; Force-unlock (gestionnaire web) :</strong>
+          Bouton "Valider" inline sur page session (zone SUBMITTED → VERT) ·
+          Modal "Recheck" avec note (SUBMITTED → ORANGE) ·
+          Note recheck affichée aux opérateurs sur page zone ·
+          Bouton <strong>"Réouvrir pour correction"</strong> (RECHECK → IN_PROGRESS, scan réactivé, données conservées) ·
+          Bouton <strong>"Déverrouiller"</strong> (force-unlock IN_PROGRESS bloquée, POST <code>zones/&lt;zid&gt;/unlock/</code>) ·
+          Modales Bootstrap sur toutes les actions de confirmation (plus de <code>confirm()</code> natifs).
+          <br/><br/>
+          <strong>Bloc 5 — Soumission Sage + Clôture + Rapport :</strong>
+          Bouton "Soumettre à Sage" conditionnel (<code>all_zones_validated=true</code>) → POST <code>submit-sage/</code> → session CLOSED ·
+          Dates <code>closed_at</code> + <code>submitted_to_sage_at</code> affichées ·
+          Page rapport <code>/scig/inventaires/:id/rapport</code> : données filtrées (<code>countedLines</code>), tableau groupé par zone, sous-totaux, récap global ·
+          <strong>Export PDF</strong> (<code>window.print()</code> + CSS <code>@media print</code> A4 paysage) ·
+          <strong>Export Excel</strong> (.xls HTML table avec couleurs, sans dépendance externe) ·
+          Boutons <code>table-top-head</code> (PDF / Excel / Refresh) ·
+          Fix backend : <code>zone_name</code> ajouté à <code>InventoryLineSerializer</code>.
+          <br/><br/>
+          <strong>Endpoints backend ajoutés :</strong>
+          POST <code>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/unlock/</code> (UnlockZoneView) ·
+          GET <code>auth/me/permissions/</code> (MePermissionsView — retourne les codes de permission de l'utilisateur courant).
+          <br/><br/>
+          <strong>RBAC dynamique SCIG :</strong>
+          <code>apps/admin_rbac/permissions.py</code> — factory <code>HasPermission(code)</code> (pattern DRF <code>BasePermission</code>) ·
+          Migration <code>admin_rbac.0002</code> — seed idempotent de 27 permissions SCIG (AppModule "scig" + 12 Vendeur + 12 Manager + 3 Admin) ·
+          Toutes les vues SCIG câblées : <code>permission_classes = [IsScigSageEnabled, HasPermission("scig.xxx")]</code>, vues mixtes GET/POST via <code>get_permissions()</code> override ·
+          Management command <code>seed_scig_roles</code> — 3 rôles système + 3 profils stackés (Vendeur / Manager / Admin SCIG) ·
+          Endpoint <code>GET /api/v1/auth/me/permissions/</code> → <code>{"permissions": [...], "is_superuser": bool}</code>.
+          <br/><br/>
+          <strong>Angular RBAC + Journal d'audit :</strong>
+          <code>_api/services/auth/permission.service.ts</code> — <code>PermissionService</code> (BehaviorSubject + localStorage <code>drp_permissions</code>, méthodes synchrones <code>has()</code>/<code>hasAny()</code>/<code>hasAll()</code>) ·
+          <code>AuthService</code> modifié — <code>load()</code> appelé au login/2FA/initSession, <code>clear()</code> au logout ·
+          <code>@if (perm.has('scig.xxx'))</code> dans toutes les pages SCIG : inventaires, session-detail, zone-detail, rapport ·
+          <code>_api/services/audit/audit.service.ts</code> — <code>getLogs(filters)</code> → <code>GET /api/v1/audit/logs/</code> ·
+          <code>_api/pages/admin/audit/</code> — page <code>/admin/audit</code> : filtres module/action/dates/texte, tableau avec badges colorés ·
+          Route <code>adminInstAudit: '/admin/audit'</code>, sidebar Administration → "Journal d'audit".
+          <br/><br/>
+          <strong>Fichiers Angular créés / modifiés :</strong>
+          <code>_api/models/scig.models.ts</code> ·
+          <code>_api/services/scig/scig.service.ts</code> (+ <code>unlockZone()</code>) ·
+          <code>_api/config/api.config.ts</code> (section SCIG + AUDIT + <code>mePermissions</code>) ·
+          <code>_api/pages/scig/</code> : <code>scig.component.ts</code>, <code>depots/</code>, <code>inventaires/</code>,
+          <code>session-detail/</code> (KPI colorés, modales, unlock, RBAC), <code>zone-detail/</code> (displayedLines, modales, réouverture RECHECK, RBAC), <code>rapport/</code> (export XLS+PDF, RBAC) ·
+          <code>src/styles.scss</code> (@media print global) ·
+          Routes <code>/scig/depots</code>, <code>/scig/inventaires</code>, <code>/scig/inventaires/:id</code>,
+          <code>/scig/inventaires/:id/zones/:zoneId</code>, <code>/scig/inventaires/:id/rapport</code>, <code>/admin/audit</code> ·
+          Menu sidebar "Sync SCIG" + "Journal d'audit" sous Administration.
+        </td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 6 — TRANSFERT INTER-DÉPÔT</td></tr>
+
+      <tr>
+        <td class="feat">Création transfert (source → destination)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/</code> — choix dépôt source et destination (CDC §6).</td>
+      </tr>
+      <tr>
+        <td class="feat">Liste des transferts</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">GET <code>transfers/</code></td>
+      </tr>
+      <tr>
+        <td class="feat">Ajout articles par scan (brouillon)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/&lt;id&gt;/lines/scan/</code> — vérifie stock dispo, bloque si insuffisant (CDC §6).</td>
+      </tr>
+      <tr>
+        <td class="feat">Validation transfert (DRAFT → VALIDATED)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/&lt;id&gt;/validate/</code></td>
+      </tr>
+      <tr>
+        <td class="feat">Expédition (VALIDATED → SHIPPED)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/&lt;id&gt;/ship/</code> — copie qty_planned → qty_shipped.</td>
+      </tr>
+      <tr>
+        <td class="feat">Réception avec scan + contrôle des écarts</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/&lt;id&gt;/receive/scan/</code> — cumule qty_received. Écart qty_shipped vs qty_received (CDC §6).</td>
+      </tr>
+      <tr>
+        <td class="feat">Clôture réception (SHIPPED → RECEIVED)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>transfers/&lt;id&gt;/receive/close/</code></td>
+      </tr>
+      <tr>
+        <td class="feat">Blocage automatique si stock insuffisant</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-na">N/A (backend)</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">Géré par le service backend au moment du scan. Frontend reçoit une erreur 400.</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 7 — SYNCHRONISATION SAGE</td></tr>
+
+      <tr>
+        <td class="feat">Configuration connexion Sage 100 (serveur, port, DB, user, pwd)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">Page <code>/scig/sage</code> — formulaire (server, port, DB, user, pwd). Badge statut dernière connexion. Bouton "Tester la connexion" avec résultat latence. Visible uniquement si <code>scig.connection.manage</code>. Mot de passe chiffré Fernet côté backend.</td>
+      </tr>
+      <tr>
+        <td class="feat">Déclenchement sync manuelle (DEPOTS / ARTICLES / STOCK / FULL)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">4 boutons type (Dépôts / Articles / Stock / FULL). Résultat immédiat après sync : créés / mis à jour / erreurs · durée. FULL affiche 3 cartes distinctes. Visible si <code>scig.sync.trigger</code>.</td>
+      </tr>
+      <tr>
+        <td class="feat">Historique des synchronisations</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">Tableau avec filtres type/statut · colonnes : date, type badge, statut badge, résultats (+créés/↑màj/✗erreurs), durée, déclencheur, message erreur. Visible si <code>scig.sync.view</code>.</td>
+      </tr>
+      <tr>
+        <td class="feat">Mode offline — queue opérations Zebra (push batch)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>sync/queue/push/</code> — idempotent via device_operation_id. À implémenter côté app mobile (CDC §7).</td>
+      </tr>
+      <tr>
+        <td class="feat">Traitement de la queue offline (flush serveur)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>sync/queue/flush/</code> — retour : processed/skipped/failed.</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 8 — GESTION DES UTILISATEURS</td></tr>
+
+      <!-- Authentification -->
+      <tr>
+        <td class="feat">Connexion sécurisée — web (Angular)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>auth/login/</code> — JWT access + refresh token. Déjà intégré dans le dashboard Angular.</td>
+      </tr>
+      <tr>
+        <td class="feat">Connexion sécurisée — terminal Zebra (Android)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Même endpoint POST <code>auth/login/</code>. L'app mobile doit stocker le JWT en stockage local sécurisé et envoyer le <code>device_id</code> (identifiant Zebra) dans chaque requête via header.</td>
+      </tr>
+      <tr>
+        <td class="feat">Renouvellement automatique du token (refresh)</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire (mobile)</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>auth/token/refresh/</code> — fait côté web. Sur mobile Zebra, prévoir un intercepteur qui raffraîchit silencieusement le token avant expiration (critique pour les sessions longues en mode inventaire).</td>
+      </tr>
+      <tr>
+        <td class="feat">Déconnexion / expiration de session</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait (web)</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">POST <code>auth/logout/</code> — invalide le refresh token. <strong>Déverrouillage automatique web</strong> ✅ : <code>AuthService.logout()</code> et <code>logoutAll()</code> appellent <code>_unlockOpenZoneIfAny()</code> — lit <code>localStorage.drp_open_zone</code>, POST <code>.../unlock/</code> (fire-and-forget), puis nettoie la clé. Clé posée à <code>openZone()</code>, retirée à <code>submitZone()</code> / <code>validateZone()</code> / force-unlock manager. Sur mobile : déconnexion explicite + timeout automatique à implémenter.</td>
+      </tr>
+
+      <!-- Rôles et périmètres -->
+      <tr>
+        <td class="feat">Rôle Vendeur — périmètre SCIG</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note"><strong>RBAC dynamique câblé :</strong> factory <code>HasPermission("scig.xxx")</code> sur chaque endpoint SCIG (<code>apps/admin_rbac/permissions.py</code>). 12 permissions Vendeur : <code>scig.stock.view</code>, <code>scig.session.view</code>, <code>scig.zone.view</code>, <code>scig.zone.open</code>, <code>scig.zone.scan</code>, <code>scig.zone.manual</code>, <code>scig.zone.submit</code>, <code>scig.labels.*</code>, <code>scig.transfer.view/scan/receive</code>. Angular : <code>PermissionService.has('scig.xxx')</code> masque les boutons non autorisés (<code>@if (perm.has(...))</code> dans toutes les pages SCIG). Profil "Profil Vendeur SCIG" créé en DB via <code>seed_scig_roles</code>.</td>
+      </tr>
+      <tr>
+        <td class="feat">Rôle Manager — périmètre SCIG</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note"><strong>RBAC dynamique câblé.</strong> 12 permissions Manager : <code>scig.session.create</code>, <code>scig.zone.create/validate/recheck/unlock</code>, <code>scig.sage.submit</code>, <code>scig.report.view/export</code>, <code>scig.dashboard.view</code>, <code>scig.transfer.create/validate/ship</code>. Profil "Profil Manager SCIG" = Vendeur + Manager (stacked). Angular : boutons "Créer session/zone", "Valider", "Recheck", "Déverrouiller", "Soumettre à Sage", "Rapport", PDF/Excel — tous conditionnels au rôle.</td>
+      </tr>
+      <tr>
+        <td class="feat">Rôle Administrateur — périmètre SCIG</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note"><strong>RBAC dynamique câblé.</strong> 3 permissions Admin : <code>scig.connection.manage</code>, <code>scig.sync.trigger</code>, <code>scig.sync.view</code>. Profil "Profil Admin SCIG" = Vendeur + Manager + Admin. Pages Angular <code>admin-roles</code>, <code>admin-profiles</code>, <code>admin-users</code> opérationnelles. Endpoint <code>GET /api/v1/auth/me/permissions/</code> charge les droits de l'utilisateur au login (cache <code>localStorage</code>). Migration <code>admin_rbac.0002</code> seed 27 permissions SCIG.</td>
+      </tr>
+      <tr>
+        <td class="feat">Navigation conditionnelle selon le rôle (mobile)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-na">N/A</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">L'app mobile doit lire le rôle depuis le JWT décodé et masquer les écrans non autorisés dès le menu principal. Pas d'écran "Validation" visible pour un Vendeur.</td>
+      </tr>
+      <tr>
+        <td class="feat">Identification du terminal Zebra (device_id)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Le backend utilise <code>device_id</code> pour verrouiller les zones d'inventaire (<code>locked_by_device</code>). L'app mobile doit générer un identifiant stable par appareil (ex. Android ID ou UUID persisté) et l'envoyer dans chaque requête de zone.</td>
+      </tr>
+
+      <!-- Traçabilité -->
+      <tr>
+        <td class="feat">Traçabilité scan inventaire (user + device + timestamp)</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait (web)</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note"><code>InventoryLine.scanned_by</code> + <code>device_id</code> alimentés par <code>scan_article_in_zone()</code> et <code>manual_count_in_zone()</code>. <code>InventoryLineSerializer</code> expose maintenant <code>scanned_by_username</code> + <code>device_id</code>. Page zone-detail : colonne "Saisi par" affiche le nom + appareil (<code>WEB</code> ou ID Zebra tronqué) pour chaque ligne. Mobile : alimenté via <code>device_id</code> envoyé dans la requête.</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité validation de zone (user + timestamp)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note"><code>InventoryZone.validated_by/at</code> + <code>rechecked_by/rechecked_at</code> alimentés. <code>InventoryZoneReadSerializer</code> expose <code>validated_by_username</code>, <code>rechecked_by_username</code>, <code>rechecked_at</code>. Page zone-detail : bandeau vert "Validée par [nom] le [date]" + bandeau gris "Recheck demandé par [nom] le [date]" affichés conditionnellement.</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité réception transfert (user + device)</td>
+        <td><span class="plat mob">Mobile</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire (mobile)</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note"><code>StockTransferLine.received_by</code> + <code>received_at</code> alimentés par <code>receive_transfer_line()</code>. Migration <code>0004</code> appliquée. UI web non prioritaire (flux mobile).</td>
+      </tr>
+      <tr>
+        <td class="feat">Journal d'audit global — vue web (AuditLog)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-ok">✅ Fait</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">Modèle <code>AuditLog</code> global dans <code>apps/core/</code>. Service <code>log_action()</code> câblé sur <strong>10 services SCIG</strong>. Endpoint <code>GET /api/v1/audit/logs/</code>. Migration <code>core.0002</code> appliquée. Page web <code>/admin/audit</code> créée : filtres module/action/dates/recherche, tableau horodatage/user/module badge/action badge/description/cible/device+IP, compteur d'entrées. Service Angular <code>AuditService.getLogs()</code>. Accessible depuis sidebar Administration → "Journal d'audit".</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 9 — NOTIFICATIONS</td></tr>
+
+      <tr>
+        <td class="feat">Alertes de rupture de stock</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-no">❌ Manquant</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">L'endpoint <code>stock/critical/</code> fournit les données mais il n'y a pas de système de push notification. À concevoir : polling côté web, push Firebase côté mobile.</td>
+      </tr>
+      <tr>
+        <td class="feat">Alerte — inventaires à réaliser</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-no">❌ Manquant</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">À implémenter : notification quand une session d'inventaire est créée et que des zones sont sans agent.</td>
+      </tr>
+      <tr>
+        <td class="feat">Alerte — réception de transfert</td>
+        <td><span class="plat both">Les deux</span></td>
+        <td><span class="be be-no">❌ Manquant</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">Notifier le dépôt destination quand un transfert passe en SHIPPED.</td>
+      </tr>
+      <tr>
+        <td class="feat">Alerte — anomalies système (sync échouée, etc.)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-no">❌ Manquant</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">Exploiter SyncLog.status=FAILED pour générer une alerte sur le dashboard.</td>
+      </tr>
+
+      <!-- ══════════════════════════════════════════ -->
+      <tr class="section-row"><td colspan="6">MODULE 10 — DASHBOARD MANAGER (WEB)</td></tr>
+
+      <tr>
+        <td class="feat">KPI — stocks critiques par dépôt et par article</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>dashboard/</code> + GET <code>stock/critical/</code> — widget stocks critiques (CDC §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">KPI — suivi des sessions d'inventaire en cours</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">GET <code>dashboard/</code> — sessions ouvertes, avancement zones (CDC §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">KPI — top articles (ventes / mouvements)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p3">NORMALE</span></td>
+        <td class="note">GET <code>dashboard/</code> (CDC §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">Action — validation des inventaires (zones)</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>zones/&lt;zid&gt;/validate/</code> et <code>/recheck/</code> — depuis le tableau de bord (CDC §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">Action — soumission inventaire vers Sage</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-ok">✅ Prêt</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">POST <code>inventory/&lt;id&gt;/submit-sage/</code> — depuis dashboard, toutes zones VERT requises (CDC §10).</td>
+      </tr>
+      <tr>
+        <td class="feat">Export des données — Excel / PDF</td>
+        <td><span class="plat web">Web</span></td>
+        <td><span class="be be-no">❌ Manquant</span></td>
+        <td><span class="fe fe-todo">À faire</span></td>
+        <td><span class="prio p2">HAUTE</span></td>
+        <td class="note">Non implémenté backend. À ajouter : endpoint d'export sur rapport inventaire et rapport stock critique (CDC §10).</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- Récapitulatif backend manquant -->
+  <h1>Fonctionnalité backend restante (1)</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Fonctionnalité</th>
+        <th>Endpoint suggéré</th>
+        <th>Priorité</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feat">Export rapport inventaire (Excel / PDF)</td>
+        <td><code>GET inventory/&lt;id&gt;/report/export/?format=xlsx|pdf</code></td>
+        <td><span class="prio p1">CRITIQUE</span></td>
+        <td class="note">Excel : librairie <code>openpyxl</code>. PDF : <code>reportlab</code> ou <code>weasyprint</code>. Données : zone, article, taille, couleur, qté théorique, qté comptée, écart, valeur écart. Accessible manager depuis le dashboard.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Implémentés -->
+  <h1>Fonctionnalités backend réalisées (4/5)</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Fonctionnalité</th>
+        <th>Statut</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feat">Statut GRIS pour zones non commencées</td>
+        <td><span class="be be-ok">✅ Existait</span></td>
+        <td class="note"><code>ZoneStatus.NOT_STARTED</code> était déjà présent dans le modèle.</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité scan inventaire (<code>scanned_by</code>, <code>device_id</code>)</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Champs ajoutés sur <code>InventoryLine</code>. Migration <code>sync_scig_sage.0004</code> appliquée.</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité re-vérification zone (<code>rechecked_by</code>, <code>rechecked_at</code>)</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Champs ajoutés sur <code>InventoryZone</code>. Migration <code>sync_scig_sage.0004</code> appliquée.</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité réception ligne transfert (<code>received_by</code>, <code>received_at</code>)</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Champs ajoutés sur <code>StockTransferLine</code>. Migration <code>sync_scig_sage.0004</code> appliquée.</td>
+      </tr>
+      <tr>
+        <td class="feat">Journal d'audit global AuditLog + <code>log_action()</code> + <code>GET audit/logs/</code></td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Modèle dans <code>apps/core/</code>. 10 points d'appel SCIG câblés. Migration <code>core.0002</code> appliquée.</td>
+      </tr>
+      <tr>
+        <td class="feat">RBAC dynamique SCIG — HasPermission + 27 permissions + seed</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Factory <code>HasPermission(code)</code> dans <code>apps/admin_rbac/permissions.py</code>. 27 permissions SCIG seedées via migration <code>admin_rbac.0002</code> (idempotent). 3 rôles système + 3 profils stackés via <code>seed_scig_roles</code>. Endpoint <code>GET /api/v1/auth/me/permissions/</code> (MePermissionsView). Toutes les vues SCIG sécurisées par code de permission granulaire.</td>
+      </tr>
+      <tr>
+        <td class="feat">Angular — PermissionService + guards conditionnels SCIG</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note"><code>PermissionService</code> avec cache localStorage (<code>drp_permissions</code>). Chargé au login. Méthodes synchrones <code>has()</code>/<code>hasAny()</code>/<code>hasAll()</code>. Guards <code>@if (perm.has('scig.xxx'))</code> sur tous les boutons sensibles (inventaires, session-detail, zone-detail, rapport).</td>
+      </tr>
+      <tr>
+        <td class="feat">Angular — Page Journal d'audit (<code>/admin/audit</code>)</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note">Service <code>AuditService.getLogs()</code>. Page avec filtres module/action/dates/recherche texte. Tableau : horodatage, utilisateur, module badge, action badge, description, cible (type + uuid tronqué), device/IP. Badges colorés (CREATE→vert, DELETE→rouge, VALIDATE→bleu…). Accessible sidebar Administration → "Journal d'audit".</td>
+      </tr>
+      <tr>
+        <td class="feat">Traçabilité zone — serializer étendu + UI zone-detail</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note"><strong>Backend :</strong> <code>InventoryZoneReadSerializer</code> + 3 champs (<code>validated_by_username</code>, <code>rechecked_by_username</code>, <code>rechecked_at</code>). <code>InventoryLineSerializer</code> + 2 champs (<code>scanned_by_username</code>, <code>device_id</code>). <strong>Angular :</strong> interfaces <code>InventoryZone</code> et <code>InventoryLine</code> étendues. Page zone-detail : bandeaux "Validée par / Recheck par" + colonne "Saisi par" avec nom + appareil.</td>
+      </tr>
+      <tr>
+        <td class="feat">Déverrouillage automatique zone web à la déconnexion</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note"><code>localStorage.drp_open_zone</code> : posé à <code>openZone()</code>, retiré à <code>submitZone()</code> / <code>validateZone()</code> / force-unlock manager. <code>AuthService._unlockOpenZoneIfAny()</code> — appelé avant <code>logout()</code> et <code>logoutAll()</code> — POST <code>.../unlock/</code> fire-and-forget sur la zone encore IN_PROGRESS.</td>
+      </tr>
+      <tr>
+        <td class="feat">Angular — Page Configuration Sage 100 (<code>/scig/sage</code>)</td>
+        <td><span class="be be-ok">✅ Fait</span></td>
+        <td class="note"><strong>Connexion :</strong> formulaire server/port/DB/user/pwd, badge statut dernier test (date + latence), bouton test live. <strong>Sync :</strong> 4 boutons type (Dépôts/Articles/Stock/FULL), résultat immédiat (créés/màj/erreurs/durée), FULL → 3 cartes. <strong>Historique :</strong> table filtrable type+statut. Accès conditionnel : <code>scig.connection.manage</code> / <code>scig.sync.trigger</code> / <code>scig.sync.view</code>. Sidebar "Sync SCIG" → "Configuration Sage".</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  DreamsPOS ERP &nbsp;|&nbsp; Section 19 — Sync SCIG / Sage 100 &nbsp;|&nbsp; Analyse CDC vs. Backend &nbsp;|&nbsp; Juin 2026
+</footer>
+
+</body>
+</html>

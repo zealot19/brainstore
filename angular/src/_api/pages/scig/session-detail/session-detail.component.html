@@ -1,0 +1,481 @@
+<!-- En-tête -->
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>@if (session) { {{ session.name }} } @else { Session d'inventaire }</h4>
+      <h6>{{ session?.depot_name ?? '…' }}</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" title="Actualiser">
+        <i class="ti ti-refresh"></i>
+      </a>
+    </li>
+    <li>
+      <div class="page-btn mt-0">
+        <a [routerLink]="['/scig/inventaires']" class="btn btn-secondary w-100">
+          <i class="feather icon-arrow-left me-2"></i>Back to Sessions
+        </a>
+      </div>
+    </li>
+  </ul>
+  <div class="page-btn d-flex gap-2">
+    @if (isSessionOpen() && perm.has('scig.zone.create')) {
+      <a href="javascript:void(0);" class="btn btn-primary"
+         data-bs-toggle="modal" data-bs-target="#zone-create-modal"
+         (click)="openCreateZone()">
+        <i class="ti ti-circle-plus me-2"></i>Créer une zone
+      </a>
+    }
+    @if (canSubmitToSage() && perm.has('scig.sage.submit')) {
+      <button class="btn btn-success"
+              data-bs-toggle="modal" data-bs-target="#confirm-sage-modal"
+              (click)="openSubmitSageConfirm()"
+              [disabled]="submittingToSage">
+        <i class="ti ti-cloud-upload me-2"></i>Soumettre à Sage
+      </button>
+    }
+    @if (session && perm.has('scig.report.view')) {
+      <a [routerLink]="['/scig/inventaires', sessionId, 'rapport']" class="btn btn-outline-secondary">
+        <i class="ti ti-file-report me-2"></i>Rapport
+      </a>
+    }
+  </div>
+</div>
+
+<!-- Erreur validation inline -->
+@if (validateError) {
+  <div class="alert alert-danger py-2 mb-3">
+    <i class="ti ti-alert-circle me-2"></i>{{ validateError }}
+  </div>
+}
+@if (submitSageError) {
+  <div class="alert alert-danger py-2 mb-3">
+    <i class="ti ti-alert-circle me-2"></i>{{ submitSageError }}
+  </div>
+}
+
+<!-- Carte résumé session -->
+@if (session) {
+  <div class="card mb-4" [class.border-success]="isSessionClosed()">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <small class="text-muted d-block">Dépôt</small>
+          <span class="fw-medium">{{ session.depot_name }}</span>
+        </div>
+        <div class="col-md-2">
+          <small class="text-muted d-block">Statut</small>
+          @if (isSessionClosed()) {
+            <span class="badge bg-secondary">
+              <i class="ti ti-lock me-1"></i>Clôturée
+            </span>
+          } @else {
+            <span class="badge bg-outline-success">
+              <i class="ti ti-lock-open me-1"></i>Ouverte
+            </span>
+          }
+        </div>
+        <div class="col-md-2">
+          <small class="text-muted d-block">Ouvert le</small>
+          <span>{{ session.opened_at | date:'dd/MM/yyyy' }}</span>
+        </div>
+        @if (isSessionClosed()) {
+          <div class="col-md-2">
+            <small class="text-muted d-block">Clôturée le</small>
+            <span class="text-success fw-medium">{{ session.closed_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="col-md-3">
+            <small class="text-muted d-block">Soumis à Sage le</small>
+            <span class="text-success fw-medium">{{ session.submitted_to_sage_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        } @else {
+          <div class="col-md-3">
+            <small class="text-muted d-block">Progression zones</small>
+            <span class="fw-medium"
+                  [ngClass]="session.all_zones_validated && session.zone_count > 0 ? 'text-success' : ''">
+              {{ session.validated_count }} / {{ session.zone_count }} validées
+              @if (session.all_zones_validated && session.zone_count > 0) {
+                <i class="ti ti-circle-check text-success ms-1"></i>
+              }
+            </span>
+          </div>
+        }
+        @if (session.notes) {
+          <div class="col-md-2">
+            <small class="text-muted d-block">Notes</small>
+            <span class="text-muted small">{{ session.notes }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Compteurs par statut — KPI cards -->
+@if (!loadingZones) {
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md">
+      <div class="card h-100 border-0" style="background:#f0f1f5; border-left:4px solid #6c757d !important;">
+        <div class="card-body py-3 text-center">
+          <i class="ti ti-circle-dashed fs-2 text-secondary"></i>
+          <div class="fw-bold fs-3 text-secondary my-1">{{ countByStatus['NOT_STARTED'] }}</div>
+          <div class="text-secondary small fw-medium">Non démarrées</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md">
+      <div class="card h-100 border-0" style="background:#fde8e8; border-left:4px solid #dc3545 !important;">
+        <div class="card-body py-3 text-center">
+          <i class="ti ti-player-play fs-2 text-danger"></i>
+          <div class="fw-bold fs-3 text-danger my-1">{{ countByStatus['IN_PROGRESS'] }}</div>
+          <div class="text-danger small fw-medium">En cours</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md">
+      <div class="card h-100 border-0" style="background:#e3eefe; border-left:4px solid #0d6efd !important;">
+        <div class="card-body py-3 text-center">
+          <i class="ti ti-send fs-2 text-primary"></i>
+          <div class="fw-bold fs-3 text-primary my-1">{{ countByStatus['SUBMITTED'] }}</div>
+          <div class="text-primary small fw-medium">À valider</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md">
+      <div class="card h-100 border-0" style="background:#fff3cd; border-left:4px solid #fd7e14 !important;">
+        <div class="card-body py-3 text-center">
+          <i class="ti ti-alert-triangle fs-2 text-warning"></i>
+          <div class="fw-bold fs-3 text-warning my-1">{{ countByStatus['RECHECK'] }}</div>
+          <div class="text-warning small fw-medium">À revérifier</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md">
+      <div class="card h-100 border-0" style="background:#d4edda; border-left:4px solid #198754 !important;">
+        <div class="card-body py-3 text-center">
+          <i class="ti ti-circle-check fs-2 text-success"></i>
+          <div class="fw-bold fs-3 text-success my-1">{{ countByStatus['VALIDATED'] }}</div>
+          <div class="text-success small fw-medium">Validées</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+}
+
+<!-- Table des zones -->
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <h5 class="mb-0">Zones de l'inventaire</h5>
+    <span class="badge bg-outline-secondary">{{ zones.length }} zone(s)</span>
+  </div>
+  <div class="card-body p-0">
+    @if (loadingZones) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Zone</th>
+              <th>Statut</th>
+              <th>Articles comptés</th>
+              <th>Lignes</th>
+              <th>Appareil actif</th>
+              <th>Validée le</th>
+              <th class="no-sort">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (z of zones; track z.id) {
+              <tr [class.table-warning]="z.status === 'SUBMITTED'">
+                <td class="fw-medium">{{ z.name }}</td>
+                <td>
+                  <span class="badge" [ngClass]="statusBadge(z.status)">
+                    <i class="ti {{ statusIcon(z.status) }} me-1"></i>
+                    {{ statusLabel(z.status) }}
+                  </span>
+                  @if (z.status === 'RECHECK' && z.recheck_note) {
+                    <div class="text-muted small mt-1">
+                      <i class="ti ti-message-circle me-1"></i>{{ z.recheck_note }}
+                    </div>
+                  }
+                </td>
+                <td>{{ z.total_counted | number:'1.0-0' }}</td>
+                <td>{{ z.lines_count }}</td>
+                <td>
+                  @if (z.locked_by_username) {
+                    <span class="text-danger small">
+                      <i class="ti ti-device-tablet me-1"></i>{{ z.locked_by_username }}
+                    </span>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td>{{ z.validated_at ? (z.validated_at | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action d-flex align-items-center gap-1">
+                    @if (z.status === 'SUBMITTED') {
+                      <!-- Valider (SUBMITTED → VERT) -->
+                      @if (perm.has('scig.zone.validate')) {
+                        <button class="btn btn-sm btn-success"
+                                data-bs-toggle="modal" data-bs-target="#confirm-validate-modal"
+                                (click)="openValidateConfirm(z)"
+                                [disabled]="validatingId === z.id"
+                                title="Valider la zone">
+                          @if (validatingId === z.id) {
+                            <span class="spinner-border spinner-border-sm"></span>
+                          } @else {
+                            <i class="ti ti-check"></i>
+                          }
+                        </button>
+                      }
+                      <!-- Recheck (SUBMITTED → ORANGE) -->
+                      @if (perm.has('scig.zone.recheck')) {
+                        <button class="btn btn-sm btn-warning text-dark"
+                                data-bs-toggle="modal" data-bs-target="#recheck-modal"
+                                (click)="openRecheck(z)"
+                                title="Renvoyer en vérification">
+                          <i class="ti ti-rotate-clockwise"></i>
+                        </button>
+                      }
+                    }
+                    @if (z.status === 'IN_PROGRESS' && perm.has('scig.zone.unlock')) {
+                      <!-- Déverrouiller (IN_PROGRESS → NOT_STARTED) -->
+                      <button class="btn btn-sm btn-outline-danger"
+                              data-bs-toggle="modal" data-bs-target="#confirm-unlock-modal"
+                              (click)="openUnlockConfirm(z)"
+                              [disabled]="unlockingId === z.id"
+                              title="Déverrouiller la zone (appareil bloqué)">
+                        @if (unlockingId === z.id) {
+                          <span class="spinner-border spinner-border-sm"></span>
+                        } @else {
+                          <i class="ti ti-lock-open"></i>
+                        }
+                      </button>
+                    }
+                    <!-- Voir / Gérer -->
+                    <a [routerLink]="['/scig/inventaires', sessionId, 'zones', z.id]"
+                       class="p-2 d-flex align-items-center border rounded" title="Détail zone">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted mb-2"><i class="ti ti-map-pins fs-2"></i></div>
+                  <p class="text-muted mb-0">Aucune zone définie.</p>
+                  @if (isSessionOpen()) {
+                    <a href="javascript:void(0);" class="btn btn-primary btn-sm mt-2"
+                       data-bs-toggle="modal" data-bs-target="#zone-create-modal"
+                       (click)="openCreateZone()">
+                      <i class="ti ti-plus me-1"></i>Créer la première zone
+                    </a>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Créer une zone -->
+<div class="modal fade" id="zone-create-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle zone</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="zoneForm" (ngSubmit)="submitZone()">
+        <div class="modal-body">
+          @if (zoneErrorMsg) { <div class="alert alert-danger py-2">{{ zoneErrorMsg }}</div> }
+
+          <div class="mb-3">
+            <label class="form-label">Nom de la zone <span class="text-danger">*</span></label>
+            <input formControlName="name" type="text" class="form-control"
+                   placeholder="ex : Zone 1 – Femme" autofocus />
+            <div class="form-text text-muted">
+              Le nom doit être unique dans cet inventaire.
+            </div>
+          </div>
+
+          <!-- Légende des statuts -->
+          <div class="alert alert-light py-2 mb-0">
+            <small class="d-block fw-medium mb-1">Cycle de vie d'une zone :</small>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge bg-outline-secondary">Non commencée</span>
+              <i class="ti ti-arrow-right align-self-center text-muted"></i>
+              <span class="badge bg-outline-danger">En cours (Zebra)</span>
+              <i class="ti ti-arrow-right align-self-center text-muted"></i>
+              <span class="badge bg-outline-primary">À valider</span>
+              <i class="ti ti-arrow-right align-self-center text-muted"></i>
+              <span class="badge bg-outline-success">Validée</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="zoneForm.invalid || savingZone">
+            @if (savingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Confirmer validation zone -->
+<div class="modal fade" id="confirm-validate-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="ti ti-circle-check text-success me-2"></i>Valider la zone
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        @if (validateError) { <div class="alert alert-danger py-2 mb-3">{{ validateError }}</div> }
+        <p class="mb-0">
+          Confirmer la validation de la zone
+          <strong>{{ validatePendingZone?.name }}</strong> ?
+          <br><small class="text-muted">Le statut passera à <span class="badge bg-outline-success">Validée</span> — action irréversible.</small>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-success"
+                (click)="confirmValidateZone()"
+                [disabled]="validatingId !== null">
+          @if (validatingId !== null) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-check me-1"></i>Valider
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Confirmer soumission à Sage -->
+<div class="modal fade" id="confirm-sage-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center pt-0 pb-2">
+        <div class="mb-3">
+          <span class="badge bg-success rounded-pill p-3">
+            <i class="ti ti-cloud-upload fs-2"></i>
+          </span>
+        </div>
+        <h5 class="mb-2">Soumettre à Sage 100 ?</h5>
+        <p class="text-muted mb-0">
+          L'inventaire sera transmis à Sage 100 et la session sera
+          <strong>définitivement clôturée</strong>.<br>
+          Cette action est irréversible.
+        </p>
+        @if (submitSageError) {
+          <div class="alert alert-danger py-2 mt-3 text-start">{{ submitSageError }}</div>
+        }
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-success px-4"
+                (click)="confirmSubmitToSage()"
+                [disabled]="submittingToSage">
+          @if (submittingToSage) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-cloud-upload me-1"></i>Soumettre
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Confirmer déverrouillage zone -->
+<div class="modal fade" id="confirm-unlock-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center pt-0 pb-2">
+        <div class="mb-3">
+          <span class="badge bg-danger rounded-pill p-3">
+            <i class="ti ti-lock-open fs-2"></i>
+          </span>
+        </div>
+        <h5 class="mb-1">Déverrouiller la zone ?</h5>
+        <p class="text-muted small mb-1">
+          Zone : <strong>{{ unlockPendingZone?.name }}</strong><br>
+          Appareil actif : <strong class="text-danger">{{ unlockPendingZone?.locked_by_username ?? '—' }}</strong>
+        </p>
+        <p class="text-muted mb-0">
+          La zone sera remise à <span class="badge bg-outline-secondary">Non commencée</span>
+          et pourra être réouverte depuis un autre appareil.<br>
+          <small>Les articles déjà comptés sont conservés.</small>
+        </p>
+        @if (unlockError) {
+          <div class="alert alert-danger py-2 mt-3 text-start">{{ unlockError }}</div>
+        }
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger px-4"
+                (click)="confirmUnlockZone()"
+                [disabled]="unlockingId !== null">
+          @if (unlockingId !== null) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="ti ti-lock-open me-1"></i>Déverrouiller
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Recheck zone -->
+<div class="modal fade" id="recheck-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="ti ti-rotate-clockwise text-warning me-2"></i>Renvoyer en vérification
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="recheckForm" (ngSubmit)="confirmRecheck()">
+        <div class="modal-body">
+          @if (recheckError) { <div class="alert alert-danger py-2">{{ recheckError }}</div> }
+          <p class="mb-3">
+            La zone <strong>{{ recheckTargetName }}</strong> sera renvoyée aux opérateurs
+            (statut → <span class="badge bg-warning text-dark">À revérifier</span>).
+          </p>
+          <div class="mb-0">
+            <label class="form-label">Note / motif (optionnel)</label>
+            <textarea formControlName="note" class="form-control" rows="3"
+                      placeholder="ex : Erreur sur la taille M rouge, recompter le rayon…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-warning text-dark" [disabled]="savingRecheck">
+            @if (savingRecheck) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Renvoyer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
