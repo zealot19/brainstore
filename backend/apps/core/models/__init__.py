@@ -5,6 +5,7 @@ from .currency import Currency, ExchangeRate
 from .uom import UnitOfMeasureCategory, UnitOfMeasure
 from .attachment import Attachment
 from .sequence import Sequence
+from .audit_log import AuditLog
 
 __all__ = [
     "BaseModel",
@@ -18,4 +19,5 @@ __all__ = [
     "UnitOfMeasure",
     "Attachment",
     "Sequence",
+    "AuditLog",
 ]

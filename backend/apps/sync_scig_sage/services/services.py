@@ -16,6 +16,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.core.exceptions import ApplicationError
+from apps.core.models import AuditLog
+from apps.core.services.audit_service import log_action
 from apps.sync_scig_sage.models import (
     Article, ArticleVariant,
     Depot, StockLevel,
@@ -265,7 +267,7 @@ def sync_full(company, triggered_by=None) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 
 @transaction.atomic
-def create_inventory_session(company, name: str, depot_id, created_by) -> InventorySession:
+def create_inventory_session(company, name: str, depot_id, created_by, notes: str = "") -> InventorySession:
     depot = Depot.objects.filter(id=depot_id, company=company, is_deleted=False).first()
     if not depot:
         raise ApplicationError("Dépôt introuvable.")
@@ -277,6 +279,7 @@ def create_inventory_session(company, name: str, depot_id, created_by) -> Invent
         company=company,
         name=name.strip(),
         depot=depot,
+        notes=notes,
         created_by=created_by,
         updated_by=created_by,
     )
@@ -352,7 +355,35 @@ def _snapshot_theoretical_stock(zone: InventoryZone):
 
 
 @transaction.atomic
-def scan_article_in_zone(zone_id, barcode: str, user, qty=1) -> InventoryLine:
+def unlock_inventory_zone(zone_id, user) -> InventoryZone:
+    """Force-unlock a stuck IN_PROGRESS zone (manager action). Preserves counted lines."""
+    zone = InventoryZone.objects.select_for_update().filter(
+        id=zone_id, is_deleted=False
+    ).first()
+    if not zone:
+        raise ApplicationError("Zone introuvable.")
+    if zone.status != ZoneStatus.IN_PROGRESS:
+        raise ApplicationError("Seules les zones en cours (verrou actif) peuvent être déverrouillées.")
+
+    previous_device = zone.locked_by_device
+    zone.status = ZoneStatus.NOT_STARTED
+    zone.locked_by_device = ""
+    zone.locked_by = None
+    zone.updated_by = user
+    zone.save(update_fields=["status", "locked_by_device", "locked_by", "updated_by", "updated_at"])
+
+    log_action(
+        user=user,
+        action=AuditLog.Action.UPDATE,
+        resource_type="InventoryZone",
+        resource_id=str(zone.id),
+        description=f"Déverrouillage forcé de la zone '{zone.name}' (appareil : {previous_device})",
+    )
+    return zone
+
+
+@transaction.atomic
+def scan_article_in_zone(zone_id, barcode: str, user, qty=1, device_id: str = "") -> InventoryLine:
     """
     Scan a barcode in an open zone.
     Looks up variant by barcode, then increments qty_counted.
@@ -380,13 +411,24 @@ def scan_article_in_zone(zone_id, barcode: str, user, qty=1) -> InventoryLine:
     line.qty_counted += qty
     line.last_scanned_at = timezone.now()
     line.is_manual = False
+    line.scanned_by = user
+    line.device_id = device_id or ""
     line.updated_by = user
-    line.save(update_fields=["qty_counted", "last_scanned_at", "is_manual", "updated_by", "updated_at"])
+    line.save(update_fields=[
+        "qty_counted", "last_scanned_at", "is_manual",
+        "scanned_by", "device_id", "updated_by", "updated_at",
+    ])
+    log_action(
+        user=user, action=AuditLog.Action.SCAN, module=AuditLog.Module.SCIG,
+        target_type="InventoryLine", target_id=line.id,
+        description=f"Scan {barcode} (qté +{qty}) — zone {zone.name}",
+        device_id=device_id, company=zone.session.company,
+    )
     return line
 
 
 @transaction.atomic
-def manual_count_in_zone(zone_id, variant_id, qty, user) -> InventoryLine:
+def manual_count_in_zone(zone_id, variant_id, qty, user, device_id: str = "") -> InventoryLine:
     """Set (not increment) a manual count for a variant in an open zone."""
     zone = InventoryZone.objects.filter(
         id=zone_id, is_deleted=False, status=ZoneStatus.IN_PROGRESS
@@ -404,8 +446,19 @@ def manual_count_in_zone(zone_id, variant_id, qty, user) -> InventoryLine:
     line.qty_counted = qty
     line.is_manual = True
     line.last_scanned_at = timezone.now()
+    line.scanned_by = user
+    line.device_id = device_id or ""
     line.updated_by = user
-    line.save(update_fields=["qty_counted", "is_manual", "last_scanned_at", "updated_by", "updated_at"])
+    line.save(update_fields=[
+        "qty_counted", "is_manual", "last_scanned_at",
+        "scanned_by", "device_id", "updated_by", "updated_at",
+    ])
+    log_action(
+        user=user, action=AuditLog.Action.SCAN, module=AuditLog.Module.SCIG,
+        target_type="InventoryLine", target_id=line.id,
+        description=f"Saisie manuelle variante {variant_id} (qté={qty}) — zone {zone.name}",
+        device_id=device_id, company=zone.session.company,
+    )
     return line
 
 
@@ -444,6 +497,12 @@ def validate_inventory_zone(zone_id, user) -> InventoryZone:
     zone.save(update_fields=[
         "status", "validated_at", "validated_by", "updated_by", "updated_at"
     ])
+    log_action(
+        user=user, action=AuditLog.Action.VALIDATE, module=AuditLog.Module.SCIG,
+        target_type="InventoryZone", target_id=zone.id,
+        description=f"Zone '{zone.name}' validée → VERT",
+        company=zone.session.company,
+    )
     return zone
 
 
@@ -458,10 +517,19 @@ def recheck_inventory_zone(zone_id, note: str, user) -> InventoryZone:
     zone.status = ZoneStatus.RECHECK
     zone.recheck_note = note or ""
     zone.submitted_at = None
+    zone.rechecked_by = user
+    zone.rechecked_at = timezone.now()
     zone.updated_by = user
     zone.save(update_fields=[
-        "status", "recheck_note", "submitted_at", "updated_by", "updated_at"
+        "status", "recheck_note", "submitted_at",
+        "rechecked_by", "rechecked_at", "updated_by", "updated_at",
     ])
+    log_action(
+        user=user, action=AuditLog.Action.RECHECK, module=AuditLog.Module.SCIG,
+        target_type="InventoryZone", target_id=zone.id,
+        description=f"Zone '{zone.name}' renvoyée en vérification → ORANGE. Note: {note or '—'}",
+        company=zone.session.company,
+    )
     return zone
 
 
@@ -518,6 +586,12 @@ def submit_inventory_to_sage(session_id, user) -> InventorySession:
         "status", "closed_at", "submitted_to_sage_at",
         "submitted_by", "updated_by", "updated_at",
     ])
+    log_action(
+        user=user, action=AuditLog.Action.SUBMIT, module=AuditLog.Module.SCIG,
+        target_type="InventorySession", target_id=session.id,
+        description=f"Inventaire '{session.name}' soumis vers Sage 100 et clôturé",
+        company=session.company,
+    )
     return session
 
 
@@ -620,6 +694,12 @@ def validate_transfer(transfer_id, user) -> StockTransfer:
     transfer.validated_by = user
     transfer.updated_by = user
     transfer.save(update_fields=["status", "validated_at", "validated_by", "updated_by", "updated_at"])
+    log_action(
+        user=user, action=AuditLog.Action.VALIDATE, module=AuditLog.Module.SCIG,
+        target_type="StockTransfer", target_id=transfer.id,
+        description=f"Transfert {transfer.reference} validé",
+        company=transfer.company,
+    )
     return transfer
 
 
@@ -637,6 +717,12 @@ def ship_transfer(transfer_id, user) -> StockTransfer:
     transfer.shipped_by = user
     transfer.updated_by = user
     transfer.save(update_fields=["status", "shipped_at", "shipped_by", "updated_by", "updated_at"])
+    log_action(
+        user=user, action=AuditLog.Action.SHIP, module=AuditLog.Module.SCIG,
+        target_type="StockTransfer", target_id=transfer.id,
+        description=f"Transfert {transfer.reference} expédié vers {transfer.destination_depot.name}",
+        company=transfer.company,
+    )
     return transfer
 
 
@@ -663,8 +749,16 @@ def receive_transfer_line(transfer_id, barcode: str, qty_received, user) -> Stoc
         raise ApplicationError("Cet article ne fait pas partie de ce transfert.")
 
     line.qty_received += qty_received
+    line.received_by = user
+    line.received_at = timezone.now()
     line.updated_by = user
-    line.save(update_fields=["qty_received", "updated_by", "updated_at"])
+    line.save(update_fields=["qty_received", "received_by", "received_at", "updated_by", "updated_at"])
+    log_action(
+        user=user, action=AuditLog.Action.RECEIVE, module=AuditLog.Module.SCIG,
+        target_type="StockTransferLine", target_id=line.id,
+        description=f"Réception scan {barcode} (qté={qty_received}) — transfert {transfer.reference}",
+        company=transfer.company,
+    )
     return line
 
 
@@ -681,6 +775,12 @@ def close_transfer_reception(transfer_id, user) -> StockTransfer:
     transfer.received_by = user
     transfer.updated_by = user
     transfer.save(update_fields=["status", "received_at", "received_by", "updated_by", "updated_at"])
+    log_action(
+        user=user, action=AuditLog.Action.RECEIVE, module=AuditLog.Module.SCIG,
+        target_type="StockTransfer", target_id=transfer.id,
+        description=f"Réception clôturée — transfert {transfer.reference}",
+        company=transfer.company,
+    )
     return transfer
 
 

@@ -48,6 +48,61 @@ $template-angular-theme: mat.m2-define-light-theme((color: (primary: $template-a
 @import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-zoom.css");
 @import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-video.css");
 
+// ── Impression rapport inventaire ─────────────────────────────────────────────
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+
+  // Cacher toute l'UI de navigation
+  .sidebar,
+  #sidebar,
+  .header,
+  .main-header,
+  .sidebar-contact,
+  .sidebar-themesettings,
+  footer,
+  .footer { display: none !important; }
+
+  // Le contenu principal prend toute la largeur
+  .page-wrapper,
+  .main-wrapper,
+  body > * > .page-wrapper {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 100% !important;
+  }
+
+  // Supprimer l'overflow qui coupe les colonnes
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  // Tables compactes et lisibles
+  table {
+    width: 100% !important;
+    font-size: 9pt;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    padding: 4px 6px !important;
+    border: 1px solid #dee2e6 !important;
+  }
+
+  thead { display: table-header-group; }
+  tr    { page-break-inside: avoid; }
+
+  // Zones du rapport : éviter la coupure en milieu de tableau
+  .card.table-list-card {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #dee2e6 !important;
+    margin-bottom: 12pt !important;
+  }
+}
+
 // .show-sub-menu {
 //   display: block;
 //   animation: fadeIn 1s;

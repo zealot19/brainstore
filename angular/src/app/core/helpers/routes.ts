@@ -53,6 +53,15 @@ export const routes={
   rbacRoles:    '/super-admin/roles',
   rbacProfiles: '/super-admin/profiles',
   adminUsers:   '/super-admin/users',
+  //admin institution
+  adminInstUsers:    '/admin/users',
+  adminInstProfiles: '/admin/profiles',
+  adminInstRoles:    '/admin/roles',
+  adminInstAudit:    '/admin/audit',
+  // ── SCIG / Sync Sage 100 ──────────────────────────────────────────────────
+  scigDepots:      '/scig/depots',
+  scigInventaires: '/scig/inventaires',
+  scigSage:        '/scig/sage',
   //application
   audioCall: '/application/audio-call',
   videoCall: '/application/video-call',

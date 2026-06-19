@@ -6,6 +6,7 @@ import { menu, sidebarData, sidebarDataone, url } from '../../core/model/sidebar
 import { CommonModule } from '@angular/common';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { ConnectedOverlayScrollHandler } from 'primeng/dom';
+import { AuthService } from '../../../_api/services/auth/auth.service';
 
 
 interface MenuItem {
@@ -39,7 +40,8 @@ export class SidebarOneComponent {
   constructor(
     private Router: Router,
     private sidebar: SidebarService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) {
     router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
@@ -47,7 +49,22 @@ export class SidebarOneComponent {
       }
     });
     this.getRoutes(this.router);
-    this.side_bar_data = this.sidebar.sidebarData1;
+    this.side_bar_data = this.buildMenuForUser();
+  }
+
+  private buildMenuForUser(): Array<any> {
+    const user = this.authService.currentUser;
+    const isSuperAdmin      = user?.is_superuser ?? false;
+    const isInstitutionAdmin = user?.is_institution_admin ?? false;
+
+    return this.sidebar.sidebarData1.map((section: any) => ({
+      ...section,
+      menu: section.menu.filter((item: any) => {
+        if (item.role === 'institution_admin') return isInstitutionAdmin || isSuperAdmin;
+        if (item.role === 'super_admin')       return isSuperAdmin;
+        return true;
+      }),
+    }));
   }
 
   private getRoutes(route: url): void {

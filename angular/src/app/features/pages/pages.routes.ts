@@ -89,6 +89,31 @@ export const Pages_routes: Routes = [
           { path: 'purchase-transaction', loadComponent: () => import('./super-admin/purchase-transaction/purchase-transaction.component').then(m => m.PurchaseTransactionComponent) }
         ]
       },
+      // ── MODULE 5 : Sync SCIG / Sage 100 ────────────────────────────────────
+      {
+        path: 'scig',
+        loadComponent: () => import('../../../_api/pages/scig/scig.component').then(m => m.ScigComponent),
+        children: [
+          { path: 'depots',         loadComponent: () => import('../../../_api/pages/scig/depots/depots.component').then(m => m.DepotsComponent) },
+          { path: 'inventaires',    loadComponent: () => import('../../../_api/pages/scig/inventaires/inventaires.component').then(m => m.InventairesComponent) },
+          { path: 'inventaires/:id',                loadComponent: () => import('../../../_api/pages/scig/session-detail/session-detail.component').then(m => m.SessionDetailComponent) },
+          { path: 'inventaires/:id/zones/:zoneId', loadComponent: () => import('../../../_api/pages/scig/zone-detail/zone-detail.component').then(m => m.ZoneDetailComponent) },
+          { path: 'inventaires/:id/rapport',       loadComponent: () => import('../../../_api/pages/scig/rapport/rapport.component').then(m => m.RapportComponent) },
+          { path: 'sage',  loadComponent: () => import('../../../_api/pages/scig/sage/sage.component').then(m => m.SageComponent) },
+        ],
+      },
+      // ── Volet Admin Institution ──────────────────────────────────────────────
+      {
+        path: 'admin',
+        loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent),
+        children: [
+          { path: 'users',    loadComponent: () => import('../../../_api/pages/admin/users/admin-users.component').then(m => m.AdminUsersComponent) },
+          { path: 'profiles', loadComponent: () => import('../../../_api/pages/admin/profiles/admin-profiles.component').then(m => m.AdminProfilesComponent) },
+          { path: 'roles',    loadComponent: () => import('../../../_api/pages/admin/roles/admin-roles.component').then(m => m.AdminRolesComponent) },
+          { path: 'roles/:id/permissions', loadComponent: () => import('../../../_api/pages/rbac/role-permissions/role-permissions.component').then(m => m.RolePermissionsComponent) },
+          { path: 'audit',    loadComponent: () => import('../../../_api/pages/admin/audit/audit.component').then(m => m.AuditLogComponent) },
+        ]
+      },
       //ui interface
       {
         path: 'advanced-ui',

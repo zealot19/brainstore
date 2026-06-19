@@ -121,6 +121,11 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     )
     address_input = _AddressInputSerializer(write_only=True, required=False)
 
+    # Bootstrap du premier admin — optionnels mais groupés
+    admin_email      = serializers.EmailField(write_only=True, required=False, allow_blank=True)
+    admin_first_name = serializers.CharField(max_length=150, write_only=True, required=False, allow_blank=True)
+    admin_last_name  = serializers.CharField(max_length=150, write_only=True, required=False, allow_blank=True)
+
     class Meta:
         model  = Company
         fields = [
@@ -130,12 +135,22 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             "country", "language_code", "timezone", "currency",
             "fiscal_year_start", "fiscal_year_end", "accounting_plan",
             "package", "is_active", "address_input",
+            "admin_email", "admin_first_name", "admin_last_name",
         ]
 
     def validate_name(self, value):
         if not value.strip():
             raise serializers.ValidationError(_("Le nom ne peut pas être vide."))
         return value.strip()
+
+    def validate(self, attrs):
+        email = attrs.get("admin_email", "").strip()
+        if email:
+            if not attrs.get("admin_first_name", "").strip():
+                raise serializers.ValidationError({"admin_first_name": _("Prénom requis si un email admin est fourni.")})
+            if not attrs.get("admin_last_name", "").strip():
+                raise serializers.ValidationError({"admin_last_name": _("Nom requis si un email admin est fourni.")})
+        return attrs
 
 
 

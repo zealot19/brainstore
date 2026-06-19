@@ -111,10 +111,16 @@ class CompanyListView(APIView):
     def post(self, request):
         payload = CompanyCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        company = services.create_company(
-            created_by=request.user, **payload.validated_data
-        )
-        return created_response(CompanyDetailSerializer(company).data)
+        try:
+            company, setup = services.create_company(
+                created_by=request.user, **payload.validated_data
+            )
+        except ApplicationError as e:
+            return error_response(str(e), status_code=400)
+        data = CompanyDetailSerializer(company).data
+        if setup:
+            data["setup"] = setup
+        return created_response(data)
 
 
 class CompanyDetailView(APIView):

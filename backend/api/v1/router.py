@@ -43,4 +43,7 @@ urlpatterns = [
 
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ────────────────
     path("scig-sage/",  include("apps.sync_scig_sage.urls")),
+
+    # ── Journal d'audit global ──────────────────────────────────────────────────
+    path("audit/",      include("apps.core.urls")),
 ]

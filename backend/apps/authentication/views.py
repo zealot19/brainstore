@@ -144,6 +144,21 @@ class MeView(APIView):
         return success_response(serializer.data, message=_("Profil mis à jour."))
 
 
+class MePermissionsView(APIView):
+    """GET /api/v1/auth/me/permissions/ — Codes de permissions du user connecté."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from apps.admin_rbac.selectors.user_role_selectors import get_user_permissions
+        company = getattr(request.user, "company", None)
+        company_id = getattr(company, "id", None)
+        perms = get_user_permissions(request.user, company_id)
+        return success_response({
+            "permissions": ["*"] if "*" in perms else sorted(perms),
+            "is_superuser": request.user.is_superuser,
+        })
+
+
 # ── Sessions ──────────────────────────────────────────────────────────────────
 
 class SessionListView(APIView):

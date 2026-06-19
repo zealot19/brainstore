@@ -13,6 +13,7 @@ urlpatterns = [
 
     # ── Profil ────────────────────────────────────────────────────────────────
     path("me/",                  views.MeView.as_view(),                   name="me"),
+    path("me/permissions/",      views.MePermissionsView.as_view(),        name="me-permissions"),
 
     # ── Sessions ──────────────────────────────────────────────────────────────
     path("sessions/",            views.SessionListView.as_view(),          name="sessions"),

@@ -149,6 +149,12 @@ class InventoryZoneReadSerializer(serializers.ModelSerializer):
     locked_by_username = serializers.CharField(
         source="locked_by.get_full_name", read_only=True, default=""
     )
+    validated_by_username = serializers.CharField(
+        source="validated_by.get_full_name", read_only=True, default=""
+    )
+    rechecked_by_username = serializers.CharField(
+        source="rechecked_by.get_full_name", read_only=True, default=""
+    )
 
     class Meta:
         model = InventoryZone
@@ -156,6 +162,8 @@ class InventoryZoneReadSerializer(serializers.ModelSerializer):
             "id", "name", "status",
             "locked_by_device", "locked_by_username",
             "submitted_at", "validated_at", "recheck_note",
+            "validated_by_username",
+            "rechecked_by_username", "rechecked_at",
             "lines_count", "total_counted",
         ]
 
@@ -183,13 +191,18 @@ class InventoryLineSerializer(serializers.ModelSerializer):
         source="variant.article.designation", read_only=True
     )
     variance = serializers.ReadOnlyField()
+    zone_name = serializers.CharField(source="zone.name", read_only=True)
+    scanned_by_username = serializers.CharField(
+        source="scanned_by.get_full_name", read_only=True, default=""
+    )
 
     class Meta:
         model = InventoryLine
         fields = [
-            "id", "article_reference", "article_designation", "variant",
+            "id", "zone_name", "article_reference", "article_designation", "variant",
             "qty_theoretical", "qty_counted", "variance",
             "is_manual", "last_scanned_at",
+            "scanned_by_username", "device_id",
         ]
 
 

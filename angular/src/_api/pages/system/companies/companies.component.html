@@ -275,6 +275,27 @@
             </div>
             <label class="form-label mb-0">Actif</label>
           </div>
+
+          <!-- Bootstrap : premier administrateur -->
+          <hr class="my-3" />
+          <p class="fw-semibold mb-3"><i class="ti ti-user-check me-1 text-primary"></i>Premier administrateur <span class="text-muted fw-normal small">(optionnel)</span></p>
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Email</label>
+              <input formControlName="admin_email" type="email" class="form-control" placeholder="admin@institution.com" />
+              <div class="form-text text-muted">Si renseigné, un agence Siège et cet admin seront créés automatiquement.</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Prénom</label>
+              <input formControlName="admin_first_name" type="text" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nom</label>
+              <input formControlName="admin_last_name" type="text" class="form-control" />
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
@@ -437,3 +458,41 @@
     </div>
   </div>
 </div>
+
+<!-- Modal : Résultat bootstrap institution -->
+@if (setupResult) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success-subtle">
+          <h5 class="modal-title text-success"><i class="ti ti-circle-check me-2"></i>Institution créée</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-3">Le setup initial a été effectué. Transmettez ces informations à l'administrateur.</p>
+          <div class="mb-3">
+            <label class="form-label text-muted small">Agence Siège</label>
+            <div class="fw-semibold">{{ setupResult.hq_agency_name }}</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-muted small">Administrateur</label>
+            <div class="fw-semibold">{{ setupResult.admin_name }}</div>
+            <div class="text-muted small">{{ setupResult.admin_email }}</div>
+          </div>
+          <div class="mb-1">
+            <label class="form-label text-muted small">Mot de passe temporaire</label>
+            <div class="input-group">
+              <input type="text" class="form-control fw-bold text-danger" [value]="setupResult.temp_password" readonly />
+              <button class="btn btn-outline-secondary" type="button" (click)="copyToClipboard(setupResult!.temp_password)">
+                <i class="ti ti-copy"></i>
+              </button>
+            </div>
+            <div class="form-text text-warning"><i class="ti ti-alert-triangle me-1"></i>Ce mot de passe ne sera plus affiché. Copiez-le maintenant.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" (click)="closeSetup()">J'ai noté, fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

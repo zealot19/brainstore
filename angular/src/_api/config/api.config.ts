@@ -9,6 +9,7 @@ export const AUTH = {
   logout:              `${API_BASE}/auth/logout/`,
   logoutAll:           `${API_BASE}/auth/logout-all/`,
   me:                  `${API_BASE}/auth/me/`,
+  mePermissions:       `${API_BASE}/auth/me/permissions/`,
   sessions:            `${API_BASE}/auth/sessions/`,
   session:       (jti: string) => `${API_BASE}/auth/sessions/${jti}/`,
   changePassword:      `${API_BASE}/auth/change-password/`,
@@ -77,6 +78,51 @@ export const RBAC = {
 
   userProfiles:      (uid: string) => `${API_BASE}/rbac/users/${uid}/profile/`,
   userProfileAssign: (uid: string) => `${API_BASE}/rbac/users/${uid}/profile/assign/`,
+};
+
+export const SCIG = {
+  dashboard:   `${API_BASE}/scig-sage/dashboard/`,
+  depots:      `${API_BASE}/scig-sage/depots/`,
+
+  inventory:               `${API_BASE}/scig-sage/inventory/`,
+  inventoryDetail:   (id: string) => `${API_BASE}/scig-sage/inventory/${id}/`,
+  inventorySubmitSage:(id: string)=> `${API_BASE}/scig-sage/inventory/${id}/submit-sage/`,
+  inventoryReport:   (id: string) => `${API_BASE}/scig-sage/inventory/${id}/report/`,
+
+  inventoryZones: (sid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/`,
+  inventoryZoneOpen:    (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/open/`,
+  inventoryZoneScan:    (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/scan/`,
+  inventoryZoneManual:  (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/manual/`,
+  inventoryZoneSubmit:  (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/submit/`,
+  inventoryZoneValidate:(sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/validate/`,
+  inventoryZoneRecheck: (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/recheck/`,
+  inventoryZoneUnlock:  (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/unlock/`,
+  inventoryZoneLines:   (sid: string, zid: string) =>
+    `${API_BASE}/scig-sage/inventory/${sid}/zones/${zid}/lines/`,
+
+  variantSearch: `${API_BASE}/scig-sage/variants/search/`,
+
+  transfers:           `${API_BASE}/scig-sage/transfers/`,
+  transferDetail:(id: string)  => `${API_BASE}/scig-sage/transfers/${id}/`,
+  transferValidate:(id: string)=> `${API_BASE}/scig-sage/transfers/${id}/validate/`,
+  transferShip:    (id: string)=> `${API_BASE}/scig-sage/transfers/${id}/ship/`,
+
+  connection:     `${API_BASE}/scig-sage/connection/`,
+  connectionTest: `${API_BASE}/scig-sage/connection/test/`,
+  syncTrigger:    `${API_BASE}/scig-sage/sync/trigger/`,
+  syncLogs:       `${API_BASE}/scig-sage/sync/logs/`,
+};
+
+export const AUDIT = {
+  logs: `${API_BASE}/audit/logs/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */

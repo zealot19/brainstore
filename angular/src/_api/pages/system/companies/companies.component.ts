@@ -30,6 +30,7 @@ export class CompaniesComponent implements OnInit {
   editErrorMsg = '';
   selectedId   = '';
   selectedCompany: Company | null = null;
+  setupResult: { admin_name: string; admin_email: string; temp_password: string; hq_agency_name: string } | null = null;
 
   createLogoFile: File | null = null;
   createLogoPreview: string | null = null;
@@ -59,7 +60,10 @@ export class CompaniesComponent implements OnInit {
       address_line1:       [''],
       address_city:        [''],
       address_postal_code: [''],
-      is_active: [true],
+      is_active:        [true],
+      admin_email:      ['', Validators.email],
+      admin_first_name: [''],
+      admin_last_name:  [''],
     });
     this.editForm = this.fb.group({
       name:       ['', Validators.required],
@@ -122,6 +126,7 @@ export class CompaniesComponent implements OnInit {
     if (this.createForm.invalid || this.creating) return;
     this.creating = true;
     this.errorMsg = '';
+    this.setupResult = null;
     const v = this.createForm.value;
     const payload: Record<string, any> = {
       name: v.name, code: v.code, slogan: v.slogan,
@@ -133,16 +138,35 @@ export class CompaniesComponent implements OnInit {
     if (v.address_line1) {
       payload['address_input'] = { line1: v.address_line1, city: v.address_city, postal_code: v.address_postal_code };
     }
+    if (v.admin_email) {
+      payload['admin_email']      = v.admin_email;
+      payload['admin_first_name'] = v.admin_first_name;
+      payload['admin_last_name']  = v.admin_last_name;
+    }
     this.companyService.create(payload, this.createLogoFile).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.creating = false;
         this.createLogoFile = null; this.createLogoPreview = null;
-        this.createForm.reset({ currency: 'XOF', is_active: true });
         this.load();
-        this.closeModal('add-company');
+        if (res?.setup) {
+          this.setupResult = res.setup;
+          this.closeModal('add-company');
+        } else {
+          this.createForm.reset({ currency: 'XOF', is_active: true });
+          this.closeModal('add-company');
+        }
       },
       error: err => { this.creating = false; this.errorMsg = this.extractError(err); },
     });
+  }
+
+  closeSetup(): void {
+    this.setupResult = null;
+    this.createForm.reset({ currency: 'XOF', is_active: true });
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).catch(() => {});
   }
 
   openEdit(c: Company): void {

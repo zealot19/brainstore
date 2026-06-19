@@ -408,7 +408,7 @@ e:\dreamspos\backend\
     <tr><td><span class="method post">POST</span></td><td>packages/admin/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer un package</td></tr>
     <tr><td><span class="method patch">PATCH</span></td><td>packages/admin/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier un package</td></tr>
     <tr><td><span class="method get">GET</span></td><td>companies/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste toutes les institutions</td></tr>
-    <tr><td><span class="method post">POST</span></td><td>companies/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer institution (slug auto, trial auto)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>companies/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer institution (slug auto, trial auto). Champs optionnels <em>admin_email</em>, <em>admin_first_name</em>, <em>admin_last_name</em> déclenchent le bootstrap : agence Siège (code HQ) + premier admin institution créés automatiquement. La réponse inclut alors un objet <em>setup</em> avec <em>temp_password</em>, <em>admin_email</em>, <em>admin_name</em>, <em>hq_agency_name</em>.</td></tr>
     <tr><td><span class="method patch">PATCH</span></td><td>companies/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier institution</td></tr>
     <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/suspend/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Suspendre avec raison</td></tr>
     <tr><td><span class="method post">POST</span></td><td>companies/&lt;id&gt;/activate/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Réactiver</td></tr>
@@ -445,6 +445,82 @@ e:\dreamspos\backend\
     <tr><td>Profile</td><td>Template de rôles réutilisable (is_default, is_system)</td></tr>
     <tr><td>UserRole</td><td>Rôle direct user→role avec expiration optionnelle et scope agence</td></tr>
     <tr><td>UserProfile</td><td>Profil assigné à un utilisateur (1 seul par user/company)</td></tr>
+  </tbody>
+</table>
+
+<h2>Endpoints — <code>/api/v1/rbac/</code></h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Accès</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>modules/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste des modules fonctionnels</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>modules/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer un module</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>modules/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier un module</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>modules/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Supprimer un module</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>modules/tree/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Arborescence des modules</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>menus/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Liste des menus Angular</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>menus/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer un menu</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>menus/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Modifier un menu</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>menus/&lt;id&gt;/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Supprimer un menu</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>menus/tree/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Arborescence pour navigation Angular (filtré par module)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>permissions/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste des permissions (lecture ouverte aux admins institution pour assignation aux rôles)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>permissions/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Créer une permission (réservé super-admin)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>permissions/bulk/</td><td><span class="status status-admin">SuperAdmin</span></td><td>Création en masse de permissions</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>permissions/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Détail d'une permission</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>roles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste rôles (company + système). Filtre : <em>company</em>, <em>system</em></td></tr>
+    <tr><td><span class="method post">POST</span></td><td>roles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Créer un rôle (scoped à la company)</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>roles/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Modifier un rôle (bloqué si is_system)</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>roles/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Supprimer un rôle (bloqué si is_system)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>roles/&lt;id&gt;/permissions/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Remplacer toutes les permissions d'un rôle</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>profiles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste profils (company + système). Filtre : <em>company</em>, <em>system</em></td></tr>
+    <tr><td><span class="method post">POST</span></td><td>profiles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Créer un profil (template de rôles)</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td>profiles/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Modifier un profil (bloqué si is_system)</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td>profiles/&lt;id&gt;/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Supprimer un profil (bloqué si is_system)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>profiles/&lt;id&gt;/roles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Remplacer tous les rôles d'un profil</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/&lt;id&gt;/roles/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Rôles actifs d'un utilisateur</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/roles/assign/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Assigner un rôle à un utilisateur (avec expiration optionnelle)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/roles/revoke/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Révoquer un rôle</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/&lt;id&gt;/profile/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Profil actif de l'utilisateur</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>users/&lt;id&gt;/profile/assign/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Assigner un profil à un utilisateur</td></tr>
+    <tr><td><span class="method get">GET</span></td><td>users/&lt;id&gt;/permissions/</td><td><span class="status status-auth">InstitAdmin</span></td><td>Liste des codes de permission effectifs d'un utilisateur</td></tr>
+  </tbody>
+</table>
+
+<h2>HasPermission — factory DRF pour SCIG</h2>
+<p>Fichier : <code>apps/admin_rbac/permissions.py</code></p>
+<div class="card">
+  <pre>
+from apps.admin_rbac.permissions import HasPermission
+
+# Endpoint sécurisé par code de permission granulaire
+class ValidateZoneView(APIView):
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.validate")]
+
+# Vue mixte GET/POST avec permissions différentes par méthode
+class InventorySessionListView(APIView):
+    permission_classes = [IsScigSageEnabled]
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.session.create")()]
+        return [IsScigSageEnabled(), HasPermission("scig.session.view")()]</pre>
+  <p style="font-size:12px; color:#555;">La factory retourne une classe (pas une instance) — compatible avec <code>permission_classes</code> DRF. Délègue à <code>get_user_permissions(user, company_id)</code> du selector existant. Superuser reçoit <code>{"*"}</code> = toutes les permissions.</p>
+</div>
+
+<h2>27 permissions SCIG — migration admin_rbac.0002</h2>
+<table>
+  <thead><tr><th>Groupe</th><th>Codes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Vendeur</strong> (12)</td><td><code>scig.stock.view</code> · <code>scig.session.view</code> · <code>scig.zone.view/open/scan/manual/submit</code> · <code>scig.labels.view/print</code> · <code>scig.transfer.view/scan/receive</code></td></tr>
+    <tr><td><strong>Manager</strong> (12)</td><td><code>scig.session.create</code> · <code>scig.zone.create/validate/recheck/unlock</code> · <code>scig.sage.submit</code> · <code>scig.report.view/export</code> · <code>scig.dashboard.view</code> · <code>scig.transfer.create/validate/ship</code></td></tr>
+    <tr><td><strong>Admin</strong> (3)</td><td><code>scig.connection.manage</code> · <code>scig.sync.trigger</code> · <code>scig.sync.view</code></td></tr>
+  </tbody>
+</table>
+<p style="font-size:12px; color:#555;">Seed des rôles et profils : <code>python manage.py seed_scig_roles</code> — 3 rôles système + 3 profils stackés (Profil Vendeur, Manager, Admin SCIG). Idempotent.</p>
+
+<h2>Endpoint MePermissions — <code>/api/v1/auth/me/permissions/</code></h2>
+<table>
+  <thead><tr><th>M</th><th>URL</th><th>Accès</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><span class="method get">GET</span></td><td>auth/me/permissions/</td><td><span class="status status-auth">Auth</span></td><td>Retourne les codes de permission de l'utilisateur courant : <code>{"permissions": ["scig.zone.validate", ...], "is_superuser": false}</code>. Superuser reçoit <code>["*"]</code>. Appelé au login par <code>AuthService</code>, mis en cache <code>localStorage</code> côté Angular.</td></tr>
   </tbody>
 </table>
 
@@ -1056,7 +1132,7 @@ e:\dreamspos\backend\
 </div>
 <div class="module-card done">
   <h3>✅ Sync SCIG — Sage 100 (<em>apps.sync_scig_sage</em>)</h3>
-  <p>Intégration SQL Server directe (pyodbc) avec Sage 100 Gestion Commerciale. SageConnection par company (mot de passe Fernet), sync articles/variants/dépôts/stocks, inventaire mobile Zebra (zones Rouge→Bleu→Vert), transferts inter-dépôts, impression étiquettes, queue offline — 41 endpoints. Accès par FeatureFlag <em>sync_scig_sage.enabled</em>.</p>
+  <p>Intégration SQL Server directe (pyodbc) avec Sage 100 Gestion Commerciale. SageConnection par company (mot de passe Fernet), sync articles/variants/dépôts/stocks, inventaire mobile Zebra (zones Gris→Rouge→Bleu→Orange→Vert + force-unlock + réouverture RECHECK), transferts inter-dépôts, impression étiquettes, queue offline — 42 endpoints. Accès par FeatureFlag <em>sync_scig_sage.enabled</em>.</p>
 </div>
 
 <h2 style="margin-top:30px;">Prochaines verticales ERP</h2>
@@ -1084,7 +1160,7 @@ e:\dreamspos\backend\
 <div class="page-break"></div>
 <h1 id="sync_scig_sage">19. Module Sync SCIG — Sage 100 <span class="status status-done">✅ COMPLET</span></h1>
 
-<p>Intégration directe SQL Server (pyodbc) avec <strong>Sage 100 Gestion Commerciale</strong>. Chaque société a sa propre connexion Sage stockée de façon sécurisée. Le module gère la synchronisation des référentiels (articles, dépôts, stocks) et les opérations terrain sur terminaux Zebra (inventaires, transferts, étiquettes). <strong>41 endpoints</strong>.</p>
+<p>Intégration directe SQL Server (pyodbc) avec <strong>Sage 100 Gestion Commerciale</strong>. Chaque société a sa propre connexion Sage stockée de façon sécurisée. Le module gère la synchronisation des référentiels (articles, dépôts, stocks) et les opérations terrain sur terminaux Zebra (inventaires, transferts, étiquettes). <strong>42 endpoints</strong>.</p>
 
 <h2>Architecture d'intégration</h2>
 <div class="arch-flow">
@@ -1111,10 +1187,10 @@ e:\dreamspos\backend\
     <tr><td>Depot</td><td>Dépôt/magasin (F_DEPOT)</td><td>company, sage_depot_no, name, is_active</td></tr>
     <tr><td>StockLevel</td><td>Stock par (variante, dépôt) (F_ARTSTOCK)</td><td>depot, variant, stock_real, stock_available, stock_transit, synced_at</td></tr>
     <tr><td>InventorySession</td><td>Session d'inventaire physique</td><td>company, name, depot, status (OPEN/CLOSED), opened_at, closed_at, submitted_to_sage_at</td></tr>
-    <tr><td>InventoryZone</td><td>Zone de comptage (terminal Zebra)</td><td>session, name, status (ROUGE/BLEU/VERT), locked_by_device, validated_by</td></tr>
-    <tr><td>InventoryLine</td><td>Ligne comptée (variante × zone)</td><td>zone, variant, qty_theoretical, qty_counted, is_manual, last_scanned_at</td></tr>
-    <tr><td>StockTransfer</td><td>Transfert inter-dépôts</td><td>company, reference (TRF-DATE-SEQ), source_depot, destination_depot, status</td></tr>
-    <tr><td>StockTransferLine</td><td>Ligne de transfert</td><td>transfer, variant, qty_planned, qty_shipped, qty_received</td></tr>
+    <tr><td>InventoryZone</td><td>Zone de comptage (terminal Zebra)</td><td>session, name, status (ROUGE/BLEU/VERT), locked_by_device, locked_by, validated_by, validated_at, <strong>rechecked_by</strong>, <strong>rechecked_at</strong>, <strong>recheck_note</strong></td></tr>
+    <tr><td>InventoryLine</td><td>Ligne comptée (variante × zone)</td><td>zone, variant, qty_theoretical, qty_counted, is_manual, last_scanned_at, <strong>scanned_by</strong>, <strong>device_id</strong></td></tr>
+    <tr><td>StockTransfer</td><td>Transfert inter-dépôts</td><td>company, reference (TRF-DATE-SEQ), source_depot, destination_depot, status, validated_by, shipped_by, received_by</td></tr>
+    <tr><td>StockTransferLine</td><td>Ligne de transfert</td><td>transfer, variant, qty_planned, qty_shipped, qty_received, <strong>received_by</strong>, <strong>received_at</strong></td></tr>
     <tr><td>LabelCampaign</td><td>Campagne d'étiquetage promotionnel</td><td>company, name, discount_percent, starts_at, ends_at</td></tr>
     <tr><td>LabelPrintJob</td><td>Job d'impression étiquettes (Zebra)</td><td>campaign, print_type (NORMAL/PROMO), print_data (JSON), device_id, total_labels</td></tr>
     <tr><td>SyncLog</td><td>Historique de synchronisation Sage</td><td>sync_type (DEPOTS/ARTICLES/STOCK/FULL), status, records_read/created/updated/failed</td></tr>
@@ -1149,17 +1225,26 @@ client = SageClient()         # sans argument = legacy/dev</pre>
 <h2>Workflow inventaire (terminaux Zebra)</h2>
 <div class="card">
   <div class="arch-flow" style="flex-wrap:wrap; gap:6px; margin:0;">
+    <div class="arch-box" style="background:#6c757d;">GRIS — NOT_STARTED</div>
+    <div class="arch-arrow">→</div>
     <div class="arch-box" style="background:#e94560;">ROUGE — IN_PROGRESS</div>
     <div class="arch-arrow">→</div>
     <div class="arch-box" style="background:#1864ab;">BLEU — SUBMITTED</div>
-    <div class="arch-arrow">→</div>
-    <div class="arch-box" style="background:#fd7e14;">ORANGE — RECHECK</div>
     <div class="arch-arrow">→</div>
     <div class="arch-box" style="background:#2b8a3e;">VERT — VALIDATED</div>
     <div class="arch-arrow">→</div>
     <div class="arch-box">Push Sage 100</div>
   </div>
-  <p style="margin-top:12px; font-size:12px; color:#555;">Zone ouverte par le terminal (lock <em>device_id</em>) → scan articles → soumission → validation manager → push F_ARTSTOCK. Submit bloqué tant que toutes les zones ne sont pas VALIDATED.</p>
+  <div class="arch-flow" style="flex-wrap:wrap; gap:6px; margin:8px 0 0 0; font-size:11px; color:#555;">
+    <span>SUBMITTED → <span style="color:#fd7e14;font-weight:bold">ORANGE (RECHECK)</span> → réouverture → IN_PROGRESS</span>
+    <span style="margin-left:20px">IN_PROGRESS bloquée → <strong>force-unlock</strong> (<code>/unlock/</code>) → NOT_STARTED</span>
+  </div>
+  <p style="margin-top:10px; font-size:12px; color:#555;">
+    Zone ouverte par le terminal (lock <em>device_id</em>) → scan articles → soumission → validation manager → push <code>F_ARTSTOCK</code>.<br>
+    Submit bloqué tant que toutes les zones ne sont pas VALIDATED.<br>
+    <strong>RECHECK</strong> : manager renvoie la zone en Orange (avec note motif) → opérateur clique "Réouvrir pour correction" → retour IN_PROGRESS, données conservées.<br>
+    <strong>Force-unlock</strong> : si le terminal Zebra plante en cours de comptage, le manager déverrouille via <code>POST /unlock/</code> → zone repart à NOT_STARTED, toutes les <code>InventoryLine</code> (qty_counted) sont préservées.
+  </p>
 </div>
 
 <h2>Règles métier clés</h2>
@@ -1170,9 +1255,40 @@ client = SageClient()         # sans argument = legacy/dev</pre>
   <li><strong>Snapshot stock théorique</strong> à l'ouverture de zone — comparaison physique vs Sage</li>
   <li><strong>Transfert</strong> : vérification stock disponible avant ajout de ligne (évite sur-planification)</li>
   <li><strong>Push Sage</strong> : update atomique <code>F_ARTSTOCK.AS_StockReel</code> avec rollback pyodbc</li>
+  <li><strong>Traçabilité complète</strong> — chaque scan/validation/recheck/réception enregistre l'utilisateur, le device et un <code>AuditLog</code> global</li>
 </ul>
 
-<h2>Endpoints — <code>/api/v1/scig/</code> (41)</h2>
+<h2>Traçabilité — Champs ajoutés</h2>
+<table>
+  <thead><tr><th>Modèle</th><th>Champ(s) ajouté(s)</th><th>Alimenté par</th></tr></thead>
+  <tbody>
+    <tr><td>InventoryLine</td><td><code>scanned_by (FK User)</code>, <code>device_id</code></td><td><code>scan_article_in_zone(device_id=)</code> et <code>manual_count_in_zone(device_id=)</code></td></tr>
+    <tr><td>InventoryZone</td><td><code>rechecked_by (FK User)</code>, <code>rechecked_at</code></td><td><code>recheck_inventory_zone()</code></td></tr>
+    <tr><td>StockTransferLine</td><td><code>received_by (FK User)</code>, <code>received_at</code></td><td><code>receive_transfer_line()</code></td></tr>
+  </tbody>
+</table>
+
+<h2>AuditLog — Actions tracées automatiquement</h2>
+<div class="card">
+  <p><code>log_action()</code> appelé silencieusement depuis les services (ne bloque jamais le flux métier).</p>
+  <table style="margin-top:8px;">
+    <thead><tr><th>Service</th><th>Action</th><th>Description loggée</th></tr></thead>
+    <tbody>
+      <tr><td>scan_article_in_zone</td><td>SCAN</td><td>Scan barcode + qté + zone + device</td></tr>
+      <tr><td>manual_count_in_zone</td><td>SCAN</td><td>Saisie manuelle variante + qté + zone + device</td></tr>
+      <tr><td>validate_inventory_zone</td><td>VALIDATE</td><td>Zone validée → VERT</td></tr>
+      <tr><td>recheck_inventory_zone</td><td>RECHECK</td><td>Zone renvoyée → ORANGE + note</td></tr>
+      <tr><td>submit_inventory_to_sage</td><td>SUBMIT</td><td>Inventaire soumis Sage + clôture</td></tr>
+      <tr><td>validate_transfer</td><td>VALIDATE</td><td>Transfert validé</td></tr>
+      <tr><td>ship_transfer</td><td>SHIP</td><td>Transfert expédié</td></tr>
+      <tr><td>receive_transfer_line</td><td>RECEIVE</td><td>Scan réception + qté par ligne</td></tr>
+      <tr><td>close_transfer_reception</td><td>RECEIVE</td><td>Clôture réception transfert</td></tr>
+      <tr><td>unlock_inventory_zone</td><td>UPDATE</td><td>Force-unlock zone bloquée (terminal mort) → NOT_STARTED</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Endpoints — <code>/api/v1/scig/</code> (42)</h2>
 <table>
   <thead><tr><th>Méthode</th><th>URL</th><th>Description</th></tr></thead>
   <tbody>
@@ -1199,7 +1315,8 @@ client = SageClient()         # sans argument = legacy/dev</pre>
     <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/manual/</td><td>Saisie manuelle quantité (écrase qty_counted)</td></tr>
     <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/submit/</td><td>Soumettre zone → BLEU (mobile)</td></tr>
     <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/validate/</td><td>Valider zone → VERT (dashboard manager)</td></tr>
-    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/recheck/</td><td>Renvoyer en vérification → ORANGE</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/recheck/</td><td>Renvoyer en vérification → ORANGE (avec note motif)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/unlock/</td><td>Force-unlock zone bloquée IN_PROGRESS (terminal Zebra mort) → NOT_STARTED, données conservées</td></tr>
     <tr><td><span class="method get">GET</span></td><td>inventory/&lt;sid&gt;/zones/&lt;zid&gt;/lines/</td><td>Lignes comptées avec écart Sage/physique</td></tr>
     <tr><td><span class="method get">GET</span><span class="method post">POST</span></td><td>transfers/</td><td>Liste / créer transfert inter-dépôts</td></tr>
     <tr><td><span class="method get">GET</span></td><td>transfers/&lt;id&gt;/</td><td>Détail transfert + lignes</td></tr>
@@ -1217,7 +1334,205 @@ client = SageClient()         # sans argument = legacy/dev</pre>
 <!-- 20. CONVENTIONS                                                  -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="page-break"></div>
-<h1 id="conventions">20. Conventions de développement</h1>
+<h1 id="audit_log">20. Journal d'Audit Global <span class="status status-done">✅ COMPLET</span></h1>
+
+<p>Journal immuable centralisé de toutes les actions significatives de l'application. Implémenté dans <code>apps/core/</code> pour être utilisable depuis n'importe quel module.</p>
+
+<h2>Modèle — AuditLog (<code>apps/core/models/audit_log.py</code>)</h2>
+<table>
+  <thead><tr><th>Champ</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>id</td><td>UUID</td><td>Clé primaire auto-générée</td></tr>
+    <tr><td>timestamp</td><td>DateTimeField (auto)</td><td>Horodatage automatique à la création — immuable</td></tr>
+    <tr><td>user</td><td>FK User (nullable)</td><td>Utilisateur ayant effectué l'action (null = système)</td></tr>
+    <tr><td>company</td><td>FK Company (nullable)</td><td>Société concernée — pour le filtrage multi-tenant</td></tr>
+    <tr><td>module</td><td>CharField (choices)</td><td>SCIG / FLEET / VOYAGE / TICKETING / PARCELS / TREASURY / RBAC / SYSTEM / AUTH / USERS</td></tr>
+    <tr><td>action</td><td>CharField (choices)</td><td>CREATE / UPDATE / DELETE / VALIDATE / RECHECK / SCAN / SUBMIT / SHIP / RECEIVE / LOGIN / LOGOUT / EXPORT / SYNC</td></tr>
+    <tr><td>target_type</td><td>CharField</td><td>Nom du modèle ciblé (ex: "InventoryZone")</td></tr>
+    <tr><td>target_id</td><td>CharField</td><td>UUID de la ressource ciblée</td></tr>
+    <tr><td>description</td><td>TextField</td><td>Description lisible de l'action</td></tr>
+    <tr><td>device_id</td><td>CharField</td><td>Identifiant du terminal Zebra (vide si action web)</td></tr>
+    <tr><td>ip_address</td><td>GenericIPAddressField</td><td>Adresse IP de la requête</td></tr>
+  </tbody>
+</table>
+<p style="margin-top:8px; color:#555; font-size:12px;"><strong>Note :</strong> <code>AuditLog</code> hérite de <code>models.Model</code> (pas de <code>BaseModel</code>) — les logs sont immuables et ne supportent pas le soft-delete ni les timestamps d'édition.</p>
+
+<h2>Service — <code>log_action()</code> (<code>apps/core/services/audit_service.py</code>)</h2>
+<div class="card">
+  <pre>
+from apps.core.services.audit_service import log_action
+from apps.core.models import AuditLog
+
+# Exemple d'appel depuis n'importe quel service
+log_action(
+    user=request.user,
+    action=AuditLog.Action.VALIDATE,
+    module=AuditLog.Module.SCIG,
+    target_type="InventoryZone",
+    target_id=zone.id,
+    description=f"Zone '{zone.name}' validée → VERT",
+    device_id="",           # optionnel — renseigné pour les actions Zebra
+    ip_address=None,        # optionnel — extrait de request si disponible
+    company=zone.session.company,
+)</pre>
+  <p style="margin-top:8px; font-size:12px; color:#555;"><code>log_action()</code> est silencieux en cas d'erreur (<code>try/except</code> interne) — il ne bloque jamais le flux métier principal.</p>
+</div>
+
+<h2>Endpoint — <code>/api/v1/audit/</code></h2>
+<table>
+  <thead><tr><th>Méthode</th><th>URL</th><th>Permission</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="method get">GET</span></td>
+      <td>audit/logs/</td>
+      <td>InstitAdmin</td>
+      <td>Liste des entrées du journal — filtres : <code>module</code>, <code>action</code>, <code>user</code>, <code>date_from</code>, <code>date_to</code>, <code>company</code> (SuperAdmin). Limité aux 500 dernières entrées. Institution admin voit uniquement sa company.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+<h1 id="scig_frontend">21. MODULE 5+8 — Frontend Angular SCIG + RBAC + Audit <span class="status status-done">✅ Complet (web)</span></h1>
+
+<h2>Structure des fichiers (<code>angular/src/_api/</code>)</h2>
+<table>
+  <thead><tr><th>Fichier</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td><code>config/api.config.ts</code></td><td>Section <code>SCIG</code> ajoutée — tous les endpoints scig-sage/ (depots, inventory, zones, variants, transfers, connection)</td></tr>
+    <tr><td><code>models/scig.models.ts</code></td><td>Interfaces TypeScript : Depot, InventorySession, InventoryZone, InventoryLine, ArticleVariantSummary, StockTransfer, PaginatedResponse</td></tr>
+    <tr><td><code>services/scig/scig.service.ts</code></td><td>Service Angular — listDepots, listInventorySessions, createInventorySession, getInventorySession, listZones, createZone, openZone, scanBarcode, manualCount, submitZone, validateZone, recheckZone, listZoneLines, searchVariants</td></tr>
+    <tr><td><code>pages/scig/scig.component.ts</code></td><td>Shell RouterOutlet — parent de toutes les pages SCIG</td></tr>
+    <tr><td><code>pages/scig/depots/</code></td><td>Page <code>/scig/depots</code> — liste des dépôts Sage (lecture seule, synchro)</td></tr>
+    <tr><td><code>pages/scig/inventaires/</code></td><td>Page <code>/scig/inventaires</code> — liste sessions + modal création (dépôt → nom → notes)</td></tr>
+    <tr><td><code>pages/scig/session-detail/</code></td><td>Page <code>/scig/inventaires/:id</code> — détail session, compteurs zones par statut, tableau zones, actions Valider/Recheck (Bloc 2 + 4)</td></tr>
+    <tr><td><code>pages/scig/zone-detail/</code></td><td>Page <code>/scig/inventaires/:id/zones/:zoneId</code> — opération zone : ouverture, scan USB, saisie manuelle, soumission, validation, recheck (Bloc 3 + 4)</td></tr>
+    <tr><td><code>pages/scig/rapport/</code></td><td>Page <code>/scig/inventaires/:id/rapport</code> — rapport d'inventaire, export PDF (<code>window.print()</code>) + Excel (HTML table .xls)</td></tr>
+    <tr><td><code>services/auth/permission.service.ts</code></td><td><code>PermissionService</code> — charge <code>GET /auth/me/permissions/</code> au login, cache localStorage, <code>has()</code>/<code>hasAny()</code>/<code>hasAll()</code> synchrones</td></tr>
+    <tr><td><code>services/audit/audit.service.ts</code></td><td><code>AuditService</code> — <code>getLogs(filters)</code> → <code>GET /api/v1/audit/logs/</code></td></tr>
+    <tr><td><code>pages/admin/audit/</code></td><td>Page <code>/admin/audit</code> — journal d'audit avec filtres, badges colorés par module/action, cible, device/IP</td></tr>
+    <tr><td><code>pages/admin/roles/, profiles/, users/</code></td><td>Gestion RBAC institution : rôles, profils, utilisateurs + assignation profil SCIG</td></tr>
+  </tbody>
+</table>
+
+<h2>Routes Angular (<code>app/features/pages/pages.routes.ts</code>)</h2>
+<table>
+  <thead><tr><th>Route</th><th>Composant</th><th>Bloc</th></tr></thead>
+  <tbody>
+    <tr><td><code>/scig/depots</code></td><td>DepotsComponent</td><td>Bloc 1</td></tr>
+    <tr><td><code>/scig/inventaires</code></td><td>InventairesComponent</td><td>Bloc 1</td></tr>
+    <tr><td><code>/scig/inventaires/:id</code></td><td>SessionDetailComponent</td><td>Bloc 2 + 4</td></tr>
+    <tr><td><code>/scig/inventaires/:id/zones/:zoneId</code></td><td>ZoneDetailComponent</td><td>Bloc 3 + 4</td></tr>
+  </tbody>
+</table>
+
+<h2>Sidebar — Menu "Sync SCIG"</h2>
+<p>Section ajoutée dans <code>app/core/service/sidebar/sidebar.service.ts</code> (entre "Administration" et "Application") avec deux sous-menus : <strong>Dépôts</strong> (<code>/scig/depots</code>) et <strong>Inventaires</strong> (<code>/scig/inventaires</code>).</p>
+
+<h2>Fonctionnalités par bloc</h2>
+<table>
+  <thead><tr><th>Bloc</th><th>CDC</th><th>Implémenté</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Bloc 1</strong></td>
+      <td>§1.1 Sélection dépôt · §1.2 Création session</td>
+      <td>
+        Page dépôts (liste Sage, sync date) ·
+        Page inventaires (liste + modal création avec dropdown dépôts actifs) ·
+        Fix backend : <code>notes</code> ajouté à <code>create_inventory_session()</code>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Bloc 2</strong></td>
+      <td>§1.3 Définition des zones</td>
+      <td>
+        Page session : info en-tête, 5 compteurs colorés (GRIS/ROUGE/BLEU/ORANGE/VERT),
+        tableau zones avec badges statut, note recheck visible, bouton "Créer une zone" (modal nom unique)
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Bloc 3</strong></td>
+      <td>§1.4 Ouverture zone · §1.5 Scan · §1.6 Soumission</td>
+      <td>
+        Ouverture zone web (<code>device_id="WEB"</code>, snapshot Sage stocks) ·
+        Scan barcode (champ auto-focalisé, scanner USB, qty ajustable, feedback immédiat) ·
+        Saisie manuelle (recherche variante debounce 350ms, sélection + qty) ·
+        Table lignes (théorique/compté/écart coloré vert-rouge-orange, badge Scan/Manuel) ·
+        Totaux globaux (lignes, qty totale, écart total) ·
+        Bouton "Soumettre pour validation"
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Bloc 4</strong></td>
+      <td>§2.2 Validation · §2.2 Re-vérification</td>
+      <td>
+        Session : bouton vert "Valider" inline (zone SUBMITTED→VALIDATED), ligne surlignée jaune ·
+        Session + zone : modal "Recheck" avec note (SUBMITTED→RECHECK) ·
+        Zone : note recheck affichée en alerte orange (visible opérateurs) ·
+        Statuts bloquants respectés (400 si zone pas SUBMITTED)
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Bloc 5</strong></td>
+      <td>§2.3 Soumission Sage · §2.4 Rapport · §10 Export</td>
+      <td>
+        Bouton "Soumettre à Sage" conditionnel (<code>all_zones_validated=true</code>) · session CLOSED · dates <code>closed_at/submitted_to_sage_at</code> ·
+        Page rapport : données filtrées (<code>qty_counted &gt; 0</code>), sous-totaux par zone, récap global ·
+        Export PDF (<code>window.print()</code> + CSS @media print A4 paysage) · Export Excel (.xls HTML table, couleurs, sans dépendance externe)
+      </td>
+    </tr>
+    <tr>
+      <td><strong>RBAC Angular</strong></td>
+      <td>§8 Rôles et périmètres</td>
+      <td>
+        <code>PermissionService</code> (BehaviorSubject + localStorage <code>drp_permissions</code>) ·
+        <code>@if (perm.has('scig.xxx'))</code> sur tous les boutons sensibles ·
+        Chargement au login/2FA/initSession · <code>clear()</code> au logout ·
+        Pages admin : <code>admin-roles</code>, <code>admin-profiles</code>, <code>admin-users</code>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Journal d'audit</strong></td>
+      <td>§8 Traçabilité</td>
+      <td>
+        Page <code>/admin/audit</code> — filtres module/action/dates/texte · badges colorés (CREATE→vert, DELETE→rouge, VALIDATE→bleu, RECHECK→orange…) ·
+        Tableau avec cible (type + uuid tronqué), device_id, ip_address · Sidebar Administration → "Journal d'audit"
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Traçabilité zone + lignes</strong></td>
+      <td>§8 Traçabilité</td>
+      <td>
+        <strong>Backend :</strong> <code>InventoryZoneReadSerializer</code> étendu — <code>validated_by_username</code>, <code>rechecked_by_username</code>, <code>rechecked_at</code> ·
+        <code>InventoryLineSerializer</code> étendu — <code>scanned_by_username</code>, <code>device_id</code><br/>
+        <strong>Angular :</strong> interfaces TypeScript mises à jour ·
+        Page zone-detail : bandeau vert "Validée par [nom] le [date]" + bandeau gris "Recheck par [nom] le [date]" ·
+        Colonne "Saisi par" dans le tableau des lignes (nom + appareil Zebra/WEB, tronqué)
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Auto-unlock à la déconnexion</strong></td>
+      <td>§8 Déconnexion</td>
+      <td>
+        <code>localStorage.drp_open_zone</code> : posé à <code>openZone()</code>, retiré à <code>submitZone()</code> / <code>validateZone()</code> / force-unlock ·
+        <code>AuthService._unlockOpenZoneIfAny()</code> appelé dans <code>logout()</code> et <code>logoutAll()</code> — POST <code>zones/&lt;zid&gt;/unlock/</code> fire-and-forget avant vidage des tokens
+      </td>
+    </tr>
+    <tr>
+      <td><strong>MODULE 7 — Page Configuration Sage</strong></td>
+      <td>§7 Sync Sage</td>
+      <td>
+        Route <code>/scig/sage</code> · Sidebar "Configuration Sage" (sous "Sync SCIG")<br/>
+        <strong>Card Connexion</strong> (<code>scig.connection.manage</code>) — formulaire server/port/DB/user/pwd, badge statut test (date + succès/échec + latence), bouton "Tester la connexion" · service <code>SageService.testConnection()</code> → <code>ConnectionTestResult</code><br/>
+        <strong>Card Sync</strong> (<code>scig.sync.trigger</code>) — 4 boutons type DEPOTS/ARTICLES/STOCK/FULL · POST <code>sync/trigger/</code> · résultat immédiat (records +créés/↑màj/✗erreurs + durée) · FULL → 3 cartes résultat distinctes<br/>
+        <strong>Card Historique</strong> (<code>scig.sync.view</code>) — table filtrable (type + statut) · colonnes date, type badge, statut badge, résultat, durée, déclencheur, erreur · GET <code>sync/logs/</code> paginé<br/>
+        Modèles TS : <code>SageConnection</code>, <code>SyncLog</code>, <code>SyncFullResult</code>, <code>ConnectionTestResult</code> dans <code>sage.models.ts</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+<h1 id="conventions">22. Conventions de développement</h1>
 
 <h2>Règles absolues</h2>
 <div class="card">
@@ -1267,6 +1582,8 @@ qs = VehicleCategory.objects.filter(
     <tr><td>IsInstitutionAdmin</td><td>is_superuser OU is_institution_admin</td><td>Gestion interne d'une institution</td></tr>
     <tr><td>IsAuthenticated</td><td>is_authenticated</td><td>Tout utilisateur connecté (fleet, voyage, treasury…)</td></tr>
     <tr><td>AllowAny</td><td>—</td><td>Endpoints publics (login, packages, online booking)</td></tr>
+    <tr><td>HasPermission(code)</td><td>Factory retournant une classe DRF — délègue à <code>get_user_permissions(user, company_id)</code></td><td>Endpoints SCIG — vérification granulaire par code (ex: <code>"scig.zone.validate"</code>)</td></tr>
+    <tr><td>IsScigSageEnabled</td><td>FeatureFlag <code>SCIG_SAGE</code> activé pour la company</td><td>Tous les endpoints SCIG (combiné avec HasPermission)</td></tr>
   </tbody>
 </table>
 
@@ -1298,9 +1615,9 @@ raise ApplicationError(_("No seats available on this trip."))
 </div><!-- /.container -->
 
 <footer>
-  <strong>DreamsPOS ERP</strong> — Documentation Backend v2.0.0<br />
+  <strong>DreamsPOS ERP</strong> — Documentation Backend v2.3.0<br />
   Mis à jour Juin 2026 &nbsp;|&nbsp; Django 5.1.4 + DRF 3.15.2 &nbsp;|&nbsp;
-  Verticale Transport &amp; Logistique complète — 291 endpoints — 14 modules — 47 modèles — 16 migrations
+  Verticale Transport &amp; Logistique complète — 292 endpoints — 14 modules — 47 modèles — 17 migrations — MODULE 7 web complet
 </footer>
 
 </body>

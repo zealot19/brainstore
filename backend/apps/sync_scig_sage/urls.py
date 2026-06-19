@@ -50,6 +50,9 @@ urlpatterns = [
     path("inventory/<uuid:session_id>/zones/<uuid:zone_id>/recheck/",
          views.RecheckZoneView.as_view(),          name="scig-zone-recheck"),
 
+    path("inventory/<uuid:session_id>/zones/<uuid:zone_id>/unlock/",
+         views.UnlockZoneView.as_view(),           name="scig-zone-unlock"),
+
     path("inventory/<uuid:session_id>/zones/<uuid:zone_id>/lines/",
          views.ZoneLinesView.as_view(),            name="scig-zone-lines"),
 

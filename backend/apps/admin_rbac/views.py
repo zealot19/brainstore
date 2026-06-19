@@ -188,7 +188,7 @@ class MenuTreeView(APIView):
 
 class PermissionListView(APIView):
     """GET/POST /rbac/permissions/"""
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [IsInstitutionAdmin]
 
     def get(self, request):
         perms = selectors.list_permissions(
@@ -199,6 +199,8 @@ class PermissionListView(APIView):
         return success_response(PermissionSerializer(perms, many=True).data)
 
     def post(self, request):
+        if not (request.user.is_staff and request.user.is_superuser):
+            return error_response(_("Action réservée au super-administrateur."), status_code=403)
         payload = PermissionWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -233,7 +235,7 @@ class PermissionBulkView(APIView):
 
 class PermissionDetailView(APIView):
     """GET /rbac/permissions/<id>/"""
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [IsInstitutionAdmin]
 
     def get(self, request, pk):
         try:

@@ -86,6 +86,13 @@ class StockTransferLine(BaseModel):
     qty_planned = models.DecimalField(max_digits=12, decimal_places=3, default=0)
     qty_shipped = models.DecimalField(max_digits=12, decimal_places=3, default=0)
     qty_received = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+    received_by = models.ForeignKey(
+        "authentication.User",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="received_transfer_lines",
+    )
+    received_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ("transfer", "variant")

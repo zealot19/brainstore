@@ -88,6 +88,7 @@ export class SidebarService {
           showSubRoute: false,
           icon2: 'user-edit',
           base: 'super-admin',
+          role: 'super_admin',
           subMenus: [
             {
               menuValue: 'Dashboard',
@@ -178,6 +179,61 @@ export class SidebarService {
           route: routes.adminUsers,
           base: 'users',
           subMenus: [],
+        },
+        {
+          menuValue: 'Administration',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'shield-user',
+          base: 'admin',
+          role: 'institution_admin',
+          subMenus: [
+            {
+              menuValue: 'Utilisateurs',
+              route: routes.adminInstUsers,
+              base: 'users',
+            },
+            {
+              menuValue: 'Profils',
+              route: routes.adminInstProfiles,
+              base: 'profiles',
+            },
+            {
+              menuValue: 'Rôles',
+              route: routes.adminInstRoles,
+              base: 'roles',
+            },
+            {
+              menuValue: 'Journal d\'audit',
+              route: routes.adminInstAudit,
+              base: 'audit',
+            },
+          ],
+        },
+        // ── MODULE 5 : Sync SCIG / Sage 100 ─────────────────────────────────
+        {
+          menuValue: 'Sync SCIG',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'arrows-exchange',
+          base: 'scig',
+          subMenus: [
+            {
+              menuValue: 'Dépôts',
+              route: routes.scigDepots,
+              base: 'depots',
+            },
+            {
+              menuValue: 'Inventaires',
+              route: routes.scigInventaires,
+              base: 'inventaires',
+            },
+            {
+              menuValue: 'Configuration Sage',
+              route: routes.scigSage,
+              base: 'sage',
+            },
+          ],
         },
         {
           menuValue: 'Application',

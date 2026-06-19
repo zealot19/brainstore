@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { TokenService } from './token.service';
-import { AUTH } from '../../config/api.config';
+import { PermissionService } from './permission.service';
+import { AUTH, SCIG } from '../../config/api.config';
 import {
   LoginRequest, LoginResponse, TwoFALoginRequest,
   TokenPair, UserProfile, UserSession,
@@ -13,9 +14,10 @@ import {
 export class AuthService {
 
   // inject() permet d'utiliser le service dans l'initialisation des champs
-  private readonly tokenService = inject(TokenService);
-  private readonly http         = inject(HttpClient);
-  private readonly router       = inject(Router);
+  private readonly tokenService     = inject(TokenService);
+  private readonly http             = inject(HttpClient);
+  private readonly router           = inject(Router);
+  private readonly permissionService = inject(PermissionService);
 
   // Profil courant — initialisé depuis localStorage pour affichage immédiat
   private _currentUser$ = new BehaviorSubject<UserProfile | null>(
@@ -35,6 +37,7 @@ export class AuthService {
           this._pending2faUserId = res.user_id;
         } else if (res.access && res.refresh) {
           this._saveSession(res.access, res.refresh, res.user);
+          this.permissionService.load().subscribe();
         }
       })
     );
@@ -47,6 +50,7 @@ export class AuthService {
         this._pending2faUserId = null;
         if (res.access && res.refresh) {
           this._saveSession(res.access, res.refresh, res.user);
+          this.permissionService.load().subscribe();
         }
       })
     );
@@ -55,14 +59,20 @@ export class AuthService {
   // ── Déconnexion ──────────────────────────────────────────────────────────────
 
   logout(): void {
+    this._unlockOpenZoneIfAny();
     const refresh = this.tokenService.getRefreshToken();
     this.http.post(AUTH.logout, { refresh }).subscribe({ error: () => {} });
+    this.permissionService.clear();
     this._clearAndRedirect('/signin');
   }
 
   logoutAll(): Observable<unknown> {
+    this._unlockOpenZoneIfAny();
     return this.http.post(AUTH.logoutAll, {}).pipe(
-      tap(() => this._clearAndRedirect('/signin'))
+      tap(() => {
+        this.permissionService.clear();
+        this._clearAndRedirect('/signin');
+      })
     );
   }
 
@@ -140,6 +150,7 @@ export class AuthService {
   initSession(): void {
     if (this.tokenService.isAuthenticated()) {
       this.getMe().subscribe({ error: () => {} });
+      this.permissionService.load().subscribe();
     }
   }
 
@@ -159,6 +170,16 @@ export class AuthService {
       this.tokenService.saveUser(user);
       this._currentUser$.next(user);
     }
+  }
+
+  private _unlockOpenZoneIfAny(): void {
+    try {
+      const raw = localStorage.getItem('drp_open_zone');
+      if (!raw) return;
+      const { sessionId, zoneId } = JSON.parse(raw);
+      this.http.post(SCIG.inventoryZoneUnlock(sessionId, zoneId), {}).subscribe({ error: () => {} });
+      localStorage.removeItem('drp_open_zone');
+    } catch {}
   }
 
   private _clearAndRedirect(path: string): void {

@@ -53,6 +53,7 @@ def create_company(*, name, package=None, package_id=None, legal_form="", countr
                    accounting_plan="OHADA", currency=None,
                    code="", slogan="", postal_box="", logo=None,
                    is_active=True, address=None, address_input=None,
+                   admin_email="", admin_first_name="", admin_last_name="",
                    created_by=None):
     slug = _unique_slug(name)
     if package is None and package_id:
@@ -87,7 +88,51 @@ def create_company(*, name, package=None, package_id=None, legal_form="", countr
     if package:
         _create_trial_subscription(company, package)
 
-    return company
+    setup = None
+    if admin_email and admin_email.strip():
+        setup = _bootstrap_company(
+            company=company,
+            admin_email=admin_email.strip(),
+            admin_first_name=admin_first_name.strip(),
+            admin_last_name=admin_last_name.strip(),
+            created_by=created_by,
+        )
+
+    return company, setup
+
+
+def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_name, created_by):
+    """Crée l'agence siège et le premier administrateur d'une nouvelle institution."""
+    from apps.system_config.models import Agency
+    from apps.users.services.user_services import create_user
+
+    hq = Agency.objects.create(
+        company=company,
+        name=f"Siège — {company.name}",
+        code="HQ",
+        agency_type=Agency.AgencyType.HEADQUARTERS,
+        is_active=True,
+        created_by=created_by,
+    )
+
+    user, temp_password = create_user(
+        created_by=created_by,
+        company=company,
+        email=admin_email,
+        first_name=admin_first_name,
+        last_name=admin_last_name,
+        is_institution_admin=True,
+        default_agency_id=hq.id,
+        agency_ids=[hq.id],
+    )
+
+    return {
+        "hq_agency_id":   str(hq.id),
+        "hq_agency_name": hq.name,
+        "admin_email":    user.email,
+        "admin_name":     user.get_full_name(),
+        "temp_password":  temp_password,
+    }
 
 
 @transaction.atomic

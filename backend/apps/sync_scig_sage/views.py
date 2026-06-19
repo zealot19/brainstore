@@ -5,6 +5,7 @@ from rest_framework import status
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
 from apps.sync_scig_sage.permissions import IsScigSageEnabled
+from apps.admin_rbac.permissions import HasPermission
 
 from apps.sync_scig_sage.models import SyncLog
 from apps.sync_scig_sage.selectors import selectors
@@ -36,7 +37,7 @@ def _company(request):
 
 class SyncTriggerView(APIView):
     """POST /sync/trigger/ — Déclencher une synchronisation depuis Sage 100."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.sync.trigger")]
 
     def post(self, request):
         ser = SyncTriggerSerializer(data=request.data)
@@ -63,7 +64,7 @@ class SyncTriggerView(APIView):
 
 class SyncLogListView(APIView):
     """GET /sync/logs/ — Historique des synchronisations."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.sync.view")]
 
     def get(self, request):
         sync_type = request.query_params.get("sync_type", "")
@@ -80,7 +81,7 @@ class SyncLogListView(APIView):
 
 class ArticleListView(APIView):
     """GET /articles/ — Liste et recherche articles."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request):
         qs = selectors.get_articles(
@@ -95,7 +96,7 @@ class ArticleListView(APIView):
 
 class ArticleDetailView(APIView):
     """GET /articles/<id>/ — Détail article + variantes + stocks."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request, article_id):
         article = selectors.get_article_by_id(_company(request), article_id)
@@ -106,7 +107,7 @@ class ArticleDetailView(APIView):
 
 class VariantSearchView(APIView):
     """GET /variants/search/?q=... — Recherche variante (mobile: scan / saisie)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request):
         query = request.query_params.get("q", "").strip()
@@ -122,7 +123,7 @@ class VariantSearchView(APIView):
 
 class DepotListView(APIView):
     """GET /depots/ — Liste des dépôts."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request):
         qs = selectors.get_depots(_company(request))
@@ -131,7 +132,7 @@ class DepotListView(APIView):
 
 class DepotStockView(APIView):
     """GET /depots/<id>/stock/ — Stock d'un dépôt (réel/dispo/transit)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request, depot_id):
         qs = selectors.get_depot_stock(
@@ -145,7 +146,7 @@ class DepotStockView(APIView):
 
 class CriticalStockView(APIView):
     """GET /stock/critical/ — Articles en rupture ou stock critique."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.stock.view")]
 
     def get(self, request):
         threshold = float(request.query_params.get("threshold", 0))
@@ -160,7 +161,16 @@ class CriticalStockView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class InventorySessionListView(APIView):
+    """
+    GET  /inventory/          → scig.session.view
+    POST /inventory/          → scig.session.create
+    """
     permission_classes = [IsScigSageEnabled]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.session.create")()]
+        return [IsScigSageEnabled(), HasPermission("scig.session.view")()]
 
     def get(self, request):
         qs = selectors.get_inventory_sessions(
@@ -191,7 +201,7 @@ class InventorySessionListView(APIView):
 
 
 class InventorySessionDetailView(APIView):
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.session.view")]
 
     def get(self, request, session_id):
         session = selectors.get_inventory_session_detail(session_id)
@@ -202,7 +212,7 @@ class InventorySessionDetailView(APIView):
 
 class SubmitInventoryToSageView(APIView):
     """POST /inventory/<id>/submit-sage/ — Soumettre vers Sage 100 et clôturer."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.sage.submit")]
 
     def post(self, request, session_id):
         try:
@@ -214,7 +224,7 @@ class SubmitInventoryToSageView(APIView):
 
 class InventoryReportView(APIView):
     """GET /inventory/<id>/report/ — Rapport complet (comparaison Sage vs physique)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.report.view")]
 
     def get(self, request, session_id):
         lines = selectors.get_inventory_report(session_id)
@@ -226,7 +236,16 @@ class InventoryReportView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class InventoryZoneListView(APIView):
+    """
+    GET  /inventory/<sid>/zones/  → scig.zone.view
+    POST /inventory/<sid>/zones/  → scig.zone.create
+    """
     permission_classes = [IsScigSageEnabled]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.zone.create")()]
+        return [IsScigSageEnabled(), HasPermission("scig.zone.view")()]
 
     def get(self, request, session_id):
         qs = selectors.get_inventory_zones(session_id)
@@ -248,7 +267,7 @@ class InventoryZoneListView(APIView):
 
 class OpenInventoryZoneView(APIView):
     """POST /inventory/<sid>/zones/<zid>/open/ — Ouvrir zone → ROUGE + lock appareil."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.open")]
 
     def post(self, request, session_id, zone_id):
         ser = OpenZoneSerializer(data=request.data)
@@ -266,7 +285,7 @@ class OpenInventoryZoneView(APIView):
 
 class ScanArticleView(APIView):
     """POST /inventory/<sid>/zones/<zid>/scan/ — Scanner un article (mobile Zebra)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.scan")]
 
     def post(self, request, session_id, zone_id):
         ser = ScanArticleSerializer(data=request.data)
@@ -285,7 +304,7 @@ class ScanArticleView(APIView):
 
 class ManualCountView(APIView):
     """POST /inventory/<sid>/zones/<zid>/manual/ — Saisie manuelle quantité."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.manual")]
 
     def post(self, request, session_id, zone_id):
         ser = ManualCountSerializer(data=request.data)
@@ -304,7 +323,7 @@ class ManualCountView(APIView):
 
 class SubmitZoneView(APIView):
     """POST /inventory/<sid>/zones/<zid>/submit/ — Transmettre zone → BLEU (mobile)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.submit")]
 
     def post(self, request, session_id, zone_id):
         try:
@@ -316,7 +335,7 @@ class SubmitZoneView(APIView):
 
 class ValidateZoneView(APIView):
     """POST /inventory/<sid>/zones/<zid>/validate/ — Valider zone → VERT (dashboard)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.validate")]
 
     def post(self, request, session_id, zone_id):
         try:
@@ -328,7 +347,7 @@ class ValidateZoneView(APIView):
 
 class RecheckZoneView(APIView):
     """POST /inventory/<sid>/zones/<zid>/recheck/ — Renvoyer en vérification → ORANGE."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.recheck")]
 
     def post(self, request, session_id, zone_id):
         ser = RecheckZoneSerializer(data=request.data)
@@ -344,9 +363,21 @@ class RecheckZoneView(APIView):
         return Response(InventoryZoneReadSerializer(zone).data)
 
 
+class UnlockZoneView(APIView):
+    """POST /inventory/<sid>/zones/<zid>/unlock/ — Déverrouiller une zone bloquée (manager)."""
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.unlock")]
+
+    def post(self, request, session_id, zone_id):
+        try:
+            zone = services.unlock_inventory_zone(zone_id, request.user)
+        except ApplicationError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(InventoryZoneReadSerializer(zone).data)
+
+
 class ZoneLinesView(APIView):
     """GET /inventory/<sid>/zones/<zid>/lines/ — Lignes comptées (comparaison Sage/physique)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.view")]
 
     def get(self, request, session_id, zone_id):
         qs = selectors.get_zone_lines_with_comparison(zone_id)
@@ -358,7 +389,16 @@ class ZoneLinesView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TransferListView(APIView):
+    """
+    GET  /transfers/  → scig.transfer.view
+    POST /transfers/  → scig.transfer.create
+    """
     permission_classes = [IsScigSageEnabled]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.transfer.create")()]
+        return [IsScigSageEnabled(), HasPermission("scig.transfer.view")()]
 
     def get(self, request):
         qs = selectors.get_transfers(
@@ -391,7 +431,7 @@ class TransferListView(APIView):
 
 
 class TransferDetailView(APIView):
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.view")]
 
     def get(self, request, transfer_id):
         transfer = selectors.get_transfer_detail(transfer_id)
@@ -402,7 +442,7 @@ class TransferDetailView(APIView):
 
 class TransferScanView(APIView):
     """POST /transfers/<id>/lines/scan/ — Ajouter article par scan (DRAFT)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.scan")]
 
     def post(self, request, transfer_id):
         ser = TransferScanSerializer(data=request.data)
@@ -422,7 +462,7 @@ class TransferScanView(APIView):
 
 class TransferValidateView(APIView):
     """POST /transfers/<id>/validate/ — DRAFT → VALIDATED."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.validate")]
 
     def post(self, request, transfer_id):
         try:
@@ -434,7 +474,7 @@ class TransferValidateView(APIView):
 
 class TransferShipView(APIView):
     """POST /transfers/<id>/ship/ — VALIDATED → SHIPPED."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.ship")]
 
     def post(self, request, transfer_id):
         try:
@@ -446,7 +486,7 @@ class TransferShipView(APIView):
 
 class TransferReceiveView(APIView):
     """POST /transfers/<id>/receive/scan/ — Scanner article à la réception."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.receive")]
 
     def post(self, request, transfer_id):
         ser = TransferReceiveSerializer(data=request.data)
@@ -466,7 +506,7 @@ class TransferReceiveView(APIView):
 
 class TransferCloseReceptionView(APIView):
     """POST /transfers/<id>/receive/close/ — Finaliser réception → RECEIVED."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.transfer.receive")]
 
     def post(self, request, transfer_id):
         try:
@@ -481,7 +521,16 @@ class TransferCloseReceptionView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class LabelCampaignListView(APIView):
+    """
+    GET  /labels/campaigns/  → scig.labels.view
+    POST /labels/campaigns/  → scig.labels.print
+    """
     permission_classes = [IsScigSageEnabled]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.labels.print")()]
+        return [IsScigSageEnabled(), HasPermission("scig.labels.view")()]
 
     def get(self, request):
         qs = selectors.get_label_campaigns(
@@ -507,8 +556,16 @@ class LabelCampaignListView(APIView):
 
 
 class PrintJobView(APIView):
-    """POST /labels/print/ — Créer un job d'impression (mobile)."""
+    """
+    GET  /labels/print/  → scig.labels.view
+    POST /labels/print/  → scig.labels.print
+    """
     permission_classes = [IsScigSageEnabled]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsScigSageEnabled(), HasPermission("scig.labels.print")()]
+        return [IsScigSageEnabled(), HasPermission("scig.labels.view")()]
 
     def get(self, request):
         qs = selectors.get_print_jobs(
@@ -543,7 +600,7 @@ class PrintJobView(APIView):
 
 class QueuePushView(APIView):
     """POST /sync/queue/push/ — Pousser opérations offline depuis l'appareil mobile."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.zone.scan")]
 
     def post(self, request):
         ser = QueuePushSerializer(data=request.data)
@@ -562,7 +619,7 @@ class QueuePushView(APIView):
 
 class QueueFlushView(APIView):
     """POST /sync/queue/flush/ — Traiter la file d'attente offline."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.sync.trigger")]
 
     def post(self, request):
         try:
@@ -574,7 +631,7 @@ class QueueFlushView(APIView):
 
 class DashboardStatsView(APIView):
     """GET /dashboard/ — KPIs manager (sessions ouvertes, transferts, stocks critiques)."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.dashboard.view")]
 
     def get(self, request):
         return Response(selectors.get_dashboard_stats(_company(request)))
@@ -586,10 +643,10 @@ class DashboardStatsView(APIView):
 
 class SageConnectionView(APIView):
     """
-    GET  /connection/      — Lire la connexion Sage 100 de la société
-    POST /connection/      — Créer ou mettre à jour la connexion
+    GET  /connection/  → scig.connection.manage
+    POST /connection/  → scig.connection.manage
     """
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.connection.manage")]
 
     def get(self, request):
         conn = SageConnection.objects.filter(
@@ -621,7 +678,7 @@ class SageConnectionView(APIView):
 
 class SageConnectionTestView(APIView):
     """POST /connection/test/ — Tester la connexion Sage 100."""
-    permission_classes = [IsScigSageEnabled]
+    permission_classes = [IsScigSageEnabled, HasPermission("scig.connection.manage")]
 
     def post(self, request):
         conn = SageConnection.objects.filter(

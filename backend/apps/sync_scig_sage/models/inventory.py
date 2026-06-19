@@ -92,6 +92,13 @@ class InventoryZone(BaseModel):
         related_name="validated_inventory_zones",
     )
     recheck_note = models.TextField(blank=True, default="")
+    rechecked_by = models.ForeignKey(
+        "authentication.User",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="rechecked_inventory_zones",
+    )
+    rechecked_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ("session", "name")
@@ -130,6 +137,13 @@ class InventoryLine(BaseModel):
         default=False, help_text="True si saisie manuelle (non scanné)"
     )
     last_scanned_at = models.DateTimeField(null=True, blank=True)
+    scanned_by = models.ForeignKey(
+        "authentication.User",
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="scanned_inventory_lines",
+    )
+    device_id = models.CharField(max_length=150, blank=True, default="")
 
     class Meta:
         unique_together = ("zone", "variant")
