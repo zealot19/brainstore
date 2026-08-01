@@ -57,6 +57,28 @@ export class SidebarService {
       hasSubRoute: false,
       showSubRoute: true,
       menu: [
+        // ── MODULE : Config Voyages ───────────────────────────────────────────
+        {
+          menuValue: 'Config Voyages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'route',
+          base: 'voyages-config',
+          subMenus: [
+            { menuValue: 'Villes',              route: routes.vcTowns,              base: 'towns'                },
+            { menuValue: 'Points de service',   route: routes.vcServicePoints,      base: 'service-points'       },
+            { menuValue: 'Trajets',             route: routes.vcRoutes,             base: 'routes'               },
+            { menuValue: 'Plans de bus',        route: routes.vcSeatingPlans,       base: 'seating-plans'        },
+            { menuValue: 'Affectations de plan',route: routes.vcVehicleAssignments, base: 'vehicle-assignments'  },
+            { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes'         },
+            { menuValue: 'Plages horaires',     route: routes.vcTimeSlots,          base: 'time-slots'           },
+            { menuValue: 'Natures de colis',    route: routes.vcConsignmentNatures, base: 'consignment-natures'  },
+            { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types'    },
+            { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns'     },
+            { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules'        },
+            { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings'             },
+          ],
+        },
         // ── MODULE 6 : Config Flotte ──────────────────────────────────────────
         {
           menuValue: 'Config Flotte',

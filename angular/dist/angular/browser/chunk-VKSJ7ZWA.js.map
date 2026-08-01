@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/finance/finance.component.ts", "src/app/features/pages/finance/finance.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { FormsModule } from '@angular/forms';\nimport { RouterLink, RouterModule } from '@angular/router';\n  \n@Component({\n  selector: 'app-finance',\n  templateUrl: './finance.component.html',\n  styleUrl: './finance.component.scss',\n  imports: [RouterModule]\n})\nexport class FinanceComponent {\n\n}\n", "<router-outlet></router-outlet>\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAWM,IAAO,mBAAP,MAAO,kBAAgB;;qCAAhB,mBAAgB;EAAA;yEAAhB,mBAAgB,WAAA,CAAA,CAAA,aAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,0BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACX7B,MAAA,oBAAA,GAAA,eAAA;;oBDSY,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEX,kBAAgB,CAAA;UAN5B;uBACW,eAAa,SAGd,CAAC,YAAY,GAAC,UAAA,oCAAA,CAAA;;;;6EAEZ,kBAAgB,EAAA,WAAA,oBAAA,UAAA,uDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

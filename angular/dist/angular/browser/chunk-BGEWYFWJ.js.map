@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/hrm/payroll/payroll.component.ts", "src/app/features/pages/hrm/payroll/payroll.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-payroll',\n    templateUrl: './payroll.component.html',\n    styleUrl: './payroll.component.scss',\n    imports: [RouterModule]\n})\nexport class PayrollComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,mBAAP,MAAO,kBAAgB;;qCAAhB,mBAAgB;EAAA;yEAAhB,mBAAgB,WAAA,CAAA,CAAA,aAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,0BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT7B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,kBAAgB,CAAA;UAN5B;uBACa,eAAa,SAGd,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,kBAAgB,EAAA,WAAA,oBAAA,UAAA,2DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

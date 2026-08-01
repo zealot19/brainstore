@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/layouts/loader/loader.component.scss"],
-  "sourcesContent": [".spinner {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  z-index: 999999;\n  color: #7638ff;\n}\n\n.spinner_lay {\n  position: fixed;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  background-color: #000;\n  opacity: 0.4;\n  z-index: 1000000;\n}\n"],
-  "mappings": ";AAAA,CAAA;AACE,YAAA;AACA,OAAA;AACA,QAAA;AACA,WAAA;AACA,SAAA;;AAGF,CAAA;AACE,YAAA;AACA,QAAA;AACA,OAAA;AACA,SAAA;AACA,UAAA;AACA,oBAAA;AACA,WAAA;AACA,WAAA;;",
-  "names": []
-}

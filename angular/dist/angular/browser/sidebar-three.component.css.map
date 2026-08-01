@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/layouts/sidebar-three/sidebar-three.component.scss"],
-  "sourcesContent": ["#sidebar .sidebar-inner {\n  width: 100%;\n}\n"],
-  "mappings": ";AAAA,CAAA,QAAA,CAAA;AACE,SAAA;;",
-  "names": []
-}

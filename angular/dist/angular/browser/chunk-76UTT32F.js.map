@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/_api/services/system/package.service.ts"],
-  "sourcesContent": ["import { Injectable } from '@angular/core';\nimport { HttpClient } from '@angular/common/http';\nimport { Observable } from 'rxjs';\nimport { SYSTEM } from '../../config/api.config';\nimport { Package, PackageForm } from '../../models/system.models';\n\n@Injectable({ providedIn: 'root' })\nexport class PackageService {\n\n  constructor(private http: HttpClient) {}\n\n  list(): Observable<Package[]> {\n    return this.http.get<Package[]>(SYSTEM.packagesAdmin);\n  }\n\n  create(data: PackageForm): Observable<Package> {\n    return this.http.post<Package>(SYSTEM.packagesAdmin, data);\n  }\n\n  update(id: string, data: Partial<PackageForm>): Observable<Package> {\n    return this.http.patch<Package>(SYSTEM.packageAdmin(id), data);\n  }\n\n  delete(id: string): Observable<void> {\n    return this.http.delete<void>(SYSTEM.packageAdmin(id));\n  }\n}\n"],
-  "mappings": ";;;;;;;;;;;;;;AAOM,IAAO,iBAAP,MAAO,gBAAc;EAEL;EAApB,YAAoB,MAAgB;AAAhB,SAAA,OAAA;EAAmB;EAEvC,OAAI;AACF,WAAO,KAAK,KAAK,IAAe,OAAO,aAAa;EACtD;EAEA,OAAO,MAAiB;AACtB,WAAO,KAAK,KAAK,KAAc,OAAO,eAAe,IAAI;EAC3D;EAEA,OAAO,IAAY,MAA0B;AAC3C,WAAO,KAAK,KAAK,MAAe,OAAO,aAAa,EAAE,GAAG,IAAI;EAC/D;EAEA,OAAO,IAAU;AACf,WAAO,KAAK,KAAK,OAAa,OAAO,aAAa,EAAE,CAAC;EACvD;;qCAlBW,iBAAc,mBAAA,UAAA,CAAA;EAAA;4EAAd,iBAAc,SAAd,gBAAc,WAAA,YADD,OAAM,CAAA;;;sEACnB,gBAAc,CAAA;UAD1B;WAAW,EAAE,YAAY,OAAM,CAAE;;;",
-  "names": []
-}

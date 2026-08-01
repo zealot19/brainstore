@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/settings/other-settings/other-settings.component.ts", "src/app/features/pages/settings/other-settings/other-settings.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-other-settings',\n    templateUrl: './other-settings.component.html',\n    styleUrls: ['./other-settings.component.scss'],\n    imports: [RouterModule]\n})\nexport class OtherSettingsComponent {\n\n}\n", "<router-outlet></router-outlet>\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,yBAAP,MAAO,wBAAsB;;qCAAtB,yBAAsB;EAAA;yEAAtB,yBAAsB,WAAA,CAAA,CAAA,oBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,gCAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACTnC,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,wBAAsB,CAAA;UANlC;uBACa,sBAAoB,SAGrB,CAAC,YAAY,GAAC,UAAA,oCAAA,CAAA;;;;6EAEd,wBAAsB,EAAA,WAAA,0BAAA,UAAA,8EAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/ui-interface/advanced-ui/ui-scrollbar/ui-scrollbar.component.scss"],
-  "sourcesContent": [".horizontal-scroll {\n    overflow-y: hidden !important;\n  }"],
-  "mappings": ";AAAA,CAAA;AACI,cAAA;;",
-  "names": []
-}

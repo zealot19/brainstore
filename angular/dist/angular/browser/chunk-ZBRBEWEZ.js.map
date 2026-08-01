@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/settings/app-settings/app-settings.component.ts", "src/app/features/pages/settings/app-settings/app-settings.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n@Component({\n    selector: 'app-app-settings',\n    templateUrl: './app-settings.component.html',\n    styleUrls: ['./app-settings.component.scss'],\n    imports: [RouterModule]\n})\nexport class AppSettingsComponent {\n\n}\n", "<router-outlet></router-outlet> \n\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAQM,IAAO,uBAAP,MAAO,sBAAoB;;qCAApB,uBAAoB;EAAA;yEAApB,uBAAoB,WAAA,CAAA,CAAA,kBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,8BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACRjC,MAAA,oBAAA,GAAA,eAAA;;oBDMc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,sBAAoB,CAAA;UANhC;uBACa,oBAAkB,SAGnB,CAAC,YAAY,GAAC,UAAA,uCAAA,CAAA;;;;6EAEd,sBAAoB,EAAA,WAAA,wBAAA,UAAA,0EAAA,YAAA,EAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

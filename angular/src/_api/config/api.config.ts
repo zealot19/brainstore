@@ -281,6 +281,27 @@ export const FLEET_CONFIG = {
   activitySectors:   `${FC}/activity-sectors/`,     activitySector:  (id: string) => `${FC}/activity-sectors/${id}/`,
 };
 
+const VC = `${API_BASE}/voyages/config`;
+
+export const VOYAGES_CONFIG = {
+  towns:              `${VC}/towns/`,              town:            (id: string) => `${VC}/towns/${id}/`,
+  servicePoints:      `${VC}/service-points/`,     servicePoint:    (id: string) => `${VC}/service-points/${id}/`,
+  fareClasses:        `${VC}/fare-classes/`,       fareClass:       (id: string) => `${VC}/fare-classes/${id}/`,
+  timeSlots:          `${VC}/time-slots/`,         timeSlot:        (id: string) => `${VC}/time-slots/${id}/`,
+  consignmentNatures: `${VC}/consignment-natures/`, consignmentNature:(id: string) => `${VC}/consignment-natures/${id}/`,
+  consignmentTypes:   `${VC}/consignment-types/`,  consignmentType: (id: string) => `${VC}/consignment-types/${id}/`,
+  loyaltyRules:       `${VC}/loyalty-rules/`,      loyaltyRule:     (id: string) => `${VC}/loyalty-rules/${id}/`,
+  routes:             `${VC}/routes/`,             route:           (id: string) => `${VC}/routes/${id}/`,
+  routeStops:         (id: string) => `${VC}/routes/${id}/stops/`,
+  routeStop:          (id: string, sid: string) => `${VC}/routes/${id}/stops/${sid}/`,
+  seatingPlans:       `${VC}/seating-plans/`,      seatingPlan:     (id: string) => `${VC}/seating-plans/${id}/`,
+  seatingPlanSeats:   (id: string) => `${VC}/seating-plans/${id}/seats/`,
+  vehicleSeatingAssignments: `${VC}/vehicle-seating-assignments/`,
+  vehicleSeatingAssignment:  (id: string) => `${VC}/vehicle-seating-assignments/${id}/`,
+  servicePatterns:    `${VC}/service-patterns/`,   servicePattern:  (id: string) => `${VC}/service-patterns/${id}/`,
+  settings:           `${VC}/settings/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 
 /** URLs qui ne nécessitent pas de token JWT */

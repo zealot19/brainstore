@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/stock/stock.component.ts", "src/app/features/pages/stock/stock.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-stock',\n    templateUrl: './stock.component.html',\n    styleUrl: './stock.component.scss',\n    standalone: true,\n    imports: [RouterModule]\n})\nexport class StockComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,iBAAP,MAAO,gBAAc;;qCAAd,iBAAc;EAAA;yEAAd,iBAAc,WAAA,CAAA,CAAA,WAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,wBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV3B,MAAA,oBAAA,GAAA,eAAA;;oBDQc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,gBAAc,CAAA;UAP1B;uBACa,aAAW,YAGT,MAAI,SACP,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,gBAAc,EAAA,WAAA,kBAAA,UAAA,mDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

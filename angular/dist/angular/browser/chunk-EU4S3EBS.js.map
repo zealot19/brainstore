@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/inventory/inventory.component.ts", "src/app/features/pages/inventory/inventory.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-inventory',\n    templateUrl: './inventory.component.html',\n    styleUrl: './inventory.component.scss',\n    imports: [RouterModule]\n})\nexport class InventoryComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,qBAAP,MAAO,oBAAkB;;qCAAlB,qBAAkB;EAAA;yEAAlB,qBAAkB,WAAA,CAAA,CAAA,eAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,4BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT/B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,oBAAkB,CAAA;UAN9B;uBACa,iBAAe,SAGhB,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,oBAAkB,EAAA,WAAA,sBAAA,UAAA,2DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

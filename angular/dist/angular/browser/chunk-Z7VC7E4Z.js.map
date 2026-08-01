@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/user-management/user-management.component.ts", "src/app/features/pages/user-management/user-management.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-user-management',\n    templateUrl: './user-management.component.html',\n    styleUrls: ['./user-management.component.scss'],\n    standalone: true,\n    imports: [RouterModule]\n})\nexport class UserManagementComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAWM,IAAO,0BAAP,MAAO,yBAAuB;;qCAAvB,0BAAuB;EAAA;yEAAvB,0BAAuB,WAAA,CAAA,CAAA,qBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,iCAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACXpC,MAAA,oBAAA,GAAA,eAAA;;oBDSc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,yBAAuB,CAAA;UAPnC;uBACa,uBAAqB,YAGnB,MAAI,SACP,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEd,yBAAuB,EAAA,WAAA,2BAAA,UAAA,uEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

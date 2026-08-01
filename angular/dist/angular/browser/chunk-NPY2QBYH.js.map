@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/super-admin/super-admin.component.ts", "src/app/features/pages/super-admin/super-admin.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n  selector: 'app-super-admin',\n  templateUrl: './super-admin.component.html',\n  styleUrls: ['./super-admin.component.scss'],\n  standalone: true,\n  imports: [RouterModule]\n})\nexport class SuperAdminComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAWM,IAAO,sBAAP,MAAO,qBAAmB;;qCAAnB,sBAAmB;EAAA;yEAAnB,sBAAmB,WAAA,CAAA,CAAA,iBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,6BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACXhC,MAAA,oBAAA,GAAA,eAAA;;oBDSY,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEX,qBAAmB,CAAA;UAP/B;uBACW,mBAAiB,YAGf,MAAI,SACP,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEZ,qBAAmB,EAAA,WAAA,uBAAA,UAAA,+DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

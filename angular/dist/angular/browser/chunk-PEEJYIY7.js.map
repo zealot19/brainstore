@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/content-cms/location/location.component.ts", "src/app/features/pages/content-cms/location/location.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n  selector: 'app-location',\n  templateUrl: './location.component.html',\n  styleUrl: './location.component.scss',\n  imports: [RouterModule]\n})\nexport class LocationComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,oBAAP,MAAO,mBAAiB;;qCAAjB,oBAAiB;EAAA;yEAAjB,oBAAiB,WAAA,CAAA,CAAA,cAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,2BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT9B,MAAA,oBAAA,GAAA,eAAA;;oBDOY,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEX,mBAAiB,CAAA;UAN7B;uBACW,gBAAc,SAGf,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEZ,mBAAiB,EAAA,WAAA,qBAAA,UAAA,qEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

@@ -391,6 +391,20 @@ export const routes={
   fcInterventionTypes: '/fleet-config/intervention-types',
   fcActivitySectors:   '/fleet-config/activity-sectors',
 
+  // ── Config Voyages ───────────────────────────────────────────────────────────
+  vcTowns:              '/voyages-config/towns',
+  vcServicePoints:      '/voyages-config/service-points',
+  vcRoutes:             '/voyages-config/routes',
+  vcSeatingPlans:       '/voyages-config/seating-plans',
+  vcVehicleAssignments: '/voyages-config/vehicle-assignments',
+  vcFareClasses:        '/voyages-config/fare-classes',
+  vcTimeSlots:          '/voyages-config/time-slots',
+  vcConsignmentNatures: '/voyages-config/consignment-natures',
+  vcConsignmentTypes:   '/voyages-config/consignment-types',
+  vcServicePatterns:    '/voyages-config/service-patterns',
+  vcLoyalty:            '/voyages-config/loyalty-rules',
+  vcSettings:           '/voyages-config/settings',
+
   //error
   error404: '/error/error-404',
   error500: '/error/error-500',

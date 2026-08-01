@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/ui-interface/icons/icons.component.ts", "src/app/features/pages/ui-interface/icons/icons.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-icons',\n    templateUrl: './icons.component.html',\n    styleUrls: ['./icons.component.scss'],\n    imports: [RouterModule]\n})\nexport class IconsComponent {\n\n   \n\n \n\n}\n", "<router-outlet></router-outlet> \n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,iBAAP,MAAO,gBAAc;;qCAAd,iBAAc;EAAA;yEAAd,iBAAc,WAAA,CAAA,CAAA,WAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,wBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV3B,MAAA,oBAAA,GAAA,eAAA;;oBDQc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,gBAAc,CAAA;UAN1B;uBACa,aAAW,SAGZ,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,gBAAc,EAAA,WAAA,kBAAA,UAAA,gEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

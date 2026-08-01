@@ -45,6 +45,14 @@ export const Pages_routes: Routes = [
                 { path: 'activity-sectors',   loadComponent: () => import('../../../_api/pages/fleet-config/activity-sectors/activity-sectors.component').then(m => m.FcActivitySectorsComponent) },
               ],
             },
+            // ── MODULE : Config Voyages ───────────────────────────────────────────────
+            {
+              path: 'voyages-config',
+              loadComponent: () => import('../../../_api/pages/voyages-config/voyages-config.component').then(m => m.VoyagesConfigComponent),
+              children: [
+                // screens registered in Tasks 9–12
+              ],
+            },
 
       {
         path: 'dashboard', loadComponent: () => import('./dashboards/dashboard.component').then(m => m.DashboardComponent),

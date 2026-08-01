@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/ui-interface/base-ui/base-ui.component.ts", "src/app/features/pages/ui-interface/base-ui/base-ui.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\n\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-base-ui',\n    templateUrl: './base-ui.component.html',\n    styleUrls: ['./base-ui.component.scss'],\n    imports: [RouterModule]\n})\nexport class BaseUiComponent {\n\n}\n", "<router-outlet></router-outlet> \n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,kBAAP,MAAO,iBAAe;;qCAAf,kBAAe;EAAA;yEAAf,kBAAe,WAAA,CAAA,CAAA,aAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,yBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV5B,MAAA,oBAAA,GAAA,eAAA;;oBDQc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,iBAAe,CAAA;UAN3B;uBACa,eAAa,SAGd,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,iBAAe,EAAA,WAAA,mBAAA,UAAA,oEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

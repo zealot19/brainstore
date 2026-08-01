@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/content-cms/content-cms.component.ts", "src/app/features/pages/content-cms/content-cms.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n  selector: 'app-content-cms',\n  templateUrl: './content-cms.component.html',\n  styleUrls: ['./content-cms.component.scss'],  \n  imports: [RouterModule]\n})\nexport class ContentCmsComponent {\n\n}\n", "<router-outlet></router-outlet>"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,sBAAP,MAAO,qBAAmB;;qCAAnB,sBAAmB;EAAA;yEAAnB,sBAAmB,WAAA,CAAA,CAAA,iBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,6BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACThC,MAAA,oBAAA,GAAA,eAAA;;oBDOY,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEX,qBAAmB,CAAA;UAN/B;uBACW,mBAAiB,SAGlB,CAAC,YAAY,GAAC,UAAA,kCAAA,CAAA;;;;6EAEZ,qBAAmB,EAAA,WAAA,uBAAA,UAAA,+DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/hrm/hrm.component.ts", "src/app/features/pages/hrm/hrm.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-hrm',\n    templateUrl: './hrm.component.html',\n    styleUrls: ['./hrm.component.scss'],\n    imports: [RouterModule]\n})\nexport class HrmComponent {\n\n}\n", "<router-outlet></router-outlet> \n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,eAAP,MAAO,cAAY;;qCAAZ,eAAY;EAAA;yEAAZ,eAAY,WAAA,CAAA,CAAA,SAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,sBAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACTzB,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,cAAY,CAAA;UANxB;uBACa,WAAS,SAGV,CAAC,YAAY,GAAC,UAAA,qCAAA,CAAA;;;;6EAEd,cAAY,EAAA,WAAA,gBAAA,UAAA,+CAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

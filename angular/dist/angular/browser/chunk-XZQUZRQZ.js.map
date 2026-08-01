@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/pages/expense/expense.component.ts", "src/app/features/pages/expense/expense.component.html"],
-  "sourcesContent": ["import { Component } from '@angular/core';\nimport { RouterModule } from '@angular/router';\n\n@Component({\n    selector: 'app-expense',\n    templateUrl: './expense.component.html',\n    styleUrls: ['./expense.component.scss'],\n    imports: [RouterModule]\n})\nexport class ExpenseComponent {\n\n}\n", "<router-outlet></router-outlet>\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AASM,IAAO,mBAAP,MAAO,kBAAgB;;qCAAhB,mBAAgB;EAAA;yEAAhB,mBAAgB,WAAA,CAAA,CAAA,aAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,UAAA,SAAA,0BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACT7B,MAAA,oBAAA,GAAA,eAAA;;oBDOc,cAAY,YAAA,GAAA,eAAA,EAAA,CAAA;;;sEAEb,kBAAgB,CAAA;UAN5B;uBACa,eAAa,SAGd,CAAC,YAAY,GAAC,UAAA,oCAAA,CAAA;;;;6EAEd,kBAAgB,EAAA,WAAA,oBAAA,UAAA,uDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}
