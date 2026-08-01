@@ -2,6 +2,7 @@ from rest_framework import serializers
 from apps.voyages_config.models import (
     Town, ServicePoint, FareClass, TimeSlot,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
+    Route, RouteStop,
 )
 
 
@@ -141,4 +142,45 @@ class LoyaltyRuleWrite(serializers.Serializer):
     reward_label = serializers.CharField(max_length=150, required=False, allow_blank=True, default="1 billet gratuit")
     valid_from = serializers.DateField(required=False, allow_null=True, default=None)
     valid_to = serializers.DateField(required=False, allow_null=True, default=None)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── RouteStop (escale) ────────────────────────────────────────────────────────
+class RouteStopRead(serializers.ModelSerializer):
+    service_point_name = serializers.CharField(source="service_point.name", read_only=True, default=None)
+    is_station = serializers.BooleanField(source="service_point.is_station", read_only=True, default=False)
+
+    class Meta:
+        model = RouteStop
+        fields = ["id", "service_point", "service_point_name", "is_station",
+                  "sequence", "distance_from_origin_km", "offset_from_departure"]
+
+
+class RouteStopWrite(serializers.Serializer):
+    service_point_id = serializers.UUIDField()
+    sequence = serializers.IntegerField(required=False, allow_null=True, default=None, min_value=1)
+    distance_from_origin_km = serializers.DecimalField(max_digits=8, decimal_places=1, required=False, allow_null=True, default=None)
+    offset_from_departure = serializers.DurationField(required=False, allow_null=True, default=None)
+
+
+# ── Route (trajet) ────────────────────────────────────────────────────────────
+class RouteRead(_ScopeMixin):
+    origin_name = serializers.CharField(source="origin.name", read_only=True, default=None)
+    destination_name = serializers.CharField(source="destination.name", read_only=True, default=None)
+    stops = RouteStopRead(many=True, read_only=True)
+
+    class Meta:
+        model = Route
+        fields = ["id", "code", "label", "origin", "origin_name",
+                  "destination", "destination_name", "distance_km", "estimated_duration",
+                  "stops", "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class RouteWrite(serializers.Serializer):
+    code = serializers.CharField(max_length=30)
+    label = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
+    origin_id = serializers.UUIDField()
+    destination_id = serializers.UUIDField()
+    distance_km = serializers.DecimalField(max_digits=8, decimal_places=1, required=False, allow_null=True, default=None)
+    estimated_duration = serializers.DurationField(required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)

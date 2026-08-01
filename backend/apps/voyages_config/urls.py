@@ -36,4 +36,10 @@ urlpatterns = [
     path("loyalty-rules/", v.LoyaltyRuleListView.as_view()),
     path("loyalty-rules/bulk-delete/", v.LoyaltyRuleBulkDeleteView.as_view()),
     path("loyalty-rules/<uuid:pk>/", v.LoyaltyRuleDetailView.as_view()),
+
+    # ── Trajets + escales ───────────────────────────────────────────────────────
+    path("routes/", v.RouteListView.as_view()),
+    path("routes/<uuid:pk>/", v.RouteDetailView.as_view()),
+    path("routes/<uuid:route_id>/stops/", v.RouteStopListView.as_view()),
+    path("routes/<uuid:route_id>/stops/<uuid:stop_id>/", v.RouteStopDetailView.as_view()),
 ]
