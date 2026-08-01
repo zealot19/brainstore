@@ -50,7 +50,14 @@ export const Pages_routes: Routes = [
               path: 'voyages-config',
               loadComponent: () => import('../../../_api/pages/voyages-config/voyages-config.component').then(m => m.VoyagesConfigComponent),
               children: [
-                // screens registered in Tasks 9–12
+                { path: 'towns',               loadComponent: () => import('../../../_api/pages/voyages-config/towns/towns.component').then(m => m.VcTownsComponent) },
+                { path: 'service-points',      loadComponent: () => import('../../../_api/pages/voyages-config/service-points/service-points.component').then(m => m.VcServicePointsComponent) },
+                { path: 'fare-classes',        loadComponent: () => import('../../../_api/pages/voyages-config/fare-classes/fare-classes.component').then(m => m.VcFareClassesComponent) },
+                { path: 'time-slots',          loadComponent: () => import('../../../_api/pages/voyages-config/time-slots/time-slots.component').then(m => m.VcTimeSlotsComponent) },
+                { path: 'consignment-natures', loadComponent: () => import('../../../_api/pages/voyages-config/consignment-natures/consignment-natures.component').then(m => m.VcConsignmentNaturesComponent) },
+                { path: 'consignment-types',   loadComponent: () => import('../../../_api/pages/voyages-config/consignment-types/consignment-types.component').then(m => m.VcConsignmentTypesComponent) },
+                { path: 'loyalty-rules',       loadComponent: () => import('../../../_api/pages/voyages-config/loyalty-rules/loyalty-rules.component').then(m => m.VcLoyaltyRulesComponent) },
+                { path: 'vehicle-assignments', loadComponent: () => import('../../../_api/pages/voyages-config/vehicle-assignments/vehicle-assignments.component').then(m => m.VcVehicleAssignmentsComponent) },
               ],
             },
 
