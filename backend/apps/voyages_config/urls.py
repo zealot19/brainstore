@@ -53,4 +53,12 @@ urlpatterns = [
     path("vehicle-seating-assignments/", v.VehicleSeatingAssignmentListView.as_view()),
     path("vehicle-seating-assignments/bulk-delete/", v.VehicleSeatingAssignmentBulkDeleteView.as_view()),
     path("vehicle-seating-assignments/<uuid:pk>/", v.VehicleSeatingAssignmentDetailView.as_view()),
+
+    # ── Planifications ──────────────────────────────────────────────────────────
+    path("service-patterns/", v.ServicePatternListView.as_view()),
+    path("service-patterns/bulk-delete/", v.ServicePatternBulkDeleteView.as_view()),
+    path("service-patterns/<uuid:pk>/", v.ServicePatternDetailView.as_view()),
+
+    # ── Paramètres Voyages ──────────────────────────────────────────────────────
+    path("settings/", v.VoyagesSettingsView.as_view()),
 ]

@@ -10,6 +10,7 @@ from apps.voyages_config.models import (
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
+    ServicePattern, VoyagesSettings,
 )
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensure_unique, cfg_lookup
@@ -503,3 +504,125 @@ class VehicleSeatingAssignmentDetailView(APIView):
 
 
 VehicleSeatingAssignmentBulkDeleteView = _bulk(VehicleSeatingAssignment)
+
+
+# ── ServicePattern (planification) ────────────────────────────────────────────
+
+_PATTERN_FK_FIELDS = {
+    "route_id": Route, "time_slot_id": TimeSlot,
+    "fare_class_id": FareClass, "default_seating_plan_id": SeatingPlan,
+}
+
+
+def _resolve_pattern_fks(d, company_id):
+    """Pop *_id keys → set model instances on a kwargs dict. Returns (kwargs, error)."""
+    out = {}
+    mapping = {"route_id": "route", "time_slot_id": "time_slot",
+               "fare_class_id": "fare_class", "default_seating_plan_id": "default_seating_plan"}
+    for key, model_cls in _PATTERN_FK_FIELDS.items():
+        if key in d:
+            cid = d.pop(key)
+            if cid is None:
+                out[mapping[key]] = None
+                continue
+            obj = cfg_lookup(model_cls, cid, company_id)
+            if not obj:
+                return None, f"Référence introuvable ({mapping[key]})."
+            out[mapping[key]] = obj
+    return out, None
+
+
+class ServicePatternListView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        qs = (scoped_qs(ServicePattern, scope_company_id(request))
+              .select_related("route", "time_slot", "fare_class", "default_seating_plan")
+              .order_by("route__code"))
+        rid = request.query_params.get("route_id")
+        if rid:
+            qs = qs.filter(route_id=rid)
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(S.ServicePatternRead(page, many=True).data)
+
+    def post(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        payload = S.ServicePatternWrite(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = dict(payload.validated_data)
+        cid = company.id if company else None
+        fks, ferr = _resolve_pattern_fks(d, cid)
+        if ferr:
+            return error_response(ferr, status_code=404)
+        obj = ServicePattern.objects.create(company=company, created_by=request.user, **fks, **d)
+        return created_response(S.ServicePatternRead(obj).data)
+
+
+class ServicePatternDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def _get(self, request, pk):
+        return scoped_qs(ServicePattern, scope_company_id(request)).filter(id=pk).first()
+
+    def get(self, request, pk):
+        obj = self._get(request, pk)
+        return success_response(S.ServicePatternRead(obj).data) if obj else error_response("Introuvable.", status_code=404)
+
+    def patch(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        payload = S.ServicePatternWrite(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        d = dict(payload.validated_data)
+        fks, ferr = _resolve_pattern_fks(d, obj.company_id)
+        if ferr:
+            return error_response(ferr, status_code=404)
+        for k, v in {**fks, **d}.items():
+            setattr(obj, k, v)
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(S.ServicePatternRead(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        obj.is_deleted = True
+        obj.updated_by = request.user
+        obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return no_content_response()
+
+
+ServicePatternBulkDeleteView = _bulk(ServicePattern)
+
+
+# ── VoyagesSettings (singleton per company) ───────────────────────────────────
+
+class VoyagesSettingsView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj, _created = VoyagesSettings.objects.get_or_create(
+            company=company, defaults={"created_by": request.user})
+        return success_response(S.VoyagesSettingsRead(obj).data)
+
+    def patch(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj, _created = VoyagesSettings.objects.get_or_create(
+            company=company, defaults={"created_by": request.user})
+        payload = S.VoyagesSettingsWrite(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        for k, v in payload.validated_data.items():
+            setattr(obj, k, v)
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(S.VoyagesSettingsRead(obj).data)

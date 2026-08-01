@@ -4,6 +4,7 @@ from apps.voyages_config.models import (
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
+    ServicePattern, VoyagesSettings,
 )
 
 
@@ -242,3 +243,57 @@ class VehicleSeatingAssignmentWrite(serializers.Serializer):
     valid_from = serializers.DateField()
     valid_to = serializers.DateField(required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── ServicePattern (planification) ────────────────────────────────────────────
+class ServicePatternRead(_ScopeMixin):
+    route_code = serializers.CharField(source="route.code", read_only=True, default=None)
+    time_slot_label = serializers.CharField(source="time_slot.label", read_only=True, default=None)
+    fare_class_name = serializers.CharField(source="fare_class.name", read_only=True, default=None)
+    default_seating_plan_code = serializers.CharField(source="default_seating_plan.code", read_only=True, default=None)
+
+    class Meta:
+        model = ServicePattern
+        fields = ["id", "route", "route_code", "time_slot", "time_slot_label",
+                  "fare_class", "fare_class_name", "default_seating_plan", "default_seating_plan_code",
+                  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+                  "valid_from", "valid_to", "company", "scope", "is_active",
+                  "created_at", "updated_at"]
+
+
+class ServicePatternWrite(serializers.Serializer):
+    route_id = serializers.UUIDField()
+    time_slot_id = serializers.UUIDField()
+    fare_class_id = serializers.UUIDField()
+    default_seating_plan_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    monday = serializers.BooleanField(required=False, default=False)
+    tuesday = serializers.BooleanField(required=False, default=False)
+    wednesday = serializers.BooleanField(required=False, default=False)
+    thursday = serializers.BooleanField(required=False, default=False)
+    friday = serializers.BooleanField(required=False, default=False)
+    saturday = serializers.BooleanField(required=False, default=False)
+    sunday = serializers.BooleanField(required=False, default=False)
+    valid_from = serializers.DateField(required=False, allow_null=True, default=None)
+    valid_to = serializers.DateField(required=False, allow_null=True, default=None)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── VoyagesSettings ───────────────────────────────────────────────────────────
+class VoyagesSettingsRead(_ScopeMixin):
+    class Meta:
+        model = VoyagesSettings
+        fields = ["id", "departure_lead_hours", "arrival_grace_hours", "ticket_expiry_days",
+                  "shift_duration_hours", "document_alert_days", "archive_delay_days",
+                  "auto_print_default", "sms_notification_default",
+                  "company", "scope", "created_at", "updated_at"]
+
+
+class VoyagesSettingsWrite(serializers.Serializer):
+    departure_lead_hours = serializers.IntegerField(required=False, min_value=0)
+    arrival_grace_hours = serializers.IntegerField(required=False, min_value=0)
+    ticket_expiry_days = serializers.IntegerField(required=False, min_value=0)
+    shift_duration_hours = serializers.IntegerField(required=False, min_value=0)
+    document_alert_days = serializers.IntegerField(required=False, min_value=0)
+    archive_delay_days = serializers.IntegerField(required=False, min_value=0)
+    auto_print_default = serializers.BooleanField(required=False)
+    sms_notification_default = serializers.BooleanField(required=False)
