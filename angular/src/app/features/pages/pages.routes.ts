@@ -59,6 +59,7 @@ export const Pages_routes: Routes = [
                 { path: 'loyalty-rules',       loadComponent: () => import('../../../_api/pages/voyages-config/loyalty-rules/loyalty-rules.component').then(m => m.VcLoyaltyRulesComponent) },
                 { path: 'vehicle-assignments', loadComponent: () => import('../../../_api/pages/voyages-config/vehicle-assignments/vehicle-assignments.component').then(m => m.VcVehicleAssignmentsComponent) },
                 { path: 'routes',              loadComponent: () => import('../../../_api/pages/voyages-config/routes/routes.component').then(m => m.VcRoutesComponent) },
+                { path: 'seating-plans',       loadComponent: () => import('../../../_api/pages/voyages-config/seating-plans/seating-plans.component').then(m => m.VcSeatingPlansComponent) },
               ],
             },
 

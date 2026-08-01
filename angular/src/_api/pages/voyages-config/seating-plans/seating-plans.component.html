@@ -1,0 +1,98 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Plans de bus</h4><h6>Plans de sièges réutilisables</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#plan-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau plan</a></div>
+</div>
+<app-info-banner text="Dessinez la disposition des sièges du bus. Cliquez une case vide pour ajouter un siège, cliquez un siège pour changer son type (Standard, VIP, Chauffeur, Personnel) ou le rendre non vendable."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher…" /></div></div></div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr><th>Code</th><th>Nom</th><th>Grille</th><th>Places vendables</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (p of filtered; track p.id) {
+            <tr>
+              <td class="fw-medium">{{ p.code }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.rows }} × {{ p.columns }}</td>
+              <td><span class="badge bg-primary">{{ p.total_seats }}</span></td>
+              <td>@if (p.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                @if (p.scope !== 'global') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#plan-modal" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="delete(p)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
+                } @else { <span class="text-muted small">—</span> }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun plan.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+
+<div class="modal fade" id="plan-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-xl"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le plan' : 'Nouveau plan de bus' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">Code <span class="text-danger">*</span></label><input [(ngModel)]="code" type="text" class="form-control" placeholder="BUS70" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input [(ngModel)]="name" type="text" class="form-control" placeholder="Bus 70 places" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Rangées</label><input [(ngModel)]="nrows" type="number" min="1" max="40" class="form-control" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Colonnes</label><input [(ngModel)]="ncols" type="number" min="1" max="10" class="form-control" /></div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-9">
+        <div class="seatmap-legend mb-2">
+          <span class="seat seat-standard">S</span> Standard
+          <span class="seat seat-vip">V</span> VIP
+          <span class="seat seat-driver">C</span> Chauffeur
+          <span class="seat seat-crew">P</span> Personnel
+          <span class="seat seat-empty">·</span> Allée / vide
+          <span class="ms-3 fw-semibold">Places vendables : {{ sellableCount }}</span>
+        </div>
+        <div class="seatmap">
+          @for (r of rowsArr; track r) {
+            <div class="seatmap-row">
+              @for (c of colsArr; track c) {
+                <div class="seat"
+                     [class.seat-empty]="!seatAt(r, c)"
+                     [class.seat-standard]="seatAt(r, c)?.seat_type === 'STANDARD'"
+                     [class.seat-vip]="seatAt(r, c)?.seat_type === 'VIP'"
+                     [class.seat-driver]="seatAt(r, c)?.seat_type === 'DRIVER'"
+                     [class.seat-crew]="seatAt(r, c)?.seat_type === 'CREW'"
+                     [class.not-sellable]="seatAt(r, c) && !seatAt(r, c)?.is_sellable"
+                     [class.selected]="selectedKey === key(r, c)"
+                     (click)="cellClick(r, c)">
+                  {{ seatAt(r, c)?.seat_number || '' }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="col-lg-3">
+        @if (selectedSeat) {
+          <div class="border rounded p-3">
+            <h6 class="fw-semibold">Siège {{ selectedSeat.seat_number }}</h6>
+            <label class="form-label small mt-2">Numéro</label>
+            <input [(ngModel)]="selectedSeat.seat_number" type="text" class="form-control form-control-sm mb-2" />
+            <label class="form-label small">Type</label>
+            <div class="btn-group-vertical w-100 mb-2">
+              @for (t of seatTypes; track t.value) {
+                <button type="button" class="btn btn-sm" [class.btn-primary]="selectedSeat.seat_type === t.value" [class.btn-outline-secondary]="selectedSeat.seat_type !== t.value" (click)="setType(t.value)">{{ t.label }}</button>
+              }
+            </div>
+            <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="seat-sell" [checked]="selectedSeat.is_sellable" (change)="toggleSellable()" /><label class="form-check-label" for="seat-sell">Vendable</label></div>
+            <button type="button" class="btn btn-sm btn-outline-danger w-100" (click)="removeSelected()"><i class="ti ti-trash me-1"></i>Retirer le siège</button>
+          </div>
+        } @else {
+          <p class="text-muted small">Cliquez une case pour ajouter ou modifier un siège.</p>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ editId ? 'Enregistrer' : 'Créer' }}</button></div>
+</div></div></div>
