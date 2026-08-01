@@ -4,12 +4,18 @@ from .external_driver  import ExternalDriver
 from .vehicle          import Vehicle
 from .odometer_log     import OdometerLog
 from .fuel_log         import FuelLog
-from .maintenance_type import MaintenanceType
-from .maintenance_order import MaintenanceOrder
-from .insurance        import Insurance
+from .service          import Service
+from .contract         import Contract
+from .recurring_cost   import RecurringCost
 from .vehicle_document import VehicleDocument
 from .assignment       import Assignment
 from .accident         import Accident
+from .parking          import Parking
+from .supplier         import Supplier
+from .config import (
+    VehicleCategoryCfg, FuelType, Transmission, TractionType,
+    UnitCategory, Unit, Period, DocumentType, Tag, InterventionType, ActivitySector,
+)
 
 __all__ = [
     "VehicleBrand",
@@ -18,10 +24,15 @@ __all__ = [
     "Vehicle",
     "OdometerLog",
     "FuelLog",
-    "MaintenanceType",
-    "MaintenanceOrder",
-    "Insurance",
+    "Service",
+    "Contract",
+    "RecurringCost",
     "VehicleDocument",
     "Assignment",
     "Accident",
+    "Parking",
+    "Supplier",
+    # Config Flotte
+    "VehicleCategoryCfg", "FuelType", "Transmission", "TractionType",
+    "UnitCategory", "Unit", "Period", "DocumentType", "Tag", "InterventionType", "ActivitySector",
 ]

@@ -1,0 +1,152 @@
+<div class="page-header">
+      <div class="add-item d-flex">
+        <div class="page-title">
+          <h4>Missions</h4>
+          <h6>Affectations et déplacements de véhicules</h6>
+        </div>
+      </div>
+      <div class="page-btn">
+        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-assignment-modal" (click)="openCreate()">
+          <i class="ti ti-circle-plus"></i>Nouvelle mission
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats + filter -->
+    <div class="row mb-3 g-3 align-items-end">
+      <div class="col-md-2">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0 text-info">{{ totalPlanned }}</h4>
+          <small class="text-muted">Planifiées</small>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0 text-warning">{{ totalInProgress }}</h4>
+          <small class="text-muted">En cours</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Statut</label>
+        <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
+          <option value="">Tous</option>
+          <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Véhicule</th>
+                <th>Conducteur</th>
+                <th>Objet</th>
+                <th>Destination</th>
+                <th>Départ prévu</th>
+                <th>Retour prévu</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of filtered">
+                <td class="fw-semibold">{{ a.vehicle_plate }}</td>
+                <td>{{ a.driver_name || '—' }}</td>
+                <td>{{ a.purpose }}</td>
+                <td>{{ a.destination }}</td>
+                <td>{{ a.planned_departure | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ a.planned_return ? (a.planned_return | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+                <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
+                <td>
+                  <a *ngIf="a.status === 'planned'" class="btn btn-sm btn-outline-warning me-1"
+                     (click)="startAssignment(a.id)" title="Démarrer">
+                    <i class="ti ti-player-play me-1"></i>Démarrer
+                  </a>
+                  <a *ngIf="a.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
+                     (click)="completeAssignment(a.id)" title="Clôturer">
+                    <i class="ti ti-check me-1"></i>Terminer
+                  </a>
+                  <a *ngIf="a.status === 'planned' || a.status === 'in_progress'"
+                     class="btn btn-sm btn-outline-danger me-1" (click)="cancelAssignment(a.id)" title="Annuler">
+                    <i class="ti ti-x me-1"></i>Annuler
+                  </a>
+                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(a.id)" title="Supprimer">
+                    <i class="ti ti-trash me-1"></i>Supprimer
+                  </a>
+                </td>
+              </tr>
+              <tr *ngIf="filtered.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">Aucune mission trouvée.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- Modal créer mission -->
+<div class="modal fade" id="create-assignment-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle mission</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+        <div class="modal-body">
+          <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Véhicule *</label>
+              <select class="form-select" formControlName="vehicle_id">
+                <option value="">-- Sélectionner --</option>
+                <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Conducteur externe</label>
+              <select class="form-select" formControlName="external_driver_id">
+                <option value="">-- Conducteur interne --</option>
+                <option *ngFor="let d of extDrivers" [value]="d.id">{{ d.full_name }}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Objet de la mission *</label>
+              <input type="text" class="form-control" formControlName="purpose">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Destination *</label>
+              <input type="text" class="form-control" formControlName="destination">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Lieu de départ</label>
+              <input type="text" class="form-control" formControlName="departure_location">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Départ prévu *</label>
+              <input type="datetime-local" class="form-control" formControlName="planned_departure">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Retour prévu</label>
+              <input type="datetime-local" class="form-control" formControlName="planned_return">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="2" formControlName="notes"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

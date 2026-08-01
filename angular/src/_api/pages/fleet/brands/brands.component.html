@@ -1,0 +1,121 @@
+<!-- Page Header -->
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Marques de véhicule</h4>
+      <h6>Gérer les marques du référentiel global</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+  </ul>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#brand-modal" (click)="openCreate()">
+      <i class="ti ti-circle-plus me-2"></i>Nouvelle marque
+    </a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row">
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-purple border-0">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div><p class="mb-1 text-white">Total marques</p><h4 class="text-white">{{ total }}</h4></div>
+        <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-car"></i></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+    <div class="search-set">
+      <div class="search-input">
+        <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+        <div class="dataTables_filter">
+          <label>
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher une marque…" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table datanew">
+          <thead class="thead-light">
+            <tr>
+              <th>Marque</th>
+              <th>Pays d'origine</th>
+              <th>Créée le</th>
+              <th class="no-sort">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of filtered; track b.id) {
+              <tr>
+                <td class="fw-medium">{{ b.name }}</td>
+                <td>{{ b.country_of_origin || '—' }}</td>
+                <td>{{ b.created_at | date:'dd/MM/yyyy' }}</td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action d-flex align-items-center">
+                    <a href="javascript:void(0);"
+                       class="me-2 p-2 d-flex align-items-center border rounded"
+                       data-bs-toggle="modal" data-bs-target="#brand-modal"
+                       (click)="openEdit(b)" title="Modifier">
+                      <i class="ti ti-edit me-1"></i>Modifier
+                    </a>
+                    <a href="javascript:void(0);"
+                       class="p-2 d-flex align-items-center border rounded"
+                       (click)="delete(b.id)" title="Supprimer">
+                      <i class="ti ti-trash text-danger me-1"></i>Supprimer
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="text-center py-4 text-muted">Aucune marque trouvée.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal : Marque -->
+<div class="modal fade" id="brand-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editId ? 'Modifier la marque' : 'Nouvelle marque' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+          <div class="mb-3">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input formControlName="name" type="text" class="form-control" placeholder="Toyota, Mercedes…" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Pays d'origine</label>
+            <input formControlName="country_of_origin" type="text" class="form-control" placeholder="Japon, Allemagne…" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            {{ editId ? 'Enregistrer' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

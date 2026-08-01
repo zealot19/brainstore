@@ -1,0 +1,162 @@
+<div class="page-header">
+      <div class="add-item d-flex">
+        <div class="page-title">
+          <h4>Carburant</h4>
+          <h6>Enregistrements de ravitaillement</h6>
+        </div>
+      </div>
+      <div class="page-btn">
+        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#fuel-log-modal"
+           (click)="openCreate()" [class.disabled]="!selectedVehicleId">
+          <i class="ti ti-circle-plus"></i>Ajouter un plein
+        </a>
+      </div>
+    </div>
+
+    <!-- Vehicle selector + stats -->
+    <div class="row mb-3 align-items-end g-3">
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Véhicule</label>
+        <select class="form-select" [(ngModel)]="selectedVehicleId" (ngModelChange)="onVehicleChange()">
+          <option value="">-- Sélectionner --</option>
+          <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0">{{ logs.length }}</h4>
+          <small class="text-muted">Pleins</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0">{{ totalLiters | number:'1.1-1' }} L</h4>
+          <small class="text-muted">Total litres</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0">{{ totalCost | number:'1.0-0' }}</h4>
+          <small class="text-muted">Coût total (FCFA)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div *ngIf="loading" class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Date</th>
+                <th>Km compteur</th>
+                <th>Litres</th>
+                <th>Prix/L</th>
+                <th>Total</th>
+                <th>Type</th>
+                <th>Station</th>
+                <th>Plein</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let l of logs">
+                <td>{{ l.date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ l.odometer_km }} km</td>
+                <td>{{ l.liters }} L</td>
+                <td>{{ l.cost_per_liter }}</td>
+                <td class="fw-semibold">{{ l.total_cost | number:'1.0-0' }}</td>
+                <td>{{ l.fuel_type || '—' }}</td>
+                <td>{{ l.station || '—' }}</td>
+                <td>
+                  <span class="badge" [class]="l.full_tank ? 'bg-success' : 'bg-secondary'">
+                    {{ l.full_tank ? 'Oui' : 'Non' }}
+                  </span>
+                </td>
+                <td>
+                  <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fuel-log-modal" (click)="openEdit(l)">
+                    <i class="ti ti-edit me-1"></i>Modifier
+                  </a>
+                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(l.id)">
+                    <i class="ti ti-trash me-1"></i>Supprimer
+                  </a>
+                </td>
+              </tr>
+              <tr *ngIf="logs.length === 0">
+                <td colspan="9" class="text-center text-muted py-4">
+                  {{ selectedVehicleId ? 'Aucun enregistrement.' : 'Sélectionnez un véhicule.' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- Modal carburant -->
+<div class="modal fade" id="fuel-log-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Ajouter' }} un plein</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Date *</label>
+              <input type="date" class="form-control" formControlName="date">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Compteur km *</label>
+              <input type="number" class="form-control" formControlName="odometer_km" min="0" step="0.1">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Litres *</label>
+              <input type="number" class="form-control" formControlName="liters" min="0" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Prix / Litre *</label>
+              <input type="number" class="form-control" formControlName="cost_per_liter" min="0" step="0.001">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Coût total</label>
+              <input type="number" class="form-control" formControlName="total_cost" min="0" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Type carburant</label>
+              <input type="text" class="form-control" formControlName="fuel_type" placeholder="diesel, essence…">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Station</label>
+              <input type="text" class="form-control" formControlName="station">
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="full_tank" formControlName="full_tank">
+                <label class="form-check-label" for="full_tank">Plein complet</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="2" formControlName="notes"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ editId ? 'Modifier' : 'Enregistrer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

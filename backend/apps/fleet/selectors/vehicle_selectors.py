@@ -4,8 +4,30 @@ from datetime import timedelta
 
 from apps.fleet.models import (
     VehicleBrand, VehicleModel, ExternalDriver,
-    Vehicle, OdometerLog, Insurance, VehicleDocument, MaintenanceOrder,
+    Vehicle, OdometerLog, Contract, VehicleDocument, Service, Parking, Supplier,
 )
+
+
+def list_parkings(company_id, search=None):
+    qs = Parking.objects.filter(company_id=company_id, is_deleted=False).order_by("name")
+    if search:
+        qs = qs.filter(name__icontains=search)
+    return qs
+
+
+def get_parking(parking_id, company_id):
+    return Parking.objects.filter(id=parking_id, company_id=company_id, is_deleted=False).first()
+
+
+def list_suppliers(company_id, search=None):
+    qs = Supplier.objects.filter(company_id=company_id, is_deleted=False).order_by("name")
+    if search:
+        qs = qs.filter(Q(name__icontains=search) | Q(code__icontains=search))
+    return qs
+
+
+def get_supplier(supplier_id, company_id):
+    return Supplier.objects.filter(id=supplier_id, company_id=company_id, is_deleted=False).first()
 
 
 # ── Marques ────────────────────────────────────────────────────────────────────
@@ -26,15 +48,13 @@ def get_vehicle_brand(brand_id):
 
 # ── Modèles ────────────────────────────────────────────────────────────────────
 
-def list_vehicle_models(brand_id=None, vehicle_type=None, search=None):
+def list_vehicle_models(brand_id=None, search=None):
     qs = (VehicleModel.objects
           .filter(is_deleted=False)
           .select_related("brand")
           .order_by("brand__name", "name"))
     if brand_id:
         qs = qs.filter(brand_id=brand_id)
-    if vehicle_type:
-        qs = qs.filter(vehicle_type=vehicle_type)
     if search:
         qs = qs.filter(Q(name__icontains=search) | Q(brand__name__icontains=search))
     return qs
@@ -70,18 +90,18 @@ def get_external_driver(driver_id, company_id):
 
 # ── Véhicules ──────────────────────────────────────────────────────────────────
 
-def list_vehicles(company_id, *, agency_id=None, status=None, vehicle_type=None,
+def list_vehicles(company_id, *, agency_id=None, status=None, category=None,
                   is_active=None, search=None):
     qs = (Vehicle.objects
           .filter(company_id=company_id, is_deleted=False)
-          .select_related("model__brand", "agency", "internal_driver", "external_driver")
+          .select_related("model__brand", "agency", "internal_driver", "external_driver", "category")
           .order_by("license_plate"))
     if agency_id:
         qs = qs.filter(agency_id=agency_id)
     if status:
         qs = qs.filter(status=status)
-    if vehicle_type:
-        qs = qs.filter(model__vehicle_type=vehicle_type)
+    if category:
+        qs = qs.filter(category_id=category)
     if is_active is not None:
         qs = qs.filter(is_active=is_active)
     if search:
@@ -123,14 +143,14 @@ def get_vehicle_stats(vehicle_id, company_id):
         total_liters=Sum("liters"),
         fuel_count=Count("id"),
     )
-    maintenance_agg = vehicle.maintenance_orders.filter(
+    maintenance_agg = vehicle.services.filter(
         is_deleted=False, status="done"
     ).aggregate(
         total_maintenance_cost=Sum("cost"),
         maintenance_count=Count("id"),
     )
-    insurance_agg = vehicle.insurances.filter(is_deleted=False).aggregate(
-        total_insurance_cost=Sum("premium_amount"),
+    contract_agg = vehicle.contracts.filter(is_deleted=False).aggregate(
+        total_contract_cost=Sum("recurring_costs__amount"),
     )
     assignment_count = vehicle.assignments.filter(is_deleted=False).count()
     accident_count = vehicle.accidents.filter(is_deleted=False).count()
@@ -149,15 +169,15 @@ def get_vehicle_stats(vehicle_id, company_id):
             "total_cost": maintenance_agg["total_maintenance_cost"] or 0,
             "count": maintenance_agg["maintenance_count"],
         },
-        "insurance": {
-            "total_premium": insurance_agg["total_insurance_cost"] or 0,
+        "contracts": {
+            "total_cost": contract_agg["total_contract_cost"] or 0,
         },
         "assignments": assignment_count,
         "accidents": accident_count,
         "tco": (
             (fuel_agg["total_fuel_cost"] or 0)
             + (maintenance_agg["total_maintenance_cost"] or 0)
-            + (insurance_agg["total_insurance_cost"] or 0)
+            + (contract_agg["total_contract_cost"] or 0)
         ),
     }
 
@@ -175,12 +195,12 @@ def get_fleet_alerts(company_id, days_ahead: int = 30):
     today = timezone.now().date()
     horizon = today + timedelta(days=days_ahead)
 
-    # Assurances
-    expiring_insurance = (
-        Insurance.objects
+    # Contrats (assurances, leasing, etc.) arrivant à échéance
+    expiring_contracts = (
+        Contract.objects
         .filter(vehicle__company_id=company_id, vehicle__is_deleted=False,
-                is_deleted=False, end_date__lte=horizon)
-        .select_related("vehicle")
+                is_deleted=False, status="active", end_date__lte=horizon)
+        .select_related("vehicle", "intervention_type", "supplier")
         .order_by("end_date")
     )
 
@@ -195,10 +215,10 @@ def get_fleet_alerts(company_id, days_ahead: int = 30):
 
     # Maintenances planifiées en retard
     overdue_maintenance = (
-        MaintenanceOrder.objects
+        Service.objects
         .filter(vehicle__company_id=company_id, vehicle__is_deleted=False,
                 is_deleted=False, status="planned", planned_date__lt=today)
-        .select_related("vehicle", "maintenance_type")
+        .select_related("vehicle", "intervention_type")
         .order_by("planned_date")
     )
 
@@ -206,12 +226,12 @@ def get_fleet_alerts(company_id, days_ahead: int = 30):
     vehicles_overdue_km = (
         Vehicle.objects
         .filter(company_id=company_id, is_deleted=False,
-                maintenance_orders__next_due_km__lte=models_current_odometer_ref())
+                services__next_due_km__lte=models_current_odometer_ref())
         .distinct()
     )
 
     return {
-        "expiring_insurance": expiring_insurance,
+        "expiring_contracts": expiring_contracts,
         "expiring_documents": expiring_documents,
         "overdue_maintenance": overdue_maintenance,
     }
@@ -231,10 +251,10 @@ def get_fleet_stats(company_id):
     by_status = dict(
         vehicles.values_list("status").annotate(cnt=Count("id")).values_list("status", "cnt")
     )
-    by_type = dict(
-        vehicles.values_list("model__vehicle_type")
+    by_category = dict(
+        vehicles.values_list("category__name")
         .annotate(cnt=Count("id"))
-        .values_list("model__vehicle_type", "cnt")
+        .values_list("category__name", "cnt")
     )
 
     fuel_total = FuelLog_total(company_id)
@@ -244,7 +264,7 @@ def get_fleet_stats(company_id):
         "total_vehicles": vehicles.count(),
         "active_vehicles": vehicles.filter(is_active=True).count(),
         "by_status": by_status,
-        "by_type": by_type,
+        "by_category": by_category,
         "total_fuel_cost": fuel_total,
         "total_maintenance_cost": maintenance_total,
     }
@@ -259,7 +279,7 @@ def FuelLog_total(company_id):
 
 
 def MaintenanceCost_total(company_id):
-    result = MaintenanceOrder.objects.filter(
+    result = Service.objects.filter(
         vehicle__company_id=company_id, is_deleted=False, status="done"
     ).aggregate(t=Sum("cost"))
     return result["t"] or 0

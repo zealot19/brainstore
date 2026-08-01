@@ -5,8 +5,73 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.fleet.models import (
     VehicleBrand, VehicleModel, ExternalDriver, Vehicle, OdometerLog,
-    Insurance, VehicleDocument,
+    VehicleDocument, Parking, Supplier,
 )
+
+
+# ── Fournisseurs ────────────────────────────────────────────────────────────────
+
+def _generate_supplier_code(company, name):
+    """Génère un code unique à partir du nom (ex. « Total Cameroun » → « TOT-01 »)."""
+    base = "".join(c for c in (name or "").upper() if c.isalnum())[:3] or "FRN"
+    n = 1
+    while True:
+        code = f"{base}-{n:02d}"
+        if not Supplier.objects.filter(company=company, code=code, is_deleted=False).exists():
+            return code
+        n += 1
+
+
+@transaction.atomic
+def create_supplier(*, company, name, code="", created_by, **fields):
+    if not code:
+        code = _generate_supplier_code(company, name)
+    elif Supplier.objects.filter(company=company, code=code, is_deleted=False).exists():
+        raise ApplicationError(_("Un fournisseur avec ce code existe déjà."))
+    return Supplier.objects.create(company=company, name=name, code=code, created_by=created_by, **fields)
+
+
+@transaction.atomic
+def update_supplier(supplier, *, updated_by, **fields):
+    allowed = {"name", "code", "tax_id", "address", "city", "country", "phone",
+               "email", "website", "contact_person", "notes", "is_active"}
+    if "code" in fields and Supplier.objects.filter(
+            company=supplier.company, code=fields["code"], is_deleted=False).exclude(id=supplier.id).exists():
+        raise ApplicationError(_("Un fournisseur avec ce code existe déjà."))
+    for key, val in fields.items():
+        if key in allowed:
+            setattr(supplier, key, val)
+    supplier.updated_by = updated_by
+    supplier.save()
+    return supplier
+
+
+@transaction.atomic
+def delete_supplier(supplier, *, deleted_by):
+    supplier.soft_delete(user=deleted_by)
+
+
+# ── Parkings ────────────────────────────────────────────────────────────────────
+
+@transaction.atomic
+def create_parking(*, company, name, location="", notes="", created_by):
+    return Parking.objects.create(company=company, name=name, location=location,
+                                  notes=notes, created_by=created_by)
+
+
+@transaction.atomic
+def update_parking(parking, *, updated_by, **fields):
+    for key in ("name", "location", "notes"):
+        if key in fields:
+            setattr(parking, key, fields[key])
+    parking.updated_by = updated_by
+    parking.save()
+    return parking
+
+
+@transaction.atomic
+def delete_parking(parking, *, deleted_by):
+    parking.soft_delete(user=deleted_by)
 
 
 # ── Marques ────────────────────────────────────────────────────────────────────
@@ -48,7 +113,8 @@ def delete_vehicle_brand(brand, *, deleted_by):
 
 @transaction.atomic
 def create_vehicle_model(
-    *, brand, name: str, vehicle_type: str, fuel_type: str,
+    *, brand, name: str, fuel_type=None,
+    transmission=None, traction_type=None,
     seats=None, doors=None, horsepower=None, payload_kg=None, created_by,
 ):
     if (VehicleModel.objects
@@ -58,8 +124,9 @@ def create_vehicle_model(
     return VehicleModel.objects.create(
         brand=brand,
         name=name,
-        vehicle_type=vehicle_type,
         fuel_type=fuel_type,
+        transmission=transmission,
+        traction_type=traction_type,
         seats=seats,
         doors=doors,
         horsepower=horsepower,
@@ -70,7 +137,8 @@ def create_vehicle_model(
 
 @transaction.atomic
 def update_vehicle_model(model, *, updated_by, **fields):
-    allowed = {"name", "vehicle_type", "fuel_type", "seats", "doors", "horsepower", "payload_kg"}
+    allowed = {"name", "fuel_type_id", "transmission_id",
+               "traction_type_id", "seats", "doors", "horsepower", "payload_kg"}
     for key, val in fields.items():
         if key in allowed:
             setattr(model, key, val)
@@ -89,19 +157,16 @@ def delete_vehicle_model(model, *, deleted_by):
 
 @transaction.atomic
 def create_external_driver(
-    *, company, first_name: str, last_name: str, license_number: str,
+    *, company, employee, license_number: str,
     license_category: str = "B", license_expiry=None,
-    phone: str = "", email: str = "", notes: str = "", created_by,
+    notes: str = "", created_by,
 ):
     return ExternalDriver.objects.create(
         company=company,
-        first_name=first_name,
-        last_name=last_name,
+        employee=employee,
         license_number=license_number,
         license_category=license_category,
         license_expiry=license_expiry,
-        phone=phone,
-        email=email,
         notes=notes,
         created_by=created_by,
     )
@@ -110,8 +175,7 @@ def create_external_driver(
 @transaction.atomic
 def update_external_driver(driver, *, updated_by, **fields):
     allowed = {
-        "first_name", "last_name", "phone", "email",
-        "license_number", "license_category", "license_expiry", "notes",
+        "employee", "license_number", "license_category", "license_expiry", "notes",
     }
     for key, val in fields.items():
         if key in allowed:
@@ -134,6 +198,9 @@ def create_vehicle(
     acquisition_date=None, acquisition_cost=None,
     agency_id=None, internal_driver_id=None, external_driver_id=None,
     tank_capacity_liters=None, notes: str = "",
+    category=None, parking_id=None, tag_ids=None,
+    registration_date=None, fiscal_horsepower=None, catalog_value=None,
+    purchase_value=None, residual_value=None,
     initial_odometer=0, created_by,
 ):
     if (Vehicle.objects
@@ -155,10 +222,20 @@ def create_vehicle(
         external_driver_id=external_driver_id,
         tank_capacity_liters=tank_capacity_liters,
         notes=notes,
+        category=category,
+        parking_id=parking_id,
+        registration_date=registration_date,
+        fiscal_horsepower=fiscal_horsepower,
+        catalog_value=catalog_value,
+        purchase_value=purchase_value,
+        residual_value=residual_value,
         status=Vehicle.Status.AVAILABLE,
         current_odometer=initial_odometer,
         created_by=created_by,
     )
+
+    if tag_ids:
+        vehicle.tags.set(tag_ids)
 
     if initial_odometer:
         OdometerLog.objects.create(
@@ -180,7 +257,10 @@ def update_vehicle(vehicle, *, updated_by, **fields):
         "acquisition_date", "acquisition_cost",
         "agency_id", "internal_driver_id", "external_driver_id",
         "tank_capacity_liters", "notes", "is_active",
+        "category_id", "parking_id", "registration_date",
+        "fiscal_horsepower", "catalog_value", "purchase_value", "residual_value",
     }
+    tag_ids = fields.pop("tag_ids", None)
     if "license_plate" in fields:
         new_plate = fields["license_plate"]
         if (Vehicle.objects
@@ -193,6 +273,8 @@ def update_vehicle(vehicle, *, updated_by, **fields):
             setattr(vehicle, key, val)
     vehicle.updated_by = updated_by
     vehicle.save()
+    if tag_ids is not None:
+        vehicle.tags.set(tag_ids)
     return vehicle
 
 
@@ -225,48 +307,6 @@ def delete_vehicle(vehicle, *, deleted_by):
     if vehicle.status == Vehicle.Status.IN_MAINTENANCE:
         raise ApplicationError(_("Impossible de supprimer un véhicule en maintenance."))
     vehicle.soft_delete(user=deleted_by)
-
-
-# ── Assurances ─────────────────────────────────────────────────────────────────
-
-@transaction.atomic
-def create_insurance(
-    *, vehicle, company_name: str, policy_number: str, insurance_type: str,
-    start_date, end_date, premium_amount,
-    deductible=None, insurer_contact: str = "", notes: str = "", created_by,
-):
-    return Insurance.objects.create(
-        vehicle=vehicle,
-        company_name=company_name,
-        policy_number=policy_number,
-        insurance_type=insurance_type,
-        start_date=start_date,
-        end_date=end_date,
-        premium_amount=premium_amount,
-        deductible=deductible,
-        insurer_contact=insurer_contact,
-        notes=notes,
-        created_by=created_by,
-    )
-
-
-@transaction.atomic
-def update_insurance(insurance, *, updated_by, **fields):
-    allowed = {
-        "company_name", "policy_number", "insurance_type",
-        "start_date", "end_date", "premium_amount",
-        "deductible", "insurer_contact", "notes",
-    }
-    for key, val in fields.items():
-        if key in allowed:
-            setattr(insurance, key, val)
-    insurance.updated_by = updated_by
-    insurance.save()
-    return insurance
-
-
-def delete_insurance(insurance, *, deleted_by):
-    insurance.soft_delete(user=deleted_by)
 
 
 # ── Documents ──────────────────────────────────────────────────────────────────

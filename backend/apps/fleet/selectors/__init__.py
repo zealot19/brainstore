@@ -7,14 +7,17 @@ from .vehicle_selectors import (
     get_vehicle_stats,
     get_fleet_alerts,
     get_fleet_stats,
+    list_parkings, get_parking,
+    list_suppliers, get_supplier,
 )
 from .fuel_selectors import (
     list_fuel_logs, get_fuel_log, list_vehicle_fuel_logs,
 )
-from .maintenance_selectors import (
-    list_maintenance_types, get_maintenance_type,
-    list_maintenance_orders, get_maintenance_order,
-    list_vehicle_maintenance_orders,
+from .operations_selectors import (
+    list_services, get_service, list_vehicle_services,
+    list_service_attachments,
+    list_contracts, get_contract, list_vehicle_contracts,
+    list_recurring_costs,
 )
 from .assignment_selectors import (
     list_assignments, get_assignment, list_vehicle_assignments,
@@ -33,9 +36,10 @@ __all__ = [
     "get_fleet_alerts",
     "get_fleet_stats",
     "list_fuel_logs", "get_fuel_log", "list_vehicle_fuel_logs",
-    "list_maintenance_types", "get_maintenance_type",
-    "list_maintenance_orders", "get_maintenance_order",
-    "list_vehicle_maintenance_orders",
+    "list_services", "get_service", "list_vehicle_services",
+    "list_service_attachments",
+    "list_contracts", "get_contract", "list_vehicle_contracts",
+    "list_recurring_costs",
     "list_assignments", "get_assignment", "list_vehicle_assignments",
     "list_accidents", "get_accident", "list_vehicle_accidents",
 ]

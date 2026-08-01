@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import (
     VehicleBrand, VehicleModel, ExternalDriver, Vehicle,
-    OdometerLog, FuelLog, MaintenanceType, MaintenanceOrder,
-    Insurance, VehicleDocument, Assignment, Accident,
+    OdometerLog, FuelLog, Service,
+    Contract, RecurringCost, VehicleDocument, Assignment, Accident,
 )
 
 
@@ -14,8 +14,8 @@ class VehicleBrandAdmin(admin.ModelAdmin):
 
 @admin.register(VehicleModel)
 class VehicleModelAdmin(admin.ModelAdmin):
-    list_display = ["brand", "name", "vehicle_type", "fuel_type", "seats"]
-    list_filter = ["vehicle_type", "fuel_type", "brand"]
+    list_display = ["brand", "name", "fuel_type", "seats"]
+    list_filter = ["fuel_type", "brand"]
     search_fields = ["name", "brand__name"]
 
 
@@ -29,7 +29,7 @@ class ExternalDriverAdmin(admin.ModelAdmin):
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
     list_display = ["license_plate", "model", "company", "status", "current_odometer", "is_active"]
-    list_filter = ["company", "status", "is_active", "model__vehicle_type"]
+    list_filter = ["company", "status", "is_active", "category"]
     search_fields = ["license_plate", "vin"]
     raw_id_fields = ["model", "agency", "internal_driver", "external_driver"]
 
@@ -48,24 +48,24 @@ class FuelLogAdmin(admin.ModelAdmin):
     raw_id_fields = ["vehicle"]
 
 
-@admin.register(MaintenanceType)
-class MaintenanceTypeAdmin(admin.ModelAdmin):
-    list_display = ["name", "category", "interval_km", "interval_days", "company"]
-    list_filter = ["category", "company"]
-
-
-@admin.register(MaintenanceOrder)
-class MaintenanceOrderAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "maintenance_type", "status", "planned_date", "cost"]
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ["vehicle", "intervention_type", "status", "planned_date", "cost"]
     list_filter = ["status"]
-    raw_id_fields = ["vehicle", "maintenance_type"]
+    raw_id_fields = ["vehicle", "intervention_type", "supplier", "driver"]
 
 
-@admin.register(Insurance)
-class InsuranceAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "company_name", "policy_number", "insurance_type", "end_date"]
-    list_filter = ["insurance_type"]
-    raw_id_fields = ["vehicle"]
+@admin.register(Contract)
+class ContractAdmin(admin.ModelAdmin):
+    list_display = ["name", "vehicle", "intervention_type", "status", "end_date"]
+    list_filter = ["status"]
+    raw_id_fields = ["vehicle", "intervention_type", "supplier", "responsible", "driver"]
+
+
+@admin.register(RecurringCost)
+class RecurringCostAdmin(admin.ModelAdmin):
+    list_display = ["contract", "description", "amount", "currency", "period"]
+    raw_id_fields = ["contract", "period"]
 
 
 @admin.register(VehicleDocument)

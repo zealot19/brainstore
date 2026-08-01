@@ -4,7 +4,8 @@ from apps.core.models import BaseModel
 
 
 class ExternalDriver(BaseModel):
-    """Conducteur externe — non utilisateur du système (prestataire, chauffeur freelance…)."""
+    """Conducteur de la flotte. L'identité provient d'un employé RH ;
+    seules les informations de permis sont propres à la flotte."""
 
     class LicenseCategory(models.TextChoices):
         A  = "A",  _("A — Moto")
@@ -15,10 +16,9 @@ class ExternalDriver(BaseModel):
 
     company    = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                    on_delete=models.CASCADE, related_name="external_drivers")
-    first_name = models.CharField(_("prénom"), max_length=150)
-    last_name  = models.CharField(_("nom"), max_length=150)
-    phone      = models.CharField(_("téléphone"), max_length=30, blank=True)
-    email      = models.EmailField(_("email"), blank=True)
+    employee   = models.ForeignKey("hr.Employee", verbose_name=_("employé (RH)"),
+                                   on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="driver_profiles")
 
     license_number   = models.CharField(_("numéro de permis"), max_length=100)
     license_category = models.CharField(_("catégorie permis"), max_length=2,
@@ -28,13 +28,13 @@ class ExternalDriver(BaseModel):
     notes = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
-        verbose_name = _("conducteur externe")
-        verbose_name_plural = _("conducteurs externes")
-        ordering = ["last_name", "first_name"]
+        verbose_name = _("conducteur")
+        verbose_name_plural = _("conducteurs")
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.full_name} — {self.license_number}"
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip()
+        return self.employee.full_name if self.employee_id else "(sans employé)"

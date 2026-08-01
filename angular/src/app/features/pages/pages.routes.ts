@@ -7,6 +7,44 @@ export const Pages_routes: Routes = [
     path: '', loadComponent: () => import('./pages.component').then((m) => m.PagesComponent),
     canActivate: [authGuard],
     children: [
+            // ── MODULE : Gestion de flotte ────────────────────────────────────────────
+            {
+              path: 'fleet',
+              loadComponent: () => import('../../../_api/pages/fleet/fleet.component').then(m => m.FleetComponent),
+              children: [
+                { path: 'dashboard',          loadComponent: () => import('../../../_api/pages/fleet/dashboard/dashboard.component').then(m => m.FleetDashboardComponent) },
+                { path: 'brands',             loadComponent: () => import('../../../_api/pages/fleet/brands/brands.component').then(m => m.FleetBrandsComponent) },
+                { path: 'models',             loadComponent: () => import('../../../_api/pages/fleet/models/models.component').then(m => m.FleetModelsComponent) },
+                { path: 'vehicles',           loadComponent: () => import('../../../_api/pages/fleet/vehicles/vehicles.component').then(m => m.FleetVehiclesComponent) },
+                { path: 'external-drivers',   loadComponent: () => import('../../../_api/pages/fleet/external-drivers/external-drivers.component').then(m => m.FleetExternalDriversComponent) },
+                { path: 'fuel-logs',          loadComponent: () => import('../../../_api/pages/fleet/fuel-logs/fuel-logs.component').then(m => m.FleetFuelLogsComponent) },
+                { path: 'services',  loadComponent: () => import('../../../_api/pages/fleet/services/services.component').then(m => m.FleetServicesComponent) },
+                { path: 'contracts', loadComponent: () => import('../../../_api/pages/fleet/contracts/contracts.component').then(m => m.FleetContractsComponent) },
+                { path: 'documents',          loadComponent: () => import('../../../_api/pages/fleet/documents/documents.component').then(m => m.FleetDocumentsComponent) },
+                { path: 'assignments',        loadComponent: () => import('../../../_api/pages/fleet/assignments/assignments.component').then(m => m.FleetAssignmentsComponent) },
+                { path: 'accidents',          loadComponent: () => import('../../../_api/pages/fleet/accidents/accidents.component').then(m => m.FleetAccidentsComponent) },
+                { path: 'parking',            loadComponent: () => import('../../../_api/pages/fleet/parking/parking.component').then(m => m.FleetParkingComponent) },
+                { path: 'suppliers',          loadComponent: () => import('../../../_api/pages/fleet/suppliers/suppliers.component').then(m => m.FleetSuppliersComponent) },
+              ],
+            },
+            // ── MODULE : Config Flotte ────────────────────────────────────────────────
+            {
+              path: 'fleet-config',
+              loadComponent: () => import('../../../_api/pages/fleet-config/fleet-config.component').then(m => m.FleetConfigComponent),
+              children: [
+                { path: 'vehicle-categories', loadComponent: () => import('../../../_api/pages/fleet-config/vehicle-categories/vehicle-categories.component').then(m => m.FcVehicleCategoriesComponent) },
+                { path: 'fuel-types',         loadComponent: () => import('../../../_api/pages/fleet-config/fuel-types/fuel-types.component').then(m => m.FcFuelTypesComponent) },
+                { path: 'transmissions',      loadComponent: () => import('../../../_api/pages/fleet-config/transmissions/transmissions.component').then(m => m.FcTransmissionsComponent) },
+                { path: 'traction-types',     loadComponent: () => import('../../../_api/pages/fleet-config/traction-types/traction-types.component').then(m => m.FcTractionTypesComponent) },
+                { path: 'unit-categories',    loadComponent: () => import('../../../_api/pages/fleet-config/unit-categories/unit-categories.component').then(m => m.FcUnitCategoriesComponent) },
+                { path: 'units',              loadComponent: () => import('../../../_api/pages/fleet-config/units/units.component').then(m => m.FcUnitsComponent) },
+                { path: 'periods',            loadComponent: () => import('../../../_api/pages/fleet-config/periods/periods.component').then(m => m.FcPeriodsComponent) },
+                { path: 'document-types',     loadComponent: () => import('../../../_api/pages/fleet-config/document-types/document-types.component').then(m => m.FcDocumentTypesComponent) },
+                { path: 'tags',               loadComponent: () => import('../../../_api/pages/fleet-config/tags/tags.component').then(m => m.FcTagsComponent) },
+                { path: 'intervention-types', loadComponent: () => import('../../../_api/pages/fleet-config/intervention-types/intervention-types.component').then(m => m.FcInterventionTypesComponent) },
+                { path: 'activity-sectors',   loadComponent: () => import('../../../_api/pages/fleet-config/activity-sectors/activity-sectors.component').then(m => m.FcActivitySectorsComponent) },
+              ],
+            },
 
       {
         path: 'dashboard', loadComponent: () => import('./dashboards/dashboard.component').then(m => m.DashboardComponent),

@@ -57,6 +57,51 @@ export class SidebarService {
       hasSubRoute: false,
       showSubRoute: true,
       menu: [
+        // ── MODULE 6 : Config Flotte ──────────────────────────────────────────
+        {
+          menuValue: 'Config Flotte',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'fleet-config',
+          subMenus: [
+            { menuValue: 'Catégories véhicule', route: routes.fcVehicleCategories, base: 'vehicle-categories' },
+            { menuValue: 'Carburants',          route: routes.fcFuelTypes,         base: 'fuel-types'         },
+            { menuValue: 'Transmissions',       route: routes.fcTransmissions,     base: 'transmissions'      },
+            { menuValue: 'Tractions',           route: routes.fcTractionTypes,     base: 'traction-types'     },
+            { menuValue: "Catégories d'unité",  route: routes.fcUnitCategories,    base: 'unit-categories'    },
+            { menuValue: 'Unités',              route: routes.fcUnits,             base: 'units'              },
+            { menuValue: 'Périodes',            route: routes.fcPeriods,           base: 'periods'            },
+            { menuValue: 'Types de document',   route: routes.fcDocumentTypes,     base: 'document-types'     },
+            { menuValue: 'Étiquettes',          route: routes.fcTags,              base: 'tags'               },
+            { menuValue: "Types d'intervention",route: routes.fcInterventionTypes, base: 'intervention-types' },
+            { menuValue: "Secteurs d'activité", route: routes.fcActivitySectors,   base: 'activity-sectors'   },
+          ],
+        },
+        // ── MODULE 6 : Gestion Flotte ─────────────────────────────────────────
+        {
+          menuValue: 'Gestion Flotte',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'car',
+          base: 'fleet',
+          subMenus: [
+            { menuValue: 'Tableau de bord',    route: routes.fleetDashboard,         base: 'dashboard'          },
+            { menuValue: 'Véhicules',          route: routes.fleetVehicles,          base: 'vehicles'           },
+            { menuValue: 'Marques',            route: routes.fleetBrands,            base: 'brands'             },
+            { menuValue: 'Modèles',            route: routes.fleetModels,            base: 'models'             },
+            { menuValue: 'Conducteurs ext.',   route: routes.fleetExternalDrivers,   base: 'external-drivers'   },
+            { menuValue: 'Carburant',          route: routes.fleetFuelLogs,          base: 'fuel-logs'          },
+            { menuValue: 'Services',           route: routes.fleetServices,          base: 'services'           },
+            { menuValue: 'Contrats',           route: routes.fleetContracts,         base: 'contracts'          },
+            { menuValue: 'Documents',          route: routes.fleetDocuments,         base: 'documents'          },
+            { menuValue: 'Missions',           route: routes.fleetAssignments,       base: 'assignments'        },
+            { menuValue: 'Accidents',          route: routes.fleetAccidents,         base: 'accidents'          },
+            { menuValue: 'Parkings',           route: routes.fleetParking,           base: 'parking'            },
+            { menuValue: 'Fournisseurs',       route: routes.fleetSuppliers,         base: 'suppliers'          },
+          ],
+        },
+
         {
           menuValue: 'Dashboard',
           hasSubRoute: true,

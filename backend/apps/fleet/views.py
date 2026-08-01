@@ -16,10 +16,11 @@ from .serializers import (
     VehicleCreateSerializer, VehicleUpdateSerializer, OdometerUpdateSerializer,
     OdometerLogSerializer,
     FuelLogSerializer, FuelLogWriteSerializer,
-    MaintenanceTypeSerializer, MaintenanceTypeWriteSerializer,
-    MaintenanceOrderSerializer, MaintenanceOrderCreateSerializer,
-    MaintenanceOrderUpdateSerializer, MaintenanceCompleteSerializer,
-    InsuranceSerializer, InsuranceWriteSerializer,
+    ServiceSerializer, ServiceCreateSerializer,
+    ServiceUpdateSerializer, ServiceCompleteSerializer,
+    ServiceAttachmentSerializer,
+    ContractSerializer, ContractWriteSerializer, ContractUpdateSerializer,
+    RecurringCostSerializer, RecurringCostWriteSerializer,
     VehicleDocumentSerializer, VehicleDocumentWriteSerializer,
     AssignmentListSerializer, AssignmentDetailSerializer,
     AssignmentCreateSerializer, AssignmentUpdateSerializer,
@@ -27,8 +28,12 @@ from .serializers import (
     AccidentListSerializer, AccidentDetailSerializer,
     AccidentCreateSerializer, AccidentUpdateSerializer,
     AccidentCloseSerializer, AccidentStatusSerializer,
+    ParkingSerializer, ParkingWriteSerializer,
+    SupplierSerializer, SupplierWriteSerializer,
 )
-from .models import VehicleModel, Vehicle, MaintenanceType, MaintenanceOrder, Assignment, Accident
+from .models import (VehicleModel, Vehicle, Service,
+                     Assignment, Accident, VehicleCategoryCfg)
+from apps.core.models import Attachment
 
 
 # ── Utilitaires ────────────────────────────────────────────────────────────────
@@ -58,6 +63,16 @@ def _parse_bool(v):
     if v is None:
         return None
     return str(v).lower() in ("true", "1", "yes")
+
+
+def _cfg(model_cls, cid, company_id):
+    """Return a Config Flotte row by id if global or owned by the company, else None."""
+    if not cid:
+        return None
+    from django.db.models import Q
+    return model_cls.objects.filter(
+        Q(company_id=company_id) | Q(company__isnull=True), id=cid, is_deleted=False
+    ).first()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -130,7 +145,6 @@ class VehicleModelListView(APIView):
     def get(self, request):
         models = selectors.list_vehicle_models(
             brand_id=request.query_params.get("brand_id"),
-            vehicle_type=request.query_params.get("vehicle_type"),
             search=request.query_params.get("search"),
         )
         paginator = StandardResultsSetPagination()
@@ -144,12 +158,17 @@ class VehicleModelListView(APIView):
         brand = selectors.get_vehicle_brand(d["brand_id"])
         if not brand:
             return error_response(_("Marque introuvable."), status_code=404)
+        from .models import FuelType, Transmission, TractionType
+        company_id = _scope_company_id(request)
+        ft = _cfg(FuelType, d.get("fuel_type_id"), company_id)
+        tr = _cfg(Transmission, d.get("transmission_id"), company_id)
+        tc = _cfg(TractionType, d.get("traction_type_id"), company_id)
         try:
             model = services.create_vehicle_model(
                 brand=brand, name=d["name"],
-                vehicle_type=d["vehicle_type"], fuel_type=d["fuel_type"],
-                seats=d["seats"], doors=d["doors"],
-                horsepower=d["horsepower"], payload_kg=d["payload_kg"],
+                fuel_type=ft, transmission=tr, traction_type=tc,
+                seats=d.get("seats"), doors=d.get("doors"),
+                horsepower=d.get("horsepower"), payload_kg=d.get("payload_kg"),
                 created_by=request.user,
             )
         except ApplicationError as e:
@@ -178,6 +197,12 @@ class VehicleModelDetailView(APIView):
             if not brand:
                 return error_response(_("Marque introuvable."), status_code=404)
             d["brand_id"] = brand.id
+        from .models import FuelType, Transmission, TractionType
+        company_id = _scope_company_id(request)
+        for key, cls in (("fuel_type_id", FuelType),
+                         ("transmission_id", Transmission), ("traction_type_id", TractionType)):
+            if d.get(key) and not _cfg(cls, d[key], company_id):
+                return error_response(_("Référence de configuration introuvable."), status_code=404)
         try:
             model = services.update_vehicle_model(model, updated_by=request.user, **d)
         except ApplicationError as e:
@@ -217,8 +242,12 @@ class ExternalDriverListView(APIView):
             return err
         payload = ExternalDriverWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        d = payload.validated_data
-        driver = services.create_external_driver(company=company, created_by=request.user, **d)
+        d = dict(payload.validated_data)
+        employee = _get_employee(d.pop("employee_id"), company.id)
+        if not employee:
+            return error_response(_("Employé RH introuvable dans votre institution."), status_code=404)
+        driver = services.create_external_driver(company=company, employee=employee,
+                                                 created_by=request.user, **d)
         return created_response(ExternalDriverSerializer(driver).data)
 
 
@@ -241,7 +270,13 @@ class ExternalDriverDetailView(APIView):
             return error_response(_("Conducteur externe introuvable."), status_code=404)
         payload = ExternalDriverWriteSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
-        driver = services.update_external_driver(driver, updated_by=request.user, **payload.validated_data)
+        d = dict(payload.validated_data)
+        if "employee_id" in d:
+            employee = _get_employee(d.pop("employee_id"), driver.company_id)
+            if not employee:
+                return error_response(_("Employé RH introuvable dans votre institution."), status_code=404)
+            d["employee"] = employee
+        driver = services.update_external_driver(driver, updated_by=request.user, **d)
         return success_response(ExternalDriverSerializer(driver).data)
 
     def delete(self, request, driver_id):
@@ -267,7 +302,7 @@ class VehicleListView(APIView):
             company_id,
             agency_id=request.query_params.get("agency_id"),
             status=request.query_params.get("status"),
-            vehicle_type=request.query_params.get("vehicle_type"),
+            category=request.query_params.get("category"),
             is_active=_parse_bool(request.query_params.get("is_active")),
             search=request.query_params.get("search"),
         )
@@ -285,6 +320,11 @@ class VehicleListView(APIView):
         model = selectors.get_vehicle_model(d["model_id"])
         if not model:
             return error_response(_("Modèle de véhicule introuvable."), status_code=404)
+        company_id = str(company.id)
+        category = _cfg(VehicleCategoryCfg, d.get("category_id"), company_id)
+        parking_id = d.get("parking_id")
+        if parking_id and not selectors.get_parking(parking_id, company_id):
+            return error_response(_("Parking introuvable."), status_code=404)
         try:
             vehicle = services.create_vehicle(
                 company=company, model=model,
@@ -296,6 +336,12 @@ class VehicleListView(APIView):
                 internal_driver_id=d["internal_driver_id"],
                 external_driver_id=d["external_driver_id"],
                 tank_capacity_liters=d["tank_capacity_liters"],
+                category=category, parking_id=parking_id, tag_ids=d.get("tag_ids"),
+                registration_date=d.get("registration_date"),
+                fiscal_horsepower=d.get("fiscal_horsepower"),
+                catalog_value=d.get("catalog_value"),
+                purchase_value=d.get("purchase_value"),
+                residual_value=d.get("residual_value"),
                 initial_odometer=d["initial_odometer"],
                 notes=d["notes"],
                 created_by=request.user,
@@ -324,8 +370,14 @@ class VehicleDetailView(APIView):
             return error_response(_("Véhicule introuvable."), status_code=404)
         payload = VehicleUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        company_id = _scope_company_id(request)
+        if d.get("category_id") and not _cfg(VehicleCategoryCfg, d["category_id"], company_id):
+            return error_response(_("Catégorie introuvable."), status_code=404)
+        if d.get("parking_id") and not selectors.get_parking(d["parking_id"], company_id):
+            return error_response(_("Parking introuvable."), status_code=404)
         try:
-            vehicle = services.update_vehicle(vehicle, updated_by=request.user, **payload.validated_data)
+            vehicle = services.update_vehicle(vehicle, updated_by=request.user, **d)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(VehicleDetailSerializer(vehicle).data)
@@ -338,6 +390,106 @@ class VehicleDetailView(APIView):
             services.delete_vehicle(vehicle, deleted_by=request.user)
         except ApplicationError as e:
             return error_response(str(e))
+        return no_content_response()
+
+
+class ParkingListView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        company_id = _scope_company_id(request)
+        if not company_id:
+            return error_response(_("company_id requis."))
+        rows = selectors.list_parkings(company_id, search=request.query_params.get("search"))
+        return success_response(ParkingSerializer(rows, many=True).data)
+
+    def post(self, request):
+        company, err = _resolve_company(request, request.data.get("company_id"))
+        if err:
+            return err
+        payload = ParkingWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        p = services.create_parking(company=company, created_by=request.user, **payload.validated_data)
+        return created_response(ParkingSerializer(p).data)
+
+
+class ParkingDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def _get(self, request, parking_id):
+        return selectors.get_parking(parking_id, _scope_company_id(request))
+
+    def get(self, request, parking_id):
+        p = self._get(request, parking_id)
+        return success_response(ParkingSerializer(p).data) if p else error_response(_("Parking introuvable."), status_code=404)
+
+    def patch(self, request, parking_id):
+        p = self._get(request, parking_id)
+        if not p:
+            return error_response(_("Parking introuvable."), status_code=404)
+        payload = ParkingWriteSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        p = services.update_parking(p, updated_by=request.user, **payload.validated_data)
+        return success_response(ParkingSerializer(p).data)
+
+    def delete(self, request, parking_id):
+        p = self._get(request, parking_id)
+        if not p:
+            return error_response(_("Parking introuvable."), status_code=404)
+        services.delete_parking(p, deleted_by=request.user)
+        return no_content_response()
+
+
+class SupplierListView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        company_id = _scope_company_id(request)
+        if not company_id:
+            return error_response(_("company_id requis."))
+        rows = selectors.list_suppliers(company_id, search=request.query_params.get("search"))
+        return success_response(SupplierSerializer(rows, many=True).data)
+
+    def post(self, request):
+        company, err = _resolve_company(request, request.data.get("company_id"))
+        if err:
+            return err
+        payload = SupplierWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        try:
+            sup = services.create_supplier(company=company, created_by=request.user, **payload.validated_data)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(SupplierSerializer(sup).data)
+
+
+class SupplierDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def _get(self, request, supplier_id):
+        return selectors.get_supplier(supplier_id, _scope_company_id(request))
+
+    def get(self, request, supplier_id):
+        s = self._get(request, supplier_id)
+        return success_response(SupplierSerializer(s).data) if s else error_response(_("Fournisseur introuvable."), status_code=404)
+
+    def patch(self, request, supplier_id):
+        s = self._get(request, supplier_id)
+        if not s:
+            return error_response(_("Fournisseur introuvable."), status_code=404)
+        payload = SupplierWriteSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        try:
+            s = services.update_supplier(s, updated_by=request.user, **payload.validated_data)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(SupplierSerializer(s).data)
+
+    def delete(self, request, supplier_id):
+        s = self._get(request, supplier_id)
+        if not s:
+            return error_response(_("Fournisseur introuvable."), status_code=404)
+        services.delete_supplier(s, deleted_by=request.user)
         return no_content_response()
 
 
@@ -395,9 +547,9 @@ class FleetAlertsView(APIView):
             days = 30
         alerts = selectors.get_fleet_alerts(company_id, days_ahead=days)
         return success_response({
-            "expiring_insurance": InsuranceSerializer(alerts["expiring_insurance"], many=True).data,
+            "expiring_contracts": ContractSerializer(alerts["expiring_contracts"], many=True).data,
             "expiring_documents": VehicleDocumentSerializer(alerts["expiring_documents"], many=True).data,
-            "overdue_maintenance": MaintenanceOrderSerializer(alerts["overdue_maintenance"], many=True).data,
+            "overdue_maintenance": ServiceSerializer(alerts["overdue_maintenance"], many=True).data,
         })
 
 
@@ -473,77 +625,17 @@ class FuelLogDetailView(APIView):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# MAINTENANCE TYPES
+# SERVICES / INTERVENTIONS
 # ══════════════════════════════════════════════════════════════════════════════
 
-class MaintenanceTypeListView(APIView):
+class ServiceListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
             return error_response(_("company_id requis."))
-        types = selectors.list_maintenance_types(company_id, search=request.query_params.get("search"))
-        paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(types, request)
-        return paginator.get_paginated_response(MaintenanceTypeSerializer(page, many=True).data)
-
-    def post(self, request):
-        company, err = _resolve_company(request, request.data.get("company_id"))
-        if err:
-            return err
-        payload = MaintenanceTypeWriteSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        d = payload.validated_data
-        mtype = services.create_maintenance_type(company=company, created_by=request.user, **d)
-        return created_response(MaintenanceTypeSerializer(mtype).data)
-
-
-class MaintenanceTypeDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
-
-    def _get(self, request, type_id):
-        company_id = _scope_company_id(request)
-        return selectors.get_maintenance_type(type_id, company_id)
-
-    def get(self, request, type_id):
-        mtype = self._get(request, type_id)
-        if not mtype:
-            return error_response(_("Type introuvable."), status_code=404)
-        return success_response(MaintenanceTypeSerializer(mtype).data)
-
-    def patch(self, request, type_id):
-        mtype = self._get(request, type_id)
-        if not mtype:
-            return error_response(_("Type introuvable."), status_code=404)
-        payload = MaintenanceTypeWriteSerializer(data=request.data, partial=True)
-        payload.is_valid(raise_exception=True)
-        mtype = services.update_maintenance_type(mtype, updated_by=request.user, **payload.validated_data)
-        return success_response(MaintenanceTypeSerializer(mtype).data)
-
-    def delete(self, request, type_id):
-        mtype = self._get(request, type_id)
-        if not mtype:
-            return error_response(_("Type introuvable."), status_code=404)
-        try:
-            services.delete_maintenance_type(mtype, deleted_by=request.user)
-        except ApplicationError as e:
-            return error_response(str(e))
-        return no_content_response()
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# MAINTENANCE ORDERS
-# ══════════════════════════════════════════════════════════════════════════════
-
-class MaintenanceOrderListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
-
-    def get(self, request):
-        company_id = _scope_company_id(request)
-        if not company_id:
-            return error_response(_("company_id requis."))
-        orders = selectors.list_maintenance_orders(
+        services_qs = selectors.list_services(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),
             status=request.query_params.get("status"),
@@ -551,194 +643,420 @@ class MaintenanceOrderListView(APIView):
             date_to=request.query_params.get("date_to"),
         )
         paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(orders, request)
-        return paginator.get_paginated_response(MaintenanceOrderSerializer(page, many=True).data)
+        page = paginator.paginate_queryset(services_qs, request)
+        return paginator.get_paginated_response(ServiceSerializer(page, many=True).data)
+
+    def post(self, request):
+        company_id = _scope_company_id(request)
+        if not company_id:
+            return error_response(_("company_id requis."))
+        payload = ServiceCreateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        vehicle = selectors.get_vehicle(d["vehicle_id"], company_id)
+        if not vehicle:
+            return error_response(_("Véhicule introuvable."), status_code=404)
+        intervention_type = _get_intervention_type(d["intervention_type_id"], company_id)
+        if not intervention_type:
+            return error_response(_("Type d'intervention introuvable."), status_code=404)
+        supplier = None
+        if d.get("supplier_id"):
+            supplier = selectors.get_supplier(d["supplier_id"], company_id)
+            if not supplier:
+                return error_response(_("Fournisseur introuvable."), status_code=404)
+        driver = None
+        if d.get("driver_id"):
+            driver = selectors.get_external_driver(d["driver_id"], company_id)
+            if not driver:
+                return error_response(_("Conducteur introuvable."), status_code=404)
+        try:
+            service = services.create_service(
+                vehicle=vehicle, intervention_type=intervention_type,
+                planned_date=d["planned_date"], description=d["description"],
+                supplier=supplier, driver=driver, currency=d["currency"],
+                notes=d["notes"], created_by=request.user,
+            )
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(ServiceSerializer(service).data)
 
 
-class VehicleMaintenanceListView(APIView):
+class VehicleServiceListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
-        orders = selectors.list_vehicle_maintenance_orders(
+        qs = selectors.list_vehicle_services(
             vehicle_id, company_id, status=request.query_params.get("status")
         )
-        if orders is None:
+        if qs is None:
             return error_response(_("Véhicule introuvable."), status_code=404)
         paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(orders, request)
-        return paginator.get_paginated_response(MaintenanceOrderSerializer(page, many=True).data)
-
-    def post(self, request, vehicle_id):
-        company_id = _scope_company_id(request)
-        vehicle = selectors.get_vehicle(vehicle_id, company_id)
-        if not vehicle:
-            return error_response(_("Véhicule introuvable."), status_code=404)
-        payload = MaintenanceOrderCreateSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        d = payload.validated_data
-        company_id_for_type = _scope_company_id(request)
-        mtype = selectors.get_maintenance_type(d["maintenance_type_id"], company_id_for_type)
-        if not mtype:
-            return error_response(_("Type de maintenance introuvable."), status_code=404)
-        try:
-            order = services.create_maintenance_order(
-                vehicle=vehicle, maintenance_type=mtype,
-                planned_date=d["planned_date"],
-                provider=d["provider"], notes=d["notes"],
-                created_by=request.user,
-            )
-        except ApplicationError as e:
-            return error_response(str(e))
-        return created_response(MaintenanceOrderSerializer(order).data)
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ServiceSerializer(page, many=True).data)
 
 
-class MaintenanceOrderDetailView(APIView):
+class ServiceDetailView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
-    def _get(self, request, order_id):
+    def _get(self, request, service_id):
         company_id = _scope_company_id(request)
-        return selectors.get_maintenance_order(order_id, company_id)
+        return selectors.get_service(service_id, company_id)
 
-    def get(self, request, order_id):
-        order = self._get(request, order_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
-        return success_response(MaintenanceOrderSerializer(order).data)
+    def get(self, request, service_id):
+        service = self._get(request, service_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        return success_response(ServiceSerializer(service).data)
 
-    def patch(self, request, order_id):
-        order = self._get(request, order_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
-        payload = MaintenanceOrderUpdateSerializer(data=request.data, partial=True)
+    def patch(self, request, service_id):
+        service = self._get(request, service_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        company_id = _scope_company_id(request)
+        payload = ServiceUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
+        d = dict(payload.validated_data)
+        if "intervention_type_id" in d:
+            itype = _get_intervention_type(d.pop("intervention_type_id"), company_id)
+            if not itype:
+                return error_response(_("Type d'intervention introuvable."), status_code=404)
+            d["intervention_type"] = itype
+        if "supplier_id" in d:
+            sid = d.pop("supplier_id")
+            d["supplier"] = selectors.get_supplier(sid, company_id) if sid else None
+        if "driver_id" in d:
+            drid = d.pop("driver_id")
+            d["driver"] = selectors.get_external_driver(drid, company_id) if drid else None
         try:
-            order = services.update_maintenance_order(order, updated_by=request.user, **payload.validated_data)
+            service = services.update_service(service, updated_by=request.user, **d)
         except ApplicationError as e:
             return error_response(str(e))
-        return success_response(MaintenanceOrderSerializer(order).data)
+        return success_response(ServiceSerializer(service).data)
 
-    def delete(self, request, order_id):
-        order = self._get(request, order_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
+    def delete(self, request, service_id):
+        service = self._get(request, service_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
         try:
-            services.delete_maintenance_order(order, deleted_by=request.user)
+            services.delete_service(service, deleted_by=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return no_content_response()
 
 
-class MaintenanceOrderStartView(APIView):
+class ServiceStartView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
-    def post(self, request, order_id):
+    def post(self, request, service_id):
         company_id = _scope_company_id(request)
-        order = selectors.get_maintenance_order(order_id, company_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
         try:
-            order = services.start_maintenance(order, updated_by=request.user)
+            service = services.start_service(service, updated_by=request.user)
         except ApplicationError as e:
             return error_response(str(e))
-        return success_response(MaintenanceOrderSerializer(order).data)
+        return success_response(ServiceSerializer(service).data)
 
 
-class MaintenanceOrderCompleteView(APIView):
+class ServiceCompleteView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
-    def post(self, request, order_id):
+    def post(self, request, service_id):
         company_id = _scope_company_id(request)
-        order = selectors.get_maintenance_order(order_id, company_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
-        payload = MaintenanceCompleteSerializer(data=request.data)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        payload = ServiceCompleteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        d = payload.validated_data
         try:
-            order = services.complete_maintenance(order, updated_by=request.user, **d)
+            service = services.complete_service(service, updated_by=request.user, **payload.validated_data)
         except ApplicationError as e:
             return error_response(str(e))
-        return success_response(MaintenanceOrderSerializer(order).data)
+        return success_response(ServiceSerializer(service).data)
 
 
-class MaintenanceOrderCancelView(APIView):
+class ServiceCancelView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
-    def post(self, request, order_id):
+    def post(self, request, service_id):
         company_id = _scope_company_id(request)
-        order = selectors.get_maintenance_order(order_id, company_id)
-        if not order:
-            return error_response(_("Ordre introuvable."), status_code=404)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
         try:
-            order = services.cancel_maintenance(order, updated_by=request.user)
+            service = services.cancel_service(service, updated_by=request.user)
         except ApplicationError as e:
             return error_response(str(e))
-        return success_response(MaintenanceOrderSerializer(order).data)
+        return success_response(ServiceSerializer(service).data)
+
+
+class ServiceAttachmentListView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, service_id):
+        company_id = _scope_company_id(request)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        items = selectors.list_service_attachments(service)
+        return success_response(ServiceAttachmentSerializer(items, many=True).data)
+
+    def post(self, request, service_id):
+        company_id = _scope_company_id(request)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        file = request.FILES.get("file")
+        if not file:
+            return error_response(_("Aucun fichier fourni."))
+        att = services.add_service_attachment(
+            service, file=file,
+            name=request.data.get("name", ""),
+            description=request.data.get("description", ""),
+            created_by=request.user,
+        )
+        return created_response(ServiceAttachmentSerializer(att).data)
+
+
+class ServiceAttachmentDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def delete(self, request, service_id, att_id):
+        company_id = _scope_company_id(request)
+        service = selectors.get_service(service_id, company_id)
+        if not service:
+            return error_response(_("Intervention introuvable."), status_code=404)
+        from django.contrib.contenttypes.models import ContentType
+        ct = ContentType.objects.get_for_model(Service)
+        try:
+            att = Attachment.objects.get(id=att_id, content_type=ct,
+                                         object_id=service.id, is_deleted=False)
+        except Attachment.DoesNotExist:
+            return error_response(_("Pièce jointe introuvable."), status_code=404)
+        services.delete_service_attachment(att, deleted_by=request.user)
+        return no_content_response()
+
+
+def _get_intervention_type(type_id, company_id):
+    from django.db.models import Q
+    from apps.fleet.models import InterventionType
+    try:
+        return InterventionType.objects.get(
+            Q(company_id=company_id) | Q(company__isnull=True),
+            id=type_id, is_deleted=False,
+        )
+    except InterventionType.DoesNotExist:
+        return None
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # INSURANCE
 # ══════════════════════════════════════════════════════════════════════════════
 
-class VehicleInsuranceListView(APIView):
+class VehicleContractListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
-        vehicle = selectors.get_vehicle(vehicle_id, company_id)
-        if not vehicle:
+        qs = selectors.list_vehicle_contracts(vehicle_id, company_id)
+        if qs is None:
             return error_response(_("Véhicule introuvable."), status_code=404)
-        insurances = vehicle.insurances.filter(is_deleted=False).order_by("-end_date")
         paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(insurances, request)
-        return paginator.get_paginated_response(InsuranceSerializer(page, many=True).data)
-
-    def post(self, request, vehicle_id):
-        company_id = _scope_company_id(request)
-        vehicle = selectors.get_vehicle(vehicle_id, company_id)
-        if not vehicle:
-            return error_response(_("Véhicule introuvable."), status_code=404)
-        payload = InsuranceWriteSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        insurance = services.create_insurance(vehicle=vehicle, created_by=request.user, **payload.validated_data)
-        return created_response(InsuranceSerializer(insurance).data)
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ContractSerializer(page, many=True).data)
 
 
-class InsuranceDetailView(APIView):
+def _resolve_contract_fks(d, company_id):
+    """Resolve *_id keys in validated data to model instances. Returns (kwargs, error)."""
+    kwargs = {}
+    if "intervention_type_id" in d:
+        it = _get_intervention_type(d["intervention_type_id"], company_id)
+        if not it:
+            return None, _("Type d'intervention introuvable.")
+        kwargs["intervention_type"] = it
+    if "supplier_id" in d:
+        sid = d["supplier_id"]
+        kwargs["supplier"] = selectors.get_supplier(sid, company_id) if sid else None
+    if "driver_id" in d:
+        drid = d["driver_id"]
+        kwargs["driver"] = selectors.get_external_driver(drid, company_id) if drid else None
+    if "billing_period_id" in d:
+        pid = d["billing_period_id"]
+        kwargs["billing_period"] = _get_period(pid, company_id) if pid else None
+    if "responsible_id" in d:
+        rid = d["responsible_id"]
+        kwargs["responsible"] = _get_employee(rid, company_id) if rid else None
+    return kwargs, None
+
+
+class ContractListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
-    def _get(self, request, insurance_id):
+    def get(self, request):
         company_id = _scope_company_id(request)
-        from apps.fleet.models import Insurance
-        try:
-            return Insurance.objects.get(
-                id=insurance_id, vehicle__company_id=company_id, is_deleted=False
-            )
-        except Insurance.DoesNotExist:
-            return None
+        if not company_id:
+            return error_response(_("company_id requis."))
+        qs = selectors.list_contracts(
+            company_id,
+            vehicle_id=request.query_params.get("vehicle_id"),
+            status=request.query_params.get("status"),
+        )
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ContractSerializer(page, many=True).data)
 
-    def get(self, request, insurance_id):
-        ins = self._get(request, insurance_id)
-        if not ins:
-            return error_response(_("Assurance introuvable."), status_code=404)
-        return success_response(InsuranceSerializer(ins).data)
-
-    def patch(self, request, insurance_id):
-        ins = self._get(request, insurance_id)
-        if not ins:
-            return error_response(_("Assurance introuvable."), status_code=404)
-        payload = InsuranceWriteSerializer(data=request.data, partial=True)
+    def post(self, request):
+        company_id = _scope_company_id(request)
+        if not company_id:
+            return error_response(_("company_id requis."))
+        payload = ContractWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        ins = services.update_insurance(ins, updated_by=request.user, **payload.validated_data)
-        return success_response(InsuranceSerializer(ins).data)
+        d = dict(payload.validated_data)
+        vehicle = selectors.get_vehicle(d.pop("vehicle_id"), company_id)
+        if not vehicle:
+            return error_response(_("Véhicule introuvable."), status_code=404)
+        fk_kwargs, err = _resolve_contract_fks(d, company_id)
+        if err:
+            return error_response(err, status_code=404)
+        for k in ("supplier_id", "driver_id", "billing_period_id", "responsible_id",
+                  "intervention_type_id"):
+            d.pop(k, None)
+        included = d.pop("included_service_ids", [])
+        contract = services.create_contract(
+            vehicle=vehicle, created_by=request.user,
+            included_service_ids=included, **fk_kwargs, **d,
+        )
+        return created_response(ContractSerializer(selectors.get_contract(contract.id, company_id)).data)
 
-    def delete(self, request, insurance_id):
-        ins = self._get(request, insurance_id)
-        if not ins:
-            return error_response(_("Assurance introuvable."), status_code=404)
-        services.delete_insurance(ins, deleted_by=request.user)
+
+class ContractDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def _get(self, request, contract_id):
+        company_id = _scope_company_id(request)
+        return selectors.get_contract(contract_id, company_id)
+
+    def get(self, request, contract_id):
+        contract = self._get(request, contract_id)
+        if not contract:
+            return error_response(_("Contrat introuvable."), status_code=404)
+        return success_response(ContractSerializer(contract).data)
+
+    def patch(self, request, contract_id):
+        contract = self._get(request, contract_id)
+        if not contract:
+            return error_response(_("Contrat introuvable."), status_code=404)
+        company_id = _scope_company_id(request)
+        payload = ContractUpdateSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        d = dict(payload.validated_data)
+        d.pop("vehicle_id", None)
+        fk_kwargs, err = _resolve_contract_fks(d, company_id)
+        if err:
+            return error_response(err, status_code=404)
+        for k in ("supplier_id", "driver_id", "billing_period_id", "responsible_id",
+                  "intervention_type_id"):
+            d.pop(k, None)
+        included = d.pop("included_service_ids", None)
+        contract = services.update_contract(
+            contract, updated_by=request.user,
+            included_service_ids=included, **fk_kwargs, **d,
+        )
+        return success_response(ContractSerializer(selectors.get_contract(contract.id, company_id)).data)
+
+    def delete(self, request, contract_id):
+        contract = self._get(request, contract_id)
+        if not contract:
+            return error_response(_("Contrat introuvable."), status_code=404)
+        services.delete_contract(contract, deleted_by=request.user)
         return no_content_response()
+
+
+class RecurringCostListView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, contract_id):
+        company_id = _scope_company_id(request)
+        contract = selectors.get_contract(contract_id, company_id)
+        if not contract:
+            return error_response(_("Contrat introuvable."), status_code=404)
+        items = selectors.list_recurring_costs(contract)
+        return success_response(RecurringCostSerializer(items, many=True).data)
+
+    def post(self, request, contract_id):
+        company_id = _scope_company_id(request)
+        contract = selectors.get_contract(contract_id, company_id)
+        if not contract:
+            return error_response(_("Contrat introuvable."), status_code=404)
+        payload = RecurringCostWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        period = _get_period(d["period_id"], company_id)
+        if not period:
+            return error_response(_("Périodicité introuvable."), status_code=404)
+        cost = services.add_recurring_cost(
+            contract, description=d["description"], amount=d["amount"],
+            currency=d["currency"], period=period, created_by=request.user,
+        )
+        return created_response(RecurringCostSerializer(cost).data)
+
+
+class RecurringCostDetailView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def _get(self, contract_id, rc_id, company_id):
+        contract = selectors.get_contract(contract_id, company_id)
+        if not contract:
+            return None
+        return contract.recurring_costs.filter(id=rc_id, is_deleted=False).first()
+
+    def patch(self, request, contract_id, rc_id):
+        company_id = _scope_company_id(request)
+        cost = self._get(contract_id, rc_id, company_id)
+        if not cost:
+            return error_response(_("Coût récurrent introuvable."), status_code=404)
+        payload = RecurringCostWriteSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        d = dict(payload.validated_data)
+        if "period_id" in d:
+            period = _get_period(d.pop("period_id"), company_id)
+            if not period:
+                return error_response(_("Périodicité introuvable."), status_code=404)
+            d["period"] = period
+        cost = services.update_recurring_cost(cost, updated_by=request.user, **d)
+        return success_response(RecurringCostSerializer(cost).data)
+
+    def delete(self, request, contract_id, rc_id):
+        company_id = _scope_company_id(request)
+        cost = self._get(contract_id, rc_id, company_id)
+        if not cost:
+            return error_response(_("Coût récurrent introuvable."), status_code=404)
+        services.delete_recurring_cost(cost, deleted_by=request.user)
+        return no_content_response()
+
+
+def _get_period(period_id, company_id):
+    from django.db.models import Q
+    from apps.fleet.models import Period
+    try:
+        return Period.objects.get(
+            Q(company_id=company_id) | Q(company__isnull=True),
+            id=period_id, is_deleted=False,
+        )
+    except Period.DoesNotExist:
+        return None
+
+
+def _get_company_user(user_id, company_id):
+    from apps.authentication.models import User
+    return User.objects.filter(id=user_id, company_id=company_id).first()
+
+
+def _get_employee(employee_id, company_id):
+    from apps.hr.models import Employee
+    return Employee.objects.filter(id=employee_id, company_id=company_id, is_deleted=False).first()
 
 
 # ══════════════════════════════════════════════════════════════════════════════

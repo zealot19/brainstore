@@ -1,0 +1,244 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Contrats</h4>
+      <h6>Assurances, leasing et plans de maintenance</h6>
+    </div>
+  </div>
+  <div class="page-btn">
+    <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#contract-modal" (click)="openCreate()">
+      <i class="ti ti-circle-plus"></i>Nouveau contrat
+    </a>
+  </div>
+</div>
+
+<div class="alert alert-info d-flex align-items-center" role="alert">
+  <i class="ti ti-info-circle"></i>
+  Un contrat regroupe assurances, leasing ou plans de maintenance, avec leurs coûts récurrents (primes, mensualités). Le type et la périodicité sont configurables.
+</div>
+
+<!-- Stats + filter -->
+<div class="row mb-3 g-3 align-items-end">
+  <div class="col-md-2">
+    <div class="card p-3 text-center"><h4 class="mb-0 text-success">{{ totalActive }}</h4><small class="text-muted">Actifs</small></div>
+  </div>
+  <div class="col-md-2">
+    <div class="card p-3 text-center"><h4 class="mb-0 text-warning">{{ totalExpiring }}</h4><small class="text-muted">Échéance ≤ 30j</small></div>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label fw-semibold">Filtrer par statut</label>
+    <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
+      <option value="">Tous les statuts</option>
+      <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+    </select>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover mb-0">
+        <thead class="thead-light">
+          <tr>
+            <th>Contrat</th>
+            <th>Véhicule</th>
+            <th>Type</th>
+            <th>Fournisseur</th>
+            <th>Échéance</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of filtered">
+            <td class="fw-semibold">{{ c.name }}</td>
+            <td>{{ c.vehicle_plate }}</td>
+            <td>{{ c.intervention_type_name }}</td>
+            <td>{{ c.supplier_name || '—' }}</td>
+            <td>
+              <span [class]="'badge ' + (c.days_until_expiry < 0 ? 'bg-danger' : (c.days_until_expiry <= 30 ? 'bg-warning' : 'bg-success'))">
+                {{ c.end_date | date:'dd/MM/yyyy' }}
+              </span>
+            </td>
+            <td><span class="badge" [class]="statusCss(c.status)">{{ statusLabel(c.status) }}</span></td>
+            <td>
+              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#contract-modal" (click)="openEdit(c)" title="Modifier">
+                <i class="ti ti-edit me-1"></i>Modifier
+              </a>
+              <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(c.id)" title="Supprimer">
+                <i class="ti ti-trash me-1"></i>Supprimer
+              </a>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">Aucun contrat trouvé.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal créer / éditer -->
+<div class="modal fade" id="contract-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Nouveau' }} contrat</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nom du contrat *</label>
+              <input type="text" class="form-control" formControlName="name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Référence externe</label>
+              <input type="text" class="form-control" formControlName="reference">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Véhicule *</label>
+              <select class="form-select" formControlName="vehicle_id">
+                <option value="">-- Sélectionner --</option>
+                <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Type *</label>
+              <select class="form-select" formControlName="intervention_type_id">
+                <option value="">-- Sélectionner --</option>
+                <option *ngFor="let t of itypes" [value]="t.id">{{ t.name }}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Services inclus</label>
+              <select class="form-select" formControlName="included_service_ids" multiple size="3">
+                <option *ngFor="let t of itypes" [value]="t.id">{{ t.name }}</option>
+              </select>
+              <small class="text-muted">Maintenez Ctrl (Cmd) pour sélectionner plusieurs.</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label d-flex justify-content-between">
+                <span>Fournisseur</span>
+                <a href="javascript:void(0)" class="small" (click)="showNewSupplier = !showNewSupplier">
+                  {{ showNewSupplier ? 'Choisir un existant' : '+ Nouveau fournisseur' }}
+                </a>
+              </label>
+              <select *ngIf="!showNewSupplier" class="form-select" formControlName="supplier_id">
+                <option [ngValue]="null">— Aucun —</option>
+                <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}</option>
+              </select>
+              <div *ngIf="showNewSupplier" class="border rounded p-2">
+                <input type="text" class="form-control form-control-sm mb-1" placeholder="Nom du fournisseur *" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
+                <input type="text" class="form-control form-control-sm mb-1" placeholder="Téléphone" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
+                <button type="button" class="btn btn-sm btn-outline-primary w-100" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Responsable</label>
+              <select class="form-select" formControlName="responsible_id">
+                <option [ngValue]="null">— Aucun —</option>
+                <option *ngFor="let e of employees" [ngValue]="e.id">{{ e.full_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Conducteur</label>
+              <select class="form-select" formControlName="driver_id">
+                <option [ngValue]="null">— Aucun —</option>
+                <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.full_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">N° de police / référence</label>
+              <input type="text" class="form-control" formControlName="policy_number">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date de début *</label>
+              <input type="date" class="form-control" formControlName="start_date">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date d'échéance *</label>
+              <input type="date" class="form-control" formControlName="end_date">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date de signature</label>
+              <input type="date" class="form-control" formControlName="creation_date">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Périodicité de facturation</label>
+              <select class="form-select" formControlName="billing_period_id">
+                <option [ngValue]="null">— Aucune —</option>
+                <option *ngFor="let p of periods" [ngValue]="p.id">{{ p.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Coût d'activation</label>
+              <input type="number" class="form-control" formControlName="activation_cost" min="0" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Franchise</label>
+              <input type="number" class="form-control" formControlName="deductible" min="0" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Devise</label>
+              <input type="text" class="form-control" formControlName="currency" maxlength="3">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Statut *</label>
+              <select class="form-select" formControlName="status">
+                <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Conditions générales</label>
+              <textarea class="form-control" rows="2" formControlName="terms"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="2" formControlName="notes"></textarea>
+            </div>
+          </div>
+
+          <!-- Coûts récurrents (édition uniquement) -->
+          <div *ngIf="costFor" class="mt-4">
+            <h6 class="fw-semibold">Coûts récurrents</h6>
+            <table class="table table-sm mb-2">
+              <thead><tr><th>Description</th><th>Montant</th><th>Périodicité</th><th></th></tr></thead>
+              <tbody>
+                <tr *ngFor="let rc of costs">
+                  <td>{{ rc.description }}</td>
+                  <td>{{ rc.amount | number:'1.0-0' }} {{ rc.currency }}</td>
+                  <td>{{ rc.period_name }}</td>
+                  <td><a class="text-danger" (click)="deleteCost(rc.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a></td>
+                </tr>
+                <tr *ngIf="costs.length === 0"><td colspan="4" class="text-muted">Aucune ligne.</td></tr>
+              </tbody>
+            </table>
+            <div [formGroup]="costForm" class="row g-2 align-items-end">
+              <div class="col-md-4"><label class="form-label small">Description</label><input type="text" class="form-control form-control-sm" formControlName="description"></div>
+              <div class="col-md-3"><label class="form-label small">Montant</label><input type="number" class="form-control form-control-sm" formControlName="amount" min="0" step="0.01"></div>
+              <div class="col-md-3"><label class="form-label small">Périodicité</label>
+                <select class="form-select form-select-sm" formControlName="period_id">
+                  <option value="">--</option>
+                  <option *ngFor="let p of periods" [value]="p.id">{{ p.name }}</option>
+                </select>
+              </div>
+              <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" (click)="addCost()" [disabled]="costForm.invalid || savingCost">Ajouter</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="load()">Fermer</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ editId ? 'Enregistrer' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

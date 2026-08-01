@@ -364,6 +364,33 @@ export const routes={
   dataTable: '/table/data-basic',
   leaflet:'/maps/leaflets',
 
+  // ── Flotte ────────────────────────────────────────────────────────────────
+  fleetDashboard:         '/fleet/dashboard',
+  fleetBrands:            '/fleet/brands',
+  fleetModels:            '/fleet/models',
+  fleetVehicles:          '/fleet/vehicles',
+  fleetExternalDrivers:   '/fleet/external-drivers',
+  fleetFuelLogs:          '/fleet/fuel-logs',
+  fleetServices:          '/fleet/services',
+  fleetContracts:         '/fleet/contracts',
+  fleetDocuments:         '/fleet/documents',
+  fleetAssignments:       '/fleet/assignments',
+  fleetAccidents:         '/fleet/accidents',
+  fleetParking:           '/fleet/parking',
+  fleetSuppliers:         '/fleet/suppliers',
+  // ── Config Flotte ───────────────────────────────────────────────────────────
+  fcVehicleCategories: '/fleet-config/vehicle-categories',
+  fcFuelTypes:         '/fleet-config/fuel-types',
+  fcTransmissions:     '/fleet-config/transmissions',
+  fcTractionTypes:     '/fleet-config/traction-types',
+  fcUnitCategories:    '/fleet-config/unit-categories',
+  fcUnits:             '/fleet-config/units',
+  fcPeriods:           '/fleet-config/periods',
+  fcDocumentTypes:     '/fleet-config/document-types',
+  fcTags:              '/fleet-config/tags',
+  fcInterventionTypes: '/fleet-config/intervention-types',
+  fcActivitySectors:   '/fleet-config/activity-sectors',
+
   //error
   error404: '/error/error-404',
   error500: '/error/error-500',

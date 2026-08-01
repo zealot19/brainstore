@@ -20,6 +20,21 @@ class Vehicle(BaseModel):
                                 on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name="vehicles")
 
+    # ── Classification & emplacement (Config Flotte) ────────────────────────────
+    category = models.ForeignKey("fleet.VehicleCategoryCfg", verbose_name=_("catégorie"),
+                                 on_delete=models.PROTECT, null=True, blank=True, related_name="vehicles")
+    tags     = models.ManyToManyField("fleet.Tag", verbose_name=_("étiquettes"),
+                                      blank=True, related_name="vehicles")
+    parking  = models.ForeignKey("fleet.Parking", verbose_name=_("parking"),
+                                 on_delete=models.SET_NULL, null=True, blank=True, related_name="vehicles")
+
+    # ── Fiscal ──────────────────────────────────────────────────────────────────
+    registration_date = models.DateField(_("date d'immatriculation"), null=True, blank=True)
+    fiscal_horsepower = models.DecimalField(_("puissance fiscale"), max_digits=6, decimal_places=2, null=True, blank=True)
+    catalog_value     = models.DecimalField(_("valeur catalogue"), max_digits=18, decimal_places=2, null=True, blank=True)
+    purchase_value    = models.DecimalField(_("valeur d'achat"), max_digits=18, decimal_places=2, null=True, blank=True)
+    residual_value    = models.DecimalField(_("valeur résiduelle"), max_digits=18, decimal_places=2, null=True, blank=True)
+
     # ── Référence technique ────────────────────────────────────────────────────
     model         = models.ForeignKey("fleet.VehicleModel", verbose_name=_("modèle"),
                                       on_delete=models.PROTECT, related_name="vehicles")

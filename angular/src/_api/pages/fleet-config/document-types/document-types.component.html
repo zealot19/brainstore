@@ -1,0 +1,56 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Types de document</h4><h6>Référentiel configurable</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fc-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau</a></div>
+</div>
+<app-info-banner text="Types de documents administratifs attachés aux véhicules : Assurance, Carte grise, Visite technique, Vignette. « Expiration requise » active le suivi des échéances."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher…" /></div></div>
+    @if (selected.size) {
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
+        <button class="btn btn-danger btn-sm" (click)="bulkDelete()"><i class="ti ti-trash me-1"></i>Supprimer la sélection</button>
+      </div>
+    }
+  </div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
+          <th>Code</th><th>Libellé</th><th>Expiration</th><th>Périmètre</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (r of filtered; track r.id) {
+            <tr>
+              <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
+              <td class="fw-medium">{{ r.code }}</td>
+              <td>{{ r.label }}</td>
+              <td>@if (r.requires_expiration) { <span class="badge bg-warning">Requise</span> } @else { <span class="text-muted">—</span> }</td>
+              <td>@if (r.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
+              <td>@if (r.is_active) { <span class="badge bg-success">Actif</span> } @else { <span class="badge bg-secondary">Inactif</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                @if (r.scope !== 'global') {
+                  <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#fc-modal" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                  <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
+                } @else { <span class="text-muted small">—</span> }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucune entrée.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+<div class="modal fade" id="fc-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier' : 'Nouveau type' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">Code <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="ASSUR" /></div>
+      <div class="col-md-8 mb-3"><label class="form-label">Libellé <span class="text-danger">*</span></label><input formControlName="label" type="text" class="form-control" placeholder="Assurance" /></div>
+    </div>
+    <div class="form-check form-switch mb-2"><input formControlName="requires_expiration" type="checkbox" class="form-check-input" id="fc-exp" /><label class="form-check-label" for="fc-exp">Expiration requise</label></div>
+    <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="fc-active" /><label class="form-check-label" for="fc-active">Actif</label></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ editId ? 'Enregistrer' : 'Créer' }}</button></div></form>
+</div></div></div>
