@@ -42,4 +42,15 @@ urlpatterns = [
     path("routes/<uuid:pk>/", v.RouteDetailView.as_view()),
     path("routes/<uuid:route_id>/stops/", v.RouteStopListView.as_view()),
     path("routes/<uuid:route_id>/stops/<uuid:stop_id>/", v.RouteStopDetailView.as_view()),
+
+    # ── Plans de bus + sièges ───────────────────────────────────────────────────
+    path("seating-plans/", v.SeatingPlanListView.as_view()),
+    path("seating-plans/bulk-delete/", v.SeatingPlanBulkDeleteView.as_view()),
+    path("seating-plans/<uuid:pk>/", v.SeatingPlanDetailView.as_view()),
+    path("seating-plans/<uuid:plan_id>/seats/", v.SeatingPlanSeatsView.as_view()),
+
+    # ── Affectations de plan ────────────────────────────────────────────────────
+    path("vehicle-seating-assignments/", v.VehicleSeatingAssignmentListView.as_view()),
+    path("vehicle-seating-assignments/bulk-delete/", v.VehicleSeatingAssignmentBulkDeleteView.as_view()),
+    path("vehicle-seating-assignments/<uuid:pk>/", v.VehicleSeatingAssignmentDetailView.as_view()),
 ]
