@@ -60,6 +60,8 @@ export const Pages_routes: Routes = [
                 { path: 'vehicle-assignments', loadComponent: () => import('../../../_api/pages/voyages-config/vehicle-assignments/vehicle-assignments.component').then(m => m.VcVehicleAssignmentsComponent) },
                 { path: 'routes',              loadComponent: () => import('../../../_api/pages/voyages-config/routes/routes.component').then(m => m.VcRoutesComponent) },
                 { path: 'seating-plans',       loadComponent: () => import('../../../_api/pages/voyages-config/seating-plans/seating-plans.component').then(m => m.VcSeatingPlansComponent) },
+                { path: 'service-patterns',    loadComponent: () => import('../../../_api/pages/voyages-config/service-patterns/service-patterns.component').then(m => m.VcServicePatternsComponent) },
+                { path: 'settings',            loadComponent: () => import('../../../_api/pages/voyages-config/settings/settings.component').then(m => m.VcSettingsComponent) },
               ],
             },
 
