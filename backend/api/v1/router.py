@@ -23,6 +23,9 @@ urlpatterns = [
     # ── Gestion de flotte ──────────────────────────────────────────────────
     path("fleet/",      include("apps.fleet.urls")),
 
+    # ── Configuration Voyages ──────────────────────────────────────────────
+    path("voyages/config/", include("apps.voyages_config.urls")),
+
     # ── Transport — Configuration ───────────────────────────────────────────
     path("transport/",  include("apps.transport_config.urls")),
 

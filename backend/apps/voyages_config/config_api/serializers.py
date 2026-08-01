@@ -1,0 +1,144 @@
+from rest_framework import serializers
+from apps.voyages_config.models import (
+    Town, ServicePoint, FareClass, TimeSlot,
+    ConsignmentNature, ConsignmentType, LoyaltyRule,
+)
+
+
+class _ScopeMixin(serializers.ModelSerializer):
+    scope = serializers.SerializerMethodField()
+
+    def get_scope(self, obj):
+        return "global" if obj.company_id is None else "company"
+
+
+# ── Town ─────────────────────────────────────────────────────────────────────
+class TownRead(_ScopeMixin):
+    class Meta:
+        model = Town
+        fields = ["id", "name", "code", "region", "company", "scope",
+                  "is_active", "created_at", "updated_at"]
+
+
+class TownWrite(serializers.Serializer):
+    name = serializers.CharField(max_length=150)
+    code = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    region = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── ServicePoint ─────────────────────────────────────────────────────────────
+class ServicePointRead(_ScopeMixin):
+    town_name = serializers.CharField(source="town.name", read_only=True, default=None)
+    station_kind_display = serializers.CharField(source="get_station_kind_display", read_only=True)
+
+    class Meta:
+        model = ServicePoint
+        fields = ["id", "town", "town_name", "code", "name", "is_station",
+                  "station_kind", "station_kind_display", "latitude", "longitude",
+                  "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class ServicePointWrite(serializers.Serializer):
+    town_id = serializers.UUIDField()
+    code = serializers.CharField(max_length=20)
+    name = serializers.CharField(max_length=150)
+    is_station = serializers.BooleanField(required=False, default=False)
+    station_kind = serializers.ChoiceField(choices=ServicePoint.StationKind.choices,
+                                           required=False, allow_blank=True, default="")
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── FareClass ────────────────────────────────────────────────────────────────
+class FareClassRead(_ScopeMixin):
+    class Meta:
+        model = FareClass
+        fields = ["id", "code", "name", "rank", "color", "company", "scope",
+                  "is_active", "created_at", "updated_at"]
+
+
+class FareClassWrite(serializers.Serializer):
+    code = serializers.CharField(max_length=20)
+    name = serializers.CharField(max_length=100)
+    rank = serializers.IntegerField(required=False, default=0, min_value=0)
+    color = serializers.CharField(max_length=7, required=False, allow_blank=True, default="")
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── TimeSlot ─────────────────────────────────────────────────────────────────
+class TimeSlotRead(_ScopeMixin):
+    class Meta:
+        model = TimeSlot
+        fields = ["id", "code", "label", "start_time", "end_time", "ordering",
+                  "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class TimeSlotWrite(serializers.Serializer):
+    code = serializers.CharField(max_length=20)
+    label = serializers.CharField(max_length=100)
+    start_time = serializers.TimeField()
+    end_time = serializers.TimeField()
+    ordering = serializers.IntegerField(required=False, default=0, min_value=0)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── ConsignmentNature ────────────────────────────────────────────────────────
+class ConsignmentNatureRead(_ScopeMixin):
+    class Meta:
+        model = ConsignmentNature
+        fields = ["id", "code", "name", "is_fragile", "requires_declaration",
+                  "is_prohibited", "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class ConsignmentNatureWrite(serializers.Serializer):
+    code = serializers.CharField(max_length=20)
+    name = serializers.CharField(max_length=100)
+    is_fragile = serializers.BooleanField(required=False, default=False)
+    requires_declaration = serializers.BooleanField(required=False, default=False)
+    is_prohibited = serializers.BooleanField(required=False, default=False)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── ConsignmentType ──────────────────────────────────────────────────────────
+class ConsignmentTypeRead(_ScopeMixin):
+    nature_name = serializers.CharField(source="nature.name", read_only=True, default=None)
+    applies_to_display = serializers.CharField(source="get_applies_to_display", read_only=True)
+
+    class Meta:
+        model = ConsignmentType
+        fields = ["id", "code", "label", "nature", "nature_name", "max_weight_kg",
+                  "max_volume_m3", "applies_to", "applies_to_display",
+                  "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class ConsignmentTypeWrite(serializers.Serializer):
+    code = serializers.CharField(max_length=20)
+    label = serializers.CharField(max_length=150)
+    nature_id = serializers.UUIDField()
+    max_weight_kg = serializers.DecimalField(max_digits=8, decimal_places=2, required=False, allow_null=True, default=None)
+    max_volume_m3 = serializers.DecimalField(max_digits=8, decimal_places=3, required=False, allow_null=True, default=None)
+    applies_to = serializers.ChoiceField(choices=ConsignmentType.AppliesTo.choices,
+                                         required=False, default=ConsignmentType.AppliesTo.BOTH)
+    is_active = serializers.BooleanField(required=False, default=True)
+
+
+# ── LoyaltyRule ──────────────────────────────────────────────────────────────
+class LoyaltyRuleRead(_ScopeMixin):
+    class Meta:
+        model = LoyaltyRule
+        fields = ["id", "name", "points_per_one_way", "points_per_round_trip",
+                  "reward_threshold", "reward_label", "valid_from", "valid_to",
+                  "company", "scope", "is_active", "created_at", "updated_at"]
+
+
+class LoyaltyRuleWrite(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    points_per_one_way = serializers.IntegerField(required=False, default=1, min_value=0)
+    points_per_round_trip = serializers.IntegerField(required=False, default=2, min_value=0)
+    reward_threshold = serializers.IntegerField(required=False, default=10, min_value=1)
+    reward_label = serializers.CharField(max_length=150, required=False, allow_blank=True, default="1 billet gratuit")
+    valid_from = serializers.DateField(required=False, allow_null=True, default=None)
+    valid_to = serializers.DateField(required=False, allow_null=True, default=None)
+    is_active = serializers.BooleanField(required=False, default=True)
