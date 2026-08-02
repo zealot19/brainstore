@@ -70,6 +70,7 @@ export const Pages_routes: Routes = [
               loadComponent: () => import('../../../_api/pages/voyages/voyages.component').then(m => m.VoyagesComponent),
               children: [
                 { path: 'list', loadComponent: () => import('../../../_api/pages/voyages/list/voyages-list.component').then(m => m.VoyagesListComponent) },
+                { path: 'trip/:id', loadComponent: () => import('../../../_api/pages/voyages/trip-detail/trip-detail.component').then(m => m.VoyagesTripDetailComponent) },
               ],
             },
 
