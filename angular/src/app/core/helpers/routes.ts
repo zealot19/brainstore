@@ -410,6 +410,11 @@ export const routes={
   voyagesList: '/voyages/list',
   voyagesTrip: '/voyages/trip',
 
+  // ── Réservations Voyages ─────────────────────────────────────────────────────
+  vbPassengers:   '/voyages-booking/passengers',
+  vbBookings:     '/voyages-booking/bookings',
+  vbBookingNew:   '/voyages-booking/bookings/new',
+
   //error
   error404: '/error/error-404',
   error500: '/error/error-500',

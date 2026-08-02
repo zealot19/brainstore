@@ -68,6 +68,19 @@ export class SidebarService {
             { menuValue: 'Voyages', route: routes.voyagesList, base: 'list' },
           ],
         },
+        // ── MODULE : Réservations Voyages ─────────────────────────────────────
+        {
+          menuValue: 'Réservations',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'ticket',
+          base: 'voyages-booking',
+          subMenus: [
+            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers'   },
+            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings'     },
+            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
+          ],
+        },
         // ── MODULE : Config Voyages ───────────────────────────────────────────
         {
           menuValue: 'Config Voyages',

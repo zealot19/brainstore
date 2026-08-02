@@ -1,0 +1,106 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Nouvelle réservation</h4><h6>Voyage · sièges · passagers · paiement</h6></div></div>
+</div>
+<app-info-banner text="Sélectionnez le voyage et les sièges, saisissez les passagers, puis confirmez. Le tarif est calculé automatiquement à la confirmation."></app-info-banner>
+
+<div class="card"><div class="card-body">
+  <ul class="nav nav-pills mb-4">
+    <li class="nav-item"><span class="nav-link" [class.active]="step===1">1. Voyage</span></li>
+    <li class="nav-item"><span class="nav-link" [class.active]="step===2">2. Sièges</span></li>
+    <li class="nav-item"><span class="nav-link" [class.active]="step===3">3. Passagers</span></li>
+    <li class="nav-item"><span class="nav-link" [class.active]="step===4">4. Paiement</span></li>
+  </ul>
+
+  @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+
+  <!-- Step 1 -->
+  @if (step === 1) {
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">Type de voyage</label>
+        <select class="form-select" [(ngModel)]="tripType">
+          <option value="one_way">Aller simple</option>
+          <option value="round_trip">Aller-retour</option>
+        </select></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Voyage aller <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="outboundTripId">
+          <option value="">— Choisir —</option>
+          @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+        </select></div>
+      @if (isRound) {
+        <div class="col-md-6 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="returnTripId">
+            <option value="">— Choisir —</option>
+            @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+          </select></div>
+      }
+    </div>
+  }
+
+  <!-- Step 2 -->
+  @if (step === 2) {
+    <h6>Sièges — aller</h6>
+    <div class="seat-grid mb-4">
+      @for (row of rows(outboundSeats); track row) {
+        <div class="d-flex gap-2 mb-2">
+          @for (s of seatsInRow(outboundSeats, row); track s.id) {
+            <button type="button" class="btn btn-sm {{ seatClass('out', s) }}" (click)="toggleSeat('out', s)">{{ s.seat_number }}</button>
+          }
+        </div>
+      }
+      @if (!outboundSeats.length) { <p class="text-muted">Aucun siège.</p> }
+    </div>
+    @if (isRound) {
+      <h6>Sièges — retour</h6>
+      <div class="seat-grid">
+        @for (row of rows(returnSeats); track row) {
+          <div class="d-flex gap-2 mb-2">
+            @for (s of seatsInRow(returnSeats, row); track s.id) {
+              <button type="button" class="btn btn-sm {{ seatClass('ret', s) }}" (click)="toggleSeat('ret', s)">{{ s.seat_number }}</button>
+            }
+          </div>
+        }
+        @if (!returnSeats.length) { <p class="text-muted">Aucun siège.</p> }
+      </div>
+    }
+    <p class="text-muted mt-2">Sièges aller sélectionnés : {{ selOutbound.length }}@if (isRound) { · retour : {{ selReturn.length }} }</p>
+  }
+
+  <!-- Step 3 -->
+  @if (step === 3) {
+    <div class="table-responsive"><table class="table">
+      <thead><tr><th>Siège aller</th>@if (isRound) { <th>Siège retour</th> }<th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Type pièce</th><th>N° pièce</th><th>Acheteur</th></tr></thead>
+      <tbody>
+        @for (p of passengers; track $index) {
+          <tr>
+            <td><span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span></td>
+            @if (isRound) { <td><span class="badge bg-info">{{ selReturn[$index].seat_number }}</span></td> }
+            <td><input class="form-control form-control-sm" [(ngModel)]="p.first_name" /></td>
+            <td><input class="form-control form-control-sm" [(ngModel)]="p.last_name" /></td>
+            <td><input class="form-control form-control-sm" [(ngModel)]="p.phone" /></td>
+            <td><select class="form-select form-select-sm" [(ngModel)]="p.id_type"><option value="cni">CNI</option><option value="passport">Passeport</option><option value="driver_license">Permis</option><option value="other">Autre</option></select></td>
+            <td><input class="form-control form-control-sm" [(ngModel)]="p.id_number" /></td>
+            <td class="text-center"><input type="radio" name="buyer" [value]="$index" [(ngModel)]="buyerIndex" /></td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  }
+
+  <!-- Step 4 -->
+  @if (step === 4) {
+    <div class="alert alert-light">
+      <p class="mb-1"><strong>Type :</strong> {{ isRound ? 'Aller-retour' : 'Aller simple' }}</p>
+      <p class="mb-1"><strong>Passagers :</strong> {{ passengers.length }}</p>
+      <p class="mb-1"><strong>Billets :</strong> {{ isRound ? passengers.length * 2 : passengers.length }}</p>
+      <p class="mb-0 text-muted">Le tarif est calculé automatiquement à la confirmation de la réservation.</p>
+    </div>
+  }
+
+  <div class="d-flex justify-content-between mt-3">
+    <button class="btn btn-light" [disabled]="step===1" (click)="prev()"><i class="ti ti-arrow-left me-1"></i>Précédent</button>
+    @if (step < 4) { <button class="btn btn-primary" (click)="next()">Suivant<i class="ti ti-arrow-right ms-1"></i></button> }
+    @else { <button class="btn btn-success" [disabled]="saving" (click)="submit()"><i class="ti ti-check me-1"></i>Créer la réservation</button> }
+  </div>
+</div></div>
