@@ -11,6 +11,7 @@ Usage:
     python manage.py seed_voyages_demo
 """
 from datetime import date, timedelta
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
@@ -47,6 +48,19 @@ class Command(BaseCommand):
             slug="demo-transport",
             defaults={"name": "Demo Transport SARL", "code": "DEMO", "country": "CM"})
         w(f"Institution : {company.name}")
+
+        # ── 1b. Test user (shimi / 0000) — institution admin of the demo company
+        User = get_user_model()
+        user, _ = User.objects.get_or_create(
+            username="shimi",
+            defaults={"email": "shimi@demo-transport.cm", "first_name": "Shimi", "last_name": "Admin"})
+        user.company = company
+        user.is_institution_admin = True
+        user.is_active = True
+        user.must_change_password = False
+        user.set_password("0000")
+        user.save()
+        w("Utilisateur : shimi / 0000 (admin institution)")
 
         # ── 2. Fleet reference + vehicles ─────────────────────────────────────
         brand, _ = VehicleBrand.objects.get_or_create(name="Toyota")
