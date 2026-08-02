@@ -25,7 +25,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>De</th><th>À</th><th>Catégorie</th><th>Montant</th><th>Validité</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
+          <th>De</th><th>À</th><th>Catégorie</th><th>Type de voyage</th><th>Montant</th><th>Validité</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
           @for (r of rows; track r.id) {
             <tr>
@@ -33,6 +33,7 @@
               <td class="fw-medium">{{ r.origin_point_name }}</td>
               <td>{{ r.destination_point_name }}</td>
               <td>{{ r.fare_class_name }}</td>
+              <td>@if (r.trip_type === 'round_trip') { <span class="badge bg-primary-transparent">{{ r.trip_type_display }}</span> } @else { <span class="badge bg-light text-dark">{{ r.trip_type_display }}</span> }</td>
               <td>{{ r.amount | number:'1.0-0' }} {{ r.currency }}</td>
               <td>{{ (r.valid_from || '—') }} → {{ (r.valid_to || '—') }}</td>
               <td>@if (r.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
@@ -43,7 +44,7 @@
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun tarif pour ce trajet.</td></tr> }
+          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun tarif pour ce trajet.</td></tr> }
         </tbody>
       </table></div>
     }
@@ -62,8 +63,15 @@
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
         <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
-      <div class="col-md-4 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount" type="number" min="0" step="0.01" class="form-control" /></div>
-      <div class="col-md-2 mb-3"><label class="form-label">Devise</label><input formControlName="currency" type="text" maxlength="3" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Type de voyage <span class="text-danger">*</span></label>
+        <select formControlName="trip_type" class="form-select">
+          <option value="one_way">Aller simple</option>
+          <option value="round_trip">Aller-retour</option>
+        </select></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount" type="number" min="0" step="0.01" class="form-control" /><small class="text-muted">Saisissez ici le prix correspondant au type de voyage sélectionné.</small></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Devise</label><input formControlName="currency" type="text" maxlength="3" class="form-control" /></div>
     </div>
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">Valide du</label><input formControlName="valid_from" type="date" class="form-control" /></div>

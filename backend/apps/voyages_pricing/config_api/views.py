@@ -43,8 +43,9 @@ class FareListView(APIView):
         try:
             fare = services.create_fare(
                 company=company, route=route, origin_point=origin, destination_point=dest,
-                fare_class=fare_class, amount=d["amount"], currency=d["currency"],
-                valid_from=d["valid_from"], valid_to=d["valid_to"], user=request.user)
+                fare_class=fare_class, trip_type=d["trip_type"], amount=d["amount"],
+                currency=d["currency"], valid_from=d["valid_from"], valid_to=d["valid_to"],
+                user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.FareRead(fare).data)
@@ -86,7 +87,7 @@ class FareDetailView(APIView):
             if not fc:
                 return error_response("Catégorie introuvable.", status_code=404)
             fields["fare_class"] = fc
-        for k in ("amount", "currency", "valid_from", "valid_to", "is_active"):
+        for k in ("amount", "currency", "valid_from", "valid_to", "is_active", "trip_type"):
             if k in d:
                 fields[k] = d[k]
         try:

@@ -36,11 +36,13 @@ def list_fares(company, route_id=None):
     return qs
 
 
-def resolve_fare(company, route, origin_point, destination_point, fare_class, on_date=None):
+def resolve_fare(company, route, origin_point, destination_point, fare_class,
+                 trip_type="one_way", on_date=None):
     on_date = on_date or _date.today()
     qs = (Fare.objects.filter(
             is_deleted=False, is_active=True, route=route,
-            origin_point=origin_point, destination_point=destination_point, fare_class=fare_class)
+            origin_point=origin_point, destination_point=destination_point,
+            fare_class=fare_class, trip_type=trip_type)
           .filter(Q(company=company) | Q(company__isnull=True))
           .filter(Q(valid_from__isnull=True) | Q(valid_from__lte=on_date))
           .filter(Q(valid_to__isnull=True) | Q(valid_to__gte=on_date)))

@@ -16,6 +16,8 @@ export interface Fare {
   destination_point_name: string | null;
   fare_class: string;
   fare_class_name: string | null;
+  trip_type: 'one_way' | 'round_trip';
+  trip_type_display: string;
   amount: string;
   currency: string;
   valid_from: string | null;

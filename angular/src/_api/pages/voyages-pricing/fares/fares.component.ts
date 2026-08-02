@@ -26,7 +26,8 @@ export class VcFaresComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
-      fare_class_id: [null, Validators.required], amount: [null, [Validators.required, Validators.min(0)]],
+      fare_class_id: [null, Validators.required], trip_type: ['one_way', Validators.required],
+      amount: [null, [Validators.required, Validators.min(0)]],
       currency: ['XAF'], valid_from: [null], valid_to: [null], is_active: [true],
     });
     this.routeSvc.list().subscribe(d => this.routes = d);
@@ -53,8 +54,8 @@ export class VcFaresComponent implements OnInit {
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.reload(); }, error: e => alert(e?.error?.detail ?? 'Suppression impossible.') });
   }
 
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ origin_point_id: null, destination_point_id: null, fare_class_id: null, amount: null, currency: 'XAF', valid_from: null, valid_to: null, is_active: true }); }
-  openEdit(r: Fare): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ origin_point_id: r.origin_point, destination_point_id: r.destination_point, fare_class_id: r.fare_class, amount: r.amount, currency: r.currency, valid_from: r.valid_from, valid_to: r.valid_to, is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ origin_point_id: null, destination_point_id: null, fare_class_id: null, trip_type: 'one_way', amount: null, currency: 'XAF', valid_from: null, valid_to: null, is_active: true }); }
+  openEdit(r: Fare): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ origin_point_id: r.origin_point, destination_point_id: r.destination_point, fare_class_id: r.fare_class, trip_type: r.trip_type, amount: r.amount, currency: r.currency, valid_from: r.valid_from, valid_to: r.valid_to, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving || !this.selectedRoute) return;
     this.saving = true; this.errorMsg = '';

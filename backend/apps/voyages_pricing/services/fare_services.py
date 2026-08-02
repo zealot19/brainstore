@@ -14,37 +14,37 @@ def _validate_segment(route, origin_point, destination_point):
         raise ApplicationError(_("Le point de départ doit précéder le point d'arrivée."))
 
 
-def _ensure_unique(company, route, origin_point, destination_point, fare_class, exclude_id=None):
+def _ensure_unique(company, route, origin_point, destination_point, fare_class, trip_type, exclude_id=None):
     qs = Fare.objects.filter(is_deleted=False, company=company, route=route,
                              origin_point=origin_point, destination_point=destination_point,
-                             fare_class=fare_class)
+                             fare_class=fare_class, trip_type=trip_type)
     if exclude_id:
         qs = qs.exclude(id=exclude_id)
     if qs.exists():
-        raise ApplicationError(_("Un tarif existe déjà pour ce segment et cette catégorie."))
+        raise ApplicationError(_("Un tarif existe déjà pour ce segment, cette catégorie et ce type de voyage."))
 
 
 @transaction.atomic
 def create_fare(*, company, route, origin_point, destination_point, fare_class, amount,
-                currency="XAF", valid_from=None, valid_to=None, user):
+                trip_type=Fare.TripType.ONE_WAY, currency="XAF", valid_from=None, valid_to=None, user):
     _validate_segment(route, origin_point, destination_point)
-    _ensure_unique(company, route, origin_point, destination_point, fare_class)
+    _ensure_unique(company, route, origin_point, destination_point, fare_class, trip_type)
     return Fare.objects.create(
         company=company, route=route, origin_point=origin_point, destination_point=destination_point,
-        fare_class=fare_class, amount=amount, currency=currency,
+        fare_class=fare_class, trip_type=trip_type, amount=amount, currency=currency,
         valid_from=valid_from, valid_to=valid_to, created_by=user)
 
 
 @transaction.atomic
 def update_fare(fare, *, user, **fields):
-    allowed = {"amount", "currency", "valid_from", "valid_to",
+    allowed = {"amount", "currency", "valid_from", "valid_to", "trip_type",
                "origin_point", "destination_point", "fare_class", "is_active"}
     for k, v in fields.items():
         if k in allowed:
             setattr(fare, k, v)
     _validate_segment(fare.route, fare.origin_point, fare.destination_point)
     _ensure_unique(fare.company, fare.route, fare.origin_point, fare.destination_point,
-                   fare.fare_class, exclude_id=fare.id)
+                   fare.fare_class, fare.trip_type, exclude_id=fare.id)
     fare.updated_by = user
     fare.save()
     return fare
