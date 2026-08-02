@@ -53,14 +53,15 @@ class Command(BaseCommand):
         User = get_user_model()
         user, _ = User.objects.get_or_create(
             username="shimi",
-            defaults={"email": "shimi@demo-transport.cm", "first_name": "Shimi", "last_name": "Admin"})
+            defaults={"first_name": "Shimi", "last_name": "Admin"})
+        user.email = "shimi@gmail.com"
         user.company = company
         user.is_institution_admin = True
         user.is_active = True
         user.must_change_password = False
         user.set_password("0000")
         user.save()
-        w("Utilisateur : shimi / 0000 (admin institution)")
+        w("Utilisateur : shimi@gmail.com / 0000 (admin institution)")
 
         # ── 2. Fleet reference + vehicles ─────────────────────────────────────
         brand, _ = VehicleBrand.objects.get_or_create(name="Toyota")
