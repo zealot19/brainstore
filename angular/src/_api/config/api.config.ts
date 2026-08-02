@@ -318,6 +318,14 @@ export const VOYAGES = {
   markDelayed: (id: string) => `${VT}/${id}/mark-delayed/`, clearDelay: (id: string) => `${VT}/${id}/clear-delay/`,
 };
 
+const VP = `${API_BASE}/voyages/pricing`;
+
+export const VOYAGES_PRICING = {
+  fares: `${VP}/fares/`, fare: (id: string) => `${VP}/fares/${id}/`,
+  faresBulkDelete: `${VP}/fares/bulk-delete/`,
+  routePoints: (id: string) => `${VP}/routes/${id}/points/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 
 /** URLs qui ne nécessitent pas de token JWT */

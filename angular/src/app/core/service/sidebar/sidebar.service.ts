@@ -87,6 +87,7 @@ export class SidebarService {
             { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types'    },
             { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns'     },
             { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules'        },
+            { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares'                },
             { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings'             },
           ],
         },

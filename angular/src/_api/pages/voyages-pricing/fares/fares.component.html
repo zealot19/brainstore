@@ -1,0 +1,74 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Tarifs</h4><h6>Tarification par trajet et par segment</h6></div></div>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" [class.disabled]="!selectedRoute" data-bs-toggle="modal" data-bs-target="#fare-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ajouter un tarif</a>
+  </div>
+</div>
+<app-info-banner text="Fixez le tarif du trajet complet (origine → destination), puis ajoutez des tarifs par segment via les escales. Ces tarifs alimenteront les réservations."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <select class="form-select w-auto" [(ngModel)]="selectedRoute" (ngModelChange)="onRouteChange()">
+      <option [ngValue]="null">— Choisir un trajet —</option>
+      @for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }
+    </select>
+    @if (selected.size) {
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
+        <button class="btn btn-danger btn-sm" (click)="bulkDelete()"><i class="ti ti-trash me-1"></i>Supprimer la sélection</button>
+      </div>
+    }
+  </div>
+  <div class="card-body p-0">
+    @if (!selectedRoute) { <p class="text-muted text-center py-5 mb-0">Choisissez un trajet pour voir et définir ses tarifs.</p> }
+    @else if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
+          <th>De</th><th>À</th><th>Catégorie</th><th>Montant</th><th>Validité</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (r of rows; track r.id) {
+            <tr>
+              <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
+              <td class="fw-medium">{{ r.origin_point_name }}</td>
+              <td>{{ r.destination_point_name }}</td>
+              <td>{{ r.fare_class_name }}</td>
+              <td>{{ r.amount | number:'1.0-0' }} {{ r.currency }}</td>
+              <td>{{ (r.valid_from || '—') }} → {{ (r.valid_to || '—') }}</td>
+              <td>@if (r.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                @if (r.scope !== 'global') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fare-modal" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
+                } @else { <span class="text-muted small">—</span> }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun tarif pour ce trajet.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+<div class="modal fade" id="fare-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le tarif' : 'Nouveau tarif' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">De <span class="text-danger">*</span></label>
+        <select formControlName="origin_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (p of points; track p.id) { <option [ngValue]="p.id">{{ p.name }} ({{ p.code }})</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">À <span class="text-danger">*</span></label>
+        <select formControlName="destination_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (p of points; track p.id) { <option [ngValue]="p.id">{{ p.name }} ({{ p.code }})</option> }</select></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
+        <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
+      <div class="col-md-4 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount" type="number" min="0" step="0.01" class="form-control" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Devise</label><input formControlName="currency" type="text" maxlength="3" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Valide du</label><input formControlName="valid_from" type="date" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Valide au</label><input formControlName="valid_to" type="date" class="form-control" /></div>
+    </div>
+    <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="fare-active" /><label class="form-check-label" for="fare-active">Actif</label></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ editId ? 'Enregistrer' : 'Créer' }}</button></div></form>
+</div></div></div>
