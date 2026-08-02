@@ -326,6 +326,23 @@ export const VOYAGES_PRICING = {
   routePoints: (id: string) => `${VP}/routes/${id}/points/`,
 };
 
+const VB = `${API_BASE}/voyages/booking`;
+
+export const VOYAGES_BOOKING = {
+  passengers: `${VB}/passengers/`,
+  passenger: (id: string) => `${VB}/passengers/${id}/`,
+  passengerLoyalty: (id: string) => `${VB}/passengers/${id}/loyalty/`,
+  bookableTrips: `${VB}/trips/bookable/`,
+  seatMap: (tripId: string) => `${VB}/trips/${tripId}/seat-map/`,
+  bookings: `${VB}/bookings/`,
+  booking: (id: string) => `${VB}/bookings/${id}/`,
+  bookingConfirm: (id: string) => `${VB}/bookings/${id}/confirm/`,
+  bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
+  bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
+  bookingRedeem: (id: string) => `${VB}/bookings/${id}/redeem/`,
+  ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 
 /** URLs qui ne nécessitent pas de token JWT */
