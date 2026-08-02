@@ -65,6 +65,8 @@ LOCAL_APPS = [
     "apps.voyages_trips",
     # ── Tarification Voyages ──
     "apps.voyages_pricing",
+    # ── Réservations Voyages ──
+    "apps.voyages_booking",
     # ── Ticketing (réservations, billets, bagages) ──
     "apps.ticketing",
     # ── Colis ──
