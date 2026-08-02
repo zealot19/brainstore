@@ -11,7 +11,7 @@ from apps.voyages_trips.models import Trip, TripStop
 
 def _trip_number():
     Sequence.objects.get_or_create(
-        code="VOY", defaults={"name": "Voyages", "prefix": "VOY/", "padding": 5})
+        code="VOY", defaults={"name": "Voyages", "prefix": "VOY", "padding": 5, "reset_yearly": True})
     return next_number("VOY")
 
 
