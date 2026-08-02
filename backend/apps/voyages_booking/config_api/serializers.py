@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.voyages_booking.models import Passenger
+from apps.voyages_booking.models import Passenger, Booking, Ticket, LoyaltyAccount, LoyaltyMovement
 
 
 class PassengerRead(serializers.ModelSerializer):
@@ -24,3 +24,87 @@ class PassengerWrite(serializers.Serializer):
     id_type = serializers.ChoiceField(choices=Passenger.IdType.choices, required=False, default=Passenger.IdType.CNI)
     id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     notes = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
+
+
+class SeatCellSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    seat_number = serializers.CharField()
+    row = serializers.IntegerField()
+    column = serializers.IntegerField()
+    seat_type = serializers.CharField()
+    status = serializers.CharField()
+
+
+class TripOptionSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    number = serializers.CharField()
+    route_code = serializers.CharField(source="route.code", default=None)
+    origin_name = serializers.CharField(source="origin.name", default=None)
+    destination_name = serializers.CharField(source="destination.name", default=None)
+    fare_class = serializers.UUIDField(source="fare_class_id")
+    fare_class_name = serializers.CharField(source="fare_class.name", default=None)
+    scheduled_departure = serializers.DateTimeField()
+
+
+class TicketRead(serializers.ModelSerializer):
+    passenger_name = serializers.CharField(source="passenger.full_name", read_only=True)
+    seat_number = serializers.CharField(source="trip_seat.seat_number", read_only=True, default=None)
+    direction_display = serializers.CharField(source="get_direction_display", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = ["id", "number", "passenger", "passenger_name", "trip", "trip_seat", "seat_number",
+                  "direction", "direction_display", "return_of", "fare", "fare_class", "amount",
+                  "is_reward", "status", "status_display", "boarded_at"]
+
+
+class BookingRead(serializers.ModelSerializer):
+    buyer_name = serializers.CharField(source="buyer.full_name", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+    trip_type_display = serializers.CharField(source="get_trip_type_display", read_only=True)
+    tickets = TicketRead(many=True, read_only=True)
+
+    class Meta:
+        model = Booking
+        fields = ["id", "reference", "status", "status_display", "trip_type", "trip_type_display",
+                  "outbound_trip", "return_trip", "buyer", "buyer_name", "amount_due", "amount_paid",
+                  "payment_method", "held_until", "channel", "notes", "created_at", "updated_at", "tickets"]
+
+
+class BookingItemSerializer(serializers.Serializer):
+    passenger = serializers.DictField()
+    outbound_seat_id = serializers.UUIDField()
+    return_seat_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+
+
+class BookingCreateSerializer(serializers.Serializer):
+    trip_type = serializers.ChoiceField(choices=Booking.TripType.choices, default=Booking.TripType.ONE_WAY)
+    outbound_trip_id = serializers.UUIDField()
+    return_trip_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    buyer = serializers.DictField()
+    items = BookingItemSerializer(many=True)
+
+
+class ConfirmSerializer(serializers.Serializer):
+    payment_method = serializers.CharField(required=False, allow_blank=True, default="")
+    amount_paid = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
+
+
+class RedeemSerializer(serializers.Serializer):
+    passenger_id = serializers.UUIDField()
+    ticket_id = serializers.UUIDField()
+
+
+class LoyaltyMovementRead(serializers.ModelSerializer):
+    kind_display = serializers.CharField(source="get_kind_display", read_only=True)
+
+    class Meta:
+        model = LoyaltyMovement
+        fields = ["id", "kind", "kind_display", "points", "booking", "note", "created_at"]
+
+
+class LoyaltyAccountRead(serializers.ModelSerializer):
+    class Meta:
+        model = LoyaltyAccount
+        fields = ["id", "passenger", "points_balance", "lifetime_points"]
