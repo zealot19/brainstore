@@ -61,6 +61,8 @@ LOCAL_APPS = [
     "apps.voyage",
     # ── Config Voyages (référentiels transport passagers) ──
     "apps.voyages_config",
+    # ── Gestion Voyages (voyages / départs) ──
+    "apps.voyages_trips",
     # ── Ticketing (réservations, billets, bagages) ──
     "apps.ticketing",
     # ── Colis ──
