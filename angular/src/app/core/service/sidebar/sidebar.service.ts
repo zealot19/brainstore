@@ -57,6 +57,17 @@ export class SidebarService {
       hasSubRoute: false,
       showSubRoute: true,
       menu: [
+        // ── MODULE : Gestion Voyages ──────────────────────────────────────────
+        {
+          menuValue: 'Voyages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'bus',
+          base: 'voyages',
+          subMenus: [
+            { menuValue: 'Voyages', route: routes.voyagesList, base: 'list' },
+          ],
+        },
         // ── MODULE : Config Voyages ───────────────────────────────────────────
         {
           menuValue: 'Config Voyages',

@@ -64,6 +64,14 @@ export const Pages_routes: Routes = [
                 { path: 'settings',            loadComponent: () => import('../../../_api/pages/voyages-config/settings/settings.component').then(m => m.VcSettingsComponent) },
               ],
             },
+            // ── MODULE : Gestion Voyages ──────────────────────────────────────────────
+            {
+              path: 'voyages',
+              loadComponent: () => import('../../../_api/pages/voyages/voyages.component').then(m => m.VoyagesComponent),
+              children: [
+                // screens registered in Tasks 6–7
+              ],
+            },
 
       {
         path: 'dashboard', loadComponent: () => import('./dashboards/dashboard.component').then(m => m.DashboardComponent),

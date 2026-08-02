@@ -302,6 +302,22 @@ export const VOYAGES_CONFIG = {
   settings:           `${VC}/settings/`,
 };
 
+const VT = `${API_BASE}/voyages/trips`;
+
+export const VOYAGES = {
+  trips: `${VT}/`, trip: (id: string) => `${VT}/${id}/`,
+  eligibleVehicles: (id: string) => `${VT}/${id}/eligible-vehicles/`,
+  assignVehicle: (id: string) => `${VT}/${id}/assign-vehicle/`,
+  crew: (id: string) => `${VT}/${id}/crew/`, crewItem: (id: string, cid: string) => `${VT}/${id}/crew/${cid}/`,
+  seats: (id: string) => `${VT}/${id}/seats/`,
+  seatsBlock: (id: string) => `${VT}/${id}/seats/block/`, seatsUnblock: (id: string) => `${VT}/${id}/seats/unblock/`,
+  stops: (id: string) => `${VT}/${id}/stops/`,
+  submit: (id: string) => `${VT}/${id}/submit/`, depart: (id: string) => `${VT}/${id}/depart/`,
+  complete: (id: string) => `${VT}/${id}/complete/`, cancel: (id: string) => `${VT}/${id}/cancel/`,
+  suspend: (id: string) => `${VT}/${id}/suspend/`, resume: (id: string) => `${VT}/${id}/resume/`,
+  markDelayed: (id: string) => `${VT}/${id}/mark-delayed/`, clearDelay: (id: string) => `${VT}/${id}/clear-delay/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 
 /** URLs qui ne nécessitent pas de token JWT */

@@ -405,6 +405,10 @@ export const routes={
   vcLoyalty:            '/voyages-config/loyalty-rules',
   vcSettings:           '/voyages-config/settings',
 
+  // ── Gestion Voyages ──────────────────────────────────────────────────────────
+  voyagesList: '/voyages/list',
+  voyagesTrip: '/voyages/trip',
+
   //error
   error404: '/error/error-404',
   error500: '/error/error-500',
