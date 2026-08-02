@@ -49,19 +49,23 @@ class Command(BaseCommand):
             defaults={"name": "Demo Transport SARL", "code": "DEMO", "country": "CM"})
         w(f"Institution : {company.name}")
 
-        # ── 1b. Test user (shimi / 0000) — institution admin of the demo company
+        # ── 1b. Test user (shimi@gmail.com / 0000) — institution admin of the demo
+        # company. Reuse whatever account already holds that email (avoids creating
+        # a duplicate email, which would break email-based login).
         User = get_user_model()
-        user, _ = User.objects.get_or_create(
-            username="shimi",
-            defaults={"first_name": "Shimi", "last_name": "Admin"})
+        user = (User.objects.filter(email__iexact="shimi@gmail.com").first()
+                or User.objects.filter(username__iexact="shimi").first()
+                or User(username="shimi"))
         user.email = "shimi@gmail.com"
+        user.first_name = user.first_name or "Shimi"
+        user.last_name = user.last_name or "Admin"
         user.company = company
         user.is_institution_admin = True
         user.is_active = True
         user.must_change_password = False
         user.set_password("0000")
         user.save()
-        w("Utilisateur : shimi@gmail.com / 0000 (admin institution)")
+        w(f"Utilisateur : shimi@gmail.com / 0000 (admin institution, compte « {user.username} »)")
 
         # ── 2. Fleet reference + vehicles ─────────────────────────────────────
         brand, _ = VehicleBrand.objects.get_or_create(name="Toyota")
