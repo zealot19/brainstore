@@ -29,6 +29,9 @@ urlpatterns = [
     # ── Gestion Voyages ────────────────────────────────────────────────────
     path("voyages/trips/", include("apps.voyages_trips.urls")),
 
+    # ── Tarification Voyages ───────────────────────────────────────────────
+    path("voyages/pricing/", include("apps.voyages_pricing.urls")),
+
     # ── Transport — Configuration ───────────────────────────────────────────
     path("transport/",  include("apps.transport_config.urls")),
 
