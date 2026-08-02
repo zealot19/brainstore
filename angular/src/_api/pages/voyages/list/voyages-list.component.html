@@ -1,0 +1,62 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Voyages</h4><h6>Gestion des départs</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau voyage</a></div>
+</div>
+<app-info-banner text="Créez et suivez les voyages. Après création, affectez un véhicule éligible (le plan de bus et les sièges sont générés automatiquement), l'équipage, puis pilotez le cycle de vie."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div></div>
+    <select class="form-select w-auto" [(ngModel)]="filterStatus" (ngModelChange)="load()">
+      <option value="">Tous les statuts</option>
+      <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+    </select>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr><th>Numéro</th><th>Trajet</th><th>Véhicule</th><th>Départ prévu</th><th>Places</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (t of filtered; track t.id) {
+            <tr>
+              <td class="fw-medium">{{ t.number }}</td>
+              <td>{{ t.route_code || '—' }}</td>
+              <td>{{ t.vehicle_plate || '—' }}</td>
+              <td>{{ t.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ t.seats_available }}/{{ t.seats_total }}</td>
+              <td>
+                <span class="badge" [class]="statusCss(t.status)">{{ statusLabel(t.status) }}</span>
+                @if (t.is_delayed) { <span class="badge bg-warning ms-1">Retard</span> }
+              </td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="open(t)" title="Ouvrir"><i class="ti ti-eye me-1"></i>Ouvrir</a>
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun voyage.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+<div class="modal fade" id="trip-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Nouveau voyage</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Trajet <span class="text-danger">*</span></label>
+        <select formControlName="route_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Planification (préremplissage)</label>
+        <select formControlName="service_pattern_id" class="form-select" (change)="onPatternChange()"><option [ngValue]="null">— Aucune —</option>@for (p of patterns; track p.id) { <option [ngValue]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }</select></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
+        <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Code</label><input formControlName="code" type="text" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Départ prévu <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Arrivée prévue <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Création…' : 'Créer' }}</button></div></form>
+</div></div></div>

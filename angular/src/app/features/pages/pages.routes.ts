@@ -69,7 +69,7 @@ export const Pages_routes: Routes = [
               path: 'voyages',
               loadComponent: () => import('../../../_api/pages/voyages/voyages.component').then(m => m.VoyagesComponent),
               children: [
-                // screens registered in Tasks 6–7
+                { path: 'list', loadComponent: () => import('../../../_api/pages/voyages/list/voyages-list.component').then(m => m.VoyagesListComponent) },
               ],
             },
 
