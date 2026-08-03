@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
+import { FareClassService } from '../../../services/voyages-config/fare-class.service';
+import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
+import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
 import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, PassengerSpec } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 
@@ -15,7 +18,10 @@ interface PaxRow extends PassengerSpec { destination_point_id: string; }
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
-  trips: TripOption[] = []; outboundTripId = ''; returnTripId = '';
+  fareClasses: FareClass[] = []; timeSlots: TimeSlot[] = [];
+  fareClassId = ''; outSlotId = ''; retSlotId = '';
+  outTrips: TripOption[] = []; retTrips: TripOption[] = [];
+  outboundTripId = ''; returnTripId = '';
   outboundSeats: SeatCell[] = []; returnSeats: SeatCell[] = [];
   destinations: TripDestination[] = [];
   selOutbound: SeatCell[] = []; selReturn: SeatCell[] = [];
@@ -23,18 +29,46 @@ export class VbNewBookingComponent implements OnInit {
   paymentMethod = ''; amountReceived: number | null = null;
   saving = false; errorMsg = '';
 
-  constructor(private svc: BookingService, private router: Router) {}
-  ngOnInit(): void { this.svc.bookableTrips().subscribe(t => this.trips = t); }
+  constructor(private svc: BookingService, private fcSvc: FareClassService,
+              private tsSvc: TimeSlotService, private router: Router) {}
+  ngOnInit(): void {
+    this.fcSvc.list().subscribe(d => this.fareClasses = d);
+    this.tsSvc.list().subscribe(d => this.timeSlots = d);
+  }
 
   get isRound(): boolean { return this.tripType === 'round_trip'; }
 
-  onTripChange(): void {
+  /** Reload the outbound / return trip lists from the chosen class + plage horaire. */
+  searchOutbound(): void {
+    this.outboundTripId = ''; this.outTrips = []; this.resetSelection();
+    if (this.fareClassId && this.outSlotId) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.outSlotId })
+        .subscribe(t => this.outTrips = t);
+    }
+  }
+  searchReturn(): void {
+    this.returnTripId = ''; this.retTrips = []; this.returnSeats = []; this.selReturn = [];
+    if (this.fareClassId && this.retSlotId) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.retSlotId })
+        .subscribe(t => this.retTrips = t);
+    }
+  }
+  onCriteriaChange(): void { this.searchOutbound(); if (this.isRound) this.searchReturn(); }
+
+  resetSelection(): void {
     this.outboundSeats = []; this.returnSeats = []; this.selOutbound = []; this.selReturn = [];
     this.destinations = []; this.passengers = [];
+  }
+
+  onOutboundChange(): void {
+    this.resetSelection();
     if (this.outboundTripId) {
       this.svc.seatMap(this.outboundTripId).subscribe(s => this.outboundSeats = s);
       this.svc.destinations(this.outboundTripId).subscribe(d => this.destinations = d);
     }
+  }
+  onReturnChange(): void {
+    this.returnSeats = []; this.selReturn = [];
     if (this.isRound && this.returnTripId) {
       this.svc.seatMap(this.returnTripId).subscribe(s => this.returnSeats = s);
     }

@@ -72,7 +72,10 @@ class BookableTripsView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request):
-        trips = selectors.bookable_trips(request.user.company)
+        trips = selectors.bookable_trips(
+            request.user.company,
+            fare_class_id=request.query_params.get("fare_class"),
+            time_slot_id=request.query_params.get("time_slot"))
         return success_response(S.TripOptionSerializer(trips, many=True).data)
 
 

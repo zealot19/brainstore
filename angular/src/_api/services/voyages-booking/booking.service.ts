@@ -8,7 +8,12 @@ import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate }
 export class BookingService {
   constructor(private http: HttpClient) {}
 
-  bookableTrips(): Observable<TripOption[]> { return this.http.get<TripOption[]>(VOYAGES_BOOKING.bookableTrips); }
+  bookableTrips(filters: { fare_class?: string; time_slot?: string } = {}): Observable<TripOption[]> {
+    let p = new HttpParams();
+    if (filters.fare_class) p = p.set('fare_class', filters.fare_class);
+    if (filters.time_slot) p = p.set('time_slot', filters.time_slot);
+    return this.http.get<TripOption[]>(VOYAGES_BOOKING.bookableTrips, { params: p });
+  }
   seatMap(tripId: string): Observable<SeatCell[]> { return this.http.get<SeatCell[]>(VOYAGES_BOOKING.seatMap(tripId)); }
   destinations(tripId: string): Observable<TripDestination[]> { return this.http.get<TripDestination[]>(VOYAGES_BOOKING.destinations(tripId)); }
 

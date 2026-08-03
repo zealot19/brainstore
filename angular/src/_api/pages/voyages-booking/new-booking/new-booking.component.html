@@ -1,37 +1,66 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Nouvelle réservation</h4><h6>Un seul formulaire — jusqu'à l'encaissement</h6></div></div>
 </div>
-<app-info-banner text="Sélectionnez le voyage et les sièges, choisissez le point de descente de chaque passager (le tarif s'ajuste), puis encaissez. La réservation est créée déjà payée."></app-info-banner>
+<app-info-banner text="Choisissez la classe et la plage horaire : les voyages correspondants s'affichent. Sélectionnez le voyage et les sièges, le point de descente de chaque passager (le tarif s'ajuste), puis encaissez. La réservation est créée déjà payée."></app-info-banner>
 
 <div class="card"><div class="card-body">
   @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
-  <!-- Voyage -->
-  <h6 class="mb-3"><span class="badge bg-primary me-2">1</span>Voyage</h6>
+  <!-- Critères -->
+  <h6 class="mb-3"><span class="badge bg-primary me-2">1</span>Critères</h6>
   <div class="row">
     <div class="col-md-3 mb-3"><label class="form-label">Type de voyage</label>
-      <select class="form-select" [(ngModel)]="tripType" (ngModelChange)="onTripChange()">
+      <select class="form-select" [(ngModel)]="tripType" (ngModelChange)="onCriteriaChange()">
         <option value="one_way">Aller simple</option>
         <option value="round_trip">Aller-retour</option>
       </select></div>
-    <div class="col-md-5 mb-3"><label class="form-label">Voyage aller <span class="text-danger">*</span></label>
-      <select class="form-select" [(ngModel)]="outboundTripId" (ngModelChange)="onTripChange()">
+    <div class="col-md-3 mb-3"><label class="form-label">Classe tarifaire <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="fareClassId" (ngModelChange)="onCriteriaChange()">
         <option value="">— Choisir —</option>
-        @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+        @for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }
+      </select></div>
+    <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (aller) <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="outSlotId" (ngModelChange)="searchOutbound()">
+        <option value="">— Choisir —</option>
+        @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
       </select></div>
     @if (isRound) {
-      <div class="col-md-4 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
-        <select class="form-select" [(ngModel)]="returnTripId" (ngModelChange)="onTripChange()">
+      <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (retour) <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="retSlotId" (ngModelChange)="searchReturn()">
           <option value="">— Choisir —</option>
-          @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+          @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
         </select></div>
     }
   </div>
 
+  <!-- Voyages disponibles -->
+  @if (fareClassId && outSlotId) {
+    <hr>
+    <h6 class="mb-3"><span class="badge bg-primary me-2">2</span>Voyages disponibles</h6>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Voyage aller <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()">
+          <option value="">— Choisir —</option>
+          @for (t of outTrips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+        </select>
+        @if (!outTrips.length) { <small class="text-muted">Aucun voyage pour ces critères.</small> }
+      </div>
+      @if (isRound && retSlotId) {
+        <div class="col-md-6 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()">
+            <option value="">— Choisir —</option>
+            @for (t of retTrips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
+          </select>
+          @if (!retTrips.length) { <small class="text-muted">Aucun voyage retour pour ces critères.</small> }
+        </div>
+      }
+    </div>
+  }
+
   <!-- Sièges -->
   @if (outboundSeats.length) {
     <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">2</span>Sièges — aller</h6>
+    <h6 class="mb-3"><span class="badge bg-primary me-2">3</span>Sièges — aller</h6>
     <div class="mb-2">
       @for (row of rows(outboundSeats); track row) {
         <div class="d-flex gap-2 mb-2">
@@ -59,7 +88,7 @@
   <!-- Passagers + point de descente -->
   @if (passengers.length) {
     <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">3</span>Passagers &amp; point de descente</h6>
+    <h6 class="mb-3"><span class="badge bg-primary me-2">4</span>Passagers &amp; point de descente</h6>
     <div class="table-responsive"><table class="table align-middle">
       <thead><tr><th>Siège</th><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>N° pièce</th><th>Descente</th><th class="text-end">Tarif</th><th class="text-center">Acheteur</th></tr></thead>
       <tbody>
@@ -92,7 +121,7 @@
   <!-- Encaissement -->
   @if (passengers.length) {
     <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">4</span>Encaissement</h6>
+    <h6 class="mb-3"><span class="badge bg-primary me-2">5</span>Encaissement</h6>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">Mode de paiement</label>
         <select class="form-select" [(ngModel)]="paymentMethod">

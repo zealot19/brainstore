@@ -28,7 +28,7 @@ from apps.hr.models import Employee
 from apps.fleet.models import Vehicle, ExternalDriver
 from apps.voyages_config.models import (
     ServicePoint, Route, RouteStop, SeatingPlan, PlanSeat,
-    VehicleSeatingAssignment, FareClass, LoyaltyRule, VoyagesSettings,
+    VehicleSeatingAssignment, FareClass, TimeSlot, LoyaltyRule, VoyagesSettings,
 )
 from apps.voyages_pricing.models import Fare
 from apps.voyages_trips.models import Trip, TripCrew
@@ -158,7 +158,16 @@ class Command(BaseCommand):
                 company=company, vehicle=v, seating_plan=plan,
                 defaults={"valid_from": date.today() - timedelta(days=60)})
 
-        # ── 7. Loyalty + settings ─────────────────────────────────────────────
+        # ── 7. Time slots (plages horaires) + loyalty + settings ──────────────
+        slot_am, _ = TimeSlot.objects.get_or_create(
+            company=company, code="MAT",
+            defaults={"label": "Matin", "start_time": "05:00", "end_time": "11:59", "ordering": 1})
+        slot_pm, _ = TimeSlot.objects.get_or_create(
+            company=company, code="APM",
+            defaults={"label": "Après-midi", "start_time": "12:00", "end_time": "17:59", "ordering": 2})
+        TimeSlot.objects.get_or_create(
+            company=company, code="SOI",
+            defaults={"label": "Soir", "start_time": "18:00", "end_time": "23:59", "ordering": 3})
         LoyaltyRule.objects.get_or_create(
             company=company, name="Programme fidélité",
             defaults={"points_per_one_way": 1, "points_per_round_trip": 2,
@@ -170,11 +179,14 @@ class Command(BaseCommand):
             (route_out, origin, destination, fc_std, "one_way", 4000),
             (route_out, origin, destination, fc_std, "round_trip", 7000),
             (route_out, origin, destination, fc_vip, "one_way", 6500),
+            (route_out, origin, destination, fc_vip, "round_trip", 11000),
             (route_ret, destination, origin, fc_std, "one_way", 4000),
             (route_ret, destination, origin, fc_std, "round_trip", 7000),
+            (route_ret, destination, origin, fc_vip, "one_way", 6500),
         ]
         if edea:
             fares.append((route_out, origin, edea, fc_std, "one_way", 2000))
+            fares.append((route_out, origin, edea, fc_vip, "one_way", 3500))
         for route, o, d, fc, tt, amount in fares:
             # Use all_objects so a previously soft-deleted fare (which still holds
             # the unique slot) is revived rather than triggering a UNIQUE error.
@@ -197,13 +209,14 @@ class Command(BaseCommand):
             w(self.style.SUCCESS("Terminé."))
             return
 
-        now = timezone.now().replace(minute=0, second=0, microsecond=0)
+        # Deterministic local midnight so departure hours land inside the slots.
+        base = timezone.localtime(timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0)
 
-        def make_trip(route, vehicle, driver, days_ahead):
-            dep = now + timedelta(days=days_ahead, hours=7)
+        def make_trip(route, vehicle, driver, days_ahead, hour, fare_class):
+            dep = base + timedelta(days=days_ahead, hours=hour)
             arr = dep + timedelta(hours=4)
             trip = trip_services.create_trip(
-                company=company, route=route, fare_class=fc_std,
+                company=company, route=route, fare_class=fare_class,
                 scheduled_departure=dep, scheduled_arrival=arr, user=None)
             assign_vehicle(trip, vehicle, user=None)
             TripCrew.objects.create(trip=trip, driver=driver, role=TripCrew.Role.DRIVER, created_by=None)
@@ -211,10 +224,11 @@ class Command(BaseCommand):
             trip.refresh_from_db()
             return trip
 
-        t_out = make_trip(route_out, bus_a, drivers[0], 1)              # DLA→YDE demain
-        t_ret = make_trip(route_ret, bus_a, drivers[0], 3)             # YDE→DLA (retour)
-        t_extra = make_trip(route_out, bus_b, drivers[1 % len(drivers)], 4)  # autre DLA→YDE
-        w(f"Voyages     : {t_out.number}, {t_ret.number}, {t_extra.number} (sièges générés)")
+        t_out = make_trip(route_out, bus_a, drivers[0], 1, 7, fc_std)   # DLA→YDE Matin, Classique
+        t_ret = make_trip(route_ret, bus_a, drivers[0], 3, 14, fc_std)  # YDE→DLA Après-midi, Classique
+        t_extra = make_trip(route_out, bus_b, drivers[1 % len(drivers)], 4, 8, fc_vip)  # DLA→YDE Matin, VIP
+        w(f"Voyages     : {t_out.number} (Classique/Matin), {t_ret.number} (Classique/Après-midi), "
+          f"{t_extra.number} (VIP/Matin)")
 
         def seats(trip, k):
             return list(trip.seats.filter(status="available").order_by("row", "column")[:k])
@@ -252,7 +266,7 @@ class Command(BaseCommand):
                     "destination_point_id": None, "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}],
             payment_method="Espèces", amount_received=10000, user=None)
 
-        # d) One-way paid on the extra trip (2 passengers)
+        # d) One-way paid on the extra VIP trip (2 passengers, VIP fare 6500 each)
         s = seats(t_extra, 2)
         booking_services.create_booking(
             company, trip_type="one_way", outbound_trip=t_extra, return_trip=None,
@@ -260,7 +274,7 @@ class Command(BaseCommand):
             items=[
                 {"passenger": pax("Boris", "Eyenga", "699100006", "CNI100006"), "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None},
                 {"passenger": pax("Diane", "Ngo", "699100007", "CNI100007"), "destination_point_id": None, "outbound_seat_id": s[1].id, "return_seat_id": None},
-            ], payment_method="Espèces", amount_received=8000, user=None)
+            ], payment_method="Espèces", amount_received=15000, user=None)
 
         w(f"Passagers   : {Passenger.objects.filter(company=company, is_deleted=False).count()}")
         w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} (toutes payées)")

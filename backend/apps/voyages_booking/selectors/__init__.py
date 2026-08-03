@@ -2,6 +2,7 @@ from django.utils import timezone
 from django.db.models import Q
 from apps.voyages_booking.models import Passenger, Booking, LoyaltyAccount
 from apps.voyages_trips.models import Trip, TripSeat
+from apps.voyages_config.models import TimeSlot
 from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
 
 _PRE_DEPARTURE = ["draft", "pending"]
@@ -15,13 +16,31 @@ def find_passengers(company, q=None):
     return qs
 
 
-def bookable_trips(company):
-    return (Trip.objects.filter(is_deleted=False, company=company,
-                                status__in=_PRE_DEPARTURE,
-                                scheduled_departure__gte=timezone.now())
-            .filter(seats__isnull=False).distinct()
-            .select_related("route", "origin", "destination", "fare_class")
-            .order_by("scheduled_departure"))
+def bookable_trips(company, fare_class_id=None, time_slot_id=None):
+    qs = (Trip.objects.filter(is_deleted=False, company=company,
+                              status__in=_PRE_DEPARTURE,
+                              scheduled_departure__gte=timezone.now())
+          .filter(seats__isnull=False).distinct()
+          .select_related("route", "origin", "destination", "fare_class", "service_pattern")
+          .order_by("scheduled_departure"))
+    if fare_class_id:
+        qs = qs.filter(fare_class_id=fare_class_id)
+    if not time_slot_id:
+        return qs
+    slot = TimeSlot.objects.filter(is_deleted=False, id=time_slot_id).first()
+    if not slot:
+        return qs
+    # A trip matches the plage horaire either via its service pattern or by its
+    # local departure time falling inside the slot window.
+    out = []
+    for t in qs:
+        if t.service_pattern_id and t.service_pattern.time_slot_id == slot.id:
+            out.append(t)
+            continue
+        lt = timezone.localtime(t.scheduled_departure).time()
+        if slot.start_time <= lt <= slot.end_time:
+            out.append(t)
+    return out
 
 
 def seat_map(trip):
