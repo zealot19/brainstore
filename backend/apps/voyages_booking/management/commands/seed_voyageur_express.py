@@ -222,47 +222,46 @@ class Command(BaseCommand):
         def pax(fn, ln, phone, idn):
             return {"first_name": fn, "last_name": ln, "phone": phone, "id_type": "cni", "id_number": idn}
 
-        # 10a. One-way HELD (3 passengers)
+        edea_id = edea.id if edea else None
+
+        # a) One-way paid, 3 passengers — one drops at the Edéa escale (cheaper fare)
         s = seats(t_out, 3)
         booking_services.create_booking(
             company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
             buyer_spec=pax("Colette", "Manga", "699100001", "CNI100001"),
             items=[
-                {"passenger": pax("Colette", "Manga", "699100001", "CNI100001"), "outbound_seat_id": s[0].id, "return_seat_id": None},
-                {"passenger": pax("Hervé", "Biya", "699100002", "CNI100002"), "outbound_seat_id": s[1].id, "return_seat_id": None},
-                {"passenger": pax("Nadège", "Fotso", "699100003", "CNI100003"), "outbound_seat_id": s[2].id, "return_seat_id": None},
-            ], user=None)
+                {"passenger": pax("Colette", "Manga", "699100001", "CNI100001"), "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None},
+                {"passenger": pax("Hervé", "Biya", "699100002", "CNI100002"), "destination_point_id": edea_id, "outbound_seat_id": s[1].id, "return_seat_id": None},
+                {"passenger": pax("Nadège", "Fotso", "699100003", "CNI100003"), "destination_point_id": None, "outbound_seat_id": s[2].id, "return_seat_id": None},
+            ], payment_method="Espèces", amount_received=15000, user=None)
 
-        # 10b. One-way CONFIRMED (loyalty)
+        # b) One-way paid (loyalty accrues)
         s = seats(t_out, 1)
-        bk = booking_services.create_booking(
+        booking_services.create_booking(
             company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
             buyer_spec=pax("Patrick", "Owona", "699100004", "CNI100004"),
-            items=[{"passenger": pax("Patrick", "Owona", "699100004", "CNI100004"), "outbound_seat_id": s[0].id, "return_seat_id": None}],
-            user=None)
-        booking_services.confirm_booking(bk, payment_method="", amount_paid=None, user=None)
+            items=[{"passenger": pax("Patrick", "Owona", "699100004", "CNI100004"), "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None}],
+            payment_method="Espèces", amount_received=5000, user=None)
 
-        # 10c. Round-trip CONFIRMED
+        # c) Round-trip paid
         so, sr = seats(t_out, 1), seats(t_ret, 1)
-        bk = booking_services.create_booking(
+        booking_services.create_booking(
             company, trip_type="round_trip", outbound_trip=t_out, return_trip=t_ret,
             buyer_spec=pax("Solange", "Ndam", "699100005", "CNI100005"),
             items=[{"passenger": pax("Solange", "Ndam", "699100005", "CNI100005"),
-                    "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}], user=None)
-        booking_services.confirm_booking(bk, payment_method="", amount_paid=None, user=None)
+                    "destination_point_id": None, "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}],
+            payment_method="Espèces", amount_received=10000, user=None)
 
-        # 10d. One-way CONFIRMED on the extra trip
+        # d) One-way paid on the extra trip (2 passengers)
         s = seats(t_extra, 2)
-        bk = booking_services.create_booking(
+        booking_services.create_booking(
             company, trip_type="one_way", outbound_trip=t_extra, return_trip=None,
             buyer_spec=pax("Boris", "Eyenga", "699100006", "CNI100006"),
             items=[
-                {"passenger": pax("Boris", "Eyenga", "699100006", "CNI100006"), "outbound_seat_id": s[0].id, "return_seat_id": None},
-                {"passenger": pax("Diane", "Ngo", "699100007", "CNI100007"), "outbound_seat_id": s[1].id, "return_seat_id": None},
-            ], user=None)
-        booking_services.confirm_booking(bk, payment_method="", amount_paid=None, user=None)
+                {"passenger": pax("Boris", "Eyenga", "699100006", "CNI100006"), "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None},
+                {"passenger": pax("Diane", "Ngo", "699100007", "CNI100007"), "destination_point_id": None, "outbound_seat_id": s[1].id, "return_seat_id": None},
+            ], payment_method="Espèces", amount_received=8000, user=None)
 
         w(f"Passagers   : {Passenger.objects.filter(company=company, is_deleted=False).count()}")
-        w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} "
-          f"(1 réservée, 3 confirmées)")
+        w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} (toutes payées)")
         w(self.style.SUCCESS("Données de démonstration ajoutées à Voyageur Express SA."))

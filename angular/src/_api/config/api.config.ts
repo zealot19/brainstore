@@ -334,12 +334,11 @@ export const VOYAGES_BOOKING = {
   passengerLoyalty: (id: string) => `${VB}/passengers/${id}/loyalty/`,
   bookableTrips: `${VB}/trips/bookable/`,
   seatMap: (tripId: string) => `${VB}/trips/${tripId}/seat-map/`,
+  destinations: (tripId: string) => `${VB}/trips/${tripId}/destinations/`,
   bookings: `${VB}/bookings/`,
   booking: (id: string) => `${VB}/bookings/${id}/`,
-  bookingConfirm: (id: string) => `${VB}/bookings/${id}/confirm/`,
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
-  bookingRedeem: (id: string) => `${VB}/bookings/${id}/redeem/`,
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
 };
 

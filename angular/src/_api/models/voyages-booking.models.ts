@@ -15,9 +15,16 @@ export interface TripOption {
   scheduled_departure: string;
 }
 
+export interface TripDestination {
+  id: string; name: string; code: string; is_station: boolean;
+  one_way_amount: string | null; round_trip_amount: string | null;
+}
+
 export interface Ticket {
   id: string; number: string; passenger: string; passenger_name: string;
   trip: string; trip_seat: string; seat_number: string | null;
+  origin_point: string | null; origin_point_name: string | null;
+  destination_point: string | null; destination_point_name: string | null;
   direction: 'outbound' | 'return'; direction_display: string; return_of: string | null;
   fare: string | null; fare_class: string; amount: string; is_reward: boolean;
   status: string; status_display: string; boarded_at: string | null;
@@ -27,8 +34,9 @@ export interface Booking {
   id: string; reference: string; status: string; status_display: string;
   trip_type: 'one_way' | 'round_trip'; trip_type_display: string;
   outbound_trip: string; return_trip: string | null; buyer: string; buyer_name: string;
-  amount_due: string; amount_paid: string; payment_method: string; held_until: string | null;
-  channel: string; notes: string; created_at: string; updated_at: string; tickets: Ticket[];
+  amount_due: string; amount_paid: string; amount_received: string; change_due: string;
+  payment_method: string; channel: string; notes: string;
+  created_at: string; updated_at: string; tickets: Ticket[];
 }
 
 export interface LoyaltyAccount { id: string; passenger: string; points_balance: number; lifetime_points: number; }
@@ -39,8 +47,12 @@ export interface PassengerSpec {
   id?: string; first_name?: string; last_name?: string; gender?: string; birth_date?: string | null;
   phone?: string; email?: string; id_type?: string; id_number?: string;
 }
-export interface BookingItem { passenger: PassengerSpec; outbound_seat_id: string; return_seat_id?: string | null; }
+export interface BookingItem {
+  passenger: PassengerSpec; destination_point_id?: string | null;
+  outbound_seat_id: string; return_seat_id?: string | null;
+}
 export interface BookingCreate {
   trip_type: 'one_way' | 'round_trip'; outbound_trip_id: string; return_trip_id?: string | null;
   buyer: PassengerSpec; items: BookingItem[];
+  payment_method?: string; amount_received?: number | null;
 }

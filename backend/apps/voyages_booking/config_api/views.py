@@ -86,6 +86,16 @@ class TripSeatMapView(APIView):
         return success_response(S.SeatCellSerializer(selectors.seat_map(trip), many=True).data)
 
 
+class TripDestinationsView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, trip_id):
+        trip = _trip(request.user.company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        return success_response(S.TripDestinationSerializer(selectors.trip_destinations(trip), many=True).data)
+
+
 class BookingListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
@@ -111,7 +121,8 @@ class BookingListView(APIView):
         try:
             booking = services.create_booking(
                 company, trip_type=d["trip_type"], outbound_trip=outbound, return_trip=return_trip,
-                buyer_spec=d["buyer"], items=d["items"], user=request.user)
+                buyer_spec=d["buyer"], items=d["items"], payment_method=d["payment_method"],
+                amount_received=d["amount_received"], user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.BookingRead(booking).data)
@@ -129,23 +140,6 @@ class BookingDetailView(APIView):
         if not b:
             return error_response("Introuvable.", status_code=404)
         services.cancel_booking(b, user=request.user)
-        return success_response(S.BookingRead(b).data)
-
-
-class BookingConfirmView(APIView):
-    permission_classes = [IsInstitutionAdmin]
-
-    def post(self, request, pk):
-        b = selectors.booking_detail(request.user.company, pk)
-        if not b:
-            return error_response("Introuvable.", status_code=404)
-        payload = S.ConfirmSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        try:
-            b = services.confirm_booking(b, payment_method=payload.validated_data["payment_method"],
-                                         amount_paid=payload.validated_data["amount_paid"], user=request.user)
-        except ApplicationError as e:
-            return error_response(str(e))
         return success_response(S.BookingRead(b).data)
 
 
@@ -171,31 +165,6 @@ class BookingNoShowView(APIView):
             b = services.mark_no_show(b, user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
-        return success_response(S.BookingRead(b).data)
-
-
-class BookingRedeemView(APIView):
-    permission_classes = [IsInstitutionAdmin]
-
-    def post(self, request, pk):
-        b = selectors.booking_detail(request.user.company, pk)
-        if not b:
-            return error_response("Introuvable.", status_code=404)
-        payload = S.RedeemSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        passenger = Passenger.objects.filter(is_deleted=False, company=request.user.company,
-                                             id=payload.validated_data["passenger_id"]).first()
-        ticket = Ticket.objects.filter(is_deleted=False, booking=b,
-                                       id=payload.validated_data["ticket_id"]).first()
-        if not passenger or not ticket:
-            return error_response("Passager ou billet introuvable.", status_code=404)
-        try:
-            services.loyalty_services.redeem_reward(b, passenger, ticket, user=request.user)
-        except ApplicationError as e:
-            return error_response(str(e))
-        b.amount_due = sum(t.amount for t in b.tickets.filter(is_deleted=False))
-        b.updated_by = request.user
-        b.save(update_fields=["amount_due", "updated_by", "updated_at"])
         return success_response(S.BookingRead(b).data)
 
 

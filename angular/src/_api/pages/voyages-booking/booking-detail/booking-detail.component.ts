@@ -21,9 +21,8 @@ export class VbBookingDetailComponent implements OnInit {
     this.svc.get(id).subscribe({ next: b => { this.booking = b; this.loading = false; }, error: () => this.loading = false });
   }
   statusClass(s: string): string {
-    return { held: 'bg-warning', confirmed: 'bg-success', boarded: 'bg-primary',
-             cancelled: 'bg-danger', expired: 'bg-secondary', no_show: 'bg-dark',
-             sold: 'bg-success' }[s] ?? 'bg-secondary';
+    return { confirmed: 'bg-success', boarded: 'bg-primary', cancelled: 'bg-danger',
+             no_show: 'bg-dark', sold: 'bg-success' }[s] ?? 'bg-secondary';
   }
   board(ticketId: string): void {
     this.svc.board(ticketId).subscribe({ next: () => this.booking && this.load(this.booking.id),

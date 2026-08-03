@@ -2,6 +2,7 @@ from django.utils import timezone
 from django.db.models import Q
 from apps.voyages_booking.models import Passenger, Booking, LoyaltyAccount
 from apps.voyages_trips.models import Trip, TripSeat
+from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
 
 _PRE_DEPARTURE = ["draft", "pending"]
 
@@ -26,6 +27,23 @@ def bookable_trips(company):
 def seat_map(trip):
     return (TripSeat.objects.filter(is_deleted=False, trip=trip)
             .order_by("row", "column"))
+
+
+def trip_destinations(trip):
+    """Selectable drop points for a trip (every route point after the origin),
+    each with the resolved one-way and round-trip fare for the trip's class."""
+    company = trip.company
+    pts = route_points(trip.route)  # [origin, escales..., destination]
+    out = []
+    for p in pts[1:]:
+        ow = resolve_fare(company, trip.route, trip.origin, p, trip.fare_class, trip_type="one_way")
+        rt = resolve_fare(company, trip.route, trip.origin, p, trip.fare_class, trip_type="round_trip")
+        out.append({
+            "id": p.id, "name": p.name, "code": p.code, "is_station": p.is_station,
+            "one_way_amount": ow.amount if ow else None,
+            "round_trip_amount": rt.amount if rt else None,
+        })
+    return out
 
 
 def list_bookings(company, status=None, trip_id=None, q=None):
@@ -55,5 +73,5 @@ def loyalty_view(passenger):
     return acc, movements
 
 
-__all__ = ["find_passengers", "bookable_trips", "seat_map",
+__all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations",
            "list_bookings", "booking_detail", "loyalty_view"]

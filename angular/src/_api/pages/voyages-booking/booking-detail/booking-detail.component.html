@@ -11,26 +11,27 @@
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Statut</small><span class="badge {{ statusClass(booking.status) }}">{{ booking.status_display }}</span></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Acheteur</small><strong>{{ booking.buyer_name }}</strong></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Type</small><strong>{{ booking.trip_type_display }}</strong></div>
-      <div class="col-md-3 mb-2"><small class="text-muted d-block">Montant dû</small><strong>{{ booking.amount_due | number:'1.0-0' }} XAF</strong></div>
-      <div class="col-md-3 mb-2"><small class="text-muted d-block">Montant payé</small><strong>{{ booking.amount_paid | number:'1.0-0' }} XAF</strong></div>
+      <div class="col-md-3 mb-2"><small class="text-muted d-block">Total à payer</small><strong>{{ booking.amount_due | number:'1.0-0' }} XAF</strong></div>
+      <div class="col-md-3 mb-2"><small class="text-muted d-block">Encaissé</small><strong>{{ booking.amount_received | number:'1.0-0' }} XAF</strong></div>
+      <div class="col-md-3 mb-2"><small class="text-muted d-block">Monnaie rendue</small><strong>{{ booking.change_due | number:'1.0-0' }} XAF</strong></div>
     </div>
-    @if (booking.status === 'held' || booking.status === 'confirmed') {
+    @if (booking.status === 'confirmed') {
       <div class="mt-2"><button class="btn btn-sm btn-outline-danger" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler la réservation</button></div>
     }
   </div></div>
 
   <div class="card"><div class="card-header"><h5 class="mb-0">Billets</h5></div>
     <div class="card-body p-0"><div class="table-responsive"><table class="table datanew">
-      <thead class="thead-light"><tr><th>Numéro</th><th>Passager</th><th>Sens</th><th>Siège</th><th>Montant</th><th>Récompense</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+      <thead class="thead-light"><tr><th>Numéro</th><th>Passager</th><th>Sens</th><th>Trajet</th><th>Siège</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
       <tbody>
         @for (t of booking.tickets; track t.id) {
           <tr>
             <td class="fw-medium">{{ t.number }}</td>
             <td>{{ t.passenger_name }}</td>
             <td>{{ t.direction_display }}</td>
+            <td>{{ t.origin_point_name || '—' }} → {{ t.destination_point_name || '—' }}</td>
             <td>{{ t.seat_number || '—' }}</td>
             <td>{{ t.amount | number:'1.0-0' }} XAF</td>
-            <td>@if (t.is_reward) { <span class="badge bg-info">Gratuit</span> } @else { — }</td>
             <td><span class="badge {{ statusClass(t.status) }}">{{ t.status_display }}</span></td>
             <td class="action-table-data">
               @if (t.status === 'sold') {

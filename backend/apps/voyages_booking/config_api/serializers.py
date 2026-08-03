@@ -46,15 +46,27 @@ class TripOptionSerializer(serializers.Serializer):
     scheduled_departure = serializers.DateTimeField()
 
 
+class TripDestinationSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    code = serializers.CharField()
+    is_station = serializers.BooleanField()
+    one_way_amount = serializers.DecimalField(max_digits=12, decimal_places=2, allow_null=True)
+    round_trip_amount = serializers.DecimalField(max_digits=12, decimal_places=2, allow_null=True)
+
+
 class TicketRead(serializers.ModelSerializer):
     passenger_name = serializers.CharField(source="passenger.full_name", read_only=True)
     seat_number = serializers.CharField(source="trip_seat.seat_number", read_only=True, default=None)
+    origin_point_name = serializers.CharField(source="origin_point.name", read_only=True, default=None)
+    destination_point_name = serializers.CharField(source="destination_point.name", read_only=True, default=None)
     direction_display = serializers.CharField(source="get_direction_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Ticket
         fields = ["id", "number", "passenger", "passenger_name", "trip", "trip_seat", "seat_number",
+                  "origin_point", "origin_point_name", "destination_point", "destination_point_name",
                   "direction", "direction_display", "return_of", "fare", "fare_class", "amount",
                   "is_reward", "status", "status_display", "boarded_at"]
 
@@ -69,11 +81,13 @@ class BookingRead(serializers.ModelSerializer):
         model = Booking
         fields = ["id", "reference", "status", "status_display", "trip_type", "trip_type_display",
                   "outbound_trip", "return_trip", "buyer", "buyer_name", "amount_due", "amount_paid",
-                  "payment_method", "held_until", "channel", "notes", "created_at", "updated_at", "tickets"]
+                  "amount_received", "change_due", "payment_method", "channel", "notes",
+                  "created_at", "updated_at", "tickets"]
 
 
 class BookingItemSerializer(serializers.Serializer):
     passenger = serializers.DictField()
+    destination_point_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     outbound_seat_id = serializers.UUIDField()
     return_seat_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
@@ -84,16 +98,8 @@ class BookingCreateSerializer(serializers.Serializer):
     return_trip_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     buyer = serializers.DictField()
     items = BookingItemSerializer(many=True)
-
-
-class ConfirmSerializer(serializers.Serializer):
     payment_method = serializers.CharField(required=False, allow_blank=True, default="")
-    amount_paid = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
-
-
-class RedeemSerializer(serializers.Serializer):
-    passenger_id = serializers.UUIDField()
-    ticket_id = serializers.UUIDField()
+    amount_received = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
 
 
 class LoyaltyMovementRead(serializers.ModelSerializer):

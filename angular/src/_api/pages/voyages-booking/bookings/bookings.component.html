@@ -10,11 +10,9 @@
     <div class="d-flex align-items-center gap-2">
       <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
         <option value="">Tous les statuts</option>
-        <option value="held">Réservé</option>
-        <option value="confirmed">Confirmé</option>
+        <option value="confirmed">Payé</option>
         <option value="boarded">Embarqué</option>
         <option value="cancelled">Annulé</option>
-        <option value="expired">Expiré</option>
         <option value="no_show">Non présenté</option>
       </select>
       <input type="text" class="form-control w-auto" placeholder="Référence, acheteur…" [(ngModel)]="q" (keyup.enter)="reload()" />
@@ -37,13 +35,10 @@
               <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(b)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
-                @if (b.status === 'held') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#confirm-modal" (click)="askConfirm(b)" title="Confirmer"><i class="ti ti-check me-1"></i>Confirmer</a>
-                }
                 @if (b.status === 'confirmed') {
                   <a href="javascript:void(0);" class="btn btn-sm btn-outline-dark me-1" (click)="noShow(b)" title="Non présenté"><i class="ti ti-user-x me-1"></i>No-show</a>
                 }
-                @if (b.status === 'held' || b.status === 'confirmed') {
+                @if (b.status === 'confirmed') {
                   <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a>
                 }
               </div></td>
@@ -54,19 +49,3 @@
     }
   </div>
 </div>
-
-<div class="modal fade" id="confirm-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Confirmer la réservation</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="confirmTarget = null"></button></div>
-  <div class="modal-body">
-    @if (confirmTarget) {
-      <p>Réservation <strong>{{ confirmTarget.reference }}</strong> — montant dû <strong>{{ confirmTarget.amount_due | number:'1.0-0' }} XAF</strong>.</p>
-      <div class="mb-3"><label class="form-label">Mode de paiement</label>
-        <select class="form-select" [(ngModel)]="payMethod">
-          <option value="" disabled selected>(module trésorerie à venir)</option>
-        </select>
-      </div>
-      <div class="mb-2"><label class="form-label">Montant payé</label><input type="number" class="form-control" [(ngModel)]="payAmount" /></div>
-    }
-  </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="confirmTarget = null">Annuler</button><button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="doConfirm()">Confirmer</button></div>
-</div></div></div>

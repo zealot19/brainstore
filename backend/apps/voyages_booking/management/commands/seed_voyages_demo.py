@@ -202,7 +202,7 @@ class Command(BaseCommand):
             def seats(trip, k):
                 return list(trip.seats.filter(status="available").order_by("row", "column")[:k])
 
-            # 8a. One-way HELD booking (2 passengers)
+            # 8a. One-way paid booking (2 passengers)
             s = seats(t_out, 2)
             booking_services.create_booking(
                 company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
@@ -211,36 +211,35 @@ class Command(BaseCommand):
                 items=[
                     {"passenger": {"first_name": "Alice", "last_name": "Ngo", "phone": "699000001",
                                    "id_type": "cni", "id_number": "CNI001"},
-                     "outbound_seat_id": s[0].id, "return_seat_id": None},
+                     "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None},
                     {"passenger": {"first_name": "Bruno", "last_name": "Foka", "phone": "699000002",
                                    "id_type": "cni", "id_number": "CNI002"},
-                     "outbound_seat_id": s[1].id, "return_seat_id": None},
-                ], user=None)
+                     "destination_point_id": None, "outbound_seat_id": s[1].id, "return_seat_id": None},
+                ], payment_method="Espèces", amount_received=10000, user=None)
 
-            # 8b. One-way CONFIRMED booking (loyalty accrues)
+            # 8b. One-way paid booking (loyalty accrues)
             s = seats(t_out, 1)
-            bk2 = booking_services.create_booking(
+            booking_services.create_booking(
                 company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
                 buyer_spec={"first_name": "Carine", "last_name": "Meli", "phone": "699000003",
                             "id_type": "cni", "id_number": "CNI003"},
                 items=[{"passenger": {"first_name": "Carine", "last_name": "Meli", "phone": "699000003",
                                       "id_type": "cni", "id_number": "CNI003"},
-                        "outbound_seat_id": s[0].id, "return_seat_id": None}], user=None)
-            booking_services.confirm_booking(bk2, payment_method="", amount_paid=None, user=None)
+                        "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None}],
+                payment_method="Espèces", amount_received=5000, user=None)
 
-            # 8c. Round-trip CONFIRMED booking (outbound + return legs)
+            # 8c. Round-trip paid booking (outbound + return legs)
             so = seats(t_out, 1)
             sr = seats(t_ret, 1)
-            bk3 = booking_services.create_booking(
+            booking_services.create_booking(
                 company, trip_type="round_trip", outbound_trip=t_out, return_trip=t_ret,
                 buyer_spec={"first_name": "David", "last_name": "Sone", "phone": "699000004",
                             "id_type": "cni", "id_number": "CNI004"},
                 items=[{"passenger": {"first_name": "David", "last_name": "Sone", "phone": "699000004",
                                       "id_type": "cni", "id_number": "CNI004"},
-                        "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}], user=None)
-            booking_services.confirm_booking(bk3, payment_method="", amount_paid=None, user=None)
+                        "destination_point_id": None, "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}],
+                payment_method="Espèces", amount_received=10000, user=None)
 
-            w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} "
-              f"(1 réservée, 2 confirmées)")
+            w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} (toutes payées)")
 
         w(self.style.SUCCESS("Données de démonstration créées avec succès."))

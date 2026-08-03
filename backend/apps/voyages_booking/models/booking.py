@@ -5,11 +5,9 @@ from apps.core.models import BaseModel
 
 class Booking(BaseModel):
     class Status(models.TextChoices):
-        HELD      = "held",      _("Réservé")
-        CONFIRMED = "confirmed", _("Confirmé")
+        CONFIRMED = "confirmed", _("Payé")
         BOARDED   = "boarded",   _("Embarqué")
         CANCELLED = "cancelled", _("Annulé")
-        EXPIRED   = "expired",   _("Expiré")
         NO_SHOW   = "no_show",   _("Non présenté")
 
     class TripType(models.TextChoices):
@@ -23,7 +21,7 @@ class Booking(BaseModel):
     company        = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                         on_delete=models.CASCADE, related_name="voyages_bookings")
     reference      = models.CharField(_("référence"), max_length=40, blank=True)
-    status         = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.HELD)
+    status         = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.CONFIRMED)
     trip_type      = models.CharField(_("type de voyage"), max_length=12, choices=TripType.choices, default=TripType.ONE_WAY)
     outbound_trip  = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage aller"),
                                         on_delete=models.PROTECT, related_name="bookings_outbound")
@@ -31,12 +29,13 @@ class Booking(BaseModel):
                                         on_delete=models.PROTECT, null=True, blank=True, related_name="bookings_return")
     buyer          = models.ForeignKey("voyages_booking.Passenger", verbose_name=_("acheteur"),
                                         on_delete=models.PROTECT, related_name="bookings_bought")
-    amount_due     = models.DecimalField(_("montant dû"), max_digits=12, decimal_places=2, default=0)
-    amount_paid    = models.DecimalField(_("montant payé"), max_digits=12, decimal_places=2, default=0)
-    payment_method = models.CharField(_("mode de paiement"), max_length=40, blank=True)
-    held_until     = models.DateTimeField(_("réservé jusqu'à"), null=True, blank=True)
-    channel        = models.CharField(_("canal"), max_length=10, choices=Channel.choices, default=Channel.COUNTER)
-    notes          = models.TextField(_("notes"), blank=True)
+    amount_due      = models.DecimalField(_("montant dû"), max_digits=12, decimal_places=2, default=0)
+    amount_paid     = models.DecimalField(_("montant payé"), max_digits=12, decimal_places=2, default=0)
+    amount_received = models.DecimalField(_("montant encaissé"), max_digits=12, decimal_places=2, default=0)
+    change_due      = models.DecimalField(_("monnaie rendue"), max_digits=12, decimal_places=2, default=0)
+    payment_method  = models.CharField(_("mode de paiement"), max_length=40, blank=True)
+    channel         = models.CharField(_("canal"), max_length=10, choices=Channel.choices, default=Channel.COUNTER)
+    notes           = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
         verbose_name = _("réservation")
@@ -52,7 +51,6 @@ class Ticket(BaseModel):
         RETURN   = "return",   _("Retour")
 
     class Status(models.TextChoices):
-        HELD      = "held",      _("Réservé")
         SOLD      = "sold",      _("Vendu")
         BOARDED   = "boarded",   _("Embarqué")
         CANCELLED = "cancelled", _("Annulé")
@@ -66,6 +64,10 @@ class Ticket(BaseModel):
                                     on_delete=models.PROTECT, related_name="tickets")
     trip_seat  = models.ForeignKey("voyages_trips.TripSeat", verbose_name=_("siège"),
                                     on_delete=models.PROTECT, related_name="tickets")
+    origin_point      = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("de"),
+                                          on_delete=models.PROTECT, null=True, blank=True, related_name="tickets_from")
+    destination_point = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("descente"),
+                                          on_delete=models.PROTECT, null=True, blank=True, related_name="tickets_to")
     direction  = models.CharField(_("sens"), max_length=10, choices=Direction.choices, default=Direction.OUTBOUND)
     return_of  = models.ForeignKey("self", verbose_name=_("retour de"),
                                     on_delete=models.SET_NULL, null=True, blank=True, related_name="return_tickets")
@@ -75,7 +77,7 @@ class Ticket(BaseModel):
                                     on_delete=models.PROTECT, related_name="tickets")
     amount     = models.DecimalField(_("montant"), max_digits=12, decimal_places=2, default=0)
     is_reward  = models.BooleanField(_("billet récompense"), default=False)
-    status     = models.CharField(_("statut"), max_length=10, choices=Status.choices, default=Status.HELD)
+    status     = models.CharField(_("statut"), max_length=10, choices=Status.choices, default=Status.SOLD)
     boarded_at = models.DateTimeField(_("embarqué à"), null=True, blank=True)
 
     class Meta(BaseModel.Meta):
