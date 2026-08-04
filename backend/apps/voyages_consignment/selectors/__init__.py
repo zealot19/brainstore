@@ -1,0 +1,61 @@
+from django.db.models import Q
+from apps.voyages_consignment.models import Parcel, Baggage
+
+
+def list_parcels(company, status=None, trip_id=None, q=None):
+    qs = (Parcel.objects.filter(is_deleted=False, company=company)
+          .select_related("origin_point", "destination_point", "trip", "consignment_type")
+          .order_by("-created_at"))
+    if status:
+        qs = qs.filter(status=status)
+    if trip_id:
+        qs = qs.filter(trip_id=trip_id)
+    if q:
+        qs = qs.filter(Q(reference__icontains=q) | Q(sender_name__icontains=q) |
+                       Q(sender_phone__icontains=q) | Q(recipient_name__icontains=q) |
+                       Q(recipient_phone__icontains=q))
+    return qs
+
+
+def parcel_detail(company, pk):
+    return (Parcel.objects.filter(is_deleted=False, company=company, id=pk)
+            .select_related("origin_point", "destination_point", "trip", "consignment_type")
+            .prefetch_related("events__trip")
+            .first())
+
+
+def pending_for_trip(company, route_id=None):
+    """Colis enregistrés sans voyage — candidats au chargement."""
+    qs = (Parcel.objects.filter(is_deleted=False, company=company,
+                                status=Parcel.Status.REGISTERED, trip__isnull=True)
+          .select_related("origin_point", "destination_point", "consignment_type")
+          .order_by("created_at"))
+    return qs
+
+
+def list_baggage(company, ticket_id=None, trip_id=None, status=None):
+    qs = (Baggage.objects.filter(is_deleted=False, company=company)
+          .select_related("ticket__passenger", "ticket__trip", "consignment_type")
+          .order_by("-created_at"))
+    if ticket_id:
+        qs = qs.filter(ticket_id=ticket_id)
+    if trip_id:
+        qs = qs.filter(ticket__trip_id=trip_id)
+    if status:
+        qs = qs.filter(status=status)
+    return qs
+
+
+def trip_manifest(trip):
+    parcels = (Parcel.objects.filter(is_deleted=False, trip=trip)
+               .exclude(status=Parcel.Status.CANCELLED)
+               .select_related("origin_point", "destination_point", "consignment_type")
+               .order_by("reference"))
+    baggage = (Baggage.objects.filter(is_deleted=False, ticket__trip=trip)
+               .exclude(status=Baggage.Status.CANCELLED)
+               .select_related("ticket__passenger", "consignment_type")
+               .order_by("tag_number"))
+    return {"parcels": parcels, "baggage": baggage}
+
+
+__all__ = ["list_parcels", "parcel_detail", "pending_for_trip", "list_baggage", "trip_manifest"]
