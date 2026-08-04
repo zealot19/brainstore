@@ -7,7 +7,7 @@ class Parcel(BaseModel):
     class Status(models.TextChoices):
         REGISTERED = "registered", _("Enregistré")
         LOADED     = "loaded",     _("Chargé")
-        ARRIVED    = "arrived",    _("Arrivé")
+        ARRIVED    = "arrived",    _("Réceptionné")
         PICKED_UP  = "picked_up",  _("Retiré")
         CANCELLED  = "cancelled",  _("Annulé")
 
@@ -56,7 +56,7 @@ class ParcelEvent(BaseModel):
     class Kind(models.TextChoices):
         REGISTERED = "registered", _("Enregistré")
         LOADED     = "loaded",     _("Chargé")
-        ARRIVED    = "arrived",    _("Arrivé")
+        ARRIVED    = "arrived",    _("Réceptionné")
         PICKED_UP  = "picked_up",  _("Retiré")
         CANCELLED  = "cancelled",  _("Annulé")
 

@@ -90,8 +90,9 @@ export const Pages_routes: Routes = [
               path: 'voyages-consignment',
               loadComponent: () => import('../../../_api/pages/voyages-consignment/voyages-consignment.component').then(m => m.VoyagesConsignmentComponent),
               children: [
-                { path: 'parcels',  loadComponent: () => import('../../../_api/pages/voyages-consignment/parcels/parcels.component').then(m => m.VcgParcelsComponent) },
-                { path: 'manifest', loadComponent: () => import('../../../_api/pages/voyages-consignment/manifest/manifest.component').then(m => m.VcgManifestComponent) },
+                { path: 'parcels',   loadComponent: () => import('../../../_api/pages/voyages-consignment/parcels/parcels.component').then(m => m.VcgParcelsComponent) },
+                { path: 'reception', loadComponent: () => import('../../../_api/pages/voyages-consignment/reception/reception.component').then(m => m.VcgReceptionComponent) },
+                { path: 'manifest',  loadComponent: () => import('../../../_api/pages/voyages-consignment/manifest/manifest.component').then(m => m.VcgManifestComponent) },
                 { path: 'baggage',  loadComponent: () => import('../../../_api/pages/voyages-consignment/baggage/baggage.component').then(m => m.VcgBaggageComponent) },
               ],
             },

@@ -20,4 +20,8 @@ export class BaggageService {
   load(id: string): Observable<Baggage> { return this.http.post<any>(VOYAGES_CONSIGNMENT.baggageLoad(id), {}).pipe(map(r => r.data ?? r)); }
   deliver(id: string): Observable<Baggage> { return this.http.post<any>(VOYAGES_CONSIGNMENT.baggageDeliver(id), {}).pipe(map(r => r.data ?? r)); }
   cancel(id: string): Observable<Baggage> { return this.http.delete<any>(VOYAGES_CONSIGNMENT.baggageItem(id)).pipe(map(r => r.data ?? r)); }
+  bulk(ids: string[], action: 'load' | 'deliver' | 'cancel'): Observable<{ done: number; errors: string[] }> {
+    return this.http.post<any>(VOYAGES_CONSIGNMENT.baggageBulk, { ids, action }).pipe(map(r => r.data ?? r));
+  }
 }
+

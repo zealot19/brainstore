@@ -15,10 +15,7 @@
         <option value="round_trip">Aller-retour</option>
       </select></div>
     <div class="col-md-3 mb-3"><label class="form-label">Classe tarifaire <span class="text-danger">*</span></label>
-      <select class="form-select" [(ngModel)]="fareClassId" (ngModelChange)="onCriteriaChange()">
-        <option value="">— Choisir —</option>
-        @for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }
-      </select></div>
+      <app-searchable-select [items]="fareClasses" labelKey="name" valueKey="id" placeholder="— Choisir —" [(ngModel)]="fareClassId" (ngModelChange)="onCriteriaChange()"></app-searchable-select></div>
     <div class="col-md-3 mb-3"><label class="form-label">Date aller <span class="text-danger">*</span></label>
       <input type="date" class="form-control" [(ngModel)]="outDate" (ngModelChange)="searchOutbound()" /></div>
     <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (aller) <span class="text-danger">*</span></label>
@@ -43,18 +40,12 @@
     <h6 class="mb-3"><span class="badge bg-primary me-2">2</span>Voyages disponibles</h6>
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">Voyage aller <span class="text-danger">*</span></label>
-        <select class="form-select" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()">
-          <option value="">— Choisir —</option>
-          @for (t of outTrips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
-        </select>
+        <app-searchable-select [items]="outTrips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()"></app-searchable-select>
         @if (!outTrips.length) { <small class="text-muted">Aucun voyage pour ces critères.</small> }
       </div>
       @if (isRound && retReady) {
         <div class="col-md-6 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
-          <select class="form-select" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()">
-            <option value="">— Choisir —</option>
-            @for (t of retTrips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
-          </select>
+          <app-searchable-select [items]="retTrips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()"></app-searchable-select>
           @if (!retTrips.length) { <small class="text-muted">Aucun voyage retour pour ces critères.</small> }
         </div>
       }

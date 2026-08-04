@@ -7,11 +7,12 @@ import { ConsignmentTypeService } from '../../../services/voyages-config/consign
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-vcg-parcels',
   templateUrl: './parcels.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgParcelsComponent implements OnInit {
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
@@ -19,6 +20,7 @@ export class VcgParcelsComponent implements OnInit {
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
   pickupTarget: Parcel | null = null; pickupName = '';
+  selected = new Set<string>();
 
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
               private ctSvc: ConsignmentTypeService, private fb: FormBuilder) {}
@@ -39,9 +41,20 @@ export class VcgParcelsComponent implements OnInit {
   }
 
   reload(): void {
-    this.loading = true;
+    this.loading = true; this.selected.clear();
     this.svc.list({ status: this.statusFilter, q: this.q }).subscribe({
       next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+  }
+  isSelected(id: string): boolean { return this.selected.has(id); }
+  toggle(id: string): void { this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id); }
+  get selectable(): Parcel[] { return this.rows.filter(r => r.status !== 'picked_up' && r.status !== 'cancelled'); }
+  get allSelected(): boolean { return this.selectable.length > 0 && this.selectable.every(r => this.selected.has(r.id)); }
+  toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.selectable.forEach(r => this.selected.add(r.id)); }
+  bulkCancel(): void {
+    if (!this.selected.size || !confirm(`Annuler ${this.selected.size} colis ?`)) return;
+    this.svc.bulk([...this.selected], 'cancel').subscribe({
+      next: r => { if (r.errors?.length) alert(r.errors.join('\n')); this.reload(); },
+      error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   statusClass(s: string): string {
     return { registered: 'bg-warning', loaded: 'bg-info', arrived: 'bg-primary',

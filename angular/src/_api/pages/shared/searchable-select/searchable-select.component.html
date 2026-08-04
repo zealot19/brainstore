@@ -1,0 +1,23 @@
+<div class="ss-wrap" [class.disabled]="disabled">
+  <button type="button" class="form-select text-start ss-toggle" (click)="toggle()" [disabled]="disabled">
+    <span [class.text-muted]="!selectedLabel">{{ selectedLabel || placeholder }}</span>
+    @if (value != null && !disabled) {
+      <i class="ti ti-x ss-clear" (click)="clear($event)"></i>
+    }
+  </button>
+  @if (open) {
+    <div class="ss-panel">
+      <div class="ss-search">
+        <i class="ti ti-search"></i>
+        <input type="text" class="form-control form-control-sm" placeholder="Rechercher…" [(ngModel)]="search" (click)="$event.stopPropagation()" autofocus />
+      </div>
+      <div class="ss-list">
+        @for (it of filtered; track it[valueKey]) {
+          <div class="ss-option" [class.active]="it[valueKey] === value" (click)="choose(it)">{{ label(it) }}</div>
+        } @empty {
+          <div class="ss-empty">Aucun résultat</div>
+        }
+      </div>
+    </div>
+  }
+</div>

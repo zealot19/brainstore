@@ -229,6 +229,51 @@ class BaggageDeliverView(APIView):
         return success_response(S.BaggageRead(b).data)
 
 
+def _bulk_apply(items, fn, user):
+    """Applique fn(obj, user=user) à chaque objet ; renvoie (done, erreurs)."""
+    done, errors = 0, []
+    for obj in items:
+        try:
+            fn(obj, user=user)
+            done += 1
+        except ApplicationError as e:
+            errors.append(str(e))
+    return done, errors
+
+
+class ParcelBulkView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request):
+        ids = request.data.get("ids") or []
+        action = request.data.get("action")
+        if not ids:
+            return error_response("Aucun colis sélectionné.")
+        qs = Parcel.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
+        fn = {"receive": services.mark_arrived, "cancel": services.cancel_parcel}.get(action)
+        if not fn:
+            return error_response("Action inconnue.")
+        done, errors = _bulk_apply(list(qs), fn, request.user)
+        return success_response({"done": done, "errors": errors})
+
+
+class BaggageBulkView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request):
+        ids = request.data.get("ids") or []
+        action = request.data.get("action")
+        if not ids:
+            return error_response("Aucun bagage sélectionné.")
+        qs = Baggage.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
+        fn = {"load": services.load_baggage, "deliver": services.deliver_baggage,
+              "cancel": services.cancel_baggage}.get(action)
+        if not fn:
+            return error_response("Action inconnue.")
+        done, errors = _bulk_apply(list(qs), fn, request.user)
+        return success_response({"done": done, "errors": errors})
+
+
 class TripManifestView(APIView):
     permission_classes = [IsInstitutionAdmin]
 

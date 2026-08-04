@@ -19,16 +19,24 @@
       <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
     </div>
+    @if (selected.size) {
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
+        <button class="btn btn-danger btn-sm" (click)="bulkCancel()"><i class="ti ti-trash me-1"></i>Annuler la sélection</button>
+      </div>
+    }
   </div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
+          <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
           <th>Référence</th><th>Trajet</th><th>Destinataire</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
           @for (p of rows; track p.id) {
             <tr>
+              <td>@if (p.status !== 'picked_up' && p.status !== 'cancelled') { <input type="checkbox" class="form-check-input" [checked]="isSelected(p.id)" (change)="toggle(p.id)" /> }</td>
               <td class="fw-medium"><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)">{{ p.reference }}</a></td>
               <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
               <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
@@ -36,12 +44,11 @@
               <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
-                @if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" (click)="arrived(p)" title="Arrivé"><i class="ti ti-map-pin-check me-1"></i>Arrivé</a> }
                 @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
         </tbody>
       </table></div>
     }
@@ -56,9 +63,9 @@
     <h6 class="text-muted">Trajet</h6>
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">Point de départ <span class="text-danger">*</span></label>
-        <select formControlName="origin_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of points; track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }</select></div>
+        <app-searchable-select formControlName="origin_point_id" [items]="points" labelKey="name" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
       <div class="col-md-6 mb-3"><label class="form-label">Point d'arrivée <span class="text-danger">*</span></label>
-        <select formControlName="destination_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of points; track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }</select></div>
+        <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
     </div>
     <h6 class="text-muted">Expéditeur / Destinataire</h6>
     <div class="row">
@@ -71,7 +78,7 @@
     <h6 class="text-muted">Contenu</h6>
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">Type de colis <span class="text-danger">*</span></label>
-        <select formControlName="consignment_type_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (c of types; track c.id) { <option [ngValue]="c.id">{{ c.label }}</option> }</select></div>
+        <app-searchable-select formControlName="consignment_type_id" [items]="types" labelKey="label" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
       <div class="col-md-3 mb-3"><label class="form-label">Poids (kg)</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
       <div class="col-md-2 mb-3"><label class="form-label">Quantité</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Valeur déclarée</label><input formControlName="declared_value" type="number" class="form-control" /></div>

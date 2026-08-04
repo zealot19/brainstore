@@ -37,11 +37,9 @@
     </div>
     <div class="row align-items-end">
       <div class="col-md-3 mb-3"><label class="form-label">Passager (billet)</label>
-        <select class="form-select" [(ngModel)]="ticketId" (ngModelChange)="reload()">
-          @for (t of tickets; track t.id) { <option [value]="t.id">{{ t.passenger_name }} · {{ t.number }}</option> }
-        </select></div>
+        <app-searchable-select [items]="ticketOptions" labelKey="label" valueKey="id" placeholder="— Choisir —" [(ngModel)]="ticketId" (ngModelChange)="reload()"></app-searchable-select></div>
       <div class="col-md-2 mb-3"><label class="form-label">Type</label>
-        <select class="form-select" [(ngModel)]="typeId"><option value="">—</option>@for (c of types; track c.id) { <option [value]="c.id">{{ c.label }}</option> }</select></div>
+        <app-searchable-select [items]="types" labelKey="label" valueKey="id" placeholder="—" [(ngModel)]="typeId"></app-searchable-select></div>
       <div class="col-md-2 mb-3"><label class="form-label">Poids (kg)</label><input type="number" step="0.01" class="form-control" [(ngModel)]="weight" /></div>
       <div class="col-md-2 mb-3"><label class="form-label">Supplément</label><input type="number" min="0" class="form-control" [(ngModel)]="amountDue" /></div>
       <div class="col-md-2 mb-3"><label class="form-label">Encaissé</label><input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" /></div>
@@ -50,11 +48,20 @@
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     @if (amountReceived) { <p class="text-muted small">Monnaie à rendre : {{ change | number:'1.0-0' }} XAF</p> }
 
+    @if (selected.size) {
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
+        <button class="btn btn-outline-info btn-sm" (click)="bulk('load')"><i class="ti ti-truck-loading me-1"></i>Charger</button>
+        <button class="btn btn-outline-success btn-sm" (click)="bulk('deliver')"><i class="ti ti-package-export me-1"></i>Livrer</button>
+        <button class="btn btn-outline-danger btn-sm" (click)="bulk('cancel')"><i class="ti ti-trash me-1"></i>Annuler</button>
+      </div>
+    }
     <div class="table-responsive"><table class="table datanew">
-      <thead class="thead-light"><tr><th>Étiquette</th><th>Poids</th><th>Franchise</th><th>Excédent</th><th>Supplément</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+      <thead class="thead-light"><tr><th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th><th>Étiquette</th><th>Poids</th><th>Franchise</th><th>Excédent</th><th>Supplément</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
       <tbody>
         @for (b of rows; track b.id) {
           <tr>
+            <td>@if (b.status !== 'delivered' && b.status !== 'cancelled') { <input type="checkbox" class="form-check-input" [checked]="isSelected(b.id)" (change)="toggleSel(b.id)" /> }</td>
             <td class="fw-medium">{{ b.tag_number }}</td>
             <td>{{ b.weight_kg || '—' }} kg</td>
             <td>{{ b.free_allowance_kg }} kg</td>
@@ -67,7 +74,7 @@
               @if (b.status !== 'delivered' && b.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
             </div></td>
           </tr>
-        } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun bagage pour ce billet.</td></tr> }
+        } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun bagage pour ce billet.</td></tr> }
       </tbody>
     </table></div>
   }

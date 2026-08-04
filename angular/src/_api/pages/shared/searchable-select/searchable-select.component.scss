@@ -1,0 +1,70 @@
+.ss-wrap {
+  position: relative;
+
+  &.disabled { opacity: .65; }
+}
+
+.ss-toggle {
+  position: relative;
+  padding-right: 2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-clear {
+  position: absolute;
+  right: 1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #9aa2b1;
+  cursor: pointer;
+
+  &:hover { color: #dc3545; }
+}
+
+.ss-panel {
+  position: absolute;
+  z-index: 1055;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e6e9ee;
+  border-radius: .5rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .12);
+  overflow: hidden;
+}
+
+.ss-search {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .5rem;
+  border-bottom: 1px solid #f0f1f5;
+
+  i { color: #9aa2b1; }
+}
+
+.ss-list {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.ss-option {
+  padding: .5rem .75rem;
+  cursor: pointer;
+  font-size: .9rem;
+
+  &:hover { background: #f5f7fb; }
+  &.active { background: #eef2ff; font-weight: 600; }
+}
+
+.ss-empty {
+  padding: .75rem;
+  text-align: center;
+  color: #9aa2b1;
+  font-size: .85rem;
+}

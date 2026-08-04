@@ -8,13 +8,14 @@ import { TimeSlotService } from '../../../services/voyages-config/time-slot.serv
 import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
 import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, PassengerSpec } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 
 interface PaxRow extends PassengerSpec { destination_point_id: string; }
 
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
@@ -37,6 +38,9 @@ export class VbNewBookingComponent implements OnInit {
   }
 
   get isRound(): boolean { return this.tripType === 'round_trip'; }
+
+  tripLabel = (t: any): string =>
+    `${t.number} · ${t.origin_name} → ${t.destination_name} · ${new Date(t.scheduled_departure).toLocaleString('fr-FR')}`;
 
   /** Reload the outbound / return trip lists from the chosen class + plage horaire. */
   get outReady(): boolean { return !!(this.fareClassId && this.outSlotId && this.outDate); }

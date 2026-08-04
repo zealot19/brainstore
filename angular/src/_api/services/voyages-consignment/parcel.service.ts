@@ -23,5 +23,8 @@ export class ParcelService {
   arrived(id: string): Observable<Parcel> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelArrived(id), {}).pipe(map(r => r.data ?? r)); }
   pickup(id: string, picked_up_by: string): Observable<Parcel> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelPickup(id), { picked_up_by }).pipe(map(r => r.data ?? r)); }
   cancel(id: string): Observable<Parcel> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelCancel(id), {}).pipe(map(r => r.data ?? r)); }
+  bulk(ids: string[], action: 'receive' | 'cancel'): Observable<{ done: number; errors: string[] }> {
+    return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelsBulk, { ids, action }).pipe(map(r => r.data ?? r));
+  }
   manifest(tripId: string): Observable<Manifest> { return this.http.get<any>(VOYAGES_CONSIGNMENT.manifest(tripId)).pipe(map(r => r.data ?? r)); }
 }

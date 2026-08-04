@@ -8,17 +8,19 @@ import { Baggage } from '../../../models/voyages-consignment.models';
 import { Booking, Ticket } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgBaggageComponent implements OnInit {
   q = ''; bookings: Booking[] = []; selectedBooking: Booking | null = null;
   ticketId = ''; rows: Baggage[] = []; types: ConsignmentType[] = [];
   weight: number | null = null; typeId = ''; description = '';
   amountDue = 0; amountReceived: number | null = null; saving = false; errorMsg = '';
+  selected = new Set<string>();
 
   constructor(private svc: BaggageService, private booking: BookingService,
               private ctSvc: ConsignmentTypeService) {}
@@ -29,9 +31,25 @@ export class VcgBaggageComponent implements OnInit {
 
   search(): void { this.booking.list({ q: this.q }).subscribe(d => this.bookings = d); }
   pickBooking(b: Booking): void { this.selectedBooking = b; this.ticketId = b.tickets[0]?.id ?? ''; this.reload(); }
-  reload(): void { if (this.ticketId) this.svc.list({ ticket: this.ticketId }).subscribe(d => this.rows = d); }
+  reload(): void { this.selected.clear(); if (this.ticketId) this.svc.list({ ticket: this.ticketId }).subscribe(d => this.rows = d); }
+
+  isSelected(id: string): boolean { return this.selected.has(id); }
+  toggleSel(id: string): void { this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id); }
+  get selectable(): Baggage[] { return this.rows.filter(r => r.status !== 'delivered' && r.status !== 'cancelled'); }
+  get allSelected(): boolean { return this.selectable.length > 0 && this.selectable.every(r => this.selected.has(r.id)); }
+  toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.selectable.forEach(r => this.selected.add(r.id)); }
+  bulk(action: 'load' | 'deliver' | 'cancel'): void {
+    if (!this.selected.size) return;
+    if (action === 'cancel' && !confirm(`Annuler ${this.selected.size} bagage(s) ?`)) return;
+    this.svc.bulk([...this.selected], action).subscribe({
+      next: r => { if (r.errors?.length) alert(r.errors.join('\n')); this.reload(); },
+      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+  }
 
   get tickets(): Ticket[] { return this.selectedBooking?.tickets ?? []; }
+  get ticketOptions(): { id: string; label: string }[] {
+    return this.tickets.map(t => ({ id: t.id, label: `${t.passenger_name} · ${t.number}` }));
+  }
   get change(): number { const r = this.amountReceived ?? 0; return r - this.amountDue > 0 ? r - this.amountDue : 0; }
   statusClass(s: string): string {
     return { checked_in: 'bg-warning', loaded: 'bg-info', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
