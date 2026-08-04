@@ -16,7 +16,7 @@ def find_passengers(company, q=None):
     return qs
 
 
-def bookable_trips(company, fare_class_id=None, time_slot_id=None):
+def bookable_trips(company, fare_class_id=None, time_slot_id=None, travel_date=None):
     qs = (Trip.objects.filter(is_deleted=False, company=company,
                               status__in=_PRE_DEPARTURE,
                               scheduled_departure__gte=timezone.now())
@@ -25,6 +25,9 @@ def bookable_trips(company, fare_class_id=None, time_slot_id=None):
           .order_by("scheduled_departure"))
     if fare_class_id:
         qs = qs.filter(fare_class_id=fare_class_id)
+    if travel_date:
+        # Match on the trip's local departure date.
+        qs = qs.filter(scheduled_departure__date=travel_date)
     if not time_slot_id:
         return qs
     slot = TimeSlot.objects.filter(is_deleted=False, id=time_slot_id).first()

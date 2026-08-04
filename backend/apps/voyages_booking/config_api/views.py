@@ -75,7 +75,8 @@ class BookableTripsView(APIView):
         trips = selectors.bookable_trips(
             request.user.company,
             fare_class_id=request.query_params.get("fare_class"),
-            time_slot_id=request.query_params.get("time_slot"))
+            time_slot_id=request.query_params.get("time_slot"),
+            travel_date=request.query_params.get("date") or None)
         return success_response(S.TripOptionSerializer(trips, many=True).data)
 
 

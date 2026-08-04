@@ -19,12 +19,16 @@
         <option value="">— Choisir —</option>
         @for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }
       </select></div>
+    <div class="col-md-3 mb-3"><label class="form-label">Date aller <span class="text-danger">*</span></label>
+      <input type="date" class="form-control" [(ngModel)]="outDate" (ngModelChange)="searchOutbound()" /></div>
     <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (aller) <span class="text-danger">*</span></label>
       <select class="form-select" [(ngModel)]="outSlotId" (ngModelChange)="searchOutbound()">
         <option value="">— Choisir —</option>
         @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
       </select></div>
     @if (isRound) {
+      <div class="col-md-3 mb-3"><label class="form-label">Date retour <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" [(ngModel)]="retDate" (ngModelChange)="searchReturn()" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (retour) <span class="text-danger">*</span></label>
         <select class="form-select" [(ngModel)]="retSlotId" (ngModelChange)="searchReturn()">
           <option value="">— Choisir —</option>
@@ -34,7 +38,7 @@
   </div>
 
   <!-- Voyages disponibles -->
-  @if (fareClassId && outSlotId) {
+  @if (outReady) {
     <hr>
     <h6 class="mb-3"><span class="badge bg-primary me-2">2</span>Voyages disponibles</h6>
     <div class="row">
@@ -45,7 +49,7 @@
         </select>
         @if (!outTrips.length) { <small class="text-muted">Aucun voyage pour ces critères.</small> }
       </div>
-      @if (isRound && retSlotId) {
+      @if (isRound && retReady) {
         <div class="col-md-6 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
           <select class="form-select" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()">
             <option value="">— Choisir —</option>

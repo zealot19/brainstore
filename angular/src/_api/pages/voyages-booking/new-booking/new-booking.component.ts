@@ -19,7 +19,7 @@ interface PaxRow extends PassengerSpec { destination_point_id: string; }
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
   fareClasses: FareClass[] = []; timeSlots: TimeSlot[] = [];
-  fareClassId = ''; outSlotId = ''; retSlotId = '';
+  fareClassId = ''; outSlotId = ''; retSlotId = ''; outDate = ''; retDate = '';
   outTrips: TripOption[] = []; retTrips: TripOption[] = [];
   outboundTripId = ''; returnTripId = '';
   outboundSeats: SeatCell[] = []; returnSeats: SeatCell[] = [];
@@ -39,17 +39,20 @@ export class VbNewBookingComponent implements OnInit {
   get isRound(): boolean { return this.tripType === 'round_trip'; }
 
   /** Reload the outbound / return trip lists from the chosen class + plage horaire. */
+  get outReady(): boolean { return !!(this.fareClassId && this.outSlotId && this.outDate); }
+  get retReady(): boolean { return !!(this.fareClassId && this.retSlotId && this.retDate); }
+
   searchOutbound(): void {
     this.outboundTripId = ''; this.outTrips = []; this.resetSelection();
-    if (this.fareClassId && this.outSlotId) {
-      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.outSlotId })
+    if (this.outReady) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.outSlotId, date: this.outDate })
         .subscribe(t => this.outTrips = t);
     }
   }
   searchReturn(): void {
     this.returnTripId = ''; this.retTrips = []; this.returnSeats = []; this.selReturn = [];
-    if (this.fareClassId && this.retSlotId) {
-      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.retSlotId })
+    if (this.retReady) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.retSlotId, date: this.retDate })
         .subscribe(t => this.retTrips = t);
     }
   }
