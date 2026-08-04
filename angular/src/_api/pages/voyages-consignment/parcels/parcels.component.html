@@ -32,7 +32,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>Référence</th><th>Trajet</th><th>Destinataire</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+          <th>Référence</th><th>Trajet</th><th>Destinataire</th><th class="text-center">Pièces</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
           @for (p of rows; track p.id) {
             <tr>
@@ -40,15 +40,23 @@
               <td class="fw-medium"><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)">{{ p.reference }}</a></td>
               <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
               <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
+              <td class="text-center">
+                @if (p.status === 'arrived' || p.status === 'picked_up') {
+                  {{ p.received_pieces }}/{{ p.quantity }}
+                  @if (p.missing_pieces) { <span class="badge bg-danger ms-1" title="Manquant">-{{ p.missing_pieces }}</span> }
+                  @if (p.damaged_pieces) { <span class="badge bg-warning ms-1" title="Avarié">⚡{{ p.damaged_pieces }}</span> }
+                } @else { {{ p.quantity }} }
+              </td>
               <td>{{ p.amount_due | number:'1.0-0' }} XAF</td>
               <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
-                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
+                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
         </tbody>
       </table></div>
     }
@@ -57,7 +65,7 @@
 
 <!-- Enregistrement -->
 <div class="modal fade" id="parcel-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Enregistrer un colis</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ isEdit ? 'Modifier le colis' : 'Enregistrer un colis' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <h6 class="text-muted">Trajet</h6>
@@ -74,7 +82,10 @@
       <div class="col-md-3 mb-3"><label class="form-label">Destinataire <span class="text-danger">*</span></label><input formControlName="recipient_name" class="form-control" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Tél. destinataire <span class="text-danger">*</span></label><input formControlName="recipient_phone" class="form-control" /></div>
     </div>
-    <div class="mb-3"><label class="form-label">Adresse destinataire</label><input formControlName="recipient_address" class="form-control" /></div>
+    <div class="row">
+      <div class="col-md-8 mb-3"><label class="form-label">Adresse destinataire</label><input formControlName="recipient_address" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">Pièce du destinataire</label><input formControlName="recipient_id_number" class="form-control" placeholder="No CNI/passeport (vérifié à la livraison)" /></div>
+    </div>
     <h6 class="text-muted">Contenu</h6>
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">Type de colis <span class="text-danger">*</span></label>
@@ -92,17 +103,23 @@
       <div class="col-md-3 mb-3"><label class="form-label">Encaissé</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Monnaie rendue</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
     </div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">Enregistrer &amp; encaisser</button></div></form>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ isEdit ? 'Enregistrer les modifications' : 'Enregistrer & encaisser' }}</button></div></form>
 </div></div></div>
 
 <!-- Retrait -->
 <div class="modal fade" id="pickup-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Retrait du colis</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="pickupTarget = null"></button></div>
+  <div class="modal-header"><h5 class="modal-title">Livraison au destinataire</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="pickupTarget = null"></button></div>
   <div class="modal-body">
-    @if (pickupTarget) { <p>Colis <strong>{{ pickupTarget.reference }}</strong> pour <strong>{{ pickupTarget.recipient_name }}</strong>.</p> }
-    <div class="mb-2"><label class="form-label">Nom du retirant <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
+    @if (pickupTarget) {
+      <p>Colis <strong>{{ pickupTarget.reference }}</strong> pour <strong>{{ pickupTarget.recipient_name }}</strong> ({{ pickupTarget.recipient_phone }}).</p>
+      @if (pickupTarget.recipient_id_number) {
+        <div class="alert alert-info py-2"><i class="ti ti-id me-1"></i>Pièce enregistrée du destinataire : <strong>{{ pickupTarget.recipient_id_number }}</strong> — à vérifier.</div>
+      }
+    }
+    <div class="mb-2"><label class="form-label">Nom de la personne qui retire <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
+    <div class="mb-2"><label class="form-label">Pièce présentée</label><input class="form-control" [(ngModel)]="pickupId" placeholder="No CNI/passeport présenté" /></div>
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" (click)="doPickup()">Confirmer le retrait</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" (click)="doPickup()">Confirmer la livraison</button></div>
 </div></div></div>
 
 <!-- Détail / suivi -->
@@ -118,7 +135,11 @@
         <div class="col-md-4 mt-2"><small class="text-muted d-block">Montant</small>{{ detail.amount_due | number:'1.0-0' }} XAF</div>
         <div class="col-md-4 mt-2"><small class="text-muted d-block">Encaissé</small>{{ detail.amount_received | number:'1.0-0' }} XAF</div>
         <div class="col-md-4 mt-2"><small class="text-muted d-block">Monnaie</small>{{ detail.change_due | number:'1.0-0' }} XAF</div>
-        @if (detail.picked_up_by) { <div class="col-md-6 mt-2"><small class="text-muted d-block">Retiré par</small>{{ detail.picked_up_by }}</div> }
+        @if (detail.status === 'arrived' || detail.status === 'picked_up') {
+          <div class="col-md-4 mt-2"><small class="text-muted d-block">Pièces reçues</small>{{ detail.received_pieces }}/{{ detail.quantity }}</div>
+          <div class="col-md-4 mt-2"><small class="text-muted d-block">Manquant / Avarié</small>{{ detail.missing_pieces }} / {{ detail.damaged_pieces }}</div>
+        }
+        @if (detail.picked_up_by) { <div class="col-md-6 mt-2"><small class="text-muted d-block">Livré à</small>{{ detail.picked_up_by }}@if (detail.picked_up_id_number) { <small class="text-muted"> · pièce {{ detail.picked_up_id_number }}</small> }</div> }
       </div>
       <h6>Suivi</h6>
       <ul class="list-group">

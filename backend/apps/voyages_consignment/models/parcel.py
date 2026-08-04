@@ -8,7 +8,7 @@ class Parcel(BaseModel):
         REGISTERED = "registered", _("Enregistré")
         LOADED     = "loaded",     _("Chargé")
         ARRIVED    = "arrived",    _("Réceptionné")
-        PICKED_UP  = "picked_up",  _("Retiré")
+        PICKED_UP  = "picked_up",  _("Livré")
         CANCELLED  = "cancelled",  _("Annulé")
 
     company           = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
@@ -23,14 +23,18 @@ class Parcel(BaseModel):
                                            on_delete=models.SET_NULL, null=True, blank=True, related_name="parcels")
     sender_name       = models.CharField(_("expéditeur"), max_length=150)
     sender_phone      = models.CharField(_("tél. expéditeur"), max_length=30)
-    recipient_name    = models.CharField(_("destinataire"), max_length=150)
-    recipient_phone   = models.CharField(_("tél. destinataire"), max_length=30)
-    recipient_address = models.CharField(_("adresse destinataire"), max_length=255, blank=True)
+    recipient_name      = models.CharField(_("destinataire"), max_length=150)
+    recipient_phone     = models.CharField(_("tél. destinataire"), max_length=30)
+    recipient_address   = models.CharField(_("adresse destinataire"), max_length=255, blank=True)
+    recipient_id_number = models.CharField(_("pièce du destinataire"), max_length=100, blank=True)
     consignment_type  = models.ForeignKey("voyages_config.ConsignmentType", verbose_name=_("type de colis"),
                                            on_delete=models.PROTECT, related_name="parcels")
     description       = models.CharField(_("description"), max_length=255, blank=True)
     weight_kg         = models.DecimalField(_("poids (kg)"), max_digits=8, decimal_places=3, null=True, blank=True)
-    quantity          = models.PositiveSmallIntegerField(_("quantité"), default=1)
+    quantity          = models.PositiveSmallIntegerField(_("nombre de pièces"), default=1)
+    received_pieces   = models.PositiveSmallIntegerField(_("pièces reçues"), default=0)
+    missing_pieces    = models.PositiveSmallIntegerField(_("pièces manquantes"), default=0)
+    damaged_pieces    = models.PositiveSmallIntegerField(_("pièces avariées"), default=0)
     declared_value    = models.DecimalField(_("valeur déclarée"), max_digits=12, decimal_places=2, null=True, blank=True)
     amount_due        = models.DecimalField(_("montant dû"), max_digits=12, decimal_places=2, default=0)
     amount_received   = models.DecimalField(_("montant encaissé"), max_digits=12, decimal_places=2, default=0)
@@ -38,10 +42,11 @@ class Parcel(BaseModel):
     payment_method    = models.CharField(_("mode de paiement"), max_length=40, blank=True)
     paid_at           = models.DateTimeField(_("payé le"), null=True, blank=True)
     loaded_at         = models.DateTimeField(_("chargé le"), null=True, blank=True)
-    arrived_at        = models.DateTimeField(_("arrivé le"), null=True, blank=True)
-    picked_up_at      = models.DateTimeField(_("retiré le"), null=True, blank=True)
-    picked_up_by      = models.CharField(_("retiré par"), max_length=150, blank=True)
-    notes             = models.TextField(_("notes"), blank=True)
+    arrived_at        = models.DateTimeField(_("réceptionné le"), null=True, blank=True)
+    picked_up_at       = models.DateTimeField(_("livré le"), null=True, blank=True)
+    picked_up_by       = models.CharField(_("livré à"), max_length=150, blank=True)
+    picked_up_id_number = models.CharField(_("pièce présentée"), max_length=100, blank=True)
+    notes              = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
         verbose_name = _("colis")
@@ -57,7 +62,7 @@ class ParcelEvent(BaseModel):
         REGISTERED = "registered", _("Enregistré")
         LOADED     = "loaded",     _("Chargé")
         ARRIVED    = "arrived",    _("Réceptionné")
-        PICKED_UP  = "picked_up",  _("Retiré")
+        PICKED_UP  = "picked_up",  _("Livré")
         CANCELLED  = "cancelled",  _("Annulé")
 
     parcel = models.ForeignKey("voyages_consignment.Parcel", verbose_name=_("colis"),

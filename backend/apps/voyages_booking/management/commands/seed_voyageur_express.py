@@ -291,7 +291,7 @@ class Command(BaseCommand):
             p1 = consignment_services.register_parcel(
                 company, origin_point=origin, destination_point=destination, consignment_type=ctype,
                 sender_name="Awono Paul", sender_phone="699200001",
-                recipient_name="Bella Marie", recipient_phone="699200002",
+                recipient_name="Bella Marie", recipient_phone="699200002", recipient_id_number="CNI123456",
                 description="Carton de vêtements", weight_kg=12, quantity=1,
                 amount_due=2500, amount_received=3000, payment_method="Espèces", user=None)
             consignment_services.assign_to_trip(p1, t_out, user=None)

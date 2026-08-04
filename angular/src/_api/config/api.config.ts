@@ -350,6 +350,7 @@ export const VOYAGES_CONSIGNMENT = {
   parcelsPending: `${VCG}/parcels/pending/`,
   parcelsBulk: `${VCG}/parcels/bulk/`,
   parcelAssignTrip: (id: string) => `${VCG}/parcels/${id}/assign-trip/`,
+  parcelUnload: (id: string) => `${VCG}/parcels/${id}/unload/`,
   parcelArrived: (id: string) => `${VCG}/parcels/${id}/arrived/`,
   parcelPickup: (id: string) => `${VCG}/parcels/${id}/pickup/`,
   parcelCancel: (id: string) => `${VCG}/parcels/${id}/cancel/`,

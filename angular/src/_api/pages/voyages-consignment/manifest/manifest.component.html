@@ -16,7 +16,10 @@
     <div class="row">
       <!-- Colis à charger -->
       <div class="col-lg-5 mb-3">
-        <div class="card h-100"><div class="card-header"><h6 class="mb-0">Colis à charger</h6></div>
+        <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between">
+          <h6 class="mb-0">Colis à charger</h6>
+          @if (pending.length) { <button class="btn btn-sm btn-primary" (click)="loadAll()"><i class="ti ti-arrows-right me-1"></i>Tout charger</button> }
+        </div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table mb-0">
             <thead class="thead-light"><tr><th>Réf.</th><th>Trajet</th><th class="no-sort"></th></tr></thead>
             <tbody>
@@ -24,7 +27,7 @@
                 <tr>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td><small>{{ p.origin_point_name }} → {{ p.destination_point_name }}</small></td>
-                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="load(p)"><i class="ti ti-truck-loading me-1"></i>Charger</a></td>
+                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="load(p)" title="Charger"><i class="ti ti-arrow-right"></i></a></td>
                 </tr>
               } @empty { <tr><td colspan="3" class="text-center py-3 text-muted">Aucun colis en attente.</td></tr> }
             </tbody>
@@ -43,7 +46,7 @@
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td>{{ p.recipient_name }}</td>
                   <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
-                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="arrived(p)"><i class="ti ti-package-import me-1"></i>Réceptionner</a> }</td>
+                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" (click)="unload(p)" title="Retirer du voyage"><i class="ti ti-arrow-left me-1"></i>Retirer</a> }</td>
                 </tr>
               } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">Aucun colis à bord.</td></tr> }
             </tbody>

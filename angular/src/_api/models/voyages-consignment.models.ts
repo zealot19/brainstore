@@ -8,12 +8,14 @@ export interface Parcel {
   destination_point: string; destination_point_name: string | null;
   trip: string | null;
   sender_name: string; sender_phone: string;
-  recipient_name: string; recipient_phone: string; recipient_address: string;
+  recipient_name: string; recipient_phone: string; recipient_address: string; recipient_id_number: string;
   consignment_type: string; consignment_type_label: string | null; description: string;
-  weight_kg: string | null; quantity: number; declared_value: string | null;
+  weight_kg: string | null; quantity: number;
+  received_pieces: number; missing_pieces: number; damaged_pieces: number;
+  declared_value: string | null;
   amount_due: string; amount_received: string; change_due: string; payment_method: string;
   paid_at: string | null; loaded_at: string | null; arrived_at: string | null;
-  picked_up_at: string | null; picked_up_by: string; notes: string;
+  picked_up_at: string | null; picked_up_by: string; picked_up_id_number: string; notes: string;
   created_at: string; updated_at: string; events: ParcelEvent[];
 }
 
@@ -33,9 +35,12 @@ export interface Manifest { parcels: Parcel[]; baggage: Baggage[]; }
 export interface ParcelCreate {
   origin_point_id: string; destination_point_id: string; consignment_type_id: string;
   sender_name: string; sender_phone: string; recipient_name: string; recipient_phone: string;
-  recipient_address?: string; description?: string; weight_kg?: number | null; quantity?: number;
+  recipient_address?: string; recipient_id_number?: string; description?: string;
+  weight_kg?: number | null; quantity?: number;
   declared_value?: number | null; amount_due: number; amount_received?: number | null; payment_method?: string;
 }
+
+export interface ParcelReceive { received_pieces?: number | null; missing_pieces?: number; damaged_pieces?: number; }
 
 export interface BaggageCreate {
   ticket_id: string; consignment_type_id?: string | null; description?: string;

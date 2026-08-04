@@ -19,7 +19,8 @@ export class VcgParcelsComponent implements OnInit {
   points: ServicePoint[] = []; types: ConsignmentType[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
-  pickupTarget: Parcel | null = null; pickupName = '';
+  pickupTarget: Parcel | null = null; pickupName = ''; pickupId = '';
+  editId: string | null = null;
   selected = new Set<string>();
 
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
@@ -31,7 +32,7 @@ export class VcgParcelsComponent implements OnInit {
       consignment_type_id: [null, Validators.required],
       sender_name: [null, Validators.required], sender_phone: [null, Validators.required],
       recipient_name: [null, Validators.required], recipient_phone: [null, Validators.required],
-      recipient_address: [''], description: [''], weight_kg: [null], quantity: [1],
+      recipient_address: [''], recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
       amount_received: [null], payment_method: [''],
     });
@@ -64,20 +65,34 @@ export class VcgParcelsComponent implements OnInit {
     const r = +this.form.value.amount_received || 0; const d = +this.form.value.amount_due || 0;
     return r - d > 0 ? r - d : 0;
   }
-  openCreate(): void { this.errorMsg = ''; this.form.reset({ quantity: 1, payment_method: '' }); }
+  get isEdit(): boolean { return this.editId != null; }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
+  openEdit(p: Parcel): void {
+    this.editId = p.id; this.errorMsg = '';
+    this.form.reset({
+      origin_point_id: p.origin_point, destination_point_id: p.destination_point, consignment_type_id: p.consignment_type,
+      sender_name: p.sender_name, sender_phone: p.sender_phone, recipient_name: p.recipient_name,
+      recipient_phone: p.recipient_phone, recipient_address: p.recipient_address, recipient_id_number: p.recipient_id_number,
+      description: p.description, weight_kg: p.weight_kg, quantity: p.quantity, declared_value: p.declared_value,
+      amount_due: p.amount_due, amount_received: p.amount_received, payment_method: p.payment_method,
+    });
+    // Le trajet, le type et l'encaissement ne se modifient pas ici (repricing = action dédiée)
+    ['origin_point_id', 'destination_point_id', 'consignment_type_id', 'amount_due', 'amount_received', 'payment_method']
+      .forEach(k => this.form.get(k)?.disable());
+  }
   submit(): void {
     if (this.form.invalid || this.saving) return;
     this.saving = true; this.errorMsg = '';
-    this.svc.create(this.form.value).subscribe({
+    const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(this.form.value);
+    req.subscribe({
       next: () => { this.saving = false; this.reload(); this.close('parcel-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
-  arrived(p: Parcel): void { this.svc.arrived(p.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
-  askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupName = ''; }
+  askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupName = ''; this.pickupId = ''; }
   doPickup(): void {
     if (!this.pickupTarget || !this.pickupName) return;
-    this.svc.pickup(this.pickupTarget.id, this.pickupName).subscribe({
+    this.svc.pickup(this.pickupTarget.id, this.pickupName, this.pickupId).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
       error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }

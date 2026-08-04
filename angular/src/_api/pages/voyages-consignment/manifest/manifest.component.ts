@@ -33,7 +33,16 @@ export class VcgManifestComponent implements OnInit {
   load(p: Parcel): void {
     this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
-  arrived(p: Parcel): void { this.parcels.arrived(p.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
+  loadAll(): void {
+    if (!this.pending.length) return;
+    let remaining = this.pending.length;
+    this.pending.forEach(p => this.parcels.assignTrip(p.id, this.tripId).subscribe({
+      next: () => { if (--remaining === 0) this.onTripChange(); },
+      error: e => { alert(e?.error?.detail ?? 'Erreur.'); if (--remaining === 0) this.onTripChange(); } }));
+  }
+  unload(p: Parcel): void {
+    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+  }
   deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
   loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
 }

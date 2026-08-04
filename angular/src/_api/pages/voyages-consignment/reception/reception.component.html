@@ -1,7 +1,7 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Réception colis</h4><h6>Vérifier et réceptionner les colis à leur arrivée</h6></div></div>
 </div>
-<app-info-banner text="Les colis en transit (chargés) apparaissent ici. Réceptionnez-les à leur arrivée à destination : seuls les colis réceptionnés pourront être retirés par les destinataires."></app-info-banner>
+<app-info-banner text="Les colis en transit (chargés) apparaissent ici. Saisissez les pièces reçues, manquantes ou avariées, puis réceptionnez. « Réceptionner Tout » réceptionne intégralement la sélection. Seuls les colis réceptionnés pourront être livrés."></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2">
@@ -11,7 +11,7 @@
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-success btn-sm" (click)="receiveSelected()"><i class="ti ti-package-import me-1"></i>Réceptionner la sélection</button>
+        <button class="btn btn-success btn-sm" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
       </div>
     }
   </div>
@@ -21,20 +21,25 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!rows.length" /></th>
-          <th>Référence</th><th>Trajet</th><th>Destinataire</th><th>Voyage</th><th class="no-sort">Actions</th></tr></thead>
+          <th>Référence</th><th>Destinataire</th><th>Description</th>
+          <th class="text-center">Pièces</th><th style="width:80px">Reçues</th><th style="width:80px">Manquant</th><th style="width:80px">Avarié</th>
+          <th class="no-sort">Action</th></tr></thead>
         <tbody>
           @for (p of rows; track p.id) {
             <tr>
               <td><input type="checkbox" class="form-check-input" [checked]="isSelected(p.id)" (change)="toggle(p.id)" /></td>
               <td class="fw-medium">{{ p.reference }}</td>
-              <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
               <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
-              <td>{{ p.trip || '—' }}</td>
-              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+              <td>{{ p.description || '—' }} <small class="text-muted">({{ p.consignment_type_label }})</small></td>
+              <td class="text-center">{{ state[p.id].received }}/{{ p.quantity }}</td>
+              <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].received" /></td>
+              <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].missing" /></td>
+              <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].damaged" /></td>
+              <td class="action-table-data">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" (click)="receiveOne(p)" title="Réceptionner"><i class="ti ti-package-import me-1"></i>Réceptionner</a>
-              </div></td>
+              </td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun colis en transit à réceptionner.</td></tr> }
+          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun colis en transit à réceptionner.</td></tr> }
         </tbody>
       </table></div>
     }

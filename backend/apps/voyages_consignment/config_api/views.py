@@ -62,6 +62,18 @@ class ParcelDetailView(APIView):
         p = selectors.parcel_detail(request.user.company, pk)
         return success_response(S.ParcelRead(p).data) if p else error_response("Introuvable.", status_code=404)
 
+    def patch(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk)
+        if not p:
+            return error_response("Introuvable.", status_code=404)
+        payload = S.ParcelEditSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        try:
+            p = services.edit_parcel(p, user=request.user, **payload.validated_data)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelRead(p).data)
+
     def delete(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
@@ -102,6 +114,26 @@ class ParcelAssignTripView(APIView):
 
 
 class ParcelArrivedView(APIView):
+    """Réception quantitative d'un colis (pièces reçues / manquantes / avariées)."""
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk)
+        if not p:
+            return error_response("Introuvable.", status_code=404)
+        payload = S.ParcelReceiveSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        try:
+            p = services.receive_parcel(p, received_pieces=d["received_pieces"],
+                                        missing_pieces=d["missing_pieces"],
+                                        damaged_pieces=d["damaged_pieces"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelRead(p).data)
+
+
+class ParcelUnloadView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def post(self, request, pk):
@@ -109,7 +141,7 @@ class ParcelArrivedView(APIView):
         if not p:
             return error_response("Introuvable.", status_code=404)
         try:
-            p = services.mark_arrived(p, user=request.user)
+            p = services.unload_parcel(p, user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.ParcelRead(p).data)
@@ -125,7 +157,9 @@ class ParcelPickupView(APIView):
         payload = S.ParcelPickupSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
-            p = services.pickup_parcel(p, picked_up_by=payload.validated_data["picked_up_by"], user=request.user)
+            p = services.pickup_parcel(p, picked_up_by=payload.validated_data["picked_up_by"],
+                                       picked_up_id_number=payload.validated_data["picked_up_id_number"],
+                                       user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.ParcelRead(p).data)
@@ -250,7 +284,8 @@ class ParcelBulkView(APIView):
         if not ids:
             return error_response("Aucun colis sélectionné.")
         qs = Parcel.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
-        fn = {"receive": services.mark_arrived, "cancel": services.cancel_parcel}.get(action)
+        fn = {"receive": services.mark_arrived, "cancel": services.cancel_parcel,
+              "unload": services.unload_parcel}.get(action)
         if not fn:
             return error_response("Action inconnue.")
         done, errors = _bulk_apply(list(qs), fn, request.user)
