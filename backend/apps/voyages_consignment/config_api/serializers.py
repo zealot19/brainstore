@@ -80,24 +80,57 @@ class AssignTripSerializer(serializers.Serializer):
 
 class BaggageRead(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    owner_name = serializers.CharField(read_only=True)
     passenger_name = serializers.CharField(source="ticket.passenger.full_name", read_only=True, default=None)
     ticket_number = serializers.CharField(source="ticket.number", read_only=True, default=None)
-    trip = serializers.UUIDField(source="ticket.trip_id", read_only=True)
+    consignment_type_label = serializers.CharField(source="consignment_type.label", read_only=True, default=None)
 
     class Meta:
         model = Baggage
-        fields = ["id", "tag_number", "ticket", "ticket_number", "passenger_name", "trip",
-                  "consignment_type", "description", "weight_kg", "free_allowance_kg", "excess_kg",
+        fields = ["id", "tag_number", "trip", "ticket", "ticket_number", "passenger_name", "owner_name",
+                  "sender_name", "sender_phone", "civility", "id_type", "id_number", "birth_date", "email",
+                  "consignment_type", "consignment_type_label", "description", "weight_kg", "quantity",
+                  "declared_value", "free_allowance_kg", "excess_kg",
                   "amount_due", "amount_received", "change_due", "payment_method", "paid_at",
-                  "status", "status_display", "loaded_at", "delivered_at", "notes",
+                  "status", "status_display", "loaded_at", "delivered_at", "delivered_comment", "notes",
                   "created_at", "updated_at"]
 
 
 class BaggageWrite(serializers.Serializer):
-    ticket_id = serializers.UUIDField()
+    trip_id = serializers.UUIDField()
+    ticket_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
+    sender_phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    civility = serializers.ChoiceField(choices=Baggage.Civility.choices, required=False, allow_blank=True, default="")
+    id_type = serializers.ChoiceField(choices=Baggage.IdType.choices, required=False, allow_blank=True, default="")
+    id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    birth_date = serializers.DateField(required=False, allow_null=True, default=None)
+    email = serializers.EmailField(required=False, allow_blank=True, default="")
     consignment_type_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     description = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     weight_kg = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, allow_null=True, default=None)
+    quantity = serializers.IntegerField(required=False, default=1)
+    declared_value = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, default=1)
     amount_due = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, default=0)
     amount_received = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
     payment_method = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
+
+
+class BaggageDeliverSerializer(serializers.Serializer):
+    comment = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
+    delivered_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
+
+
+class BaggageEditSerializer(serializers.Serializer):
+    sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    sender_phone = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    civility = serializers.ChoiceField(choices=Baggage.Civility.choices, required=False, allow_blank=True)
+    id_type = serializers.ChoiceField(choices=Baggage.IdType.choices, required=False, allow_blank=True)
+    id_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    birth_date = serializers.DateField(required=False, allow_null=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    description = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    weight_kg = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, allow_null=True)
+    quantity = serializers.IntegerField(required=False)
+    declared_value = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    notes = serializers.CharField(required=False, allow_blank=True)

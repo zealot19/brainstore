@@ -20,13 +20,16 @@ export interface Parcel {
 }
 
 export interface Baggage {
-  id: string; tag_number: string; ticket: string; ticket_number: string | null;
-  passenger_name: string | null; trip: string | null;
-  consignment_type: string | null; description: string;
-  weight_kg: string | null; free_allowance_kg: string; excess_kg: string;
+  id: string; tag_number: string; trip: string | null;
+  ticket: string | null; ticket_number: string | null; passenger_name: string | null; owner_name: string;
+  sender_name: string; sender_phone: string; civility: string; id_type: string; id_number: string;
+  birth_date: string | null; email: string;
+  consignment_type: string | null; consignment_type_label: string | null; description: string;
+  weight_kg: string | null; quantity: number; declared_value: string;
+  free_allowance_kg: string; excess_kg: string;
   amount_due: string; amount_received: string; change_due: string; payment_method: string;
   paid_at: string | null; status: string; status_display: string;
-  loaded_at: string | null; delivered_at: string | null; notes: string;
+  loaded_at: string | null; delivered_at: string | null; delivered_comment: string; notes: string;
   created_at: string; updated_at: string;
 }
 
@@ -43,6 +46,10 @@ export interface ParcelCreate {
 export interface ParcelReceive { received_pieces?: number | null; missing_pieces?: number; damaged_pieces?: number; }
 
 export interface BaggageCreate {
-  ticket_id: string; consignment_type_id?: string | null; description?: string;
-  weight_kg?: number | null; amount_due?: number; amount_received?: number | null; payment_method?: string;
+  trip_id: string; ticket_id?: string | null;
+  sender_name?: string; sender_phone?: string; civility?: string; id_type?: string;
+  id_number?: string; birth_date?: string | null; email?: string;
+  consignment_type_id?: string | null; description?: string;
+  weight_kg?: number | null; quantity?: number; declared_value?: number;
+  amount_due?: number; amount_received?: number | null; payment_method?: string;
 }

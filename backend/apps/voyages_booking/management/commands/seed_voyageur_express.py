@@ -305,8 +305,15 @@ class Command(BaseCommand):
             tk = Ticket.objects.filter(booking__company=company, trip=t_out, is_deleted=False).first()
             if tk:
                 consignment_services.add_baggage(
-                    company, ticket=tk, consignment_type=ctype, description="Valise",
-                    weight_kg=28, amount_due=2000, amount_received=2000, payment_method="Espèces", user=None)
+                    company, trip=t_out, ticket=tk, consignment_type=ctype, description="Valise",
+                    weight_kg=28, quantity=1, declared_value=30000, amount_due=2000,
+                    amount_received=2000, payment_method="Espèces", user=None)
+                # Bagage sans billet (expéditeur identifié directement)
+                consignment_services.add_baggage(
+                    company, trip=t_out, ticket=None, consignment_type=ctype, description="Carton scellé",
+                    sender_name="Ondoa Firmin", sender_phone="699300010", id_type="cni", id_number="CNI778899",
+                    civility="mr", weight_kg=15, quantity=1, declared_value=10000, amount_due=1500,
+                    amount_received=2000, payment_method="Espèces", user=None)
             w("Colis/Bagages : 2 colis (dont 1 arrivé) + 1 bagage")
 
         w(self.style.SUCCESS("Données de démonstration ajoutées à Voyageur Express SA."))

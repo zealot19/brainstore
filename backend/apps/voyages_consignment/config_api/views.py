@@ -185,7 +185,8 @@ class BaggageListView(APIView):
     def get(self, request):
         qs = selectors.list_baggage(request.user.company, ticket_id=request.query_params.get("ticket"),
                                     trip_id=request.query_params.get("trip"),
-                                    status=request.query_params.get("status"))
+                                    status=request.query_params.get("status"),
+                                    q=request.query_params.get("q"))
         return success_response(S.BaggageRead(qs, many=True).data)
 
     def post(self, request):
@@ -195,10 +196,14 @@ class BaggageListView(APIView):
         payload = S.BaggageWrite(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
-        ticket = Ticket.objects.filter(is_deleted=False, booking__company=company,
-                                       id=d["ticket_id"]).first()
-        if not ticket:
-            return error_response("Billet introuvable.", status_code=404)
+        trip = Trip.objects.filter(is_deleted=False, company=company, id=d["trip_id"]).first()
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        ticket = None
+        if d["ticket_id"]:
+            ticket = Ticket.objects.filter(is_deleted=False, booking__company=company, id=d["ticket_id"]).first()
+            if not ticket:
+                return error_response("Billet introuvable.", status_code=404)
         ctype = None
         if d["consignment_type_id"]:
             ctype = _cfg(ConsignmentType, company.id, d["consignment_type_id"])
@@ -206,8 +211,11 @@ class BaggageListView(APIView):
                 return error_response("Type introuvable.", status_code=404)
         try:
             bag = services.add_baggage(
-                company, ticket=ticket, consignment_type=ctype, description=d["description"],
-                weight_kg=d["weight_kg"], amount_due=d["amount_due"], amount_received=d["amount_received"],
+                company, trip=trip, ticket=ticket, consignment_type=ctype, description=d["description"],
+                weight_kg=d["weight_kg"], quantity=d["quantity"], declared_value=d["declared_value"],
+                sender_name=d["sender_name"], sender_phone=d["sender_phone"], civility=d["civility"],
+                id_type=d["id_type"], id_number=d["id_number"], birth_date=d["birth_date"], email=d["email"],
+                amount_due=d["amount_due"], amount_received=d["amount_received"],
                 payment_method=d["payment_method"], user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
@@ -223,6 +231,18 @@ class BaggageDetailView(APIView):
     def get(self, request, pk):
         b = self._get(request, pk)
         return success_response(S.BaggageRead(b).data) if b else error_response("Introuvable.", status_code=404)
+
+    def patch(self, request, pk):
+        b = self._get(request, pk)
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        payload = S.BaggageEditSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        try:
+            b = services.edit_baggage(b, user=request.user, **payload.validated_data)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.BaggageRead(b).data)
 
     def delete(self, request, pk):
         b = self._get(request, pk)
@@ -256,8 +276,11 @@ class BaggageDeliverView(APIView):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
         if not b:
             return error_response("Introuvable.", status_code=404)
+        payload = S.BaggageDeliverSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
         try:
-            b = services.deliver_baggage(b, user=request.user)
+            b = services.deliver_baggage(b, comment=payload.validated_data["comment"],
+                                         delivered_at=payload.validated_data["delivered_at"], user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.BaggageRead(b).data)

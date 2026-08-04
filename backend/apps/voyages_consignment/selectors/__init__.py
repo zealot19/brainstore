@@ -33,16 +33,22 @@ def pending_for_trip(company, route_id=None):
     return qs
 
 
-def list_baggage(company, ticket_id=None, trip_id=None, status=None):
+def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None):
     qs = (Baggage.objects.filter(is_deleted=False, company=company)
-          .select_related("ticket__passenger", "ticket__trip", "consignment_type")
+          .select_related("ticket__passenger", "trip", "consignment_type")
           .order_by("-created_at"))
     if ticket_id:
         qs = qs.filter(ticket_id=ticket_id)
     if trip_id:
-        qs = qs.filter(ticket__trip_id=trip_id)
+        qs = qs.filter(trip_id=trip_id)
     if status:
         qs = qs.filter(status=status)
+    if q:
+        qs = qs.filter(Q(tag_number__icontains=q) | Q(sender_name__icontains=q) |
+                       Q(sender_phone__icontains=q) | Q(ticket__number__icontains=q) |
+                       Q(ticket__passenger__first_name__icontains=q) |
+                       Q(ticket__passenger__last_name__icontains=q) |
+                       Q(ticket__passenger__phone__icontains=q))
     return qs
 
 
@@ -51,7 +57,7 @@ def trip_manifest(trip):
                .exclude(status=Parcel.Status.CANCELLED)
                .select_related("origin_point", "destination_point", "consignment_type")
                .order_by("reference"))
-    baggage = (Baggage.objects.filter(is_deleted=False, ticket__trip=trip)
+    baggage = (Baggage.objects.filter(is_deleted=False, trip=trip)
                .exclude(status=Baggage.Status.CANCELLED)
                .select_related("ticket__passenger", "consignment_type")
                .order_by("tag_number"))
