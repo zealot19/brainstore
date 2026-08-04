@@ -81,6 +81,19 @@ export class SidebarService {
             { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
           ],
         },
+        // ── MODULE : Colis & Bagages ──────────────────────────────────────────
+        {
+          menuValue: 'Colis & Bagages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'package',
+          base: 'voyages-consignment',
+          subMenus: [
+            { menuValue: 'Colis',            route: routes.vcgParcels,  base: 'parcels'  },
+            { menuValue: 'Manifeste voyage', route: routes.vcgManifest, base: 'manifest' },
+            { menuValue: 'Bagages',          route: routes.vcgBaggage,  base: 'baggage'  },
+          ],
+        },
         // ── MODULE : Config Voyages ───────────────────────────────────────────
         {
           menuValue: 'Config Voyages',

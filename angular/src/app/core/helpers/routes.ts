@@ -415,6 +415,11 @@ export const routes={
   vbBookings:     '/voyages-booking/bookings',
   vbBookingNew:   '/voyages-booking/bookings/new',
 
+  // ── Colis & Bagages ──────────────────────────────────────────────────────────
+  vcgParcels:  '/voyages-consignment/parcels',
+  vcgManifest: '/voyages-consignment/manifest',
+  vcgBaggage:  '/voyages-consignment/baggage',
+
   //error
   error404: '/error/error-404',
   error500: '/error/error-500',

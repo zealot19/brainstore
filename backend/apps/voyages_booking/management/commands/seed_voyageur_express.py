@@ -34,8 +34,10 @@ from apps.voyages_pricing.models import Fare
 from apps.voyages_trips.models import Trip, TripCrew
 from apps.voyages_trips.services import trip_services
 from apps.voyages_trips.services.assignment import assign_vehicle
-from apps.voyages_booking.models import Booking, Passenger
+from apps.voyages_booking.models import Booking, Passenger, Ticket
 from apps.voyages_booking import services as booking_services
+from apps.voyages_consignment.models import Parcel
+from apps.voyages_consignment import services as consignment_services
 
 _COLS = ["A", "B", "C", "D"]
 
@@ -278,4 +280,33 @@ class Command(BaseCommand):
 
         w(f"Passagers   : {Passenger.objects.filter(company=company, is_deleted=False).count()}")
         w(f"Réservations: {Booking.objects.filter(company=company, is_deleted=False).count()} (toutes payées)")
+        # ── Colis & Bagages ────────────────────────────────────────────────────
+        if not Parcel.objects.filter(company=company, is_deleted=False).exists():
+            from apps.voyages_config.models import ConsignmentNature, ConsignmentType
+            nature, _ = ConsignmentNature.objects.get_or_create(
+                company=company, code="STD", defaults={"name": "Marchandise générale"})
+            ctype, _ = ConsignmentType.objects.get_or_create(
+                company=company, code="CARTON", defaults={"label": "Carton", "nature": nature,
+                                                           "max_weight_kg": 30})
+            p1 = consignment_services.register_parcel(
+                company, origin_point=origin, destination_point=destination, consignment_type=ctype,
+                sender_name="Awono Paul", sender_phone="699200001",
+                recipient_name="Bella Marie", recipient_phone="699200002",
+                description="Carton de vêtements", weight_kg=12, quantity=1,
+                amount_due=2500, amount_received=3000, payment_method="Espèces", user=None)
+            consignment_services.assign_to_trip(p1, t_out, user=None)
+            consignment_services.mark_arrived(p1, user=None)
+            consignment_services.register_parcel(
+                company, origin_point=origin, destination_point=destination, consignment_type=ctype,
+                sender_name="Ngo Lea", sender_phone="699200003",
+                recipient_name="Fouda Eric", recipient_phone="699200004",
+                description="Colis divers", weight_kg=5, quantity=2,
+                amount_due=1500, amount_received=1500, payment_method="Espèces", user=None)
+            tk = Ticket.objects.filter(booking__company=company, trip=t_out, is_deleted=False).first()
+            if tk:
+                consignment_services.add_baggage(
+                    company, ticket=tk, consignment_type=ctype, description="Valise",
+                    weight_kg=28, amount_due=2000, amount_received=2000, payment_method="Espèces", user=None)
+            w("Colis/Bagages : 2 colis (dont 1 arrivé) + 1 bagage")
+
         w(self.style.SUCCESS("Données de démonstration ajoutées à Voyageur Express SA."))

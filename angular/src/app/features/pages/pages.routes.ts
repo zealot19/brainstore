@@ -85,6 +85,16 @@ export const Pages_routes: Routes = [
                 { path: 'bookings/:id',  loadComponent: () => import('../../../_api/pages/voyages-booking/booking-detail/booking-detail.component').then(m => m.VbBookingDetailComponent) },
               ],
             },
+            // ── MODULE : Colis & Bagages ──────────────────────────────────────────────
+            {
+              path: 'voyages-consignment',
+              loadComponent: () => import('../../../_api/pages/voyages-consignment/voyages-consignment.component').then(m => m.VoyagesConsignmentComponent),
+              children: [
+                { path: 'parcels',  loadComponent: () => import('../../../_api/pages/voyages-consignment/parcels/parcels.component').then(m => m.VcgParcelsComponent) },
+                { path: 'manifest', loadComponent: () => import('../../../_api/pages/voyages-consignment/manifest/manifest.component').then(m => m.VcgManifestComponent) },
+                { path: 'baggage',  loadComponent: () => import('../../../_api/pages/voyages-consignment/baggage/baggage.component').then(m => m.VcgBaggageComponent) },
+              ],
+            },
 
       {
         path: 'dashboard', loadComponent: () => import('./dashboards/dashboard.component').then(m => m.DashboardComponent),
