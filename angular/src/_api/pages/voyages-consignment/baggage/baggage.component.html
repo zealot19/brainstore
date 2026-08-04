@@ -1,0 +1,69 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Bagages</h4><h6>Enregistrement des bagages sur un billet</h6></div></div>
+</div>
+<app-info-banner text="Recherchez une réservation, choisissez le billet du passager, pesez le bagage : la franchise s'applique et l'excédent est indiqué. Saisissez le supplément et encaissez."></app-info-banner>
+
+<div class="card"><div class="card-body">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <input type="text" class="form-control w-auto" placeholder="Référence ou passager…" [(ngModel)]="q" (keyup.enter)="search()" />
+    <button class="btn btn-outline-secondary btn-sm" (click)="search()"><i class="ti ti-search me-1"></i>Rechercher</button>
+  </div>
+
+  @if (!selectedBooking && bookings.length) {
+    <div class="table-responsive"><table class="table">
+      <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Voyage</th><th class="no-sort"></th></tr></thead>
+      <tbody>
+        @for (b of bookings; track b.id) {
+          <tr>
+            <td class="fw-medium">{{ b.reference }}</td>
+            <td>{{ b.buyer_name }}</td>
+            <td>{{ b.trip_type_display }}</td>
+            <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="pickBooking(b)"><i class="ti ti-check me-1"></i>Choisir</a></td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  }
+
+  @if (selectedBooking) {
+    <div class="alert alert-light d-flex justify-content-between align-items-center">
+      <span>Réservation <strong>{{ selectedBooking.reference }}</strong> — {{ selectedBooking.buyer_name }}</span>
+      <button class="btn btn-sm btn-light" (click)="selectedBooking = null; rows = []"><i class="ti ti-arrow-left me-1"></i>Changer</button>
+    </div>
+    <div class="row align-items-end">
+      <div class="col-md-3 mb-3"><label class="form-label">Passager (billet)</label>
+        <select class="form-select" [(ngModel)]="ticketId" (ngModelChange)="reload()">
+          @for (t of tickets; track t.id) { <option [value]="t.id">{{ t.passenger_name }} · {{ t.number }}</option> }
+        </select></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Type</label>
+        <select class="form-select" [(ngModel)]="typeId"><option value="">—</option>@for (c of types; track c.id) { <option [value]="c.id">{{ c.label }}</option> }</select></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Poids (kg)</label><input type="number" step="0.01" class="form-control" [(ngModel)]="weight" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Supplément</label><input type="number" min="0" class="form-control" [(ngModel)]="amountDue" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Encaissé</label><input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" /></div>
+      <div class="col-md-1 mb-3"><button class="btn btn-primary w-100" [disabled]="!ticketId || saving" (click)="add()"><i class="ti ti-plus"></i></button></div>
+    </div>
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    @if (amountReceived) { <p class="text-muted small">Monnaie à rendre : {{ change | number:'1.0-0' }} XAF</p> }
+
+    <div class="table-responsive"><table class="table datanew">
+      <thead class="thead-light"><tr><th>Étiquette</th><th>Poids</th><th>Franchise</th><th>Excédent</th><th>Supplément</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+      <tbody>
+        @for (b of rows; track b.id) {
+          <tr>
+            <td class="fw-medium">{{ b.tag_number }}</td>
+            <td>{{ b.weight_kg || '—' }} kg</td>
+            <td>{{ b.free_allowance_kg }} kg</td>
+            <td>{{ b.excess_kg }} kg</td>
+            <td>{{ b.amount_due | number:'1.0-0' }} XAF</td>
+            <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
+            <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+              @if (b.status === 'checked_in') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" (click)="loadBag(b)" title="Charger"><i class="ti ti-truck-loading me-1"></i>Charger</a> }
+              @if (b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" (click)="deliver(b)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
+              @if (b.status !== 'delivered' && b.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
+            </div></td>
+          </tr>
+        } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun bagage pour ce billet.</td></tr> }
+      </tbody>
+    </table></div>
+  }
+</div></div>
