@@ -342,6 +342,23 @@ export const VOYAGES_BOOKING = {
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
 };
 
+const VCG = `${API_BASE}/voyages/consignment`;
+
+export const VOYAGES_CONSIGNMENT = {
+  parcels: `${VCG}/parcels/`,
+  parcel: (id: string) => `${VCG}/parcels/${id}/`,
+  parcelsPending: `${VCG}/parcels/pending/`,
+  parcelAssignTrip: (id: string) => `${VCG}/parcels/${id}/assign-trip/`,
+  parcelArrived: (id: string) => `${VCG}/parcels/${id}/arrived/`,
+  parcelPickup: (id: string) => `${VCG}/parcels/${id}/pickup/`,
+  parcelCancel: (id: string) => `${VCG}/parcels/${id}/cancel/`,
+  baggage: `${VCG}/baggage/`,
+  baggageItem: (id: string) => `${VCG}/baggage/${id}/`,
+  baggageLoad: (id: string) => `${VCG}/baggage/${id}/load/`,
+  baggageDeliver: (id: string) => `${VCG}/baggage/${id}/deliver/`,
+  manifest: (tripId: string) => `${VCG}/trips/${tripId}/manifest/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 
 /** URLs qui ne nécessitent pas de token JWT */

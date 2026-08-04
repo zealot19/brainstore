@@ -1,0 +1,43 @@
+export interface ParcelEvent {
+  id: string; kind: string; kind_display: string; trip: string | null; note: string; created_at: string;
+}
+
+export interface Parcel {
+  id: string; reference: string; status: string; status_display: string;
+  origin_point: string; origin_point_name: string | null;
+  destination_point: string; destination_point_name: string | null;
+  trip: string | null;
+  sender_name: string; sender_phone: string;
+  recipient_name: string; recipient_phone: string; recipient_address: string;
+  consignment_type: string; consignment_type_label: string | null; description: string;
+  weight_kg: string | null; quantity: number; declared_value: string | null;
+  amount_due: string; amount_received: string; change_due: string; payment_method: string;
+  paid_at: string | null; loaded_at: string | null; arrived_at: string | null;
+  picked_up_at: string | null; picked_up_by: string; notes: string;
+  created_at: string; updated_at: string; events: ParcelEvent[];
+}
+
+export interface Baggage {
+  id: string; tag_number: string; ticket: string; ticket_number: string | null;
+  passenger_name: string | null; trip: string | null;
+  consignment_type: string | null; description: string;
+  weight_kg: string | null; free_allowance_kg: string; excess_kg: string;
+  amount_due: string; amount_received: string; change_due: string; payment_method: string;
+  paid_at: string | null; status: string; status_display: string;
+  loaded_at: string | null; delivered_at: string | null; notes: string;
+  created_at: string; updated_at: string;
+}
+
+export interface Manifest { parcels: Parcel[]; baggage: Baggage[]; }
+
+export interface ParcelCreate {
+  origin_point_id: string; destination_point_id: string; consignment_type_id: string;
+  sender_name: string; sender_phone: string; recipient_name: string; recipient_phone: string;
+  recipient_address?: string; description?: string; weight_kg?: number | null; quantity?: number;
+  declared_value?: number | null; amount_due: number; amount_received?: number | null; payment_method?: string;
+}
+
+export interface BaggageCreate {
+  ticket_id: string; consignment_type_id?: string | null; description?: string;
+  weight_kg?: number | null; amount_due?: number; amount_received?: number | null; payment_method?: string;
+}
