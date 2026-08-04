@@ -1,0 +1,124 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Colis</h4><h6>Enregistrement, suivi et retrait des colis</h6></div></div>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parcel-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Enregistrer un colis</a>
+  </div>
+</div>
+<app-info-banner text="Enregistrez le colis (expéditeur, destinataire, contenu) et encaissez le montant au dépôt. Le colis part « Enregistré » ; il sera affecté à un voyage via le manifeste, puis retiré par le destinataire à l'arrivée."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
+        <option value="">Tous les statuts</option>
+        <option value="registered">Enregistré</option>
+        <option value="loaded">Chargé</option>
+        <option value="arrived">Arrivé</option>
+        <option value="picked_up">Retiré</option>
+        <option value="cancelled">Annulé</option>
+      </select>
+      <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>Référence</th><th>Trajet</th><th>Destinataire</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (p of rows; track p.id) {
+            <tr>
+              <td class="fw-medium"><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)">{{ p.reference }}</a></td>
+              <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
+              <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
+              <td>{{ p.amount_due | number:'1.0-0' }} XAF</td>
+              <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
+                @if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" (click)="arrived(p)" title="Arrivé"><i class="ti ti-map-pin-check me-1"></i>Arrivé</a> }
+                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+
+<!-- Enregistrement -->
+<div class="modal fade" id="parcel-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Enregistrer un colis</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <h6 class="text-muted">Trajet</h6>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Point de départ <span class="text-danger">*</span></label>
+        <select formControlName="origin_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of points; track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Point d'arrivée <span class="text-danger">*</span></label>
+        <select formControlName="destination_point_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of points; track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }</select></div>
+    </div>
+    <h6 class="text-muted">Expéditeur / Destinataire</h6>
+    <div class="row">
+      <div class="col-md-3 mb-3"><label class="form-label">Expéditeur <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Tél. expéditeur <span class="text-danger">*</span></label><input formControlName="sender_phone" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Destinataire <span class="text-danger">*</span></label><input formControlName="recipient_name" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Tél. destinataire <span class="text-danger">*</span></label><input formControlName="recipient_phone" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">Adresse destinataire</label><input formControlName="recipient_address" class="form-control" /></div>
+    <h6 class="text-muted">Contenu</h6>
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">Type de colis <span class="text-danger">*</span></label>
+        <select formControlName="consignment_type_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (c of types; track c.id) { <option [ngValue]="c.id">{{ c.label }}</option> }</select></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Poids (kg)</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">Quantité</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Valeur déclarée</label><input formControlName="declared_value" type="number" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">Description</label><input formControlName="description" class="form-control" /></div>
+    <h6 class="text-muted">Encaissement</h6>
+    <div class="row">
+      <div class="col-md-3 mb-3"><label class="form-label">Mode de paiement</label>
+        <select formControlName="payment_method" class="form-select"><option value="" disabled selected>(module trésorerie à venir)</option></select></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Encaissé</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">Monnaie rendue</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
+    </div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">Enregistrer &amp; encaisser</button></div></form>
+</div></div></div>
+
+<!-- Retrait -->
+<div class="modal fade" id="pickup-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Retrait du colis</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="pickupTarget = null"></button></div>
+  <div class="modal-body">
+    @if (pickupTarget) { <p>Colis <strong>{{ pickupTarget.reference }}</strong> pour <strong>{{ pickupTarget.recipient_name }}</strong>.</p> }
+    <div class="mb-2"><label class="form-label">Nom du retirant <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" (click)="doPickup()">Confirmer le retrait</button></div>
+</div></div></div>
+
+<!-- Détail / suivi -->
+<div class="modal fade" id="detail-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Colis {{ detail?.reference }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (detail) {
+      <div class="row mb-3">
+        <div class="col-md-6"><small class="text-muted d-block">Trajet</small><strong>{{ detail.origin_point_name }} → {{ detail.destination_point_name }}</strong></div>
+        <div class="col-md-6"><small class="text-muted d-block">Statut</small><span class="badge {{ statusClass(detail.status) }}">{{ detail.status_display }}</span></div>
+        <div class="col-md-6 mt-2"><small class="text-muted d-block">Expéditeur</small>{{ detail.sender_name }} · {{ detail.sender_phone }}</div>
+        <div class="col-md-6 mt-2"><small class="text-muted d-block">Destinataire</small>{{ detail.recipient_name }} · {{ detail.recipient_phone }}</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">Montant</small>{{ detail.amount_due | number:'1.0-0' }} XAF</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">Encaissé</small>{{ detail.amount_received | number:'1.0-0' }} XAF</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">Monnaie</small>{{ detail.change_due | number:'1.0-0' }} XAF</div>
+        @if (detail.picked_up_by) { <div class="col-md-6 mt-2"><small class="text-muted d-block">Retiré par</small>{{ detail.picked_up_by }}</div> }
+      </div>
+      <h6>Suivi</h6>
+      <ul class="list-group">
+        @for (e of detail.events; track e.id) {
+          <li class="list-group-item d-flex justify-content-between"><span><i class="ti ti-point-filled me-1"></i>{{ e.kind_display }}<small class="text-muted ms-2">{{ e.note }}</small></span><small class="text-muted">{{ e.created_at | date:'short' }}</small></li>
+        } @empty { <li class="list-group-item text-muted">Aucun événement.</li> }
+      </ul>
+    }
+  </div>
+</div></div></div>
