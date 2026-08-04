@@ -35,6 +35,9 @@ urlpatterns = [
     # ── Réservations Voyages ───────────────────────────────────────────────
     path("voyages/booking/", include("apps.voyages_booking.urls")),
 
+    # ── Colis & Bagages Voyages ────────────────────────────────────────────
+    path("voyages/consignment/", include("apps.voyages_consignment.urls")),
+
     # ── Transport — Configuration ───────────────────────────────────────────
     path("transport/",  include("apps.transport_config.urls")),
 
