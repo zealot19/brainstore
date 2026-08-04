@@ -22,7 +22,10 @@ export class VcgBaggageComponent implements OnInit {
 
   constructor(private svc: BaggageService, private booking: BookingService,
               private ctSvc: ConsignmentTypeService) {}
-  ngOnInit(): void { this.ctSvc.list().subscribe(d => this.types = d); }
+  ngOnInit(): void {
+    this.ctSvc.list().subscribe(d => this.types = d);
+    this.search(); // charge les réservations récentes dès l'ouverture
+  }
 
   search(): void { this.booking.list({ q: this.q }).subscribe(d => this.bookings = d); }
   pickBooking(b: Booking): void { this.selectedBooking = b; this.ticketId = b.tickets[0]?.id ?? ''; this.reload(); }

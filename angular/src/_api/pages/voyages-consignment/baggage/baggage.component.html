@@ -9,20 +9,25 @@
     <button class="btn btn-outline-secondary btn-sm" (click)="search()"><i class="ti ti-search me-1"></i>Rechercher</button>
   </div>
 
-  @if (!selectedBooking && bookings.length) {
-    <div class="table-responsive"><table class="table">
-      <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Voyage</th><th class="no-sort"></th></tr></thead>
-      <tbody>
-        @for (b of bookings; track b.id) {
-          <tr>
-            <td class="fw-medium">{{ b.reference }}</td>
-            <td>{{ b.buyer_name }}</td>
-            <td>{{ b.trip_type_display }}</td>
-            <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="pickBooking(b)"><i class="ti ti-check me-1"></i>Choisir</a></td>
-          </tr>
-        }
-      </tbody>
-    </table></div>
+  @if (!selectedBooking) {
+    <p class="text-muted"><i class="ti ti-info-circle me-1"></i>Étape 1 — choisissez la réservation du passager, puis ajoutez ses bagages.</p>
+    @if (bookings.length) {
+      <div class="table-responsive"><table class="table">
+        <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Voyage</th><th class="no-sort"></th></tr></thead>
+        <tbody>
+          @for (b of bookings; track b.id) {
+            <tr>
+              <td class="fw-medium">{{ b.reference }}</td>
+              <td>{{ b.buyer_name }}</td>
+              <td>{{ b.trip_type_display }}</td>
+              <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="pickBooking(b)"><i class="ti ti-check me-1"></i>Choisir</a></td>
+            </tr>
+          }
+        </tbody>
+      </table></div>
+    } @else {
+      <p class="text-center py-4 text-muted">Aucune réservation trouvée. Créez d'abord une réservation.</p>
+    }
   }
 
   @if (selectedBooking) {
