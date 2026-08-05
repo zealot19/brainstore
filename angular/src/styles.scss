@@ -101,6 +101,18 @@ $template-angular-theme: mat.m2-define-light-theme((color: (primary: $template-a
     border: 1px solid #dee2e6 !important;
     margin-bottom: 12pt !important;
   }
+
+  // ── Feuille de route Voyages : n'imprimer que le bordereau ciblé ─────────
+  // (règles globales : elles doivent atteindre <body> et les éléments du
+  //  composant hors encapsulation Angular)
+  .no-print,
+  .rm-act { display: none !important; }
+  .print-only { display: table-cell !important; }
+
+  // Par défaut les deux bordereaux restent imprimables ; le clic sur un bouton
+  // pose une classe sur <body> pour n'imprimer que celui demandé.
+  body.printing-voyages .print-colis,
+  body.printing-colis .print-voyages { display: none !important; }
 }
 
 // .show-sub-menu {

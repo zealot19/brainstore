@@ -12,20 +12,11 @@
 .rm-section { margin-top: 14px; font-weight: 700; }
 .rm-table { font-size: .85rem; }
 
-/* La colonne "Émargement" ne sert qu'à l'impression */
+/* La colonne "Émargement" ne sert qu'à l'impression (masquée à l'écran) */
 .print-only { display: none; }
 
-/* À l'écran, les deux bordereaux sont visibles l'un sous l'autre */
+/* À l'écran, les deux bordereaux sont visibles l'un sous l'autre ;
+   l'impression (masquage du chrome + choix du bordereau) est gérée globalement
+   dans src/styles.scss car les règles doivent atteindre <body> et le shell,
+   hors encapsulation du composant. */
 .print-colis { margin-top: 24px; }
-
-@media print {
-  /* Masque tout le chrome de l'application */
-  app-sidebar, .sidebar, .header, app-header, .page-header, .no-print { display: none !important; }
-  .print-only { display: table-cell; }
-  .rm-act { display: none !important; }
-
-  /* Par défaut à l'impression, on masque les deux ; le body active celui voulu */
-  .print-voyages, .print-colis { display: none; }
-  body.printing-voyages .print-voyages { display: block; }
-  body.printing-colis .print-colis { display: block; }
-}
