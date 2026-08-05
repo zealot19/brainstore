@@ -95,5 +95,14 @@ def loyalty_view(passenger):
     return acc, movements
 
 
+def trip_passengers(trip):
+    """Billets vendus/embarqués d'un voyage, triés par siège (pour la feuille de route)."""
+    from apps.voyages_booking.models import Ticket
+    return (Ticket.objects.filter(is_deleted=False, trip=trip,
+                                  status__in=[Ticket.Status.SOLD, Ticket.Status.BOARDED])
+            .select_related("passenger", "trip_seat", "destination_point")
+            .order_by("trip_seat__row", "trip_seat__column"))
+
+
 __all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations",
-           "list_bookings", "booking_detail", "loyalty_view"]
+           "list_bookings", "booking_detail", "loyalty_view", "trip_passengers"]

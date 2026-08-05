@@ -180,6 +180,8 @@ def cancel_booking(booking, *, user):
 def board_ticket(ticket, *, user):
     if ticket.status != Ticket.Status.SOLD:
         raise ApplicationError(_("Seul un billet vendu peut être embarqué."))
+    if ticket.trip.status not in ("pending", "departed"):
+        raise ApplicationError(_("L'embarquement n'est possible qu'à l'approche du départ."))
     ticket.status = Ticket.Status.BOARDED
     ticket.boarded_at = timezone.now()
     ticket.updated_by = user
@@ -189,6 +191,18 @@ def board_ticket(ticket, *, user):
         ticket.booking.updated_by = user
         ticket.booking.save(update_fields=["status", "updated_by", "updated_at"])
     return ticket
+
+
+@transaction.atomic
+def board_all_tickets(trip, *, user):
+    """Embarque tous les billets vendus non encore embarqués d'un voyage. Idempotent."""
+    if trip.status not in ("pending", "departed"):
+        raise ApplicationError(_("L'embarquement n'est possible qu'à l'approche du départ."))
+    done = 0
+    for t in trip.tickets.filter(is_deleted=False, status=Ticket.Status.SOLD):
+        board_ticket(t, user=user)
+        done += 1
+    return done
 
 
 @transaction.atomic
