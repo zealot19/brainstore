@@ -340,6 +340,8 @@ export const VOYAGES_BOOKING = {
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
+  tripRoadmap: (tripId: string) => `${VB}/trips/${tripId}/roadmap/`,
+  tripBoardAll: (tripId: string) => `${VB}/trips/${tripId}/board-all/`,
 };
 
 const VCG = `${API_BASE}/voyages/consignment`;
