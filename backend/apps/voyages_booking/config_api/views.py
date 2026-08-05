@@ -198,3 +198,96 @@ class PassengerLoyaltyView(APIView):
             "account": S.LoyaltyAccountRead(acc).data if acc else None,
             "movements": S.LoyaltyMovementRead(movements, many=True).data,
         })
+
+
+from apps.voyages_trips.models import Trip as VoyageTrip
+from apps.voyages_consignment.selectors import trip_manifest
+
+
+def _company_header(company, request):
+    logo_url = None
+    if getattr(company, "logo", None):
+        try:
+            logo_url = request.build_absolute_uri(company.logo.url)
+        except Exception:
+            logo_url = None
+    address = str(company.address) if getattr(company, "address_id", None) else ""
+    return {"name": company.name, "slogan": company.slogan or "", "logo_url": logo_url,
+            "phone": company.phone or "", "email": company.email or "", "address": address}
+
+
+class TripRoadmapView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, trip_id):
+        trip = (VoyageTrip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id)
+                .select_related("route", "origin", "destination", "vehicle").first())
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+
+        seats = trip.seats.filter(is_deleted=False)
+        seats_total = seats.count()
+        seats_sold = seats.filter(status__in=["sold"]).count()
+
+        passengers = []
+        boarded_count = 0
+        for t in selectors.trip_passengers(trip):
+            is_boarded = t.status == "boarded"
+            if is_boarded:
+                boarded_count += 1
+            passengers.append({
+                "ticket_id": str(t.id), "number": t.number,
+                "passenger_name": t.passenger.full_name if t.passenger_id else "",
+                "seat_number": t.trip_seat.seat_number if t.trip_seat_id else "",
+                "destination_point_name": t.destination_point.name if t.destination_point_id else "",
+                "direction_display": t.get_direction_display(),
+                "status": t.status, "boarded": is_boarded,
+                "boarded_at": t.boarded_at,
+            })
+
+        manifest = trip_manifest(trip)
+        baggage = [{
+            "tag_number": b.tag_number, "owner_name": b.owner_name,
+            "ticket_id": str(b.ticket_id) if b.ticket_id else None,
+            "passenger_name": (b.ticket.passenger.full_name if b.ticket_id and b.ticket.passenger_id else ""),
+            "description": b.description, "weight_kg": b.weight_kg, "quantity": b.quantity,
+        } for b in manifest["baggage"]]
+        parcels = [{
+            "reference": p.reference, "sender_name": p.sender_name, "sender_phone": p.sender_phone,
+            "recipient_name": p.recipient_name, "recipient_phone": p.recipient_phone,
+            "description": p.description, "quantity": p.quantity,
+        } for p in manifest["parcels"]]
+
+        crew = [{"role_display": c.get_role_display(),
+                 "driver_name": c.driver.full_name if c.driver_id else ""}
+                for c in trip.crew.filter(is_deleted=False)]
+
+        data = {
+            "company": _company_header(trip.company, request),
+            "trip": {
+                "number": trip.number, "route_code": trip.route.code if trip.route_id else "",
+                "origin_name": trip.origin.name if trip.origin_id else "",
+                "destination_name": trip.destination.name if trip.destination_id else "",
+                "scheduled_departure": trip.scheduled_departure,
+                "status": trip.status, "status_display": trip.get_status_display(),
+                "vehicle_plate": trip.vehicle.license_plate if trip.vehicle_id else "",
+                "crew": crew, "seats_total": seats_total, "seats_sold": seats_sold,
+                "boarded_count": boarded_count,
+            },
+            "passengers": passengers, "baggage": baggage, "parcels": parcels,
+        }
+        return success_response(data)
+
+
+class TripBoardAllView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request, trip_id):
+        trip = VoyageTrip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id).first()
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        try:
+            done = services.board_all_tickets(trip, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response({"done": done})
