@@ -65,5 +65,6 @@ export class VoyagesListComponent implements OnInit {
     });
   }
   open(t: Trip): void { this.router.navigate(['/voyages/trip', t.id]); }
+  roadmap(t: Trip): void { this.router.navigate(['/voyages/roadmap', t.id]); }
   private close(): void { document.getElementById('trip-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

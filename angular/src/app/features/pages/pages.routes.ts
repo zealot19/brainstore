@@ -72,6 +72,7 @@ export const Pages_routes: Routes = [
               children: [
                 { path: 'list', loadComponent: () => import('../../../_api/pages/voyages/list/voyages-list.component').then(m => m.VoyagesListComponent) },
                 { path: 'trip/:id', loadComponent: () => import('../../../_api/pages/voyages/trip-detail/trip-detail.component').then(m => m.VoyagesTripDetailComponent) },
+                { path: 'roadmap/:tripId', loadComponent: () => import('../../../_api/pages/voyages/roadmap/roadmap.component').then(m => m.VbRoadmapComponent) },
               ],
             },
             // ── MODULE : Réservations Voyages ─────────────────────────────────────────
