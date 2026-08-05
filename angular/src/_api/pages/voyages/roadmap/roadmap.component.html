@@ -1,0 +1,96 @@
+<div class="rm-actions no-print">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <button class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-1"></i>Retour</button>
+    <div class="d-flex gap-2">
+      @if (canBoard) { <button class="btn btn-outline-success" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>Tout embarquer</button> }
+      <button class="btn btn-outline-primary" (click)="printDoc('voyages')"><i class="ti ti-printer me-1"></i>Bordereau Voyages</button>
+      <button class="btn btn-outline-primary" (click)="printDoc('colis')"><i class="ti ti-printer me-1"></i>Bordereau Colis</button>
+    </div>
+  </div>
+</div>
+
+@if (loading) { <div class="text-center py-5 no-print"><div class="spinner-border text-primary"></div></div> }
+@else if (data) {
+  <!-- En-tête voyage (écran) -->
+  <div class="card mb-3 no-print"><div class="card-body">
+    <h4>{{ data.trip.number }} <span class="badge bg-info ms-2">{{ data.trip.status_display }}</span></h4>
+    <p class="mb-1">{{ data.trip.origin_name }} → {{ data.trip.destination_name }} · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p class="mb-1 text-muted">Véhicule : {{ data.trip.vehicle_plate || '—' }} · Équipage :
+      @for (c of data.trip.crew; track $index) { {{ c.role_display }} {{ c.driver_name }}@if (!$last) { , } } @empty { — }</p>
+    <p class="mb-0"><strong>Remplissage :</strong> {{ data.trip.seats_sold }}/{{ data.trip.seats_total }} · <strong>Embarqués :</strong> {{ data.trip.boarded_count }}</p>
+  </div></div>
+
+  <!-- ===================== Bordereau Voyages ===================== -->
+  <div class="print-voyages">
+    <div class="rm-doc-header">
+      <div class="rm-company">
+        @if (data.company.logo_url) { <img [src]="data.company.logo_url" class="rm-logo" alt="logo" /> }
+        <div>
+          <div class="rm-company-name">{{ data.company.name }}</div>
+          @if (data.company.slogan) { <div class="rm-company-slogan">{{ data.company.slogan }}</div> }
+          <div class="rm-company-contact">{{ data.company.phone }}@if (data.company.address) {  · {{ data.company.address }} }</div>
+        </div>
+      </div>
+      <div class="rm-doc-title">Bordereau Voyages</div>
+    </div>
+    <div class="rm-trip-line">
+      <strong>{{ data.trip.number }}</strong> — {{ data.trip.origin_name }} → {{ data.trip.destination_name }}
+      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · Véhicule {{ data.trip.vehicle_plate || '—' }}
+    </div>
+
+    <h6 class="rm-section">Passagers ({{ data.passengers.length }})</h6>
+    <table class="table table-bordered rm-table">
+      <thead><tr><th>#</th><th>Billet</th><th>Passager</th><th>Siège</th><th>Descente</th><th>Sens</th><th>Embarqué</th><th class="no-print rm-act">Action</th><th class="print-only">Émargement</th></tr></thead>
+      <tbody>
+        @for (p of data.passengers; track p.ticket_id; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td><td>{{ p.number }}</td><td>{{ p.passenger_name }}</td>
+            <td>{{ p.seat_number }}</td><td>{{ p.destination_point_name }}</td><td>{{ p.direction_display }}</td>
+            <td>@if (p.boarded) { <span class="badge bg-success">Oui</span> } @else { <span class="badge bg-secondary">Non</span> }</td>
+            <td class="no-print rm-act">@if (!p.boarded && canBoard) { <button class="btn btn-sm btn-outline-success" (click)="board(p.ticket_id)"><i class="ti ti-user-check"></i></button> }</td>
+            <td class="print-only"></td>
+          </tr>
+        } @empty { <tr><td colspan="9" class="text-center text-muted">Aucun passager.</td></tr> }
+      </tbody>
+    </table>
+
+    <h6 class="rm-section">Bagages ({{ data.baggage.length }})</h6>
+    <table class="table table-bordered rm-table">
+      <thead><tr><th>Étiquette</th><th>Propriétaire</th><th>Description</th><th>Poids</th><th>Nb</th></tr></thead>
+      <tbody>
+        @for (b of data.baggage; track b.tag_number) {
+          <tr><td>{{ b.tag_number }}</td><td>{{ b.owner_name }}</td><td>{{ b.description || '—' }}</td><td>{{ b.weight_kg || '—' }}</td><td>{{ b.quantity }}</td></tr>
+        } @empty { <tr><td colspan="5" class="text-center text-muted">Aucun bagage.</td></tr> }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== Bordereau Colis ===================== -->
+  <div class="print-colis">
+    <div class="rm-doc-header">
+      <div class="rm-company">
+        @if (data.company.logo_url) { <img [src]="data.company.logo_url" class="rm-logo" alt="logo" /> }
+        <div>
+          <div class="rm-company-name">{{ data.company.name }}</div>
+          @if (data.company.slogan) { <div class="rm-company-slogan">{{ data.company.slogan }}</div> }
+          <div class="rm-company-contact">{{ data.company.phone }}@if (data.company.address) {  · {{ data.company.address }} }</div>
+        </div>
+      </div>
+      <div class="rm-doc-title">Bordereau Colis</div>
+    </div>
+    <div class="rm-trip-line">
+      <strong>{{ data.trip.number }}</strong> — {{ data.trip.origin_name }} → {{ data.trip.destination_name }}
+      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · Véhicule {{ data.trip.vehicle_plate || '—' }}
+    </div>
+    <h6 class="rm-section">Colis ({{ data.parcels.length }})</h6>
+    <table class="table table-bordered rm-table">
+      <thead><tr><th>Référence</th><th>Expéditeur</th><th>Destinataire</th><th>Description</th><th>Pièces</th></tr></thead>
+      <tbody>
+        @for (c of data.parcels; track c.reference) {
+          <tr><td>{{ c.reference }}</td><td>{{ c.sender_name }}<br><small>{{ c.sender_phone }}</small></td>
+            <td>{{ c.recipient_name }}<br><small>{{ c.recipient_phone }}</small></td><td>{{ c.description || '—' }}</td><td>{{ c.quantity }}</td></tr>
+        } @empty { <tr><td colspan="5" class="text-center text-muted">Aucun colis chargé.</td></tr> }
+      </tbody>
+    </table>
+  </div>
+}
