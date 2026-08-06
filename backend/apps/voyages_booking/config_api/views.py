@@ -291,3 +291,40 @@ class TripBoardAllView(APIView):
         except ApplicationError as e:
             return error_response(str(e))
         return success_response({"done": done})
+
+
+class BookingPrintView(APIView):
+    """Données enrichies pour l'impression des billets d'une réservation."""
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, pk):
+        b = selectors.booking_detail(request.user.company, pk)
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        tickets = []
+        for t in b.tickets.filter(is_deleted=False).exclude(status="cancelled").order_by("direction"):
+            trip = t.trip if t.trip_id else None
+            tickets.append({
+                "number": t.number,
+                "passenger_name": t.passenger.full_name if t.passenger_id else "",
+                "direction_display": t.get_direction_display(),
+                "trip_number": trip.number if trip else "",
+                "route_code": trip.route.code if trip and trip.route_id else "",
+                "origin_name": trip.origin.name if trip and trip.origin_id else "",
+                "destination_name": t.destination_point.name if t.destination_point_id else (
+                    trip.destination.name if trip and trip.destination_id else ""),
+                "scheduled_departure": trip.scheduled_departure if trip else None,
+                "seat_number": t.trip_seat.seat_number if t.trip_seat_id else "",
+                "fare_class": t.fare_class.name if t.fare_class_id else "",
+                "amount": t.amount,
+                "is_reward": t.is_reward,
+            })
+        return success_response({
+            "company": _company_header(request.user.company, request),
+            "reference": b.reference,
+            "buyer_name": b.buyer.full_name if b.buyer_id else "",
+            "trip_type_display": b.get_trip_type_display(),
+            "amount_paid": b.amount_paid,
+            "created_at": b.created_at,
+            "tickets": tickets,
+        })
