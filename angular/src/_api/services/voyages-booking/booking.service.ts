@@ -26,6 +26,7 @@ export class BookingService {
     return this.http.get<Booking[]>(VOYAGES_BOOKING.bookings, { params: p });
   }
   get(id: string): Observable<Booking> { return this.http.get<Booking>(VOYAGES_BOOKING.booking(id)); }
+  printData(id: string): Observable<any> { return this.http.get<any>(VOYAGES_BOOKING.bookingPrint(id)); }
   create(body: BookingCreate): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookings, body); }
   cancel(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingCancel(id), {}); }
   noShow(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingNoShow(id), {}); }

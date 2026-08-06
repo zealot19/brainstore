@@ -337,6 +337,7 @@ export const VOYAGES_BOOKING = {
   destinations: (tripId: string) => `${VB}/trips/${tripId}/destinations/`,
   bookings: `${VB}/bookings/`,
   booking: (id: string) => `${VB}/bookings/${id}/`,
+  bookingPrint: (id: string) => `${VB}/bookings/${id}/print/`,
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,

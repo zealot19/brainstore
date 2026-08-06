@@ -1,7 +1,40 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Détail réservation</h4><h6>Billets et cycle de vie</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-2"></i>Retour</a></div>
+  <div class="page-btn d-flex gap-2">
+    @if (printData?.tickets?.length) { <a href="javascript:void(0);" class="btn btn-outline-primary" (click)="printTickets()"><i class="ti ti-printer me-2"></i>Imprimer les billets</a> }
+    <a href="javascript:void(0);" class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-2"></i>Retour</a>
+  </div>
 </div>
+
+<!-- Billets imprimables (masqués à l'écran, affichés seulement à l'impression) -->
+@if (printData) {
+  <div class="tickets-print">
+    @for (t of printData.tickets; track t.number) {
+      <div class="ticket-slip">
+        <div class="ts-head">
+          @if (printData.company.logo_url) { <img [src]="printData.company.logo_url" class="ts-logo" alt="logo" /> }
+          <div>
+            <div class="ts-company">{{ printData.company.name }}</div>
+            @if (printData.company.slogan) { <div class="ts-slogan">{{ printData.company.slogan }}</div> }
+            <div class="ts-contact">{{ printData.company.phone }}@if (printData.company.address) {  · {{ printData.company.address }} }</div>
+          </div>
+          <div class="ts-doc">BILLET<br><span>{{ t.direction_display }}</span></div>
+        </div>
+        <div class="ts-body">
+          <div class="ts-row"><span>N° billet</span><strong>{{ t.number }}</strong></div>
+          <div class="ts-row"><span>Réservation</span><strong>{{ printData.reference }}</strong></div>
+          <div class="ts-row"><span>Passager</span><strong>{{ t.passenger_name }}</strong></div>
+          <div class="ts-row"><span>Voyage</span><strong>{{ t.trip_number }} ({{ t.route_code }})</strong></div>
+          <div class="ts-row"><span>Trajet</span><strong>{{ t.origin_name }} → {{ t.destination_name }}</strong></div>
+          <div class="ts-row"><span>Départ</span><strong>{{ t.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+          <div class="ts-row"><span>Siège</span><strong>{{ t.seat_number }}</strong> <span>Classe</span><strong>{{ t.fare_class }}</strong></div>
+          <div class="ts-row ts-amount"><span>Montant</span><strong>@if (t.is_reward) { GRATUIT (fidélité) } @else { {{ t.amount | number:'1.0-0' }} XAF }</strong></div>
+        </div>
+        <div class="ts-foot">Conservez ce billet - à présenter à l'embarquement.</div>
+      </div>
+    }
+  </div>
+}
 
 @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
 @else if (booking) {

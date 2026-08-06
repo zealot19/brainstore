@@ -11,6 +11,7 @@ import { Booking } from '../../../models/voyages-booking.models';
 })
 export class VbBookingDetailComponent implements OnInit {
   booking: Booking | null = null; loading = false;
+  printData: any = null;
   constructor(private svc: BookingService, private route: ActivatedRoute, private router: Router) {}
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -19,6 +20,13 @@ export class VbBookingDetailComponent implements OnInit {
   load(id: string): void {
     this.loading = true;
     this.svc.get(id).subscribe({ next: b => { this.booking = b; this.loading = false; }, error: () => this.loading = false });
+    this.svc.printData(id).subscribe({ next: d => this.printData = d, error: () => {} });
+  }
+  printTickets(): void {
+    document.body.classList.add('printing-tickets');
+    const cleanup = () => { document.body.classList.remove('printing-tickets'); window.removeEventListener('afterprint', cleanup); };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(() => window.print(), 50);
   }
   statusClass(s: string): string {
     return { confirmed: 'bg-success', boarded: 'bg-primary', cancelled: 'bg-danger',

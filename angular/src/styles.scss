@@ -3335,3 +3335,36 @@ border:1px solid #1F2228;
   background: #131313 !important;
 }
 }
+// ── Billets voyageurs imprimables (Détail réservation) ────────────────────────
+.tickets-print { display: none; }               // masqué à l'écran
+
+@media print {
+  // Quand on imprime les billets : ne montrer que les slips
+  body.printing-tickets .page-header,
+  body.printing-tickets .card { display: none !important; }
+  body.printing-tickets .tickets-print { display: block !important; }
+
+  .ticket-slip {
+    border: 1px dashed #555;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 0 0 10px 0;
+    page-break-inside: avoid;
+  }
+  .ticket-slip .ts-head {
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1.5px solid #222; padding-bottom: 6px; margin-bottom: 6px;
+  }
+  .ticket-slip .ts-logo { height: 40px; width: auto; object-fit: contain; }
+  .ticket-slip .ts-company { font-weight: 700; font-size: 12pt; }
+  .ticket-slip .ts-slogan { font-style: italic; color: #555; font-size: 8pt; }
+  .ticket-slip .ts-contact { color: #555; font-size: 8pt; }
+  .ticket-slip .ts-doc { margin-left: auto; text-align: right; font-weight: 700; font-size: 11pt; }
+  .ticket-slip .ts-doc span { font-weight: 400; font-size: 8pt; }
+  .ticket-slip .ts-row {
+    display: flex; gap: 6px; align-items: baseline; font-size: 9.5pt; padding: 1.5px 0;
+  }
+  .ticket-slip .ts-row span { color: #555; min-width: 70px; }
+  .ticket-slip .ts-amount { border-top: 1px solid #ddd; margin-top: 4px; padding-top: 4px; font-size: 11pt; }
+  .ticket-slip .ts-foot { margin-top: 6px; font-size: 7.5pt; color: #777; text-align: center; }
+}
