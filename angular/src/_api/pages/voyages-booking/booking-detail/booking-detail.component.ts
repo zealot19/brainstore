@@ -23,10 +23,18 @@ export class VbBookingDetailComponent implements OnInit {
     this.svc.printData(id).subscribe({ next: d => this.printData = d, error: () => {} });
   }
   printTickets(): void {
-    document.body.classList.add('printing-tickets');
-    const cleanup = () => { document.body.classList.remove('printing-tickets'); window.removeEventListener('afterprint', cleanup); };
-    window.addEventListener('afterprint', cleanup);
-    setTimeout(() => window.print(), 50);
+    if (!this.booking) return;
+    this.svc.renderTickets(this.booking.id).subscribe({
+      next: r => {
+        const w = window.open('', '_blank');
+        if (!w) { alert('Autorisez les fenêtres pop-up pour imprimer.'); return; }
+        w.document.write(r.html);
+        w.document.close();
+        w.focus();
+        setTimeout(() => { w.print(); }, 300);
+      },
+      error: e => alert(e?.error?.detail ?? 'Impression impossible.'),
+    });
   }
   statusClass(s: string): string {
     return { confirmed: 'bg-success', boarded: 'bg-primary', cancelled: 'bg-danger',

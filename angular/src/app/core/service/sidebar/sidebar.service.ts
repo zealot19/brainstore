@@ -116,6 +116,7 @@ export class SidebarService {
             { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns'     },
             { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules'        },
             { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares'                },
+            { menuValue: 'Config billets',      route: routes.vcTicketTemplate,     base: 'ticket-template'      },
             { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings'             },
           ],
         },

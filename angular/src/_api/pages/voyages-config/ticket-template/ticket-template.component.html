@@ -1,0 +1,59 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Config billets</h4><h6>Modèle HTML du billet voyageur</h6></div></div>
+  <div class="page-btn d-flex gap-2">
+    <a href="javascript:void(0);" class="btn btn-outline-secondary" (click)="preview()"><i class="ti ti-eye me-1"></i>Aperçu</a>
+    <a href="javascript:void(0);" class="btn btn-outline-danger" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser au défaut</a>
+    <a href="javascript:void(0);" class="btn btn-primary" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</a>
+  </div>
+</div>
+<app-info-banner text="Saisissez le HTML de votre billet. Utilisez les placeholders {{ '{{ token }}' }} (voir la liste) : ils seront remplacés par les données réelles à l'impression. Le défaut reproduit un billet type ; changez couleurs, textes et disposition à votre guise. « Aperçu » affiche le rendu avec des données d'exemple."></app-info-banner>
+
+@if (msg) { <div class="alert alert-success py-2">{{ msg }}</div> }
+
+@if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+@else {
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">HTML — Recto (billet)</h6></div>
+        <div class="card-body"><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:340px" [(ngModel)]="recto"></textarea></div>
+      </div>
+      <div class="card"><div class="card-header"><h6 class="mb-0">HTML — Verso (conditions / agences, optionnel)</h6></div>
+        <div class="card-body"><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:200px" [(ngModel)]="verso"></textarea></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card"><div class="card-header"><h6 class="mb-0">Placeholders disponibles</h6></div>
+        <div class="card-body">
+          <p class="text-muted small mb-2">Insérez ces jetons dans votre HTML :</p>
+          <ul class="list-unstyled small mb-0" style="columns:2">
+            <li>{{ '{{ company_name }}' }}</li>
+            <li>{{ '{{ company_slogan }}' }}</li>
+            <li>{{ '{{ company_logo_url }}' }}</li>
+            <li>{{ '{{ company_phone }}' }}</li>
+            <li>{{ '{{ company_email }}' }}</li>
+            <li>{{ '{{ company_address }}' }}</li>
+            <li>{{ '{{ company_niu }}' }}</li>
+            <li>{{ '{{ company_rccm }}' }}</li>
+            <li>{{ '{{ ticket_number }}' }}</li>
+            <li>{{ '{{ booking_reference }}' }}</li>
+            <li>{{ '{{ passenger_name }}' }}</li>
+            <li>{{ '{{ seat }}' }}</li>
+            <li>{{ '{{ departure }}' }}</li>
+            <li>{{ '{{ destination }}' }}</li>
+            <li>{{ '{{ travel_date }}' }}</li>
+            <li>{{ '{{ travel_time }}' }}</li>
+            <li>{{ '{{ travel_class }}' }}</li>
+            <li>{{ '{{ trip_type }}' }}</li>
+            <li>{{ '{{ trip_number }}' }}</li>
+            <li>{{ '{{ vehicle }}' }}</li>
+            <li>{{ '{{ agent }}' }}</li>
+            <li>{{ '{{ ticket_price }}' }}</li>
+            <li>{{ '{{ registered_date }}' }}</li>
+            <li>{{ '{{ printed_date }}' }}</li>
+            <li>{{ '{{ expiration_date }}' }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+}

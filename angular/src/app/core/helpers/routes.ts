@@ -404,6 +404,7 @@ export const routes={
   vcServicePatterns:    '/voyages-config/service-patterns',
   vcLoyalty:            '/voyages-config/loyalty-rules',
   vcSettings:           '/voyages-config/settings',
+  vcTicketTemplate:     '/voyages-config/ticket-template',
   vcFares:              '/voyages-config/fares',
 
   // ── Gestion Voyages ──────────────────────────────────────────────────────────

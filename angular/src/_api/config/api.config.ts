@@ -300,6 +300,9 @@ export const VOYAGES_CONFIG = {
   vehicleSeatingAssignment:  (id: string) => `${VC}/vehicle-seating-assignments/${id}/`,
   servicePatterns:    `${VC}/service-patterns/`,   servicePattern:  (id: string) => `${VC}/service-patterns/${id}/`,
   settings:           `${VC}/settings/`,
+  ticketTemplate:        `${VC}/ticket-template/`,
+  ticketTemplateReset:   `${VC}/ticket-template/reset/`,
+  ticketTemplatePreview: `${VC}/ticket-template/preview/`,
 };
 
 const VT = `${API_BASE}/voyages/trips`;
@@ -339,6 +342,7 @@ export const VOYAGES_BOOKING = {
   openReturns: `${VB}/bookings/open-returns/`,
   booking: (id: string) => `${VB}/bookings/${id}/`,
   bookingPrint: (id: string) => `${VB}/bookings/${id}/print/`,
+  bookingRenderTickets: (id: string) => `${VB}/bookings/${id}/render-tickets/`,
   bookingAssignReturn: (id: string) => `${VB}/bookings/${id}/assign-return/`,
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,

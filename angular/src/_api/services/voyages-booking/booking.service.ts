@@ -27,6 +27,7 @@ export class BookingService {
   }
   get(id: string): Observable<Booking> { return this.http.get<Booking>(VOYAGES_BOOKING.booking(id)); }
   printData(id: string): Observable<any> { return this.http.get<any>(VOYAGES_BOOKING.bookingPrint(id)); }
+  renderTickets(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_BOOKING.bookingRenderTickets(id)); }
   openReturns(q?: string): Observable<Booking[]> {
     let p = new HttpParams();
     if (q) p = p.set('q', q);
