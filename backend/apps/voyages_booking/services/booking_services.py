@@ -85,26 +85,30 @@ def _price(company, trip, destination_point, trip_type):
 
 @transaction.atomic
 def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec, items,
-                   payment_method="", amount_received=None, user):
+                   payment_method="", amount_received=None, return_open=False, user):
     """Create a fully-paid booking in a single step (no hold/confirm phase).
 
     items: [{"passenger": <spec>, "destination_point_id": UUID|None,
              "outbound_seat_id": UUID, "return_seat_id": UUID|None}]
+
+    Aller-retour a retour ouvert : trip_type=round_trip + return_open=True + pas de
+    return_trip -> seuls les billets aller sont crees, le tarif A/R est facture,
+    le retour sera affecte plus tard via assign_return().
     """
     if not items:
         raise ApplicationError(_("Aucun passager sélectionné."))
     _assert_bookable(outbound_trip)
     is_round = trip_type == Booking.TripType.ROUND_TRIP
-    if is_round:
-        if not return_trip:
-            raise ApplicationError(_("Le voyage retour est requis pour un aller-retour."))
+    open_return = is_round and (return_open or not return_trip)
+    if is_round and not open_return:
         _assert_bookable(return_trip)
 
     buyer = _resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
         company=company, reference=_booking_reference(), status=Booking.Status.CONFIRMED,
-        trip_type=trip_type, outbound_trip=outbound_trip, return_trip=return_trip if is_round else None,
-        buyer=buyer, created_by=user)
+        trip_type=trip_type, outbound_trip=outbound_trip,
+        return_trip=return_trip if (is_round and not open_return) else None,
+        return_open=open_return, buyer=buyer, created_by=user)
 
     total = Decimal("0")
     for item in items:
@@ -124,7 +128,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
         out_seat.save(update_fields=["status", "booking_id", "updated_by", "updated_at"])
         total += fare.amount
 
-        if is_round:
+        if is_round and not open_return:
             if not item.get("return_seat_id"):
                 raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
             ret_seat = _lock_seat(return_trip, item["return_seat_id"])
@@ -152,6 +156,42 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     booking.save(update_fields=["amount_due", "amount_paid", "amount_received", "change_due",
                                 "payment_method", "updated_by", "updated_at"])
     loyalty_services.accrue(booking, user=user)
+    return booking
+
+
+@transaction.atomic
+def assign_return(booking, return_trip, *, items, user):
+    """Affecte le voyage retour d'un A/R a retour ouvert et emet les billets retour.
+
+    items: [{"outbound_ticket_id": UUID, "return_seat_id": UUID}] — un par billet aller.
+    """
+    if booking.trip_type != Booking.TripType.ROUND_TRIP or not booking.return_open:
+        raise ApplicationError(_("Cette réservation n'a pas de retour ouvert à affecter."))
+    _assert_bookable(return_trip)
+    outbound_tickets = list(booking.tickets.filter(is_deleted=False, direction=Ticket.Direction.OUTBOUND))
+    if len(items) != len(outbound_tickets):
+        raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
+    by_id = {str(t.id): t for t in outbound_tickets}
+    for item in items:
+        out_ticket = by_id.get(str(item.get("outbound_ticket_id")))
+        if not out_ticket:
+            raise ApplicationError(_("Billet aller introuvable pour cette réservation."))
+        if out_ticket.return_tickets.filter(is_deleted=False).exists():
+            raise ApplicationError(_("Un billet retour existe déjà pour ce passager."))
+        ret_seat = _lock_seat(return_trip, item["return_seat_id"])
+        Ticket.objects.create(
+            booking=booking, number=_ticket_number(), passenger=out_ticket.passenger, trip=return_trip,
+            trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
+            direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
+            fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)
+        ret_seat.status = TripSeat.Status.SOLD
+        ret_seat.booking_id = booking.id
+        ret_seat.updated_by = user
+        ret_seat.save(update_fields=["status", "booking_id", "updated_by", "updated_at"])
+    booking.return_trip = return_trip
+    booking.return_open = False
+    booking.updated_by = user
+    booking.save(update_fields=["return_trip", "return_open", "updated_by", "updated_at"])
     return booking
 
 

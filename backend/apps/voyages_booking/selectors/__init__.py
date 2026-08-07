@@ -82,6 +82,17 @@ def list_bookings(company, status=None, trip_id=None, q=None):
     return qs
 
 
+def open_return_bookings(company, q=None):
+    qs = (Booking.objects.filter(is_deleted=False, company=company, return_open=True)
+          .exclude(status=Booking.Status.CANCELLED)
+          .select_related("outbound_trip", "buyer")
+          .order_by("-created_at"))
+    if q:
+        qs = qs.filter(Q(reference__icontains=q) | Q(buyer__phone__icontains=q) |
+                       Q(buyer__last_name__icontains=q) | Q(buyer__first_name__icontains=q))
+    return qs
+
+
 def booking_detail(company, pk):
     return (Booking.objects.filter(is_deleted=False, company=company, id=pk)
             .select_related("outbound_trip", "return_trip", "buyer")
@@ -105,4 +116,5 @@ def trip_passengers(trip):
 
 
 __all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations",
-           "list_bookings", "booking_detail", "loyalty_view", "trip_passengers"]
+           "list_bookings", "booking_detail", "loyalty_view", "trip_passengers",
+           "open_return_bookings"]

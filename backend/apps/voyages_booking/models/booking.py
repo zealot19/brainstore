@@ -35,6 +35,7 @@ class Booking(BaseModel):
     change_due      = models.DecimalField(_("monnaie rendue"), max_digits=12, decimal_places=2, default=0)
     payment_method  = models.CharField(_("mode de paiement"), max_length=40, blank=True)
     channel         = models.CharField(_("canal"), max_length=10, choices=Channel.choices, default=Channel.COUNTER)
+    return_open     = models.BooleanField(_("retour ouvert"), default=False)
     notes           = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):

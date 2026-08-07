@@ -80,9 +80,9 @@ class BookingRead(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ["id", "reference", "status", "status_display", "trip_type", "trip_type_display",
-                  "outbound_trip", "return_trip", "buyer", "buyer_name", "amount_due", "amount_paid",
-                  "amount_received", "change_due", "payment_method", "channel", "notes",
-                  "created_at", "updated_at", "tickets"]
+                  "outbound_trip", "return_trip", "return_open", "buyer", "buyer_name",
+                  "amount_due", "amount_paid", "amount_received", "change_due", "payment_method",
+                  "channel", "notes", "created_at", "updated_at", "tickets"]
 
 
 class BookingItemSerializer(serializers.Serializer):
@@ -100,6 +100,17 @@ class BookingCreateSerializer(serializers.Serializer):
     items = BookingItemSerializer(many=True)
     payment_method = serializers.CharField(required=False, allow_blank=True, default="")
     amount_received = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
+    return_open = serializers.BooleanField(required=False, default=False)
+
+
+class AssignReturnItemSerializer(serializers.Serializer):
+    outbound_ticket_id = serializers.UUIDField()
+    return_seat_id = serializers.UUIDField()
+
+
+class AssignReturnSerializer(serializers.Serializer):
+    return_trip_id = serializers.UUIDField()
+    items = AssignReturnItemSerializer(many=True)
 
 
 class LoyaltyMovementRead(serializers.ModelSerializer):

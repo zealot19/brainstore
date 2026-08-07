@@ -126,10 +126,38 @@ class BookingListView(APIView):
             booking = services.create_booking(
                 company, trip_type=d["trip_type"], outbound_trip=outbound, return_trip=return_trip,
                 buyer_spec=d["buyer"], items=d["items"], payment_method=d["payment_method"],
-                amount_received=d["amount_received"], user=request.user)
+                amount_received=d["amount_received"], return_open=d["return_open"], user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.BookingRead(booking).data)
+
+
+class OpenReturnsView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        qs = selectors.open_return_bookings(request.user.company, q=request.query_params.get("q"))
+        return success_response(S.BookingRead(qs, many=True).data)
+
+
+class BookingAssignReturnView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request, pk):
+        b = selectors.booking_detail(request.user.company, pk)
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        payload = S.AssignReturnSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        return_trip = _trip(request.user.company, d["return_trip_id"])
+        if not return_trip:
+            return error_response("Voyage retour introuvable.", status_code=404)
+        try:
+            b = services.assign_return(b, return_trip, items=d["items"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.BookingRead(b).data)
 
 
 class BookingDetailView(APIView):
