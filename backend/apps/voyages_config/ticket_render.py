@@ -93,7 +93,7 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
       <div class="sf">{e(tokens.get('travel_date',''))} · {e(tokens.get('travel_time',''))}</div>
       <div class="sf">{e(tokens.get('departure',''))} -> {e(tokens.get('destination',''))}</div>
       <div class="sf">Bus {e(tokens.get('vehicle',''))} · Siege {e(tokens.get('seat',''))}</div>
-      <div class="sf">{e(tokens.get('ticket_price',''))}</div>
+      <div class="sf price">{e(tokens.get('ticket_price',''))}</div>
     </div>"""
 
     def f(label, val):
@@ -131,10 +131,11 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
   .tk .f small{{display:block;font-size:6.5pt;color:var(--muted);font-weight:700}}
   .tk .f b{{font-size:11pt}}
   .tk .note{{margin-top:8px;border-top:1px solid #ddd;padding-top:4px;font-size:7pt;color:var(--muted)}}
-  .tk .stub{{width:52mm;border-left:2px dashed var(--ink);padding:5mm 4mm;text-align:center}}
+  .tk .stub{{width:52mm;border-left:2px dashed var(--ink);padding:5mm 4mm;text-align:center;font-weight:700}}
   .tk .stub .qr svg{{width:26mm;height:26mm}}
-  .tk .stub .num{{font-weight:700;font-size:12pt;margin:5px 0 7px}}
-  .tk .stub .sf{{text-align:left;font-size:11pt;line-height:1.35;margin-bottom:5px}}
+  .tk .stub .num{{font-weight:800;font-size:12pt;margin:5px 0 7px}}
+  .tk .stub .sf{{text-align:left;font-size:11pt;line-height:1.35;margin-bottom:5px;font-weight:700}}
+  .tk .stub .price{{font-size:16pt;font-weight:800;margin-top:3px}}
 </style>
 <div class="tk">
   {band}
