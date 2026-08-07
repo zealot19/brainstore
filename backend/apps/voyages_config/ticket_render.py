@@ -154,20 +154,47 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
 def build_verso(tpl):
     e = _html.escape
     conds = "".join(f"<p>{e(l.strip())}</p>" for l in (tpl.verso_conditions or "").splitlines() if l.strip())
-    ags = "".join(f"<div class='ag'>{e(l.strip())}</div>" for l in (tpl.agencies or "").splitlines() if l.strip())
+
+    # Agences (liste structuree) : nom en gros, quartier, telephone -> en colonnes
+    cards = []
+    for a in (tpl.agencies_list or []):
+        if not isinstance(a, dict):
+            continue
+        name = (a.get("name") or "").strip()
+        loc = (a.get("location") or "").strip()
+        phone = (a.get("phone") or "").strip()
+        if not (name or loc or phone):
+            continue
+        cards.append(
+            f"<div class='ag'>"
+            f"<div class='ag-name'>{e(name)}</div>"
+            f"<div class='ag-loc'>{e(loc)}</div>"
+            f"<div class='ag-tel'>{e(phone)}</div>"
+            f"</div>"
+        )
+    ags = "".join(cards)
+    if not ags:
+        ags = f"<div class='ag'><div class='ag-loc'>{e(tpl.address)}</div></div>"
+
     return f"""<style>
-  .tkv{{width:190mm;min-height:95mm;box-sizing:border-box;padding:10mm;font-family:Arial,Helvetica,sans-serif;
-       color:{tpl.color_ink};font-size:9pt;line-height:1.5}}
-  .tkv h3{{color:{tpl.color_accent};text-align:center;font-style:italic;margin:0 0 8px}}
-  .tkv .cond p{{margin:5px 0}}
-  .tkv .agencies{{margin-top:10mm;text-align:center}}
-  .tkv .agencies h4{{color:{tpl.color_accent};margin-bottom:6px}}
-  .tkv .agencies .ag{{display:inline-block;margin:2px 10px;font-weight:600}}
+  .tkv{{position:relative;width:190mm;min-height:95mm;box-sizing:border-box;padding:10mm;
+       font-family:Arial,Helvetica,sans-serif;color:{tpl.color_ink};font-size:8.5pt;line-height:1.45;
+       display:flex;flex-direction:column}}
+  .tkv h3{{color:{tpl.color_accent};text-align:center;font-style:italic;font-weight:800;margin:0 0 6px;font-size:12pt}}
+  .tkv .cond{{flex:1}}
+  .tkv .cond p{{margin:4px 0}}
+  .tkv .agencies{{margin-top:6mm;border-top:2px solid {tpl.color_accent};padding-top:4mm}}
+  .tkv .agencies h4{{color:{tpl.color_accent};text-align:center;margin:0 0 6px;font-size:12pt;font-style:italic;font-weight:800}}
+  .tkv .agencies .row{{display:flex;justify-content:space-around;align-items:flex-start;gap:6mm;text-align:center}}
+  .tkv .agencies .ag{{flex:1}}
+  .tkv .agencies .ag-name{{font-weight:800;font-size:13pt;letter-spacing:1px}}
+  .tkv .agencies .ag-loc{{color:#555;margin:1px 0}}
+  .tkv .agencies .ag-tel{{font-weight:700;letter-spacing:1px}}
 </style>
 <div class="tkv">
-  <h3>{e(tpl.slogan)}</h3>
+  <h3>&laquo; {e(tpl.slogan)} &raquo;</h3>
   <div class="cond">{conds}</div>
-  <div class="agencies"><h4>Nos Agences</h4>{ags or '<div class="ag">' + e(tpl.address) + '</div>'}</div>
+  <div class="agencies"><h4>Nos Agences</h4><div class="row">{ags}</div></div>
 </div>"""
 
 

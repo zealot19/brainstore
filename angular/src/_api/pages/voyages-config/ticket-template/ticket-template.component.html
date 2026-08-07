@@ -56,8 +56,25 @@
     <div class="col-12"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">Textes</h6></div>
       <div class="card-body"><div class="row">
         <div class="col-12 mb-3"><label class="form-label">Note (bas du recto)</label><input class="form-control" [(ngModel)]="m.recto_notice" /></div>
-        <div class="col-md-8 mb-3"><label class="form-label">Conditions (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.verso_conditions"></textarea></div>
-        <div class="col-md-4 mb-3"><label class="form-label">Agences (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.agencies"></textarea></div>
+        <div class="col-12 mb-3"><label class="form-label">Conditions (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.verso_conditions"></textarea></div>
+
+        <div class="col-12">
+          <label class="form-label d-flex justify-content-between align-items-center">
+            <span>Agences (bas du verso)</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAgency()"><i class="ti ti-plus me-1"></i>Ajouter une agence</button>
+          </label>
+          @if (!m.agencies_list.length) {
+            <p class="text-muted small mb-2">Aucune agence. Ajoutez-en pour les afficher au bas du verso (nom, quartier, téléphone).</p>
+          }
+          @for (a of m.agencies_list; track trackByIndex($index)) {
+            <div class="row g-2 mb-2 align-items-center">
+              <div class="col-md-4"><input class="form-control" placeholder="Ville / Agence (ex. YAOUNDE)" [(ngModel)]="a.name" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-4"><input class="form-control" placeholder="Quartier / Lieu (ex. OLEMBE)" [(ngModel)]="a.location" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-3"><input class="form-control" placeholder="Téléphone" [(ngModel)]="a.phone" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger w-100" (click)="removeAgency($index)"><i class="ti ti-trash"></i></button></div>
+            </div>
+          }
+        </div>
       </div></div></div>
     </div>
 

@@ -42,7 +42,8 @@ class TicketTemplate(_CompanyScoped):
     # ── Textes ────────────────────────────────────────────────────────────────
     recto_notice     = models.CharField(_("note (bas du recto)"), max_length=255, blank=True, default=DEFAULT_RECTO_NOTICE)
     verso_conditions = models.TextField(_("conditions (verso)"), blank=True, default=DEFAULT_VERSO_CONDITIONS)
-    agencies         = models.TextField(_("agences (une par ligne)"), blank=True)
+    # Liste d'agences : [{"name": ..., "location": ..., "phone": ...}, ...]
+    agencies_list    = models.JSONField(_("agences (verso)"), default=list, blank=True)
 
     # ── Options ───────────────────────────────────────────────────────────────
     show_verso     = models.BooleanField(_("afficher le verso"), default=True)

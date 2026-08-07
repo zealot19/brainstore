@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VOYAGES_CONFIG } from '../../config/api.config';
 
+export interface TicketAgency { name: string; location: string; phone: string; }
+
 export interface TicketTemplate {
   brand_name: string; slogan: string; niu: string; rccm: string;
   phone: string; email: string; address: string;
   logo_url: string | null; background_logo_url: string | null;
   color_ink: string; color_accent: string; color_band: string;
-  recto_notice: string; verso_conditions: string; agencies: string;
+  recto_notice: string; verso_conditions: string; agencies_list: TicketAgency[];
   show_verso: boolean; show_stub: boolean; show_watermark: boolean; show_qr: boolean;
   custom_html: boolean; html_recto: string; html_verso: string;
 }

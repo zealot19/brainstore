@@ -299,19 +299,35 @@ class VoyagesSettingsWrite(serializers.Serializer):
     sms_notification_default = serializers.BooleanField(required=False)
 
 
+import json
 from apps.voyages_config.models import TicketTemplate
+
+
+class _JSONListField(serializers.JSONField):
+    """Accepte une liste JSON, ou une chaine JSON (cas multipart/form-data)."""
+
+    def to_internal_value(self, data):
+        if isinstance(data, str):
+            try:
+                data = json.loads(data or "[]")
+            except ValueError:
+                self.fail("invalid")
+        if not isinstance(data, list):
+            self.fail("invalid")
+        return data
 
 
 class TicketTemplateSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
     background_logo_url = serializers.SerializerMethodField()
+    agencies_list = _JSONListField(required=False)
 
     class Meta:
         model = TicketTemplate
         fields = ["brand_name", "slogan", "niu", "rccm", "phone", "email", "address",
                   "logo", "logo_url", "background_logo", "background_logo_url",
                   "color_ink", "color_accent", "color_band",
-                  "recto_notice", "verso_conditions", "agencies",
+                  "recto_notice", "verso_conditions", "agencies_list",
                   "show_verso", "show_stub", "show_watermark", "show_qr",
                   "custom_html", "html_recto", "html_verso"]
         extra_kwargs = {"logo": {"required": False}, "background_logo": {"required": False}}
