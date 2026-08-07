@@ -3,15 +3,23 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VOYAGES_CONFIG } from '../../config/api.config';
 
-export interface TicketTemplate { html_recto: string; html_verso: string; }
+export interface TicketTemplate {
+  brand_name: string; slogan: string; niu: string; rccm: string;
+  phone: string; email: string; address: string;
+  logo_url: string | null; background_logo_url: string | null;
+  color_ink: string; color_accent: string; color_band: string;
+  recto_notice: string; verso_conditions: string; agencies: string;
+  show_verso: boolean; show_stub: boolean; show_watermark: boolean; show_qr: boolean;
+  custom_html: boolean; html_recto: string; html_verso: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class TicketTemplateService {
   constructor(private http: HttpClient) {}
   get(): Observable<TicketTemplate> { return this.http.get<TicketTemplate>(VOYAGES_CONFIG.ticketTemplate); }
-  save(body: TicketTemplate): Observable<TicketTemplate> { return this.http.put<TicketTemplate>(VOYAGES_CONFIG.ticketTemplate, body); }
+  save(fd: FormData): Observable<TicketTemplate> { return this.http.put<TicketTemplate>(VOYAGES_CONFIG.ticketTemplate, fd); }
   reset(): Observable<TicketTemplate> { return this.http.post<TicketTemplate>(VOYAGES_CONFIG.ticketTemplateReset, {}); }
-  preview(body: TicketTemplate): Observable<{ html: string; tokens: string[] }> {
-    return this.http.post<{ html: string; tokens: string[] }>(VOYAGES_CONFIG.ticketTemplatePreview, body);
+  preview(fd: FormData): Observable<{ html: string; tokens: string[] }> {
+    return this.http.post<{ html: string; tokens: string[] }>(VOYAGES_CONFIG.ticketTemplatePreview, fd);
   }
 }

@@ -1,59 +1,75 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Config billets</h4><h6>Modèle HTML du billet voyageur</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>Config billets</h4><h6>Personnalisez le billet (formulaire) — aucune connaissance HTML requise</h6></div></div>
   <div class="page-btn d-flex gap-2">
     <a href="javascript:void(0);" class="btn btn-outline-secondary" (click)="preview()"><i class="ti ti-eye me-1"></i>Aperçu</a>
-    <a href="javascript:void(0);" class="btn btn-outline-danger" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser au défaut</a>
+    <a href="javascript:void(0);" class="btn btn-outline-danger" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser</a>
     <a href="javascript:void(0);" class="btn btn-primary" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</a>
   </div>
 </div>
-<app-info-banner text="Saisissez le HTML de votre billet. Utilisez les placeholders {{ '{{ token }}' }} (voir la liste) : ils seront remplacés par les données réelles à l'impression. Le défaut reproduit un billet type ; changez couleurs, textes et disposition à votre guise. « Aperçu » affiche le rendu avec des données d'exemple."></app-info-banner>
+<app-info-banner text="Remplissez les infos fixes du billet (entreprise, couleurs, logos, conditions, agences). Seules les données voyage/passager sont dynamiques. Un QR code contenant les infos du billet est ajouté (scannable). « Aperçu » affiche le rendu avec des données d'exemple."></app-info-banner>
 
 @if (msg) { <div class="alert alert-success py-2">{{ msg }}</div> }
 
-@if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+@if (loading || !m) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
 @else {
   <div class="row">
-    <div class="col-lg-8">
-      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">HTML — Recto (billet)</h6></div>
-        <div class="card-body"><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:340px" [(ngModel)]="recto"></textarea></div>
-      </div>
-      <div class="card"><div class="card-header"><h6 class="mb-0">HTML — Verso (conditions / agences, optionnel)</h6></div>
-        <div class="card-body"><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:200px" [(ngModel)]="verso"></textarea></div>
-      </div>
+    <!-- Entreprise -->
+    <div class="col-lg-6"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">Entreprise (billet)</h6></div>
+      <div class="card-body"><div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Nom affiché</label><input class="form-control" [(ngModel)]="m.brand_name" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Slogan</label><input class="form-control" [(ngModel)]="m.slogan" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">NIU</label><input class="form-control" [(ngModel)]="m.niu" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">RCCM</label><input class="form-control" [(ngModel)]="m.rccm" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Téléphone</label><input class="form-control" [(ngModel)]="m.phone" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Email</label><input class="form-control" [(ngModel)]="m.email" /></div>
+        <div class="col-12 mb-1"><label class="form-label">Adresse</label><input class="form-control" [(ngModel)]="m.address" /></div>
+      </div></div></div>
     </div>
-    <div class="col-lg-4">
-      <div class="card"><div class="card-header"><h6 class="mb-0">Placeholders disponibles</h6></div>
-        <div class="card-body">
-          <p class="text-muted small mb-2">Insérez ces jetons dans votre HTML :</p>
-          <ul class="list-unstyled small mb-0" style="columns:2">
-            <li>{{ '{{ company_name }}' }}</li>
-            <li>{{ '{{ company_slogan }}' }}</li>
-            <li>{{ '{{ company_logo_url }}' }}</li>
-            <li>{{ '{{ company_phone }}' }}</li>
-            <li>{{ '{{ company_email }}' }}</li>
-            <li>{{ '{{ company_address }}' }}</li>
-            <li>{{ '{{ company_niu }}' }}</li>
-            <li>{{ '{{ company_rccm }}' }}</li>
-            <li>{{ '{{ ticket_number }}' }}</li>
-            <li>{{ '{{ booking_reference }}' }}</li>
-            <li>{{ '{{ passenger_name }}' }}</li>
-            <li>{{ '{{ seat }}' }}</li>
-            <li>{{ '{{ departure }}' }}</li>
-            <li>{{ '{{ destination }}' }}</li>
-            <li>{{ '{{ travel_date }}' }}</li>
-            <li>{{ '{{ travel_time }}' }}</li>
-            <li>{{ '{{ travel_class }}' }}</li>
-            <li>{{ '{{ trip_type }}' }}</li>
-            <li>{{ '{{ trip_number }}' }}</li>
-            <li>{{ '{{ vehicle }}' }}</li>
-            <li>{{ '{{ agent }}' }}</li>
-            <li>{{ '{{ ticket_price }}' }}</li>
-            <li>{{ '{{ registered_date }}' }}</li>
-            <li>{{ '{{ printed_date }}' }}</li>
-            <li>{{ '{{ expiration_date }}' }}</li>
-          </ul>
+
+    <!-- Images + Couleurs + Options -->
+    <div class="col-lg-6">
+      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Images</h6></div>
+        <div class="card-body"><div class="row">
+          <div class="col-md-6 mb-3"><label class="form-label">Logo (en-tête)</label><input type="file" class="form-control" accept="image/*" (change)="onLogo($event)" />
+            @if (m.logo_url) { <a [href]="m.logo_url" target="_blank" class="small">logo actuel</a> }</div>
+          <div class="col-md-6 mb-3"><label class="form-label">Logo d'arrière-plan (filigrane)</label><input type="file" class="form-control" accept="image/*" (change)="onBg($event)" />
+            @if (m.background_logo_url) { <a [href]="m.background_logo_url" target="_blank" class="small">image actuelle</a> }</div>
+        </div></div></div>
+
+      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Couleurs</h6></div>
+        <div class="card-body"><div class="row">
+          <div class="col-md-4 mb-2"><label class="form-label">Encre</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_ink" /></div>
+          <div class="col-md-4 mb-2"><label class="form-label">Accent</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_accent" /></div>
+          <div class="col-md-4 mb-2"><label class="form-label">Bande</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_band" /></div>
+        </div></div></div>
+
+      <div class="card"><div class="card-header"><h6 class="mb-0">Options</h6></div>
+        <div class="card-body d-flex flex-wrap gap-3">
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-verso" [(ngModel)]="m.show_verso" /><label class="form-check-label" for="o-verso">Verso</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-stub" [(ngModel)]="m.show_stub" /><label class="form-check-label" for="o-stub">Talon détachable</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-wm" [(ngModel)]="m.show_watermark" /><label class="form-check-label" for="o-wm">Filigrane</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-qr" [(ngModel)]="m.show_qr" /><label class="form-check-label" for="o-qr">QR code</label></div>
+        </div></div>
+    </div>
+
+    <!-- Conditions & Agences -->
+    <div class="col-12"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">Textes</h6></div>
+      <div class="card-body"><div class="row">
+        <div class="col-12 mb-3"><label class="form-label">Note (bas du recto)</label><input class="form-control" [(ngModel)]="m.recto_notice" /></div>
+        <div class="col-md-8 mb-3"><label class="form-label">Conditions (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.verso_conditions"></textarea></div>
+        <div class="col-md-4 mb-3"><label class="form-label">Agences (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.agencies"></textarea></div>
+      </div></div></div>
+    </div>
+
+    <!-- HTML avancé -->
+    <div class="col-12"><div class="card"><div class="card-body">
+      <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="adv" [(ngModel)]="m.custom_html" /><label class="form-check-label" for="adv"><strong>HTML avancé</strong> (pour experts — remplace le gabarit par votre HTML ; tokens {{ '{{ token }}' }} + {{ '{{ qr_code }}' }})</label></div>
+      @if (m.custom_html) {
+        <div class="row">
+          <div class="col-lg-6 mb-2"><label class="form-label">HTML recto</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_recto"></textarea></div>
+          <div class="col-lg-6 mb-2"><label class="form-label">HTML verso</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_verso"></textarea></div>
         </div>
-      </div>
-    </div>
+      }
+    </div></div></div>
   </div>
 }
