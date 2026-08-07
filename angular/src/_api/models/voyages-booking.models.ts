@@ -33,7 +33,8 @@ export interface Ticket {
 export interface Booking {
   id: string; reference: string; status: string; status_display: string;
   trip_type: 'one_way' | 'round_trip'; trip_type_display: string;
-  outbound_trip: string; return_trip: string | null; buyer: string; buyer_name: string;
+  outbound_trip: string; return_trip: string | null; return_open: boolean;
+  buyer: string; buyer_name: string;
   amount_due: string; amount_paid: string; amount_received: string; change_due: string;
   payment_method: string; channel: string; notes: string;
   created_at: string; updated_at: string; tickets: Ticket[];
@@ -54,5 +55,8 @@ export interface BookingItem {
 export interface BookingCreate {
   trip_type: 'one_way' | 'round_trip'; outbound_trip_id: string; return_trip_id?: string | null;
   buyer: PassengerSpec; items: BookingItem[];
-  payment_method?: string; amount_received?: number | null;
+  payment_method?: string; amount_received?: number | null; return_open?: boolean;
 }
+
+export interface AssignReturnItem { outbound_ticket_id: string; return_seat_id: string; }
+export interface AssignReturn { return_trip_id: string; items: AssignReturnItem[]; }

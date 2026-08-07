@@ -41,4 +41,5 @@ export class VbBookingDetailComponent implements OnInit {
     this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   back(): void { this.router.navigate(['/voyages-booking/bookings']); }
+  goAssignReturn(): void { this.router.navigate(['/voyages-booking/open-returns']); }
 }

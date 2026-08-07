@@ -83,6 +83,7 @@ export const Pages_routes: Routes = [
                 { path: 'passengers',    loadComponent: () => import('../../../_api/pages/voyages-booking/passengers/passengers.component').then(m => m.VbPassengersComponent) },
                 { path: 'bookings',      loadComponent: () => import('../../../_api/pages/voyages-booking/bookings/bookings.component').then(m => m.VbBookingsComponent) },
                 { path: 'bookings/new',  loadComponent: () => import('../../../_api/pages/voyages-booking/new-booking/new-booking.component').then(m => m.VbNewBookingComponent) },
+                { path: 'open-returns',  loadComponent: () => import('../../../_api/pages/voyages-booking/open-returns/open-returns.component').then(m => m.VbOpenReturnsComponent) },
                 { path: 'bookings/:id',  loadComponent: () => import('../../../_api/pages/voyages-booking/booking-detail/booking-detail.component').then(m => m.VbBookingDetailComponent) },
               ],
             },

@@ -79,6 +79,7 @@ export class SidebarService {
             { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers'   },
             { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings'     },
             { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
+            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns' },
           ],
         },
         // ── MODULE : Colis & Bagages ──────────────────────────────────────────

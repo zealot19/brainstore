@@ -28,6 +28,7 @@ export class VbNewBookingComponent implements OnInit {
   selOutbound: SeatCell[] = []; selReturn: SeatCell[] = [];
   passengers: PaxRow[] = []; buyerIndex = 0;
   paymentMethod = ''; amountReceived: number | null = null;
+  returnOpen = false;
   saving = false; errorMsg = '';
 
   constructor(private svc: BookingService, private fcSvc: FareClassService,
@@ -60,7 +61,12 @@ export class VbNewBookingComponent implements OnInit {
         .subscribe(t => this.retTrips = t);
     }
   }
-  onCriteriaChange(): void { this.searchOutbound(); if (this.isRound) this.searchReturn(); }
+  get needReturnSel(): boolean { return this.isRound && !this.returnOpen; }
+  onCriteriaChange(): void { this.searchOutbound(); if (this.needReturnSel) this.searchReturn(); }
+  onReturnOpenChange(): void {
+    if (this.returnOpen) { this.retSlotId = ''; this.retDate = ''; this.returnTripId = ''; this.retTrips = []; this.returnSeats = []; this.selReturn = []; }
+    else if (this.isRound) { this.searchReturn(); }
+  }
 
   resetSelection(): void {
     this.outboundSeats = []; this.returnSeats = []; this.selOutbound = []; this.selReturn = [];
@@ -134,7 +140,7 @@ export class VbNewBookingComponent implements OnInit {
 
   get canSubmit(): boolean {
     if (this.saving || !this.outboundTripId || !this.selOutbound.length) return false;
-    if (this.isRound && (!this.returnTripId || this.selReturn.length !== this.selOutbound.length)) return false;
+    if (this.needReturnSel && (!this.returnTripId || this.selReturn.length !== this.selOutbound.length)) return false;
     if (this.anyMissingFare) return false;
     if (this.passengers.some(p => !p.first_name || !p.last_name || !p.phone)) return false;
     if ((this.amountReceived ?? 0) < this.total) return false;
@@ -151,14 +157,15 @@ export class VbNewBookingComponent implements OnInit {
                      id_type: p.id_type, id_number: p.id_number },
         destination_point_id: p.destination_point_id || null,
         outbound_seat_id: seat.id,
-        return_seat_id: this.isRound ? this.selReturn[i]?.id ?? null : null,
+        return_seat_id: this.needReturnSel ? this.selReturn[i]?.id ?? null : null,
       };
     });
     const buyer = items[this.buyerIndex].passenger;
     const body: BookingCreate = {
       trip_type: this.tripType, outbound_trip_id: this.outboundTripId,
-      return_trip_id: this.isRound ? this.returnTripId : null,
+      return_trip_id: this.needReturnSel ? this.returnTripId : null,
       buyer, items, payment_method: this.paymentMethod, amount_received: this.amountReceived,
+      return_open: this.isRound && this.returnOpen,
     };
     this.svc.create(body).subscribe({
       next: b => this.router.navigate(['/voyages-booking/bookings', b.id]),

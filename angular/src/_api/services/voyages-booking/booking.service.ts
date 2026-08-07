@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VOYAGES_BOOKING } from '../../config/api.config';
-import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate } from '../../models/voyages-booking.models';
+import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate, AssignReturn } from '../../models/voyages-booking.models';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -27,6 +27,14 @@ export class BookingService {
   }
   get(id: string): Observable<Booking> { return this.http.get<Booking>(VOYAGES_BOOKING.booking(id)); }
   printData(id: string): Observable<any> { return this.http.get<any>(VOYAGES_BOOKING.bookingPrint(id)); }
+  openReturns(q?: string): Observable<Booking[]> {
+    let p = new HttpParams();
+    if (q) p = p.set('q', q);
+    return this.http.get<Booking[]>(VOYAGES_BOOKING.openReturns, { params: p });
+  }
+  assignReturn(id: string, body: AssignReturn): Observable<Booking> {
+    return this.http.post<Booking>(VOYAGES_BOOKING.bookingAssignReturn(id), body);
+  }
   create(body: BookingCreate): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookings, body); }
   cancel(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingCancel(id), {}); }
   noShow(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingNoShow(id), {}); }

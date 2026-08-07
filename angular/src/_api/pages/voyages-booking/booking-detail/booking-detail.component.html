@@ -43,14 +43,15 @@
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Référence</small><strong>{{ booking.reference }}</strong></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Statut</small><span class="badge {{ statusClass(booking.status) }}">{{ booking.status_display }}</span></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Acheteur</small><strong>{{ booking.buyer_name }}</strong></div>
-      <div class="col-md-3 mb-2"><small class="text-muted d-block">Type</small><strong>{{ booking.trip_type_display }}</strong></div>
+      <div class="col-md-3 mb-2"><small class="text-muted d-block">Type</small><strong>{{ booking.trip_type_display }}</strong>@if (booking.return_open) { <span class="badge bg-warning ms-1">Retour ouvert</span> }</div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Total à payer</small><strong>{{ booking.amount_due | number:'1.0-0' }} XAF</strong></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Encaissé</small><strong>{{ booking.amount_received | number:'1.0-0' }} XAF</strong></div>
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Monnaie rendue</small><strong>{{ booking.change_due | number:'1.0-0' }} XAF</strong></div>
     </div>
-    @if (booking.status === 'confirmed') {
-      <div class="mt-2"><button class="btn btn-sm btn-outline-danger" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler la réservation</button></div>
-    }
+    <div class="mt-2 d-flex gap-2">
+      @if (booking.return_open) { <a href="javascript:void(0);" class="btn btn-sm btn-primary" (click)="goAssignReturn()"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a> }
+      @if (booking.status === 'confirmed') { <button class="btn btn-sm btn-outline-danger" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler la réservation</button> }
+    </div>
   </div></div>
 
   <div class="card"><div class="card-header"><h5 class="mb-0">Billets</h5></div>

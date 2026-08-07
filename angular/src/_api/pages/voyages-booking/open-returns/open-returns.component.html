@@ -1,0 +1,79 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Retours à traiter</h4><h6>Affecter le voyage retour des aller-retours à retour ouvert</h6></div></div>
+</div>
+<app-info-banner text="Ces réservations aller-retour sont déjà payées ; le retour n'a pas encore été daté. Le jour du retour, choisissez la réservation, sélectionnez le voyage retour et les sièges, puis affectez — les billets retour sont émis (aucun encaissement)."></app-info-banner>
+
+@if (!target) {
+  <div class="card table-list-card">
+    <div class="card-header d-flex align-items-center gap-2">
+      <input type="text" class="form-control w-auto" placeholder="Référence, acheteur, téléphone…" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+    </div>
+    <div class="card-body p-0">
+      @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+      @else {
+        <div class="table-responsive"><table class="table datanew">
+          <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Aller</th><th>Payé</th><th class="no-sort">Action</th></tr></thead>
+          <tbody>
+            @for (b of rows; track b.id) {
+              <tr>
+                <td class="fw-medium">{{ b.reference }}</td>
+                <td>{{ b.buyer_name }}</td>
+                <td>{{ b.tickets.length ? b.tickets[0].passenger_name : '' }} <span class="badge bg-light text-dark">{{ b.tickets.length }} billet(s)</span></td>
+                <td>{{ b.amount_paid | number:'1.0-0' }} XAF</td>
+                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-primary" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
+              </tr>
+            } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun retour ouvert à traiter.</td></tr> }
+          </tbody>
+        </table></div>
+      }
+    </div>
+  </div>
+}
+
+@if (target) {
+  <div class="card"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Affecter le retour — {{ target.reference }} <small class="text-muted">({{ outboundTickets.length }} passager(s))</small></h5>
+      <button class="btn btn-light btn-sm" (click)="cancelPick()"><i class="ti ti-arrow-left me-1"></i>Retour à la liste</button>
+    </div>
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">Classe tarifaire <span class="text-danger">*</span></label>
+        <app-searchable-select [items]="fareClasses" labelKey="name" valueKey="id" placeholder="— Choisir —" [(ngModel)]="fareClassId" (ngModelChange)="search()"></app-searchable-select></div>
+      <div class="col-md-4 mb-3"><label class="form-label">Date retour <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" [(ngModel)]="date" (ngModelChange)="search()" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">Plage horaire <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="slotId" (ngModelChange)="search()">
+          <option value="">— Choisir —</option>
+          @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
+        </select></div>
+    </div>
+
+    @if (ready) {
+      <div class="mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
+        <app-searchable-select [items]="trips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="returnTripId" (ngModelChange)="onTripChange()"></app-searchable-select>
+        @if (!trips.length) { <small class="text-muted">Aucun voyage retour pour ces critères.</small> }
+      </div>
+    }
+
+    @if (seats.length) {
+      <h6 class="mt-2">Sièges retour — sélectionnez {{ outboundTickets.length }} siège(s)</h6>
+      <div class="mb-2">
+        @for (row of rowsOf(seats); track row) {
+          <div class="d-flex gap-2 mb-2">
+            @for (s of seatsInRow(row); track s.id) {
+              <button type="button" class="btn btn-sm {{ seatClass(s) }}" style="width:48px" (click)="toggle(s)">{{ s.seat_number }}</button>
+            }
+          </div>
+        }
+      </div>
+      <p class="text-muted small">Sélectionnés : {{ selReturn.length }} / {{ outboundTickets.length }}</p>
+    }
+
+    <div class="d-flex justify-content-end mt-2">
+      <button class="btn btn-success" [disabled]="!canAssign" (click)="assign()"><i class="ti ti-check me-1"></i>Affecter le retour &amp; émettre les billets</button>
+    </div>
+  </div></div>
+}

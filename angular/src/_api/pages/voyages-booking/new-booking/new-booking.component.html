@@ -24,6 +24,12 @@
         @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
       </select></div>
     @if (isRound) {
+      <div class="col-12 mb-2">
+        <div class="form-check"><input type="checkbox" class="form-check-input" id="return-open" [(ngModel)]="returnOpen" (ngModelChange)="onReturnOpenChange()" />
+          <label class="form-check-label" for="return-open">Retour ouvert (date/bus du retour à fixer plus tard)</label></div>
+      </div>
+    }
+    @if (needReturnSel) {
       <div class="col-md-3 mb-3"><label class="form-label">Date retour <span class="text-danger">*</span></label>
         <input type="date" class="form-control" [(ngModel)]="retDate" (ngModelChange)="searchReturn()" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Plage horaire (retour) <span class="text-danger">*</span></label>
@@ -43,7 +49,7 @@
         <app-searchable-select [items]="outTrips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()"></app-searchable-select>
         @if (!outTrips.length) { <small class="text-muted">Aucun voyage pour ces critères.</small> }
       </div>
-      @if (isRound && retReady) {
+      @if (needReturnSel && retReady) {
         <div class="col-md-6 mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
           <app-searchable-select [items]="retTrips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()"></app-searchable-select>
           @if (!retTrips.length) { <small class="text-muted">Aucun voyage retour pour ces critères.</small> }
@@ -65,7 +71,7 @@
         </div>
       }
     </div>
-    @if (isRound && returnSeats.length) {
+    @if (needReturnSel && returnSeats.length) {
       <h6 class="mb-3 mt-3">Sièges — retour</h6>
       <div class="mb-2">
         @for (row of rows(returnSeats); track row) {
@@ -89,7 +95,7 @@
       <tbody>
         @for (p of passengers; track $index) {
           <tr>
-            <td><span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span>@if (isRound && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
+            <td><span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span>@if (needReturnSel && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.first_name" /></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.last_name" /></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.phone" /></td>
