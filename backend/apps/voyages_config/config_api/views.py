@@ -11,7 +11,9 @@ from apps.voyages_config.models import (
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
     ServicePattern, VoyagesSettings,
+    TicketTemplate, DEFAULT_TICKET_RECTO, DEFAULT_TICKET_VERSO,
 )
+from apps.voyages_config import ticket_render
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensure_unique, cfg_lookup
 
@@ -626,3 +628,61 @@ class VoyagesSettingsView(APIView):
         obj.updated_by = request.user
         obj.save()
         return success_response(S.VoyagesSettingsRead(obj).data)
+
+
+# ── TicketTemplate (Config billets, singleton per company) ────────────────────
+
+class TicketTemplateView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj = ticket_render.get_or_create_template(company)
+        return success_response(S.TicketTemplateSerializer(obj).data)
+
+    def put(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj = ticket_render.get_or_create_template(company)
+        payload = S.TicketTemplateSerializer(data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        for k, v in payload.validated_data.items():
+            setattr(obj, k, v)
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(S.TicketTemplateSerializer(obj).data)
+
+
+class TicketTemplateResetView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj = ticket_render.get_or_create_template(company)
+        obj.html_recto = DEFAULT_TICKET_RECTO
+        obj.html_verso = DEFAULT_TICKET_VERSO
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(S.TicketTemplateSerializer(obj).data)
+
+
+class TicketTemplatePreviewView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        recto = request.data.get("html_recto", "")
+        verso = request.data.get("html_verso", "")
+        tokens = ticket_render.sample_tokens(company, request)
+        pages = [ticket_render.render(recto, tokens)]
+        if verso.strip():
+            pages.append(ticket_render.render(verso, tokens))
+        return success_response({"html": ticket_render.render_document(pages),
+                                 "tokens": ticket_render.TOKENS})

@@ -61,4 +61,9 @@ urlpatterns = [
 
     # ── Paramètres Voyages ──────────────────────────────────────────────────────
     path("settings/", v.VoyagesSettingsView.as_view()),
+
+    # ── Config billets (modèle de billet HTML) ──────────────────────────────────
+    path("ticket-template/", v.TicketTemplateView.as_view()),
+    path("ticket-template/reset/", v.TicketTemplateResetView.as_view()),
+    path("ticket-template/preview/", v.TicketTemplatePreviewView.as_view()),
 ]

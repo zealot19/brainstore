@@ -4,10 +4,12 @@ from .commercial import FareClass, TimeSlot, ConsignmentNature, ConsignmentType
 from .scheduling import ServicePattern
 from .loyalty import LoyaltyRule
 from .settings import VoyagesSettings
+from .ticket import TicketTemplate, DEFAULT_TICKET_RECTO, DEFAULT_TICKET_VERSO
 
 __all__ = [
     "Town", "ServicePoint", "Route", "RouteStop",
     "SeatingPlan", "PlanSeat", "VehicleSeatingAssignment",
     "FareClass", "TimeSlot", "ConsignmentNature", "ConsignmentType",
     "ServicePattern", "LoyaltyRule", "VoyagesSettings",
+    "TicketTemplate", "DEFAULT_TICKET_RECTO", "DEFAULT_TICKET_VERSO",
 ]

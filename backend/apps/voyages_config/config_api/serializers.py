@@ -297,3 +297,8 @@ class VoyagesSettingsWrite(serializers.Serializer):
     archive_delay_days = serializers.IntegerField(required=False, min_value=0)
     auto_print_default = serializers.BooleanField(required=False)
     sms_notification_default = serializers.BooleanField(required=False)
+
+
+class TicketTemplateSerializer(serializers.Serializer):
+    html_recto = serializers.CharField(required=False, allow_blank=True)
+    html_verso = serializers.CharField(required=False, allow_blank=True)

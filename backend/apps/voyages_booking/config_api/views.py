@@ -321,6 +321,57 @@ class TripBoardAllView(APIView):
         return success_response({"done": done})
 
 
+class BookingRenderTicketsView(APIView):
+    """HTML des billets d'une réservation, rendu depuis le modèle « Config billets »."""
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, pk):
+        from datetime import timedelta
+        from django.utils import timezone
+        from apps.voyages_config import ticket_render
+        from apps.voyages_config.models import VoyagesSettings
+        b = selectors.booking_detail(request.user.company, pk)
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        company = request.user.company
+        tpl = ticket_render.get_or_create_template(company)
+        base = ticket_render.company_tokens(company, request)
+        settings = (VoyagesSettings.objects.filter(is_deleted=False, company=company).first()
+                    or VoyagesSettings.objects.filter(is_deleted=False, company__isnull=True).first())
+        expiry_days = settings.ticket_expiry_days if settings else 7
+        now = timezone.now()
+        reg = timezone.localtime(b.created_at)
+        exp = reg + timedelta(days=expiry_days)
+        pages = []
+        for t in b.tickets.filter(is_deleted=False).exclude(status="cancelled").order_by("direction"):
+            trip = t.trip if t.trip_id else None
+            dep = timezone.localtime(trip.scheduled_departure) if trip else None
+            tokens = dict(base)
+            tokens.update({
+                "ticket_number": t.number, "booking_reference": b.reference,
+                "passenger_name": t.passenger.full_name if t.passenger_id else "",
+                "seat": t.trip_seat.seat_number if t.trip_seat_id else "",
+                "departure": trip.origin.name if trip and trip.origin_id else "",
+                "destination": t.destination_point.name if t.destination_point_id else (
+                    trip.destination.name if trip and trip.destination_id else ""),
+                "travel_date": dep.strftime("%d/%m/%Y") if dep else "",
+                "travel_time": dep.strftime("%HH%M") if dep else "",
+                "travel_class": t.fare_class.name if t.fare_class_id else "",
+                "trip_type": t.get_direction_display(),
+                "trip_number": trip.number if trip else "",
+                "vehicle": trip.vehicle.license_plate if trip and trip.vehicle_id else "",
+                "agent": (b.created_by.get_full_name() or b.created_by.username) if b.created_by_id else "",
+                "ticket_price": f"{t.amount:.0f} XAF",
+                "registered_date": reg.strftime("%d/%m/%Y"),
+                "printed_date": now.strftime("%d/%m/%Y"),
+                "expiration_date": exp.strftime("%d/%m/%Y"),
+            })
+            pages.append(ticket_render.render(tpl.html_recto, tokens))
+            if (tpl.html_verso or "").strip():
+                pages.append(ticket_render.render(tpl.html_verso, tokens))
+        return success_response({"html": ticket_render.render_document(pages)})
+
+
 class BookingPrintView(APIView):
     """Données enrichies pour l'impression des billets d'une réservation."""
     permission_classes = [IsInstitutionAdmin]
