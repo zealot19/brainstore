@@ -366,9 +366,7 @@ class BookingRenderTicketsView(APIView):
                 "printed_date": now.strftime("%d/%m/%Y"),
                 "expiration_date": exp.strftime("%d/%m/%Y"),
             })
-            pages.append(ticket_render.render(tpl.html_recto, tokens))
-            if (tpl.html_verso or "").strip():
-                pages.append(ticket_render.render(tpl.html_verso, tokens))
+            pages.extend(ticket_render.build_ticket_pages(tpl, tokens, request=request))
         return success_response({"html": ticket_render.render_document(pages)})
 
 

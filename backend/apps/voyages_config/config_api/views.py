@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from apps.core.permissions import IsInstitutionAdmin
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
@@ -634,26 +635,24 @@ class VoyagesSettingsView(APIView):
 
 class TicketTemplateView(APIView):
     permission_classes = [IsInstitutionAdmin]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
         company, err = resolve_company_or_global(request)
         if err:
             return err
         obj = ticket_render.get_or_create_template(company)
-        return success_response(S.TicketTemplateSerializer(obj).data)
+        return success_response(S.TicketTemplateSerializer(obj, context={"request": request}).data)
 
     def put(self, request):
         company, err = resolve_company_or_global(request)
         if err:
             return err
         obj = ticket_render.get_or_create_template(company)
-        payload = S.TicketTemplateSerializer(data=request.data, partial=True)
+        payload = S.TicketTemplateSerializer(obj, data=request.data, partial=True, context={"request": request})
         payload.is_valid(raise_exception=True)
-        for k, v in payload.validated_data.items():
-            setattr(obj, k, v)
-        obj.updated_by = request.user
-        obj.save()
-        return success_response(S.TicketTemplateSerializer(obj).data)
+        payload.save(updated_by=request.user)
+        return success_response(payload.data)
 
 
 class TicketTemplateResetView(APIView):
@@ -664,25 +663,26 @@ class TicketTemplateResetView(APIView):
         if err:
             return err
         obj = ticket_render.get_or_create_template(company)
-        obj.html_recto = DEFAULT_TICKET_RECTO
-        obj.html_verso = DEFAULT_TICKET_VERSO
-        obj.updated_by = request.user
-        obj.save()
-        return success_response(S.TicketTemplateSerializer(obj).data)
+        obj.delete()  # supprime le modele actuel...
+        fresh = ticket_render.get_or_create_template(company)  # ...et recree le defaut (pre-rempli societe)
+        return success_response(S.TicketTemplateSerializer(fresh, context={"request": request}).data)
 
 
 class TicketTemplatePreviewView(APIView):
     permission_classes = [IsInstitutionAdmin]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request):
         company, err = resolve_company_or_global(request)
         if err:
             return err
-        recto = request.data.get("html_recto", "")
-        verso = request.data.get("html_verso", "")
-        tokens = ticket_render.sample_tokens(company, request)
-        pages = [ticket_render.render(recto, tokens)]
-        if verso.strip():
-            pages.append(ticket_render.render(verso, tokens))
+        # Applique les valeurs postees sur une copie non persistee du modele.
+        obj = ticket_render.get_or_create_template(company)
+        payload = S.TicketTemplateSerializer(obj, data=request.data, partial=True, context={"request": request})
+        payload.is_valid(raise_exception=True)
+        for k, v in payload.validated_data.items():
+            setattr(obj, k, v)
+        tokens = ticket_render.sample_tokens()
+        pages = ticket_render.build_ticket_pages(obj, tokens, request=request)
         return success_response({"html": ticket_render.render_document(pages),
                                  "tokens": ticket_render.TOKENS})

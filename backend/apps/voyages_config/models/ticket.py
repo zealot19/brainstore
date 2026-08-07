@@ -2,99 +2,58 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .base import _CompanyScoped
 
+# Textes par defaut (formulaire)
+DEFAULT_RECTO_NOTICE = ("L'embarquement commence a l'heure. Presentez-vous a temps, "
+                        "sinon votre place peut etre reattribuee.")
+DEFAULT_VERSO_CONDITIONS = (
+    "Soyez a l'agence au plus tard 45 min avant le depart. L'embarquement se clot 10 min avant.\n"
+    "Les billets sont valables jusqu'a la date souhaitee ; ni remboursables, ni echangeables, ni cedes.\n"
+    "Les bagages sont soumis a la franchise autorisee ; les excedents sont payants.\n"
+    "Conservez ce billet et presentez-le a l'embarquement."
+)
 
-# ── Modele de billet par defaut (facon BOARDING) ──────────────────────────────
-# Les couleurs sont des variables CSS en tete, faciles a changer par l'utilisateur.
-DEFAULT_TICKET_RECTO = """<style>
-  .tk { --ink:#1a1a1a; --accent:#e6a817; --band:#111; --muted:#6b6b6b;
-        position:relative; width:190mm; min-height:95mm; box-sizing:border-box;
-        display:flex; border:1.5px solid var(--ink); font-family:Arial,Helvetica,sans-serif;
-        color:var(--ink); overflow:hidden; }
-  .tk .band { width:14mm; background:var(--band); color:#fff; display:flex; align-items:center; justify-content:center; }
-  .tk .band span { writing-mode:vertical-rl; transform:rotate(180deg); font-weight:800; letter-spacing:4px; font-size:20pt; }
-  .tk .body { flex:1; padding:6mm 6mm; position:relative; }
-  .tk .wm { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-            font-size:34pt; font-weight:800; color:rgba(230,168,23,.10); transform:rotate(-18deg); pointer-events:none; }
-  .tk .head { display:flex; align-items:center; gap:8px; border-bottom:2px solid var(--accent); padding-bottom:4px; }
-  .tk .head img { height:14mm; }
-  .tk .head .slogan { flex:1; text-align:center; font-style:italic; font-weight:700; color:var(--accent); font-size:11pt; }
-  .tk .head .ids { font-size:6.5pt; color:var(--muted); text-align:right; line-height:1.3; }
-  .tk .pax { margin:5px 0 8px; font-size:20pt; font-weight:800; }
-  .tk .pax small { display:block; font-size:7pt; font-weight:600; color:var(--muted); letter-spacing:1px; }
-  .tk .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px 10px; }
-  .tk .f small { display:block; font-size:6.5pt; color:var(--muted); font-weight:700; letter-spacing:.5px; }
-  .tk .f b { font-size:11pt; }
-  .tk .note { margin-top:8px; border-top:1px solid #ddd; padding-top:4px; font-size:7pt; color:var(--muted); }
-  .tk .stub { width:44mm; border-left:2px dashed var(--ink); padding:5mm 4mm; text-align:center; }
-  .tk .stub .bars { font-family:'Libre Barcode 39',monospace; letter-spacing:1px; font-size:8pt; word-break:break-all;
-                    background:repeating-linear-gradient(90deg,#111 0 2px,#fff 2px 4px); color:transparent; height:12mm; margin-bottom:4px; }
-  .tk .stub .num { font-weight:700; font-size:9pt; margin-bottom:6px; }
-  .tk .stub .f { text-align:left; margin-bottom:5px; }
-</style>
-<div class="tk">
-  <div class="band"><span>BOARDING</span></div>
-  <div class="body">
-    <div class="wm">{{ company_name }}</div>
-    <div class="head">
-      <img src="{{ company_logo_url }}" alt="">
-      <div class="slogan">{{ company_slogan }}</div>
-      <div class="ids">NIU: {{ company_niu }}<br>R.C.C.M: {{ company_rccm }}</div>
-    </div>
-    <div class="pax"><small>NOM PASSAGER</small>{{ passenger_name }} <span style="font-size:11pt">[{{ seat }}]</span></div>
-    <div class="grid">
-      <div class="f"><small>DEPART</small><b>{{ departure }}</b></div>
-      <div class="f"><small>DESTINATION</small><b>{{ destination }}</b></div>
-      <div class="f"><small>DATE VOYAGE</small><b>{{ travel_date }}</b></div>
-      <div class="f"><small>CLASSE</small><b>{{ travel_class }}</b></div>
-      <div class="f"><small>TYPE</small><b>{{ trip_type }}</b></div>
-      <div class="f"><small>AGENT</small><b>{{ agent }}</b></div>
-      <div class="f"><small>BUS</small><b>{{ vehicle }}</b></div>
-      <div class="f"><small>HEURE</small><b>{{ travel_time }}</b></div>
-      <div class="f"><small>PRIX</small><b>{{ ticket_price }}</b></div>
-      <div class="f"><small>ENREGISTRE LE</small><b>{{ registered_date }}</b></div>
-      <div class="f"><small>IMPRIME LE</small><b>{{ printed_date }}</b></div>
-      <div class="f"><small>EXPIRE LE</small><b>{{ expiration_date }}</b></div>
-    </div>
-    <div class="note">L'embarquement commence a l'heure. Presentez-vous a temps, sinon votre place peut etre reattribuee.</div>
-  </div>
-  <div class="stub">
-    <div class="bars">{{ ticket_number }}</div>
-    <div class="num">{{ ticket_number }}</div>
-    <div class="f"><small style="color:#6b6b6b">PASSAGER</small><br>{{ passenger_name }}</div>
-    <div class="f"><small style="color:#6b6b6b">DATE</small> {{ travel_date }} · {{ travel_time }}</div>
-    <div class="f"><small style="color:#6b6b6b">TRAJET</small> {{ departure }} -> {{ destination }}</div>
-    <div class="f"><small style="color:#6b6b6b">BUS</small> {{ vehicle }} · <small style="color:#6b6b6b">SIEGE</small> {{ seat }}</div>
-    <div class="f"><small style="color:#6b6b6b">PRIX</small> {{ ticket_price }}</div>
-  </div>
-</div>"""
-
-DEFAULT_TICKET_VERSO = """<style>
-  .tkv { width:190mm; min-height:95mm; box-sizing:border-box; padding:8mm; font-family:Arial,Helvetica,sans-serif;
-         color:#1a1a1a; font-size:8.5pt; line-height:1.4; }
-  .tkv h3 { color:#e6a817; text-align:center; font-style:italic; }
-  .tkv .cond p { margin:4px 0; }
-  .tkv .ag { margin-top:8mm; text-align:center; }
-  .tkv .ag h4 { color:#e6a817; }
-</style>
-<div class="tkv">
-  <h3>{{ company_slogan }}</h3>
-  <div class="cond">
-    <p><b>Conditions :</b> soyez a l'agence au plus tard 45 min avant le depart. L'embarquement se clot 10 min avant le depart.</p>
-    <p>Les billets sont valables jusqu'a la date souhaitee. Ni remboursables ni echangeables ; encore moins cedes.</p>
-    <p>Les bagages sont soumis aux valises de soute dans la limite autorisee ; les excedents sont payants.</p>
-    <p>Conservez ce billet et presentez-le a l'embarquement.</p>
-  </div>
-  <div class="ag">
-    <h4>Nos Agences</h4>
-    <p>{{ company_name }} · {{ company_phone }} · {{ company_address }}</p>
-  </div>
-</div>"""
+# HTML par defaut (mode avance uniquement)
+DEFAULT_TICKET_RECTO = "<div class=\"tk\">{{ passenger_name }} — {{ ticket_number }}</div>"
+DEFAULT_TICKET_VERSO = ""
 
 
 class TicketTemplate(_CompanyScoped):
-    """Modele HTML du billet voyageur, un par institution (Config billets)."""
-    html_recto = models.TextField(_("HTML du billet (recto)"), default=DEFAULT_TICKET_RECTO)
-    html_verso = models.TextField(_("HTML du verso"), blank=True, default=DEFAULT_TICKET_VERSO)
+    """Configuration du billet voyageur (Config billets), un par institution.
+    Par defaut : formulaire (gabarit genere). Mode avance : HTML brut."""
+
+    # ── Entreprise (specifique billet) ───────────────────────────────────────
+    brand_name = models.CharField(_("nom affiche"), max_length=255, blank=True)
+    slogan     = models.CharField(_("slogan"), max_length=255, blank=True)
+    niu        = models.CharField(_("NIU"), max_length=100, blank=True)
+    rccm       = models.CharField(_("RCCM"), max_length=100, blank=True)
+    phone      = models.CharField(_("telephone"), max_length=60, blank=True)
+    email      = models.CharField(_("email"), max_length=150, blank=True)
+    address    = models.CharField(_("adresse"), max_length=255, blank=True)
+
+    # ── Images ───────────────────────────────────────────────────────────────
+    logo            = models.FileField(_("logo"), upload_to="tickets/logos/", null=True, blank=True)
+    background_logo = models.FileField(_("logo d'arriere-plan"), upload_to="tickets/bg/", null=True, blank=True)
+
+    # ── Couleurs ──────────────────────────────────────────────────────────────
+    color_ink    = models.CharField(_("couleur encre"), max_length=9, default="#1a1a1a")
+    color_accent = models.CharField(_("couleur accent"), max_length=9, default="#e6a817")
+    color_band   = models.CharField(_("couleur bande"), max_length=9, default="#111111")
+
+    # ── Textes ────────────────────────────────────────────────────────────────
+    recto_notice     = models.CharField(_("note (bas du recto)"), max_length=255, blank=True, default=DEFAULT_RECTO_NOTICE)
+    verso_conditions = models.TextField(_("conditions (verso)"), blank=True, default=DEFAULT_VERSO_CONDITIONS)
+    agencies         = models.TextField(_("agences (une par ligne)"), blank=True)
+
+    # ── Options ───────────────────────────────────────────────────────────────
+    show_verso     = models.BooleanField(_("afficher le verso"), default=True)
+    show_stub      = models.BooleanField(_("afficher le talon"), default=True)
+    show_watermark = models.BooleanField(_("afficher le filigrane"), default=True)
+    show_qr        = models.BooleanField(_("afficher le QR code"), default=True)
+
+    # ── Mode avance (HTML brut) ────────────────────────────────────────────────
+    custom_html = models.BooleanField(_("HTML avance"), default=False)
+    html_recto  = models.TextField(_("HTML du billet (recto)"), blank=True, default=DEFAULT_TICKET_RECTO)
+    html_verso  = models.TextField(_("HTML du verso"), blank=True, default=DEFAULT_TICKET_VERSO)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("modele de billet")

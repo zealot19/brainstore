@@ -299,6 +299,34 @@ class VoyagesSettingsWrite(serializers.Serializer):
     sms_notification_default = serializers.BooleanField(required=False)
 
 
-class TicketTemplateSerializer(serializers.Serializer):
-    html_recto = serializers.CharField(required=False, allow_blank=True)
-    html_verso = serializers.CharField(required=False, allow_blank=True)
+from apps.voyages_config.models import TicketTemplate
+
+
+class TicketTemplateSerializer(serializers.ModelSerializer):
+    logo_url = serializers.SerializerMethodField()
+    background_logo_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TicketTemplate
+        fields = ["brand_name", "slogan", "niu", "rccm", "phone", "email", "address",
+                  "logo", "logo_url", "background_logo", "background_logo_url",
+                  "color_ink", "color_accent", "color_band",
+                  "recto_notice", "verso_conditions", "agencies",
+                  "show_verso", "show_stub", "show_watermark", "show_qr",
+                  "custom_html", "html_recto", "html_verso"]
+        extra_kwargs = {"logo": {"required": False}, "background_logo": {"required": False}}
+
+    def _url(self, f):
+        req = self.context.get("request")
+        if not f:
+            return None
+        try:
+            return req.build_absolute_uri(f.url) if req else f.url
+        except Exception:
+            return None
+
+    def get_logo_url(self, obj):
+        return self._url(obj.logo)
+
+    def get_background_logo_url(self, obj):
+        return self._url(obj.background_logo)
