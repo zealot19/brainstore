@@ -101,4 +101,17 @@ export class VcgParcelsComponent implements OnInit {
     this.svc.cancel(p.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
+
+  printReceipt(id: string): void {
+    this.svc.receipt(id).subscribe({
+      next: r => {
+        const w = window.open('', '_blank');
+        if (!w) { return; }
+        w.document.write(r.html);
+        w.document.close();
+        setTimeout(() => w.print(), 300);
+      },
+      error: () => {},
+    });
+  }
 }

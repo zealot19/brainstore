@@ -51,6 +51,7 @@
               <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printReceipt(p.id)" title="Imprimer le reçu"><i class="ti ti-printer me-1"></i>Reçu</a>
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
                 @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }

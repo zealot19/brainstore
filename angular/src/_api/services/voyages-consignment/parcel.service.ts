@@ -29,4 +29,5 @@ export class ParcelService {
     return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelsBulk, { ids, action }).pipe(map(r => r.data ?? r));
   }
   manifest(tripId: string): Observable<Manifest> { return this.http.get<any>(VOYAGES_CONSIGNMENT.manifest(tripId)).pipe(map(r => r.data ?? r)); }
+  receipt(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.parcelReceipt(id)); }
 }

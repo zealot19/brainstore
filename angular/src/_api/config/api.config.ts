@@ -363,11 +363,14 @@ export const VOYAGES_CONSIGNMENT = {
   parcelArrived: (id: string) => `${VCG}/parcels/${id}/arrived/`,
   parcelPickup: (id: string) => `${VCG}/parcels/${id}/pickup/`,
   parcelCancel: (id: string) => `${VCG}/parcels/${id}/cancel/`,
+  parcelReceipt: (id: string) => `${VCG}/parcels/${id}/receipt/`,
   baggage: `${VCG}/baggage/`,
   baggageBulk: `${VCG}/baggage/bulk/`,
   baggageItem: (id: string) => `${VCG}/baggage/${id}/`,
   baggageLoad: (id: string) => `${VCG}/baggage/${id}/load/`,
   baggageDeliver: (id: string) => `${VCG}/baggage/${id}/deliver/`,
+  baggageTicket: (id: string) => `${VCG}/baggage/${id}/ticket/`,
+  baggageLabel: (id: string) => `${VCG}/baggage/${id}/label/`,
   manifest: (tripId: string) => `${VCG}/trips/${tripId}/manifest/`,
 };
 
