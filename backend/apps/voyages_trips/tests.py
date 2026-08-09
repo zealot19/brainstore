@@ -26,3 +26,12 @@ def test_transbordement_model_fields_default_zero():
     assert t.passengers_moved == 0
     assert t.passengers_overflow == 0
     assert t.baggage_moved == 0
+
+
+from apps.voyages_trips.services.transbordement import overflow_split
+
+
+def test_overflow_split():
+    assert overflow_split([1, 2, 3], 2) == ([1, 2], [3])
+    assert overflow_split([1, 2], 5) == ([1, 2], [])
+    assert overflow_split([], 0) == ([], [])
