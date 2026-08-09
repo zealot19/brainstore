@@ -106,7 +106,12 @@ class BookingListView(APIView):
     def get(self, request):
         qs = selectors.list_bookings(
             request.user.company, status=request.query_params.get("status"),
-            trip_id=request.query_params.get("trip"), q=request.query_params.get("q"))
+            trip_id=request.query_params.get("trip"), q=request.query_params.get("q"),
+            trip_type=request.query_params.get("trip_type"),
+            channel=request.query_params.get("channel"),
+            date_field=request.query_params.get("date_field"),
+            date_from=request.query_params.get("date_from"),
+            date_to=request.query_params.get("date_to"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.BookingRead(page, many=True).data)

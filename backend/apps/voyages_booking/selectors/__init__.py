@@ -4,6 +4,7 @@ from apps.voyages_booking.models import Passenger, Booking, LoyaltyAccount
 from apps.voyages_trips.models import Trip, TripSeat
 from apps.voyages_config.models import TimeSlot
 from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
+from apps.core.filters import resolve_date_field, apply_date_range
 
 _PRE_DEPARTURE = ["draft", "pending"]
 
@@ -68,7 +69,8 @@ def trip_destinations(trip):
     return out
 
 
-def list_bookings(company, status=None, trip_id=None, q=None):
+def list_bookings(company, status=None, trip_id=None, q=None,
+                  trip_type=None, channel=None, date_field=None, date_from=None, date_to=None):
     qs = (Booking.objects.filter(is_deleted=False, company=company)
           .select_related("outbound_trip", "return_trip", "buyer")
           .order_by("-created_at"))
@@ -76,9 +78,17 @@ def list_bookings(company, status=None, trip_id=None, q=None):
         qs = qs.filter(status=status)
     if trip_id:
         qs = qs.filter(Q(outbound_trip_id=trip_id) | Q(return_trip_id=trip_id))
+    if trip_type:
+        qs = qs.filter(trip_type=trip_type)
+    if channel:
+        qs = qs.filter(channel=channel)
     if q:
         qs = qs.filter(Q(reference__icontains=q) | Q(buyer__phone__icontains=q) |
                        Q(buyer__last_name__icontains=q))
+    field = resolve_date_field(
+        {"created": "created_at", "departure": "outbound_trip__scheduled_departure",
+         "arrival": "outbound_trip__scheduled_arrival"}, date_field, "created")
+    qs = apply_date_range(qs, field, date_from, date_to)
     return qs
 
 
