@@ -11,6 +11,8 @@ export interface TicketTemplate {
   logo_url: string | null; background_logo_url: string | null;
   color_ink: string; color_accent: string; color_band: string;
   recto_notice: string; verso_conditions: string; agencies_list: TicketAgency[];
+  ticket_width_mm: number | string; ticket_height_mm: number | string;
+  parcel_receipt_terms: string; baggage_ticket_note: string;
   show_verso: boolean; show_stub: boolean; show_watermark: boolean; show_qr: boolean;
   custom_html: boolean; html_recto: string; html_verso: string;
 }

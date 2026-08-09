@@ -36,6 +36,7 @@ export class VcTicketTemplateComponent implements OnInit {
     const fd = new FormData();
     const fields: (keyof TicketTemplate)[] = ['brand_name', 'slogan', 'niu', 'rccm', 'phone', 'email',
       'address', 'color_ink', 'color_accent', 'color_band', 'recto_notice', 'verso_conditions',
+      'ticket_width_mm', 'ticket_height_mm', 'parcel_receipt_terms', 'baggage_ticket_note',
       'show_verso', 'show_stub', 'show_watermark', 'show_qr', 'custom_html', 'html_recto', 'html_verso'];
     fields.forEach(k => {
       const v = m[k];
