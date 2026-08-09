@@ -18,11 +18,10 @@ export class BookingService {
   seatMap(tripId: string): Observable<SeatCell[]> { return this.http.get<SeatCell[]>(VOYAGES_BOOKING.seatMap(tripId)); }
   destinations(tripId: string): Observable<TripDestination[]> { return this.http.get<TripDestination[]>(VOYAGES_BOOKING.destinations(tripId)); }
 
-  list(params: { status?: string; trip?: string; q?: string } = {}): Observable<Booking[]> {
+  list(params: { status?: string; trip?: string; q?: string; trip_type?: string; channel?: string;
+                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Booking[]> {
     let p = new HttpParams().set('page_size', '500');
-    if (params.status) p = p.set('status', params.status);
-    if (params.trip) p = p.set('trip', params.trip);
-    if (params.q) p = p.set('q', params.q);
+    Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<Booking[]>(VOYAGES_BOOKING.bookings, { params: p });
   }
   get(id: string): Observable<Booking> { return this.http.get<Booking>(VOYAGES_BOOKING.booking(id)); }

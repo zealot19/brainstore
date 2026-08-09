@@ -9,11 +9,11 @@ import { Parcel, ParcelCreate, ParcelReceive, Manifest } from '../../models/voya
 export class ParcelService {
   constructor(private http: HttpClient) {}
 
-  list(params: { status?: string; trip?: string; q?: string } = {}): Observable<Parcel[]> {
+  list(params: { status?: string; trip?: string; q?: string; consignment_type?: string;
+                 origin_point?: string; destination_point?: string;
+                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Parcel[]> {
     let p = new HttpParams().set('page_size', '500');
-    if (params.status) p = p.set('status', params.status);
-    if (params.trip) p = p.set('trip', params.trip);
-    if (params.q) p = p.set('q', params.q);
+    Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<any>(VOYAGES_CONSIGNMENT.parcels, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   pending(): Observable<Parcel[]> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelsPending).pipe(map(r => r.data ?? r)); }

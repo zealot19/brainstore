@@ -8,10 +8,11 @@ import { Trip, TripCrew, TripSeat, TripStop, EligibleVehicle } from '../../model
 export class TripService {
   constructor(private http: HttpClient) {}
 
-  list(status?: string): Observable<Trip[]> {
-    let params = new HttpParams().set('page_size', '200');
-    if (status) params = params.set('status', status);
-    return this.http.get<Trip[]>(VOYAGES.trips, { params });
+  list(params: { status?: string; route?: string; vehicle?: string;
+                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Trip[]> {
+    let p = new HttpParams().set('page_size', '200');
+    Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
+    return this.http.get<Trip[]>(VOYAGES.trips, { params: p });
   }
   get(id: string): Observable<Trip> { return this.http.get<Trip>(VOYAGES.trip(id)); }
   create(data: Record<string, unknown>): Observable<Trip> { return this.http.post<Trip>(VOYAGES.trips, data); }

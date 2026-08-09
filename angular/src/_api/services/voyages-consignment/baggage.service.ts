@@ -9,12 +9,10 @@ import { Baggage, BaggageCreate } from '../../models/voyages-consignment.models'
 export class BaggageService {
   constructor(private http: HttpClient) {}
 
-  list(params: { ticket?: string; trip?: string; status?: string; q?: string } = {}): Observable<Baggage[]> {
+  list(params: { ticket?: string; trip?: string; status?: string; q?: string; consignment_type?: string;
+                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Baggage[]> {
     let p = new HttpParams();
-    if (params.ticket) p = p.set('ticket', params.ticket);
-    if (params.trip) p = p.set('trip', params.trip);
-    if (params.status) p = p.set('status', params.status);
-    if (params.q) p = p.set('q', params.q);
+    Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<any>(VOYAGES_CONSIGNMENT.baggage, { params: p }).pipe(map(r => r.data ?? r));
   }
   create(body: BaggageCreate): Observable<Baggage> { return this.http.post<any>(VOYAGES_CONSIGNMENT.baggage, body).pipe(map(r => r.data ?? r)); }

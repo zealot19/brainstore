@@ -45,7 +45,7 @@ export class VoyagesListComponent implements OnInit {
   }
   load(): void {
     this.loading = true;
-    this.svc.list(this.filterStatus || undefined).subscribe({ next: d => { this.rows = d; this.filtered = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.list({ status: this.filterStatus || undefined }).subscribe({ next: d => { this.rows = d; this.filtered = d; this.loading = false; }, error: () => this.loading = false });
   }
   statusCss(s: string): string { return this.statuses.find(x => x.value === s)?.css ?? ''; }
   statusLabel(s: string): string { return this.statuses.find(x => x.value === s)?.label ?? s; }
