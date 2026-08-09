@@ -51,6 +51,67 @@
         }
       </div></div>
 
+      <!-- Transbordement -->
+      @if (trip.status === 'pending' || trip.status === 'departed') {
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Transbordement</h6>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transbord-modal" (click)="openTransbord()">
+              <i class="ti ti-transfer me-1"></i>Transborder
+            </button>
+          </div>
+          @if (tbHistory.length) {
+            <ul class="list-group list-group-flush">
+              @for (h of tbHistory; track h.id) {
+                <li class="list-group-item small">
+                  {{ h.from_vehicle || '—' }} → <strong>{{ h.to_vehicle }}</strong>
+                  · {{ h.passengers_moved }} passager(s)
+                  @if (h.passengers_overflow) { · {{ h.passengers_overflow }} basculé(s) vers {{ h.overflow_trip }} ({{ h.baggage_moved }} bagage(s)) }
+                  <span class="text-muted">— {{ h.created_at | date:'short' }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="modal fade" id="transbord-modal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header"><h5 class="modal-title">Transborder le voyage</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+              <div class="modal-body">
+                @if (tbError) { <div class="alert alert-danger py-2">{{ tbError }}</div> }
+                <p class="mb-2">Passagers vendus : <strong>{{ tbSoldCount }}</strong></p>
+                <div class="mb-3">
+                  <label class="form-label">Nouveau bus</label>
+                  <select class="form-select" [(ngModel)]="tbVehicle">
+                    <option value="">— Choisir —</option>
+                    @for (v of tbVehicles; track v.id) { <option [value]="v.id">{{ v.license_plate }} — {{ v.model_name }} ({{ v.seats }} places)</option> }
+                  </select>
+                  @if (tbVehicles.length === 0) { <p class="text-muted small mt-1">Aucun bus éligible.</p> }
+                </div>
+                @if (tbNeedsOverflow) {
+                  <div class="mb-3">
+                    <div class="alert alert-warning py-2">Ce bus a {{ tbSelectedSeats }} places pour {{ tbSoldCount }} passagers. Choisissez un voyage de bascule.</div>
+                    <label class="form-label">Voyage de bascule (même trajet)</label>
+                    <select class="form-select" [(ngModel)]="tbOverflowTrip">
+                      <option value="">— Choisir —</option>
+                      @for (o of tbOverflow; track o.id) { <option [value]="o.id">{{ o.number || o.code }} ({{ o.free_seats }} places)</option> }
+                    </select>
+                  </div>
+                }
+                <div class="mb-2"><label class="form-label">Note</label>
+                  <textarea class="form-control" rows="2" [(ngModel)]="tbNote"></textarea></div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" [disabled]="tbBusy" data-bs-dismiss="modal" (click)="doTransbord()">Confirmer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Crew -->
       <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Équipage</h6></div><div class="card-body">
         <ul class="list-group mb-2">

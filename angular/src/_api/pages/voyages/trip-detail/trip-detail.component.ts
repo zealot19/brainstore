@@ -27,6 +27,11 @@ export class VoyagesTripDetailComponent implements OnInit {
   newRole = 'DRIVER';
   actionError = '';
 
+  tbVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
+  tbOverflow: { id: string; number: string; code: string; free_seats: number }[] = [];
+  tbSoldCount = 0; tbVehicle = ''; tbOverflowTrip = ''; tbNote = '';
+  tbError = ''; tbBusy = false; tbHistory: any[] = [];
+
   roles = [{ v: 'DRIVER', l: 'Chauffeur' }, { v: 'CONVOYEUR', l: 'Convoyeur' }, { v: 'CONTROLEUR', l: 'Contrôleur' }];
 
   constructor(private svc: TripService, private driverSvc: ExternalDriverService,
@@ -44,6 +49,7 @@ export class VoyagesTripDetailComponent implements OnInit {
       next: t => {
         this.trip = t; this.loading = false;
         this.loadSeats();
+        this.loadTbHistory();
         if (!t.vehicle) this.svc.eligibleVehicles(this.id).subscribe(v => this.eligible = v);
       },
       error: () => this.loading = false,
@@ -98,5 +104,31 @@ export class VoyagesTripDetailComponent implements OnInit {
   markDelayed(): void {
     const reason = prompt('Motif du retard ?') ?? '';
     this.run(this.svc.markDelayed(this.id, { delay_reason: reason }));
+  }
+
+  get tbSelectedSeats(): number { return this.tbVehicles.find(v => v.id === this.tbVehicle)?.seats ?? 0; }
+  get tbNeedsOverflow(): boolean { return this.tbVehicle !== '' && this.tbSelectedSeats < this.tbSoldCount; }
+
+  openTransbord(): void {
+    this.tbError = ''; this.tbVehicle = ''; this.tbOverflowTrip = ''; this.tbNote = '';
+    this.svc.transbordEligible(this.id).subscribe({
+      next: r => { this.tbVehicles = r.vehicles; this.tbOverflow = r.overflow_trips; this.tbSoldCount = r.sold_count; },
+      error: () => {},
+    });
+  }
+  loadTbHistory(): void { this.svc.transbordHistory(this.id).subscribe(h => this.tbHistory = h); }
+
+  doTransbord(): void {
+    if (!this.tbVehicle) { this.tbError = 'Choisissez un bus.'; return; }
+    if (this.tbNeedsOverflow && !this.tbOverflowTrip) { this.tbError = 'Capacité insuffisante : choisissez un voyage de bascule.'; return; }
+    this.tbBusy = true; this.tbError = '';
+    this.svc.transbord(this.id, {
+      vehicle_id: this.tbVehicle,
+      overflow_trip_id: this.tbOverflowTrip || undefined,
+      note: this.tbNote || undefined,
+    }).subscribe({
+      next: () => { this.tbBusy = false; this.reload(); this.loadTbHistory(); },
+      error: e => { this.tbBusy = false; this.tbError = e?.error?.detail ?? 'Transbordement impossible.'; },
+    });
   }
 }
