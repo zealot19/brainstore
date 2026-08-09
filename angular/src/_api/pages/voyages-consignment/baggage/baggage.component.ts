@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { BaggageService } from '../../../services/voyages-consignment/baggage.service';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
+import { TripService } from '../../../services/voyages/trip.service';
 import { Baggage, BaggageCreate } from '../../../models/voyages-consignment.models';
 import { TripOption } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
@@ -17,6 +18,8 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 })
 export class VcgBaggageComponent implements OnInit {
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';
+  tripFilter = ''; typeFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
+  filterTrips: { id: string; number?: string; code?: string }[] = [];
   trips: TripOption[] = []; types: ConsignmentType[] = [];
   ticketOptions: { id: string; label: string }[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
@@ -24,7 +27,8 @@ export class VcgBaggageComponent implements OnInit {
   deliverTarget: Baggage | null = null; deliverComment = '';
 
   constructor(private svc: BaggageService, private booking: BookingService,
-              private ctSvc: ConsignmentTypeService, private fb: FormBuilder) {}
+              private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
+              private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -36,12 +40,23 @@ export class VcgBaggageComponent implements OnInit {
     });
     this.booking.bookableTrips().subscribe(t => this.trips = t);
     this.ctSvc.list().subscribe(d => this.types = d);
+    this.tripSvc.list().subscribe(d => this.filterTrips = d as any);
+    this.reload();
+  }
+
+  clearFilters(): void {
+    this.statusFilter = this.q = this.tripFilter = this.typeFilter = this.dateFrom = this.dateTo = '';
+    this.dateField = 'created';
     this.reload();
   }
 
   reload(): void {
     this.loading = true; this.selected.clear();
-    this.svc.list({ status: this.statusFilter, q: this.q }).subscribe({
+    this.svc.list({
+      status: this.statusFilter || undefined, q: this.q || undefined,
+      trip: this.tripFilter || undefined, consignment_type: this.typeFilter || undefined,
+      date_field: this.dateField, date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+    }).subscribe({
       next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
 
