@@ -83,3 +83,40 @@ def apply_transbord(trip, new_plan, *, overflow_trip=None, user=None):
     trip.save(update_fields=["seating_plan", "updated_by", "updated_at"])
     return {"passengers_moved": len(kept_ids), "passengers_overflow": moved_overflow,
             "baggage_moved": baggage_moved}
+
+
+@transaction.atomic
+def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note=""):
+    from apps.voyages_trips.models import Transbordement
+    from apps.voyages_trips.selectors.eligibility import (
+        blocking_reasons, active_seating_plan, document_warnings)
+
+    if trip.status not in ("pending", "departed"):
+        raise ApplicationError(_("Ce voyage ne peut pas être transbordé (statut invalide)."))
+
+    reasons = blocking_reasons(to_vehicle, window_start=trip.scheduled_departure,
+                               window_end=trip.scheduled_arrival, exclude_trip=trip)
+    if reasons:
+        raise ApplicationError(" ".join(str(r) for r in reasons))
+
+    new_plan = active_seating_plan(to_vehicle, trip.scheduled_departure.date())
+    if new_plan is None:
+        raise ApplicationError(_("Aucun plan de bus actif pour ce véhicule."))
+
+    if overflow_trip is not None:
+        if overflow_trip.id == trip.id or overflow_trip.route_id != trip.route_id \
+                or overflow_trip.status not in ("draft", "pending"):
+            raise ApplicationError(_("Voyage de bascule invalide (même trajet, non parti)."))
+
+    from_vehicle = trip.vehicle
+    counts = apply_transbord(trip, new_plan, overflow_trip=overflow_trip, user=user)
+
+    trip.vehicle = to_vehicle
+    trip.updated_by = user
+    trip.save(update_fields=["vehicle", "updated_by", "updated_at"])
+
+    tb = Transbordement.objects.create(
+        company=trip.company, trip=trip, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
+        overflow_trip=overflow_trip, note=note or "", created_by=user, **counts)
+    warnings = document_warnings(to_vehicle, before_date=trip.scheduled_arrival.date(), alert_days=30)
+    return {"transbordement_id": str(tb.id), "warnings": warnings, **counts}

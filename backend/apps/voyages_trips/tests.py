@@ -137,3 +137,14 @@ def test_apply_transbord_smaller_with_overflow_moves_surplus_and_baggage():
     for t in g["tickets"]:
         t.refresh_from_db()
         assert t.trip_seat.trip_id == t.trip_id
+
+
+@pytest.mark.django_db
+def test_transbord_trip_rejects_non_transbordable_status():
+    from apps.core.exceptions import ApplicationError
+    from apps.voyages_trips.services.transbordement import transbord_trip
+    g = _graph()
+    g["src"].status = "draft"
+    g["src"].save(update_fields=["status"])
+    with pytest.raises(ApplicationError):
+        transbord_trip(g["src"], None, user=None)
