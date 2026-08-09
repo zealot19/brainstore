@@ -328,6 +328,8 @@ class TicketTemplateSerializer(serializers.ModelSerializer):
                   "logo", "logo_url", "background_logo", "background_logo_url",
                   "color_ink", "color_accent", "color_band",
                   "recto_notice", "verso_conditions", "agencies_list",
+                  "ticket_width_mm", "ticket_height_mm",
+                  "parcel_receipt_terms", "baggage_ticket_note",
                   "show_verso", "show_stub", "show_watermark", "show_qr",
                   "custom_html", "html_recto", "html_verso"]
         extra_kwargs = {"logo": {"required": False}, "background_logo": {"required": False}}

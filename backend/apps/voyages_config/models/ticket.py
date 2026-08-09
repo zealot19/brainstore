@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .base import _CompanyScoped
@@ -11,6 +12,12 @@ DEFAULT_VERSO_CONDITIONS = (
     "Les bagages sont soumis a la franchise autorisee ; les excedents sont payants.\n"
     "Conservez ce billet et presentez-le a l'embarquement."
 )
+
+DEFAULT_PARCEL_RECEIPT_TERMS = (
+    "Par sa signature, le client declare avoir lu et accepte "
+    "les conditions definies par l'agence."
+)
+DEFAULT_BAGGAGE_TICKET_NOTE = "Merci de votre confiance. Bon voyage !"
 
 # HTML par defaut (mode avance uniquement)
 DEFAULT_TICKET_RECTO = "<div class=\"tk\">{{ passenger_name }} — {{ ticket_number }}</div>"
@@ -39,11 +46,21 @@ class TicketTemplate(_CompanyScoped):
     color_accent = models.CharField(_("couleur accent"), max_length=9, default="#e6a817")
     color_band   = models.CharField(_("couleur bande"), max_length=9, default="#111111")
 
+    # ── Format billet (mm) ────────────────────────────────────────────────────
+    ticket_width_mm  = models.DecimalField(_("largeur billet (mm)"), max_digits=6, decimal_places=2, default=Decimal("203"))
+    ticket_height_mm = models.DecimalField(_("hauteur billet (mm)"), max_digits=6, decimal_places=2, default=Decimal("82.55"))
+
     # ── Textes ────────────────────────────────────────────────────────────────
     recto_notice     = models.CharField(_("note (bas du recto)"), max_length=255, blank=True, default=DEFAULT_RECTO_NOTICE)
     verso_conditions = models.TextField(_("conditions (verso)"), blank=True, default=DEFAULT_VERSO_CONDITIONS)
     # Liste d'agences : [{"name": ..., "location": ..., "phone": ...}, ...]
     agencies_list    = models.JSONField(_("agences (verso)"), default=list, blank=True)
+
+    # ── Documents colis & bagages ─────────────────────────────────────────────
+    parcel_receipt_terms = models.TextField(_("mention conditions (recu colis)"),
+                                             blank=True, default=DEFAULT_PARCEL_RECEIPT_TERMS)
+    baggage_ticket_note  = models.CharField(_("note (ticket bagage)"), max_length=255,
+                                            blank=True, default=DEFAULT_BAGGAGE_TICKET_NOTE)
 
     # ── Options ───────────────────────────────────────────────────────────────
     show_verso     = models.BooleanField(_("afficher le verso"), default=True)
