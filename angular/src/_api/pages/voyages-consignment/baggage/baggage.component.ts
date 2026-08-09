@@ -126,4 +126,14 @@ export class VcgBaggageComponent implements OnInit {
     this.svc.cancel(b.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
+
+  private openAndPrint(html: string): void {
+    const w = window.open('', '_blank');
+    if (!w) { return; }
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => w.print(), 300);
+  }
+  printTicket(id: string): void { this.svc.ticket(id).subscribe({ next: r => this.openAndPrint(r.html), error: () => {} }); }
+  printLabel(id: string): void { this.svc.label(id).subscribe({ next: r => this.openAndPrint(r.html), error: () => {} }); }
 }

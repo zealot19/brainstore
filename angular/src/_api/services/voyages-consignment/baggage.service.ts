@@ -25,5 +25,7 @@ export class BaggageService {
   bulk(ids: string[], action: 'load' | 'deliver' | 'cancel'): Observable<{ done: number; errors: string[] }> {
     return this.http.post<any>(VOYAGES_CONSIGNMENT.baggageBulk, { ids, action }).pipe(map(r => r.data ?? r));
   }
+  ticket(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.baggageTicket(id)); }
+  label(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.baggageLabel(id)); }
 }
 

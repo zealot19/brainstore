@@ -47,6 +47,8 @@
               <td>{{ b.amount_due | number:'1.0-0' }} XAF</td>
               <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printTicket(b.id)" title="Ticket de bagage"><i class="ti ti-ticket me-1"></i>Ticket</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printLabel(b.id)" title="Étiquette"><i class="ti ti-tag me-1"></i>Étiquette</a>
                 @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#baggage-modal" (click)="openEdit(b)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
                 @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#deliver-modal" (click)="askDeliver(b)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
                 @if (b.status !== 'delivered' && b.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
