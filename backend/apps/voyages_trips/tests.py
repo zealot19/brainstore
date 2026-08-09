@@ -15,3 +15,14 @@ def test_list_trips_filters_route_vehicle_and_departure_range():
 def test_list_trips_created_basis():
     qs = list_trips(None, date_field="created", date_from="2026-01-01")
     assert "created_at" in str(qs.query)
+
+
+import pytest
+from apps.voyages_trips.models import Transbordement
+
+
+def test_transbordement_model_fields_default_zero():
+    t = Transbordement()
+    assert t.passengers_moved == 0
+    assert t.passengers_overflow == 0
+    assert t.baggage_moved == 0
