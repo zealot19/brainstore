@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
+import { TripService } from '../../../services/voyages/trip.service';
 import { Booking } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 
@@ -13,13 +14,24 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 })
 export class VbBookingsComponent implements OnInit {
   rows: Booking[] = []; loading = false; statusFilter = ''; q = '';
+  typeFilter = ''; channelFilter = ''; tripFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
+  trips: { id: string; number?: string; code?: string }[] = [];
 
-  constructor(private svc: BookingService, private router: Router) {}
-  ngOnInit(): void { this.reload(); }
+  constructor(private svc: BookingService, private tripSvc: TripService, private router: Router) {}
+  ngOnInit(): void { this.tripSvc.list().subscribe(d => this.trips = d as any); this.reload(); }
   reload(): void {
     this.loading = true;
-    this.svc.list({ status: this.statusFilter, q: this.q }).subscribe({
-      next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.list({
+      status: this.statusFilter || undefined, q: this.q || undefined,
+      trip: this.tripFilter || undefined, trip_type: this.typeFilter || undefined,
+      channel: this.channelFilter || undefined, date_field: this.dateField,
+      date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+    }).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+  }
+  clearFilters(): void {
+    this.statusFilter = this.q = this.typeFilter = this.channelFilter = this.tripFilter = this.dateFrom = this.dateTo = '';
+    this.dateField = 'created';
+    this.reload();
   }
   statusClass(s: string): string {
     return { confirmed: 'bg-success', boarded: 'bg-primary',
