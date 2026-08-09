@@ -344,3 +344,54 @@ class TripManifestView(APIView):
             "parcels": S.ParcelRead(m["parcels"], many=True).data,
             "baggage": S.BaggageRead(m["baggage"], many=True).data,
         })
+
+
+from apps.voyages_config import ticket_render
+from apps.voyages_consignment import doc_render
+
+
+def _agent(user):
+    return (user.get_full_name() or user.username) if user else ""
+
+
+class ParcelReceiptView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, pk):
+        p = (Parcel.objects.filter(is_deleted=False, company=request.user.company, id=pk)
+             .select_related("origin_point", "destination_point").first())
+        if not p:
+            return error_response("Introuvable.", status_code=404)
+        tpl = ticket_render.get_or_create_template(request.user.company)
+        logo_url = ticket_render._abs(request, tpl.logo)
+        html = doc_render.build_parcel_receipt(p, tpl, agent=_agent(request.user), logo_url=logo_url)
+        return success_response({"html": html})
+
+
+class BaggageTicketView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, pk):
+        b = (Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk)
+             .select_related("trip", "trip__route", "trip__destination", "trip__vehicle",
+                             "ticket", "ticket__passenger").first())
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        tpl = ticket_render.get_or_create_template(request.user.company)
+        logo_url = ticket_render._abs(request, tpl.logo)
+        html = doc_render.build_baggage_ticket(b, tpl, agent=_agent(request.user), logo_url=logo_url)
+        return success_response({"html": html})
+
+
+class BaggageLabelView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, pk):
+        b = (Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk)
+             .select_related("trip", "trip__route", "trip__destination",
+                             "ticket", "ticket__passenger").first())
+        if not b:
+            return error_response("Introuvable.", status_code=404)
+        tpl = ticket_render.get_or_create_template(request.user.company)
+        html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user))
+        return success_response({"html": html})
