@@ -311,3 +311,72 @@ class TripMarkDelayedView(APIView):
 
 class TripClearDelayView(_LifecycleView):
     action = "clear_delay"
+
+
+from apps.voyages_trips.services.transbordement import transbord_trip
+
+
+class TripTransbordEligibleView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        return success_response(selectors.transbord_options(company, trip))
+
+
+class TripTransbordView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        from apps.fleet.models import Vehicle
+        vehicle = Vehicle.objects.filter(id=request.data.get("vehicle_id"),
+                                         company=company, is_deleted=False).first()
+        if not vehicle:
+            return error_response("Véhicule introuvable.", status_code=404)
+        overflow_trip = None
+        oid = request.data.get("overflow_trip_id")
+        if oid:
+            overflow_trip = selectors.get_trip(company, oid)
+            if not overflow_trip:
+                return error_response("Voyage de bascule introuvable.", status_code=404)
+        try:
+            res = transbord_trip(trip, vehicle, overflow_trip=overflow_trip,
+                                 user=request.user, note=request.data.get("note", ""))
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(res)
+
+
+class TripTransbordHistoryView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        rows = [{
+            "id": str(tb.id),
+            "from_vehicle": tb.from_vehicle.license_plate if tb.from_vehicle_id else "",
+            "to_vehicle": tb.to_vehicle.license_plate if tb.to_vehicle_id else "",
+            "overflow_trip": (tb.overflow_trip.number or tb.overflow_trip.code) if tb.overflow_trip_id else "",
+            "passengers_moved": tb.passengers_moved,
+            "passengers_overflow": tb.passengers_overflow,
+            "baggage_moved": tb.baggage_moved,
+            "note": tb.note,
+            "created_at": tb.created_at,
+        } for tb in selectors.trip_transbordements(trip)]
+        return success_response(rows)

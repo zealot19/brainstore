@@ -20,4 +20,7 @@ urlpatterns = [
     path("<uuid:trip_id>/resume/", v.TripResumeView.as_view()),
     path("<uuid:trip_id>/mark-delayed/", v.TripMarkDelayedView.as_view()),
     path("<uuid:trip_id>/clear-delay/", v.TripClearDelayView.as_view()),
+    path("<uuid:trip_id>/transbord/eligible/", v.TripTransbordEligibleView.as_view()),
+    path("<uuid:trip_id>/transbord/", v.TripTransbordView.as_view()),
+    path("<uuid:trip_id>/transbord/history/", v.TripTransbordHistoryView.as_view()),
 ]
