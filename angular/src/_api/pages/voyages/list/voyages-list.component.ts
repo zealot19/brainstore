@@ -6,6 +6,7 @@ import { TripService } from '../../../services/voyages/trip.service';
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
 import { ServicePatternService } from '../../../services/voyages-config/service-pattern.service';
+import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -17,6 +18,8 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 })
 export class VoyagesListComponent implements OnInit {
   rows: Trip[] = []; filtered: Trip[] = []; loading = true; filterStatus = '';
+  filterRoute = ''; filterVehicle = ''; dateField = 'departure'; dateFrom = ''; dateTo = '';
+  vehicles: { id: string; license_plate: string }[] = [];
   routes: Route[] = []; fareClasses: FareClass[] = []; patterns: ServicePattern[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
 
@@ -30,7 +33,8 @@ export class VoyagesListComponent implements OnInit {
   ];
 
   constructor(private svc: TripService, private routeSvc: RouteService, private fcSvc: FareClassService,
-              private spSvc: ServicePatternService, private fb: FormBuilder, private router: Router) {}
+              private spSvc: ServicePatternService, private vehicleSvc: VehicleService,
+              private fb: FormBuilder, private router: Router) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -41,11 +45,22 @@ export class VoyagesListComponent implements OnInit {
     this.routeSvc.list().subscribe(d => this.routes = d);
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
     this.spSvc.list().subscribe(d => this.patterns = d);
+    this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.load();
   }
   load(): void {
     this.loading = true;
-    this.svc.list({ status: this.filterStatus || undefined }).subscribe({ next: d => { this.rows = d; this.filtered = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.list({
+      status: this.filterStatus || undefined, route: this.filterRoute || undefined,
+      vehicle: this.filterVehicle || undefined, date_field: this.dateField,
+      date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+    }).subscribe({ next: d => { this.rows = d; this.filtered = d; this.loading = false; },
+                   error: () => this.loading = false });
+  }
+  clearFilters(): void {
+    this.filterStatus = this.filterRoute = this.filterVehicle = this.dateFrom = this.dateTo = '';
+    this.dateField = 'departure';
+    this.load();
   }
   statusCss(s: string): string { return this.statuses.find(x => x.value === s)?.css ?? ''; }
   statusLabel(s: string): string { return this.statuses.find(x => x.value === s)?.label ?? s; }
