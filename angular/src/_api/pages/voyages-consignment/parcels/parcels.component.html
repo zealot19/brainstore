@@ -7,7 +7,7 @@
 <app-info-banner text="Enregistrez le colis (expéditeur, destinataire, contenu) et encaissez le montant au dépôt. Le colis part « Enregistré » ; il sera affecté à un voyage via le manifeste, puis retiré par le destinataire à l'arrivée."></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
       <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
         <option value="">Tous les statuts</option>
         <option value="registered">Enregistré</option>
@@ -16,8 +16,32 @@
         <option value="picked_up">Retiré</option>
         <option value="cancelled">Annulé</option>
       </select>
+      <select class="form-select w-auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
+        <option value="">Tous voyages</option>
+        @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
+      </select>
+      <select class="form-select w-auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
+        <option value="">Tous types</option>
+        @for (c of types; track c.id) { <option [value]="c.id">{{ c.label }}</option> }
+      </select>
+      <select class="form-select w-auto" [(ngModel)]="originFilter" (ngModelChange)="reload()">
+        <option value="">Toute origine</option>
+        @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
+      </select>
+      <select class="form-select w-auto" [(ngModel)]="destFilter" (ngModelChange)="reload()">
+        <option value="">Toute destination</option>
+        @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
+      </select>
+      <select class="form-select w-auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
+        <option value="created">Date création</option>
+        <option value="departure">Date départ</option>
+        <option value="arrival">Date arrivée</option>
+      </select>
+      <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
+      <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
       <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">

@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
+import { TripService } from '../../../services/voyages/trip.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -16,6 +17,9 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 })
 export class VcgParcelsComponent implements OnInit {
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
+  tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
+  dateField = 'created'; dateFrom = ''; dateTo = '';
+  trips: { id: string; number?: string; code?: string }[] = [];
   points: ServicePoint[] = []; types: ConsignmentType[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
@@ -24,7 +28,8 @@ export class VcgParcelsComponent implements OnInit {
   selected = new Set<string>();
 
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
-              private ctSvc: ConsignmentTypeService, private fb: FormBuilder) {}
+              private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
+              private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -38,13 +43,23 @@ export class VcgParcelsComponent implements OnInit {
     });
     this.spSvc.list().subscribe(d => this.points = d);
     this.ctSvc.list().subscribe(d => this.types = d);
+    this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.reload();
   }
 
   reload(): void {
     this.loading = true; this.selected.clear();
-    this.svc.list({ status: this.statusFilter, q: this.q }).subscribe({
-      next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.list({
+      status: this.statusFilter || undefined, q: this.q || undefined,
+      trip: this.tripFilter || undefined, consignment_type: this.typeFilter || undefined,
+      origin_point: this.originFilter || undefined, destination_point: this.destFilter || undefined,
+      date_field: this.dateField, date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+    }).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+  }
+  clearFilters(): void {
+    this.statusFilter = this.q = this.tripFilter = this.typeFilter = this.originFilter = this.destFilter = this.dateFrom = this.dateTo = '';
+    this.dateField = 'created';
+    this.reload();
   }
   isSelected(id: string): boolean { return this.selected.has(id); }
   toggle(id: string): void { this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id); }
