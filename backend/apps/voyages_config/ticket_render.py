@@ -113,9 +113,11 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
         f("IMPRIME LE", tokens.get("printed_date", "")),
         f("EXPIRE LE", tokens.get("expiration_date", "")),
     ])
+    w = tpl.ticket_width_mm or 203
+    h = tpl.ticket_height_mm or 82.55
     return f"""<style>
   .tk{{--ink:{tpl.color_ink};--accent:{tpl.color_accent};--band:{tpl.color_band};--muted:#6b6b6b;
-      position:relative;width:190mm;min-height:95mm;box-sizing:border-box;display:flex;
+      position:relative;width:{w}mm;height:{h}mm;box-sizing:border-box;display:flex;
       border:1.5px solid var(--ink);font-family:Arial,Helvetica,sans-serif;color:var(--ink);overflow:hidden}}
   .tk .band{{width:14mm;background:var(--band);color:#fff;display:flex;align-items:center;justify-content:center}}
   .tk .band span{{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;letter-spacing:4px;font-size:20pt}}
@@ -166,35 +168,34 @@ def build_verso(tpl):
         if not (name or loc or phone):
             continue
         cards.append(
-            f"<div class='ag'>"
-            f"<div class='ag-name'>{e(name)}</div>"
-            f"<div class='ag-loc'>{e(loc)}</div>"
-            f"<div class='ag-tel'>{e(phone)}</div>"
-            f"</div>"
-        )
-    ags = "".join(cards)
-    if not ags:
-        ags = f"<div class='ag'><div class='ag-loc'>{e(tpl.address)}</div></div>"
-
+            f"<div class='ag'><div class='ag-name'>{e(name)}</div>"
+            f"<div class='ag-loc'>{e(loc)}</div><div class='ag-tel'>{e(phone)}</div></div>")
+    ags = "".join(cards) or f"<div class='ag'><div class='ag-loc'>{e(tpl.address)}</div></div>"
+    w = tpl.ticket_width_mm or 203
+    h = tpl.ticket_height_mm or 82.55
     return f"""<style>
-  .tkv{{position:relative;width:190mm;min-height:95mm;box-sizing:border-box;padding:10mm;
-       font-family:Arial,Helvetica,sans-serif;color:{tpl.color_ink};font-size:8.5pt;line-height:1.45;
-       display:flex;flex-direction:column}}
-  .tkv h3{{color:{tpl.color_accent};text-align:center;font-style:italic;font-weight:800;margin:0 0 6px;font-size:12pt}}
+  .tkv{{display:flex;width:{w}mm;height:{h}mm;box-sizing:border-box;
+       font-family:Arial,Helvetica,sans-serif;color:{tpl.color_ink};font-size:7pt;line-height:1.3}}
+  .tkv .cut{{width:52mm;flex:none;border-right:1px dashed #999}}
+  .tkv .content{{flex:1;padding:4mm;display:flex;flex-direction:column;overflow:hidden}}
+  .tkv h3{{color:{tpl.color_accent};text-align:center;font-style:italic;font-weight:800;margin:0 0 3px;font-size:9pt}}
   .tkv .cond{{flex:1}}
-  .tkv .cond p{{margin:4px 0}}
-  .tkv .agencies{{margin-top:6mm;border-top:2px solid {tpl.color_accent};padding-top:4mm}}
-  .tkv .agencies h4{{color:{tpl.color_accent};text-align:center;margin:0 0 6px;font-size:12pt;font-style:italic;font-weight:800}}
-  .tkv .agencies .row{{display:flex;justify-content:space-around;align-items:flex-start;gap:6mm;text-align:center}}
+  .tkv .cond p{{margin:2px 0}}
+  .tkv .agencies{{margin-top:2mm;border-top:2px solid {tpl.color_accent};padding-top:2mm}}
+  .tkv .agencies h4{{color:{tpl.color_accent};text-align:center;margin:0 0 3px;font-size:9pt;font-style:italic;font-weight:800}}
+  .tkv .agencies .row{{display:flex;justify-content:space-around;gap:4mm;text-align:center}}
   .tkv .agencies .ag{{flex:1}}
-  .tkv .agencies .ag-name{{font-weight:800;font-size:13pt;letter-spacing:1px}}
-  .tkv .agencies .ag-loc{{color:#555;margin:1px 0}}
-  .tkv .agencies .ag-tel{{font-weight:700;letter-spacing:1px}}
+  .tkv .agencies .ag-name{{font-weight:800;font-size:10pt;letter-spacing:1px}}
+  .tkv .agencies .ag-loc{{color:#555}}
+  .tkv .agencies .ag-tel{{font-weight:700}}
 </style>
 <div class="tkv">
-  <h3>&laquo; {e(tpl.slogan)} &raquo;</h3>
-  <div class="cond">{conds}</div>
-  <div class="agencies"><h4>Nos Agences</h4><div class="row">{ags}</div></div>
+  <div class="cut"></div>
+  <div class="content">
+    <h3>&laquo; {e(tpl.slogan)} &raquo;</h3>
+    <div class="cond">{conds}</div>
+    <div class="agencies"><h4>Nos Agences</h4><div class="row">{ags}</div></div>
+  </div>
 </div>"""
 
 
@@ -227,11 +228,14 @@ def sample_tokens():
     }
 
 
-def render_document(inner_html_list):
-    body = "".join(f'<div class="tk-page">{h}</div>' for h in inner_html_list)
+def render_document(inner_html_list, *, tpl=None):
+    w = (tpl.ticket_width_mm if tpl else None) or 203
+    h = (tpl.ticket_height_mm if tpl else None) or 82.55
+    body = "".join(f'<div class="tk-page">{h_}</div>' for h_ in inner_html_list)
     return (
         '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Billets</title>'
-        '<style>@page{size:A4 landscape;margin:8mm}body{margin:0;font-family:Arial,Helvetica,sans-serif}'
+        f'<style>@page{{size:{w}mm {h}mm landscape;margin:0}}'
+        'body{margin:0;font-family:Arial,Helvetica,sans-serif}'
         '.tk-page{page-break-after:always}</style>'
         f'</head><body>{body}</body></html>'
     )

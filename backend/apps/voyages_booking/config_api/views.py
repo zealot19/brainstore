@@ -367,7 +367,7 @@ class BookingRenderTicketsView(APIView):
                 "expiration_date": exp.strftime("%d/%m/%Y"),
             })
             pages.extend(ticket_render.build_ticket_pages(tpl, tokens, request=request))
-        return success_response({"html": ticket_render.render_document(pages)})
+        return success_response({"html": ticket_render.render_document(pages, tpl=tpl)})
 
 
 class BookingPrintView(APIView):
