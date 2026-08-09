@@ -37,7 +37,14 @@ class TripListCreateView(APIView):
         company, err = _scope(request)
         if err:
             return err
-        qs = selectors.list_trips(company, status=request.query_params.get("status"))
+        qs = selectors.list_trips(
+            company,
+            status=request.query_params.get("status"),
+            route=request.query_params.get("route"),
+            vehicle=request.query_params.get("vehicle"),
+            date_field=request.query_params.get("date_field"),
+            date_from=request.query_params.get("date_from"),
+            date_to=request.query_params.get("date_to"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.TripListSerializer(page, many=True).data)
