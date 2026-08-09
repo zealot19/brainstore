@@ -39,3 +39,25 @@ def test_baggage_label_payant_flag():
     assert "PAYANT" in doc_render.build_baggage_label(b, _tpl(), agent="Admin")
     b0 = Baggage(tag_number="BAG-0", sender_name="X", amount_due=0, quantity=1)
     assert "GRATUIT" in doc_render.build_baggage_label(b0, _tpl(), agent="Admin")
+
+
+from apps.voyages_consignment.selectors import list_parcels, list_baggage
+
+_UU = "00000000-0000-0000-0000-000000000002"
+
+
+def test_list_parcels_filters_type_points_and_departure():
+    qs = list_parcels(None, consignment_type=_UU, origin_point=_UU, destination_point=_UU,
+                      date_field="departure", date_from="2026-01-01", date_to="2026-12-31")
+    sql = str(qs.query)
+    assert "consignment_type_id" in sql
+    assert "origin_point_id" in sql
+    assert "destination_point_id" in sql
+    assert "scheduled_departure" in sql
+
+
+def test_list_baggage_filters_type_and_created_default():
+    qs = list_baggage(None, consignment_type=_UU, date_from="2026-01-01")
+    sql = str(qs.query)
+    assert "consignment_type_id" in sql
+    assert "created_at" in sql

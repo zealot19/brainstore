@@ -1,8 +1,14 @@
 from django.db.models import Q
 from apps.voyages_consignment.models import Parcel, Baggage
+from apps.core.filters import resolve_date_field, apply_date_range
+
+_CONS_DATE_FIELDS = {"created": "created_at", "departure": "trip__scheduled_departure",
+                     "arrival": "trip__scheduled_arrival"}
 
 
-def list_parcels(company, status=None, trip_id=None, q=None):
+def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
+                 origin_point=None, destination_point=None,
+                 date_field=None, date_from=None, date_to=None):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
           .select_related("origin_point", "destination_point", "trip", "consignment_type")
           .order_by("-created_at"))
@@ -10,10 +16,18 @@ def list_parcels(company, status=None, trip_id=None, q=None):
         qs = qs.filter(status=status)
     if trip_id:
         qs = qs.filter(trip_id=trip_id)
+    if consignment_type:
+        qs = qs.filter(consignment_type_id=consignment_type)
+    if origin_point:
+        qs = qs.filter(origin_point_id=origin_point)
+    if destination_point:
+        qs = qs.filter(destination_point_id=destination_point)
     if q:
         qs = qs.filter(Q(reference__icontains=q) | Q(sender_name__icontains=q) |
                        Q(sender_phone__icontains=q) | Q(recipient_name__icontains=q) |
                        Q(recipient_phone__icontains=q))
+    field = resolve_date_field(_CONS_DATE_FIELDS, date_field, "created")
+    qs = apply_date_range(qs, field, date_from, date_to)
     return qs
 
 
@@ -33,7 +47,8 @@ def pending_for_trip(company, route_id=None):
     return qs
 
 
-def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None):
+def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None,
+                 consignment_type=None, date_field=None, date_from=None, date_to=None):
     qs = (Baggage.objects.filter(is_deleted=False, company=company)
           .select_related("ticket__passenger", "trip", "consignment_type")
           .order_by("-created_at"))
@@ -43,12 +58,16 @@ def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None):
         qs = qs.filter(trip_id=trip_id)
     if status:
         qs = qs.filter(status=status)
+    if consignment_type:
+        qs = qs.filter(consignment_type_id=consignment_type)
     if q:
         qs = qs.filter(Q(tag_number__icontains=q) | Q(sender_name__icontains=q) |
                        Q(sender_phone__icontains=q) | Q(ticket__number__icontains=q) |
                        Q(ticket__passenger__first_name__icontains=q) |
                        Q(ticket__passenger__last_name__icontains=q) |
                        Q(ticket__passenger__phone__icontains=q))
+    field = resolve_date_field(_CONS_DATE_FIELDS, date_field, "created")
+    qs = apply_date_range(qs, field, date_from, date_to)
     return qs
 
 

@@ -22,8 +22,17 @@ class ParcelListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request):
-        qs = selectors.list_parcels(request.user.company, status=request.query_params.get("status"),
-                                    trip_id=request.query_params.get("trip"), q=request.query_params.get("q"))
+        qs = selectors.list_parcels(
+            request.user.company,
+            status=request.query_params.get("status"),
+            trip_id=request.query_params.get("trip"),
+            q=request.query_params.get("q"),
+            consignment_type=request.query_params.get("consignment_type"),
+            origin_point=request.query_params.get("origin_point"),
+            destination_point=request.query_params.get("destination_point"),
+            date_field=request.query_params.get("date_field"),
+            date_from=request.query_params.get("date_from"),
+            date_to=request.query_params.get("date_to"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.ParcelRead(page, many=True).data)
@@ -183,10 +192,16 @@ class BaggageListView(APIView):
     permission_classes = [IsInstitutionAdmin]
 
     def get(self, request):
-        qs = selectors.list_baggage(request.user.company, ticket_id=request.query_params.get("ticket"),
-                                    trip_id=request.query_params.get("trip"),
-                                    status=request.query_params.get("status"),
-                                    q=request.query_params.get("q"))
+        qs = selectors.list_baggage(
+            request.user.company,
+            ticket_id=request.query_params.get("ticket"),
+            trip_id=request.query_params.get("trip"),
+            status=request.query_params.get("status"),
+            q=request.query_params.get("q"),
+            consignment_type=request.query_params.get("consignment_type"),
+            date_field=request.query_params.get("date_field"),
+            date_from=request.query_params.get("date_from"),
+            date_to=request.query_params.get("date_to"))
         return success_response(S.BaggageRead(qs, many=True).data)
 
     def post(self, request):
