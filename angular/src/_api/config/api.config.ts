@@ -319,6 +319,9 @@ export const VOYAGES = {
   complete: (id: string) => `${VT}/${id}/complete/`, cancel: (id: string) => `${VT}/${id}/cancel/`,
   suspend: (id: string) => `${VT}/${id}/suspend/`, resume: (id: string) => `${VT}/${id}/resume/`,
   markDelayed: (id: string) => `${VT}/${id}/mark-delayed/`, clearDelay: (id: string) => `${VT}/${id}/clear-delay/`,
+  transbordEligible: (id: string) => `${VT}/${id}/transbord/eligible/`,
+  transbord: (id: string) => `${VT}/${id}/transbord/`,
+  transbordHistory: (id: string) => `${VT}/${id}/transbord/history/`,
 };
 
 const VP = `${API_BASE}/voyages/pricing`;

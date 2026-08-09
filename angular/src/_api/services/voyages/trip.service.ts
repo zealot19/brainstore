@@ -42,4 +42,14 @@ export class TripService {
   resume(id: string): Observable<Trip> { return this.http.post<Trip>(VOYAGES.resume(id), {}); }
   markDelayed(id: string, data: Record<string, unknown>): Observable<Trip> { return this.http.post<Trip>(VOYAGES.markDelayed(id), data); }
   clearDelay(id: string): Observable<Trip> { return this.http.post<Trip>(VOYAGES.clearDelay(id), {}); }
+
+  transbordEligible(id: string): Observable<{ vehicles: { id: string; license_plate: string; model_name: string; seats: number }[];
+                                              overflow_trips: { id: string; number: string; code: string; free_seats: number }[];
+                                              sold_count: number }> {
+    return this.http.get<any>(VOYAGES.transbordEligible(id));
+  }
+  transbord(id: string, body: { vehicle_id: string; overflow_trip_id?: string; note?: string }): Observable<any> {
+    return this.http.post<any>(VOYAGES.transbord(id), body);
+  }
+  transbordHistory(id: string): Observable<any[]> { return this.http.get<any[]>(VOYAGES.transbordHistory(id)); }
 }
