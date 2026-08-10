@@ -32,6 +32,15 @@ export class VoyagesTripDetailComponent implements OnInit {
   tbSoldCount = 0; tbVehicle = ''; tbOverflowTrip = ''; tbNote = '';
   tbError = ''; tbBusy = false; tbHistory: any[] = [];
 
+  selTickets: { id: string; seat: string; passenger_name: string }[] = [];
+  selParcels: { id: string; reference: string; recipient_name: string }[] = [];
+  selBaggage: { id: string; tag_number: string; owner_name: string }[] = [];
+  selDestTrips: { id: string; number: string; code: string; free_seats: number }[] = [];
+  selVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
+  selTicketIds = new Set<string>(); selParcelIds = new Set<string>(); selBaggageIds = new Set<string>();
+  selDestKind: 'trip' | 'vehicle' = 'trip'; selDestTrip = ''; selDestVehicle = '';
+  selNote = ''; selError = ''; selBusy = false;
+
   roles = [{ v: 'DRIVER', l: 'Chauffeur' }, { v: 'CONVOYEUR', l: 'Convoyeur' }, { v: 'CONTROLEUR', l: 'Contrôleur' }];
 
   constructor(private svc: TripService, private driverSvc: ExternalDriverService,
@@ -129,6 +138,35 @@ export class VoyagesTripDetailComponent implements OnInit {
     }).subscribe({
       next: () => { this.tbBusy = false; this.reload(); this.loadTbHistory(); },
       error: e => { this.tbBusy = false; this.tbError = e?.error?.detail ?? 'Transbordement impossible.'; },
+    });
+  }
+
+  openSelection(): void {
+    this.selError = ''; this.selNote = ''; this.selDestKind = 'trip'; this.selDestTrip = ''; this.selDestVehicle = '';
+    this.selTicketIds.clear(); this.selParcelIds.clear(); this.selBaggageIds.clear();
+    this.svc.selectionOptions(this.id).subscribe({
+      next: r => {
+        this.selTickets = r.tickets; this.selParcels = r.parcels; this.selBaggage = r.baggage;
+        this.selDestTrips = r.dest_trips; this.selVehicles = r.vehicles;
+      },
+      error: () => {},
+    });
+  }
+  toggleSel(set: Set<string>, id: string): void { set.has(id) ? set.delete(id) : set.add(id); }
+
+  doSelection(): void {
+    const total = this.selTicketIds.size + this.selParcelIds.size + this.selBaggageIds.size;
+    if (!total) { this.selError = 'Sélectionnez au moins un élément.'; return; }
+    const destTrip = this.selDestKind === 'trip' ? this.selDestTrip : '';
+    const destVehicle = this.selDestKind === 'vehicle' ? this.selDestVehicle : '';
+    if (!destTrip && !destVehicle) { this.selError = 'Choisissez une destination.'; return; }
+    this.selBusy = true; this.selError = '';
+    this.svc.transbordSelection(this.id, {
+      ticket_ids: [...this.selTicketIds], parcel_ids: [...this.selParcelIds], baggage_ids: [...this.selBaggageIds],
+      dest_trip_id: destTrip || undefined, dest_vehicle_id: destVehicle || undefined, note: this.selNote || undefined,
+    }).subscribe({
+      next: () => { this.selBusy = false; this.reload(); this.loadTbHistory(); },
+      error: e => { this.selBusy = false; this.selError = e?.error?.detail ?? 'Transbordement impossible.'; },
     });
   }
 }

@@ -56,9 +56,14 @@
         <div class="card mb-3">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="mb-0">Transbordement</h6>
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transbord-modal" (click)="openTransbord()">
-              <i class="ti ti-transfer me-1"></i>Transborder
-            </button>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transbord-modal" (click)="openTransbord()">
+                <i class="ti ti-transfer me-1"></i>Remplacer le bus
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#transbord-sel-modal" (click)="openSelection()">
+                <i class="ti ti-checklist me-1"></i>Transborder une sélection
+              </button>
+            </div>
           </div>
           @if (tbHistory.length) {
             <ul class="list-group list-group-flush">
@@ -106,6 +111,76 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
                 <button type="button" class="btn btn-primary" [disabled]="tbBusy" data-bs-dismiss="modal" (click)="doTransbord()">Confirmer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="transbord-sel-modal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header"><h5 class="modal-title">Transborder une sélection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+              <div class="modal-body">
+                @if (selError) { <div class="alert alert-danger py-2">{{ selError }}</div> }
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <h6>Passagers</h6>
+                    @for (t of selTickets; track t.id) {
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [checked]="selTicketIds.has(t.id)" (change)="toggleSel(selTicketIds, t.id)" id="tk-{{t.id}}">
+                        <label class="form-check-label" for="tk-{{t.id}}">[{{ t.seat }}] {{ t.passenger_name }}</label>
+                      </div>
+                    } @empty { <p class="text-muted small">Aucun passager.</p> }
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <h6>Colis</h6>
+                    @for (p of selParcels; track p.id) {
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [checked]="selParcelIds.has(p.id)" (change)="toggleSel(selParcelIds, p.id)" id="pc-{{p.id}}">
+                        <label class="form-check-label" for="pc-{{p.id}}">{{ p.reference }} — {{ p.recipient_name }}</label>
+                      </div>
+                    } @empty { <p class="text-muted small">Aucun colis.</p> }
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <h6>Bagages</h6>
+                    @for (b of selBaggage; track b.id) {
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" [checked]="selBaggageIds.has(b.id)" (change)="toggleSel(selBaggageIds, b.id)" id="bg-{{b.id}}">
+                        <label class="form-check-label" for="bg-{{b.id}}">{{ b.tag_number }} — {{ b.owner_name }}</label>
+                      </div>
+                    } @empty { <p class="text-muted small">Aucun bagage.</p> }
+                  </div>
+                </div>
+                <hr>
+                <div class="mb-2">
+                  <label class="form-label d-block">Destination</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="selDestKind" [value]="'trip'" [(ngModel)]="selDestKind" id="dk-trip">
+                    <label class="form-check-label" for="dk-trip">Voyage existant</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="selDestKind" [value]="'vehicle'" [(ngModel)]="selDestKind" id="dk-veh">
+                    <label class="form-check-label" for="dk-veh">Bus de remplacement</label>
+                  </div>
+                </div>
+                @if (selDestKind === 'trip') {
+                  <select class="form-select" [(ngModel)]="selDestTrip">
+                    <option value="">— Voyage (même trajet) —</option>
+                    @for (o of selDestTrips; track o.id) { <option [value]="o.id">{{ o.number || o.code }} ({{ o.free_seats }} places)</option> }
+                  </select>
+                } @else {
+                  <select class="form-select" [(ngModel)]="selDestVehicle">
+                    <option value="">— Bus en attente —</option>
+                    @for (v of selVehicles; track v.id) { <option [value]="v.id">{{ v.license_plate }} — {{ v.model_name }} ({{ v.seats }} places)</option> }
+                  </select>
+                }
+                <div class="mt-3"><label class="form-label">Note</label>
+                  <textarea class="form-control" rows="2" [(ngModel)]="selNote"></textarea></div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" [disabled]="selBusy" data-bs-dismiss="modal" (click)="doSelection()">Confirmer</button>
               </div>
             </div>
           </div>
