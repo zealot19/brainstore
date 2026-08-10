@@ -110,3 +110,58 @@ Permissions : `IsInstitutionAdmin` (comme les autres vues voyages).
 - Pas de séparation d'un bagage de son passager.
 - Pas de transbordement « voyage entier vers un autre voyage existant » : le remplacement se fait
   toujours par le bus ; seul le **surplus** va vers un voyage de bascule.
+
+---
+
+# Extension — Transbordement sélectif
+
+**Date :** 2026-08-10. Ajout au transbordement : une **action séparée** « Transborder une sélection »
+qui laisse l'agent choisir **quoi** déplacer (passagers / colis / bagages) et **lesquels** (donc la
+quantité), vers un **voyage existant** (même trajet) ou un **bus de remplacement** (nouveau voyage créé).
+Le remplacement de bus complet déjà livré reste inchangé.
+
+## Modèle — évolution de `Transbordement`
+- `kind` : `CharField` choix `bus` (remplacement complet) / `selection` (sélectif), défaut `bus`.
+- `to_vehicle` : devient **nullable** (`null=True, blank=True`) — une sélection vers un voyage existant ne change pas le bus source.
+- `destination_trip` : FK Trip nullable (`related_name="transbordements_destination"`) — cible d'une sélection.
+- `parcels_moved` : `PositiveIntegerField` défaut 0.
+Migration unique (altération).
+
+## Service — `apps/voyages_trips/services/transbordement.py`
+`transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids, dest_trip=None, dest_vehicle=None, user=None, note="")` — atomique :
+1. Source `trip.status` ∈ {`pending`,`departed`} sinon `ApplicationError`.
+2. Au moins un élément sélectionné, sinon `ApplicationError`.
+3. Destination : exactement l'un de `dest_trip` / `dest_vehicle`.
+   - `dest_trip` : même `route_id`, statut `draft`/`pending`, ≠ `trip`.
+   - `dest_vehicle` : éligible (`blocking_reasons`), plan actif ; on **crée** un nouveau voyage cloné
+     (`route`, `fare_class`, `origin`, `destination`, `scheduled_departure/arrival` du source ;
+     `vehicle=dest_vehicle` ; `seating_plan=active_seating_plan(...)` ; `status="pending"`), puis `materialise_seats`.
+4. Passagers : pour chaque `ticket_id` sélectionné (vendu/embarqué, sur `trip`), libérer le siège source
+   (→ `available`), attribuer un siège libre du voyage destination (→ `sold`), `ticket.trip = dest`,
+   `ticket.trip_seat = <siège dest>`. Erreur si places insuffisantes.
+5. Colis : `Parcel.trip = dest` pour chaque `parcel_id` (sur `trip`).
+6. Bagages : `Baggage.trip = dest` pour chaque `baggage_id` (sur `trip`).
+7. Trace `Transbordement(kind="selection", trip=source, destination_trip=dest, to_vehicle=dest.vehicle,
+   passengers_moved, parcels_moved, baggage_moved, note)`.
+8. Retour `{transbordement_id, destination_trip_id, passengers_moved, parcels_moved, baggage_moved}`.
+
+## Sélecteur — `selection_options(company, trip)`
+`{ tickets: [{id, seat, passenger_name}], parcels: [{id, reference, recipient_name}],
+   baggage: [{id, tag_number, owner_name}], dest_trips: [{id, number, code, free_seats}],
+   vehicles: [{id, license_plate, model_name, seats}] }`.
+
+## API (app `voyages_trips`)
+- `GET voyages/trips/<uuid:trip_id>/transbord/selection/options/` → `selection_options`.
+- `POST voyages/trips/<uuid:trip_id>/transbord/selection/` → corps
+  `{ ticket_ids[], parcel_ids[], baggage_ids[], dest_trip_id?, dest_vehicle_id?, note? }`.
+
+## Frontend
+- Détail voyage : bouton **« Transborder une sélection »** (statuts `pending`/`departed`), modale avec
+  3 listes cochables (passagers/colis/bagages) + choix destination (radio « Voyage existant » →
+  dropdown / « Bus de remplacement » → dropdown) + note. Après succès : recharge + historique.
+- `trip.service.ts` : `selectionOptions(id)`, `transbordSelection(id, body)`.
+
+## Vérification (ajouts)
+- Tests `transbord_selection` (`@pytest.mark.django_db`) : sélection partielle vers voyage existant
+  (passagers ré-attribués, colis/bagages déplacés, non cochés restés) ; sélection vers bus (nouveau
+  voyage créé) ; capacité insuffisante → `ApplicationError` ; aucune sélection → `ApplicationError`.
