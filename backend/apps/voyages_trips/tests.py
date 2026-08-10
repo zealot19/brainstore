@@ -148,3 +148,9 @@ def test_transbord_trip_rejects_non_transbordable_status():
     g["src"].save(update_fields=["status"])
     with pytest.raises(ApplicationError):
         transbord_trip(g["src"], None, user=None)
+
+
+def test_transbordement_selection_kind_defaults():
+    t = Transbordement(kind="selection")
+    assert t.kind == "selection"
+    assert t.parcels_moved == 0
