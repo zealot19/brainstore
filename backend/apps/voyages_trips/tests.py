@@ -154,3 +154,63 @@ def test_transbordement_selection_kind_defaults():
     t = Transbordement(kind="selection")
     assert t.kind == "selection"
     assert t.parcels_moved == 0
+
+
+def _parcel(company, src_trip, origin, dest_point):
+    from apps.voyages_config.models import ConsignmentNature, ConsignmentType
+    from apps.voyages_consignment.models import Parcel
+    nat = ConsignmentNature.objects.create(company=company, code="N", name="Nature")
+    typ = ConsignmentType.objects.create(company=company, code="T", label="Type", nature=nat)
+    return Parcel.objects.create(company=company, reference="COL-1", trip=src_trip,
+                                 origin_point=origin, destination_point=dest_point, consignment_type=typ,
+                                 sender_name="Exp", sender_phone="600", recipient_name="Dst", recipient_phone="601")
+
+
+@pytest.mark.django_db
+def test_transbord_selection_to_existing_trip():
+    from apps.voyages_trips.services.transbordement import transbord_selection
+    from apps.voyages_config.models import ServicePoint
+    g = _graph()
+    a = ServicePoint.objects.get(company=g["company"], code="A")
+    b = ServicePoint.objects.get(company=g["company"], code="B")
+    parcel = _parcel(g["company"], g["src"], a, b)
+    t0 = g["tickets"][0]
+    src_seat_id = t0.trip_seat_id
+    res = transbord_selection(g["src"], ticket_ids=[str(t0.id)], parcel_ids=[str(parcel.id)],
+                              baggage_ids=[str(g["baggage"].id)], dest_trip=g["dest"], user=None)
+    assert res["passengers_moved"] == 1 and res["parcels_moved"] == 1 and res["baggage_moved"] == 1
+    t0.refresh_from_db(); parcel.refresh_from_db(); g["baggage"].refresh_from_db()
+    assert t0.trip_id == g["dest"].id and t0.trip_seat.trip_id == g["dest"].id
+    assert parcel.trip_id == g["dest"].id and g["baggage"].trip_id == g["dest"].id
+    # non sélectionnés restés
+    assert g["tickets"][1].refresh_from_db() is None and g["tickets"][1].trip_id == g["src"].id
+    # siège source libéré
+    from apps.voyages_trips.models import TripSeat
+    assert TripSeat.objects.get(id=src_seat_id).status == "available"
+
+
+@pytest.mark.django_db
+def test_transbord_selection_empty_raises():
+    from apps.core.exceptions import ApplicationError
+    from apps.voyages_trips.services.transbordement import transbord_selection
+    g = _graph()
+    with pytest.raises(ApplicationError):
+        transbord_selection(g["src"], ticket_ids=[], parcel_ids=[], baggage_ids=[],
+                            dest_trip=g["dest"], user=None)
+
+
+@pytest.mark.django_db
+def test_transbord_selection_capacity_insufficient_raises():
+    from apps.core.exceptions import ApplicationError
+    from apps.voyages_trips.services.transbordement import transbord_selection
+    from apps.voyages_config.models import Route, FareClass, ServicePoint
+    g = g2 = _graph()
+    route = Route.objects.get(company=g["company"], code="A-B")
+    fc = FareClass.objects.get(company=g["company"], code="ECO")
+    a = ServicePoint.objects.get(company=g["company"], code="A")
+    b = ServicePoint.objects.get(company=g["company"], code="B")
+    small = _plan(g["company"], "ONE", 1)
+    dest1 = _trip(g["company"], route, fc, a, b, small)
+    with pytest.raises(ApplicationError):
+        transbord_selection(g["src"], ticket_ids=[str(g["tickets"][0].id), str(g["tickets"][1].id)],
+                            parcel_ids=[], baggage_ids=[], dest_trip=dest1, user=None)

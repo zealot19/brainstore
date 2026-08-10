@@ -116,7 +116,103 @@ def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note=""):
     trip.save(update_fields=["vehicle", "updated_by", "updated_at"])
 
     tb = Transbordement.objects.create(
-        company=trip.company, trip=trip, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
+        company=trip.company, kind="bus", trip=trip, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
         overflow_trip=overflow_trip, note=note or "", created_by=user, **counts)
     warnings = document_warnings(to_vehicle, before_date=trip.scheduled_arrival.date(), alert_days=30)
     return {"transbordement_id": str(tb.id), "warnings": warnings, **counts}
+
+
+def _clone_trip_for_vehicle(trip, vehicle, *, user):
+    """Crée un nouveau voyage (copié du source) desservi par `vehicle`, sièges matérialisés."""
+    from apps.voyages_trips.models import Trip
+    from apps.voyages_trips.selectors.eligibility import active_seating_plan
+    from apps.voyages_trips.services.assignment import materialise_seats
+    plan = active_seating_plan(vehicle, trip.scheduled_departure.date())
+    dest = Trip.objects.create(
+        company=trip.company, route=trip.route, fare_class=trip.fare_class,
+        origin=trip.origin, destination=trip.destination, vehicle=vehicle, seating_plan=plan,
+        scheduled_departure=trip.scheduled_departure, scheduled_arrival=trip.scheduled_arrival,
+        status="pending", created_by=user)
+    materialise_seats(dest)
+    return dest
+
+
+@transaction.atomic
+def transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids,
+                        dest_trip=None, dest_vehicle=None, user=None, note=""):
+    """Déplace une sélection (passagers/colis/bagages) vers un voyage existant ou un nouveau
+    voyage créé pour un bus de remplacement."""
+    from apps.voyages_trips.models import Transbordement, TripSeat
+    from apps.voyages_trips.selectors.eligibility import blocking_reasons, active_seating_plan
+    from apps.voyages_booking.models import Ticket
+    from apps.voyages_consignment.models import Parcel, Baggage
+
+    if trip.status not in ("pending", "departed"):
+        raise ApplicationError(_("Ce voyage ne peut pas être transbordé (statut invalide)."))
+
+    ticket_ids = [str(x) for x in (ticket_ids or [])]
+    parcel_ids = [str(x) for x in (parcel_ids or [])]
+    baggage_ids = [str(x) for x in (baggage_ids or [])]
+    if not (ticket_ids or parcel_ids or baggage_ids):
+        raise ApplicationError(_("Sélectionnez au moins un passager, un colis ou un bagage."))
+
+    if bool(dest_trip) == bool(dest_vehicle):
+        raise ApplicationError(_("Choisissez une seule destination : un voyage existant OU un bus."))
+
+    if dest_vehicle is not None:
+        reasons = blocking_reasons(dest_vehicle, window_start=trip.scheduled_departure,
+                                   window_end=trip.scheduled_arrival, exclude_trip=trip)
+        if reasons:
+            raise ApplicationError(" ".join(str(r) for r in reasons))
+        if active_seating_plan(dest_vehicle, trip.scheduled_departure.date()) is None:
+            raise ApplicationError(_("Aucun plan de bus actif pour ce véhicule."))
+        dest = _clone_trip_for_vehicle(trip, dest_vehicle, user=user)
+    else:
+        if dest_trip.id == trip.id or dest_trip.route_id != trip.route_id \
+                or dest_trip.status not in ("draft", "pending"):
+            raise ApplicationError(_("Voyage de destination invalide (même trajet, non parti)."))
+        dest = dest_trip
+
+    # Passagers
+    tickets = list(trip.tickets.filter(is_deleted=False, id__in=ticket_ids,
+                                       status__in=["sold", "boarded"]).select_related("trip_seat"))
+    dest_free = list(dest.seats.filter(status=TripSeat.Status.AVAILABLE).order_by("row", "column"))
+    if len(dest_free) < len(tickets):
+        raise ApplicationError(_("Le voyage de destination n'a pas assez de places."))
+    passengers_moved = 0
+    for tk, seat in zip(tickets, dest_free):
+        old = tk.trip_seat
+        if old is not None:
+            old.status = TripSeat.Status.AVAILABLE
+            old.save(update_fields=["status"])
+        tk.trip = dest
+        tk.trip_seat = seat
+        tk.updated_by = user
+        tk.save(update_fields=["trip", "trip_seat", "updated_by", "updated_at"])
+        seat.status = TripSeat.Status.SOLD
+        seat.save(update_fields=["status"])
+        passengers_moved += 1
+
+    # Colis
+    parcels_moved = 0
+    for p in Parcel.objects.filter(is_deleted=False, company=trip.company, trip=trip, id__in=parcel_ids):
+        p.trip = dest
+        p.updated_by = user
+        p.save(update_fields=["trip", "updated_by", "updated_at"])
+        parcels_moved += 1
+
+    # Bagages
+    baggage_moved = 0
+    for bg in Baggage.objects.filter(is_deleted=False, company=trip.company, trip=trip, id__in=baggage_ids):
+        bg.trip = dest
+        bg.updated_by = user
+        bg.save(update_fields=["trip", "updated_by", "updated_at"])
+        baggage_moved += 1
+
+    tb = Transbordement.objects.create(
+        company=trip.company, kind="selection", trip=trip, from_vehicle=trip.vehicle,
+        to_vehicle=dest.vehicle, destination_trip=dest, note=note or "", created_by=user,
+        passengers_moved=passengers_moved, parcels_moved=parcels_moved, baggage_moved=baggage_moved)
+    return {"transbordement_id": str(tb.id), "destination_trip_id": str(dest.id),
+            "passengers_moved": passengers_moved, "parcels_moved": parcels_moved,
+            "baggage_moved": baggage_moved}
