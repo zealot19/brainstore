@@ -894,3 +894,28 @@ git -C /Users/zealot/Desktop/brainstore/new_erp/ERP-master branch -d feature/tra
 **Placeholder scan :** aucun TBD/TODO ; code complet. Notes « vérifier import FormsModule / imports existants » = vérifications d'exécution légitimes.
 
 **Type consistency :** `apply_transbord(trip, new_plan, *, overflow_trip=None, user=None)` et `transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note="")` cohérents entre définition (Tasks 3-4), appel vue (Task 5) et tests. Dict de retour `{passengers_moved, passengers_overflow, baggage_moved}` identique service ↔ modèle (`**counts`) ↔ tests. Endpoints `transbordEligible/transbord/transbordHistory` cohérents api.config ↔ service ↔ vues ↔ urls. Champs UI (`tbVehicle`, `tbOverflowTrip`, `tbNeedsOverflow`, …) cohérents TS ↔ template.
+
+---
+
+# Partie 2 — Transbordement sélectif (Tasks 9-13)
+
+### Task 9: Évolution modèle `Transbordement` + migration
+- Modifier `models/transbordement.py` : `kind` (choix `bus`/`selection`, défaut `bus`), `to_vehicle` → `null=True, blank=True`, `destination_trip` (FK Trip null, `related_name="transbordements_destination"`), `parcels_moved` (PositiveInteger, défaut 0).
+- `makemigrations` + `migrate`. Test : `Transbordement(kind="selection").parcels_moved == 0`.
+
+### Task 10: Service `transbord_selection` + sélecteur `selection_options`
+- `transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids, dest_trip=None, dest_vehicle=None, user=None, note="")` (voir spec, atomique).
+- `selection_options(company, trip)` (voir spec).
+- Tests django_db : sélection partielle → voyage existant ; sélection → bus (nouveau voyage créé) ; capacité insuffisante ; sélection vide.
+
+### Task 11: API sélectif
+- `GET .../transbord/selection/options/`, `POST .../transbord/selection/` + urls.
+
+### Task 12: Frontend service + config
+- `VOYAGES.transbordSelectionOptions(id)`, `VOYAGES.transbordSelection(id)` ; `TripService.selectionOptions(id)`, `transbordSelection(id, body)`.
+
+### Task 13: Frontend UI (modale sélection)
+- Bouton « Transborder une sélection » + modale (3 listes cochables + destination radio voyage/bus + note).
+
+### Task 14: Vérif finale + fusion (remplace l'ancienne Task 8)
+- `manage.py check`, pytest complet voyages_trips, `ng build`, puis finishing-a-development-branch.
