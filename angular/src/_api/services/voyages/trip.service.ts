@@ -52,4 +52,18 @@ export class TripService {
     return this.http.post<any>(VOYAGES.transbord(id), body);
   }
   transbordHistory(id: string): Observable<any[]> { return this.http.get<any[]>(VOYAGES.transbordHistory(id)); }
+
+  selectionOptions(id: string): Observable<{
+    tickets: { id: string; seat: string; passenger_name: string }[];
+    parcels: { id: string; reference: string; recipient_name: string }[];
+    baggage: { id: string; tag_number: string; owner_name: string }[];
+    dest_trips: { id: string; number: string; code: string; free_seats: number }[];
+    vehicles: { id: string; license_plate: string; model_name: string; seats: number }[];
+  }> {
+    return this.http.get<any>(VOYAGES.transbordSelectionOptions(id));
+  }
+  transbordSelection(id: string, body: { ticket_ids: string[]; parcel_ids: string[]; baggage_ids: string[];
+                                         dest_trip_id?: string; dest_vehicle_id?: string; note?: string }): Observable<any> {
+    return this.http.post<any>(VOYAGES.transbordSelection(id), body);
+  }
 }
