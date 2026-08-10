@@ -23,4 +23,6 @@ urlpatterns = [
     path("<uuid:trip_id>/transbord/eligible/", v.TripTransbordEligibleView.as_view()),
     path("<uuid:trip_id>/transbord/", v.TripTransbordView.as_view()),
     path("<uuid:trip_id>/transbord/history/", v.TripTransbordHistoryView.as_view()),
+    path("<uuid:trip_id>/transbord/selection/options/", v.TripTransbordSelectionOptionsView.as_view()),
+    path("<uuid:trip_id>/transbord/selection/", v.TripTransbordSelectionView.as_view()),
 ]

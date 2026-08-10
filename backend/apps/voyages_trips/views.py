@@ -380,3 +380,55 @@ class TripTransbordHistoryView(APIView):
             "created_at": tb.created_at,
         } for tb in selectors.trip_transbordements(trip)]
         return success_response(rows)
+
+
+from apps.voyages_trips.services.transbordement import transbord_selection
+
+
+class TripTransbordSelectionOptionsView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def get(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        return success_response(selectors.selection_options(company, trip))
+
+
+class TripTransbordSelectionView(APIView):
+    permission_classes = [IsInstitutionAdmin]
+
+    def post(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        dest_trip = None
+        dest_vehicle = None
+        did = request.data.get("dest_trip_id")
+        vid = request.data.get("dest_vehicle_id")
+        if did:
+            dest_trip = selectors.get_trip(company, did)
+            if not dest_trip:
+                return error_response("Voyage de destination introuvable.", status_code=404)
+        elif vid:
+            from apps.fleet.models import Vehicle
+            dest_vehicle = Vehicle.objects.filter(id=vid, company=company, is_deleted=False).first()
+            if not dest_vehicle:
+                return error_response("Véhicule introuvable.", status_code=404)
+        try:
+            res = transbord_selection(
+                trip,
+                ticket_ids=request.data.get("ticket_ids", []),
+                parcel_ids=request.data.get("parcel_ids", []),
+                baggage_ids=request.data.get("baggage_ids", []),
+                dest_trip=dest_trip, dest_vehicle=dest_vehicle,
+                user=request.user, note=request.data.get("note", ""))
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(res)
