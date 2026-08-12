@@ -51,120 +51,12 @@ export class SidebarService {
 
   public sidebarData1 = [
     {
-      tittle: 'Main',
+      tittle: 'Général',
       showAsTab: false,
       separateRoute: false,
       hasSubRoute: false,
       showSubRoute: true,
       menu: [
-        // ── MODULE : Gestion Voyages ──────────────────────────────────────────
-        {
-          menuValue: 'Voyages',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'bus',
-          base: 'voyages',
-          subMenus: [
-            { menuValue: 'Voyages', route: routes.voyagesList, base: 'list' },
-          ],
-        },
-        // ── MODULE : Réservations Voyages ─────────────────────────────────────
-        {
-          menuValue: 'Réservations',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'ticket',
-          base: 'voyages-booking',
-          subMenus: [
-            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers'   },
-            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings'     },
-            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
-            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns' },
-          ],
-        },
-        // ── MODULE : Colis & Bagages ──────────────────────────────────────────
-        {
-          menuValue: 'Colis & Bagages',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'package',
-          base: 'voyages-consignment',
-          subMenus: [
-            { menuValue: 'Colis',            route: routes.vcgParcels,   base: 'parcels'   },
-            { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception' },
-            { menuValue: 'Manifeste voyage', route: routes.vcgManifest,  base: 'manifest'  },
-            { menuValue: 'Bagages',          route: routes.vcgBaggage,   base: 'baggage'   },
-          ],
-        },
-        // ── MODULE : Config Voyages ───────────────────────────────────────────
-        {
-          menuValue: 'Config Voyages',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'route',
-          base: 'voyages-config',
-          subMenus: [
-            { menuValue: 'Villes',              route: routes.vcTowns,              base: 'towns'                },
-            { menuValue: 'Points de service',   route: routes.vcServicePoints,      base: 'service-points'       },
-            { menuValue: 'Trajets',             route: routes.vcRoutes,             base: 'routes'               },
-            { menuValue: 'Plans de bus',        route: routes.vcSeatingPlans,       base: 'seating-plans'        },
-            { menuValue: 'Affectations de plan',route: routes.vcVehicleAssignments, base: 'vehicle-assignments'  },
-            { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes'         },
-            { menuValue: 'Plages horaires',     route: routes.vcTimeSlots,          base: 'time-slots'           },
-            { menuValue: 'Natures de colis',    route: routes.vcConsignmentNatures, base: 'consignment-natures'  },
-            { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types'    },
-            { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns'     },
-            { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules'        },
-            { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares'                },
-            { menuValue: 'Config billets',      route: routes.vcTicketTemplate,     base: 'ticket-template'      },
-            { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings'             },
-          ],
-        },
-        // ── MODULE 6 : Config Flotte ──────────────────────────────────────────
-        {
-          menuValue: 'Config Flotte',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'settings-cog',
-          base: 'fleet-config',
-          subMenus: [
-            { menuValue: 'Catégories véhicule', route: routes.fcVehicleCategories, base: 'vehicle-categories' },
-            { menuValue: 'Carburants',          route: routes.fcFuelTypes,         base: 'fuel-types'         },
-            { menuValue: 'Transmissions',       route: routes.fcTransmissions,     base: 'transmissions'      },
-            { menuValue: 'Tractions',           route: routes.fcTractionTypes,     base: 'traction-types'     },
-            { menuValue: "Catégories d'unité",  route: routes.fcUnitCategories,    base: 'unit-categories'    },
-            { menuValue: 'Unités',              route: routes.fcUnits,             base: 'units'              },
-            { menuValue: 'Périodes',            route: routes.fcPeriods,           base: 'periods'            },
-            { menuValue: 'Types de document',   route: routes.fcDocumentTypes,     base: 'document-types'     },
-            { menuValue: 'Étiquettes',          route: routes.fcTags,              base: 'tags'               },
-            { menuValue: "Types d'intervention",route: routes.fcInterventionTypes, base: 'intervention-types' },
-            { menuValue: "Secteurs d'activité", route: routes.fcActivitySectors,   base: 'activity-sectors'   },
-          ],
-        },
-        // ── MODULE 6 : Gestion Flotte ─────────────────────────────────────────
-        {
-          menuValue: 'Gestion Flotte',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'car',
-          base: 'fleet',
-          subMenus: [
-            { menuValue: 'Tableau de bord',    route: routes.fleetDashboard,         base: 'dashboard'          },
-            { menuValue: 'Véhicules',          route: routes.fleetVehicles,          base: 'vehicles'           },
-            { menuValue: 'Marques',            route: routes.fleetBrands,            base: 'brands'             },
-            { menuValue: 'Modèles',            route: routes.fleetModels,            base: 'models'             },
-            { menuValue: 'Conducteurs ext.',   route: routes.fleetExternalDrivers,   base: 'external-drivers'   },
-            { menuValue: 'Carburant',          route: routes.fleetFuelLogs,          base: 'fuel-logs'          },
-            { menuValue: 'Services',           route: routes.fleetServices,          base: 'services'           },
-            { menuValue: 'Contrats',           route: routes.fleetContracts,         base: 'contracts'          },
-            { menuValue: 'Documents',          route: routes.fleetDocuments,         base: 'documents'          },
-            { menuValue: 'Missions',           route: routes.fleetAssignments,       base: 'assignments'        },
-            { menuValue: 'Accidents',          route: routes.fleetAccidents,         base: 'accidents'          },
-            { menuValue: 'Parkings',           route: routes.fleetParking,           base: 'parking'            },
-            { menuValue: 'Fournisseurs',       route: routes.fleetSuppliers,         base: 'suppliers'          },
-          ],
-        },
-
         {
           menuValue: 'Dashboard',
           hasSubRoute: true,
@@ -188,159 +80,6 @@ export class SidebarService {
               route: routes.salesDashboard,
               base: 'sales-dashboard'
             }, */
-          ],
-        },
-        {
-          menuValue: 'Super Admin',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'user-edit',
-          base: 'super-admin',
-          role: 'super_admin',
-          subMenus: [
-            {
-              menuValue: 'Dashboard',
-              route: routes.superadminDashboard,
-              base: 'dashboard'
-            },
-            {
-              menuValue: 'Companies',
-              route: routes.superadminCompanies,
-              base: 'dashboard'
-            },
-            {
-              menuValue: 'Subscriptions',
-              route: routes.superadminSubscriptions,
-            },
-            {
-              menuValue: 'Packages',
-              route: routes.superadminPackages,
-            },
-            {
-              menuValue: 'Domain',
-              route: routes.superadminDomain,
-            },
-            {
-              menuValue: 'Purchase Transaction',
-              route: routes.purchaseTransaction,
-            },
-          ],
-        },
-        {
-          menuValue: 'Config Système',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'settings-2',
-          base: 'system-config',
-          subMenus: [
-            {
-              menuValue: 'Companies',
-              route: routes.superadminCompanies,
-              base: 'companies',
-            },
-            {
-              menuValue: 'Agences',
-              route: routes.superadminAgencies,
-              base: 'agencies',
-            },
-            {
-              menuValue: 'Packages',
-              route: routes.superadminPackages,
-              base: 'packages',
-            },
-            {
-              menuValue: 'Paramètres',
-              route: routes.systemParameters,
-              base: 'parameters',
-            },
-            {
-              menuValue: 'Feature Flags',
-              route: routes.systemFeatureFlags,
-              base: 'feature-flags',
-            },
-          ],
-        },
-        {
-          menuValue: 'Admin RBAC',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'shield-lock',
-          base: 'admin-rbac',
-          subMenus: [
-            {
-              menuValue: 'Rôles',
-              route: routes.rbacRoles,
-              base: 'roles',
-            },
-            {
-              menuValue: 'Profils',
-              route: routes.rbacProfiles,
-              base: 'profiles',
-            },
-          ],
-        },
-        {
-          menuValue: 'Utilisateurs',
-          hasSubRoute: false,
-          showSubRoute: false,
-          icon2: 'users',
-          route: routes.adminUsers,
-          base: 'users',
-          subMenus: [],
-        },
-        {
-          menuValue: 'Administration',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'shield-user',
-          base: 'admin',
-          role: 'institution_admin',
-          subMenus: [
-            {
-              menuValue: 'Utilisateurs',
-              route: routes.adminInstUsers,
-              base: 'users',
-            },
-            {
-              menuValue: 'Profils',
-              route: routes.adminInstProfiles,
-              base: 'profiles',
-            },
-            {
-              menuValue: 'Rôles',
-              route: routes.adminInstRoles,
-              base: 'roles',
-            },
-            {
-              menuValue: 'Journal d\'audit',
-              route: routes.adminInstAudit,
-              base: 'audit',
-            },
-          ],
-        },
-        // ── MODULE 5 : Sync SCIG / Sage 100 ─────────────────────────────────
-        {
-          menuValue: 'Sync SCIG',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'arrows-exchange',
-          base: 'scig',
-          subMenus: [
-            {
-              menuValue: 'Dépôts',
-              route: routes.scigDepots,
-              base: 'depots',
-            },
-            {
-              menuValue: 'Inventaires',
-              route: routes.scigInventaires,
-              base: 'inventaires',
-            },
-            {
-              menuValue: 'Configuration Sage',
-              route: routes.scigSage,
-              base: 'sage',
-            },
           ],
         },
         {
@@ -544,6 +283,286 @@ export class SidebarService {
             {
               menuValue: 'Dark',
               route: routes.Dark,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      tittle: 'Voyages',
+      showAsTab: false,
+      separateRoute: false,
+      hasSubRoute: false,
+      showSubRoute: true,
+      menu: [
+        {
+          menuValue: 'Voyages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'bus',
+          base: 'voyages',
+          subMenus: [
+            { menuValue: 'Voyages', route: routes.voyagesList, base: 'list' },
+          ],
+        },
+        {
+          menuValue: 'Réservations',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'ticket',
+          base: 'voyages-booking',
+          subMenus: [
+            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers'   },
+            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings'     },
+            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
+            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns' },
+          ],
+        },
+        {
+          menuValue: 'Colis & Bagages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'package',
+          base: 'voyages-consignment',
+          subMenus: [
+            { menuValue: 'Colis',            route: routes.vcgParcels,   base: 'parcels'   },
+            { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception' },
+            { menuValue: 'Manifeste voyage', route: routes.vcgManifest,  base: 'manifest'  },
+            { menuValue: 'Bagages',          route: routes.vcgBaggage,   base: 'baggage'   },
+          ],
+        },
+        {
+          menuValue: 'Config Voyages',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'route',
+          base: 'voyages-config',
+          subMenus: [
+            { menuValue: 'Villes',              route: routes.vcTowns,              base: 'towns'                },
+            { menuValue: 'Points de service',   route: routes.vcServicePoints,      base: 'service-points'       },
+            { menuValue: 'Trajets',             route: routes.vcRoutes,             base: 'routes'               },
+            { menuValue: 'Plans de bus',        route: routes.vcSeatingPlans,       base: 'seating-plans'        },
+            { menuValue: 'Affectations de plan',route: routes.vcVehicleAssignments, base: 'vehicle-assignments'  },
+            { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes'         },
+            { menuValue: 'Plages horaires',     route: routes.vcTimeSlots,          base: 'time-slots'           },
+            { menuValue: 'Natures de colis',    route: routes.vcConsignmentNatures, base: 'consignment-natures'  },
+            { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types'    },
+            { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns'     },
+            { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules'        },
+            { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares'                },
+            { menuValue: 'Config billets',      route: routes.vcTicketTemplate,     base: 'ticket-template'      },
+            { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings'             },
+          ],
+        },
+      ],
+    },
+    {
+      tittle: 'Flotte',
+      showAsTab: false,
+      separateRoute: false,
+      hasSubRoute: false,
+      showSubRoute: true,
+      menu: [
+        {
+          menuValue: 'Gestion Flotte',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'car',
+          base: 'fleet',
+          subMenus: [
+            { menuValue: 'Tableau de bord',    route: routes.fleetDashboard,         base: 'dashboard'          },
+            { menuValue: 'Véhicules',          route: routes.fleetVehicles,          base: 'vehicles'           },
+            { menuValue: 'Marques',            route: routes.fleetBrands,            base: 'brands'             },
+            { menuValue: 'Modèles',            route: routes.fleetModels,            base: 'models'             },
+            { menuValue: 'Conducteurs ext.',   route: routes.fleetExternalDrivers,   base: 'external-drivers'   },
+            { menuValue: 'Carburant',          route: routes.fleetFuelLogs,          base: 'fuel-logs'          },
+            { menuValue: 'Services',           route: routes.fleetServices,          base: 'services'           },
+            { menuValue: 'Contrats',           route: routes.fleetContracts,         base: 'contracts'          },
+            { menuValue: 'Documents',          route: routes.fleetDocuments,         base: 'documents'          },
+            { menuValue: 'Missions',           route: routes.fleetAssignments,       base: 'assignments'        },
+            { menuValue: 'Accidents',          route: routes.fleetAccidents,         base: 'accidents'          },
+            { menuValue: 'Parkings',           route: routes.fleetParking,           base: 'parking'            },
+            { menuValue: 'Fournisseurs',       route: routes.fleetSuppliers,         base: 'suppliers'          },
+          ],
+        },
+        {
+          menuValue: 'Config Flotte',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'fleet-config',
+          subMenus: [
+            { menuValue: 'Catégories véhicule', route: routes.fcVehicleCategories, base: 'vehicle-categories' },
+            { menuValue: 'Carburants',          route: routes.fcFuelTypes,         base: 'fuel-types'         },
+            { menuValue: 'Transmissions',       route: routes.fcTransmissions,     base: 'transmissions'      },
+            { menuValue: 'Tractions',           route: routes.fcTractionTypes,     base: 'traction-types'     },
+            { menuValue: "Catégories d'unité",  route: routes.fcUnitCategories,    base: 'unit-categories'    },
+            { menuValue: 'Unités',              route: routes.fcUnits,             base: 'units'              },
+            { menuValue: 'Périodes',            route: routes.fcPeriods,           base: 'periods'            },
+            { menuValue: 'Types de document',   route: routes.fcDocumentTypes,     base: 'document-types'     },
+            { menuValue: 'Étiquettes',          route: routes.fcTags,              base: 'tags'               },
+            { menuValue: "Types d'intervention",route: routes.fcInterventionTypes, base: 'intervention-types' },
+            { menuValue: "Secteurs d'activité", route: routes.fcActivitySectors,   base: 'activity-sectors'   },
+          ],
+        },
+      ],
+    },
+    {
+      tittle: 'Administration',
+      showAsTab: false,
+      separateRoute: false,
+      hasSubRoute: false,
+      showSubRoute: true,
+      menu: [
+        {
+          menuValue: 'Config Système',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-2',
+          base: 'system-config',
+          subMenus: [
+            {
+              menuValue: 'Companies',
+              route: routes.superadminCompanies,
+              base: 'companies',
+            },
+            {
+              menuValue: 'Agences',
+              route: routes.superadminAgencies,
+              base: 'agencies',
+            },
+            {
+              menuValue: 'Packages',
+              route: routes.superadminPackages,
+              base: 'packages',
+            },
+            {
+              menuValue: 'Paramètres',
+              route: routes.systemParameters,
+              base: 'parameters',
+            },
+            {
+              menuValue: 'Feature Flags',
+              route: routes.systemFeatureFlags,
+              base: 'feature-flags',
+            },
+          ],
+        },
+        {
+          menuValue: 'Admin RBAC',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'shield-lock',
+          base: 'admin-rbac',
+          subMenus: [
+            {
+              menuValue: 'Rôles',
+              route: routes.rbacRoles,
+              base: 'roles',
+            },
+            {
+              menuValue: 'Profils',
+              route: routes.rbacProfiles,
+              base: 'profiles',
+            },
+          ],
+        },
+        {
+          menuValue: 'Utilisateurs',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'users',
+          route: routes.adminUsers,
+          base: 'users',
+          subMenus: [],
+        },
+        {
+          menuValue: 'Administration',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'shield-user',
+          base: 'admin',
+          role: 'institution_admin',
+          subMenus: [
+            {
+              menuValue: 'Utilisateurs',
+              route: routes.adminInstUsers,
+              base: 'users',
+            },
+            {
+              menuValue: 'Profils',
+              route: routes.adminInstProfiles,
+              base: 'profiles',
+            },
+            {
+              menuValue: 'Rôles',
+              route: routes.adminInstRoles,
+              base: 'roles',
+            },
+            {
+              menuValue: 'Journal d\'audit',
+              route: routes.adminInstAudit,
+              base: 'audit',
+            },
+          ],
+        },
+        {
+          menuValue: 'Super Admin',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'user-edit',
+          base: 'super-admin',
+          role: 'super_admin',
+          subMenus: [
+            {
+              menuValue: 'Dashboard',
+              route: routes.superadminDashboard,
+              base: 'dashboard'
+            },
+            {
+              menuValue: 'Companies',
+              route: routes.superadminCompanies,
+              base: 'dashboard'
+            },
+            {
+              menuValue: 'Subscriptions',
+              route: routes.superadminSubscriptions,
+            },
+            {
+              menuValue: 'Packages',
+              route: routes.superadminPackages,
+            },
+            {
+              menuValue: 'Domain',
+              route: routes.superadminDomain,
+            },
+            {
+              menuValue: 'Purchase Transaction',
+              route: routes.purchaseTransaction,
+            },
+          ],
+        },
+        {
+          menuValue: 'Sync SCIG',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'arrows-exchange',
+          base: 'scig',
+          subMenus: [
+            {
+              menuValue: 'Dépôts',
+              route: routes.scigDepots,
+              base: 'depots',
+            },
+            {
+              menuValue: 'Inventaires',
+              route: routes.scigInventaires,
+              base: 'inventaires',
+            },
+            {
+              menuValue: 'Configuration Sage',
+              route: routes.scigSage,
+              base: 'sage',
             },
           ],
         },
