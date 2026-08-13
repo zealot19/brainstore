@@ -7,7 +7,7 @@
   <div class="card table-list-card">
     <div class="card-header d-flex align-items-center gap-2">
       <input type="text" class="form-control w-auto" placeholder="Référence, acheteur, téléphone…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
     </div>
     <div class="card-body p-0">
       @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
@@ -21,7 +21,7 @@
                 <td>{{ b.buyer_name }}</td>
                 <td>{{ b.tickets.length ? b.tickets[0].passenger_name : '' }} <span class="badge bg-light text-dark">{{ b.tickets.length }} billet(s)</span></td>
                 <td>{{ b.amount_paid | number:'1.0-0' }} XAF</td>
-                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-primary" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
+                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
               </tr>
             } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun retour ouvert à traiter.</td></tr> }
           </tbody>
@@ -35,7 +35,7 @@
   <div class="card"><div class="card-body">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Affecter le retour — {{ target.reference }} <small class="text-muted">({{ outboundTickets.length }} passager(s))</small></h5>
-      <button class="btn btn-light btn-sm" (click)="cancelPick()"><i class="ti ti-arrow-left me-1"></i>Retour à la liste</button>
+      <button class="btn btn-sm btn-light" (click)="cancelPick()"><i class="ti ti-arrow-left me-1"></i>Retour à la liste</button>
     </div>
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
