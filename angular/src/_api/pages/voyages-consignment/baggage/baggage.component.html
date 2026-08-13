@@ -32,15 +32,15 @@
       <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
       <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
       <input type="text" class="form-control w-auto" placeholder="Étiquette, passager, téléphone…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
-      <button class="btn btn-outline-secondary btn-sm" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-outline-info btn-sm" (click)="bulk('load')"><i class="ti ti-truck-loading me-1"></i>Charger</button>
-        <button class="btn btn-outline-success btn-sm" (click)="bulk('deliver')"><i class="ti ti-package-export me-1"></i>Retirer</button>
-        <button class="btn btn-outline-danger btn-sm" (click)="bulk('cancel')"><i class="ti ti-trash me-1"></i>Annuler</button>
+        <button class="btn btn-sm btn-info" (click)="bulk('load')"><i class="ti ti-truck-loading me-1"></i>Charger</button>
+        <button class="btn btn-sm btn-success" (click)="bulk('deliver')"><i class="ti ti-package-export me-1"></i>Retirer</button>
+        <button class="btn btn-sm btn-danger" (click)="bulk('cancel')"><i class="ti ti-trash me-1"></i>Annuler</button>
       </div>
     }
   </div>

@@ -6,12 +6,12 @@
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2">
       <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-outline-secondary btn-sm" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-success btn-sm" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
+        <button class="btn btn-sm btn-success" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
       </div>
     }
   </div>
