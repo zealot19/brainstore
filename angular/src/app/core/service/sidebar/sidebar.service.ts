@@ -480,7 +480,7 @@ export class SidebarService {
           menuValue: 'Administration',
           hasSubRoute: true,
           showSubRoute: false,
-          icon2: 'shield-user',
+          icon2: 'shield-check',
           base: 'admin',
           role: 'institution_admin',
           subMenus: [
