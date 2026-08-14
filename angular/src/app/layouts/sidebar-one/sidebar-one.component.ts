@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 
 import { NavigationEnd, NavigationStart, Router, Event as RouterEvent, RouterLink, RouterLinkActive } from '@angular/router';
 import { routes, SidebarService } from '../../core/core.index';
@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { ConnectedOverlayScrollHandler } from 'primeng/dom';
 import { AuthService } from '../../../_api/services/auth/auth.service';
+import { PermissionService } from '../../../_api/services/auth/permission.service';
+import { Subscription } from 'rxjs';
 
 
 interface MenuItem {
@@ -27,11 +29,12 @@ interface SubMenu {
     styleUrls: ['./sidebar-one.component.scss'],
     imports: [RouterLink,CommonModule,NgScrollbar,RouterLinkActive],
 })
-export class SidebarOneComponent {
+export class SidebarOneComponent implements OnDestroy {
   routes = routes;
   base = '';
   page = '';
   currentUrl = '';
+  private permSub?: Subscription;
 
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,6 +45,7 @@ export class SidebarOneComponent {
     private sidebar: SidebarService,
     private router: Router,
     private authService: AuthService,
+    private permissionService: PermissionService,
   ) {
     router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
@@ -50,6 +54,14 @@ export class SidebarOneComponent {
     });
     this.getRoutes(this.router);
     this.side_bar_data = this.buildMenuForUser();
+    // Reconstruire le menu quand les permissions arrivent (chargées en async après login).
+    this.permSub = this.permissionService.permissions$.subscribe(() => {
+      this.side_bar_data = this.buildMenuForUser();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.permSub?.unsubscribe();
   }
 
   private buildMenuForUser(): Array<any> {
@@ -57,13 +69,27 @@ export class SidebarOneComponent {
     const isSuperAdmin      = user?.is_superuser ?? false;
     const isInstitutionAdmin = user?.is_institution_admin ?? false;
 
+    const allowed = (p: string | string[] | undefined): boolean =>
+      !p || (Array.isArray(p) ? this.permissionService.hasAny(...p) : this.permissionService.has(p));
+
+    const roleOk = (item: any): boolean => {
+      if (item.role === 'institution_admin') return isInstitutionAdmin || isSuperAdmin;
+      if (item.role === 'super_admin')       return isSuperAdmin;
+      return true;
+    };
+
     return this.sidebar.sidebarData1.map((section: any) => ({
       ...section,
-      menu: section.menu.filter((item: any) => {
-        if (item.role === 'institution_admin') return isInstitutionAdmin || isSuperAdmin;
-        if (item.role === 'super_admin')       return isSuperAdmin;
-        return true;
-      }),
+      menu: section.menu
+        .filter((item: any) => roleOk(item) && allowed(item.permission))
+        .map((item: any) => {
+          if (item.hasSubRoute && Array.isArray(item.subMenus)) {
+            return { ...item, subMenus: item.subMenus.filter((s: any) => allowed(s.permission)) };
+          }
+          return item;
+        })
+        .filter((item: any) =>
+          !(item.hasSubRoute && Array.isArray(item.subMenus)) || item.subMenus.length > 0),
     }));
   }
 
