@@ -69,8 +69,11 @@ export class SidebarOneComponent implements OnDestroy {
     const isSuperAdmin      = user?.is_superuser ?? false;
     const isInstitutionAdmin = user?.is_institution_admin ?? false;
 
+    // Super-admin et admin d'institution voient tout (statut fiable via currentUser,
+    // indépendant du chargement async des permissions).
     const allowed = (p: string | string[] | undefined): boolean =>
-      !p || (Array.isArray(p) ? this.permissionService.hasAny(...p) : this.permissionService.has(p));
+      isSuperAdmin || isInstitutionAdmin || !p ||
+      (Array.isArray(p) ? this.permissionService.hasAny(...p) : this.permissionService.has(p));
 
     const roleOk = (item: any): boolean => {
       if (item.role === 'institution_admin') return isInstitutionAdmin || isSuperAdmin;
