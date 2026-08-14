@@ -6,7 +6,7 @@
         </div>
       </div>
       <div class="page-btn">
-        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-assignment-modal" (click)="openCreate()">
+        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-assignment-modal" *hasPermission="'fleet.assignment.manage'" (click)="openCreate()">
           <i class="ti ti-circle-plus"></i>Nouvelle mission
         </a>
       </div>
@@ -62,19 +62,19 @@
                 <td>{{ a.planned_return ? (a.planned_return | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
                 <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
                 <td>
-                  <a *ngIf="a.status === 'planned'" class="btn btn-sm btn-outline-warning me-1"
+                  <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'planned'" class="btn btn-sm btn-outline-warning me-1"
                      (click)="startAssignment(a.id)" title="Démarrer">
                     <i class="ti ti-player-play me-1"></i>Démarrer
-                  </a>
-                  <a *ngIf="a.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
+                  </a></ng-container>
+                  <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
                      (click)="completeAssignment(a.id)" title="Clôturer">
                     <i class="ti ti-check me-1"></i>Terminer
-                  </a>
-                  <a *ngIf="a.status === 'planned' || a.status === 'in_progress'"
+                  </a></ng-container>
+                  <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'planned' || a.status === 'in_progress'"
                      class="btn btn-sm btn-outline-danger me-1" (click)="cancelAssignment(a.id)" title="Annuler">
                     <i class="ti ti-x me-1"></i>Annuler
-                  </a>
-                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(a.id)" title="Supprimer">
+                  </a></ng-container>
+                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.assignment.manage'" (click)="delete(a.id)" title="Supprimer">
                     <i class="ti ti-trash me-1"></i>Supprimer
                   </a>
                 </td>

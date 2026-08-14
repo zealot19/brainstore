@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { FleetStats, FleetAlerts } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-dashboard',
   templateUrl: './dashboard.component.html',
-  imports: [CommonModule],
+  imports: [HasPermissionDirective, CommonModule],
 })
 export class FleetDashboardComponent implements OnInit {
 

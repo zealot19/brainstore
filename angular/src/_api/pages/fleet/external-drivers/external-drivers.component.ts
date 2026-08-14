@@ -5,11 +5,12 @@ import { ExternalDriverService } from '../../../services/fleet/external-driver.s
 import { ExternalDriver } from '../../../models/fleet.models';
 import { EmployeeService } from '../../../services/hr/employee.service';
 import { Employee } from '../../../models/hr.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-external-drivers',
   templateUrl: './external-drivers.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetExternalDriversComponent implements OnInit {
 

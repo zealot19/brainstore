@@ -5,11 +5,12 @@ import { AccidentService } from '../../../services/fleet/accident.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
 import { AccidentListItem, VehicleListItem, ExternalDriver } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-accidents',
   templateUrl: './accidents.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetAccidentsComponent implements OnInit {
 

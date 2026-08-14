@@ -8,11 +8,12 @@ import { FuelTypeService } from '../../../services/fleet-config/fuel-type.servic
 import { TransmissionService } from '../../../services/fleet-config/transmission.service';
 import { TractionTypeService } from '../../../services/fleet-config/traction-type.service';
 import { FuelType, Transmission, TractionType } from '../../../models/fleet-config.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-models',
   templateUrl: './models.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetModelsComponent implements OnInit {
 

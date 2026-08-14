@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VehicleBrandService } from '../../../services/fleet/vehicle-brand.service';
 import { VehicleBrand } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-brands',
   templateUrl: './brands.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetBrandsComponent implements OnInit {
 

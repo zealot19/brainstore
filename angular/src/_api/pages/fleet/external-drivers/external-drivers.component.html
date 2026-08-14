@@ -6,7 +6,7 @@
         </div>
       </div>
       <div class="page-btn">
-        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#driver-modal" (click)="openCreate()">
+        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#driver-modal" *hasPermission="'fleet.driver.manage'" (click)="openCreate()">
           <i class="ti ti-circle-plus"></i>Ajouter un conducteur
         </a>
       </div>
@@ -65,10 +65,10 @@
                   <span *ngIf="!d.license_expiry" class="text-muted">—</span>
                 </td>
                 <td>
-                  <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#driver-modal" (click)="openEdit(d)">
+                  <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#driver-modal" *hasPermission="'fleet.driver.manage'" (click)="openEdit(d)">
                     <i class="ti ti-edit me-1"></i>Modifier
                   </a>
-                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(d.id)">
+                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.driver.manage'" (click)="delete(d.id)">
                     <i class="ti ti-trash me-1"></i>Supprimer
                   </a>
                 </td>

@@ -6,7 +6,7 @@
         </div>
       </div>
       <div class="page-btn">
-        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-accident-modal" (click)="openCreate()">
+        <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-accident-modal" *hasPermission="'fleet.accident.manage'" (click)="openCreate()">
           <i class="ti ti-circle-plus"></i>Déclarer un accident
         </a>
       </div>
@@ -68,15 +68,15 @@
                 <td>{{ a.estimated_damage_cost ? (a.estimated_damage_cost | number:'1.0-0') : '—' }}</td>
                 <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
                 <td>
-                  <a *ngIf="a.status === 'open'" class="btn btn-sm btn-outline-warning me-1"
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'open'" class="btn btn-sm btn-outline-warning me-1"
                      (click)="setStatus(a.id, 'under_repair')" title="Mettre en réparation">
                     <i class="ti ti-tool me-1"></i>Réparation
-                  </a>
-                  <a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-success me-1"
+                  </a></ng-container>
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-success me-1"
                      data-bs-toggle="modal" data-bs-target="#close-accident-modal" (click)="openClose(a.id)" title="Clôturer">
                     <i class="ti ti-check me-1"></i>Terminer
-                  </a>
-                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(a.id)" title="Supprimer">
+                  </a></ng-container>
+                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.accident.manage'" (click)="delete(a.id)" title="Supprimer">
                     <i class="ti ti-trash me-1"></i>Supprimer
                   </a>
                 </td>

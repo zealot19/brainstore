@@ -4,7 +4,7 @@
     <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parking-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau parking</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parking-modal" *hasPermission="'fleet.parking.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau parking</a>
   </div>
 </div>
 
@@ -34,8 +34,8 @@
               <td class="fw-medium">{{ r.name }}</td>
               <td>{{ r.location || '—' }}</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#parking-modal" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
-                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
+                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#parking-modal" *hasPermission="'fleet.parking.manage'" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'fleet.parking.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
               </div></td>
             </tr>
           } @empty { <tr><td colspan="3" class="text-center py-4 text-muted">Aucun parking.</td></tr> }

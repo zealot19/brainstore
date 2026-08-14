@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="page-btn">
-    <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#contract-modal" (click)="openCreate()">
+    <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#contract-modal" *hasPermission="'fleet.contract.manage'" (click)="openCreate()">
       <i class="ti ti-circle-plus"></i>Nouveau contrat
     </a>
   </div>
@@ -64,10 +64,10 @@
             </td>
             <td><span class="badge" [class]="statusCss(c.status)">{{ statusLabel(c.status) }}</span></td>
             <td>
-              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#contract-modal" (click)="openEdit(c)" title="Modifier">
+              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#contract-modal" *hasPermission="'fleet.contract.manage'" (click)="openEdit(c)" title="Modifier">
                 <i class="ti ti-edit me-1"></i>Modifier
               </a>
-              <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(c.id)" title="Supprimer">
+              <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.contract.manage'" (click)="delete(c.id)" title="Supprimer">
                 <i class="ti ti-trash me-1"></i>Supprimer
               </a>
             </td>
@@ -136,7 +136,7 @@
               <div *ngIf="showNewSupplier" class="border rounded p-2">
                 <input type="text" class="form-control form-control-sm mb-1" placeholder="Nom du fournisseur *" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
                 <input type="text" class="form-control form-control-sm mb-1" placeholder="Téléphone" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
-                <button type="button" class="btn btn-sm btn-outline-primary w-100" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
+                <button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.supplier.manage'" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
               </div>
             </div>
             <div class="col-md-6">
@@ -214,7 +214,7 @@
                   <td>{{ rc.description }}</td>
                   <td>{{ rc.amount | number:'1.0-0' }} {{ rc.currency }}</td>
                   <td>{{ rc.period_name }}</td>
-                  <td><a class="text-danger" (click)="deleteCost(rc.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a></td>
+                  <td><a class="text-danger" *hasPermission="'fleet.recurring_cost.manage'" (click)="deleteCost(rc.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a></td>
                 </tr>
                 <tr *ngIf="costs.length === 0"><td colspan="4" class="text-muted">Aucune ligne.</td></tr>
               </tbody>
@@ -228,7 +228,7 @@
                   <option *ngFor="let p of periods" [value]="p.id">{{ p.name }}</option>
                 </select>
               </div>
-              <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" (click)="addCost()" [disabled]="costForm.invalid || savingCost">Ajouter</button></div>
+              <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.recurring_cost.manage'" (click)="addCost()" [disabled]="costForm.invalid || savingCost">Ajouter</button></div>
             </div>
           </div>
         </div>

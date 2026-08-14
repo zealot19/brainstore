@@ -8,11 +8,12 @@ import { ExternalDriverService } from '../../../services/fleet/external-driver.s
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { Service, ServiceAttachment, VehicleListItem, Supplier, ExternalDriver } from '../../../models/fleet.models';
 import { InterventionType } from '../../../models/fleet-config.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-services',
   templateUrl: './services.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetServicesComponent implements OnInit {
 

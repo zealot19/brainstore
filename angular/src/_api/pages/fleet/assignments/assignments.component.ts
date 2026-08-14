@@ -5,11 +5,12 @@ import { AssignmentService } from '../../../services/fleet/assignment.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
 import { AssignmentListItem, VehicleListItem, ExternalDriver } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-assignments',
   templateUrl: './assignments.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetAssignmentsComponent implements OnInit {
 

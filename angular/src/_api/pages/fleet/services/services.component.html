@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="page-btn">
-    <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#service-modal" (click)="openCreate()">
+    <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#service-modal" *hasPermission="'fleet.maintenance.manage'" (click)="openCreate()">
       <i class="ti ti-circle-plus"></i>Planifier une intervention
     </a>
   </div>
@@ -63,21 +63,21 @@
             <td>{{ o.planned_date | date:'dd/MM/yyyy' }}</td>
             <td>{{ o.cost ? (o.cost | number:'1.0-0') + ' ' + o.currency : '—' }}</td>
             <td>
-              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#service-modal" (click)="openEdit(o)" title="Modifier">
+              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#service-modal" *hasPermission="'fleet.maintenance.manage'" (click)="openEdit(o)" title="Modifier">
                 <i class="ti ti-edit me-1"></i>Modifier
               </a>
-              <a *ngIf="o.status === 'planned'" class="btn btn-sm btn-outline-warning me-1" (click)="startService(o.id)" title="Démarrer">
+              <ng-container *hasPermission="'fleet.maintenance.manage'"><a *ngIf="o.status === 'planned'" class="btn btn-sm btn-outline-warning me-1" (click)="startService(o.id)" title="Démarrer">
                 <i class="ti ti-player-play me-1"></i>Démarrer
-              </a>
-              <a *ngIf="o.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
+              </a></ng-container>
+              <ng-container *hasPermission="'fleet.maintenance.manage'"><a *ngIf="o.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
                  data-bs-toggle="modal" data-bs-target="#complete-service-modal" (click)="openComplete(o.id)" title="Terminer">
                 <i class="ti ti-check me-1"></i>Terminer
-              </a>
-              <a *ngIf="o.status === 'planned' || o.status === 'in_progress'"
+              </a></ng-container>
+              <ng-container *hasPermission="'fleet.maintenance.manage'"><a *ngIf="o.status === 'planned' || o.status === 'in_progress'"
                  class="btn btn-sm btn-outline-danger me-1" (click)="cancelService(o.id)" title="Annuler">
                 <i class="ti ti-x me-1"></i>Annuler
-              </a>
-              <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(o.id)" title="Supprimer">
+              </a></ng-container>
+              <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.maintenance.manage'" (click)="delete(o.id)" title="Supprimer">
                 <i class="ti ti-trash me-1"></i>Supprimer
               </a>
             </td>
@@ -139,7 +139,7 @@
               <div *ngIf="showNewSupplier" class="border rounded p-2">
                 <input type="text" class="form-control form-control-sm mb-1" placeholder="Nom du fournisseur *" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
                 <input type="text" class="form-control form-control-sm mb-1" placeholder="Téléphone" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
-                <button type="button" class="btn btn-sm btn-outline-primary w-100" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
+                <button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.supplier.manage'" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
               </div>
             </div>
             <div class="col-md-6">
@@ -165,7 +165,7 @@
             <ul class="list-group mb-2">
               <li *ngFor="let a of attachments" class="list-group-item d-flex justify-content-between align-items-center">
                 <a [href]="a.file" target="_blank"><i class="ti ti-paperclip"></i>{{ a.name }}</a>
-                <a class="text-danger" (click)="deleteAttachment(a.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
+                <a class="text-danger" *hasPermission="'fleet.maintenance.manage'" (click)="deleteAttachment(a.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
               </li>
               <li *ngIf="attachments.length === 0" class="list-group-item text-muted">Aucune pièce jointe.</li>
             </ul>

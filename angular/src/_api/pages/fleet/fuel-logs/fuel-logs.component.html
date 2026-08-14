@@ -7,7 +7,7 @@
       </div>
       <div class="page-btn">
         <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#fuel-log-modal"
-           (click)="openCreate()" [class.disabled]="!selectedVehicleId">
+           *hasPermission="'fleet.fuel.manage'" (click)="openCreate()" [class.disabled]="!selectedVehicleId">
           <i class="ti ti-circle-plus"></i>Ajouter un plein
         </a>
       </div>
@@ -78,10 +78,10 @@
                   </span>
                 </td>
                 <td>
-                  <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fuel-log-modal" (click)="openEdit(l)">
+                  <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fuel-log-modal" *hasPermission="'fleet.fuel.manage'" (click)="openEdit(l)">
                     <i class="ti ti-edit me-1"></i>Modifier
                   </a>
-                  <a class="btn btn-sm btn-outline-danger me-1" (click)="delete(l.id)">
+                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.fuel.manage'" (click)="delete(l.id)">
                     <i class="ti ti-trash me-1"></i>Supprimer
                   </a>
                 </td>

@@ -10,7 +10,7 @@
     <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-vehicle-modal" (click)="openCreate()">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-vehicle-modal" *hasPermission="'fleet.vehicle.create'" (click)="openCreate()">
       <i class="ti ti-circle-plus me-2"></i>Nouveau véhicule
     </a>
   </div>
@@ -135,20 +135,20 @@
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#odometer-modal"
-                       (click)="openOdometer(v)" title="Mettre à jour le kilométrage">
+                       *hasPermission="'fleet.vehicle.update'" (click)="openOdometer(v)" title="Mettre à jour le kilométrage">
                       <i class="ti ti-gauge"></i>
                     </a>
                     <!-- Edit -->
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#edit-vehicle-modal"
-                       (click)="openEdit(v)" title="Modifier">
+                       *hasPermission="'fleet.vehicle.update'" (click)="openEdit(v)" title="Modifier">
                       <i class="ti ti-edit me-1"></i>Modifier
                     </a>
                     <!-- Delete -->
                     <a href="javascript:void(0);"
                        class="p-2 d-flex align-items-center border rounded"
-                       (click)="delete(v.id)" title="Supprimer">
+                       *hasPermission="'fleet.vehicle.delete'" (click)="delete(v.id)" title="Supprimer">
                       <i class="ti ti-trash text-danger me-1"></i>Supprimer
                     </a>
                   </div>

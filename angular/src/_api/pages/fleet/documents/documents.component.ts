@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { VehicleDocumentService } from '../../../services/fleet/vehicle-document.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { VehicleDocument, VehicleListItem } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-documents',
   templateUrl: './documents.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetDocumentsComponent implements OnInit {
 

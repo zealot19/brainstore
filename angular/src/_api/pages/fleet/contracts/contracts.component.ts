@@ -11,11 +11,12 @@ import { EmployeeService } from '../../../services/hr/employee.service';
 import { Contract, RecurringCost, VehicleListItem, Supplier, ExternalDriver } from '../../../models/fleet.models';
 import { InterventionType, Period } from '../../../models/fleet-config.models';
 import { Employee } from '../../../models/hr.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fleet-contracts',
   templateUrl: './contracts.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetContractsComponent implements OnInit {
 
