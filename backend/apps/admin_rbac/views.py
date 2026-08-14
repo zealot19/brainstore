@@ -265,11 +265,15 @@ class RoleListView(APIView):
         payload = RoleWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
+        # Un admin d'institution ne crée que des rôles de SA société (isolation) ;
+        # seul un super-admin peut créer un rôle global (company=null) ou d'une autre société.
+        company_id = ((d["company"].id if d.get("company") else None)
+                      if request.user.is_superuser else request.user.company_id)
         try:
             role = services.create_role(
                 name=d["name"],
                 description=d.get("description", ""),
-                company_id=d["company"].id if d.get("company") else None,
+                company_id=company_id,
                 created_by=request.user,
             )
         except ApplicationError as e:
@@ -355,11 +359,14 @@ class ProfileListView(APIView):
         payload = ProfileWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
+        # Isolation : un admin d'institution ne crée que des profils de SA société.
+        company_id = ((d["company"].id if d.get("company") else None)
+                      if request.user.is_superuser else request.user.company_id)
         try:
             profile = services.create_profile(
                 name=d["name"],
                 description=d.get("description", ""),
-                company_id=d["company"].id if d.get("company") else None,
+                company_id=company_id,
                 is_default=d.get("is_default", False),
                 created_by=request.user,
             )

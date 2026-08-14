@@ -280,11 +280,19 @@ class AgencyListView(APIView):
         return success_response(AgencySerializer(agencies, many=True).data)
 
     def post(self, request):
-        payload = AgencyWriteSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        company_id = request.data.get("company") or _get_company_id(request)
+        # Résout la société AVANT validation : un admin d'institution est scopé à sa propre
+        # société (il n'a pas à envoyer 'company'), un super-admin peut la préciser. On injecte
+        # 'company' dans les données pour que le UniqueTogetherValidator (company, code) fonctionne.
+        if request.user.is_superuser:
+            company_id = request.data.get("company") or _get_company_id(request)
+        else:
+            company_id = getattr(request.user, "company_id", None) or _get_company_id(request)
         if not company_id:
             return error_response(_("company requis."), status_code=400)
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+        data["company"] = str(company_id)
+        payload = AgencyWriteSerializer(data=data)
+        payload.is_valid(raise_exception=True)
         try:
             agency = services.create_agency(
                 company_id=company_id,
