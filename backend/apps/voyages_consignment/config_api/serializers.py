@@ -96,21 +96,37 @@ class BaggageRead(serializers.ModelSerializer):
                   "created_at", "updated_at"]
 
 
-class _BlankAsNullMixin:
-    """Traite une chaîne vide comme None pour certains champs optionnels
-    (un <input type=date> vide ou un select non renseigné envoie "" et non null)."""
+class _EmptyNormalizeMixin:
+    """Normalise les valeurs vides envoyées par un formulaire Angular :
+    - `blank_null_fields` : "" -> None (ex. <input type=date> vide, select non renseigné) ;
+    - `null_blank_fields` : None -> "" (ex. form.reset() met les contrôles non listés à null,
+      or les CharField/ChoiceField refusent null)."""
     blank_null_fields = ()
+    null_blank_fields = ()
 
     def to_internal_value(self, data):
         if hasattr(data, "get"):
-            cleaned = {k: (None if (k in self.blank_null_fields and v == "") else v)
-                       for k, v in data.items()}
+            cleaned = {}
+            for k, v in data.items():
+                if k in self.blank_null_fields and v == "":
+                    v = None
+                elif k in self.null_blank_fields and v is None:
+                    v = ""
+                cleaned[k] = v
             data = cleaned
         return super().to_internal_value(data)
 
 
-class BaggageWrite(_BlankAsNullMixin, serializers.Serializer):
+# Rétro-compatibilité (l'ancien nom référencé ailleurs éventuellement)
+_BlankAsNullMixin = _EmptyNormalizeMixin
+
+_BAG_TEXT_FIELDS = ("sender_name", "sender_phone", "civility", "id_type",
+                    "id_number", "email", "description", "payment_method")
+
+
+class BaggageWrite(_EmptyNormalizeMixin, serializers.Serializer):
     blank_null_fields = ("birth_date", "ticket_id", "consignment_type_id")
+    null_blank_fields = _BAG_TEXT_FIELDS
     trip_id = serializers.UUIDField()
     ticket_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
@@ -135,8 +151,10 @@ class BaggageDeliverSerializer(serializers.Serializer):
     delivered_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
 
 
-class BaggageEditSerializer(_BlankAsNullMixin, serializers.Serializer):
+class BaggageEditSerializer(_EmptyNormalizeMixin, serializers.Serializer):
     blank_null_fields = ("birth_date",)
+    null_blank_fields = ("sender_name", "sender_phone", "civility", "id_type",
+                         "id_number", "email", "description", "notes")
     sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     sender_phone = serializers.CharField(max_length=30, required=False, allow_blank=True)
     civility = serializers.ChoiceField(choices=Baggage.Civility.choices, required=False, allow_blank=True)

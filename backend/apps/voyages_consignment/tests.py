@@ -72,3 +72,14 @@ def test_baggage_write_accepts_empty_optional_fields():
     assert s.validated_data["birth_date"] is None
     assert s.validated_data["ticket_id"] is None
     assert s.validated_data["consignment_type_id"] is None
+
+
+def test_baggage_write_accepts_null_optional_text_fields():
+    """form.reset() envoie null pour les champs non listés -> le serializer doit coercer null->''."""
+    from apps.voyages_consignment.config_api.serializers import BaggageWrite
+    data = {"trip_id": "00000000-0000-0000-0000-000000000001", "id_type": "cni",
+            "sender_name": None, "sender_phone": None, "civility": None,
+            "id_number": None, "email": None, "description": None}
+    s = BaggageWrite(data=data)
+    assert s.is_valid(), s.errors
+    assert s.validated_data["sender_name"] == "" and s.validated_data["civility"] == ""

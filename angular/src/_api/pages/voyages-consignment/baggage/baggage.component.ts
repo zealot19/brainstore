@@ -89,7 +89,15 @@ export class VcgBaggageComponent implements OnInit {
 
   openCreate(): void {
     this.editId = null; this.errorMsg = '';
-    this.form.reset({ id_type: 'cni', quantity: 1, declared_value: 1, amount_due: 0, payment_method: '' });
+    // Réinitialiser AVEC tous les champs : form.reset({partiel}) met les contrôles non listés
+    // à null, or les CharField du backend refusent null.
+    this.form.reset({
+      trip_id: null, ticket_id: null,
+      sender_name: '', sender_phone: '', civility: '', id_type: 'cni', id_number: '',
+      birth_date: null, email: '',
+      consignment_type_id: null, description: '', weight_kg: null, quantity: 1, declared_value: 1,
+      amount_due: 0, amount_received: null, payment_method: '',
+    });
     this.form.enable(); this.ticketOptions = [];
   }
   openEdit(b: Baggage): void {
