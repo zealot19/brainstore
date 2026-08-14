@@ -8,21 +8,39 @@ import { RoleService } from '../../../services/rbac/role.service';
 import { PermissionService } from '../../../services/rbac/permission.service';
 import { Role, Permission } from '../../../models/rbac.models';
 
-const CATEGORY_ORDER = ['view', 'create', 'update', 'delete', 'export', 'import', 'admin'];
-const CATEGORY_LABEL: Record<string, string> = {
-  view: 'Voir', create: 'Créer', update: 'Modifier',
-  delete: 'Supprimer', export: 'Exporter', import: 'Importer', admin: 'Admin',
+// Ordre et libellés des actions (générique, tous modules). Le dernier segment du
+// code `<module>.<resource>.<action>` fait foi (le champ `category` est peu fiable).
+const ACTION_ORDER = [
+  'view', 'create', 'update', 'delete', 'manage',
+  'export', 'import', 'print', 'scan', 'admin',
+];
+const ACTION_LABEL: Record<string, string> = {
+  view: 'Voir', create: 'Créer', update: 'Modifier', delete: 'Supprimer',
+  manage: 'Gérer', export: 'Exporter', import: 'Importer', admin: 'Admin',
+  print: 'Imprimer', scan: 'Scanner',
+  board: 'Embarquer', arrive: 'Arrivée', depart: 'Départ',
+  cancel: 'Annuler', confirm: 'Confirmer', noshow: 'No-show',
 };
-const CATEGORY_CLASS: Record<string, string> = {
+const ACTION_CLASS: Record<string, string> = {
   view: 'bg-outline-info', create: 'bg-outline-success', update: 'bg-outline-warning',
-  delete: 'bg-outline-danger', export: 'bg-outline-secondary', import: 'bg-outline-secondary', admin: 'bg-outline-dark',
+  delete: 'bg-outline-danger', manage: 'bg-outline-primary',
 };
 
-interface PermGroup {
+interface ResourceRow {
+  key: string;                         // segment ressource
+  label: string;                       // libellé lisible
+  actions: Record<string, Permission>; // action -> permission
+}
+interface ModuleGroup {
   moduleName: string;
-  order: number;
-  perms: Permission[];
+  columns: string[];                   // union ordonnée des actions du module
+  rows: ResourceRow[];
   expanded: boolean;
+}
+
+function prettify(seg: string): string {
+  const s = seg.replace(/[_-]+/g, ' ').trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
 }
 
 @Component({
@@ -32,9 +50,9 @@ interface PermGroup {
 })
 export class RolePermissionsComponent implements OnInit {
 
-  role:           Role | null  = null;
-  allGroups:      PermGroup[]  = [];
-  visibleGroups:  PermGroup[]  = [];
+  role:          Role | null   = null;
+  allGroups:     ModuleGroup[] = [];
+  visibleGroups: ModuleGroup[] = [];
   selectedPermIds = new Set<string>();
 
   search   = '';
@@ -68,97 +86,127 @@ export class RolePermissionsComponent implements OnInit {
     });
   }
 
+  // ── Construction hiérarchique Module → Ressource → Action ─────────────────────
+  private buildGroups(perms: Permission[]): ModuleGroup[] {
+    const modules = new Map<string, { rows: Map<string, ResourceRow>; actions: Set<string> }>();
+
+    for (const p of perms) {
+      const parts = p.code.split('.');
+      const action = parts[parts.length - 1];
+      const resKey = parts.length >= 3 ? parts.slice(1, -1).join('.') : '';
+      if (!modules.has(p.module_name)) modules.set(p.module_name, { rows: new Map(), actions: new Set() });
+      const mod = modules.get(p.module_name)!;
+      mod.actions.add(action);
+      if (!mod.rows.has(resKey))
+        mod.rows.set(resKey, { key: resKey, label: resKey ? prettify(resKey) : 'Général', actions: {} });
+      mod.rows.get(resKey)!.actions[action] = p;
+    }
+
+    const orderIdx = (a: string) => {
+      const i = ACTION_ORDER.indexOf(a);
+      return i === -1 ? ACTION_ORDER.length : i;
+    };
+
+    return [...modules.entries()]
+      .map(([moduleName, { rows, actions }]) => ({
+        moduleName,
+        columns: [...actions].sort((a, b) => orderIdx(a) - orderIdx(b) || a.localeCompare(b)),
+        rows: [...rows.values()].sort((a, b) => a.label.localeCompare(b.label)),
+        expanded: this.moduleHasSelection(rows),
+      }))
+      .sort((a, b) => a.moduleName.localeCompare(b.moduleName));
+  }
+
+  private moduleHasSelection(rows: Map<string, ResourceRow>): boolean {
+    for (const r of rows.values())
+      for (const p of Object.values(r.actions))
+        if (this.selectedPermIds.has(p.id)) return true;
+    return false;
+  }
+
+  // ── Recherche ─────────────────────────────────────────────────────────────────
   applySearch(): void {
     const q = this.search.toLowerCase().trim();
     this.visibleGroups = this.allGroups
-      .map(g => ({
-        ...g,
-        perms: q ? g.perms.filter(p =>
-          p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
-        ) : g.perms,
-        expanded: q ? true : g.expanded,
-      }))
-      .filter(g => g.perms.length > 0);
+      .map(g => {
+        const rows = q
+          ? g.rows.filter(r =>
+              r.label.toLowerCase().includes(q) ||
+              Object.values(r.actions).some(p =>
+                p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)))
+          : g.rows;
+        return { ...g, rows, expanded: q ? true : g.expanded };
+      })
+      .filter(g => g.rows.length > 0);
   }
 
-  toggleModule(group: PermGroup): void {
-    const src = this.allGroups.find(g => g.moduleName === group.moduleName)!;
-    src.expanded = !src.expanded;
-    this.applySearch();
-  }
-
-  toggleSelectAll(group: PermGroup): void {
-    const src = this.allGroups.find(g => g.moduleName === group.moduleName)!;
-    const allChecked = src.perms.every(p => this.selectedPermIds.has(p.id));
-    for (const p of src.perms) {
-      if (allChecked) this.selectedPermIds.delete(p.id);
-      else            this.selectedPermIds.add(p.id);
-    }
-  }
-
+  // ── Cellules ────────────────────────────────────────────────────────────────
+  permAt(row: ResourceRow, action: string): Permission | undefined { return row.actions[action]; }
+  isChecked(id: string): boolean { return this.selectedPermIds.has(id); }
   togglePerm(id: string): void {
     if (this.selectedPermIds.has(id)) this.selectedPermIds.delete(id);
     else this.selectedPermIds.add(id);
   }
 
-  selectedCount(group: PermGroup): number {
+  // ── Sélection par ressource (ligne) ──────────────────────────────────────────
+  private rowPerms(row: ResourceRow): Permission[] { return Object.values(row.actions); }
+  isResourceChecked(row: ResourceRow): boolean {
+    const ps = this.rowPerms(row);
+    return ps.length > 0 && ps.every(p => this.selectedPermIds.has(p.id));
+  }
+  isResourceIndeterminate(row: ResourceRow): boolean {
+    const ps = this.rowPerms(row);
+    const c = ps.filter(p => this.selectedPermIds.has(p.id)).length;
+    return c > 0 && c < ps.length;
+  }
+  toggleResource(row: ResourceRow): void {
+    const ps = this.rowPerms(row);
+    const all = ps.every(p => this.selectedPermIds.has(p.id));
+    for (const p of ps) all ? this.selectedPermIds.delete(p.id) : this.selectedPermIds.add(p.id);
+  }
+
+  // ── Sélection par module ─────────────────────────────────────────────────────
+  private modulePerms(group: ModuleGroup): Permission[] {
     const src = this.allGroups.find(g => g.moduleName === group.moduleName);
-    return src ? src.perms.filter(p => this.selectedPermIds.has(p.id)).length : 0;
+    return src ? src.rows.flatMap(r => Object.values(r.actions)) : [];
   }
-
-  totalCount(group: PermGroup): number {
-    const src = this.allGroups.find(g => g.moduleName === group.moduleName);
-    return src ? src.perms.length : 0;
+  selectedCount(group: ModuleGroup): number {
+    return this.modulePerms(group).filter(p => this.selectedPermIds.has(p.id)).length;
   }
-
-  isModuleChecked(group: PermGroup): boolean {
+  totalCount(group: ModuleGroup): number { return this.modulePerms(group).length; }
+  isModuleChecked(group: ModuleGroup): boolean {
+    const ps = this.modulePerms(group);
+    return ps.length > 0 && ps.every(p => this.selectedPermIds.has(p.id));
+  }
+  isModuleIndeterminate(group: ModuleGroup): boolean {
+    const c = this.selectedCount(group);
+    return c > 0 && c < this.totalCount(group);
+  }
+  toggleModuleAll(group: ModuleGroup): void {
+    const ps = this.modulePerms(group);
+    const all = ps.every(p => this.selectedPermIds.has(p.id));
+    for (const p of ps) all ? this.selectedPermIds.delete(p.id) : this.selectedPermIds.add(p.id);
+  }
+  toggleModule(group: ModuleGroup): void {
     const src = this.allGroups.find(g => g.moduleName === group.moduleName)!;
-    return src.perms.length > 0 && src.perms.every(p => this.selectedPermIds.has(p.id));
-  }
-
-  isModuleIndeterminate(group: PermGroup): boolean {
-    const src = this.allGroups.find(g => g.moduleName === group.moduleName)!;
-    const c = src.perms.filter(p => this.selectedPermIds.has(p.id)).length;
-    return c > 0 && c < src.perms.length;
+    src.expanded = !src.expanded;
+    this.applySearch();
   }
 
   get totalSelected(): number { return this.selectedPermIds.size; }
 
+  actionLabel(a: string): string { return ACTION_LABEL[a] ?? prettify(a); }
+  actionClass(a: string):  string { return ACTION_CLASS[a] ?? 'bg-outline-secondary'; }
+
+  // ── Enregistrement ────────────────────────────────────────────────────────────
   save(): void {
     if (!this.role || this.saving) return;
-    this.saving   = true;
-    this.saved    = false;
-    this.errorMsg = '';
+    this.saving = true; this.saved = false; this.errorMsg = '';
     this.roleService.setPermissions(this.role.id, [...this.selectedPermIds]).subscribe({
-      next: () => {
-        this.saving = false;
-        this.saved  = true;
-        setTimeout(() => this.saved = false, 3000);
-      },
+      next: () => { this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 3000); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }
 
   back(): void { this.location.back(); }
-
-  categoryLabel(cat: string): string { return CATEGORY_LABEL[cat] ?? cat; }
-  categoryClass(cat: string):  string { return CATEGORY_CLASS[cat]  ?? 'bg-outline-secondary'; }
-
-  private buildGroups(perms: Permission[]): PermGroup[] {
-    const map = new Map<string, { perms: Permission[]; order: number }>();
-    for (const p of perms) {
-      if (!map.has(p.module_name)) map.set(p.module_name, { perms: [], order: 0 });
-      map.get(p.module_name)!.perms.push(p);
-    }
-    return [...map.entries()]
-      .map(([moduleName, { perms, order }]) => ({
-        moduleName,
-        order,
-        expanded: perms.some(p => this.selectedPermIds.has(p.id)),
-        perms: [...perms].sort((a, b) =>
-          CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category)
-        ),
-      }))
-      .sort((a, b) => a.moduleName.localeCompare(b.moduleName));
-  }
 }

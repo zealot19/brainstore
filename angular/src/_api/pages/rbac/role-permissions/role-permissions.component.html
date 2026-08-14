@@ -35,7 +35,7 @@
         <i class="ti ti-search position-absolute" style="left:10px;top:50%;transform:translateY(-50%);color:#999"></i>
         <input type="search" class="form-control ps-4"
                [(ngModel)]="search" (ngModelChange)="applySearch()"
-               placeholder="Rechercher une permission par nom ou code…" />
+               placeholder="Rechercher une permission par nom, ressource ou code…" />
       </div>
       <span class="text-muted text-nowrap fs-13">
         <strong class="text-primary">{{ totalSelected }}</strong> permission{{ totalSelected !== 1 ? 's' : '' }} sélectionnée{{ totalSelected !== 1 ? 's' : '' }}
@@ -43,58 +43,77 @@
     </div>
   </div>
 
-  <!-- Accordion par module -->
   @if (visibleGroups.length === 0) {
     <div class="card"><div class="card-body text-center text-muted py-5">Aucune permission trouvée.</div></div>
   } @else {
-    <div class="accordion" id="perms-accordion">
-      @for (group of visibleGroups; track group.moduleName) {
-        <div class="card mb-2 border">
-          <!-- En-tête module -->
-          <div class="card-header d-flex align-items-center gap-3 py-2 cursor-pointer"
-               (click)="toggleModule(group)">
-            <input type="checkbox" class="form-check-input flex-shrink-0"
-                   [checked]="isModuleChecked(group)"
-                   [indeterminate]="isModuleIndeterminate(group)"
-                   (click)="$event.stopPropagation()"
-                   (change)="toggleSelectAll(group)">
-            <div class="flex-fill d-flex align-items-center gap-2">
-              <span class="fw-bold text-uppercase fs-12">{{ group.moduleName }}</span>
-              <span class="badge"
-                    [ngClass]="selectedCount(group) > 0 ? 'bg-primary' : 'bg-outline-secondary'">
-                {{ selectedCount(group) }}/{{ totalCount(group) }}
-              </span>
-            </div>
-            <i class="ti" [ngClass]="group.expanded ? 'ti-chevron-up' : 'ti-chevron-down'" style="color:#999"></i>
+    <!-- Un bloc par module -->
+    @for (group of visibleGroups; track group.moduleName) {
+      <div class="card mb-2 border">
+        <!-- En-tête module -->
+        <div class="card-header d-flex align-items-center gap-3 py-2 cursor-pointer"
+             (click)="toggleModule(group)">
+          <input type="checkbox" class="form-check-input flex-shrink-0"
+                 [checked]="isModuleChecked(group)"
+                 [indeterminate]="isModuleIndeterminate(group)"
+                 (click)="$event.stopPropagation()"
+                 (change)="toggleModuleAll(group)">
+          <div class="flex-fill d-flex align-items-center gap-2">
+            <span class="fw-bold text-uppercase fs-12">{{ group.moduleName }}</span>
+            <span class="badge" [ngClass]="selectedCount(group) > 0 ? 'bg-primary' : 'bg-outline-secondary'">
+              {{ selectedCount(group) }}/{{ totalCount(group) }}
+            </span>
           </div>
-
-          <!-- Permissions du module -->
-          @if (group.expanded) {
-            <div class="card-body pt-2 pb-3">
-              <div class="row g-2">
-                @for (p of group.perms; track p.id) {
-                  <div class="col-xl-4 col-md-6">
-                    <label class="d-flex align-items-start gap-2 p-2 rounded border cursor-pointer"
-                           [ngClass]="selectedPermIds.has(p.id) ? 'border-primary bg-primary-transparent' : ''">
-                      <input type="checkbox" class="form-check-input mt-1 flex-shrink-0"
-                             [checked]="selectedPermIds.has(p.id)"
-                             (change)="togglePerm(p.id)">
-                      <div class="min-w-0">
-                        <div class="d-flex align-items-center gap-1 flex-wrap">
-                          <span class="fw-medium fs-14">{{ p.name }}</span>
-                          <span class="badge badge-sm" [ngClass]="categoryClass(p.category)">{{ categoryLabel(p.category) }}</span>
-                        </div>
-                        <div class="text-muted font-monospace fs-11 text-truncate">{{ p.code }}</div>
-                      </div>
-                    </label>
-                  </div>
-                }
-              </div>
-            </div>
-          }
+          <i class="ti" [ngClass]="group.expanded ? 'ti-chevron-up' : 'ti-chevron-down'" style="color:#999"></i>
         </div>
-      }
-    </div>
+
+        <!-- Grille ressources × actions -->
+        @if (group.expanded) {
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0 perm-grid">
+                <thead class="thead-light">
+                  <tr>
+                    <th style="min-width:180px">Ressource</th>
+                    @for (col of group.columns; track col) {
+                      <th class="text-center">
+                        <span class="badge badge-sm" [ngClass]="actionClass(col)">{{ actionLabel(col) }}</span>
+                      </th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of group.rows; track row.key) {
+                    <tr>
+                      <td>
+                        <label class="d-flex align-items-center gap-2 mb-0 cursor-pointer">
+                          <input type="checkbox" class="form-check-input flex-shrink-0"
+                                 [checked]="isResourceChecked(row)"
+                                 [indeterminate]="isResourceIndeterminate(row)"
+                                 (change)="toggleResource(row)">
+                          <span class="fw-medium fs-14">{{ row.label }}</span>
+                        </label>
+                      </td>
+                      @for (col of group.columns; track col) {
+                        <td class="text-center">
+                          @if (permAt(row, col); as perm) {
+                            <input type="checkbox" class="form-check-input"
+                                   [checked]="isChecked(perm.id)"
+                                   (change)="togglePerm(perm.id)"
+                                   [title]="perm.name + ' — ' + perm.code">
+                          } @else {
+                            <span class="text-muted">—</span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
     <!-- Bouton bas de page -->
     <div class="d-flex justify-content-end mt-3 mb-4">
