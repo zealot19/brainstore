@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
-from apps.core.permissions import IsInstitutionAdmin, IsSuperAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsSuperAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -80,7 +80,8 @@ def _cfg(model_cls, cid, company_id):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleBrandListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.brand.view', 'POST': 'fleet.brand.manage'}
 
     def get(self, request):
         brands = selectors.list_vehicle_brands(search=request.query_params.get("search"))
@@ -104,7 +105,8 @@ class VehicleBrandListView(APIView):
 
 
 class VehicleBrandDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.brand.view', 'PATCH': 'fleet.brand.manage', 'PUT': 'fleet.brand.manage', 'DELETE': 'fleet.brand.manage'}
 
     def get(self, request, brand_id):
         brand = selectors.get_vehicle_brand(brand_id)
@@ -140,7 +142,8 @@ class VehicleBrandDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleModelListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.model.view', 'POST': 'fleet.model.manage'}
 
     def get(self, request):
         models = selectors.list_vehicle_models(
@@ -177,7 +180,8 @@ class VehicleModelListView(APIView):
 
 
 class VehicleModelDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.model.view', 'PATCH': 'fleet.model.manage', 'PUT': 'fleet.model.manage', 'DELETE': 'fleet.model.manage'}
 
     def get(self, request, model_id):
         model = selectors.get_vehicle_model(model_id)
@@ -225,7 +229,8 @@ class VehicleModelDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class ExternalDriverListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.driver.view', 'POST': 'fleet.driver.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -252,7 +257,8 @@ class ExternalDriverListView(APIView):
 
 
 class ExternalDriverDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.driver.view', 'PATCH': 'fleet.driver.manage', 'PUT': 'fleet.driver.manage', 'DELETE': 'fleet.driver.manage'}
 
     def _get(self, request, driver_id):
         company_id = _scope_company_id(request)
@@ -292,7 +298,8 @@ class ExternalDriverDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.vehicle.view', 'POST': 'fleet.vehicle.create'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -352,7 +359,8 @@ class VehicleListView(APIView):
 
 
 class VehicleDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.vehicle.view', 'PATCH': 'fleet.vehicle.update', 'PUT': 'fleet.vehicle.update', 'DELETE': 'fleet.vehicle.delete'}
 
     def _get_vehicle(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -394,7 +402,8 @@ class VehicleDetailView(APIView):
 
 
 class ParkingListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.parking.view', 'POST': 'fleet.parking.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -414,7 +423,8 @@ class ParkingListView(APIView):
 
 
 class ParkingDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.parking.view', 'PATCH': 'fleet.parking.manage', 'PUT': 'fleet.parking.manage', 'DELETE': 'fleet.parking.manage'}
 
     def _get(self, request, parking_id):
         return selectors.get_parking(parking_id, _scope_company_id(request))
@@ -441,7 +451,8 @@ class ParkingDetailView(APIView):
 
 
 class SupplierListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.supplier.view', 'POST': 'fleet.supplier.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -464,7 +475,8 @@ class SupplierListView(APIView):
 
 
 class SupplierDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.supplier.view', 'PATCH': 'fleet.supplier.manage', 'PUT': 'fleet.supplier.manage', 'DELETE': 'fleet.supplier.manage'}
 
     def _get(self, request, supplier_id):
         return selectors.get_supplier(supplier_id, _scope_company_id(request))
@@ -494,7 +506,8 @@ class SupplierDetailView(APIView):
 
 
 class VehicleOdometerView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.vehicle.view', 'POST': 'fleet.vehicle.update'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -524,7 +537,8 @@ class VehicleOdometerView(APIView):
 
 
 class VehicleStatsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.vehicle.view'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -535,7 +549,8 @@ class VehicleStatsView(APIView):
 
 
 class FleetAlertsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.dashboard.view'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -554,7 +569,8 @@ class FleetAlertsView(APIView):
 
 
 class FleetStatsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.dashboard.view'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -568,7 +584,8 @@ class FleetStatsView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleFuelLogListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.fuel.view', 'POST': 'fleet.fuel.manage'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -595,7 +612,8 @@ class VehicleFuelLogListView(APIView):
 
 
 class FuelLogDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.fuel.view', 'PATCH': 'fleet.fuel.manage', 'PUT': 'fleet.fuel.manage', 'DELETE': 'fleet.fuel.manage'}
 
     def _get_log(self, request, log_id):
         company_id = _scope_company_id(request)
@@ -629,7 +647,8 @@ class FuelLogDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class ServiceListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.maintenance.view', 'POST': 'fleet.maintenance.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -682,7 +701,8 @@ class ServiceListView(APIView):
 
 
 class VehicleServiceListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.maintenance.view'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -697,7 +717,8 @@ class VehicleServiceListView(APIView):
 
 
 class ServiceDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.maintenance.view', 'PATCH': 'fleet.maintenance.manage', 'PUT': 'fleet.maintenance.manage', 'DELETE': 'fleet.maintenance.manage'}
 
     def _get(self, request, service_id):
         company_id = _scope_company_id(request)
@@ -746,7 +767,8 @@ class ServiceDetailView(APIView):
 
 
 class ServiceStartView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.maintenance.manage'}
 
     def post(self, request, service_id):
         company_id = _scope_company_id(request)
@@ -761,7 +783,8 @@ class ServiceStartView(APIView):
 
 
 class ServiceCompleteView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.maintenance.manage'}
 
     def post(self, request, service_id):
         company_id = _scope_company_id(request)
@@ -778,7 +801,8 @@ class ServiceCompleteView(APIView):
 
 
 class ServiceCancelView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.maintenance.manage'}
 
     def post(self, request, service_id):
         company_id = _scope_company_id(request)
@@ -793,7 +817,8 @@ class ServiceCancelView(APIView):
 
 
 class ServiceAttachmentListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.maintenance.view', 'POST': 'fleet.maintenance.manage'}
 
     def get(self, request, service_id):
         company_id = _scope_company_id(request)
@@ -821,7 +846,8 @@ class ServiceAttachmentListView(APIView):
 
 
 class ServiceAttachmentDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.maintenance.view', 'DELETE': 'fleet.maintenance.manage'}
 
     def delete(self, request, service_id, att_id):
         company_id = _scope_company_id(request)
@@ -856,7 +882,8 @@ def _get_intervention_type(type_id, company_id):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleContractListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.contract.view'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -892,7 +919,8 @@ def _resolve_contract_fks(d, company_id):
 
 
 class ContractListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.contract.view', 'POST': 'fleet.contract.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -932,7 +960,8 @@ class ContractListView(APIView):
 
 
 class ContractDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.contract.view', 'PATCH': 'fleet.contract.manage', 'PUT': 'fleet.contract.manage', 'DELETE': 'fleet.contract.manage'}
 
     def _get(self, request, contract_id):
         company_id = _scope_company_id(request)
@@ -975,7 +1004,8 @@ class ContractDetailView(APIView):
 
 
 class RecurringCostListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.recurring_cost.view', 'POST': 'fleet.recurring_cost.manage'}
 
     def get(self, request, contract_id):
         company_id = _scope_company_id(request)
@@ -1004,7 +1034,8 @@ class RecurringCostListView(APIView):
 
 
 class RecurringCostDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.recurring_cost.view', 'PATCH': 'fleet.recurring_cost.manage', 'PUT': 'fleet.recurring_cost.manage', 'DELETE': 'fleet.recurring_cost.manage'}
 
     def _get(self, contract_id, rc_id, company_id):
         contract = selectors.get_contract(contract_id, company_id)
@@ -1064,7 +1095,8 @@ def _get_employee(employee_id, company_id):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class VehicleDocumentListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.document.view', 'POST': 'fleet.document.manage'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -1088,7 +1120,8 @@ class VehicleDocumentListView(APIView):
 
 
 class VehicleDocumentDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.document.view', 'PATCH': 'fleet.document.manage', 'PUT': 'fleet.document.manage', 'DELETE': 'fleet.document.manage'}
 
     def _get(self, request, doc_id):
         company_id = _scope_company_id(request)
@@ -1128,7 +1161,8 @@ class VehicleDocumentDetailView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class AssignmentListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.assignment.view', 'POST': 'fleet.assignment.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -1176,7 +1210,8 @@ class AssignmentListView(APIView):
 
 
 class AssignmentDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.assignment.view', 'PATCH': 'fleet.assignment.manage', 'PUT': 'fleet.assignment.manage', 'DELETE': 'fleet.assignment.manage'}
 
     def _get(self, request, assignment_id):
         company_id = _scope_company_id(request)
@@ -1212,7 +1247,8 @@ class AssignmentDetailView(APIView):
 
 
 class AssignmentStartView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.assignment.manage'}
 
     def post(self, request, assignment_id):
         company_id = _scope_company_id(request)
@@ -1233,7 +1269,8 @@ class AssignmentStartView(APIView):
 
 
 class AssignmentCompleteView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.assignment.manage'}
 
     def post(self, request, assignment_id):
         company_id = _scope_company_id(request)
@@ -1255,7 +1292,8 @@ class AssignmentCompleteView(APIView):
 
 
 class AssignmentCancelView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.assignment.manage'}
 
     def post(self, request, assignment_id):
         company_id = _scope_company_id(request)
@@ -1271,7 +1309,8 @@ class AssignmentCancelView(APIView):
 
 class VehicleAssignmentListView(APIView):
     """Liste des missions d'un véhicule spécifique."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.assignment.view'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
@@ -1290,7 +1329,8 @@ class VehicleAssignmentListView(APIView):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class AccidentListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.accident.view', 'POST': 'fleet.accident.manage'}
 
     def get(self, request):
         company_id = _scope_company_id(request)
@@ -1328,7 +1368,8 @@ class AccidentListView(APIView):
 
 
 class AccidentDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.accident.view', 'PATCH': 'fleet.accident.manage', 'PUT': 'fleet.accident.manage', 'DELETE': 'fleet.accident.manage'}
 
     def _get(self, request, accident_id):
         company_id = _scope_company_id(request)
@@ -1361,7 +1402,8 @@ class AccidentDetailView(APIView):
 
 
 class AccidentCloseView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.accident.manage'}
 
     def post(self, request, accident_id):
         company_id = _scope_company_id(request)
@@ -1384,7 +1426,8 @@ class AccidentCloseView(APIView):
 
 
 class AccidentStatusView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'fleet.accident.manage', 'PATCH': 'fleet.accident.manage'}
 
     def post(self, request, accident_id):
         company_id = _scope_company_id(request)
@@ -1404,7 +1447,8 @@ class AccidentStatusView(APIView):
 
 class VehicleAccidentListView(APIView):
     """Liste des accidents d'un véhicule spécifique."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'fleet.accident.view'}
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
