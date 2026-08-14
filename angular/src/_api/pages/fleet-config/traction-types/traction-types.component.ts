@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { TractionTypeService } from '../../../services/fleet-config/traction-type.service';
 import { TractionType } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-traction-types',
   templateUrl: './traction-types.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcTractionTypesComponent implements OnInit {
   rows: TractionType[] = []; filtered: TractionType[] = []; loading = true; search = '';

@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { TagService } from '../../../services/fleet-config/tag.service';
 import { Tag } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-tags',
   templateUrl: './tags.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcTagsComponent implements OnInit {
   rows: Tag[] = []; filtered: Tag[] = []; loading = true; search = ''; selected = new Set<string>();

@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { UnitCategoryService } from '../../../services/fleet-config/unit-category.service';
 import { UnitCategory } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-unit-categories',
   templateUrl: './unit-categories.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcUnitCategoriesComponent implements OnInit {
   rows: UnitCategory[] = []; filtered: UnitCategory[] = []; loading = true; search = '';

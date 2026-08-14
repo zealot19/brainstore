@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ActivitySectorService } from '../../../services/fleet-config/activity-sector.service';
 import { ActivitySector } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-activity-sectors',
   templateUrl: './activity-sectors.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcActivitySectorsComponent implements OnInit {
   rows: ActivitySector[] = []; filtered: ActivitySector[] = []; loading = true; search = ''; selected = new Set<string>();

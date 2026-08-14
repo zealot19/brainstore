@@ -5,11 +5,12 @@ import { UnitService } from '../../../services/fleet-config/unit.service';
 import { UnitCategoryService } from '../../../services/fleet-config/unit-category.service';
 import { Unit, UnitCategory } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-units',
   templateUrl: './units.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcUnitsComponent implements OnInit {
   rows: Unit[] = []; filtered: Unit[] = []; categories: UnitCategory[] = [];

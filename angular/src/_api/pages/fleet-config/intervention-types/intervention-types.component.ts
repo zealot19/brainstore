@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { InterventionTypeService } from '../../../services/fleet-config/intervention-type.service';
 import { InterventionType } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-intervention-types',
   templateUrl: './intervention-types.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcInterventionTypesComponent implements OnInit {
   rows: InterventionType[] = []; filtered: InterventionType[] = []; loading = true; search = '';

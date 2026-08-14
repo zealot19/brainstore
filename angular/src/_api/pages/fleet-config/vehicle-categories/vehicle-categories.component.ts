@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { VehicleCategoryCfgService } from '../../../services/fleet-config/vehicle-category-cfg.service';
 import { VehicleCategoryCfg } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-fc-vehicle-categories',
   templateUrl: './vehicle-categories.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcVehicleCategoriesComponent implements OnInit {
   rows: VehicleCategoryCfg[] = []; filtered: VehicleCategoryCfg[] = []; loading = true; search = '';
