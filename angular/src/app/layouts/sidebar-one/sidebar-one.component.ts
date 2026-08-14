@@ -81,19 +81,22 @@ export class SidebarOneComponent implements OnDestroy {
       return true;
     };
 
-    return this.sidebar.sidebarData1.map((section: any) => ({
-      ...section,
-      menu: section.menu
-        .filter((item: any) => roleOk(item) && allowed(item.permission))
-        .map((item: any) => {
-          if (item.hasSubRoute && Array.isArray(item.subMenus)) {
-            return { ...item, subMenus: item.subMenus.filter((s: any) => allowed(s.permission)) };
-          }
-          return item;
-        })
-        .filter((item: any) =>
-          !(item.hasSubRoute && Array.isArray(item.subMenus)) || item.subMenus.length > 0),
-    }));
+    return this.sidebar.sidebarData1
+      .map((section: any) => ({
+        ...section,
+        menu: section.menu
+          .filter((item: any) => roleOk(item) && allowed(item.permission))
+          .map((item: any) => {
+            if (item.hasSubRoute && Array.isArray(item.subMenus)) {
+              return { ...item, subMenus: item.subMenus.filter((s: any) => allowed(s.permission)) };
+            }
+            return item;
+          })
+          .filter((item: any) =>
+            !(item.hasSubRoute && Array.isArray(item.subMenus)) || item.subMenus.length > 0),
+      }))
+      // Module (section) masqué s'il ne reste aucune entrée visible.
+      .filter((section: any) => Array.isArray(section.menu) && section.menu.length > 0);
   }
 
   private getRoutes(route: url): void {
