@@ -62,8 +62,22 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 # ── Output serializers ────────────────────────────────────────────────────────
 
+def _company_ref(c):
+    """Représentation `CompanyRef` attendue par le frontend (objet, pas UUID)."""
+    if not c:
+        return None
+    return {
+        "id":       str(c.id),
+        "name":     c.name,
+        "slug":     c.slug,
+        "logo":     c.logo.url if c.logo else None,
+        "currency": c.currency.code if c.currency_id else None,
+    }
+
+
 class UserCompactSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    company   = serializers.SerializerMethodField()
 
     class Meta:
         model  = User
@@ -78,9 +92,13 @@ class UserCompactSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         return obj.get_full_name()
 
+    def get_company(self, obj):
+        return _company_ref(obj.company)
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    company   = serializers.SerializerMethodField()
 
     class Meta:
         model  = User
@@ -95,11 +113,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id", "email", "is_institution_admin", "is_agency_admin",
             "is_2fa_enabled", "must_change_password",
-            "last_login", "date_joined", "company", "default_agency",
+            "last_login", "date_joined", "default_agency",
         ]
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+    def get_company(self, obj):
+        return _company_ref(obj.company)
 
 
 class TokenOutputSerializer(serializers.Serializer):
