@@ -27,6 +27,27 @@ Le frontend (menu/boutons par permission) et les autres modules sont hors périm
 - **Admin d'institution** (`is_institution_admin`) → **tout dans sa société** (bypass du granulaire).
 - **Personnel régulier** → uniquement les permissions de ses **rôles/profils** (`get_user_permissions`).
 
+## Seed des permissions Flotte manquantes (préalable)
+
+Certaines ressources Flotte n'ont pas de code de permission. Une **data migration** dans
+`apps/admin_rbac/migrations/` (rattachée à l'`AppModule` `fleet`) les crée (idempotent,
+`update_or_create`), avec catégorie `view` pour la lecture et `update` pour l'écriture :
+
+| Code | Libellé | Catégorie |
+|---|---|---|
+| `fleet.parking.view` / `.manage` | Consulter / Gérer les parkings | view / update |
+| `fleet.supplier.view` / `.manage` | Consulter / Gérer les fournisseurs | view / update |
+| `fleet.contract.view` / `.manage` | Consulter / Gérer les contrats | view / update |
+| `fleet.recurring_cost.view` / `.manage` | Consulter / Gérer les coûts récurrents | view / update |
+| `fleet.config.view` / `.manage` | Consulter / Gérer la configuration flotte (données de référence) | view / update |
+
+`fleet.config.*` couvre **toutes** les données de référence de Config Flotte (catégories véhicule,
+carburants, transmissions, tractions, unités, catégories d'unité, périodes, types de document,
+étiquettes, types d'intervention, secteurs d'activité) — gérées via les vues de base
+`_ConfigListView`/`_ConfigDetailView`/`_ConfigBulkDeleteView`.
+
+Après ce seed, **toutes** les vues Flotte ont un code → aucune ne reste sur `IsInstitutionAdmin`.
+
 ## Composant — `HasModulePermission`
 
 Nouvelle classe DRF dans `apps/core/permissions.py` :
@@ -67,9 +88,9 @@ Lecture de la permission requise :
 
 ## Application au module Flotte
 
-Pour chaque vue fleet **dont la ressource a un code seedé**, remplacer
+Pour **chaque** vue fleet (toutes ont désormais un code), remplacer
 `permission_classes = [IsInstitutionAdmin]` par `permission_classes = [IsAuthenticated, HasModulePermission]`
-et déclarer `permission_map`. Ressources et codes concernés :
+et déclarer `permission_map`. Ressources et codes :
 
 | Ressource | Vues | GET | Écriture |
 |---|---|---|---|
@@ -83,12 +104,14 @@ et déclarer `permission_map`. Ressources et codes concernés :
 | Documents véhicule | VehicleDocumentList/Detail | `fleet.document.view` | `fleet.document.manage` |
 | Missions | Assignment(+Vehicle)List/Detail, AssignmentStart/Complete/Cancel | `fleet.assignment.view` | `fleet.assignment.manage` |
 | Accidents | Accident(+Vehicle)List/Detail, AccidentClose/Status | `fleet.accident.view` | `fleet.accident.manage` |
+| Parkings | ParkingList/Detail | `fleet.parking.view` | `fleet.parking.manage` |
+| Fournisseurs | SupplierList/Detail | `fleet.supplier.view` | `fleet.supplier.manage` |
+| Contrats | Contract(+Vehicle)List/Detail | `fleet.contract.view` | `fleet.contract.manage` |
+| Coûts récurrents | RecurringCostList/Detail | `fleet.recurring_cost.view` | `fleet.recurring_cost.manage` |
+| Config flotte (référence) | `_ConfigListView`/`_ConfigDetailView`/`_ConfigBulkDeleteView` + Unit* | `fleet.config.view` | `fleet.config.manage` |
 
-**Ressources sans code seedé** — Parking, Fournisseurs, Contrats, Coûts récurrents, Unités —
-**restent sur `IsInstitutionAdmin`** (non modifiées ; à mapper dans une tranche ultérieure une fois
-les codes ajoutés).
-
-`IsAuthenticated` et `HasModulePermission` sont importés depuis `apps.core.permissions`.
+`IsAuthenticated` et `HasModulePermission` sont importés depuis `apps.core.permissions`. Toutes les
+vues Flotte sont couvertes (aucune ne reste sur `IsInstitutionAdmin`).
 
 ## Gestion des erreurs
 
@@ -104,14 +127,16 @@ Tests `@pytest.mark.django_db` (construction d'un utilisateur staff + rôle + pe
 - staff sans aucune permission fleet → GET véhicules → **403**.
 - **admin d'institution** (is_institution_admin) → GET et POST **≠ 403** (bypass).
 - **super-admin** → tout **≠ 403**.
-- Une vue **non migrée** (ex. Parking) reste accessible à l'admin d'institution et refusée au staff
-  (comportement `IsInstitutionAdmin` inchangé).
+- staff avec `fleet.config.view` → GET d'une ressource de config (ex. unités) **≠ 403** ;
+  POST/PATCH sans `fleet.config.manage` → **403**.
+- Seed vérifié : les 10 nouveaux codes existent et sont rattachés à l'`AppModule` `fleet`.
 
-`manage.py check` OK.
+`manage.py check` + migration OK.
 
 ## Hors périmètre
 
 - Frontend : filtrage du menu + directive/boutons par permission (tranche 2).
 - Rôles/profils par défaut à la création d'une société (tranche 4).
-- Ajout de codes pour les ressources non couvertes + autres modules (Voyages, Config…) (tranche 3).
+- Application aux **autres modules** (Voyages, Réservations, Config Voyages…) + seed de leurs codes manquants (tranche 3).
 - Modification de `get_user_permissions` (réutilisé tel quel).
+- Granularité par ressource pour la config flotte (regroupée sous `fleet.config.*` dans cette tranche).
