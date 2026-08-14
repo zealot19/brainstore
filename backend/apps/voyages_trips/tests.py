@@ -214,3 +214,56 @@ def test_transbord_selection_capacity_insufficient_raises():
     with pytest.raises(ApplicationError):
         transbord_selection(g["src"], ticket_ids=[str(g["tickets"][0].id), str(g["tickets"][1].id)],
                             parcel_ids=[], baggage_ids=[], dest_trip=dest1, user=None)
+
+
+import pytest
+from rest_framework.test import APIRequestFactory, force_authenticate
+from apps.authentication.models import User
+from apps.voyages_trips.views import TripListCreateView
+
+
+def _make_staff(codes):
+    from apps.system_config.services import create_company
+    from apps.users.services.user_services import create_user
+    from apps.admin_rbac.services import create_role
+    from apps.admin_rbac.models import UserRole, Permission
+    company, setup = create_company(
+        name="Voy RBAC Co", admin_email="voyadmin@x.com",
+        admin_first_name="A", admin_last_name="B")
+    admin = User.objects.get(email="voyadmin@x.com")
+    staff, _ = create_user(
+        created_by=admin, company=company, email="voystaff@x.com",
+        first_name="S", last_name="T", is_institution_admin=False,
+        default_agency_id=setup["hq_agency_id"], agency_ids=[setup["hq_agency_id"]])
+    pids = list(Permission.objects.filter(code__in=codes).values_list("id", flat=True))
+    role = create_role(name="Role", company_id=company.id, permission_ids=pids, created_by=admin)
+    UserRole.objects.create(user=staff, role=role, company=company)
+    return company, admin, staff
+
+
+def _status(view, method, user, **kw):
+    req = getattr(APIRequestFactory(), method)("/x", {}, format="json")
+    force_authenticate(req, user=user)
+    r = view.as_view()(req, **kw)
+    return r.status_code
+
+
+@pytest.mark.django_db
+def test_trip_view_permission_gating():
+    company, admin, staff = _make_staff(["voyage.trip.view"])
+    assert _status(TripListCreateView, "get", staff) != 403
+    assert _status(TripListCreateView, "post", staff) == 403
+    assert _status(TripListCreateView, "get", admin) != 403
+    assert _status(TripListCreateView, "post", admin) != 403
+
+
+@pytest.mark.django_db
+def test_trip_create_permission():
+    company, admin, staff = _make_staff(["voyage.trip.view", "voyage.trip.create"])
+    assert _status(TripListCreateView, "post", staff) != 403
+
+
+@pytest.mark.django_db
+def test_staff_without_voyage_perm_denied():
+    company, admin, staff = _make_staff([])
+    assert _status(TripListCreateView, "get", staff) == 403

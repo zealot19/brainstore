@@ -1,6 +1,6 @@
 from django.db.models import Q
 from rest_framework.views import APIView
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -31,7 +31,8 @@ def _cfg(model_cls, cid, company):
 
 
 class TripListCreateView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view', 'POST': 'voyage.trip.create'}
 
     def get(self, request):
         company, err = _scope(request)
@@ -79,7 +80,8 @@ class TripListCreateView(APIView):
 
 
 class TripDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view', 'PATCH': 'voyage.trip.update', 'PUT': 'voyage.trip.update', 'DELETE': 'voyage.trip.delete'}
 
     def _get(self, request, trip_id):
         company, err = _scope(request)
@@ -121,7 +123,8 @@ class TripDetailView(APIView):
 
 
 class TripEligibleVehiclesView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -136,7 +139,8 @@ class TripEligibleVehiclesView(APIView):
 
 
 class TripAssignVehicleView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.update'}
 
     def post(self, request, trip_id):
         company, err = _scope(request)
@@ -158,7 +162,8 @@ class TripAssignVehicleView(APIView):
 
 
 class TripCrewView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.crew.view', 'POST': 'voyage.crew.manage'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -189,7 +194,8 @@ class TripCrewView(APIView):
 
 
 class TripCrewDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'DELETE': 'voyage.crew.manage'}
 
     def delete(self, request, trip_id, crew_id):
         company, err = _scope(request)
@@ -208,7 +214,8 @@ class TripCrewDetailView(APIView):
 
 
 class TripSeatsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -222,7 +229,8 @@ class TripSeatsView(APIView):
 
 
 class _TripSeatStatusView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.update'}
     target = None       # TripSeat.Status value to set
     from_status = None  # required current status
 
@@ -252,7 +260,8 @@ class TripSeatUnblockView(_TripSeatStatusView):
 
 
 class TripStopsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -266,7 +275,8 @@ class TripStopsView(APIView):
 
 
 class _LifecycleView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.update'}
     action = None  # name of services function
 
     def post(self, request, trip_id):
@@ -285,15 +295,22 @@ class _LifecycleView(APIView):
 
 
 class TripSubmitView(_LifecycleView):   action = "submit_trip"
-class TripDepartView(_LifecycleView):   action = "depart_trip"
-class TripCompleteView(_LifecycleView): action = "complete_trip"
-class TripCancelView(_LifecycleView):   action = "cancel_trip"
+class TripDepartView(_LifecycleView):
+    action = "depart_trip"
+    permission_map = {"POST": "voyage.trip.depart"}
+class TripCompleteView(_LifecycleView):
+    action = "complete_trip"
+    permission_map = {"POST": "voyage.trip.arrive"}
+class TripCancelView(_LifecycleView):
+    action = "cancel_trip"
+    permission_map = {"POST": "voyage.trip.cancel"}
 class TripSuspendView(_LifecycleView):  action = "suspend_trip"
 class TripResumeView(_LifecycleView):   action = "resume_trip"
 
 
 class TripMarkDelayedView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.update'}
 
     def post(self, request, trip_id):
         company, err = _scope(request)
@@ -317,7 +334,8 @@ from apps.voyages_trips.services.transbordement import transbord_trip
 
 
 class TripTransbordEligibleView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -330,7 +348,8 @@ class TripTransbordEligibleView(APIView):
 
 
 class TripTransbordView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.update'}
 
     def post(self, request, trip_id):
         company, err = _scope(request)
@@ -359,7 +378,8 @@ class TripTransbordView(APIView):
 
 
 class TripTransbordHistoryView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'voyage.trip.view'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
