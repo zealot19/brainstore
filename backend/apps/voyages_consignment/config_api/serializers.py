@@ -96,7 +96,21 @@ class BaggageRead(serializers.ModelSerializer):
                   "created_at", "updated_at"]
 
 
-class BaggageWrite(serializers.Serializer):
+class _BlankAsNullMixin:
+    """Traite une chaîne vide comme None pour certains champs optionnels
+    (un <input type=date> vide ou un select non renseigné envoie "" et non null)."""
+    blank_null_fields = ()
+
+    def to_internal_value(self, data):
+        if hasattr(data, "get"):
+            cleaned = {k: (None if (k in self.blank_null_fields and v == "") else v)
+                       for k, v in data.items()}
+            data = cleaned
+        return super().to_internal_value(data)
+
+
+class BaggageWrite(_BlankAsNullMixin, serializers.Serializer):
+    blank_null_fields = ("birth_date", "ticket_id", "consignment_type_id")
     trip_id = serializers.UUIDField()
     ticket_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
@@ -121,7 +135,8 @@ class BaggageDeliverSerializer(serializers.Serializer):
     delivered_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
 
 
-class BaggageEditSerializer(serializers.Serializer):
+class BaggageEditSerializer(_BlankAsNullMixin, serializers.Serializer):
+    blank_null_fields = ("birth_date",)
     sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     sender_phone = serializers.CharField(max_length=30, required=False, allow_blank=True)
     civility = serializers.ChoiceField(choices=Baggage.Civility.choices, required=False, allow_blank=True)
