@@ -6,10 +6,9 @@ import { AUTH } from '../../config/api.config';
 const STORAGE_KEY = 'drp_permissions';
 
 interface PermissionsResponse {
-  data: {
-    permissions: string[];
-    is_superuser: boolean;
-  };
+  // Le corps est déjà désemballé par apiUnwrapInterceptor ({success,data} -> data).
+  permissions: string[];
+  is_superuser: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,7 +31,7 @@ export class PermissionService {
   load(): Observable<PermissionsResponse> {
     return this.http.get<PermissionsResponse>(AUTH.mePermissions).pipe(
       tap(res => {
-        const { permissions, is_superuser } = res.data;
+        const { permissions, is_superuser } = res;
         this._superuser$.next(is_superuser ?? false);
         const codes = new Set(permissions ?? []);
         this._codes$.next(codes);
