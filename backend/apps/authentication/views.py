@@ -153,8 +153,10 @@ class MePermissionsView(APIView):
         company = getattr(request.user, "company", None)
         company_id = getattr(company, "id", None)
         perms = get_user_permissions(request.user, company_id)
+        # Admin d'institution = accès complet à sa société (miroir du bypass backend).
+        is_admin = request.user.is_superuser or getattr(request.user, "is_institution_admin", False)
         return success_response({
-            "permissions": ["*"] if "*" in perms else sorted(perms),
+            "permissions": ["*"] if (is_admin or "*" in perms) else sorted(perms),
             "is_superuser": request.user.is_superuser,
         })
 
