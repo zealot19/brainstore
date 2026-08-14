@@ -73,6 +73,7 @@ class CompanyListSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "code", "slug", "logo", "slogan", "is_active",
             "country", "language_code",
+            "legal_form", "capital", "rccm", "tax_id", "cnps_number", "vat_number",
             "package", "package_name", "currency_code",
             "address_line", "postal_box",
             "user_count", "agency_count",

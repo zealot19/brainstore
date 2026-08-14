@@ -34,3 +34,16 @@ def test_institution_admin_role_is_scoped_to_company():
     assert resp.status_code == 201, resp.content
     import json
     assert json.loads(resp.content)["data"]["company"] == str(company.id)
+
+
+def test_company_list_serializer_exposes_identity_fields():
+    """Le serializer LISTE expose RCCM / forme juridique / NIU (sinon le formulaire
+    d'édition les affiche vides puis les écrase à l'enregistrement)."""
+    from apps.system_config.serializers import CompanyListSerializer
+    from apps.system_config.models import Company
+    c = Company(name="X", rccm="RC/123", legal_form="sarl", tax_id="NIU-9",
+                cnps_number="CN-1", vat_number="VAT-1")
+    data = CompanyListSerializer(c).data
+    for f in ("rccm", "legal_form", "tax_id", "cnps_number", "vat_number", "capital"):
+        assert f in data, f
+    assert data["rccm"] == "RC/123" and data["legal_form"] == "sarl" and data["tax_id"] == "NIU-9"

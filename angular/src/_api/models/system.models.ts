@@ -41,6 +41,9 @@ export interface Company {
   legal_form?:   string;
   rccm?:         string;
   tax_id?:       string;
+  cnps_number?:  string;
+  vat_number?:   string;
+  capital?:      number | null;
   email?:        string;
   phone?:        string;
   website?:      string;
