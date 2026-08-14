@@ -50,3 +50,13 @@ def test_manage_resource_gating():
 def test_staff_without_fleet_perm_denied():
     company, admin, staff = _make_staff([])
     assert _status(VehicleListView, "get", staff) == 403
+
+
+from apps.fleet.config_api.views import UnitListView
+
+
+@pytest.mark.django_db
+def test_fleet_config_gating():
+    company, admin, staff = _make_staff(["fleet.config.view"])
+    assert _status(UnitListView, "get", staff) != 403    # a fleet.config.view
+    assert _status(UnitListView, "post", staff) == 403   # pas fleet.config.manage

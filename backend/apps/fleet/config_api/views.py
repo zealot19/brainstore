@@ -1,6 +1,6 @@
 from django.db.models import Q
 from rest_framework.views import APIView
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -13,7 +13,8 @@ from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensu
 
 
 class _ConfigListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "fleet.config.view", "POST": "fleet.config.manage"}
     model = None
     read = None
     write = None
@@ -51,7 +52,8 @@ class _ConfigListView(APIView):
 
 
 class _ConfigDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "fleet.config.view", "PATCH": "fleet.config.manage", "PUT": "fleet.config.manage", "DELETE": "fleet.config.manage"}
     model = None
     read = None
     write = None
@@ -96,7 +98,8 @@ class _ConfigDetailView(APIView):
 
 
 class _ConfigBulkDeleteView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "fleet.config.manage"}
     model = None
 
     def post(self, request):
