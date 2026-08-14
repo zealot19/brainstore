@@ -25,6 +25,8 @@ export interface menu {
   base: string;
   page: string
   subMenus: subMenus[];
+  role?: string;
+  permission?: string | string[];
 }
 export interface subMenus {
   showSubRoute: boolean;
@@ -32,4 +34,6 @@ export interface subMenus {
   route:string
   page: string
   base?:string
+  role?: string;
+  permission?: string | string[];
 }
