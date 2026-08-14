@@ -420,6 +420,7 @@ export class SidebarService {
           showSubRoute: false,
           icon2: 'settings-2',
           base: 'system-config',
+          role: 'super_admin',
           subMenus: [
             {
               menuValue: 'Companies',
@@ -454,6 +455,7 @@ export class SidebarService {
           showSubRoute: false,
           icon2: 'shield-lock',
           base: 'admin-rbac',
+          role: 'super_admin',
           subMenus: [
             {
               menuValue: 'Rôles',
@@ -474,6 +476,7 @@ export class SidebarService {
           icon2: 'users',
           route: routes.adminUsers,
           base: 'users',
+          role: 'super_admin',
           subMenus: [],
         },
         {
@@ -1327,6 +1330,7 @@ export class SidebarService {
           menuValue: 'Users',
           icon2: 'shield-up',
           route: routes.adminUsers,
+          role: 'super_admin',
           hasSubRoute: false,
           showSubRoute: false,
         },

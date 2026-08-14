@@ -84,7 +84,7 @@ class UserCompactSerializer(serializers.ModelSerializer):
         fields = [
             "id", "email", "username", "full_name", "phone", "avatar",
             "job_title", "language_code", "timezone",
-            "is_institution_admin", "is_agency_admin",
+            "is_superuser", "is_institution_admin", "is_agency_admin",
             "is_2fa_enabled", "must_change_password",
             "company", "default_agency",
         ]
@@ -105,13 +105,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             "id", "email", "username", "first_name", "last_name", "full_name",
             "phone", "avatar", "job_title", "language_code", "timezone",
-            "is_institution_admin", "is_agency_admin",
+            "is_superuser", "is_institution_admin", "is_agency_admin",
             "is_2fa_enabled", "must_change_password",
             "company", "default_agency",
             "last_login", "date_joined",
         ]
         read_only_fields = [
-            "id", "email", "is_institution_admin", "is_agency_admin",
+            "id", "email", "is_superuser", "is_institution_admin", "is_agency_admin",
             "is_2fa_enabled", "must_change_password",
             "last_login", "date_joined", "default_agency",
         ]
