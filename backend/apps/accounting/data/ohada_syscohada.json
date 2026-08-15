@@ -1,0 +1,1388 @@
+[
+  {
+    "code": "1",
+    "name": "Comptes de ressources durables",
+    "type": "equity",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "10",
+    "name": "Capital",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "101",
+    "name": "Capital social",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "10"
+  },
+  {
+    "code": "104",
+    "name": "Primes liées au capital social",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "10"
+  },
+  {
+    "code": "105",
+    "name": "Écarts de réévaluation",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "10"
+  },
+  {
+    "code": "106",
+    "name": "Réserves",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "10"
+  },
+  {
+    "code": "109",
+    "name": "Actionnaires, capital souscrit non appelé",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "10"
+  },
+  {
+    "code": "11",
+    "name": "Report à nouveau",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "111",
+    "name": "Report à nouveau créditeur",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "11"
+  },
+  {
+    "code": "119",
+    "name": "Report à nouveau débiteur",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "11"
+  },
+  {
+    "code": "12",
+    "name": "Report à nouveau (en instance d'affectation)",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "120",
+    "name": "Résultat en instance d'affectation",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "12"
+  },
+  {
+    "code": "13",
+    "name": "Résultat net de l'exercice",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "130",
+    "name": "Résultat net : bénéfice",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "13"
+  },
+  {
+    "code": "139",
+    "name": "Résultat net : perte",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "13"
+  },
+  {
+    "code": "14",
+    "name": "Subventions d'investissement",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "141",
+    "name": "Subventions d'équipement",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "14"
+  },
+  {
+    "code": "15",
+    "name": "Provisions réglementées et fonds assimilés",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "151",
+    "name": "Amortissements dérogatoires",
+    "type": "equity",
+    "reconcile": false,
+    "parent": "15"
+  },
+  {
+    "code": "16",
+    "name": "Emprunts et dettes assimilées",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "161",
+    "name": "Emprunts obligataires",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "16"
+  },
+  {
+    "code": "162",
+    "name": "Emprunts et dettes auprès des établissements de crédit",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "16"
+  },
+  {
+    "code": "165",
+    "name": "Dépôts et cautionnements reçus",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "16"
+  },
+  {
+    "code": "17",
+    "name": "Dettes de crédit-bail et contrats assimilés",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "18",
+    "name": "Dettes liées à des participations et comptes de liaison",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "19",
+    "name": "Provisions pour risques et charges",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "1"
+  },
+  {
+    "code": "191",
+    "name": "Provisions pour litiges",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "19"
+  },
+  {
+    "code": "198",
+    "name": "Autres provisions pour risques et charges",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "19"
+  },
+  {
+    "code": "2",
+    "name": "Comptes d'actif immobilisé",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "20",
+    "name": "Charges immobilisées",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "201",
+    "name": "Frais d'établissement",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "20"
+  },
+  {
+    "code": "21",
+    "name": "Immobilisations incorporelles",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "211",
+    "name": "Frais de recherche et de développement",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "21"
+  },
+  {
+    "code": "213",
+    "name": "Logiciels et sites internet",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "21"
+  },
+  {
+    "code": "215",
+    "name": "Fonds commercial",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "21"
+  },
+  {
+    "code": "22",
+    "name": "Terrains",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "221",
+    "name": "Terrains agricoles et forestiers",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "22"
+  },
+  {
+    "code": "223",
+    "name": "Terrains bâtis",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "22"
+  },
+  {
+    "code": "23",
+    "name": "Bâtiments, installations techniques et agencements",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "231",
+    "name": "Bâtiments industriels, agricoles et administratifs",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "23"
+  },
+  {
+    "code": "235",
+    "name": "Aménagements, agencements et installations",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "23"
+  },
+  {
+    "code": "24",
+    "name": "Matériel, mobilier et actifs biologiques",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "241",
+    "name": "Matériel et outillage industriel et commercial",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "24"
+  },
+  {
+    "code": "244",
+    "name": "Matériel et mobilier de bureau",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "24"
+  },
+  {
+    "code": "245",
+    "name": "Matériel de transport",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "24"
+  },
+  {
+    "code": "27",
+    "name": "Autres immobilisations financières",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "271",
+    "name": "Prêts et créances non commerciales",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "27"
+  },
+  {
+    "code": "275",
+    "name": "Dépôts et cautionnements versés",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "27"
+  },
+  {
+    "code": "28",
+    "name": "Amortissements",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "281",
+    "name": "Amortissements des immobilisations incorporelles",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "28"
+  },
+  {
+    "code": "283",
+    "name": "Amortissements des bâtiments et installations",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "28"
+  },
+  {
+    "code": "284",
+    "name": "Amortissements du matériel",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "28"
+  },
+  {
+    "code": "29",
+    "name": "Dépréciations des immobilisations",
+    "type": "asset_fixed",
+    "reconcile": false,
+    "parent": "2"
+  },
+  {
+    "code": "3",
+    "name": "Comptes de stocks",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "31",
+    "name": "Marchandises",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "32",
+    "name": "Matières premières et fournitures liées",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "33",
+    "name": "Autres approvisionnements",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "34",
+    "name": "Produits en cours",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "35",
+    "name": "Services en cours",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "36",
+    "name": "Produits finis",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "37",
+    "name": "Stocks de produits et marchandises en cours de route",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "38",
+    "name": "Stocks en cours de route, en consignation ou en dépôt",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "39",
+    "name": "Dépréciations des stocks",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": "3"
+  },
+  {
+    "code": "4",
+    "name": "Comptes de tiers",
+    "type": "asset_current",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "40",
+    "name": "Fournisseurs et comptes rattachés",
+    "type": "liability_payable",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "401",
+    "name": "Fournisseurs",
+    "type": "liability_payable",
+    "reconcile": true,
+    "parent": "40"
+  },
+  {
+    "code": "402",
+    "name": "Fournisseurs, effets à payer",
+    "type": "liability_payable",
+    "reconcile": false,
+    "parent": "40"
+  },
+  {
+    "code": "408",
+    "name": "Fournisseurs, factures non parvenues",
+    "type": "liability_payable",
+    "reconcile": false,
+    "parent": "40"
+  },
+  {
+    "code": "409",
+    "name": "Fournisseurs débiteurs",
+    "type": "liability_payable",
+    "reconcile": false,
+    "parent": "40"
+  },
+  {
+    "code": "41",
+    "name": "Clients et comptes rattachés",
+    "type": "asset_receivable",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "411",
+    "name": "Clients",
+    "type": "asset_receivable",
+    "reconcile": true,
+    "parent": "41"
+  },
+  {
+    "code": "412",
+    "name": "Clients, effets à recevoir en portefeuille",
+    "type": "asset_receivable",
+    "reconcile": false,
+    "parent": "41"
+  },
+  {
+    "code": "416",
+    "name": "Créances clients litigieuses ou douteuses",
+    "type": "asset_receivable",
+    "reconcile": false,
+    "parent": "41"
+  },
+  {
+    "code": "418",
+    "name": "Clients, produits non encore facturés",
+    "type": "asset_receivable",
+    "reconcile": false,
+    "parent": "41"
+  },
+  {
+    "code": "419",
+    "name": "Clients créditeurs (avances et acomptes reçus)",
+    "type": "asset_receivable",
+    "reconcile": false,
+    "parent": "41"
+  },
+  {
+    "code": "42",
+    "name": "Personnel",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "421",
+    "name": "Personnel, rémunérations dues",
+    "type": "liability_current",
+    "reconcile": true,
+    "parent": "42"
+  },
+  {
+    "code": "422",
+    "name": "Personnel, œuvres sociales internes",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "42"
+  },
+  {
+    "code": "423",
+    "name": "Personnel, oppositions et saisies-arrêts",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "42"
+  },
+  {
+    "code": "424",
+    "name": "Personnel, congés à payer",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "42"
+  },
+  {
+    "code": "425",
+    "name": "Personnel, avances et acomptes",
+    "type": "liability_current",
+    "reconcile": true,
+    "parent": "42"
+  },
+  {
+    "code": "428",
+    "name": "Personnel, charges à payer et produits à recevoir",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "42"
+  },
+  {
+    "code": "43",
+    "name": "Organismes sociaux",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "431",
+    "name": "Sécurité sociale (CNPS)",
+    "type": "liability_current",
+    "reconcile": true,
+    "parent": "43"
+  },
+  {
+    "code": "432",
+    "name": "Caisses de retraite complémentaire",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "43"
+  },
+  {
+    "code": "438",
+    "name": "Organismes sociaux, charges à payer et produits à recevoir",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "43"
+  },
+  {
+    "code": "44",
+    "name": "État et collectivités publiques",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "441",
+    "name": "État, subventions à recevoir",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "44"
+  },
+  {
+    "code": "443",
+    "name": "État, TVA facturée",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "44"
+  },
+  {
+    "code": "4431",
+    "name": "État, TVA facturée sur ventes",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "443"
+  },
+  {
+    "code": "445",
+    "name": "État, TVA récupérable",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "44"
+  },
+  {
+    "code": "4451",
+    "name": "État, TVA récupérable sur immobilisations",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "445"
+  },
+  {
+    "code": "4452",
+    "name": "État, TVA récupérable sur achats",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "445"
+  },
+  {
+    "code": "447",
+    "name": "État, impôts retenus à la source",
+    "type": "tax",
+    "reconcile": true,
+    "parent": "44"
+  },
+  {
+    "code": "4471",
+    "name": "État, IRPP retenu à la source",
+    "type": "tax",
+    "reconcile": true,
+    "parent": "447"
+  },
+  {
+    "code": "4472",
+    "name": "État, redevance audiovisuelle (RAV)",
+    "type": "tax",
+    "reconcile": true,
+    "parent": "447"
+  },
+  {
+    "code": "448",
+    "name": "État, charges à payer et produits à recevoir",
+    "type": "tax",
+    "reconcile": false,
+    "parent": "44"
+  },
+  {
+    "code": "45",
+    "name": "Organismes internationaux",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "46",
+    "name": "Associés et groupe",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "47",
+    "name": "Débiteurs et créditeurs divers",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "471",
+    "name": "Comptes d'attente",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "47"
+  },
+  {
+    "code": "48",
+    "name": "Créances et dettes hors activités ordinaires (HAO)",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "481",
+    "name": "Fournisseurs d'investissements",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "48"
+  },
+  {
+    "code": "49",
+    "name": "Dépréciations et provisions pour risques à court terme",
+    "type": "liability_current",
+    "reconcile": false,
+    "parent": "4"
+  },
+  {
+    "code": "5",
+    "name": "Comptes de trésorerie",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "50",
+    "name": "Titres de placement",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "501",
+    "name": "Titres du Trésor et bons de caisse à court terme",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "50"
+  },
+  {
+    "code": "52",
+    "name": "Banques",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "521",
+    "name": "Banques locales",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "52"
+  },
+  {
+    "code": "522",
+    "name": "Banques, autres établissements",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "52"
+  },
+  {
+    "code": "53",
+    "name": "Établissements financiers et assimilés",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "531",
+    "name": "Chèques postaux",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "53"
+  },
+  {
+    "code": "57",
+    "name": "Caisse",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "571",
+    "name": "Caisse siège social",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "57"
+  },
+  {
+    "code": "572",
+    "name": "Caisse succursale A",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "57"
+  },
+  {
+    "code": "573",
+    "name": "Caisse succursale B",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "57"
+  },
+  {
+    "code": "574",
+    "name": "Caisse succursale C",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "57"
+  },
+  {
+    "code": "575",
+    "name": "Caisse succursale D",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "57"
+  },
+  {
+    "code": "58",
+    "name": "Régies d'avances, accréditifs et virements internes",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "585",
+    "name": "Virements de fonds",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "58"
+  },
+  {
+    "code": "59",
+    "name": "Dépréciations et provisions pour risques à court terme",
+    "type": "asset_cash",
+    "reconcile": false,
+    "parent": "5"
+  },
+  {
+    "code": "6",
+    "name": "Comptes de charges des activités ordinaires",
+    "type": "expense",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "60",
+    "name": "Achats et variations de stocks",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "601",
+    "name": "Achats de marchandises",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "60"
+  },
+  {
+    "code": "602",
+    "name": "Achats de matières premières et fournitures liées",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "60"
+  },
+  {
+    "code": "604",
+    "name": "Achats stockés de matières et fournitures consommables",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "60"
+  },
+  {
+    "code": "605",
+    "name": "Autres achats",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "60"
+  },
+  {
+    "code": "608",
+    "name": "Achats d'emballages",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "60"
+  },
+  {
+    "code": "61",
+    "name": "Transports",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "611",
+    "name": "Transports sur achats",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "61"
+  },
+  {
+    "code": "612",
+    "name": "Transports sur ventes",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "61"
+  },
+  {
+    "code": "613",
+    "name": "Transports pour le compte de tiers",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "61"
+  },
+  {
+    "code": "616",
+    "name": "Transports du personnel",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "61"
+  },
+  {
+    "code": "62",
+    "name": "Services extérieurs A",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "621",
+    "name": "Sous-traitance générale",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "622",
+    "name": "Locations et charges locatives",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "623",
+    "name": "Redevances de crédit-bail et contrats assimilés",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "624",
+    "name": "Entretien, réparations et maintenance",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "625",
+    "name": "Primes d'assurance",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "626",
+    "name": "Études, recherches et documentation",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "627",
+    "name": "Publicité, publications et relations publiques",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "628",
+    "name": "Frais de télécommunications",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "62"
+  },
+  {
+    "code": "63",
+    "name": "Services extérieurs B",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "631",
+    "name": "Frais bancaires",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "63"
+  },
+  {
+    "code": "632",
+    "name": "Rémunérations d'intermédiaires et de conseils",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "63"
+  },
+  {
+    "code": "633",
+    "name": "Frais de formation du personnel",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "63"
+  },
+  {
+    "code": "637",
+    "name": "Rémunérations de personnel extérieur à l'entreprise",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "63"
+  },
+  {
+    "code": "64",
+    "name": "Impôts et taxes",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "641",
+    "name": "Impôts et taxes directs",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "64"
+  },
+  {
+    "code": "645",
+    "name": "Impôts et taxes indirects",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "64"
+  },
+  {
+    "code": "646",
+    "name": "Droits d'enregistrement",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "64"
+  },
+  {
+    "code": "647",
+    "name": "Pénalités et amendes fiscales",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "64"
+  },
+  {
+    "code": "65",
+    "name": "Autres charges",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "651",
+    "name": "Pertes sur créances clients et autres débiteurs",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "65"
+  },
+  {
+    "code": "658",
+    "name": "Charges diverses",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "65"
+  },
+  {
+    "code": "66",
+    "name": "Charges de personnel",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "661",
+    "name": "Rémunérations directes versées au personnel",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "66"
+  },
+  {
+    "code": "663",
+    "name": "Indemnités forfaitaires versées au personnel",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "66"
+  },
+  {
+    "code": "664",
+    "name": "Charges sociales",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "66"
+  },
+  {
+    "code": "668",
+    "name": "Autres charges sociales",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "66"
+  },
+  {
+    "code": "67",
+    "name": "Frais financiers et charges assimilées",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "671",
+    "name": "Intérêts des emprunts",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "67"
+  },
+  {
+    "code": "674",
+    "name": "Autres intérêts",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "67"
+  },
+  {
+    "code": "676",
+    "name": "Pertes de change",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "67"
+  },
+  {
+    "code": "68",
+    "name": "Dotations aux amortissements",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "681",
+    "name": "Dotations aux amortissements d'exploitation",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "68"
+  },
+  {
+    "code": "69",
+    "name": "Dotations aux provisions et aux dépréciations",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "6"
+  },
+  {
+    "code": "691",
+    "name": "Dotations aux provisions d'exploitation",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "69"
+  },
+  {
+    "code": "7",
+    "name": "Comptes de produits des activités ordinaires",
+    "type": "income",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "70",
+    "name": "Ventes",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "701",
+    "name": "Ventes de marchandises",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "702",
+    "name": "Ventes de produits finis",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "704",
+    "name": "Travaux facturés",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "705",
+    "name": "Études et prestations de services",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "706",
+    "name": "Services vendus",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "707",
+    "name": "Produits accessoires",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "708",
+    "name": "Produits des activités annexes",
+    "type": "income",
+    "reconcile": false,
+    "parent": "70"
+  },
+  {
+    "code": "71",
+    "name": "Subventions d'exploitation",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "711",
+    "name": "Subventions d'exploitation reçues",
+    "type": "income",
+    "reconcile": false,
+    "parent": "71"
+  },
+  {
+    "code": "72",
+    "name": "Production immobilisée",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "75",
+    "name": "Autres produits",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "758",
+    "name": "Produits divers",
+    "type": "income",
+    "reconcile": false,
+    "parent": "75"
+  },
+  {
+    "code": "77",
+    "name": "Revenus financiers et produits assimilés",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "771",
+    "name": "Intérêts de prêts et de créances diverses",
+    "type": "income",
+    "reconcile": false,
+    "parent": "77"
+  },
+  {
+    "code": "776",
+    "name": "Gains de change",
+    "type": "income",
+    "reconcile": false,
+    "parent": "77"
+  },
+  {
+    "code": "78",
+    "name": "Transferts de charges",
+    "type": "income",
+    "reconcile": false,
+    "parent": "7"
+  },
+  {
+    "code": "781",
+    "name": "Transferts de charges d'exploitation",
+    "type": "income",
+    "reconcile": false,
+    "parent": "78"
+  },
+  {
+    "code": "8",
+    "name": "Comptes des autres charges et produits (HAO)",
+    "type": "expense",
+    "reconcile": false,
+    "parent": null
+  },
+  {
+    "code": "81",
+    "name": "Valeurs comptables des cessions d'immobilisations",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "82",
+    "name": "Produits des cessions d'immobilisations",
+    "type": "income",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "83",
+    "name": "Charges hors activités ordinaires",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "84",
+    "name": "Produits hors activités ordinaires",
+    "type": "income",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "85",
+    "name": "Dotations hors activités ordinaires",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "86",
+    "name": "Reprises hors activités ordinaires",
+    "type": "income",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "87",
+    "name": "Participation des travailleurs",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "88",
+    "name": "Subventions d'équilibre",
+    "type": "income",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "89",
+    "name": "Impôts sur le résultat",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "8"
+  },
+  {
+    "code": "891",
+    "name": "Impôts sur les bénéfices de l'exercice",
+    "type": "expense",
+    "reconcile": false,
+    "parent": "89"
+  }
+]
