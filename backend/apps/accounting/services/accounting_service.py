@@ -126,3 +126,29 @@ class AccountingService:
         entry.posted_by = posted_by
         entry.save()
         return entry
+
+    @staticmethod
+    @transaction.atomic
+    def cancel_entry(entry_id, reason="", *, cancelled_by=None) -> JournalEntry:
+        entry = JournalEntry.objects.select_for_update().filter(id=entry_id, is_deleted=False).first()
+        if not entry:
+            raise ApplicationError(_("Pièce introuvable."))
+        if entry.state != "posted":
+            raise ApplicationError(_("Seule une pièce validée peut être annulée."))
+
+        reversal = JournalEntry.objects.create(
+            company_id=entry.company_id, journal=entry.journal, period=entry.period, date=entry.date,
+            entry_type=entry.entry_type, partner=entry.partner,
+            label=_("Extourne — %s") % entry.label, reference=reason or entry.reference,
+            source_model=entry.source_model, source_id=entry.source_id,
+            reversed_entry=entry, created_by=cancelled_by)
+        for ln in entry.lines.all():
+            JournalEntryLine.objects.create(
+                entry=reversal, sequence=ln.sequence, account=ln.account, label=ln.label,
+                debit=ln.credit, credit=ln.debit, partner=ln.partner, created_by=cancelled_by)
+
+        AccountingService.post_entry(reversal.id, posted_by=cancelled_by)
+        entry.state = "cancelled"
+        entry.save(update_fields=["state", "updated_at"])
+        reversal.refresh_from_db()
+        return reversal
