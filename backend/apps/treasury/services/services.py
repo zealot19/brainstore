@@ -133,6 +133,9 @@ def close_session(session, *, closing_balance, notes="", updated_by):
     reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
     reg.current_balance = closing_balance
     reg.save(update_fields=["current_balance"])
+
+    from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
+    TreasuryAccountingBridge.post_session_difference(session)
     return session
 
 
@@ -174,6 +177,12 @@ def create_transaction(
 
     # Update balances
     _apply_transaction_balance(txn, sign=+1)
+
+    from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
+    entry = TreasuryAccountingBridge.post_movement(txn)
+    if entry:
+        txn.journal_entry = entry
+        txn.save(update_fields=["journal_entry"])
     return txn
 
 
@@ -205,6 +214,14 @@ def delete_transaction(txn, *, deleted_by):
         raise ApplicationError(
             _("Cannot delete a transaction from a closed session.")
         )
+    # Extourne comptable si le mouvement était posté
+    if txn.journal_entry_id:
+        from apps.accounting.services import AccountingService
+        try:
+            if txn.journal_entry.state == "posted":
+                AccountingService.cancel_entry(txn.journal_entry_id, reason="Annulation mouvement")
+        except Exception:
+            pass
     # Reverse balance impact
     _apply_transaction_balance(txn, sign=-1)
     txn.soft_delete(user=deleted_by)
@@ -265,7 +282,7 @@ def create_transfer(
         acc.save(update_fields=["current_balance"])
 
     reference = _next_ref(Transfer, company, "TRF")
-    return Transfer.objects.create(
+    transfer = Transfer.objects.create(
         company=company, reference=reference,
         from_cash_register=from_cash_register, from_bank_account=from_bank_account,
         to_cash_register=to_cash_register, to_bank_account=to_bank_account,
@@ -274,3 +291,9 @@ def create_transfer(
         completed_by=created_by,
         created_by=created_by,
     )
+    from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
+    entry = TreasuryAccountingBridge.post_transfer(transfer)
+    if entry:
+        transfer.journal_entry = entry
+        transfer.save(update_fields=["journal_entry"])
+    return transfer
