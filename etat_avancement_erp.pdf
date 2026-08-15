@@ -1,0 +1,228 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [5 0 R 7 0 R 9 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4485 >>
+stream
+BT
+/F2 20.0 Tf
+1 0 0 1 56.0 777.9 Tm (État d'avancement ? ERP) Tj
+/F1 8.5 Tf
+1 0 0 1 56.0 747.9 Tm (Système de gestion pour compagnie de transport de voyageurs ? 15 août 2026) Tj
+1 0 0 1 56.0 735.9 Tm (Stack : Django + DRF \(backend\) · Angular standalone \(frontend\) · multi-tenant \(sociétés / agences\) · i18n FR/EN) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 715.9 Tm (1. Vision & périmètre) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 691.9 Tm (ERP multi-sociétés \(multi-tenant\) pour une compagnie de transport : gestion de la flotte, des) Tj
+1 0 0 1 56.0 677.9 Tm (voyages, des réservations/billetterie, des colis et bagages, de la tarification, ainsi que) Tj
+1 0 0 1 56.0 663.9 Tm (l'administration \(sociétés, agences, utilisateurs, rôles et permissions\). Chaque société) Tj
+1 0 0 1 56.0 649.9 Tm (\(institution\) est isolée ; un super-administrateur plateforme provisionne les sociétés ; chaque) Tj
+1 0 0 1 56.0 635.9 Tm (société a un administrateur d'institution qui gère son personnel.) Tj
+1 0 0 1 56.0 621.9 Tm (Modules métier à venir \(specs fournies ultérieurement\) : Trésorerie, Ressources Humaines \(RH\),) Tj
+1 0 0 1 56.0 607.9 Tm (Comptabilité.) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 589.9 Tm (2. Architecture des modules) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 561.9 Tm (Backend ? apps Django \(apps/\)) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 544.9 Tm (?  core ? socle \(permissions, réponses, pagination, audit, devises\).) Tj
+1 0 0 1 56.0 530.9 Tm (?  authentication ? utilisateur custom, JWT, 2FA, sessions, me/, me/permissions.) Tj
+1 0 0 1 56.0 516.9 Tm (?  system_config ? sociétés, agences, packages, abonnements, paramètres, feature-flags.) Tj
+1 0 0 1 56.0 502.9 Tm (?  admin_rbac ? modules, menus, permissions, rôles, profils, affectations \(c?ur RBAC\).) Tj
+1 0 0 1 56.0 488.9 Tm (?  users ? gestion des utilisateurs \(institution\).) Tj
+1 0 0 1 56.0 474.9 Tm (?  fleet ? flotte \(véhicules, marques, modèles, conducteurs, carburant, maintenance, documents,) Tj
+1 0 0 1 70.0 460.9 Tm (missions, accidents, parkings, fournisseurs, contrats, config\).) Tj
+1 0 0 1 56.0 446.9 Tm (?  voyages_trips ? voyages \(cycle de vie : soumission, départ, arrivée, embarquement,) Tj
+1 0 0 1 70.0 432.9 Tm (annulation, transbordement, équipages\).) Tj
+1 0 0 1 56.0 418.9 Tm (?  voyages_booking ? réservations, passagers, billets, retours, embarquement, feuille de route.) Tj
+1 0 0 1 56.0 404.9 Tm (?  voyages_config ? config voyages \(villes, points, trajets, plans de bus, catégories) Tj
+1 0 0 1 70.0 390.9 Tm (tarifaires, créneaux, colis, fidélité, modèle de billet, paramètres\).) Tj
+1 0 0 1 56.0 376.9 Tm (?  voyages_consignment ? colis & bagages \(réception, manifeste, livraison, impressions\).) Tj
+1 0 0 1 56.0 362.9 Tm (?  voyages_pricing ? tarifs.) Tj
+1 0 0 1 56.0 348.9 Tm (?  hr ? RH \(modèles présents, vues minimales ? à compléter\).) Tj
+1 0 0 1 56.0 334.9 Tm (?  treasury ? Trésorerie \(modèles présents, vues minimales ? à compléter\).) Tj
+1 0 0 1 56.0 320.9 Tm (?  sync_scig_sage ? synchronisation Sage / SCIG \(inventaires, zones, transferts\).) Tj
+1 0 0 1 56.0 306.9 Tm (?  online_booking ? réservation en ligne \(public\).) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 288.9 Tm (Frontend ? Angular \(angular/src\)) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 271.9 Tm (Pages métier sous _api/pages/* \(fleet, fleet-config, voyages, voyages-booking, voyages-config,) Tj
+1 0 0 1 56.0 257.9 Tm (voyages-consignment, voyages-pricing, admin, rbac, system, users, scig\). Services sous) Tj
+1 0 0 1 56.0 243.9 Tm (_api/services/*. Menu latéral piloté par app/core/service/sidebar/sidebar.service.ts.) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 225.9 Tm (3. Travaux réalisés \(session en cours\)) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 197.9 Tm (Corrections « mise en place d'une entreprise ») Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 180.9 Tm (?  Seed des devises \(table Currency vide ? création d'entreprise échouait\) : migration) Tj
+1 0 0 1 70.0 166.9 Tm (core/0003.) Tj
+1 0 0 1 56.0 152.9 Tm (?  Scoping société à la création d'agences, rôles et profils par un admin d'institution) Tj
+1 0 0 1 70.0 138.9 Tm (\(isolation ; plus de champ 'company' requis\).) Tj
+1 0 0 1 56.0 124.9 Tm (?  Identité de l'entreprise \(RCCM, forme juridique, NIU, CNPS, TVA, capital\) : exposée par le) Tj
+1 0 0 1 70.0 110.9 Tm (serializer liste et éditable ? ne s'écrase plus à l'enregistrement.) Tj
+1 0 0 1 56.0 96.9 Tm (?  me/ et login renvoient 'company' comme objet \(CompanyRef\) et 'is_superuser' ? corrige) Tj
+1 0 0 1 70.0 82.9 Tm (companyId nul \(assignation de profils\) et le gating du menu.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 4735 >>
+stream
+BT
+/F1 10.0 Tf
+1 0 0 1 56.0 781.9 Tm (?  Écrans multi-institutions réservés au super-admin \(marqueurs de menu 'super_admin'\).) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 763.9 Tm (Autres correctifs) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 746.9 Tm (?  Création de bagage : tolérance des champs optionnels vides/null \(serializer robuste + reset) Tj
+1 0 0 1 70.0 732.9 Tm (de formulaire complet\).) Tj
+1 0 0 1 56.0 718.9 Tm (?  Page d'attribution des permissions repensée : hiérarchie Module ? Ressource ? cases d'action) Tj
+1 0 0 1 70.0 704.9 Tm (\(CRUD\) avec sélection groupée.) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 686.9 Tm (4. RBAC ? état détaillé \(base pour la suite\)) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 662.9 Tm (Le contrôle d'accès basé sur les rôles est complet et effectif de bout en bout. Section clé pour) Tj
+1 0 0 1 56.0 648.9 Tm (intégrer les futurs modules \(Trésorerie, RH, Comptabilité\).) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 630.9 Tm (4.1 Mécanisme) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 613.9 Tm (?  Backend : classe core.permissions.HasModulePermission. Chaque vue déclare permission_classes) Tj
+1 0 0 1 70.0 599.9 Tm (= [IsAuthenticated, HasModulePermission] + un permission_map = { 'GET': '<code>.view',) Tj
+1 0 0 1 70.0 585.9 Tm ('POST'/'PATCH'/'PUT'/'DELETE': '<code>.manage' }.) Tj
+1 0 0 1 56.0 571.9 Tm (?  Ordre d'autorisation : super-admin \(is_superuser\) ? tout ; admin d'institution) Tj
+1 0 0 1 70.0 557.9 Tm (\(is_institution_admin\) ? tout dans sa société \(bypass\) ; sinon vérifie le code via) Tj
+1 0 0 1 70.0 543.9 Tm (get_user_permissions\(user, société\).) Tj
+1 0 0 1 56.0 529.9 Tm (?  Frontend : directive standalone *hasPermission='code' \(ou tableau, au moins un\) dans) Tj
+1 0 0 1 70.0 515.9 Tm (app/shared/directives/ ; masque menus et boutons. Réactive au chargement des permissions.) Tj
+1 0 0 1 56.0 501.9 Tm (?  Menu : filtrage générique dans sidebar.service.ts/buildMenuForUser ? toute entrée avec un) Tj
+1 0 0 1 70.0 487.9 Tm (champ 'permission' est masquée si non accordée ; groupes/modules vides masqués ; super/admin) Tj
+1 0 0 1 70.0 473.9 Tm (institution bypass via currentUser.) Tj
+1 0 0 1 56.0 459.9 Tm (?  me/permissions renvoie ['*'] pour super-admin ET admin d'institution ; sinon les codes des) Tj
+1 0 0 1 70.0 445.9 Tm (rôles/profils. PermissionService \(front\) charge ce endpoint au login/bootstrap.) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 427.9 Tm (4.2 Taxonomie des codes de permission) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 410.9 Tm (Format : <module>.<ressource>.<action>. 102 permissions seedées, reproductibles via migrations) Tj
+1 0 0 1 56.0 396.9 Tm (\(admin_rbac 0002 à 0007\). Préfixes de module de permission \(? noms d'apps\) :) Tj
+1 0 0 1 56.0 382.9 Tm (?  fleet.*  \(33\) ? app fleet \(+ fleet.config.* groupé pour la config de référence\).) Tj
+1 0 0 1 56.0 368.9 Tm (?  voyage.*  \(11\) ? app voyages_trips \(trip, crew, dashboard\).) Tj
+1 0 0 1 56.0 354.9 Tm (?  ticketing.*  \(17\) ? apps voyages_booking \(booking/customer/ticket\) ET voyages_consignment) Tj
+1 0 0 1 70.0 340.9 Tm (\(ticketing.parcel.*, ticketing.luggage.*\).) Tj
+1 0 0 1 56.0 326.9 Tm (?  transport.*  \(14\) ? app voyages_config \(city/route/fareclass/terminal + transport.config.*) Tj
+1 0 0 1 70.0 312.9 Tm (groupé\) ET voyages_pricing \(transport.fare.*\).) Tj
+1 0 0 1 56.0 298.9 Tm (?  scig.*  \(27\) ? app sync_scig_sage.) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 280.9 Tm (4.3 Modules déjà protégés \(backend + menu + boutons\)) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 263.9 Tm (?  Flotte \(fleet\) ? codes fleet.* ? 0 IsInstitutionAdmin restant.) Tj
+1 0 0 1 56.0 249.9 Tm (?  Voyages \(voyages_trips\) ? codes voyage.*.) Tj
+1 0 0 1 56.0 235.9 Tm (?  Réservations \(voyages_booking\) ? codes ticketing.*.) Tj
+1 0 0 1 56.0 221.9 Tm (?  Config Voyages \(voyages_config\) ? codes transport.* + transport.config.*.) Tj
+1 0 0 1 56.0 207.9 Tm (?  Colis & Bagages \(voyages_consignment\) ? codes ticketing.parcel.* / ticketing.luggage.*.) Tj
+1 0 0 1 56.0 193.9 Tm (?  Tarifs \(voyages_pricing\) ? codes transport.fare.*.) Tj
+1 0 0 1 56.0 179.9 Tm (Vérifié : aucune vue de ces 6 modules n'utilise plus IsInstitutionAdmin ; tout est gouverné par) Tj
+1 0 0 1 56.0 165.9 Tm (les permissions.) Tj
+/F2 11.5 Tf
+1 0 0 1 56.0 147.9 Tm (4.4 Rôles & profils par défaut) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 130.9 Tm (À la création d'une société \(seed_default_roles, appelé par _bootstrap_company\), 6 rôles + 6) Tj
+1 0 0 1 56.0 116.9 Tm (profils homonymes scopés à la société sont créés \(idempotent\) : Chef d'agence, Guichetier,) Tj
+1 0 0 1 56.0 102.9 Tm (Régulateur, Gestionnaire de flotte, Agent colis & bagages, Comptable \(lecture\). Commande de) Tj
+1 0 0 1 56.0 88.9 Tm (backfill : python manage.py seed_default_roles [--company <id>] \(déjà exécutée sur la base de) Tj
+1 0 0 1 56.0 74.9 Tm (dev\).) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 4176 >>
+stream
+BT
+/F2 14.0 Tf
+1 0 0 1 56.0 781.9 Tm (5. Recette : intégrer un NOUVEAU module au RBAC) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 757.9 Tm (Procédure reproductible \(suivie pour les 6 modules\). À appliquer pour Trésorerie, RH,) Tj
+1 0 0 1 56.0 743.9 Tm (Comptabilité une fois leurs specs et endpoints prêts :) Tj
+1 0 0 1 56.0 729.9 Tm (?  Définir les codes de permission du module : <module>.<ressource>.<action> \(view/manage, ou) Tj
+1 0 0 1 70.0 715.9 Tm (create/update/delete si granularité utile ; un code groupé <module>.config.* pour la config) Tj
+1 0 0 1 70.0 701.9 Tm (de référence\).) Tj
+1 0 0 1 56.0 687.9 Tm (?  Seeder ces codes via une data-migration admin_rbac \(rattachée à un AppModule\), sur le modèle) Tj
+1 0 0 1 70.0 673.9 Tm (de 0003-0007 ? indispensable pour que base fraîche/tests/prod les aient.) Tj
+1 0 0 1 56.0 659.9 Tm (?  Backend : sur chaque vue, remplacer IsInstitutionAdmin par [IsAuthenticated,) Tj
+1 0 0 1 70.0 645.9 Tm (HasModulePermission] + permission_map \(GET?.view, écriture?.manage\). Objectif : 0) Tj
+1 0 0 1 70.0 631.9 Tm (IsInstitutionAdmin.) Tj
+1 0 0 1 56.0 617.9 Tm (?  Frontend menu : ajouter 'permission' sur chaque entrée de menu du module dans) Tj
+1 0 0 1 70.0 603.9 Tm (sidebar.service.ts.) Tj
+1 0 0 1 56.0 589.9 Tm (?  Frontend boutons : importer HasPermissionDirective et poser *hasPermission sur) Tj
+1 0 0 1 70.0 575.9 Tm (Nouveau/Modifier/Supprimer + actions ; envelopper dans <ng-container *hasPermission> les) Tj
+1 0 0 1 70.0 561.9 Tm (boutons déjà sous *ngIf.) Tj
+1 0 0 1 56.0 547.9 Tm (?  Tests pytest \(patron _make_staff\) : staff avec .view ? lecture OK / écriture 403 ; avec) Tj
+1 0 0 1 70.0 533.9 Tm (.manage ? écriture OK ; admin ? tout.) Tj
+1 0 0 1 56.0 519.9 Tm (?  Rôles par défaut : ajouter les nouveaux codes aux bundles pertinents dans) Tj
+1 0 0 1 70.0 505.9 Tm (admin_rbac/services/defaults.py \(ex. Comptable pour la Compta/Trésorerie, un rôle RH dédié\) +) Tj
+1 0 0 1 70.0 491.9 Tm (rejouer seed_default_roles.) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 473.9 Tm (6. Prochaines étapes ? Trésorerie, RH, Comptabilité) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 449.9 Tm (?  Trésorerie \(app treasury existante : modèles présents, vues minimales\) ? compléter les) Tj
+1 0 0 1 70.0 435.9 Tm (endpoints puis appliquer la recette RBAC \(codes ex. treasury.*\).) Tj
+1 0 0 1 56.0 421.9 Tm (?  RH \(app hr existante : modèles présents, vues minimales\) ? idem \(codes ex. hr.*\), prévoir un) Tj
+1 0 0 1 70.0 407.9 Tm (rôle 'Responsable RH'.) Tj
+1 0 0 1 56.0 393.9 Tm (?  Comptabilité \(à créer\) ? nouvelle app + codes ex. accounting.*, rôle 'Comptable' enrichi.) Tj
+1 0 0 1 56.0 379.9 Tm (?  Pour chacun : brainstorm ? spec ? plan ? exécution \(workflow superpowers\), puis intégration) Tj
+1 0 0 1 70.0 365.9 Tm (RBAC via la recette \(section 5\), puis mise à jour des rôles par défaut.) Tj
+1 0 0 1 56.0 351.9 Tm (?  Interconnexions à prévoir : Réservations/Colis \(encaissements\) ? Trésorerie ; Trésorerie/Paie) Tj
+1 0 0 1 70.0 337.9 Tm (? Comptabilité ; RH \(employés\) ? conducteurs/équipages \(fleet/voyages\).) Tj
+/F2 14.0 Tf
+1 0 0 1 56.0 319.9 Tm (7. Points d'attention / dette technique) Tj
+/F1 10.0 Tf
+1 0 0 1 56.0 295.9 Tm (?  Après tout changement du payload utilisateur \(is_superuser, company objet, permissions\), les) Tj
+1 0 0 1 70.0 281.9 Tm (sessions ouvertes doivent se reconnecter \(cache localStorage\) ? sinon menu/permissions) Tj
+1 0 0 1 70.0 267.9 Tm (obsolètes.) Tj
+1 0 0 1 56.0 253.9 Tm (?  Les codes de permission historiques n'étaient dans aucune migration \(présents seulement en) Tj
+1 0 0 1 70.0 239.9 Tm (dev\) : corrigé \(migrations 0003-0007\). Toujours seeder par migration.) Tj
+1 0 0 1 56.0 225.9 Tm (?  Avertissement staticfiles \(dossier static manquant\) ? bénin, à nettoyer.) Tj
+1 0 0 1 56.0 211.9 Tm (?  Taxonomie de permission \(voyage/ticketing/transport\) ? noms d'apps \(voyages_*\) : documenté) Tj
+1 0 0 1 70.0 197.9 Tm (ici \(section 4.2\) pour éviter la confusion lors des extensions.) Tj
+1 0 0 1 56.0 183.9 Tm (?  Durcissement possible : guards de route Angular pour bloquer l'accès direct par URL aux) Tj
+1 0 0 1 70.0 169.9 Tm (écrans non autorisés \(aujourd'hui : menu masqué + backend qui refuse\).) Tj
+ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000133 00000 n 
+0000000230 00000 n 
+0000000332 00000 n 
+0000000474 00000 n 
+0000005011 00000 n 
+0000005153 00000 n 
+0000009940 00000 n 
+0000010083 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R >>
+startxref
+14312
+%%EOF
