@@ -10,11 +10,12 @@ import { TripOption } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgBaggageComponent implements OnInit {
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';

@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 interface RowState { received: number; missing: number; damaged: number; }
 
 @Component({
   selector: 'app-vcg-reception',
   templateUrl: './reception.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcgReceptionComponent implements OnInit {
   rows: Parcel[] = []; loading = false; q = '';

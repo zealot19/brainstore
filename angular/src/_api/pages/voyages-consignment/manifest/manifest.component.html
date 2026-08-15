@@ -18,7 +18,7 @@
       <div class="col-lg-5 mb-3">
         <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between">
           <h6 class="mb-0">Colis à charger</h6>
-          @if (pending.length) { <button class="btn btn-sm btn-primary" (click)="loadAll()"><i class="ti ti-arrows-right me-1"></i>Tout charger</button> }
+          @if (pending.length) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" (click)="loadAll()"><i class="ti ti-arrows-right me-1"></i>Tout charger</button> }
         </div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table mb-0">
             <thead class="thead-light"><tr><th>Réf.</th><th>Trajet</th><th class="no-sort"></th></tr></thead>
@@ -27,7 +27,7 @@
                 <tr>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td><small>{{ p.origin_point_name }} → {{ p.destination_point_name }}</small></td>
-                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="load(p)" title="Charger"><i class="ti ti-arrow-right"></i></a></td>
+                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.parcel.manage'" (click)="load(p)" title="Charger"><i class="ti ti-arrow-right"></i></a></td>
                 </tr>
               } @empty { <tr><td colspan="3" class="text-center py-3 text-muted">Aucun colis en attente.</td></tr> }
             </tbody>
@@ -46,7 +46,7 @@
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td>{{ p.recipient_name }}</td>
                   <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
-                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" (click)="unload(p)" title="Retirer du voyage"><i class="ti ti-arrow-left me-1"></i>Retirer</a> }</td>
+                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unload(p)" title="Retirer du voyage"><i class="ti ti-arrow-left me-1"></i>Retirer</a> }</td>
                 </tr>
               } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">Aucun colis à bord.</td></tr> }
             </tbody>
@@ -63,8 +63,8 @@
                   <td>{{ b.weight_kg || '—' }} kg</td>
                   <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
                   <td class="text-end">
-                    @if (b.status === 'checked_in') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" (click)="loadBag(b)"><i class="ti ti-truck-loading me-1"></i>Charger</a> }
-                    @if (b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" (click)="deliver(b)"><i class="ti ti-package-export me-1"></i>Livrer</a> }
+                    @if (b.status === 'checked_in') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" *hasPermission="'ticketing.luggage.manage'" (click)="loadBag(b)"><i class="ti ti-truck-loading me-1"></i>Charger</a> }
+                    @if (b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.luggage.manage'" (click)="deliver(b)"><i class="ti ti-package-export me-1"></i>Livrer</a> }
                   </td>
                 </tr>
               } @empty { <tr><td colspan="5" class="text-center py-3 text-muted">Aucun bagage.</td></tr> }

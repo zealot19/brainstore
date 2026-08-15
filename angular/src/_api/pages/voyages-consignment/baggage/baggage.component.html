@@ -1,7 +1,7 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Bagages</h4><h6>Enregistrement et retrait des bagages</h6></div></div>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#baggage-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ajouter un bagage</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#baggage-modal" *hasPermission="'ticketing.luggage.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ajouter un bagage</a>
   </div>
 </div>
 <app-info-banner text="Le bagage est rattaché à un voyage dès l'enregistrement. Le passager (billet) est facultatif : sans billet, saisissez l'identité de l'expéditeur. Le retrait se fait au passager à l'arrivée."></app-info-banner>
@@ -38,9 +38,9 @@
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-info" (click)="bulk('load')"><i class="ti ti-truck-loading me-1"></i>Charger</button>
-        <button class="btn btn-sm btn-success" (click)="bulk('deliver')"><i class="ti ti-package-export me-1"></i>Retirer</button>
-        <button class="btn btn-sm btn-danger" (click)="bulk('cancel')"><i class="ti ti-trash me-1"></i>Annuler</button>
+        <button class="btn btn-sm btn-info" *hasPermission="'ticketing.luggage.manage'" (click)="bulk('load')"><i class="ti ti-truck-loading me-1"></i>Charger</button>
+        <button class="btn btn-sm btn-success" *hasPermission="'ticketing.luggage.manage'" (click)="bulk('deliver')"><i class="ti ti-package-export me-1"></i>Retirer</button>
+        <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.luggage.manage'" (click)="bulk('cancel')"><i class="ti ti-trash me-1"></i>Annuler</button>
       </div>
     }
   </div>
@@ -63,11 +63,11 @@
               <td>{{ b.amount_due | number:'1.0-0' }} XAF</td>
               <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printTicket(b.id)" title="Ticket de bagage"><i class="ti ti-ticket me-1"></i>Ticket</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printLabel(b.id)" title="Étiquette"><i class="ti ti-tag me-1"></i>Étiquette</a>
-                @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#baggage-modal" (click)="openEdit(b)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
-                @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#deliver-modal" (click)="askDeliver(b)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
-                @if (b.status !== 'delivered' && b.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.luggage.view'" (click)="printTicket(b.id)" title="Ticket de bagage"><i class="ti ti-ticket me-1"></i>Ticket</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.luggage.view'" (click)="printLabel(b.id)" title="Étiquette"><i class="ti ti-tag me-1"></i>Étiquette</a>
+                @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#baggage-modal" *hasPermission="'ticketing.luggage.manage'" (click)="openEdit(b)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
+                @if (b.status === 'checked_in' || b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#deliver-modal" *hasPermission="'ticketing.luggage.manage'" (click)="askDeliver(b)" title="Retrait"><i class="ti ti-package-export me-1"></i>Retrait</a> }
+                @if (b.status !== 'delivered' && b.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.luggage.manage'" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun bagage.</td></tr> }
@@ -135,5 +135,5 @@
     @if (deliverTarget) { <p>Bagage <strong>{{ deliverTarget.tag_number }}</strong> — {{ deliverTarget.owner_name }}.</p> }
     <div class="mb-2"><label class="form-label">Commentaire</label><textarea class="form-control" rows="2" [(ngModel)]="deliverComment" placeholder="Observation éventuelle à la remise"></textarea></div>
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="deliverTarget = null">Annuler</button><button type="button" class="btn btn-success" (click)="doDeliver()">Confirmer le retrait</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="deliverTarget = null">Annuler</button><button type="button" class="btn btn-success" *hasPermission="'ticketing.luggage.manage'" (click)="doDeliver()">Confirmer le retrait</button></div>
 </div></div></div>

@@ -7,11 +7,12 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { Parcel, Baggage, Manifest } from '../../../models/voyages-consignment.models';
 import { TripOption } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vcg-manifest',
   templateUrl: './manifest.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcgManifestComponent implements OnInit {
   trips: TripOption[] = []; tripId = '';

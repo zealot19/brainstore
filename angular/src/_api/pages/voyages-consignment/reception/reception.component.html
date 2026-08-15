@@ -11,7 +11,7 @@
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-success" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
+        <button class="btn btn-sm btn-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
       </div>
     }
   </div>
@@ -36,7 +36,7 @@
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].missing" /></td>
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].damaged" /></td>
               <td class="action-table-data">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" (click)="receiveOne(p)" title="Réceptionner"><i class="ti ti-package-import me-1"></i>Réceptionner</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveOne(p)" title="Réceptionner"><i class="ti ti-package-import me-1"></i>Réceptionner</a>
               </td>
             </tr>
           } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun colis en transit à réceptionner.</td></tr> }

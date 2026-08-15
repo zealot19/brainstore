@@ -9,11 +9,12 @@ import { Parcel } from '../../../models/voyages-consignment.models';
 import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vcg-parcels',
   templateUrl: './parcels.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgParcelsComponent implements OnInit {
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';

@@ -1,7 +1,7 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Colis</h4><h6>Enregistrement, suivi et retrait des colis</h6></div></div>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parcel-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Enregistrer un colis</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Enregistrer un colis</a>
   </div>
 </div>
 <app-info-banner text="Enregistrez le colis (expéditeur, destinataire, contenu) et encaissez le montant au dépôt. Le colis part « Enregistré » ; il sera affecté à un voyage via le manifeste, puis retiré par le destinataire à l'arrivée."></app-info-banner>
@@ -46,7 +46,7 @@
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-danger" (click)="bulkCancel()"><i class="ti ti-trash me-1"></i>Annuler la sélection</button>
+        <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" (click)="bulkCancel()"><i class="ti ti-trash me-1"></i>Annuler la sélection</button>
       </div>
     }
   </div>
@@ -75,10 +75,10 @@
               <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="printReceipt(p.id)" title="Imprimer le reçu"><i class="ti ti-printer me-1"></i>Reçu</a>
-                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
-                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="askPickup(p)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
-                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" title="Imprimer le reçu"><i class="ti ti-printer me-1"></i>Reçu</a>
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
+                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
@@ -144,7 +144,7 @@
     <div class="mb-2"><label class="form-label">Nom de la personne qui retire <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
     <div class="mb-2"><label class="form-label">Pièce présentée</label><input class="form-control" [(ngModel)]="pickupId" placeholder="No CNI/passeport présenté" /></div>
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" (click)="doPickup()">Confirmer la livraison</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" *hasPermission="'ticketing.parcel.manage'" (click)="doPickup()">Confirmer la livraison</button></div>
 </div></div></div>
 
 <!-- Détail / suivi -->
