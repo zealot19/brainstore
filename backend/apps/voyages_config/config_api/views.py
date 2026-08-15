@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -22,7 +22,8 @@ from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensu
 # ── Generic scoped-config views (mirrors apps.fleet.config_api) ────────────────
 
 class _ConfigListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage"}
     model = None
     read = None
     write = None
@@ -60,7 +61,9 @@ class _ConfigListView(APIView):
 
 
 class _ConfigDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "PATCH": "transport.config.manage",
+                      "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
     model = None
     read = None
     write = None
@@ -105,7 +108,8 @@ class _ConfigDetailView(APIView):
 
 
 class _ConfigBulkDeleteView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "transport.config.manage"}
     model = None
 
     def post(self, request):
@@ -127,28 +131,42 @@ class _ConfigBulkDeleteView(APIView):
         return success_response({"deleted": count})
 
 
-def _pair(model_cls, read_cls, write_cls, unique="name", search=("name",)):
-    lst = type(f"{model_cls.__name__}ListView", (_ConfigListView,),
-               {"model": model_cls, "read": read_cls, "write": write_cls,
-                "unique_field": unique, "search_fields": list(search)})
-    det = type(f"{model_cls.__name__}DetailView", (_ConfigDetailView,),
-               {"model": model_cls, "read": read_cls, "write": write_cls, "unique_field": unique})
+def _perm_maps(perm):
+    return (
+        {"GET": f"{perm}.view", "POST": f"{perm}.manage"},
+        {"GET": f"{perm}.view", "PATCH": f"{perm}.manage", "PUT": f"{perm}.manage", "DELETE": f"{perm}.manage"},
+    )
+
+
+def _pair(model_cls, read_cls, write_cls, unique="name", search=("name",), perm=None):
+    lst_attrs = {"model": model_cls, "read": read_cls, "write": write_cls,
+                 "unique_field": unique, "search_fields": list(search)}
+    det_attrs = {"model": model_cls, "read": read_cls, "write": write_cls, "unique_field": unique}
+    if perm:
+        lmap, dmap = _perm_maps(perm)
+        lst_attrs["permission_map"] = lmap
+        det_attrs["permission_map"] = dmap
+    lst = type(f"{model_cls.__name__}ListView", (_ConfigListView,), lst_attrs)
+    det = type(f"{model_cls.__name__}DetailView", (_ConfigDetailView,), det_attrs)
     return lst, det
 
 
-def _bulk(model_cls):
-    return type(f"{model_cls.__name__}BulkDeleteView", (_ConfigBulkDeleteView,), {"model": model_cls})
+def _bulk(model_cls, perm=None):
+    attrs = {"model": model_cls}
+    if perm:
+        attrs["permission_map"] = {"POST": f"{perm}.manage"}
+    return type(f"{model_cls.__name__}BulkDeleteView", (_ConfigBulkDeleteView,), attrs)
 
 
 # ── Simple reference tables ───────────────────────────────────────────────────
-TownListView, TownDetailView = _pair(Town, S.TownRead, S.TownWrite, unique="name", search=("name", "code"))
-FareClassListView, FareClassDetailView = _pair(FareClass, S.FareClassRead, S.FareClassWrite, unique="code", search=("code", "name"))
+TownListView, TownDetailView = _pair(Town, S.TownRead, S.TownWrite, unique="name", search=("name", "code"), perm="transport.city")
+FareClassListView, FareClassDetailView = _pair(FareClass, S.FareClassRead, S.FareClassWrite, unique="code", search=("code", "name"), perm="transport.fareclass")
 TimeSlotListView, TimeSlotDetailView = _pair(TimeSlot, S.TimeSlotRead, S.TimeSlotWrite, unique="code", search=("code", "label"))
 ConsignmentNatureListView, ConsignmentNatureDetailView = _pair(ConsignmentNature, S.ConsignmentNatureRead, S.ConsignmentNatureWrite, unique="code", search=("code", "name"))
 LoyaltyRuleListView, LoyaltyRuleDetailView = _pair(LoyaltyRule, S.LoyaltyRuleRead, S.LoyaltyRuleWrite, unique="name", search=("name",))
 
-TownBulkDeleteView = _bulk(Town)
-FareClassBulkDeleteView = _bulk(FareClass)
+TownBulkDeleteView = _bulk(Town, perm="transport.city")
+FareClassBulkDeleteView = _bulk(FareClass, perm="transport.fareclass")
 TimeSlotBulkDeleteView = _bulk(TimeSlot)
 ConsignmentNatureBulkDeleteView = _bulk(ConsignmentNature)
 LoyaltyRuleBulkDeleteView = _bulk(LoyaltyRule)
@@ -156,6 +174,8 @@ LoyaltyRuleBulkDeleteView = _bulk(LoyaltyRule)
 
 # ── ServicePoint (FK: town) ───────────────────────────────────────────────────
 class ServicePointListView(_ConfigListView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.manage", "PATCH": "transport.terminal.manage", "PUT": "transport.terminal.manage", "DELETE": "transport.terminal.manage"}
     model = ServicePoint
     read = S.ServicePointRead
     write = S.ServicePointWrite
@@ -169,6 +189,8 @@ class ServicePointListView(_ConfigListView):
 
 
 class ServicePointDetailView(_ConfigDetailView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.manage", "PATCH": "transport.terminal.manage", "PUT": "transport.terminal.manage", "DELETE": "transport.terminal.manage"}
     model = ServicePoint
     read = S.ServicePointRead
     write = S.ServicePointWrite
@@ -181,7 +203,7 @@ class ServicePointDetailView(_ConfigDetailView):
             setattr(obj, k, v)
 
 
-ServicePointBulkDeleteView = _bulk(ServicePoint)
+ServicePointBulkDeleteView = _bulk(ServicePoint, perm="transport.terminal")
 
 
 # ── ConsignmentType (FK: nature) ──────────────────────────────────────────────
@@ -217,7 +239,8 @@ ConsignmentTypeBulkDeleteView = _bulk(ConsignmentType)
 # ── Route (trajet) + escales ──────────────────────────────────────────────────
 
 class RouteListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
 
     def get(self, request):
         qs = (scoped_qs(Route, scope_company_id(request))
@@ -256,7 +279,8 @@ class RouteListView(APIView):
 
 
 class RouteDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
 
     def _get(self, request, pk):
         return (scoped_qs(Route, scope_company_id(request))
@@ -308,7 +332,8 @@ class RouteDetailView(APIView):
 
 
 class RouteStopListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
 
     def _route(self, request, route_id):
         return scoped_qs(Route, scope_company_id(request)).filter(id=route_id).first()
@@ -342,7 +367,8 @@ class RouteStopListView(APIView):
 
 
 class RouteStopDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
 
     def _get(self, request, route_id, stop_id):
         route = scoped_qs(Route, scope_company_id(request)).filter(id=route_id).first()
@@ -402,7 +428,8 @@ SeatingPlanBulkDeleteView = _bulk(SeatingPlan)
 
 
 class SeatingPlanSeatsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def _plan(self, request, plan_id):
         return scoped_qs(SeatingPlan, scope_company_id(request)).filter(id=plan_id).first()
@@ -437,7 +464,8 @@ class SeatingPlanSeatsView(APIView):
 # ── VehicleSeatingAssignment ──────────────────────────────────────────────────
 
 class VehicleSeatingAssignmentListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def get(self, request):
         qs = (scoped_qs(VehicleSeatingAssignment, scope_company_id(request))
@@ -467,7 +495,8 @@ class VehicleSeatingAssignmentListView(APIView):
 
 
 class VehicleSeatingAssignmentDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def _get(self, request, pk):
         return scoped_qs(VehicleSeatingAssignment, scope_company_id(request)).filter(id=pk).first()
@@ -536,7 +565,8 @@ def _resolve_pattern_fks(d, company_id):
 
 
 class ServicePatternListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def get(self, request):
         qs = (scoped_qs(ServicePattern, scope_company_id(request))
@@ -565,7 +595,8 @@ class ServicePatternListView(APIView):
 
 
 class ServicePatternDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def _get(self, request, pk):
         return scoped_qs(ServicePattern, scope_company_id(request)).filter(id=pk).first()
@@ -606,7 +637,8 @@ ServicePatternBulkDeleteView = _bulk(ServicePattern)
 # ── VoyagesSettings (singleton per company) ───────────────────────────────────
 
 class VoyagesSettingsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def get(self, request):
         company, err = resolve_company_or_global(request)
@@ -634,7 +666,8 @@ class VoyagesSettingsView(APIView):
 # ── TicketTemplate (Config billets, singleton per company) ────────────────────
 
 class TicketTemplateView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
@@ -656,7 +689,8 @@ class TicketTemplateView(APIView):
 
 
 class TicketTemplateResetView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
 
     def post(self, request):
         company, err = resolve_company_or_global(request)
@@ -669,7 +703,8 @@ class TicketTemplateResetView(APIView):
 
 
 class TicketTemplatePreviewView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request):
