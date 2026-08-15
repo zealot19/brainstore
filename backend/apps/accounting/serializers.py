@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Account, Journal, FiscalYear, AccountingPeriod, Partner
+from .models import (Account, Journal, FiscalYear, AccountingPeriod, Partner,
+                     JournalEntry, JournalEntryLine)
 
 
 class PartnerSerializer(serializers.ModelSerializer):
@@ -41,3 +42,24 @@ class AccountingPeriodSerializer(serializers.ModelSerializer):
         model = AccountingPeriod
         fields = ["id", "fiscal_year", "code", "name", "date_start", "date_end", "state"]
         read_only_fields = ["id"]
+
+
+class JournalEntryLineSerializer(serializers.ModelSerializer):
+    account_code = serializers.CharField(source="account.code", read_only=True)
+
+    class Meta:
+        model = JournalEntryLine
+        fields = ["id", "sequence", "account", "account_code", "label", "debit", "credit", "partner", "reconciled", "reconcile_group"]
+        read_only_fields = ["id"]
+
+
+class JournalEntrySerializer(serializers.ModelSerializer):
+    lines = JournalEntryLineSerializer(many=True, read_only=True)
+    journal_code = serializers.CharField(source="journal.code", read_only=True)
+
+    class Meta:
+        model = JournalEntry
+        fields = ["id", "name", "journal", "journal_code", "period", "date", "entry_type", "partner",
+                  "label", "reference", "state", "total_debit", "total_credit", "posted_at",
+                  "reversed_entry", "source_model", "source_id", "lines"]
+        read_only_fields = ["id", "name", "state", "total_debit", "total_credit", "posted_at", "period"]

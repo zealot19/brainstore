@@ -1,11 +1,14 @@
+from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from apps.core.permissions import IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response
-from .models import Account, Journal, FiscalYear, AccountingPeriod, Partner
+from apps.core.exceptions import ApplicationError
+from .models import Account, Journal, FiscalYear, AccountingPeriod, Partner, JournalEntry
 from .serializers import (AccountSerializer, JournalSerializer,
                           FiscalYearSerializer, AccountingPeriodSerializer,
-                          PartnerSerializer)
+                          PartnerSerializer, JournalEntrySerializer)
+from .services.accounting_service import AccountingService, EntryRequest, LineRequest
 
 
 def _company(request):
@@ -221,3 +224,100 @@ class PartnerDetailView(APIView):
         o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message=_("Partenaire supprimé."))
+
+
+class EntryListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "accounting.entry.view", "POST": "accounting.entry.create"}
+
+    def get(self, request):
+        qs = JournalEntry.objects.filter(is_deleted=False, company_id=_company(request)).select_related("journal")
+        for param, fieldname in (("journal", "journal_id"), ("period", "period_id"), ("state", "state")):
+            val = request.query_params.get(param)
+            if val:
+                qs = qs.filter(**{fieldname: val})
+        if request.query_params.get("date_from"):
+            qs = qs.filter(date__gte=request.query_params["date_from"])
+        if request.query_params.get("date_to"):
+            qs = qs.filter(date__lte=request.query_params["date_to"])
+        return success_response(JournalEntrySerializer(qs.prefetch_related("lines"), many=True).data)
+
+    def post(self, request):
+        d = request.data
+        lines = [LineRequest(account_code=str(ln.get("account")), label=ln.get("label", ""),
+                             debit=Decimal(str(ln.get("debit") or 0)), credit=Decimal(str(ln.get("credit") or 0)),
+                             partner_id=ln.get("partner")) for ln in d.get("lines", [])]
+        req = EntryRequest(company_id=_company(request), journal_code=str(d.get("journal")), date=d.get("date"),
+                           label=d.get("label", ""), reference=d.get("reference", ""),
+                           entry_type=d.get("entry_type", "manual"), partner_id=d.get("partner"), lines=lines)
+        try:
+            entry = AccountingService.create_entry(req, created_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e.message))
+        return created_response(JournalEntrySerializer(entry).data)
+
+
+class EntryDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "accounting.entry.view", "PATCH": "accounting.entry.create", "DELETE": "accounting.entry.create"}
+
+    def _get(self, request, pk):
+        return JournalEntry.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
+
+    def get(self, request, pk):
+        o = self._get(request, pk)
+        return success_response(JournalEntrySerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+
+    def patch(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        if o.state != "draft":
+            return error_response(_("Une pièce validée est immuable."))
+        for f in ("label", "reference"):
+            if f in request.data:
+                setattr(o, f, request.data[f])
+        o.updated_by = request.user
+        o.save()
+        return success_response(JournalEntrySerializer(o).data)
+
+    def delete(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        if o.state != "draft":
+            return error_response(_("Seule une pièce en brouillon peut être supprimée."))
+        o.is_deleted = True
+        o.updated_by = request.user
+        o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return success_response(message=_("Pièce supprimée."))
+
+
+class EntryPostView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "accounting.entry.post"}
+
+    def post(self, request, pk):
+        o = JournalEntry.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        try:
+            entry = AccountingService.post_entry(o.id, posted_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e.message))
+        return success_response(JournalEntrySerializer(entry).data)
+
+
+class EntryCancelView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "accounting.entry.cancel"}
+
+    def post(self, request, pk):
+        o = JournalEntry.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        try:
+            reversal = AccountingService.cancel_entry(o.id, reason=request.data.get("reason", ""), cancelled_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e.message))
+        return success_response(JournalEntrySerializer(reversal).data)
