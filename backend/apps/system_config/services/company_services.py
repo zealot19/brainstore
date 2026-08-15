@@ -130,6 +130,10 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     from apps.admin_rbac.services.defaults import seed_default_roles
     seed_default_roles(company, created_by=created_by)
 
+    # Référentiel comptable OHADA de la société (G-Accounting A1).
+    from apps.accounting.services.seed import seed_accounting
+    seed_accounting(company, created_by=created_by)
+
     return {
         "hq_agency_id":   str(hq.id),
         "hq_agency_name": hq.name,
