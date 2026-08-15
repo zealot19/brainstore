@@ -67,3 +67,14 @@ def test_default_roles_idempotent():
     before = Role.objects.filter(company=company).count()
     seed_default_roles(company)  # rappel
     assert Role.objects.filter(company=company).count() == before
+
+
+@pytest.mark.django_db
+def test_seed_default_roles_command_backfills():
+    from apps.system_config.services import create_company
+    from apps.admin_rbac.models import Role
+    from django.core.management import call_command
+    company, _ = create_company(name="NoBootstrap Co")   # pas d'admin_email -> pas de bootstrap
+    assert Role.objects.filter(company=company).count() == 0
+    call_command("seed_default_roles", company=str(company.id))
+    assert Role.objects.filter(company=company).count() == 6
