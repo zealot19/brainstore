@@ -52,6 +52,7 @@ export const Pages_routes: Routes = [
               children: [
                 { path: 'accounts',      loadComponent: () => import('../../../_api/pages/accounting/accounts/accounts.component').then(m => m.AccAccountsComponent) },
                 { path: 'journals',      loadComponent: () => import('../../../_api/pages/accounting/journals/journals.component').then(m => m.AccJournalsComponent) },
+                { path: 'fiscal-years',  loadComponent: () => import('../../../_api/pages/accounting/fiscal-years/fiscal-years.component').then(m => m.AccFiscalYearsComponent) },
                 { path: '', redirectTo: 'accounts', pathMatch: 'full' },
               ],
             },

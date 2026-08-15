@@ -1,0 +1,88 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Exercices & Périodes</h4><h6>Exercices comptables et périodes mensuelles</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fy-modal" *hasPermission="'accounting.fiscalyear.manage'" (click)="openCreateYear()"><i class="ti ti-circle-plus me-2"></i>Nouvel exercice</a></div>
+</div>
+<app-info-banner text="L'exercice courant et ses 12 périodes mensuelles sont créés à l'ouverture de l'institution. Sélectionnez un exercice pour gérer ses périodes."></app-info-banner>
+<div class="row">
+  <div class="col-lg-5">
+    <div class="card table-list-card"><div class="card-header"><h5 class="mb-0">Exercices</h5></div>
+      <div class="card-body p-0">
+        @if (loadingYears) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+        @else {
+          <div class="table-responsive"><table class="table datanew">
+            <thead class="thead-light"><tr><th>Code</th><th>Nom</th><th>Début</th><th>Fin</th><th>État</th></tr></thead>
+            <tbody>
+              @for (fy of years; track fy.id) {
+                <tr style="cursor:pointer" [class.table-active]="selected?.id === fy.id" (click)="select(fy)">
+                  <td class="fw-medium">{{ fy.code }}</td><td>{{ fy.name }}</td><td>{{ fy.date_start }}</td><td>{{ fy.date_end }}</td>
+                  <td>@if (fy.state === 'open') { <span class="badge bg-success">Ouvert</span> } @else { <span class="badge bg-secondary">Clôturé</span> }</td>
+                </tr>
+              } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun exercice.</td></tr> }
+            </tbody>
+          </table></div>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card table-list-card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Périodes @if (selected) { — {{ selected.name }} }</h5>
+        @if (selected) { <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#per-modal" *hasPermission="'accounting.period.manage'" (click)="openCreatePeriod()"><i class="ti ti-circle-plus me-1"></i>Nouvelle période</a> }
+      </div>
+      <div class="card-body p-0">
+        @if (!selected) { <div class="text-center py-5 text-muted">Sélectionnez un exercice.</div> }
+        @else if (loadingPeriods) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+        @else {
+          <div class="table-responsive"><table class="table datanew">
+            <thead class="thead-light"><tr><th>Code</th><th>Nom</th><th>Début</th><th>Fin</th><th>État</th><th class="no-sort">Actions</th></tr></thead>
+            <tbody>
+              @for (p of periods; track p.id) {
+                <tr>
+                  <td class="fw-medium">{{ p.code }}</td><td>{{ p.name }}</td><td>{{ p.date_start }}</td><td>{{ p.date_end }}</td>
+                  <td>
+                    @if (p.state === 'open') { <span class="badge bg-success">Ouverte</span> }
+                    @else if (p.state === 'closed') { <span class="badge bg-warning">Clôturée</span> }
+                    @else { <span class="badge bg-secondary">Verrouillée</span> }
+                  </td>
+                  <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                    @if (p.state === 'open') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'accounting.period.manage'" (click)="closePeriod(p)" title="Clôturer"><i class="ti ti-lock me-1"></i>Clôturer</a> }
+                    @else { <span class="text-muted small">—</span> }
+                  </div></td>
+                </tr>
+              } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucune période.</td></tr> }
+            </tbody>
+          </table></div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="fy-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Nouvel exercice</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="fyForm" (ngSubmit)="submitYear()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-5 mb-3"><label class="form-label">Code <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="FY2027" /></div>
+      <div class="col-md-7 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" placeholder="Exercice 2027" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Début <span class="text-danger">*</span></label><input formControlName="date_start" type="date" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Fin <span class="text-danger">*</span></label><input formControlName="date_end" type="date" class="form-control" /></div>
+    </div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="fyForm.invalid || saving">Créer</button></div></form>
+</div></div></div>
+<div class="modal fade" id="per-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Nouvelle période</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="pForm" (ngSubmit)="submitPeriod()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-5 mb-3"><label class="form-label">Code <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="2027-01" /></div>
+      <div class="col-md-7 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" placeholder="Janvier 2027" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Début <span class="text-danger">*</span></label><input formControlName="date_start" type="date" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Fin <span class="text-danger">*</span></label><input formControlName="date_end" type="date" class="form-control" /></div>
+    </div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="pForm.invalid || saving">Créer</button></div></form>
+</div></div></div>
