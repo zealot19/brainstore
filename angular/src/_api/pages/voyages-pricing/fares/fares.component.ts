@@ -7,11 +7,12 @@ import { FareClassService } from '../../../services/voyages-config/fare-class.se
 import { Fare, RoutePoint } from '../../../models/voyages-pricing.models';
 import { Route, FareClass } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-fares',
   templateUrl: './fares.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcFaresComponent implements OnInit {
   routes: Route[] = []; fareClasses: FareClass[] = [];

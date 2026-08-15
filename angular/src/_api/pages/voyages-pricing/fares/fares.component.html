@@ -1,7 +1,7 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Tarifs</h4><h6>Tarification par trajet et par segment</h6></div></div>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" [class.disabled]="!selectedRoute" data-bs-toggle="modal" data-bs-target="#fare-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ajouter un tarif</a>
+    <a href="javascript:void(0);" class="btn btn-primary" [class.disabled]="!selectedRoute" data-bs-toggle="modal" data-bs-target="#fare-modal" *hasPermission="'transport.fare.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ajouter un tarif</a>
   </div>
 </div>
 <app-info-banner text="Fixez le tarif du trajet complet (origine → destination), puis ajoutez des tarifs par segment via les escales. Ces tarifs alimenteront les réservations."></app-info-banner>
@@ -14,7 +14,7 @@
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
         <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-danger" (click)="bulkDelete()"><i class="ti ti-trash me-1"></i>Supprimer la sélection</button>
+        <button class="btn btn-sm btn-danger" *hasPermission="'transport.fare.manage'" (click)="bulkDelete()"><i class="ti ti-trash me-1"></i>Supprimer la sélection</button>
       </div>
     }
   </div>
@@ -39,8 +39,8 @@
               <td>@if (r.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 @if (r.scope !== 'global') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fare-modal" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#fare-modal" *hasPermission="'transport.fare.manage'" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'transport.fare.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>

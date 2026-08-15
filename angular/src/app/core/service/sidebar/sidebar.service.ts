@@ -349,7 +349,7 @@ export class SidebarService {
             { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types',    permission: 'transport.config.view' },
             { menuValue: 'Planifications',      route: routes.vcServicePatterns,    base: 'service-patterns',     permission: 'transport.config.view' },
             { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules',        permission: 'transport.config.view' },
-            { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares'                },
+            { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares',                permission: 'transport.fare.view' },
             { menuValue: 'Config billets',      route: routes.vcTicketTemplate,     base: 'ticket-template',      permission: 'transport.config.view' },
             { menuValue: 'Paramètres Voyages',  route: routes.vcSettings,           base: 'settings',             permission: 'transport.config.view' },
           ],
