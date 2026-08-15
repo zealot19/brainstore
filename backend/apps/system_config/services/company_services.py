@@ -126,6 +126,10 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
         agency_ids=[hq.id],
     )
 
+    # Rôles & profils par défaut de la société (RBAC tranche 4).
+    from apps.admin_rbac.services.defaults import seed_default_roles
+    seed_default_roles(company, created_by=created_by)
+
     return {
         "hq_agency_id":   str(hq.id),
         "hq_agency_name": hq.name,
