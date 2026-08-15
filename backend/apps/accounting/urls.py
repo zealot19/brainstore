@@ -9,4 +9,6 @@ urlpatterns = [
     path("fiscal-years/",        views.FiscalYearListView.as_view()),
     path("periods/",             views.PeriodListView.as_view()),
     path("periods/<uuid:pk>/close/", views.PeriodCloseView.as_view()),
+    path("partners/",           views.PartnerListView.as_view()),
+    path("partners/<uuid:pk>/", views.PartnerDetailView.as_view()),
 ]

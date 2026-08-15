@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import Account, Journal, FiscalYear, AccountingPeriod
+from .models import Account, Journal, FiscalYear, AccountingPeriod, Partner
+
+
+class PartnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partner
+        fields = ["id", "partner_type", "name", "source_model", "source_id", "active", "note"]
+        read_only_fields = ["id"]
 
 
 class AccountSerializer(serializers.ModelSerializer):

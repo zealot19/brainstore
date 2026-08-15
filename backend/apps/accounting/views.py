@@ -2,9 +2,10 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from apps.core.permissions import IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response
-from .models import Account, Journal, FiscalYear, AccountingPeriod
+from .models import Account, Journal, FiscalYear, AccountingPeriod, Partner
 from .serializers import (AccountSerializer, JournalSerializer,
-                          FiscalYearSerializer, AccountingPeriodSerializer)
+                          FiscalYearSerializer, AccountingPeriodSerializer,
+                          PartnerSerializer)
 
 
 def _company(request):
@@ -165,3 +166,58 @@ class PeriodCloseView(APIView):
         o.updated_by = request.user
         o.save(update_fields=["state", "updated_by", "updated_at"])
         return success_response(AccountingPeriodSerializer(o).data)
+
+
+class PartnerListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "accounting.partner.view", "POST": "accounting.partner.manage"}
+
+    def get(self, request):
+        qs = Partner.objects.filter(is_deleted=False, company_id=_company(request))
+        ptype = request.query_params.get("type")
+        if ptype:
+            qs = qs.filter(partner_type=ptype)
+        term = request.query_params.get("search")
+        if term:
+            qs = qs.filter(name__icontains=term)
+        return success_response(PartnerSerializer(qs.order_by("name"), many=True).data)
+
+    def post(self, request):
+        d = request.data
+        obj = Partner.objects.create(
+            company_id=_company(request), partner_type=d.get("partner_type", "other"),
+            name=d["name"], source_model=d.get("source_model", ""), source_id=d.get("source_id"),
+            note=d.get("note", ""), created_by=request.user)
+        return created_response(PartnerSerializer(obj).data)
+
+
+class PartnerDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "accounting.partner.view", "PATCH": "accounting.partner.manage", "DELETE": "accounting.partner.manage"}
+
+    def _get(self, request, pk):
+        return Partner.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
+
+    def get(self, request, pk):
+        o = self._get(request, pk)
+        return success_response(PartnerSerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+
+    def patch(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        for f in ("partner_type", "name", "source_model", "active", "note"):
+            if f in request.data:
+                setattr(o, f, request.data[f])
+        o.updated_by = request.user
+        o.save()
+        return success_response(PartnerSerializer(o).data)
+
+    def delete(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response(_("Introuvable."), status_code=404)
+        o.is_deleted = True
+        o.updated_by = request.user
+        o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return success_response(message=_("Partenaire supprimé."))
