@@ -73,6 +73,8 @@ LOCAL_APPS = [
     "apps.ticketing",
     # ── Colis ──
     "apps.parcel",
+    # ── Comptabilité (G-Accounting) ──
+    "apps.accounting",
     # ── Trésorerie ──
     "apps.treasury",
     # ── Réservation en ligne ──

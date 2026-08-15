@@ -50,6 +50,9 @@ urlpatterns = [
     # ── Colis ───────────────────────────────────────────────────────────────────
     path("parcels/",    include("apps.parcel.urls")),
 
+    # ── Comptabilité (G-Accounting) ──────────────────────────────────────────────
+    path("accounting/", include("apps.accounting.urls")),
+
     # ── Trésorerie ──────────────────────────────────────────────────────────────
     path("treasury/",   include("apps.treasury.urls")),
 
