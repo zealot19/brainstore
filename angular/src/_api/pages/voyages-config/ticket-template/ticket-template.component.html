@@ -2,8 +2,8 @@
   <div class="add-item d-flex"><div class="page-title"><h4>Config billets</h4><h6>Personnalisez le billet (formulaire) — aucune connaissance HTML requise</h6></div></div>
   <div class="page-btn d-flex gap-2">
     <a href="javascript:void(0);" class="btn btn-outline-secondary" (click)="preview()"><i class="ti ti-eye me-1"></i>Aperçu</a>
-    <a href="javascript:void(0);" class="btn btn-outline-danger" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser</a>
-    <a href="javascript:void(0);" class="btn btn-primary" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</a>
+    <a href="javascript:void(0);" class="btn btn-outline-danger" *hasPermission="'transport.config.manage'" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser</a>
+    <a href="javascript:void(0);" class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</a>
   </div>
 </div>
 <app-info-banner text="Remplissez les infos fixes du billet (entreprise, couleurs, logos, conditions, agences). Seules les données voyage/passager sont dynamiques. Un QR code contenant les infos du billet est ajouté (scannable). « Aperçu » affiche le rendu avec des données d'exemple."></app-info-banner>

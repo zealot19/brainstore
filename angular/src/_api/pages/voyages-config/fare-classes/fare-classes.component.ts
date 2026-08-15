@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
 import { FareClass } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-fare-classes',
   templateUrl: './fare-classes.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcFareClassesComponent implements OnInit {
   rows: FareClass[] = []; filtered: FareClass[] = []; loading = true; search = ''; selected = new Set<string>();

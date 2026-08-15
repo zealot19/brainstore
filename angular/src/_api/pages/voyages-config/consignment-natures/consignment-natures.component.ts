@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ConsignmentNatureService } from '../../../services/voyages-config/consignment-nature.service';
 import { ConsignmentNature } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-consignment-natures',
   templateUrl: './consignment-natures.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcConsignmentNaturesComponent implements OnInit {
   rows: ConsignmentNature[] = []; filtered: ConsignmentNature[] = []; loading = true; search = ''; selected = new Set<string>();

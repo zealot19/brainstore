@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-time-slots',
   templateUrl: './time-slots.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcTimeSlotsComponent implements OnInit {
   rows: TimeSlot[] = []; filtered: TimeSlot[] = []; loading = true; search = ''; selected = new Set<string>();

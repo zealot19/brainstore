@@ -5,11 +5,12 @@ import { ServicePointService } from '../../../services/voyages-config/service-po
 import { TownService } from '../../../services/voyages-config/town.service';
 import { ServicePoint, Town } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-service-points',
   templateUrl: './service-points.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcServicePointsComponent implements OnInit {
   rows: ServicePoint[] = []; filtered: ServicePoint[] = []; loading = true; search = ''; selected = new Set<string>();

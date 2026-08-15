@@ -5,11 +5,12 @@ import { RouteService } from '../../../services/voyages-config/route.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { Route, RouteStop, ServicePoint } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-routes',
   templateUrl: './routes.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcRoutesComponent implements OnInit {
   rows: Route[] = []; filtered: Route[] = []; loading = true; search = '';

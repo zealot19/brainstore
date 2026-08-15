@@ -8,11 +8,12 @@ import { FareClassService } from '../../../services/voyages-config/fare-class.se
 import { SeatingPlanService } from '../../../services/voyages-config/seating-plan.service';
 import { ServicePattern, Route, TimeSlot, FareClass, SeatingPlan } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-service-patterns',
   templateUrl: './service-patterns.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcServicePatternsComponent implements OnInit {
   rows: ServicePattern[] = []; filtered: ServicePattern[] = []; loading = true; search = ''; selected = new Set<string>();

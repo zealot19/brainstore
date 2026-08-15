@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TicketTemplateService, TicketTemplate, TicketAgency } from '../../../services/voyages-config/ticket-template.service';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-ticket-template',
   templateUrl: './ticket-template.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcTicketTemplateComponent implements OnInit {
   m: TicketTemplate | null = null;

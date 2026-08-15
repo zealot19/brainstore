@@ -5,11 +5,12 @@ import { ConsignmentTypeService } from '../../../services/voyages-config/consign
 import { ConsignmentNatureService } from '../../../services/voyages-config/consignment-nature.service';
 import { ConsignmentType, ConsignmentNature } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-consignment-types',
   templateUrl: './consignment-types.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcConsignmentTypesComponent implements OnInit {
   rows: ConsignmentType[] = []; filtered: ConsignmentType[] = []; loading = true; search = ''; selected = new Set<string>();

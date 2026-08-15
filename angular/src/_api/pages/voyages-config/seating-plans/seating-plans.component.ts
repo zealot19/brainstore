@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { SeatingPlanService } from '../../../services/voyages-config/seating-plan.service';
 import { SeatingPlan, PlanSeat, SeatType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vc-seating-plans',
   templateUrl: './seating-plans.component.html',
   styleUrls: ['./seating-plans.component.scss'],
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcSeatingPlansComponent implements OnInit {
   rows: SeatingPlan[] = []; filtered: SeatingPlan[] = []; loading = true; search = '';
