@@ -9,13 +9,14 @@ import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
 import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, PassengerSpec } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 interface PaxRow extends PassengerSpec { destination_point_id: string; }
 
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';

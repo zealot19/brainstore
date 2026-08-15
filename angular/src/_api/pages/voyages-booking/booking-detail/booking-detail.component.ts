@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { Booking } from '../../../models/voyages-booking.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vb-booking-detail',
   templateUrl: './booking-detail.component.html',
-  imports: [CommonModule],
+  imports: [HasPermissionDirective, CommonModule],
 })
 export class VbBookingDetailComponent implements OnInit {
   booking: Booking | null = null; loading = false;

@@ -66,7 +66,7 @@
       @for (row of rows(outboundSeats); track row) {
         <div class="d-flex gap-2 mb-2">
           @for (s of seatsInRow(outboundSeats, row); track s.id) {
-            <button type="button" class="btn btn-sm {{ seatClass('out', s) }}" style="width:48px" (click)="toggleSeat('out', s)">{{ s.seat_number }}</button>
+            <button type="button" class="btn btn-sm {{ seatClass('out', s) }}" style="width:48px" *hasPermission="'ticketing.booking.create'" (click)="toggleSeat('out', s)">{{ s.seat_number }}</button>
           }
         </div>
       }
@@ -77,7 +77,7 @@
         @for (row of rows(returnSeats); track row) {
           <div class="d-flex gap-2 mb-2">
             @for (s of seatsInRow(returnSeats, row); track s.id) {
-              <button type="button" class="btn btn-sm {{ seatClass('ret', s) }}" style="width:48px" (click)="toggleSeat('ret', s)">{{ s.seat_number }}</button>
+              <button type="button" class="btn btn-sm {{ seatClass('ret', s) }}" style="width:48px" *hasPermission="'ticketing.booking.create'" (click)="toggleSeat('ret', s)">{{ s.seat_number }}</button>
             }
           </div>
         }
@@ -138,7 +138,7 @@
   }
 
   <div class="d-flex justify-content-end mt-2">
-    <button class="btn btn-success" [disabled]="!canSubmit" (click)="submit()">
+    <button class="btn btn-success" [disabled]="!canSubmit" *hasPermission="'ticketing.booking.create'" (click)="submit()">
       <i class="ti ti-cash-register me-1"></i>Encaisser &amp; créer la réservation
     </button>
   </div>

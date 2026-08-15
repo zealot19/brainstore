@@ -9,11 +9,12 @@ import { Booking, Ticket, TripOption, SeatCell } from '../../../models/voyages-b
 import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vb-open-returns',
   templateUrl: './open-returns.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VbOpenReturnsComponent implements OnInit {
   rows: Booking[] = []; loading = false; q = '';

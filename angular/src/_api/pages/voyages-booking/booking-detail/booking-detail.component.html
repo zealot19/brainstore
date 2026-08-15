@@ -1,7 +1,7 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>Détail réservation</h4><h6>Billets et cycle de vie</h6></div></div>
   <div class="page-btn d-flex gap-2">
-    @if (printData?.tickets?.length) { <a href="javascript:void(0);" class="btn btn-outline-primary" (click)="printTickets()"><i class="ti ti-printer me-2"></i>Imprimer les billets</a> }
+    @if (printData?.tickets?.length) { <a href="javascript:void(0);" class="btn btn-outline-primary" *hasPermission="'ticketing.ticket.print'" (click)="printTickets()"><i class="ti ti-printer me-2"></i>Imprimer les billets</a> }
     <a href="javascript:void(0);" class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-2"></i>Retour</a>
   </div>
 </div>
@@ -49,8 +49,8 @@
       <div class="col-md-3 mb-2"><small class="text-muted d-block">Monnaie rendue</small><strong>{{ booking.change_due | number:'1.0-0' }} XAF</strong></div>
     </div>
     <div class="mt-2 d-flex gap-2">
-      @if (booking.return_open) { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="goAssignReturn()"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a> }
-      @if (booking.status === 'confirmed') { <button class="btn btn-sm btn-outline-danger" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler la réservation</button> }
+      @if (booking.return_open) { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.booking.update'" (click)="goAssignReturn()"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a> }
+      @if (booking.status === 'confirmed') { <button class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.booking.cancel'" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler la réservation</button> }
     </div>
   </div></div>
 
@@ -69,7 +69,7 @@
             <td><span class="badge {{ statusClass(t.status) }}">{{ t.status_display }}</span></td>
             <td class="action-table-data">
               @if (t.status === 'sold') {
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" (click)="board(t.id)" title="Embarquer"><i class="ti ti-user-check me-1"></i>Embarquer</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.booking.board'" (click)="board(t.id)" title="Embarquer"><i class="ti ti-user-check me-1"></i>Embarquer</a>
               } @else { <span class="text-muted small">—</span> }
             </td>
           </tr>

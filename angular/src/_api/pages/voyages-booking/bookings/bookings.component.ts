@@ -6,11 +6,12 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { TripService } from '../../../services/voyages/trip.service';
 import { Booking } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vb-bookings',
   templateUrl: './bookings.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VbBookingsComponent implements OnInit {
   rows: Booking[] = []; loading = false; statusFilter = ''; q = '';

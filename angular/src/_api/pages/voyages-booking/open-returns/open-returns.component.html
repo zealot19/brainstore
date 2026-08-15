@@ -21,7 +21,7 @@
                 <td>{{ b.buyer_name }}</td>
                 <td>{{ b.tickets.length ? b.tickets[0].passenger_name : '' }} <span class="badge bg-light text-dark">{{ b.tickets.length }} billet(s)</span></td>
                 <td>{{ b.amount_paid | number:'1.0-0' }} XAF</td>
-                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
+                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.booking.update'" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
               </tr>
             } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun retour ouvert à traiter.</td></tr> }
           </tbody>
@@ -73,7 +73,7 @@
     }
 
     <div class="d-flex justify-content-end mt-2">
-      <button class="btn btn-success" [disabled]="!canAssign" (click)="assign()"><i class="ti ti-check me-1"></i>Affecter le retour &amp; émettre les billets</button>
+      <button class="btn btn-success" [disabled]="!canAssign" *hasPermission="'ticketing.booking.update'" (click)="assign()"><i class="ti ti-check me-1"></i>Affecter le retour &amp; émettre les billets</button>
     </div>
   </div></div>
 }
