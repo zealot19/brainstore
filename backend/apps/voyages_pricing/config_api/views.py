@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -11,7 +11,8 @@ from .common import scope_company_id, resolve_company_or_global, scoped_qs, cfg_
 
 
 class FareListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'transport.fare.view', 'POST': 'transport.fare.manage'}
 
     def get(self, request):
         qs = (scoped_qs(Fare, scope_company_id(request))
@@ -52,7 +53,8 @@ class FareListView(APIView):
 
 
 class FareDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'transport.fare.view', 'PATCH': 'transport.fare.manage', 'PUT': 'transport.fare.manage', 'DELETE': 'transport.fare.manage'}
 
     def _get(self, request, pk):
         return scoped_qs(Fare, scope_company_id(request)).filter(id=pk).first()
@@ -105,7 +107,8 @@ class FareDetailView(APIView):
 
 
 class FareBulkDeleteView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'transport.fare.manage'}
 
     def post(self, request):
         ids = request.data.get("ids") or []
@@ -122,7 +125,8 @@ class FareBulkDeleteView(APIView):
 
 
 class RoutePointsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'transport.fare.view'}
 
     def get(self, request, route_id):
         route = cfg_lookup(Route, route_id, scope_company_id(request))
