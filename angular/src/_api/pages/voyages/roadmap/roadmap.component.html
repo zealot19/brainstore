@@ -2,7 +2,7 @@
   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
     <button class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-1"></i>Retour</button>
     <div class="d-flex gap-2">
-      @if (canBoard) { <button class="btn btn-outline-success" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>Tout embarquer</button> }
+      @if (canBoard) { <button class="btn btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>Tout embarquer</button> }
       <button class="btn btn-outline-primary" (click)="printDoc('voyages')"><i class="ti ti-printer me-1"></i>Bordereau Voyages</button>
       <button class="btn btn-outline-primary" (click)="printDoc('colis')"><i class="ti ti-printer me-1"></i>Bordereau Colis</button>
     </div>
@@ -47,7 +47,7 @@
             <td>{{ i + 1 }}</td><td>{{ p.number }}</td><td>{{ p.passenger_name }}</td>
             <td>{{ p.seat_number }}</td><td>{{ p.destination_point_name }}</td><td>{{ p.direction_display }}</td>
             <td>@if (p.boarded) { <span class="badge bg-success">Oui</span> } @else { <span class="badge bg-secondary">Non</span> }</td>
-            <td class="no-print rm-act">@if (!p.boarded && canBoard) { <button class="btn btn-sm btn-outline-success" (click)="board(p.ticket_id)"><i class="ti ti-user-check"></i></button> }</td>
+            <td class="no-print rm-act">@if (!p.boarded && canBoard) { <button class="btn btn-sm btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="board(p.ticket_id)"><i class="ti ti-user-check"></i></button> }</td>
             <td class="print-only"></td>
           </tr>
         } @empty { <tr><td colspan="9" class="text-center text-muted">Aucun passager.</td></tr> }

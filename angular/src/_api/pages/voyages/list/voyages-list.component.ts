@@ -10,11 +10,12 @@ import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-voyages-list',
   templateUrl: './voyages-list.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VoyagesListComponent implements OnInit {
   rows: Trip[] = []; filtered: Trip[] = []; loading = true; filterStatus = '';

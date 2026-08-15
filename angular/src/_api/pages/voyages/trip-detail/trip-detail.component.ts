@@ -6,12 +6,13 @@ import { TripService } from '../../../services/voyages/trip.service';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
 import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyages.models';
 import { ExternalDriver } from '../../../models/fleet.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-voyages-trip-detail',
   templateUrl: './trip-detail.component.html',
   styleUrls: ['./trip-detail.component.scss'],
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, RouterModule],
 })
 export class VoyagesTripDetailComponent implements OnInit {
   id = '';

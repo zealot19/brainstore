@@ -14,16 +14,16 @@
   <!-- Lifecycle toolbar -->
   <div class="card mb-3"><div class="card-body d-flex flex-wrap gap-2">
     <a [routerLink]="['/voyages/roadmap', trip.id]" class="btn btn-sm btn-outline-secondary"><i class="ti ti-clipboard-list me-1"></i>Feuille de route</a>
-    @if (trip.status === 'draft') { <button class="btn btn-sm btn-outline-primary" (click)="submit()"><i class="ti ti-send me-1"></i>Soumettre</button> }
+    @if (trip.status === 'draft') { <button class="btn btn-sm btn-outline-primary" *hasPermission="'voyage.trip.update'" (click)="submit()"><i class="ti ti-send me-1"></i>Soumettre</button> }
     @if (trip.status === 'pending') {
-      <button class="btn btn-sm btn-outline-success" (click)="depart()"><i class="ti ti-player-play me-1"></i>Départ</button>
-      <button class="btn btn-sm btn-outline-warning" (click)="suspend()"><i class="ti ti-player-pause me-1"></i>Suspendre</button>
+      <button class="btn btn-sm btn-outline-success" *hasPermission="'voyage.trip.depart'" (click)="depart()"><i class="ti ti-player-play me-1"></i>Départ</button>
+      <button class="btn btn-sm btn-outline-warning" *hasPermission="'voyage.trip.update'" (click)="suspend()"><i class="ti ti-player-pause me-1"></i>Suspendre</button>
     }
-    @if (trip.status === 'suspended') { <button class="btn btn-sm btn-outline-success" (click)="resume()"><i class="ti ti-player-play me-1"></i>Reprendre</button> }
-    @if (trip.status === 'departed') { <button class="btn btn-sm btn-outline-success" (click)="complete()"><i class="ti ti-flag-check me-1"></i>Clôturer</button> }
-    @if (trip.status === 'pending' || trip.status === 'suspended' || trip.status === 'draft') { <button class="btn btn-sm btn-outline-danger" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler</button> }
-    @if (!trip.is_delayed && (trip.status === 'pending' || trip.status === 'departed')) { <button class="btn btn-sm btn-outline-secondary" (click)="markDelayed()"><i class="ti ti-clock-exclamation me-1"></i>Mettre en retard</button> }
-    @if (trip.is_delayed) { <button class="btn btn-sm btn-outline-secondary" (click)="clearDelay()"><i class="ti ti-clock-check me-1"></i>Retirer le retard</button> }
+    @if (trip.status === 'suspended') { <button class="btn btn-sm btn-outline-success" *hasPermission="'voyage.trip.update'" (click)="resume()"><i class="ti ti-player-play me-1"></i>Reprendre</button> }
+    @if (trip.status === 'departed') { <button class="btn btn-sm btn-outline-success" *hasPermission="'voyage.trip.arrive'" (click)="complete()"><i class="ti ti-flag-check me-1"></i>Clôturer</button> }
+    @if (trip.status === 'pending' || trip.status === 'suspended' || trip.status === 'draft') { <button class="btn btn-sm btn-outline-danger" *hasPermission="'voyage.trip.cancel'" (click)="cancel()"><i class="ti ti-x me-1"></i>Annuler</button> }
+    @if (!trip.is_delayed && (trip.status === 'pending' || trip.status === 'departed')) { <button class="btn btn-sm btn-outline-secondary" *hasPermission="'voyage.trip.update'" (click)="markDelayed()"><i class="ti ti-clock-exclamation me-1"></i>Mettre en retard</button> }
+    @if (trip.is_delayed) { <button class="btn btn-sm btn-outline-secondary" *hasPermission="'voyage.trip.update'" (click)="clearDelay()"><i class="ti ti-clock-check me-1"></i>Retirer le retard</button> }
   </div></div>
 
   <div class="row">
@@ -40,7 +40,7 @@
             <option [ngValue]="null">— Choisir —</option>
             @for (v of eligible; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option> }
           </select>
-          <button class="btn btn-sm btn-primary w-100" (click)="assign()" [disabled]="!selectedVehicle">Affecter</button>
+          <button class="btn btn-sm btn-primary w-100" *hasPermission="'voyage.trip.update'" (click)="assign()" [disabled]="!selectedVehicle">Affecter</button>
           @if (eligible.length === 0) { <p class="text-muted small mt-2">Aucun véhicule éligible pour ce créneau.</p> }
         }
         @if (assignWarnings.length) {
@@ -57,10 +57,10 @@
           <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="mb-0">Transbordement</h6>
             <div class="d-flex gap-2">
-              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transbord-modal" (click)="openTransbord()">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transbord-modal" *hasPermission="'voyage.trip.update'" (click)="openTransbord()">
                 <i class="ti ti-transfer me-1"></i>Remplacer le bus
               </button>
-              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#transbord-sel-modal" (click)="openSelection()">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#transbord-sel-modal" *hasPermission="'voyage.trip.update'" (click)="openSelection()">
                 <i class="ti ti-checklist me-1"></i>Transborder une sélection
               </button>
             </div>
@@ -110,7 +110,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" [disabled]="tbBusy" data-bs-dismiss="modal" (click)="doTransbord()">Confirmer</button>
+                <button type="button" class="btn btn-primary" [disabled]="tbBusy" data-bs-dismiss="modal" *hasPermission="'voyage.trip.update'" (click)="doTransbord()">Confirmer</button>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" [disabled]="selBusy" data-bs-dismiss="modal" (click)="doSelection()">Confirmer</button>
+                <button type="button" class="btn btn-primary" [disabled]="selBusy" data-bs-dismiss="modal" *hasPermission="'voyage.trip.update'" (click)="doSelection()">Confirmer</button>
               </div>
             </div>
           </div>
@@ -193,7 +193,7 @@
           @for (c of trip.crew; track c.id) {
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{ c.driver_name }} <span class="badge bg-light text-dark ms-1">{{ c.role_display }}</span></span>
-              <a class="text-danger" (click)="removeCrew(c)" title="Retirer"><i class="ti ti-trash"></i></a>
+              <a class="text-danger" *hasPermission="'voyage.crew.manage'" (click)="removeCrew(c)" title="Retirer"><i class="ti ti-trash"></i></a>
             </li>
           }
           @empty { <li class="list-group-item text-muted">Aucun équipage.</li> }
@@ -201,7 +201,7 @@
         <div class="row g-2">
           <div class="col-7"><select class="form-select form-select-sm" [(ngModel)]="newDriver"><option [ngValue]="null">— Conducteur —</option>@for (d of drivers; track d.id) { <option [ngValue]="d.id">{{ d.full_name }}</option> }</select></div>
           <div class="col-3"><select class="form-select form-select-sm" [(ngModel)]="newRole">@for (r of roles; track r.v) { <option [value]="r.v">{{ r.l }}</option> }</select></div>
-          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" (click)="addCrew()" [disabled]="!newDriver">+</button></div>
+          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newDriver">+</button></div>
         </div>
       </div></div>
     </div>
@@ -231,7 +231,7 @@
                        [class.seat-blocked]="s?.status === 'blocked'"
                        [class.seat-held]="s?.status === 'held'"
                        [class.seat-sold]="s?.status === 'sold'"
-                       (click)="toggleSeat(s)">{{ s?.seat_number || '' }}</div>
+                       *hasPermission="'voyage.trip.update'" (click)="toggleSeat(s)">{{ s?.seat_number || '' }}</div>
                 }
               </div>
             }

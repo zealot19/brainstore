@@ -4,12 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { Roadmap } from '../../../models/voyages-roadmap.models';
+import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-vb-roadmap',
   templateUrl: './roadmap.component.html',
   styleUrls: ['./roadmap.component.scss'],
-  imports: [CommonModule],
+  imports: [HasPermissionDirective, CommonModule],
 })
 export class VbRoadmapComponent implements OnInit {
   tripId = ''; data: Roadmap | null = null; loading = false;
