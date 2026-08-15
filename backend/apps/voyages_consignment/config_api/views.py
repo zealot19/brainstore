@@ -1,6 +1,6 @@
 from django.db.models import Q
 from rest_framework.views import APIView
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
@@ -19,7 +19,8 @@ def _cfg(model, company_id, pk):
 
 
 class ParcelListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.manage'}
 
     def get(self, request):
         qs = selectors.list_parcels(
@@ -65,7 +66,8 @@ class ParcelListView(APIView):
 
 
 class ParcelDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view', 'PATCH': 'ticketing.parcel.manage', 'PUT': 'ticketing.parcel.manage', 'DELETE': 'ticketing.parcel.manage'}
 
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -95,7 +97,8 @@ class ParcelDetailView(APIView):
 
 
 class ParcelPendingView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
 
     def get(self, request):
         qs = selectors.pending_for_trip(request.user.company, route_id=request.query_params.get("route"))
@@ -103,7 +106,8 @@ class ParcelPendingView(APIView):
 
 
 class ParcelAssignTripView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -124,7 +128,8 @@ class ParcelAssignTripView(APIView):
 
 class ParcelArrivedView(APIView):
     """Réception quantitative d'un colis (pièces reçues / manquantes / avariées)."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -143,7 +148,8 @@ class ParcelArrivedView(APIView):
 
 
 class ParcelUnloadView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -157,7 +163,8 @@ class ParcelUnloadView(APIView):
 
 
 class ParcelPickupView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -175,7 +182,8 @@ class ParcelPickupView(APIView):
 
 
 class ParcelCancelView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
@@ -189,7 +197,8 @@ class ParcelCancelView(APIView):
 
 
 class BaggageListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.luggage.view', 'POST': 'ticketing.luggage.manage'}
 
     def get(self, request):
         qs = selectors.list_baggage(
@@ -238,7 +247,8 @@ class BaggageListView(APIView):
 
 
 class BaggageDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.luggage.view', 'PATCH': 'ticketing.luggage.manage', 'PUT': 'ticketing.luggage.manage', 'DELETE': 'ticketing.luggage.manage'}
 
     def _get(self, request, pk):
         return Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
@@ -271,7 +281,8 @@ class BaggageDetailView(APIView):
 
 
 class BaggageLoadView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.luggage.manage'}
 
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
@@ -285,7 +296,8 @@ class BaggageLoadView(APIView):
 
 
 class BaggageDeliverView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.luggage.manage'}
 
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
@@ -314,7 +326,8 @@ def _bulk_apply(items, fn, user):
 
 
 class ParcelBulkView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request):
         ids = request.data.get("ids") or []
@@ -331,7 +344,8 @@ class ParcelBulkView(APIView):
 
 
 class BaggageBulkView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.luggage.manage'}
 
     def post(self, request):
         ids = request.data.get("ids") or []
@@ -348,7 +362,8 @@ class BaggageBulkView(APIView):
 
 
 class TripManifestView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
 
     def get(self, request, trip_id):
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id).first()
@@ -370,7 +385,8 @@ def _agent(user):
 
 
 class ParcelReceiptView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
 
     def get(self, request, pk):
         p = (Parcel.objects.filter(is_deleted=False, company=request.user.company, id=pk)
@@ -384,7 +400,8 @@ class ParcelReceiptView(APIView):
 
 
 class BaggageTicketView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.luggage.view'}
 
     def get(self, request, pk):
         b = (Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk)
@@ -399,7 +416,8 @@ class BaggageTicketView(APIView):
 
 
 class BaggageLabelView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.luggage.view'}
 
     def get(self, request, pk):
         b = (Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk)
