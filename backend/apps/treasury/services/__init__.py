@@ -5,6 +5,7 @@ from .services import (
     create_transaction, delete_transaction,
     create_transfer,
 )
+from .seed import seed_treasury_mapping
 
 __all__ = [
     "create_cash_register", "update_cash_register", "delete_cash_register",
@@ -12,4 +13,5 @@ __all__ = [
     "open_session", "close_session",
     "create_transaction", "delete_transaction",
     "create_transfer",
+    "seed_treasury_mapping",
 ]

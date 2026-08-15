@@ -134,6 +134,10 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     from apps.accounting.services.seed import seed_accounting
     seed_accounting(company, created_by=created_by)
 
+    # Correspondances comptables de la Trésorerie (G-Trésorerie T1).
+    from apps.treasury.services.seed import seed_treasury_mapping
+    seed_treasury_mapping(company, created_by=created_by)
+
     return {
         "hq_agency_id":   str(hq.id),
         "hq_agency_name": hq.name,

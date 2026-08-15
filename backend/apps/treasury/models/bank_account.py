@@ -13,6 +13,10 @@ class BankAccount(BaseModel):
     account_number  = models.CharField(_("account number"),  max_length=50)
     current_balance = models.DecimalField(_("current balance"), max_digits=14, decimal_places=2,
                                            default=0)
+    account = models.ForeignKey("accounting.Account", verbose_name=_("compte comptable"), null=True, blank=True,
+                                on_delete=models.SET_NULL, related_name="+")
+    journal = models.ForeignKey("accounting.Journal", verbose_name=_("journal"), null=True, blank=True,
+                                on_delete=models.SET_NULL, related_name="+")
     is_active = models.BooleanField(_("active"), default=True)
     notes     = models.TextField(_("notes"), blank=True)
 

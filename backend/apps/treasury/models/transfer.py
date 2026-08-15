@@ -44,6 +44,9 @@ class Transfer(BaseModel):
                                        on_delete=models.SET_NULL, null=True, blank=True,
                                        related_name="completed_transfers")
 
+    journal_entry = models.ForeignKey("accounting.JournalEntry", verbose_name=_("pièce comptable"),
+                                      null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
     class Meta(BaseModel.Meta):
         verbose_name = _("transfer")
         verbose_name_plural = _("transfers")
