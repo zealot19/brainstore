@@ -391,6 +391,11 @@ export const routes={
   fcInterventionTypes: '/fleet-config/intervention-types',
   fcActivitySectors:   '/fleet-config/activity-sectors',
 
+  // ── Comptabilité ──────────────────────────────────────────────────────────────
+  accAccounts:    '/accounting/accounts',
+  accJournals:    '/accounting/journals',
+  accFiscalYears: '/accounting/fiscal-years',
+
   // ── Config Voyages ───────────────────────────────────────────────────────────
   vcTowns:              '/voyages-config/towns',
   vcServicePoints:      '/voyages-config/service-points',

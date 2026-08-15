@@ -45,6 +45,15 @@ export const Pages_routes: Routes = [
                 { path: 'activity-sectors',   loadComponent: () => import('../../../_api/pages/fleet-config/activity-sectors/activity-sectors.component').then(m => m.FcActivitySectorsComponent) },
               ],
             },
+            // ── MODULE : Comptabilité ─────────────────────────────────────────────────
+            {
+              path: 'accounting',
+              loadComponent: () => import('../../../_api/pages/accounting/accounting.component').then(m => m.AccountingComponent),
+              children: [
+                { path: 'accounts',      loadComponent: () => import('../../../_api/pages/accounting/accounts/accounts.component').then(m => m.AccAccountsComponent) },
+                { path: '', redirectTo: 'accounts', pathMatch: 'full' },
+              ],
+            },
             // ── MODULE : Config Voyages ───────────────────────────────────────────────
             {
               path: 'voyages-config',

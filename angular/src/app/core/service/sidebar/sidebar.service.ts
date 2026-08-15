@@ -408,6 +408,25 @@ export class SidebarService {
       ],
     },
     {
+      tittle: 'Comptabilité',
+      showAsTab: false,
+      separateRoute: false,
+      menu: [
+        {
+          menuValue: 'Comptabilité',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'accounting',
+          subMenus: [
+            { menuValue: 'Plan comptable',       route: routes.accAccounts,    base: 'accounts',      permission: 'accounting.account.view' },
+            { menuValue: 'Journaux',             route: routes.accJournals,    base: 'journals',      permission: 'accounting.journal.view' },
+            { menuValue: 'Exercices & Périodes', route: routes.accFiscalYears, base: 'fiscal-years',  permission: 'accounting.fiscalyear.view' },
+          ],
+        },
+      ],
+    },
+    {
       tittle: 'Administration',
       showAsTab: false,
       separateRoute: false,
