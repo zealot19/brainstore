@@ -302,7 +302,7 @@ export class SidebarService {
           icon2: 'bus',
           base: 'voyages',
           subMenus: [
-            { menuValue: 'Voyages', route: routes.voyagesList, base: 'list' },
+            { menuValue: 'Voyages', route: routes.voyagesList, base: 'list', permission: 'voyage.trip.view' },
           ],
         },
         {
