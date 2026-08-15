@@ -312,10 +312,10 @@ export class SidebarService {
           icon2: 'ticket',
           base: 'voyages-booking',
           subMenus: [
-            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers'   },
-            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings'     },
-            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new' },
-            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns' },
+            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers',   permission: 'ticketing.customer.view' },
+            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings',     permission: 'ticketing.booking.view' },
+            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new', permission: 'ticketing.booking.create' },
+            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns', permission: 'ticketing.booking.view' },
           ],
         },
         {
