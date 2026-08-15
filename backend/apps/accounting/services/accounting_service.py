@@ -93,3 +93,36 @@ class AccountingService:
             JournalEntryLine.objects.create(entry=entry, sequence=seq, account=acc, label=label,
                                             debit=debit, credit=credit, partner_id=partner_id, created_by=created_by)
         return entry
+
+    @staticmethod
+    @transaction.atomic
+    def post_entry(entry_id, *, posted_by=None) -> JournalEntry:
+        entry = JournalEntry.objects.select_for_update().filter(id=entry_id, is_deleted=False).first()
+        if not entry:
+            raise ApplicationError(_("Pièce introuvable."))
+        if entry.state != "draft":
+            raise ApplicationError(_("Seule une pièce en brouillon peut être validée."))
+        agg = entry.lines.aggregate(d=Sum("debit"), c=Sum("credit"))
+        total_d = agg["d"] or Decimal("0")
+        total_c = agg["c"] or Decimal("0")
+        if total_d != total_c:
+            raise ApplicationError(_("Pièce déséquilibrée : débit %(d)s ≠ crédit %(c)s.") % {"d": total_d, "c": total_c})
+        if total_d <= 0:
+            raise ApplicationError(_("Une pièce validée doit avoir un montant strictement positif."))
+        if entry.period.state != "open":
+            raise ApplicationError(_("La période comptable n'est pas ouverte."))
+
+        year = entry.date.year
+        seq, _created = JournalSequence.objects.select_for_update().get_or_create(
+            company_id=entry.company_id, journal=entry.journal, year=year)
+        seq.last_number += 1
+        seq.save(update_fields=["last_number", "updated_at"])
+
+        entry.name = _sequence_name(entry.journal, year, seq.last_number)
+        entry.total_debit = total_d
+        entry.total_credit = total_c
+        entry.state = "posted"
+        entry.posted_at = timezone.now()
+        entry.posted_by = posted_by
+        entry.save()
+        return entry
