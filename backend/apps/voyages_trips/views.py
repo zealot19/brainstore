@@ -406,7 +406,8 @@ from apps.voyages_trips.services.transbordement import transbord_selection
 
 
 class TripTransbordSelectionOptionsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.trip.view"}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -419,7 +420,8 @@ class TripTransbordSelectionOptionsView(APIView):
 
 
 class TripTransbordSelectionView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "voyage.trip.update"}
 
     def post(self, request, trip_id):
         company, err = _scope(request)
