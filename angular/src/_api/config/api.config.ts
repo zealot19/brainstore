@@ -379,7 +379,15 @@ export const VOYAGES_CONSIGNMENT = {
   manifest: (tripId: string) => `${VCG}/trips/${tripId}/manifest/`,
 };
 
-/** URLs qui ne nécessitent pas de token JWT */
+const ACC = `${API_BASE}/accounting`;
+
+export const ACCOUNTING = {
+  accounts:    `${ACC}/accounts/`,          account:     (id: string) => `${ACC}/accounts/${id}/`,
+  journals:    `${ACC}/journals/`,          journal:     (id: string) => `${ACC}/journals/${id}/`,
+  fiscalYears: `${ACC}/fiscal-years/`,      fiscalYear:  (id: string) => `${ACC}/fiscal-years/${id}/`,
+  periods:     `${ACC}/periods/`,           period:      (id: string) => `${ACC}/periods/${id}/`,
+  periodClose: (id: string) => `${ACC}/periods/${id}/close/`,
+};
 
 /** URLs qui ne nécessitent pas de token JWT */
 export const PUBLIC_URLS: string[] = [
