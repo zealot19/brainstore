@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from apps.core.permissions import IsInstitutionAdmin
+from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.pagination import StandardResultsSetPagination
 from apps.voyages_booking.models import Passenger
@@ -9,7 +9,8 @@ from .common import scope_company_id, resolve_company_or_global
 
 
 class PassengerListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.customer.view', 'POST': 'ticketing.customer.manage'}
 
     def get(self, request):
         qs = selectors.find_passengers(request.user.company, request.query_params.get("q"))
@@ -28,7 +29,8 @@ class PassengerListView(APIView):
 
 
 class PassengerDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.customer.view', 'PATCH': 'ticketing.customer.manage', 'PUT': 'ticketing.customer.manage', 'DELETE': 'ticketing.customer.manage'}
 
     def _get(self, request, pk):
         return Passenger.objects.filter(is_deleted=False, company_id=scope_company_id(request), id=pk).first()
@@ -69,7 +71,8 @@ def _trip(company, trip_id):
 
 
 class BookableTripsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request):
         trips = selectors.bookable_trips(
@@ -81,7 +84,8 @@ class BookableTripsView(APIView):
 
 
 class TripSeatMapView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request, trip_id):
         trip = _trip(request.user.company, trip_id)
@@ -91,7 +95,8 @@ class TripSeatMapView(APIView):
 
 
 class TripDestinationsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request, trip_id):
         trip = _trip(request.user.company, trip_id)
@@ -101,7 +106,8 @@ class TripDestinationsView(APIView):
 
 
 class BookingListView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view', 'POST': 'ticketing.booking.create'}
 
     def get(self, request):
         qs = selectors.list_bookings(
@@ -138,7 +144,8 @@ class BookingListView(APIView):
 
 
 class OpenReturnsView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request):
         qs = selectors.open_return_bookings(request.user.company, q=request.query_params.get("q"))
@@ -146,7 +153,8 @@ class OpenReturnsView(APIView):
 
 
 class BookingAssignReturnView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.update'}
 
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
@@ -166,7 +174,8 @@ class BookingAssignReturnView(APIView):
 
 
 class BookingDetailView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view', 'DELETE': 'ticketing.booking.cancel'}
 
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
@@ -181,7 +190,8 @@ class BookingDetailView(APIView):
 
 
 class BookingCancelView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.cancel'}
 
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
@@ -192,7 +202,8 @@ class BookingCancelView(APIView):
 
 
 class BookingNoShowView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.noshow'}
 
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
@@ -206,7 +217,8 @@ class BookingNoShowView(APIView):
 
 
 class TicketBoardView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.board'}
 
     def post(self, request, pk):
         t = Ticket.objects.filter(is_deleted=False, booking__company=request.user.company, id=pk).first()
@@ -220,7 +232,8 @@ class TicketBoardView(APIView):
 
 
 class PassengerLoyaltyView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.customer.view'}
 
     def get(self, request, pk):
         p = Passenger.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
@@ -250,7 +263,8 @@ def _company_header(company, request):
 
 
 class TripRoadmapView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request, trip_id):
         trip = (VoyageTrip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id)
@@ -313,7 +327,8 @@ class TripRoadmapView(APIView):
 
 
 class TripBoardAllView(APIView):
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.board'}
 
     def post(self, request, trip_id):
         trip = VoyageTrip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id).first()
@@ -328,7 +343,8 @@ class TripBoardAllView(APIView):
 
 class BookingRenderTicketsView(APIView):
     """HTML des billets d'une réservation, rendu depuis le modèle « Config billets »."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.ticket.view'}
 
     def get(self, request, pk):
         from datetime import timedelta
@@ -377,7 +393,8 @@ class BookingRenderTicketsView(APIView):
 
 class BookingPrintView(APIView):
     """Données enrichies pour l'impression des billets d'une réservation."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.ticket.print'}
 
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
