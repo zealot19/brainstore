@@ -28,7 +28,8 @@ def test_institution_admin_role_is_scoped_to_company():
         name="Scope Test SA", admin_email="sc.admin@example.com",
         admin_first_name="SC", admin_last_name="Admin")
     admin = User.objects.get(email="sc.admin@example.com")
-    req = APIRequestFactory().post("/roles/", {"name": "Guichetier", "description": "x"}, format="json")
+    # Nom volontairement hors du jeu de rôles par défaut (seedés à la création de la société).
+    req = APIRequestFactory().post("/roles/", {"name": "Rôle Personnalisé Test", "description": "x"}, format="json")
     force_authenticate(req, user=admin)
     resp = RoleListView.as_view()(req); resp.render()
     assert resp.status_code == 201, resp.content
