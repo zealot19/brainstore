@@ -38,6 +38,33 @@ class TenantMiddleware:
         return response
 
     def _resolve_tenant(self, request):
-        # Résolution différée — le tenant est injecté après validation JWT
-        # La logique complète sera dans apps.system_config une fois l'app créée
-        return None
+        """Résout le tenant depuis les claims du JWT (Authorization: Bearer …).
+
+        Le middleware s'exécute AVANT l'authentification DRF : request.user n'est pas
+        encore disponible. On décode donc le jeton directement depuis l'en-tête. On
+        est indulgent — un en-tête absent ou un jeton invalide renvoie None ; c'est la
+        vue (auth DRF) qui applique le vrai 401. Les super-admins ont company_id=None
+        et restent donc sans tenant (ils précisent la société via ?company=).
+        """
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+        from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+        auth = JWTAuthentication()
+        header = auth.get_header(request)
+        if header is None:
+            return None
+        raw = auth.get_raw_token(header)
+        if raw is None:
+            return None
+        try:
+            token = auth.get_validated_token(raw)
+        except (InvalidToken, TokenError):
+            return None
+        company_id = token.get("company_id")
+        if not company_id:
+            return None
+        return {
+            "company_id": company_id,
+            "agency_id":  token.get("agency_id"),
+            "user_id":    token.get("user_id"),
+        }
