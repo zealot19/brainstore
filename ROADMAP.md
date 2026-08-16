@@ -70,6 +70,17 @@
 
 ## 3. Reste à faire (backlog priorisé)
 
+### Flotte
+> Analyse 2026-08-16 : la config & la gestion flotte couvrent (voire dépassent) Odoo Fleet
+> (accidents, missions, documents+expiration, entretien préventif km/jours en bonus).
+> Écarts mineurs restants :
+- [ ] **Pont comptable flotte** : poster les coûts (carburant, entretien, contrats,
+      réparation accident) vers la comptabilité/trésorerie (même schéma que colis/bagages).
+- [ ] **Rappels d'échéance** : alertes expiration documents/contrats + entretien dû
+      (`expiry_date`, `end_date`, `next_due_km`/`next_due_date`, `requires_expiration`).
+- [ ] *(optionnel)* champs environnementaux/fiscaux (CO₂, puissance kW, déduction fiscale),
+      champs VE (batterie/autonomie), historique conducteur-titulaire, rapport coût/TCO.
+
 ### Trésorerie
 - [ ] **T2 — Partenaire sur mouvement** : rattacher un tiers (client/fournisseur) à une
       transaction ; relevé & **rapprochement bancaire** (import relevé, pointage).
