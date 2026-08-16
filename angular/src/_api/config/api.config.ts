@@ -395,6 +395,10 @@ export const TREASURY = {
   stats:     `${TRZ}/stats/`,
   registers: `${TRZ}/registers/`,   register: (id: string) => `${TRZ}/registers/${id}/`,
   banks:     `${TRZ}/banks/`,       bank:     (id: string) => `${TRZ}/banks/${id}/`,
+  sessions:     `${TRZ}/sessions/`,       session:      (id: string) => `${TRZ}/sessions/${id}/`,
+  sessionOpen:  `${TRZ}/sessions/open/`,  sessionClose: (id: string) => `${TRZ}/sessions/${id}/close/`,
+  transactions: `${TRZ}/transactions/`,   transaction:  (id: string) => `${TRZ}/transactions/${id}/`,
+  transfers:    `${TRZ}/transfers/`,      transfer:     (id: string) => `${TRZ}/transfers/${id}/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */
