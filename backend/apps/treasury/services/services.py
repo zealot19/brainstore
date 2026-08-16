@@ -22,19 +22,20 @@ def _next_ref(model, company, prefix_key):
 
 @transaction.atomic
 def create_cash_register(*, company, name, terminal=None, responsible=None,
-                          opening_balance=0, notes="", account_id=None, journal_id=None, created_by):
+                          opening_balance=0, notes="", account_id=None, journal_id=None,
+                          agency_id=None, created_by):
     return CashRegister.objects.create(
         company=company, name=name, terminal=terminal,
         responsible=responsible,
         current_balance=opening_balance,
-        account_id=account_id, journal_id=journal_id,
+        account_id=account_id, journal_id=journal_id, agency_id=agency_id,
         notes=notes, created_by=created_by,
     )
 
 
 @transaction.atomic
 def update_cash_register(register, *, updated_by, **fields):
-    allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id"}
+    allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id", "agency_id"}
     for k, v in fields.items():
         if k in allowed:
             setattr(register, k, v)

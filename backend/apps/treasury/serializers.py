@@ -10,6 +10,7 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
     account_code = serializers.CharField(source="account.code", read_only=True, default=None)
     journal_code = serializers.CharField(source="journal.code", read_only=True, default=None)
     journal_name = serializers.CharField(source="journal.name", read_only=True, default=None)
+    agency_name  = serializers.CharField(source="agency.name", read_only=True, default=None)
 
     class Meta:
         model = CashRegister
@@ -17,6 +18,7 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
             "id", "name", "terminal_name", "responsible_name",
             "current_balance", "is_active", "notes",
             "account", "journal", "account_code", "journal_code", "journal_name",
+            "agency", "agency_name",
             "created_at", "updated_at",
         ]
 
@@ -40,6 +42,7 @@ class CashRegisterWriteSerializer(serializers.Serializer):
     notes            = serializers.CharField(required=False, allow_blank=True, default="")
     account_id       = serializers.UUIDField(required=False, allow_null=True)
     journal_id       = serializers.UUIDField(required=False, allow_null=True)
+    agency_id        = serializers.UUIDField(required=False, allow_null=True)
 
 
 class CashRegisterUpdateSerializer(serializers.Serializer):
@@ -50,6 +53,7 @@ class CashRegisterUpdateSerializer(serializers.Serializer):
     notes          = serializers.CharField(required=False, allow_blank=True)
     account_id     = serializers.UUIDField(required=False, allow_null=True)
     journal_id     = serializers.UUIDField(required=False, allow_null=True)
+    agency_id      = serializers.UUIDField(required=False, allow_null=True)
 
 
 # ── Bank account ───────────────────────────────────────────────────────────────

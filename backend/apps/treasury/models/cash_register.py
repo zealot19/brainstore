@@ -22,6 +22,8 @@ class CashRegister(BaseModel):
                                 on_delete=models.SET_NULL, related_name="+")
     journal = models.ForeignKey("accounting.Journal", verbose_name=_("journal"), null=True, blank=True,
                                 on_delete=models.SET_NULL, related_name="+")
+    agency = models.ForeignKey("system_config.Agency", verbose_name=_("agence"), null=True, blank=True,
+                               on_delete=models.SET_NULL, related_name="cash_registers")
     is_active = models.BooleanField(_("active"), default=True)
     notes     = models.TextField(_("notes"), blank=True)
 

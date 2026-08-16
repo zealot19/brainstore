@@ -68,6 +68,7 @@ class CashRegisterListView(APIView):
             company=company, name=d["name"], terminal=terminal, responsible=responsible,
             opening_balance=d.get("opening_balance", 0),
             account_id=d.get("account_id"), journal_id=d.get("journal_id"),
+            agency_id=d.get("agency_id"),
             notes=d.get("notes", ""), created_by=request.user,
         )
         return Response(CashRegisterReadSerializer(reg).data, status=status.HTTP_201_CREATED)
