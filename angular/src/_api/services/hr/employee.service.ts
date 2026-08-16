@@ -5,8 +5,6 @@ import { map } from 'rxjs/operators';
 import { HR } from '../../config/api.config';
 import { Employee } from '../../models/hr.models';
 
-interface Paginated<T> { count: number; results: T[]; }
-
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
   constructor(private http: HttpClient) {}
@@ -15,7 +13,7 @@ export class EmployeeService {
     let params = new HttpParams().set('page_size', '500');
     if (opts?.search) params = params.set('search', opts.search);
     if (opts?.status) params = params.set('status', opts.status);
-    return this.http.get<Paginated<Employee>>(HR.employees, { params }).pipe(map(r => r.results));
+    return this.http.get<any>(HR.employees, { params }).pipe(map(r => r.results ?? r.data ?? r));
   }
 
   create(data: Record<string, unknown>): Observable<Employee> {
