@@ -25,7 +25,7 @@ export class TripService {
   }
 
   listCrew(id: string): Observable<TripCrew[]> { return this.http.get<TripCrew[]>(VOYAGES.crew(id)); }
-  addCrew(id: string, driverId: string, role: string): Observable<TripCrew> { return this.http.post<TripCrew>(VOYAGES.crew(id), { driver_id: driverId, role }); }
+  addCrew(id: string, memberId: string): Observable<TripCrew> { return this.http.post<TripCrew>(VOYAGES.crew(id), { member_id: memberId }); }
   removeCrew(id: string, cid: string): Observable<unknown> { return this.http.delete(VOYAGES.crewItem(id, cid)); }
 
   listSeats(id: string): Observable<TripSeat[]> { return this.http.get<TripSeat[]>(VOYAGES.seats(id)); }

@@ -15,10 +15,10 @@ export interface TripStop {
 
 export interface TripCrew {
   id: string;
-  driver: string;
-  driver_name: string | null;
-  role: CrewRole;
-  role_display: string;
+  member: string;
+  member_name: string | null;
+  member_type_name: string | null;
+  is_driver: boolean;
   boarded_at: string | null;
 }
 
