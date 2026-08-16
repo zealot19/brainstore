@@ -64,8 +64,9 @@ techniques* qui rendent l'automatisation comptable possible.
 |-------------|---------|--------|
 | **A1 — Référentiel** | `Account`, `Journal`, `FiscalYear`, `AccountingPeriod` + plan SYSCOHADA (198 comptes) seedé par société + API + RBAC `accounting.*` | ✅ livré |
 | **A1-FE — Écrans** | Plan comptable, Journaux, Exercices & Périodes (Angular) | ✅ livré |
-| **A2 — Moteur d'écritures** | `JournalEntry` / `JournalEntryLine`, `Partner`, `AccountingService.create_entry/post/cancel`, équilibre débit=crédit, séquences, saisie OD | 🔜 en conception |
-| **Trésorerie** | Caisses/sessions/mouvements → génèrent des écritures via `AccountingService` | ⏳ après A2 |
+| **A2 — Moteur d'écritures** | `JournalEntry` / `JournalEntryLine`, `Partner`, `AccountingService.create_entry/post/cancel`, équilibre débit=crédit, séquences, saisie OD | ✅ livré |
+| **Trésorerie — T1** | Pont comptable : mouvements/transferts/écart de caisse → écritures via `AccountingService` (mapping catégorie→compte seedé, non-bloquant) + RBAC `treasury.*` | ✅ livré |
+| **Trésorerie — T2/T3** | Relevé & rapprochement bancaire + partenaire sur mouvement (T2) ; frontend (T3) | ⏳ |
 | **A3 — Reporting** | Grand livre, balance, compte de résultat, bilan | ⏳ |
 | **A4 — Lettrage & clôtures** | Lettrage des tiers, clôture période/exercice, à-nouveaux | ⏳ |
 
