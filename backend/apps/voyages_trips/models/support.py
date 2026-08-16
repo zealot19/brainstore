@@ -24,24 +24,18 @@ class TripStop(BaseModel):
 
 
 class TripCrew(BaseModel):
-    class Role(models.TextChoices):
-        DRIVER     = "DRIVER",     _("Chauffeur")
-        CONVOYEUR  = "CONVOYEUR",  _("Convoyeur")
-        CONTROLEUR = "CONTROLEUR", _("Contrôleur")
-
     trip = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage"),
                              on_delete=models.CASCADE, related_name="crew")
-    driver = models.ForeignKey("fleet.ExternalDriver", verbose_name=_("conducteur"),
-                               on_delete=models.PROTECT, related_name="trip_crew")
-    role = models.CharField(_("rôle"), max_length=12, choices=Role.choices, default=Role.DRIVER)
+    member = models.ForeignKey("voyages_trips.CrewMember", verbose_name=_("membre d'équipage"),
+                               on_delete=models.PROTECT, null=True, related_name="trip_assignments")
     boarded_at = models.DateTimeField(_("embarqué à"), null=True, blank=True)
 
     class Meta(BaseModel.Meta):
         verbose_name = _("équipage")
-        ordering = ["trip", "role"]
+        ordering = ["trip", "id"]
 
     def __str__(self):
-        return f"{self.trip_id} — {self.get_role_display()}"
+        return f"{self.trip_id} — {self.member_id}"
 
 
 class TripSeat(BaseModel):

@@ -184,13 +184,11 @@ class TripCrewView(APIView):
             return error_response("Voyage introuvable.", status_code=404)
         payload = S.TripCrewWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        from apps.fleet.models import ExternalDriver
-        driver = ExternalDriver.objects.filter(id=payload.validated_data["driver_id"],
-                                               company=company, is_deleted=False).first()
-        if not driver:
-            return error_response("Conducteur introuvable.", status_code=404)
-        crew = TripCrew.objects.create(trip=trip, driver=driver,
-                                       role=payload.validated_data["role"], created_by=request.user)
+        member = CrewMember.objects.filter(id=payload.validated_data["member_id"],
+                                           company=company, is_deleted=False).first()
+        if not member:
+            return error_response("Membre d'équipage introuvable.", status_code=404)
+        crew = TripCrew.objects.create(trip=trip, member=member, created_by=request.user)
         return created_response(S.TripCrewSerializer(crew).data)
 
 

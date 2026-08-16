@@ -40,7 +40,7 @@ def submit_trip(trip, *, user):
         raise ApplicationError(_("Seul un brouillon peut être soumis."))
     if not trip.vehicle_id or not trip.seating_plan_id:
         raise ApplicationError(_("Affectez un véhicule (avec plan de bus) avant de soumettre."))
-    if not trip.crew.filter(is_deleted=False, role="DRIVER").exists():
+    if not trip.crew.filter(is_deleted=False, member__member_type__is_driver=True).exists():
         raise ApplicationError(_("Ajoutez au moins un chauffeur à l'équipage."))
     trip.status = Trip.Status.PENDING
     trip.updated_by = user

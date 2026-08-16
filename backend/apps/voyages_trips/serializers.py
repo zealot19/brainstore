@@ -12,17 +12,17 @@ class TripStopSerializer(serializers.ModelSerializer):
 
 
 class TripCrewSerializer(serializers.ModelSerializer):
-    driver_name = serializers.CharField(source="driver.full_name", read_only=True, default=None)
-    role_display = serializers.CharField(source="get_role_display", read_only=True)
+    member_name      = serializers.CharField(source="member.full_name", read_only=True, default=None)
+    member_type_name = serializers.CharField(source="member.member_type.name", read_only=True, default=None)
+    is_driver        = serializers.BooleanField(source="member.member_type.is_driver", read_only=True, default=False)
 
     class Meta:
         model = TripCrew
-        fields = ["id", "driver", "driver_name", "role", "role_display", "boarded_at"]
+        fields = ["id", "member", "member_name", "member_type_name", "is_driver", "boarded_at"]
 
 
 class TripCrewWriteSerializer(serializers.Serializer):
-    driver_id = serializers.UUIDField()
-    role = serializers.ChoiceField(choices=TripCrew.Role.choices, default=TripCrew.Role.DRIVER)
+    member_id = serializers.UUIDField()
 
 
 class TripSeatSerializer(serializers.ModelSerializer):
