@@ -22,18 +22,19 @@ def _next_ref(model, company, prefix_key):
 
 @transaction.atomic
 def create_cash_register(*, company, name, terminal=None, responsible=None,
-                          opening_balance=0, notes="", created_by):
+                          opening_balance=0, notes="", account_id=None, journal_id=None, created_by):
     return CashRegister.objects.create(
         company=company, name=name, terminal=terminal,
         responsible=responsible,
         current_balance=opening_balance,
+        account_id=account_id, journal_id=journal_id,
         notes=notes, created_by=created_by,
     )
 
 
 @transaction.atomic
 def update_cash_register(register, *, updated_by, **fields):
-    allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes"}
+    allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id"}
     for k, v in fields.items():
         if k in allowed:
             setattr(register, k, v)
@@ -54,18 +55,19 @@ def delete_cash_register(register, *, deleted_by):
 
 @transaction.atomic
 def create_bank_account(*, company, bank_name, account_name, account_number,
-                         opening_balance=0, notes="", created_by):
+                         opening_balance=0, notes="", account_id=None, journal_id=None, created_by):
     return BankAccount.objects.create(
         company=company, bank_name=bank_name,
         account_name=account_name, account_number=account_number,
         current_balance=opening_balance,
+        account_id=account_id, journal_id=journal_id,
         notes=notes, created_by=created_by,
     )
 
 
 @transaction.atomic
 def update_bank_account(account, *, updated_by, **fields):
-    allowed = {"bank_name", "account_name", "account_number", "is_active", "notes"}
+    allowed = {"bank_name", "account_name", "account_number", "is_active", "notes", "account_id", "journal_id"}
     for k, v in fields.items():
         if k in allowed:
             setattr(account, k, v)
