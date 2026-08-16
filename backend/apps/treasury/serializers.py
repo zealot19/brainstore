@@ -141,6 +141,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     payment_display  = serializers.CharField(source="get_payment_mode_display", read_only=True)
     account_label    = serializers.SerializerMethodField()
+    journal_entry_name = serializers.CharField(source="journal_entry.name", read_only=True, default=None)
 
     class Meta:
         model = Transaction
@@ -152,6 +153,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
             "amount", "payment_mode", "payment_display",
             "description", "transaction_date",
             "trip_id", "booking_id", "parcel_id",
+            "journal_entry", "journal_entry_name",
             "created_at",
         ]
 
