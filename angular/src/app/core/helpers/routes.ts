@@ -400,6 +400,9 @@ export const routes={
   trzDashboard: '/treasury/dashboard',
   trzRegisters: '/treasury/registers',
   trzBanks:     '/treasury/banks',
+  trzSessions:  '/treasury/sessions',
+  trzMovements: '/treasury/movements',
+  trzTransfers: '/treasury/transfers',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

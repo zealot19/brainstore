@@ -1,0 +1,56 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Sessions de caisse</h4><h6>Ouverture et clôture des caisses</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-open-modal" *hasPermission="'treasury.session.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Ouvrir une session</a></div>
+</div>
+<app-info-banner text="Une session doit être ouverte sur une caisse pour y enregistrer des mouvements. À la clôture, l'écart (compté − attendu) est calculé et comptabilisé."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center gap-2">
+    <select [(ngModel)]="statusFilter" (ngModelChange)="load()" class="form-select w-auto">
+      <option value="">Toutes</option><option value="open">Ouvertes</option><option value="closed">Clôturées</option>
+    </select>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr><th>Caisse</th><th>Statut</th><th>Ouverture</th><th>Attendu</th><th>Écart</th><th>Ouvert par</th><th>Ouvert le</th><th class="no-sort">Actions</th></tr></thead>
+        <tbody>
+          @for (s of rows; track s.id) {
+            <tr>
+              <td class="fw-medium">{{ s.register_name }}</td>
+              <td>@if (s.status === 'open') { <span class="badge bg-success">Ouverte</span> } @else { <span class="badge bg-secondary">Clôturée</span> }</td>
+              <td>{{ s.opening_balance }}</td>
+              <td>{{ s.expected_closing ?? '—' }}</td>
+              <td>{{ s.difference ?? '—' }}</td>
+              <td>{{ s.opened_by_name }}</td>
+              <td>{{ s.opened_at | date:'short' }}</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                @if (s.status === 'open') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" *hasPermission="'treasury.session.manage'" (click)="openClose(s)" title="Clôturer"><i class="ti ti-lock me-1"></i>Clôturer</a> }
+                @else { <span class="text-muted small">—</span> }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucune session.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+<div class="modal fade" id="trz-open-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Ouvrir une session</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="openForm" (ngSubmit)="submitOpen()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">Caisse <span class="text-danger">*</span></label>
+      <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
+    </div>
+    <div class="mb-3"><label class="form-label">Solde d'ouverture</label><input formControlName="opening_balance" type="number" class="form-control" placeholder="(par défaut : solde actuel de la caisse)" /></div>
+    <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">Ouvrir</button></div></form>
+</div></div></div>
+<div class="modal fade" id="trz-close-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Clôturer la session</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="closeForm" (ngSubmit)="submitClose()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">Solde compté <span class="text-danger">*</span></label><input formControlName="closing_balance" type="number" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="closeForm.invalid || saving">Clôturer</button></div></form>
+</div></div></div>
