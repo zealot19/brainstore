@@ -2,29 +2,37 @@
   <div class="add-item d-flex"><div class="page-title"><h4>Employés</h4><h6>Personnel de l'institution</h6></div></div>
   <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#hr-emp-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouvel employé</a></div>
 </div>
-<app-info-banner text="Créez et consultez les employés. Le matricule est généré automatiquement s'il n'est pas renseigné. Contrats, congés et paie viendront ensuite."></app-info-banner>
+<app-info-banner text="Créez, modifiez et consultez les employés. Le matricule est généré automatiquement s'il n'est pas renseigné. Contrats, congés et paie viendront ensuite."></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher (nom, matricule)…" /></div></div></div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Matricule</th><th>Nom complet</th><th>Statut</th></tr></thead>
+        <thead class="thead-light"><tr><th>Matricule</th><th>Nom complet</th><th>Poste</th><th>Téléphone</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
           @for (r of filtered; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.employee_number }}</td>
               <td>{{ r.full_name || (r.first_name + ' ' + r.last_name) }}</td>
-              <td>@if (r.status_label) { <span class="badge bg-info">{{ r.status_label }}</span> } @else { <span class="text-muted">—</span> }</td>
+              <td>{{ r.job_title || '—' }}</td>
+              <td>{{ r.phone || '—' }}</td>
+              <td>@if (r.status_label) { <span class="badge" [ngClass]="r.is_active ? 'bg-success' : 'bg-secondary'">{{ r.status_label }}</span> } @else { <span class="text-muted">—</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#hr-emp-modal" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
+                @if (r.is_active) {
+                  <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#hr-term-modal" (click)="openTerminate(r)" title="Départ"><i class="ti ti-logout text-danger me-1"></i>Départ</a>
+                } @else { <span class="text-muted small">—</span> }
+              </div></td>
             </tr>
-          } @empty { <tr><td colspan="3" class="text-center py-4 text-muted">Aucun employé.</td></tr> }
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun employé.</td></tr> }
         </tbody>
       </table></div>
     }
   </div>
 </div>
 <div class="modal fade" id="hr-emp-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Nouvel employé</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier l\'employé' : 'Nouvel employé' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
@@ -32,7 +40,7 @@
       <div class="col-md-6 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="last_name" type="text" class="form-control" /></div>
     </div>
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Date d'embauche <span class="text-danger">*</span></label><input formControlName="hire_date" type="date" class="form-control" /></div>
+      @if (!editId) { <div class="col-md-6 mb-3"><label class="form-label">Date d'embauche <span class="text-danger">*</span></label><input formControlName="hire_date" type="date" class="form-control" /></div> }
       <div class="col-md-6 mb-3"><label class="form-label">Genre</label>
         <select formControlName="gender" class="form-select">@for (g of genders; track g.value) { <option [value]="g.value">{{ g.label }}</option> }</select>
       </div>
@@ -41,6 +49,14 @@
       <div class="col-md-6 mb-3"><label class="form-label">Téléphone</label><input formControlName="phone" type="text" class="form-control" /></div>
       <div class="col-md-6 mb-3"><label class="form-label">Email</label><input formControlName="personal_email" type="email" class="form-control" /></div>
     </div>
-    <div class="mb-3"><label class="form-label">Matricule</label><input formControlName="employee_number" type="text" class="form-control" placeholder="(auto si vide)" /></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">Créer</button></div></form>
+    @if (!editId) { <div class="mb-3"><label class="form-label">Matricule</label><input formControlName="employee_number" type="text" class="form-control" placeholder="(auto si vide)" /></div> }
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ editId ? 'Enregistrer' : 'Créer' }}</button></div></form>
+</div></div></div>
+<div class="modal fade" id="hr-term-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Départ de l'employé</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="termForm" (ngSubmit)="submitTerminate()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">Date de départ <span class="text-danger">*</span></label><input formControlName="termination_date" type="date" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">Motif</label><textarea formControlName="reason" class="form-control" rows="2"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-danger" [disabled]="termForm.invalid || saving">Enregistrer le départ</button></div></form>
 </div></div></div>

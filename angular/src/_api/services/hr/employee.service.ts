@@ -21,4 +21,12 @@ export class EmployeeService {
   create(data: Record<string, unknown>): Observable<Employee> {
     return this.http.post<Employee>(HR.employees, data);
   }
+
+  update(id: string, data: Record<string, unknown>): Observable<Employee> {
+    return this.http.patch<Employee>(HR.employee(id), data);
+  }
+
+  terminate(id: string, data: Record<string, unknown>): Observable<Employee> {
+    return this.http.post<Employee>(HR.employeeTerminate(id), data);
+  }
 }

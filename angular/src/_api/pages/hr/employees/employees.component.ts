@@ -14,7 +14,8 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 export class HrEmployeesComponent implements OnInit {
   rows: Employee[] = []; filtered: Employee[] = []; loading = true; search = '';
   genders = [{ value: '', label: '—' }, { value: 'M', label: 'Masculin' }, { value: 'F', label: 'Féminin' }];
-  form!: FormGroup; saving = false; errorMsg = '';
+  form!: FormGroup; termForm!: FormGroup; saving = false; errorMsg = '';
+  editId: string | null = null; termId: string | null = null;
 
   constructor(private svc: EmployeeService, private fb: FormBuilder) {}
 
@@ -24,6 +25,7 @@ export class HrEmployeesComponent implements OnInit {
       hire_date: ['', Validators.required], gender: [''], phone: [''],
       personal_email: [''], employee_number: [''],
     });
+    this.termForm = this.fb.group({ termination_date: ['', Validators.required], reason: [''] });
     this.load();
   }
   load(): void {
@@ -36,17 +38,36 @@ export class HrEmployeesComponent implements OnInit {
       || (r.full_name || '').toLowerCase().includes(q)
       || (r.employee_number || '').toLowerCase().includes(q));
   }
-  openCreate(): void { this.errorMsg = ''; this.form.reset({ first_name: '', last_name: '', hire_date: '', gender: '', phone: '', personal_email: '', employee_number: '' }); }
+  openCreate(): void {
+    this.editId = null; this.errorMsg = '';
+    this.form.reset({ first_name: '', last_name: '', hire_date: '', gender: '', phone: '', personal_email: '', employee_number: '' });
+  }
+  openEdit(r: Employee): void {
+    this.editId = r.id; this.errorMsg = '';
+    this.form.reset({ first_name: r.first_name, last_name: r.last_name, hire_date: r.hire_date ?? '',
+      gender: r.gender ?? '', phone: r.phone ?? '', personal_email: r.personal_email ?? '', employee_number: r.employee_number });
+  }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = this.form.value;
-    const payload: Record<string, unknown> = {
-      first_name: v.first_name, last_name: v.last_name, hire_date: v.hire_date,
-      gender: v.gender || '', phone: v.phone || '', personal_email: v.personal_email || '',
-    };
-    if (v.employee_number) payload['employee_number'] = v.employee_number;
-    this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.close(); },
+    if (this.editId) {
+      const payload = { first_name: v.first_name, last_name: v.last_name, gender: v.gender || '',
+                        phone: v.phone || '', personal_email: v.personal_email || '' };
+      this.svc.update(this.editId, payload).subscribe({ next: () => { this.saving = false; this.load(); this.close('hr-emp-modal'); },
+        error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+    } else {
+      const payload: Record<string, unknown> = { first_name: v.first_name, last_name: v.last_name, hire_date: v.hire_date,
+        gender: v.gender || '', phone: v.phone || '', personal_email: v.personal_email || '' };
+      if (v.employee_number) payload['employee_number'] = v.employee_number;
+      this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.close('hr-emp-modal'); },
+        error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+    }
+  }
+  openTerminate(r: Employee): void { this.termId = r.id; this.errorMsg = ''; this.termForm.reset({ termination_date: '', reason: '' }); }
+  submitTerminate(): void {
+    if (this.termForm.invalid || this.saving || !this.termId) return; this.saving = true; this.errorMsg = '';
+    this.svc.terminate(this.termId, this.termForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.close('hr-term-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
-  private close(): void { document.getElementById('hr-emp-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
+  private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

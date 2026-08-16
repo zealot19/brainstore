@@ -129,6 +129,7 @@ export const AUDIT = {
 export const HR = {
   employees: `${API_BASE}/hr/employees/`,
   employee:  (id: string) => `${API_BASE}/hr/employees/${id}/`,
+  employeeTerminate: (id: string) => `${API_BASE}/hr/employees/${id}/terminate/`,
 };
 
 export const FLEET = {
