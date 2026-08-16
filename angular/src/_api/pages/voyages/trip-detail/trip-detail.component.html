@@ -192,16 +192,15 @@
         <ul class="list-group mb-2">
           @for (c of trip.crew; track c.id) {
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>{{ c.driver_name }} <span class="badge bg-light text-dark ms-1">{{ c.role_display }}</span></span>
+              <span>{{ c.member_name }} <span class="badge bg-light text-dark ms-1">{{ c.member_type_name }}</span></span>
               <a class="text-danger" *hasPermission="'voyage.crew.manage'" (click)="removeCrew(c)" title="Retirer"><i class="ti ti-trash"></i></a>
             </li>
           }
           @empty { <li class="list-group-item text-muted">Aucun équipage.</li> }
         </ul>
         <div class="row g-2">
-          <div class="col-7"><select class="form-select form-select-sm" [(ngModel)]="newDriver"><option [ngValue]="null">— Conducteur —</option>@for (d of drivers; track d.id) { <option [ngValue]="d.id">{{ d.full_name }}</option> }</select></div>
-          <div class="col-3"><select class="form-select form-select-sm" [(ngModel)]="newRole">@for (r of roles; track r.v) { <option [value]="r.v">{{ r.l }}</option> }</select></div>
-          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newDriver">+</button></div>
+          <div class="col-10"><select class="form-select form-select-sm" [(ngModel)]="newMember"><option [ngValue]="null">— Membre d'équipage —</option>@for (m of members; track m.id) { <option [ngValue]="m.id">{{ m.full_name }} ({{ m.member_type_name }})</option> }</select></div>
+          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newMember">+</button></div>
         </div>
       </div></div>
     </div>

@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TripService } from '../../../services/voyages/trip.service';
-import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
+import { CrewMemberService } from '../../../services/voyages/crew-member.service';
 import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyages.models';
-import { ExternalDriver } from '../../../models/fleet.models';
+import { CrewMember } from '../../../models/crew.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
@@ -20,12 +20,11 @@ export class VoyagesTripDetailComponent implements OnInit {
   loading = true;
   seats: TripSeat[] = [];
   eligible: EligibleVehicle[] = [];
-  drivers: ExternalDriver[] = [];
+  members: CrewMember[] = [];
   selectedVehicle: string | null = null;
   assignWarnings: string[] = [];
   assignError = '';
-  newDriver: string | null = null;
-  newRole = 'DRIVER';
+  newMember: string | null = null;
   actionError = '';
 
   tbVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
@@ -42,14 +41,12 @@ export class VoyagesTripDetailComponent implements OnInit {
   selDestKind: 'trip' | 'vehicle' = 'trip'; selDestTrip = ''; selDestVehicle = '';
   selNote = ''; selError = ''; selBusy = false;
 
-  roles = [{ v: 'DRIVER', l: 'Chauffeur' }, { v: 'CONVOYEUR', l: 'Convoyeur' }, { v: 'CONTROLEUR', l: 'Contrôleur' }];
-
-  constructor(private svc: TripService, private driverSvc: ExternalDriverService,
+  constructor(private svc: TripService, private crewSvc: CrewMemberService,
               private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id') || '';
-    this.driverSvc.list().subscribe(d => this.drivers = d);
+    this.crewSvc.list().subscribe(d => this.members = d.filter(m => m.is_active));
     this.reload();
   }
 
@@ -94,8 +91,8 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   // ── crew ──
   addCrew(): void {
-    if (!this.newDriver) return;
-    this.svc.addCrew(this.id, this.newDriver, this.newRole).subscribe({ next: () => { this.newDriver = null; this.reload(); }, error: e => alert(e?.error?.detail ?? 'Ajout impossible.') });
+    if (!this.newMember) return;
+    this.svc.addCrew(this.id, this.newMember).subscribe({ next: () => { this.newMember = null; this.reload(); }, error: e => alert(e?.error?.detail ?? 'Ajout impossible.') });
   }
   removeCrew(c: TripCrew): void { if (!confirm('Retirer ce membre ?')) return; this.svc.removeCrew(this.id, c.id).subscribe(() => this.reload()); }
 
