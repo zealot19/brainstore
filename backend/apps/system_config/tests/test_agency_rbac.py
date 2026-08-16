@@ -32,3 +32,24 @@ def test_agency_gating():
     assert _status(AgencyListView, "post", staff, {"name": "Ag 1", "code": "A1", "agency_type": "branch"}) == 403
     assert _status(AgencyListView, "get", admin) != 403
     assert _status(AgencyListView, "post", admin, {"name": "Ag 2", "code": "A2", "agency_type": "branch"}) in (200, 201)
+
+
+@pytest.mark.django_db
+def test_institution_admin_lists_own_agencies_without_company_param():
+    """Un admin d'institution qui crée une agence doit la retrouver dans la liste
+    sans passer ?company= (le tenant middleware est un stub → fallback user.company)."""
+    company, admin, staff = _staff(["system.agency.view"])
+
+    # POST : création (résout la société via request.user.company)
+    req = APIRequestFactory().post("/x", {"name": "Ag X", "code": "AGX", "agency_type": "branch"}, format="json")
+    force_authenticate(req, user=admin)
+    resp = AgencyListView.as_view()(req)
+    assert resp.status_code in (200, 201)
+
+    # GET : liste SANS ?company= et SANS middleware tenant
+    reqg = APIRequestFactory().get("/x")
+    force_authenticate(reqg, user=admin)
+    respg = AgencyListView.as_view()(reqg)
+    assert respg.status_code == 200
+    codes = [a["code"] for a in respg.data["data"]]
+    assert "AGX" in codes

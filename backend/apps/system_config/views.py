@@ -255,12 +255,19 @@ class CompanySubscriptionListView(APIView):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _get_company_id(request, pk=None):
-    """Retourne company_id selon le rôle : SuperAdmin peut spécifier, sinon tenant courant."""
+    """Retourne company_id selon le rôle : SuperAdmin peut spécifier, sinon tenant courant.
+
+    Le tenant middleware étant encore un stub (retourne None), on retombe sur la
+    société de l'utilisateur : un admin/agent d'institution est scopé à sa propre
+    société. Cohérent avec la résolution utilisée par le POST de création.
+    """
     from apps.core.middleware import get_current_tenant
     if pk:
         return pk
     tenant = get_current_tenant()
-    return tenant["company_id"] if tenant else None
+    if tenant:
+        return tenant["company_id"]
+    return getattr(request.user, "company_id", None)
 
 
 class AgencyListView(APIView):
