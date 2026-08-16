@@ -31,6 +31,8 @@ class ServicePoint(_CompanyScoped):
                                     choices=StationKind.choices, blank=True)
     latitude = models.DecimalField(_("latitude"), max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(_("longitude"), max_digits=9, decimal_places=6, null=True, blank=True)
+    agency = models.ForeignKey("system_config.Agency", verbose_name=_("agence"), null=True, blank=True,
+                               on_delete=models.SET_NULL, related_name="service_points")
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("point de service")

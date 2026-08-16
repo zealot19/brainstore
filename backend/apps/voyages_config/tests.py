@@ -87,3 +87,29 @@ def test_grouped_config_gating():
 def test_staff_without_config_perm_denied():
     company, admin, staff = _make_staff([])
     assert _status(TownListView, "get", staff) == 403
+
+
+import json
+import pytest
+from rest_framework.test import APIRequestFactory, force_authenticate
+from apps.authentication.models import User
+from apps.system_config.models import Agency
+from apps.voyages_config.models import Town
+from apps.voyages_config.config_api.views import ServicePointListView
+
+
+@pytest.mark.django_db
+def test_service_point_with_agency():
+    from apps.system_config.services import create_company
+    company, _ = create_company(name="SP Co", admin_email="sp@x.com", admin_first_name="A", admin_last_name="B")
+    admin = User.objects.get(email="sp@x.com")
+    town = Town.objects.create(company=company, name="Douala")
+    agency = Agency.objects.filter(company=company).first()
+    payload = {"town_id": str(town.id), "code": "PV1", "name": "Point Vente 1",
+               "is_station": True, "station_kind": "AGENCY", "agency_id": str(agency.id)}
+    req = APIRequestFactory().post("/x", payload, format="json")
+    force_authenticate(req, user=admin)
+    r = ServicePointListView.as_view()(req)
+    r.render()
+    assert r.status_code in (200, 201)
+    assert json.loads(r.content)["data"]["agency"] == str(agency.id)

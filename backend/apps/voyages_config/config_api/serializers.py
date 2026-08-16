@@ -34,11 +34,13 @@ class TownWrite(serializers.Serializer):
 class ServicePointRead(_ScopeMixin):
     town_name = serializers.CharField(source="town.name", read_only=True, default=None)
     station_kind_display = serializers.CharField(source="get_station_kind_display", read_only=True)
+    agency_name = serializers.CharField(source="agency.name", read_only=True, default=None)
 
     class Meta:
         model = ServicePoint
         fields = ["id", "town", "town_name", "code", "name", "is_station",
                   "station_kind", "station_kind_display", "latitude", "longitude",
+                  "agency", "agency_name",
                   "company", "scope", "is_active", "created_at", "updated_at"]
 
 
@@ -52,6 +54,7 @@ class ServicePointWrite(serializers.Serializer):
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)
+    agency_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
 
 # ── FareClass ────────────────────────────────────────────────────────────────
