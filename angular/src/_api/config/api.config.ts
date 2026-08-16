@@ -314,6 +314,7 @@ export const VOYAGES = {
   eligibleVehicles: (id: string) => `${VT}/${id}/eligible-vehicles/`,
   assignVehicle: (id: string) => `${VT}/${id}/assign-vehicle/`,
   crew: (id: string) => `${VT}/${id}/crew/`, crewItem: (id: string, cid: string) => `${VT}/${id}/crew/${cid}/`,
+  crewMembers: `${VT}/crew-members/`, crewMember: (id: string) => `${VT}/crew-members/${id}/`,
   seats: (id: string) => `${VT}/${id}/seats/`,
   seatsBlock: (id: string) => `${VT}/${id}/seats/block/`, seatsUnblock: (id: string) => `${VT}/${id}/seats/unblock/`,
   stops: (id: string) => `${VT}/${id}/stops/`,
