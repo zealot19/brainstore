@@ -288,6 +288,7 @@ export const VOYAGES_CONFIG = {
   towns:              `${VC}/towns/`,              town:            (id: string) => `${VC}/towns/${id}/`,
   servicePoints:      `${VC}/service-points/`,     servicePoint:    (id: string) => `${VC}/service-points/${id}/`,
   fareClasses:        `${VC}/fare-classes/`,       fareClass:       (id: string) => `${VC}/fare-classes/${id}/`,
+  crewMemberTypes:    `${VC}/crew-member-types/`,  crewMemberType:  (id: string) => `${VC}/crew-member-types/${id}/`,
   timeSlots:          `${VC}/time-slots/`,         timeSlot:        (id: string) => `${VC}/time-slots/${id}/`,
   consignmentNatures: `${VC}/consignment-natures/`, consignmentNature:(id: string) => `${VC}/consignment-natures/${id}/`,
   consignmentTypes:   `${VC}/consignment-types/`,  consignmentType: (id: string) => `${VC}/consignment-types/${id}/`,

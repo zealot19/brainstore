@@ -425,6 +425,8 @@ export const routes={
   vcSettings:           '/voyages-config/settings',
   vcTicketTemplate:     '/voyages-config/ticket-template',
   vcFares:              '/voyages-config/fares',
+  vcCrewMemberTypes:    '/voyages-config/crew-member-types',
+  vcCrewMembers:        '/voyages-config/crew-members',
 
   // ── Gestion Voyages ──────────────────────────────────────────────────────────
   voyagesList: '/voyages/list',

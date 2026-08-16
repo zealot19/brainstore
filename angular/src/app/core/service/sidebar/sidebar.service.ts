@@ -344,6 +344,8 @@ export class SidebarService {
             { menuValue: 'Plans de bus',        route: routes.vcSeatingPlans,       base: 'seating-plans',        permission: 'transport.config.view' },
             { menuValue: 'Affectations de plan',route: routes.vcVehicleAssignments, base: 'vehicle-assignments',  permission: 'transport.config.view' },
             { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes',         permission: 'transport.fareclass.view' },
+            { menuValue: "Types d'équipage",    route: routes.vcCrewMemberTypes,    base: 'crew-member-types',    permission: 'transport.config.view' },
+            { menuValue: "Membres d'équipage",  route: routes.vcCrewMembers,        base: 'crew-members',         permission: 'voyage.crew.view' },
             { menuValue: 'Plages horaires',     route: routes.vcTimeSlots,          base: 'time-slots',           permission: 'transport.config.view' },
             { menuValue: 'Natures de colis',    route: routes.vcConsignmentNatures, base: 'consignment-natures',  permission: 'transport.config.view' },
             { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types',    permission: 'transport.config.view' },

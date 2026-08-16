@@ -160,3 +160,7 @@ export interface VoyagesSettings {
   created_at: string;
   updated_at: string;
 }
+
+export interface CrewMemberType {
+  id: string; code: string; name: string; is_driver: boolean; is_active: boolean; scope?: string;
+}
