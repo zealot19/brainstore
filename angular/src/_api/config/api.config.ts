@@ -389,6 +389,14 @@ export const ACCOUNTING = {
   periodClose: (id: string) => `${ACC}/periods/${id}/close/`,
 };
 
+const TRZ = `${API_BASE}/treasury`;
+
+export const TREASURY = {
+  stats:     `${TRZ}/stats/`,
+  registers: `${TRZ}/registers/`,   register: (id: string) => `${TRZ}/registers/${id}/`,
+  banks:     `${TRZ}/banks/`,       bank:     (id: string) => `${TRZ}/banks/${id}/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 export const PUBLIC_URLS: string[] = [
   AUTH.login,
