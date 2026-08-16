@@ -4,7 +4,7 @@ from apps.voyages_config.models import (
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
-    ServicePattern, VoyagesSettings,
+    ServicePattern, VoyagesSettings, CrewMemberType,
 )
 
 
@@ -21,6 +21,20 @@ class TownRead(_ScopeMixin):
         model = Town
         fields = ["id", "name", "code", "region", "company", "scope",
                   "is_active", "created_at", "updated_at"]
+
+
+class CrewMemberTypeRead(_ScopeMixin):
+    class Meta:
+        model = CrewMemberType
+        fields = ["id", "code", "name", "is_driver", "company", "scope",
+                  "is_active", "created_at", "updated_at"]
+
+
+class CrewMemberTypeWrite(serializers.Serializer):
+    code      = serializers.CharField(max_length=20)
+    name      = serializers.CharField(max_length=100)
+    is_driver = serializers.BooleanField(required=False, default=False)
+    is_active = serializers.BooleanField(required=False, default=True)
 
 
 class TownWrite(serializers.Serializer):

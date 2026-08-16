@@ -17,6 +17,9 @@ urlpatterns = [
     path("fare-classes/bulk-delete/", v.FareClassBulkDeleteView.as_view()),
     path("fare-classes/<uuid:pk>/", v.FareClassDetailView.as_view()),
 
+    path("crew-member-types/",           v.CrewMemberTypeListView.as_view()),
+    path("crew-member-types/<uuid:pk>/", v.CrewMemberTypeDetailView.as_view()),
+
     # ── Plages horaires ─────────────────────────────────────────────────────────
     path("time-slots/", v.TimeSlotListView.as_view()),
     path("time-slots/bulk-delete/", v.TimeSlotBulkDeleteView.as_view()),
