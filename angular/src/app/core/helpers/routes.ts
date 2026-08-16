@@ -401,6 +401,9 @@ export const routes={
   trzRegisters: '/treasury/registers',
   trzBanks:     '/treasury/banks',
 
+  // ── Administration institution ──────────────────────────────────────────────
+  admAgencies:  '/admin/agencies',
+
   // ── Config Voyages ───────────────────────────────────────────────────────────
   vcTowns:              '/voyages-config/towns',
   vcServicePoints:      '/voyages-config/service-points',

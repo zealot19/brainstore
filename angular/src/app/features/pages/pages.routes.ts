@@ -45,6 +45,8 @@ export const Pages_routes: Routes = [
                 { path: 'activity-sectors',   loadComponent: () => import('../../../_api/pages/fleet-config/activity-sectors/activity-sectors.component').then(m => m.FcActivitySectorsComponent) },
               ],
             },
+            // ── Administration institution : Agences ──────────────────────────────────
+            { path: 'admin/agencies', loadComponent: () => import('../../../_api/pages/system/agencies-admin/agencies-admin.component').then(m => m.AgenciesAdminComponent) },
             // ── MODULE : Trésorerie ───────────────────────────────────────────────────
             {
               path: 'treasury',

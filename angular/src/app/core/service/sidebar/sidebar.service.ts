@@ -453,6 +453,16 @@ export class SidebarService {
       showSubRoute: true,
       menu: [
         {
+          menuValue: 'Structure',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-2',
+          base: 'admin',
+          subMenus: [
+            { menuValue: 'Agences', route: routes.admAgencies, base: 'agencies', permission: 'system.agency.view' },
+          ],
+        },
+        {
           menuValue: 'Config Système',
           hasSubRoute: true,
           showSubRoute: false,
