@@ -28,6 +28,8 @@ export interface ServicePoint extends VcBase {
   station_kind_display: string;
   latitude: string | null;
   longitude: string | null;
+  agency?: string | null;
+  agency_name?: string | null;
 }
 
 export interface RouteStop {
