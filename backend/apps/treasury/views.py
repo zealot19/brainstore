@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.core.permissions import IsAuthenticated
+from apps.core.permissions import IsAuthenticated, HasModulePermission
 from apps.core.pagination import StandardResultsSetPagination
 from apps.core.exceptions import ApplicationError
 
@@ -25,7 +25,8 @@ def _company(request):
 # ── Stats ──────────────────────────────────────────────────────────────────────
 
 class TreasuryStatsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.dashboard.view"}
 
     def get(self, request):
         stats = selectors.get_treasury_stats(_company(request).id)
@@ -35,7 +36,8 @@ class TreasuryStatsView(APIView):
 # ── Cash registers ─────────────────────────────────────────────────────────────
 
 class CashRegisterListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.register.view", "POST": "treasury.register.manage"}
 
     def get(self, request):
         qs = selectors.list_cash_registers(
@@ -71,7 +73,8 @@ class CashRegisterListView(APIView):
 
 
 class CashRegisterDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.register.view", "PATCH": "treasury.register.manage", "DELETE": "treasury.register.manage"}
 
     def _get(self, request, register_id):
         return selectors.get_cash_register(register_id, _company(request).id)
@@ -105,7 +108,8 @@ class CashRegisterDetailView(APIView):
 # ── Bank accounts ──────────────────────────────────────────────────────────────
 
 class BankAccountListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.bank.view", "POST": "treasury.bank.manage"}
 
     def get(self, request):
         qs = selectors.list_bank_accounts(
@@ -125,7 +129,8 @@ class BankAccountListView(APIView):
 
 
 class BankAccountDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.bank.view", "PATCH": "treasury.bank.manage", "DELETE": "treasury.bank.manage"}
 
     def _get(self, request, account_id):
         return selectors.get_bank_account(account_id, _company(request).id)
@@ -159,7 +164,8 @@ class BankAccountDetailView(APIView):
 # ── Sessions ───────────────────────────────────────────────────────────────────
 
 class CashSessionListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.view"}
 
     def get(self, request):
         params = request.query_params
@@ -176,7 +182,8 @@ class CashSessionListView(APIView):
 
 
 class OpenSessionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
 
     def post(self, request):
         company = _company(request)
@@ -199,7 +206,8 @@ class OpenSessionView(APIView):
 
 
 class CloseSessionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
 
     def post(self, request, session_id):
         company = _company(request)
@@ -221,7 +229,8 @@ class CloseSessionView(APIView):
 
 
 class CashSessionDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.view"}
 
     def get(self, request, session_id):
         obj = selectors.get_session(session_id, _company(request).id)
@@ -233,7 +242,8 @@ class CashSessionDetailView(APIView):
 # ── Transactions ───────────────────────────────────────────────────────────────
 
 class TransactionListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.transaction.view", "POST": "treasury.transaction.manage"}
 
     def get(self, request):
         params = request.query_params
@@ -288,7 +298,8 @@ class TransactionListView(APIView):
 
 
 class TransactionDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.transaction.view", "DELETE": "treasury.transaction.manage"}
 
     def get(self, request, txn_id):
         obj = selectors.get_transaction(txn_id, _company(request).id)
@@ -310,7 +321,8 @@ class TransactionDetailView(APIView):
 # ── Transfers ──────────────────────────────────────────────────────────────────
 
 class TransferListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.transfer.view", "POST": "treasury.transfer.manage"}
 
     def get(self, request):
         params = request.query_params
@@ -358,7 +370,8 @@ class TransferListView(APIView):
 
 
 class TransferDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.transfer.view"}
 
     def get(self, request, transfer_id):
         obj = selectors.get_transfer(transfer_id, _company(request).id)
