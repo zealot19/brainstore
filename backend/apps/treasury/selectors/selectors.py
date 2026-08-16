@@ -178,3 +178,11 @@ def get_treasury_stats(company_id):
         "today_net":          today_income - today_expense,
         "open_sessions":      open_sessions,
     }
+
+
+def get_open_session_for_user(company_id, user):
+    from apps.treasury.models import CashSession
+    return (CashSession.objects
+            .filter(company_id=company_id, opened_by=user, status=CashSession.Status.OPEN, is_deleted=False)
+            .order_by("-opened_at")
+            .first())
