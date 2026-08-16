@@ -5,7 +5,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 
-from apps.core.permissions import IsSuperAdmin, IsInstitutionAdmin
+from apps.core.permissions import IsSuperAdmin, IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response
 from apps.core.exceptions import ApplicationError
 
@@ -265,7 +265,8 @@ def _get_company_id(request, pk=None):
 
 class AgencyListView(APIView):
     """GET /system/agencies/?company=<id> ou via middleware tenant."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "system.agency.view", "POST": "system.agency.manage"}
 
     def get(self, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
@@ -317,7 +318,9 @@ class AgencyListView(APIView):
 
 class AgencyDetailView(APIView):
     """GET/PATCH/DELETE /system/agencies/<id>/"""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "system.agency.view", "PATCH": "system.agency.manage",
+                      "PUT": "system.agency.manage", "DELETE": "system.agency.manage"}
 
     def _get(self, pk, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
@@ -357,7 +360,8 @@ class AgencyDetailView(APIView):
 
 class AgencyTreeView(APIView):
     """GET /system/agencies/tree/?company=<id> — Arborescence complète."""
-    permission_classes = [IsInstitutionAdmin]
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "system.agency.view"}
 
     def get(self, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
