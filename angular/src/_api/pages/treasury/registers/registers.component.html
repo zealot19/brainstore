@@ -9,11 +9,12 @@
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Nom</th><th>Terminal</th><th>Solde</th><th>Compte</th><th>Journal</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <thead class="thead-light"><tr><th>Nom</th><th>Agence</th><th>Terminal</th><th>Solde</th><th>Compte</th><th>Journal</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
           @for (r of filtered; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.name }}</td>
+              <td>{{ r.agency_name || '—' }}</td>
               <td>{{ r.terminal_name || '—' }}</td>
               <td>{{ r.current_balance }}</td>
               <td>{{ r.account_code || '—' }}</td>
@@ -24,7 +25,7 @@
                 <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.register.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucune caisse.</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucune caisse.</td></tr> }
         </tbody>
       </table></div>
     }
@@ -35,6 +36,9 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">Agence</label>
+      <select formControlName="agency_id" class="form-select"><option [ngValue]="null">— Aucune —</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
+    </div>
     <div class="mb-3"><label class="form-label">Compte comptable (571x)</label>
       <select formControlName="account_id" class="form-select"><option [ngValue]="null">— Aucun —</option>@for (a of accounts; track a.id) { <option [ngValue]="a.id">{{ a.code }} — {{ a.name }}</option> }</select>
     </div>
