@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.voyages_trips.models import Trip, TripStop, TripCrew, TripSeat
+from apps.voyages_trips.models import Trip, TripStop, TripCrew, TripSeat, CrewMember
 
 
 class TripStopSerializer(serializers.ModelSerializer):
@@ -105,3 +105,23 @@ class MarkDelayedSerializer(serializers.Serializer):
 
 class SeatIdsSerializer(serializers.Serializer):
     seat_ids = serializers.ListField(child=serializers.UUIDField())
+
+
+class CrewMemberSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(read_only=True)
+    member_type_name = serializers.CharField(source="member_type.name", read_only=True)
+    is_driver = serializers.BooleanField(source="member_type.is_driver", read_only=True)
+
+    class Meta:
+        model = CrewMember
+        fields = ["id", "first_name", "last_name", "full_name", "member_type", "member_type_name",
+                  "is_driver", "phone", "license_number", "is_active"]
+
+
+class CrewMemberWriteSerializer(serializers.Serializer):
+    first_name     = serializers.CharField(max_length=150)
+    last_name      = serializers.CharField(max_length=150)
+    member_type_id = serializers.UUIDField()
+    phone          = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    license_number = serializers.CharField(max_length=50, required=False, allow_blank=True, default="")
+    is_active      = serializers.BooleanField(required=False, default=True)

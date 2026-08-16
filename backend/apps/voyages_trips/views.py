@@ -7,7 +7,8 @@ from apps.core.pagination import StandardResultsSetPagination
 from apps.system_config.models import Company
 
 from . import selectors, services, serializers as S
-from .models import TripCrew, TripSeat
+from .models import TripCrew, TripSeat, CrewMember
+from apps.voyages_config.models import CrewMemberType
 
 
 def _scope(request):
@@ -454,3 +455,61 @@ class TripTransbordSelectionView(APIView):
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(res)
+
+
+class CrewMemberListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.manage"}
+
+    def get(self, request):
+        cid = request.user.company_id
+        qs = CrewMember.objects.filter(is_deleted=False, company_id=cid).select_related("member_type").order_by("last_name")
+        return success_response(S.CrewMemberSerializer(qs, many=True).data)
+
+    def post(self, request):
+        cid = request.user.company_id
+        p = S.CrewMemberWriteSerializer(data=request.data); p.is_valid(raise_exception=True); d = p.validated_data
+        mt = CrewMemberType.objects.filter(id=d["member_type_id"], company_id=cid, is_deleted=False).first()
+        if not mt:
+            return error_response("Type introuvable.", status_code=404)
+        obj = CrewMember.objects.create(company_id=cid, first_name=d["first_name"], last_name=d["last_name"],
+                                        member_type=mt, phone=d["phone"], license_number=d["license_number"],
+                                        is_active=d["is_active"], created_by=request.user)
+        return created_response(S.CrewMemberSerializer(obj).data)
+
+
+class CrewMemberDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.crew.view", "PATCH": "voyage.crew.manage", "DELETE": "voyage.crew.manage"}
+
+    def _get(self, request, pk):
+        return CrewMember.objects.filter(is_deleted=False, company_id=request.user.company_id, id=pk).first()
+
+    def get(self, request, pk):
+        o = self._get(request, pk)
+        return success_response(S.CrewMemberSerializer(o).data) if o else error_response("Introuvable.", status_code=404)
+
+    def patch(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response("Introuvable.", status_code=404)
+        d = request.data
+        for f in ("first_name", "last_name", "phone", "license_number", "is_active"):
+            if f in d:
+                setattr(o, f, d[f])
+        if "member_type_id" in d:
+            mt = CrewMemberType.objects.filter(id=d["member_type_id"], company_id=o.company_id, is_deleted=False).first()
+            if not mt:
+                return error_response("Type introuvable.", status_code=404)
+            o.member_type = mt
+        o.updated_by = request.user
+        o.save()
+        return success_response(S.CrewMemberSerializer(o).data)
+
+    def delete(self, request, pk):
+        o = self._get(request, pk)
+        if not o:
+            return error_response("Introuvable.", status_code=404)
+        o.is_deleted = True; o.updated_by = request.user
+        o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return success_response(message="Membre supprimé.")
