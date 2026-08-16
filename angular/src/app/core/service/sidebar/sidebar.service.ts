@@ -449,6 +449,24 @@ export class SidebarService {
       ],
     },
     {
+      tittle: 'RH',
+      showAsTab: false,
+      separateRoute: false,
+      menu: [
+        {
+          menuValue: 'Ressources Humaines',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'hr',
+          role: 'institution_admin',
+          subMenus: [
+            { menuValue: 'Employés', route: routes.hrEmployees, base: 'employees' },
+          ],
+        },
+      ],
+    },
+    {
       tittle: 'Administration',
       showAsTab: false,
       separateRoute: false,

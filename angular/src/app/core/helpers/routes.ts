@@ -407,6 +407,9 @@ export const routes={
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',
 
+  // ── RH ──────────────────────────────────────────────────────────────────────
+  hrEmployees:  '/hr/employees',
+
   // ── Config Voyages ───────────────────────────────────────────────────────────
   vcTowns:              '/voyages-config/towns',
   vcServicePoints:      '/voyages-config/service-points',

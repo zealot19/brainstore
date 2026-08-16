@@ -47,6 +47,8 @@ export const Pages_routes: Routes = [
             },
             // ── Administration institution : Agences ──────────────────────────────────
             { path: 'admin/agencies', loadComponent: () => import('../../../_api/pages/system/agencies-admin/agencies-admin.component').then(m => m.AgenciesAdminComponent) },
+            // ── RH : Employés ─────────────────────────────────────────────────────────
+            { path: 'hr/employees', loadComponent: () => import('../../../_api/pages/hr/employees/employees.component').then(m => m.HrEmployeesComponent) },
             // ── MODULE : Trésorerie ───────────────────────────────────────────────────
             {
               path: 'treasury',

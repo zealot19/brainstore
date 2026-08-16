@@ -1,0 +1,46 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Employés</h4><h6>Personnel de l'institution</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#hr-emp-modal" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouvel employé</a></div>
+</div>
+<app-info-banner text="Créez et consultez les employés. Le matricule est généré automatiquement s'il n'est pas renseigné. Contrats, congés et paie viendront ensuite."></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher (nom, matricule)…" /></div></div></div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr><th>Matricule</th><th>Nom complet</th><th>Statut</th></tr></thead>
+        <tbody>
+          @for (r of filtered; track r.id) {
+            <tr>
+              <td class="fw-medium">{{ r.employee_number }}</td>
+              <td>{{ r.full_name || (r.first_name + ' ' + r.last_name) }}</td>
+              <td>@if (r.status_label) { <span class="badge bg-info">{{ r.status_label }}</span> } @else { <span class="text-muted">—</span> }</td>
+            </tr>
+          } @empty { <tr><td colspan="3" class="text-center py-4 text-muted">Aucun employé.</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+<div class="modal fade" id="hr-emp-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Nouvel employé</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Prénom <span class="text-danger">*</span></label><input formControlName="first_name" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="last_name" type="text" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Date d'embauche <span class="text-danger">*</span></label><input formControlName="hire_date" type="date" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Genre</label>
+        <select formControlName="gender" class="form-select">@for (g of genders; track g.value) { <option [value]="g.value">{{ g.label }}</option> }</select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">Téléphone</label><input formControlName="phone" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Email</label><input formControlName="personal_email" type="email" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">Matricule</label><input formControlName="employee_number" type="text" class="form-control" placeholder="(auto si vide)" /></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">Créer</button></div></form>
+</div></div></div>
