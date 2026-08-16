@@ -51,7 +51,7 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
     if received < due:
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
-    return Baggage.objects.create(
+    baggage = Baggage.objects.create(
         company=company, tag_number=_tag_number(), trip=trip, ticket=ticket,
         sender_name=sender_name, sender_phone=sender_phone, civility=civility,
         id_type=id_type, id_number=id_number, birth_date=birth_date, email=email,
@@ -61,6 +61,9 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
         amount_due=due, amount_received=received, change_due=received - due,
         payment_method=payment_method or "", paid_at=timezone.now() if due > 0 else None,
         status=Baggage.Status.CHECKED_IN, created_by=user)
+    from apps.treasury.services import record_baggage_payment
+    record_baggage_payment(company, baggage=baggage, amount=due, payment_method=payment_method, user=user)
+    return baggage
 
 
 _EDITABLE = {"sender_name", "sender_phone", "civility", "id_type", "id_number", "birth_date",

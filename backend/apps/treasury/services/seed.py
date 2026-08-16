@@ -5,6 +5,7 @@ from apps.treasury.models import MovementAccountMapping
 _DEFAULTS = {
     "ticket_sales":    "706",
     "parcel_shipping": "707",
+    "baggage":         "706",
     "charter":         "708",
     "other_income":    "758",
     "fuel":            "601",

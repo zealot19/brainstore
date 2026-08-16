@@ -14,8 +14,10 @@ def test_bootstrap_seeds_mapping():
     c = _company()
     m = {x.category: x.account.code for x in MovementAccountMapping.objects.filter(company=c)}
     assert m.get("ticket_sales") == "706"
+    assert m.get("parcel_shipping") == "707"
+    assert m.get("baggage") == "706"
     assert m.get("fuel") == "601"
-    assert len(m) == 10
+    assert len(m) == 11
 
 
 @pytest.mark.django_db

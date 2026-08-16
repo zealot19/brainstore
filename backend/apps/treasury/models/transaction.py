@@ -16,6 +16,7 @@ class Transaction(BaseModel):
         # Income
         TICKET_SALES    = "ticket_sales",    _("Ticket Sales")
         PARCEL_SHIPPING = "parcel_shipping", _("Parcel Shipping")
+        BAGGAGE         = "baggage",         _("Bagages")
         CHARTER         = "charter",         _("Charter")
         OTHER_INCOME    = "other_income",    _("Other Income")
         # Expense
@@ -71,6 +72,12 @@ class Transaction(BaseModel):
     voyage_booking = models.ForeignKey("voyages_booking.Booking", verbose_name=_("réservation voyage"),
                                        on_delete=models.SET_NULL, null=True, blank=True,
                                        related_name="treasury_transactions")
+    voyages_parcel  = models.ForeignKey("voyages_consignment.Parcel", verbose_name=_("colis"),
+                                        on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name="treasury_transactions")
+    voyages_baggage = models.ForeignKey("voyages_consignment.Baggage", verbose_name=_("bagage"),
+                                        on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name="treasury_transactions")
 
     journal_entry = models.ForeignKey("accounting.JournalEntry", verbose_name=_("pièce comptable"),
                                       null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

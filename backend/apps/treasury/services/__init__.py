@@ -7,6 +7,7 @@ from .services import (
 )
 from .seed import seed_treasury_mapping
 from .booking_sales import record_booking_payment
+from .consignment_sales import record_parcel_payment, record_baggage_payment
 
 __all__ = [
     "create_cash_register", "update_cash_register", "delete_cash_register",
@@ -16,4 +17,5 @@ __all__ = [
     "create_transfer",
     "seed_treasury_mapping",
     "record_booking_payment",
+    "record_parcel_payment", "record_baggage_payment",
 ]

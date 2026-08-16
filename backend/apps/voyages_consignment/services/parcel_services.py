@@ -48,6 +48,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
         amount_due=due, amount_received=received, change_due=received - due,
         payment_method=payment_method or "", paid_at=timezone.now(), created_by=user)
     _event(parcel, ParcelEvent.Kind.REGISTERED, user=user)
+    from apps.treasury.services import record_parcel_payment
+    record_parcel_payment(company, parcel=parcel, amount=due, payment_method=payment_method, user=user)
     return parcel
 
 
