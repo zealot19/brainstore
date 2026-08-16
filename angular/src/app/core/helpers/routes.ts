@@ -396,6 +396,11 @@ export const routes={
   accJournals:    '/accounting/journals',
   accFiscalYears: '/accounting/fiscal-years',
 
+  // ── Trésorerie ──────────────────────────────────────────────────────────────
+  trzDashboard: '/treasury/dashboard',
+  trzRegisters: '/treasury/registers',
+  trzBanks:     '/treasury/banks',
+
   // ── Config Voyages ───────────────────────────────────────────────────────────
   vcTowns:              '/voyages-config/towns',
   vcServicePoints:      '/voyages-config/service-points',

@@ -408,6 +408,25 @@ export class SidebarService {
       ],
     },
     {
+      tittle: 'Trésorerie',
+      showAsTab: false,
+      separateRoute: false,
+      menu: [
+        {
+          menuValue: 'Trésorerie',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'treasury',
+          subMenus: [
+            { menuValue: 'Tableau de bord',    route: routes.trzDashboard, base: 'dashboard', permission: 'treasury.dashboard.view' },
+            { menuValue: 'Caisses',            route: routes.trzRegisters, base: 'registers', permission: 'treasury.register.view' },
+            { menuValue: 'Comptes bancaires',  route: routes.trzBanks,     base: 'banks',     permission: 'treasury.bank.view' },
+          ],
+        },
+      ],
+    },
+    {
       tittle: 'Comptabilité',
       showAsTab: false,
       separateRoute: false,

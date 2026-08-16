@@ -45,6 +45,16 @@ export const Pages_routes: Routes = [
                 { path: 'activity-sectors',   loadComponent: () => import('../../../_api/pages/fleet-config/activity-sectors/activity-sectors.component').then(m => m.FcActivitySectorsComponent) },
               ],
             },
+            // ── MODULE : Trésorerie ───────────────────────────────────────────────────
+            {
+              path: 'treasury',
+              loadComponent: () => import('../../../_api/pages/treasury/treasury.component').then(m => m.TreasuryComponent),
+              children: [
+                { path: 'dashboard', loadComponent: () => import('../../../_api/pages/treasury/dashboard/dashboard.component').then(m => m.TrzDashboardComponent) },
+                { path: 'registers', loadComponent: () => import('../../../_api/pages/treasury/registers/registers.component').then(m => m.TrzRegistersComponent) },
+                { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+              ],
+            },
             // ── MODULE : Comptabilité ─────────────────────────────────────────────────
             {
               path: 'accounting',
