@@ -68,6 +68,9 @@ class Transaction(BaseModel):
     parcel  = models.ForeignKey("parcel.Parcel", verbose_name=_("parcel"),
                                  on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name="transactions")
+    voyage_booking = models.ForeignKey("voyages_booking.Booking", verbose_name=_("réservation voyage"),
+                                       on_delete=models.SET_NULL, null=True, blank=True,
+                                       related_name="treasury_transactions")
 
     journal_entry = models.ForeignKey("accounting.JournalEntry", verbose_name=_("pièce comptable"),
                                       null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

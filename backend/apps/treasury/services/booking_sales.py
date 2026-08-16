@@ -24,23 +24,27 @@ def record_booking_payment(company, *, booking, amount, payment_method, user):
     amount = Decimal(str(amount or 0))
     if amount <= 0:
         return None
-    if booking is not None and Transaction.objects.filter(booking=booking, is_deleted=False).exists():
+    if booking is not None and Transaction.objects.filter(voyage_booking=booking, is_deleted=False).exists():
         return None  # idempotent
 
     mode, is_cash = _normalize_payment(payment_method)
     ref = getattr(booking, "reference", "") or ""
-    trip = getattr(booking, "outbound_trip", None)
     common = dict(company=company, transaction_type=Transaction.Type.INCOME,
                   category=Transaction.Category.TICKET_SALES, amount=amount, payment_mode=mode,
-                  description=f"Vente {ref}".strip(), booking=booking, trip=trip, created_by=user)
+                  description=f"Vente {ref}".strip(), created_by=user)
 
     if is_cash:
         session = get_open_session_for_user(company.id, user)
         if not session:
             raise ApplicationError(_("Ouvrez d'abord votre session de caisse pour encaisser une vente au comptant."))
-        return create_transaction(account_type=Transaction.AccountType.CASH, cash_session=session, **common)
+        txn = create_transaction(account_type=Transaction.AccountType.CASH, cash_session=session, **common)
+    else:
+        banks = list(BankAccount.objects.filter(company=company, is_deleted=False, is_active=True))
+        if len(banks) != 1:
+            return None
+        txn = create_transaction(account_type=Transaction.AccountType.BANK, bank_account=banks[0], **common)
 
-    banks = list(BankAccount.objects.filter(company=company, is_deleted=False, is_active=True))
-    if len(banks) != 1:
-        return None
-    return create_transaction(account_type=Transaction.AccountType.BANK, bank_account=banks[0], **common)
+    if booking is not None:
+        txn.voyage_booking = booking
+        txn.save(update_fields=["voyage_booking"])
+    return txn

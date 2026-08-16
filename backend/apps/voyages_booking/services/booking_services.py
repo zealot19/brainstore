@@ -156,6 +156,9 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     booking.save(update_fields=["amount_due", "amount_paid", "amount_received", "change_due",
                                 "payment_method", "updated_by", "updated_at"])
     loyalty_services.accrue(booking, user=user)
+
+    from apps.treasury.services import record_booking_payment
+    record_booking_payment(company, booking=booking, amount=total, payment_method=payment_method, user=user)
     return booking
 
 
