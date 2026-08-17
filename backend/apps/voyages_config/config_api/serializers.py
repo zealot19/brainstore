@@ -4,7 +4,7 @@ from apps.voyages_config.models import (
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
-    ServicePattern, VoyagesSettings, CrewMemberType,
+    ServicePattern, VoyagesSettings, CrewMemberType, ExpenseType,
 )
 
 
@@ -35,6 +35,34 @@ class CrewMemberTypeWrite(serializers.Serializer):
     name      = serializers.CharField(max_length=100)
     is_driver = serializers.BooleanField(required=False, default=False)
     is_active = serializers.BooleanField(required=False, default=True)
+
+
+class ExpenseTypeRead(_ScopeMixin):
+    class Meta:
+        model = ExpenseType
+        fields = ["id", "code", "name", "account_code", "company", "scope",
+                  "is_active", "created_at", "updated_at"]
+
+
+class ExpenseTypeWrite(serializers.Serializer):
+    code         = serializers.CharField(max_length=30)
+    name         = serializers.CharField(max_length=150)
+    account_code = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
+    is_active    = serializers.BooleanField(required=False, default=True)
+
+    def validate_account_code(self, value):
+        if not value:
+            return value
+        from apps.accounting.models import Account
+        request = self.context.get("request")
+        company_id = getattr(getattr(request, "user", None), "company_id", None)
+        qs = Account.objects.filter(code=value, account_type="expense", is_deleted=False)
+        if company_id:
+            qs = qs.filter(company_id=company_id)
+        if not qs.exists():
+            raise serializers.ValidationError(
+                "Compte de charge introuvable dans le plan comptable.")
+        return value
 
 
 class TownWrite(serializers.Serializer):

@@ -7,7 +7,7 @@ from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
 from django.db import transaction
 from apps.voyages_config.models import (
-    Town, ServicePoint, FareClass, TimeSlot, CrewMemberType,
+    Town, ServicePoint, FareClass, TimeSlot, CrewMemberType, ExpenseType,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
@@ -165,6 +165,7 @@ TimeSlotListView, TimeSlotDetailView = _pair(TimeSlot, S.TimeSlotRead, S.TimeSlo
 ConsignmentNatureListView, ConsignmentNatureDetailView = _pair(ConsignmentNature, S.ConsignmentNatureRead, S.ConsignmentNatureWrite, unique="code", search=("code", "name"))
 LoyaltyRuleListView, LoyaltyRuleDetailView = _pair(LoyaltyRule, S.LoyaltyRuleRead, S.LoyaltyRuleWrite, unique="name", search=("name",))
 CrewMemberTypeListView, CrewMemberTypeDetailView = _pair(CrewMemberType, S.CrewMemberTypeRead, S.CrewMemberTypeWrite, unique="code", search=("code", "name"))
+ExpenseTypeListView, ExpenseTypeDetailView = _pair(ExpenseType, S.ExpenseTypeRead, S.ExpenseTypeWrite, unique="code", search=("code", "name"))
 
 TownBulkDeleteView = _bulk(Town, perm="transport.city")
 FareClassBulkDeleteView = _bulk(FareClass, perm="transport.fareclass")

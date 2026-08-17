@@ -142,6 +142,10 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     from apps.voyages_config.services.crew_seed import seed_crew_member_types
     seed_crew_member_types(company, created_by=created_by)
 
+    # Types de dépense par défaut (Voyages).
+    from apps.voyages_config.services.expense_seed import seed_expense_types
+    seed_expense_types(company, created_by=created_by)
+
     return {
         "hq_agency_id":   str(hq.id),
         "hq_agency_name": hq.name,
