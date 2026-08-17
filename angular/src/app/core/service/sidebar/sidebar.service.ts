@@ -220,13 +220,14 @@ export class SidebarService {
       separateRoute: false,
       menu: [
         {
-          menuValue: 'Rapports',
-          hasSubRoute: false,
+          menuValue: 'Reporting',
+          hasSubRoute: true,
           showSubRoute: false,
           icon2: 'file-text',
-          route: routes.reporting,
           base: 'reporting',
-          permission: 'reporting.view',
+          subMenus: [
+            { menuValue: 'Rapports', route: routes.reporting, base: 'reporting', permission: 'reporting.view' },
+          ],
         },
       ],
     },
