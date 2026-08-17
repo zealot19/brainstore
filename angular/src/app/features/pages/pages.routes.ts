@@ -75,7 +75,7 @@ export const Pages_routes: Routes = [
               ],
             },
             // ── MODULE : Reporting ────────────────────────────────────────────────────
-            { path: 'reporting', loadComponent: () => import('../../../_api/pages/reporting/reporting.component').then(m => m.ReportingComponent) },
+            { path: 'reporting/reports', loadComponent: () => import('../../../_api/pages/reporting/reporting.component').then(m => m.ReportingComponent) },
             // ── MODULE : Config Voyages ───────────────────────────────────────────────
             {
               path: 'voyages-config',
