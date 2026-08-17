@@ -31,6 +31,8 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
         sched = scheduled_departure + rs.offset_from_departure if rs.offset_from_departure else None
         TripStop.objects.create(trip=trip, service_point=rs.service_point, sequence=rs.sequence,
                                 scheduled_arrival=sched, created_by=user)
+    from apps.voyages_trips.services.expense_services import apply_expense_schedule
+    apply_expense_schedule(trip)
     return trip
 
 
