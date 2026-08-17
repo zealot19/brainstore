@@ -13,7 +13,7 @@
 
           <div class="login-userheading">
             <h3>Sign In</h3>
-            <h4>Access the Dreamspos panel using your email and passcode.</h4>
+            <h4>Access your dashboard using your email and password.</h4>
           </div>
 
           <!-- Alerte erreur -->
@@ -26,7 +26,7 @@
             <label class="form-label">Email<span class="text-danger">*</span></label>
             <div class="input-group">
               <input type="email" class="form-control border-end-0"
-                     formControlName="email" placeholder="admin@dreamspos.com"
+                     formControlName="email" placeholder="admin@example.com"
                      [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
               <span class="input-group-text border-start-0"><i class="ti ti-mail"></i></span>
             </div>
@@ -72,35 +72,8 @@
             </button>
           </div>
 
-          <div class="signinform">
-            <h4>New on our platform?
-              <a [routerLink]="routes.register" class="hover-a"> Create an account</a>
-            </h4>
-          </div>
-
-          <div class="form-setlogin or-text"><h4>OR</h4></div>
-
-          <div class="form-sociallink mt-2">
-            <ul class="d-flex justify-content-center row-gap-2">
-              <li>
-                <a href="javascript:void(0);" class="facebook-logo">
-                  <img src="assets/img/icons/facebook-logo.svg" alt="Facebook">
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0);">
-                  <img src="assets/img/icons/google.png" alt="Google">
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0);" class="apple-logo">
-                  <img src="assets/img/icons/apple-logo.svg" alt="Apple">
-                </a>
-              </li>
-            </ul>
-            <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
-              <p>Copyright &copy; 2025 DreamsPOS</p>
-            </div>
+          <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
+            <p>&copy; 2026 · Tous droits réservés</p>
           </div>
 
         </div>
