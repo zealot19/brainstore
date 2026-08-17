@@ -1,0 +1,13 @@
+# Ne jamais embarquer les secrets/artefacts locaux dans l'image
+.env
+*.sqlite3
+db.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+staticfiles/
+media/
+.git/
+.python-version

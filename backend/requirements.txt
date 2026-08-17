@@ -1,3 +1,0 @@
-# Point d'entrée pour la détection Python de Nixpacks (Railway).
-# Les dépendances réelles sont dans requirements/production.txt.
--r requirements/production.txt
