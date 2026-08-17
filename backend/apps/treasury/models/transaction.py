@@ -26,6 +26,7 @@ class Transaction(BaseModel):
         SUPPLIES        = "supplies",        _("Supplies / Office")
         RENT            = "rent",            _("Rent")
         OTHER_EXPENSE   = "other_expense",   _("Other Expense")
+        VOYAGE_EXPENSE  = "voyage_expense",  _("Dépense voyage")
 
     class PaymentMode(models.TextChoices):
         CASH         = "cash",         _("Cash")
@@ -78,6 +79,11 @@ class Transaction(BaseModel):
     voyages_baggage = models.ForeignKey("voyages_consignment.Baggage", verbose_name=_("bagage"),
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="treasury_transactions")
+    voyage_expense  = models.ForeignKey("voyages_trips.TripExpense", verbose_name=_("dépense voyage"),
+                                        on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name="treasury_transactions")
+    counterpart_account = models.ForeignKey("accounting.Account", verbose_name=_("compte de contrepartie"),
+                                            on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
 
     journal_entry = models.ForeignKey("accounting.JournalEntry", verbose_name=_("pièce comptable"),
                                       null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

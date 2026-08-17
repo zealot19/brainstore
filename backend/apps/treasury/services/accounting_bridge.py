@@ -41,7 +41,7 @@ class TreasuryAccountingBridge:
                 journal = bank.journal or _journal(company_id, "BANQUE")
                 liquidity = bank.account or _account(company_id, "521")
             mapping = MovementAccountMapping.objects.filter(company_id=company_id, category=txn.category).first()
-            counterpart = mapping.account if mapping else None
+            counterpart = txn.counterpart_account or (mapping.account if mapping else None)
             if not (journal and liquidity and counterpart):
                 return None
             amount = txn.amount

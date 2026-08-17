@@ -16,8 +16,9 @@ def test_bootstrap_seeds_mapping():
     assert m.get("ticket_sales") == "706"
     assert m.get("parcel_shipping") == "707"
     assert m.get("baggage") == "706"
+    assert m.get("voyage_expense") == "658"
     assert m.get("fuel") == "601"
-    assert len(m) == 11
+    assert len(m) == 12
 
 
 @pytest.mark.django_db

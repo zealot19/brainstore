@@ -14,6 +14,7 @@ _DEFAULTS = {
     "supplies":        "605",
     "rent":            "622",
     "other_expense":   "658",
+    "voyage_expense":  "658",
 }
 
 

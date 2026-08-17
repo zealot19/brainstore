@@ -150,6 +150,7 @@ def create_transaction(
     payment_mode, description="", transaction_date=None,
     cash_session=None, bank_account=None,
     trip=None, booking=None, parcel=None,
+    counterpart_account=None,
     created_by,
 ):
     if amount <= 0:
@@ -175,6 +176,7 @@ def create_transaction(
         description=description,
         transaction_date=transaction_date or timezone.now().date(),
         trip=trip, booking=booking, parcel=parcel,
+        counterpart_account=counterpart_account,
         created_by=created_by,
     )
 
