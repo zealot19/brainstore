@@ -22,4 +22,4 @@ COPY . .
 RUN SECRET_KEY=build-only python manage.py collectstatic --noinput
 
 # Railway fournit $PORT. Les migrations tournent en pre-deploy (railway.json).
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD sh -c 'gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000}'
