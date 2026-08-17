@@ -1,7 +1,12 @@
 import pytest
 from apps.reporting.core import ReportColumn, ReportGroup, ReportResult
 
-pytest.importorskip("weasyprint")
+# WeasyPrint loads system libs (Pango/Cairo) at import — raises OSError when absent
+# (e.g. local macOS without brew libs). Skip the whole module in that case; CI/Docker cover it.
+try:
+    import weasyprint  # noqa: F401
+except (ImportError, OSError):
+    pytest.skip("weasyprint unavailable (système Pango/Cairo)", allow_module_level=True)
 
 
 @pytest.mark.django_db
