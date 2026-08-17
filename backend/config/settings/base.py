@@ -69,6 +69,8 @@ LOCAL_APPS = [
     "apps.voyages_booking",
     # ── Colis & Bagages Voyages ──
     "apps.voyages_consignment",
+    # ── Reporting (états PDF/Excel/CSV) ──
+    "apps.reporting",
     # ── Ticketing (réservations, billets, bagages) ──
     "apps.ticketing",
     # ── Colis ──

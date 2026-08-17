@@ -59,6 +59,9 @@ urlpatterns = [
     # ── Réservation en ligne (public) ───────────────────────────────────────────
     path("online/",     include("apps.online_booking.urls")),
 
+    # ── Reporting (états PDF/Excel/CSV) ────────────────────────────────────────
+    path("reporting/",  include("apps.reporting.urls")),
+
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ────────────────
     path("scig-sage/",  include("apps.sync_scig_sage.urls")),
 
