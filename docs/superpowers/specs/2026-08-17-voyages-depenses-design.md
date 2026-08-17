@@ -45,18 +45,20 @@ module Reporting.
 |---|---|---|
 | code | Char(30) | unique (company, code) |
 | name | Char(150) | ex. Carburant, Péage, Ration chauffeur |
-| account_code | Char(10) | compte OHADA de charge (contrepartie). ex. 601, 6378, 6371, 658 |
+| account_code | Char(10) | compte OHADA de charge (contrepartie). **Choisi via un sélecteur** parmi les comptes de charge (classe 6) du plan de la société ; **validé côté backend** (le compte doit exister) → aucun code invalide possible. Stocké en code. |
 | is_active | bool (hérité) | |
 
 - Exposé via la **factory `_pair`** (perm par défaut `transport.config.*`), comme
-  `CrewMemberType`.
-- Seed `seed_expense_types(company)` (idempotent), appelé au bootstrap société. Défauts :
-  - `CARBURANT` → Carburant → 601
-  - `PEAGE` → Péage → 6378
-  - `RATION_CH` → Ration chauffeur → 6371
-  - `RATION_CV` → Ration convoyeur → 6371
-  - `AUTRES` → Autres → 658
-  (codes indicatifs, ajustables ; le compte doit exister dans le plan comptable de la société.)
+  `CrewMemberType`. Le write-serializer valide que `account_code` existe dans
+  `accounting.Account(company, code=..., account_type="expense")`.
+- Seed `seed_expense_types(company)` (idempotent), appelé au bootstrap société. Défauts
+  (tous éditables ensuite via le sélecteur ; comptes confirmés présents dans le plan semé) :
+  - `CARBURANT` → Carburant → **604** (matières et fournitures consommables)
+  - `PEAGE` → Péage → **658** (charges diverses — pas de compte péage dédié)
+  - `RATION_CH` → Ration chauffeur → **637** (personnel extérieur ; équipage souvent externe)
+  - `RATION_CV` → Ration convoyeur → **637**
+  - `AUTRES` → Autres → **658**
+  (Le seed ne crée un type que si le compte existe ; sinon il l'ignore.)
 
 ### `ExpenseSchedule` (barème) + `ExpenseScheduleLine`
 - `ExpenseSchedule` (_CompanyScoped) : `route` FK, `fare_class` FK, `is_active`.
@@ -135,7 +137,8 @@ module Reporting, plus tard.)
 
 ## 6. Frontend (Angular)
 - **Config Voyages** :
-  - « Types de dépense » — écran CRUD via `BaseConfigService` (comme types d'équipage).
+  - « Types de dépense » — écran CRUD via `BaseConfigService` (comme types d'équipage),
+    avec un **sélecteur de compte** (dropdown des comptes de charge classe 6 de la société).
   - « Barème dépenses » — écran maître/détail (route + fare class + lignes {type, montant}).
 - **Voyage → trip-detail** : nouvelle carte **Dépenses** — liste des `TripExpense`
   (type, montant, statut), ajout/édition (PLANNED), bouton **Décaisser** (choix implicite de
