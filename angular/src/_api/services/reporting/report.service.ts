@@ -12,7 +12,7 @@ export class ReportService {
   catalog(): Observable<ReportMeta[]> { return this.http.get<ReportMeta[]>(REPORTING.catalog); }
 
   download(code: string, format: string, filters: Record<string, string>): void {
-    let p = new HttpParams().set('format', format);
+    let p = new HttpParams().set('fmt', format);
     Object.entries(filters).forEach(([k, v]) => { if (v) p = p.set(k, v); });
     this.http.get(REPORTING.generate(code), { params: p, responseType: 'blob' }).subscribe(blob => {
       const url = URL.createObjectURL(blob);

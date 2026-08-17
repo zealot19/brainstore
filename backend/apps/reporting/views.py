@@ -26,7 +26,8 @@ class ReportGenerateView(APIView):
         if not entry:
             return error_response("Rapport introuvable.", status_code=404)
         result = entry["build"](request.user.company, parse_filters(request))
-        fmt = request.query_params.get("format", "pdf")
+        # NB: 'format' est réservé par DRF (négociation de contenu) → on utilise 'fmt'.
+        fmt = request.query_params.get("fmt", "pdf")
         if fmt == "csv":
             body, ct, ext = render_csv(result), "text/csv", "csv"
         elif fmt == "xlsx":
