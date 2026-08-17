@@ -4,8 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TripService } from '../../../services/voyages/trip.service';
 import { CrewMemberService } from '../../../services/voyages/crew-member.service';
-import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyages.models';
+import { TripExpenseService } from '../../../services/voyages/trip-expense.service';
+import { ExpenseTypeService } from '../../../services/voyages-config/expense-type.service';
+import { Trip, TripSeat, TripCrew, TripExpense, EligibleVehicle } from '../../../models/voyages.models';
 import { CrewMember } from '../../../models/crew.models';
+import { ExpenseType } from '../../../models/voyages-config.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
@@ -27,6 +30,10 @@ export class VoyagesTripDetailComponent implements OnInit {
   newMember: string | null = null;
   actionError = '';
 
+  expenses: TripExpense[] = [];
+  expenseTypes: ExpenseType[] = [];
+  newExpType = ''; newExpAmount: number | null = null; expError = '';
+
   tbVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
   tbOverflow: { id: string; number: string; code: string; free_seats: number }[] = [];
   tbSoldCount = 0; tbVehicle = ''; tbOverflowTrip = ''; tbNote = '';
@@ -42,12 +49,35 @@ export class VoyagesTripDetailComponent implements OnInit {
   selNote = ''; selError = ''; selBusy = false;
 
   constructor(private svc: TripService, private crewSvc: CrewMemberService,
+              private expSvc: TripExpenseService, private expTypeSvc: ExpenseTypeService,
               private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id') || '';
     this.crewSvc.list().subscribe(d => this.members = d.filter(m => m.is_active));
+    this.expTypeSvc.list().subscribe(d => this.expenseTypes = d.filter(t => t.is_active));
+    this.loadExpenses();
     this.reload();
+  }
+
+  loadExpenses(): void { this.expSvc.list(this.id).subscribe(d => this.expenses = d); }
+  expTypeName(id: string): string { return this.expenseTypes.find(t => t.id === id)?.name ?? id; }
+  addExpense(): void {
+    if (!this.newExpType || !this.newExpAmount) return;
+    this.expError = '';
+    this.expSvc.create(this.id, { expense_type: this.newExpType, amount: this.newExpAmount }).subscribe({
+      next: () => { this.newExpType = ''; this.newExpAmount = null; this.loadExpenses(); },
+      error: e => this.expError = e?.error?.detail ?? 'Ajout impossible.' });
+  }
+  disburseExpense(e: TripExpense): void {
+    this.expError = '';
+    this.expSvc.disburse(this.id, e.id).subscribe({ next: () => this.loadExpenses(),
+      error: err => this.expError = err?.error?.detail ?? 'Décaissement impossible.' });
+  }
+  removeExpense(e: TripExpense): void {
+    if (!confirm('Supprimer cette dépense ?')) return;
+    this.expSvc.remove(this.id, e.id).subscribe({ next: () => this.loadExpenses(),
+      error: err => alert(err?.error?.detail ?? 'Suppression impossible.') });
   }
 
   reload(): void {

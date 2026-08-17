@@ -22,6 +22,17 @@ export interface TripCrew {
   boarded_at: string | null;
 }
 
+export interface TripExpense {
+  id: string;
+  expense_type: string;
+  expense_type_name: string | null;
+  amount: number;
+  description: string;
+  date: string;
+  status: 'planned' | 'paid' | 'cancelled';
+  cash_session: string | null;
+}
+
 export interface TripSeat {
   id: string;
   seat_number: string;

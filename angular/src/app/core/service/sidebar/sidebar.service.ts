@@ -108,6 +108,8 @@ export class SidebarService {
             { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes',         permission: 'transport.fareclass.view' },
             { menuValue: "Types d'équipage",    route: routes.vcCrewMemberTypes,    base: 'crew-member-types',    permission: 'transport.config.view' },
             { menuValue: "Membres d'équipage",  route: routes.vcCrewMembers,        base: 'crew-members',         permission: 'voyage.crew.view' },
+            { menuValue: "Types de dépense",    route: routes.vcExpenseTypes,       base: 'expense-types',        permission: 'transport.config.view' },
+            { menuValue: "Barème dépenses",     route: routes.vcExpenseSchedules,   base: 'expense-schedules',    permission: 'transport.config.view' },
             { menuValue: 'Plages horaires',     route: routes.vcTimeSlots,          base: 'time-slots',           permission: 'transport.config.view' },
             { menuValue: 'Natures de colis',    route: routes.vcConsignmentNatures, base: 'consignment-natures',  permission: 'transport.config.view' },
             { menuValue: 'Types de colis',      route: routes.vcConsignmentTypes,   base: 'consignment-types',    permission: 'transport.config.view' },

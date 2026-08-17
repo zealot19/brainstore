@@ -164,3 +164,17 @@ export interface VoyagesSettings {
 export interface CrewMemberType {
   id: string; code: string; name: string; is_driver: boolean; is_active: boolean; scope?: string;
 }
+
+export interface ExpenseType {
+  id: string; code: string; name: string; account_code: string; is_active: boolean; scope?: string;
+}
+
+export interface ExpenseScheduleLine {
+  id?: string; expense_type: string; expense_type_name?: string | null; amount: number;
+}
+
+export interface ExpenseSchedule {
+  id: string; route: string; route_name?: string | null;
+  fare_class: string; fare_class_name?: string | null;
+  is_active: boolean; lines: ExpenseScheduleLine[];
+}
