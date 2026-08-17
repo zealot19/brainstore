@@ -189,30 +189,6 @@
           </li>
         }
 
-          <li class="submenu-open">
-							<h6 class="submenu-hdr">Help</h6>
-							<ul>
-								<li><a routerLink="https://dreamspos.dreamstechnologies.com/documentation/angular.html" target="_blank"><i class="ti ti-file-text fs-16 me-2"></i><span>Documentation</span></a></li>
-								<li><a routerLink="https://dreamspos.dreamstechnologies.com/documentation/changelog.html" target="_blank"><i class="ti ti-exchange fs-16 me-2"></i><span>Changelog </span><span class="badge bg-primary badge-xs text-white fs-10 ms-2">v2.2.9</span></a></li>
-								<li class="submenu">
-									<a [routerLink]="" (click)="multiLevelOne()" [ngClass]="{'subdrop':multiLevel1}"><i class="ti ti-menu-2 fs-16 me-2"></i><span>Multi Level</span><span class="menu-arrow"></span></a>
-									<ul [ngStyle]="{'display':multiLevel1?'block':''}">
-										<li><a [routerLink]="">Level 1.1</a></li>
-										<li class="submenu submenu-two"><a [routerLink]="" [ngClass]="{'subdrop':multiLevel2}" (click)="multiLevelTwo()">Level 1.2<span class="menu-arrow inside-submenu"></span></a>
-											<ul [ngStyle]="{'display':multiLevel2?'block':''}">
-												<li><a [routerLink]="">Level 2.1</a></li>
-												<li class="submenu submenu-two submenu-three"><a [routerLink]="" [ngClass]="{'subdrop':multiLevel3}" (click)="multiLevelThree()">Level 2.2<span class="menu-arrow inside-submenu inside-submenu-two"></span></a>
-													<ul [ngStyle]="{'display':multiLevel3?'block':''}">
-														<li><a [routerLink]="" class="ms-0">Level 3.1</a></li>
-														<li><a [routerLink]="" class="ms-0">Level 3.2</a></li>
-													</ul>
-												</li>
-											</ul>
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</li>
         </ul>
       </div>
     </div>

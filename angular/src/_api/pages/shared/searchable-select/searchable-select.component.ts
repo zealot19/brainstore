@@ -4,7 +4,7 @@ import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/f
 
 /**
  * Select recherchable réutilisable, compatible [(ngModel)] et formControlName.
- * Style Bootstrap/DreamsPOS, sans dépendance externe.
+ * Style Bootstrap/BrainstoreGroup, sans dépendance externe.
  *
  * <app-searchable-select [items]="list" labelKey="name" valueKey="id"
  *                        placeholder="— Choisir —" [(ngModel)]="value">
