@@ -7,7 +7,7 @@ from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
 from django.db import transaction
 from apps.voyages_config.models import (
-    Town, ServicePoint, FareClass, TimeSlot, CrewMemberType, ExpenseType,
+    Town, ServicePoint, FareClass, TimeSlot, CrewMemberType, ExpenseType, ExpenseSchedule,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
@@ -166,6 +166,61 @@ ConsignmentNatureListView, ConsignmentNatureDetailView = _pair(ConsignmentNature
 LoyaltyRuleListView, LoyaltyRuleDetailView = _pair(LoyaltyRule, S.LoyaltyRuleRead, S.LoyaltyRuleWrite, unique="name", search=("name",))
 CrewMemberTypeListView, CrewMemberTypeDetailView = _pair(CrewMemberType, S.CrewMemberTypeRead, S.CrewMemberTypeWrite, unique="code", search=("code", "name"))
 ExpenseTypeListView, ExpenseTypeDetailView = _pair(ExpenseType, S.ExpenseTypeRead, S.ExpenseTypeWrite, unique="code", search=("code", "name"))
+
+
+class ExpenseScheduleListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage"}
+
+    def get(self, request):
+        company_id = getattr(request.user, "company_id", None)
+        qs = ExpenseSchedule.objects.filter(is_deleted=False)
+        if company_id:
+            qs = qs.filter(company_id=company_id)
+        qs = qs.select_related("route", "fare_class").prefetch_related("lines")
+        return success_response(S.ExpenseScheduleSerializer(qs, many=True).data)
+
+    def post(self, request):
+        payload = S.ExpenseScheduleWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        schedule = payload.save(company_id=getattr(request.user, "company_id", None),
+                                created_by=request.user)
+        return created_response(S.ExpenseScheduleSerializer(schedule).data)
+
+
+class ExpenseScheduleDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "PATCH": "transport.config.manage",
+                      "DELETE": "transport.config.manage"}
+
+    def _get(self, request, pk):
+        company_id = getattr(request.user, "company_id", None)
+        qs = ExpenseSchedule.objects.filter(is_deleted=False)
+        if company_id:
+            qs = qs.filter(company_id=company_id)
+        return qs.filter(pk=pk).first()
+
+    def get(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Barème introuvable.", status_code=404)
+        return success_response(S.ExpenseScheduleSerializer(obj).data)
+
+    def patch(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Barème introuvable.", status_code=404)
+        payload = S.ExpenseScheduleWriteSerializer(obj, data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        obj = payload.save(updated_by=request.user)
+        return success_response(S.ExpenseScheduleSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Barème introuvable.", status_code=404)
+        obj.soft_delete(user=request.user)
+        return success_response(message="Barème supprimé.")
 
 TownBulkDeleteView = _bulk(Town, perm="transport.city")
 FareClassBulkDeleteView = _bulk(FareClass, perm="transport.fareclass")

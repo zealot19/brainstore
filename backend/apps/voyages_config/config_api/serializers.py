@@ -5,6 +5,7 @@ from apps.voyages_config.models import (
     Route, RouteStop,
     SeatingPlan, PlanSeat, VehicleSeatingAssignment,
     ServicePattern, VoyagesSettings, CrewMemberType, ExpenseType,
+    ExpenseSchedule, ExpenseScheduleLine,
 )
 
 
@@ -63,6 +64,52 @@ class ExpenseTypeWrite(serializers.Serializer):
             raise serializers.ValidationError(
                 "Compte de charge introuvable dans le plan comptable.")
         return value
+
+
+class ExpenseScheduleLineSerializer(serializers.ModelSerializer):
+    expense_type_name = serializers.CharField(source="expense_type.name", read_only=True)
+
+    class Meta:
+        model = ExpenseScheduleLine
+        fields = ["id", "expense_type", "expense_type_name", "amount"]
+
+
+class ExpenseScheduleSerializer(serializers.ModelSerializer):
+    lines = ExpenseScheduleLineSerializer(many=True, read_only=True)
+    route_name = serializers.CharField(source="route.code", read_only=True)
+    fare_class_name = serializers.CharField(source="fare_class.name", read_only=True)
+
+    class Meta:
+        model = ExpenseSchedule
+        fields = ["id", "route", "route_name", "fare_class", "fare_class_name", "is_active", "lines"]
+
+
+class ExpenseScheduleWriteSerializer(serializers.ModelSerializer):
+    lines = ExpenseScheduleLineSerializer(many=True)
+
+    class Meta:
+        model = ExpenseSchedule
+        fields = ["route", "fare_class", "is_active", "lines"]
+
+    def _sync_lines(self, schedule, lines):
+        schedule.lines.all().delete()
+        for ln in lines:
+            ExpenseScheduleLine.objects.create(schedule=schedule, **ln)
+
+    def create(self, validated):
+        lines = validated.pop("lines", [])
+        schedule = ExpenseSchedule.objects.create(**validated)
+        self._sync_lines(schedule, lines)
+        return schedule
+
+    def update(self, instance, validated):
+        lines = validated.pop("lines", None)
+        for k, v in validated.items():
+            setattr(instance, k, v)
+        instance.save()
+        if lines is not None:
+            self._sync_lines(instance, lines)
+        return instance
 
 
 class TownWrite(serializers.Serializer):

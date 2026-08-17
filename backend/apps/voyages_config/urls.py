@@ -21,6 +21,8 @@ urlpatterns = [
     path("crew-member-types/<uuid:pk>/", v.CrewMemberTypeDetailView.as_view()),
     path("expense-types/",               v.ExpenseTypeListView.as_view()),
     path("expense-types/<uuid:pk>/",     v.ExpenseTypeDetailView.as_view()),
+    path("expense-schedules/",           v.ExpenseScheduleListView.as_view()),
+    path("expense-schedules/<uuid:pk>/", v.ExpenseScheduleDetailView.as_view()),
 
     # ── Plages horaires ─────────────────────────────────────────────────────────
     path("time-slots/", v.TimeSlotListView.as_view()),

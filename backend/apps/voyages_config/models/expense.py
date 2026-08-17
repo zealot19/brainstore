@@ -15,3 +15,28 @@ class ExpenseType(_CompanyScoped):
 
     def __str__(self):
         return f"{self.code} — {self.name}"
+
+
+class ExpenseSchedule(_CompanyScoped):
+    route      = models.ForeignKey("voyages_config.Route", verbose_name=_("trajet"),
+                                   on_delete=models.CASCADE, related_name="expense_schedules")
+    fare_class = models.ForeignKey("voyages_config.FareClass", verbose_name=_("catégorie tarifaire"),
+                                   on_delete=models.CASCADE, related_name="expense_schedules")
+
+    class Meta(_CompanyScoped.Meta):
+        verbose_name = _("barème de dépenses")
+        verbose_name_plural = _("barèmes de dépenses")
+        unique_together = [("company", "route", "fare_class")]
+        ordering = ["route", "fare_class"]
+
+    def __str__(self):
+        return f"{self.route_id} · {self.fare_class_id}"
+
+
+class ExpenseScheduleLine(models.Model):
+    schedule     = models.ForeignKey(ExpenseSchedule, on_delete=models.CASCADE, related_name="lines")
+    expense_type = models.ForeignKey("voyages_config.ExpenseType", on_delete=models.PROTECT)
+    amount       = models.DecimalField(_("montant"), max_digits=14, decimal_places=2)
+
+    class Meta:
+        ordering = ["id"]

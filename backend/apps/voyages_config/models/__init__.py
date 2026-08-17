@@ -6,7 +6,7 @@ from .loyalty import LoyaltyRule
 from .settings import VoyagesSettings
 from .ticket import TicketTemplate, DEFAULT_TICKET_RECTO, DEFAULT_TICKET_VERSO
 from .crew_member_type import CrewMemberType
-from .expense import ExpenseType
+from .expense import ExpenseType, ExpenseSchedule, ExpenseScheduleLine
 
 __all__ = [
     "Town", "ServicePoint", "Route", "RouteStop",
@@ -15,5 +15,5 @@ __all__ = [
     "ServicePattern", "LoyaltyRule", "VoyagesSettings",
     "TicketTemplate", "DEFAULT_TICKET_RECTO", "DEFAULT_TICKET_VERSO",
     "CrewMemberType",
-    "ExpenseType",
+    "ExpenseType", "ExpenseSchedule", "ExpenseScheduleLine",
 ]
