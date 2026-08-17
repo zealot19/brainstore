@@ -3,5 +3,5 @@
 // ⚠️ Remplacer apiUrl par l'URL du backend Railway, suffixée par /api/v1.
 export const environment = {
   production: true,
-  apiUrl: 'https://erp-backend.up.railway.app/api/v1',
+  apiUrl: 'https://brainstore-production.up.railway.app/api/v1',
 };
