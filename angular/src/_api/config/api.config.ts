@@ -397,6 +397,13 @@ export const ACCOUNTING = {
   periodClose: (id: string) => `${ACC}/periods/${id}/close/`,
 };
 
+const RP = `${API_BASE}/reporting`;
+
+export const REPORTING = {
+  catalog: `${RP}/catalog/`,
+  generate: (code: string) => `${RP}/${code}/`,
+};
+
 const TRZ = `${API_BASE}/treasury`;
 
 export const TREASURY = {

@@ -74,6 +74,8 @@ export const Pages_routes: Routes = [
                 { path: '', redirectTo: 'accounts', pathMatch: 'full' },
               ],
             },
+            // ── MODULE : Reporting ────────────────────────────────────────────────────
+            { path: 'reporting', loadComponent: () => import('../../../_api/pages/reporting/reporting.component').then(m => m.ReportingComponent) },
             // ── MODULE : Config Voyages ───────────────────────────────────────────────
             {
               path: 'voyages-config',

@@ -215,6 +215,22 @@ export class SidebarService {
       ],
     },
     {
+      tittle: 'Reporting',
+      showAsTab: false,
+      separateRoute: false,
+      menu: [
+        {
+          menuValue: 'Rapports',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'file-text',
+          route: routes.reporting,
+          base: 'reporting',
+          permission: 'reporting.view',
+        },
+      ],
+    },
+    {
       tittle: 'Administration',
       showAsTab: false,
       separateRoute: false,

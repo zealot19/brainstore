@@ -429,6 +429,7 @@ export const routes={
   vcCrewMembers:        '/voyages-config/crew-members',
   vcExpenseTypes:       '/voyages-config/expense-types',
   vcExpenseSchedules:   '/voyages-config/expense-schedules',
+  reporting:            '/reporting',
 
   // ── Gestion Voyages ──────────────────────────────────────────────────────────
   voyagesList: '/voyages/list',
