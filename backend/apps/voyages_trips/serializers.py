@@ -1,5 +1,20 @@
 from rest_framework import serializers
-from apps.voyages_trips.models import Trip, TripStop, TripCrew, TripSeat, CrewMember
+from apps.voyages_trips.models import Trip, TripStop, TripCrew, TripSeat, CrewMember, TripExpense
+
+
+class TripExpenseSerializer(serializers.ModelSerializer):
+    expense_type_name = serializers.CharField(source="expense_type.name", read_only=True)
+
+    class Meta:
+        model = TripExpense
+        fields = ["id", "expense_type", "expense_type_name", "amount", "description",
+                  "date", "status", "cash_session"]
+
+
+class TripExpenseWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TripExpense
+        fields = ["expense_type", "amount", "description", "date"]
 
 
 class TripStopSerializer(serializers.ModelSerializer):

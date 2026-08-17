@@ -7,7 +7,7 @@ from apps.core.pagination import StandardResultsSetPagination
 from apps.system_config.models import Company
 
 from . import selectors, services, serializers as S
-from .models import TripCrew, TripSeat, CrewMember
+from .models import TripCrew, TripSeat, CrewMember, TripExpense
 from apps.voyages_config.models import CrewMemberType
 
 
@@ -511,3 +511,67 @@ class CrewMemberDetailView(APIView):
         o.is_deleted = True; o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message="Membre supprimé.")
+
+
+# ── Dépenses de voyage ────────────────────────────────────────────────────────
+
+class TripExpenseListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.expense.view", "POST": "voyage.expense.manage"}
+
+    def get(self, request, trip_id):
+        qs = TripExpense.objects.filter(trip_id=trip_id, is_deleted=False).select_related("expense_type")
+        return success_response(S.TripExpenseSerializer(qs, many=True).data)
+
+    def post(self, request, trip_id):
+        payload = S.TripExpenseWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        exp = TripExpense.objects.create(trip_id=trip_id, created_by=request.user, **payload.validated_data)
+        return created_response(S.TripExpenseSerializer(exp).data)
+
+
+class TripExpenseDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.expense.view", "PATCH": "voyage.expense.manage",
+                      "DELETE": "voyage.expense.manage"}
+
+    def _get(self, trip_id, pk):
+        return TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).first()
+
+    def patch(self, request, trip_id, pk):
+        exp = self._get(trip_id, pk)
+        if not exp:
+            return error_response("Dépense introuvable.", status_code=404)
+        if exp.status == TripExpense.Status.PAID:
+            return error_response("Dépense déjà décaissée.")
+        payload = S.TripExpenseWriteSerializer(exp, data=request.data, partial=True)
+        payload.is_valid(raise_exception=True)
+        for k, v in payload.validated_data.items():
+            setattr(exp, k, v)
+        exp.updated_by = request.user
+        exp.save()
+        return success_response(S.TripExpenseSerializer(exp).data)
+
+    def delete(self, request, trip_id, pk):
+        exp = self._get(trip_id, pk)
+        if not exp:
+            return error_response("Dépense introuvable.", status_code=404)
+        exp.is_deleted = True; exp.updated_by = request.user
+        exp.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return success_response(message="Dépense supprimée.")
+
+
+class TripExpenseDisburseView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "voyage.expense.manage"}
+
+    def post(self, request, trip_id, pk):
+        from apps.voyages_trips.services.expense_services import disburse_trip_expense
+        exp = TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).first()
+        if not exp:
+            return error_response("Dépense introuvable.", status_code=404)
+        try:
+            exp = disburse_trip_expense(exp, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.TripExpenseSerializer(exp).data)

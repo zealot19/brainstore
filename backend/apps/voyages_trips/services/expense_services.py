@@ -1,3 +1,6 @@
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
+from apps.core.exceptions import ApplicationError
 from apps.voyages_trips.models import TripExpense
 from apps.voyages_config.models import ExpenseSchedule
 
@@ -16,3 +19,20 @@ def apply_expense_schedule(trip) -> int:
                                    amount=line.amount, created_by=trip.created_by)
         created += 1
     return created
+
+
+@transaction.atomic
+def disburse_trip_expense(trip_expense, *, user):
+    from apps.treasury.selectors.selectors import get_open_session_for_user
+    from apps.treasury.services import record_trip_expense
+    if trip_expense.status == TripExpense.Status.PAID:
+        return trip_expense
+    session = get_open_session_for_user(trip_expense.trip.company_id, user)
+    if not session:
+        raise ApplicationError(_("Ouvrez d'abord votre session de caisse pour décaisser."))
+    record_trip_expense(trip_expense.trip.company, trip_expense=trip_expense, cash_session=session, user=user)
+    trip_expense.status = TripExpense.Status.PAID
+    trip_expense.cash_session = session
+    trip_expense.updated_by = user
+    trip_expense.save(update_fields=["status", "cash_session", "updated_by", "updated_at"])
+    return trip_expense
