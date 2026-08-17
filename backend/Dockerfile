@@ -9,6 +9,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Dépendances système WeasyPrint (rendu PDF des rapports).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libcairo2 libffi8 \
+    shared-mime-info fonts-dejavu \
+    && rm -rf /var/lib/apt/lists/*
+
 # Dépendances Python d'abord (cache de couche). On copie TOUT requirements/ pour
 # que les références imbriquées (production.txt -> -r base.txt) se résolvent.
 COPY requirements/ requirements/
