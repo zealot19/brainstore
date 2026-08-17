@@ -11,12 +11,14 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 # Domaines de confiance pour le CSRF (schéma inclus) — ex. le domaine Vercel.
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
-# Render fournit automatiquement le hostname externe : on l'ajoute pour que l'app
-# démarre sans configurer ALLOWED_HOSTS à la main au premier déploiement.
-_render_host = env("RENDER_EXTERNAL_HOSTNAME", default="")
-if _render_host:
-    ALLOWED_HOSTS.append(_render_host)
-    CSRF_TRUSTED_ORIGINS.append(f"https://{_render_host}")
+# La plateforme fournit automatiquement le hostname externe : on l'ajoute pour que
+# l'app démarre sans configurer ALLOWED_HOSTS à la main au premier déploiement.
+#   Railway → RAILWAY_PUBLIC_DOMAIN   |   Render → RENDER_EXTERNAL_HOSTNAME
+for _host in (env("RAILWAY_PUBLIC_DOMAIN", default=""),
+              env("RENDER_EXTERNAL_HOSTNAME", default="")):
+    if _host:
+        ALLOWED_HOSTS.append(_host)
+        CSRF_TRUSTED_ORIGINS.append(f"https://{_host}")
 
 # ── Fichiers statiques (WhiteNoise) ───────────────────────────────────────────
 # Render/Vercel ne servent pas les statiques Django : WhiteNoise s'en charge depuis
