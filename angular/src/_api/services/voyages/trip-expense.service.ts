@@ -11,5 +11,5 @@ export class TripExpenseService {
   create(tripId: string, data: Record<string, unknown>): Observable<TripExpense> { return this.http.post<TripExpense>(VOYAGES.tripExpenses(tripId), data); }
   update(tripId: string, id: string, data: Record<string, unknown>): Observable<TripExpense> { return this.http.patch<TripExpense>(VOYAGES.tripExpense(tripId, id), data); }
   remove(tripId: string, id: string): Observable<unknown> { return this.http.delete(VOYAGES.tripExpense(tripId, id)); }
-  disburse(tripId: string, id: string): Observable<TripExpense> { return this.http.post<TripExpense>(VOYAGES.tripExpenseDisburse(tripId, id), {}); }
+  disburse(tripId: string, id: string, cashSessionId: string): Observable<TripExpense> { return this.http.post<TripExpense>(VOYAGES.tripExpenseDisburse(tripId, id), { cash_session_id: cashSessionId }); }
 }

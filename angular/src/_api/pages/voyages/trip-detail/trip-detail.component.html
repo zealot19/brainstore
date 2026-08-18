@@ -207,6 +207,14 @@
       <!-- Dépenses -->
       <div class="card mb-3" *hasPermission="'voyage.expense.view'"><div class="card-header"><h6 class="mb-0">Dépenses</h6></div><div class="card-body">
         @if (expError) { <div class="alert alert-danger py-1 px-2 small">{{ expError }}</div> }
+        <div class="mb-2" *hasPermission="'voyage.expense.manage'">
+          <label class="form-label small mb-1">Caisse de décaissement</label>
+          <select class="form-select form-select-sm" [(ngModel)]="disburseSession">
+            <option value="">— Choisir la caisse —</option>
+            @for (s of openSessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
+          </select>
+          @if (openSessions.length === 0) { <div class="text-muted small mt-1">Aucune caisse ouverte. Ouvrez une session de caisse pour décaisser.</div> }
+        </div>
         <div class="table-responsive"><table class="table table-sm mb-2">
           <thead><tr><th>Type</th><th class="text-end">Montant</th><th>Statut</th><th></th></tr></thead>
           <tbody>

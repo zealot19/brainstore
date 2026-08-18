@@ -58,6 +58,22 @@ def test_disburse_posts_and_is_idempotent():
 
 
 @pytest.mark.django_db
+def test_disburse_uses_chosen_cash_session():
+    """La caisse est choisie explicitement : le mouvement doit provenir de CETTE session."""
+    from apps.treasury.services.services import create_cash_register, open_session
+    from apps.voyages_trips.services.expense_services import disburse_trip_expense
+    company, admin, exp = _setup()
+    reg1 = create_cash_register(company=company, name="C1", created_by=admin)
+    reg2 = create_cash_register(company=company, name="C2", created_by=admin)
+    open_session(company=company, cash_register=reg1, created_by=admin)
+    s2 = open_session(company=company, cash_register=reg2, created_by=admin)
+    exp = disburse_trip_expense(exp, user=admin, cash_session=s2)
+    txn = Transaction.objects.get(voyage_expense=exp, is_deleted=False)
+    assert txn.cash_session_id == s2.id
+    assert exp.cash_session_id == s2.id
+
+
+@pytest.mark.django_db
 def test_disburse_endpoint_requires_manage_permission():
     from apps.voyages_trips.views import TripExpenseDisburseView
     company, admin, exp = _setup()

@@ -567,11 +567,19 @@ class TripExpenseDisburseView(APIView):
 
     def post(self, request, trip_id, pk):
         from apps.voyages_trips.services.expense_services import disburse_trip_expense
-        exp = TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).first()
+        from apps.treasury.models import CashSession
+        exp = TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).select_related("trip").first()
         if not exp:
             return error_response("Dépense introuvable.", status_code=404)
+        session = None
+        sid = request.data.get("cash_session_id")
+        if sid:
+            session = CashSession.objects.filter(id=sid, company_id=exp.trip.company_id,
+                                                 status=CashSession.Status.OPEN, is_deleted=False).first()
+            if not session:
+                return error_response("Caisse introuvable ou déjà fermée.")
         try:
-            exp = disburse_trip_expense(exp, user=request.user)
+            exp = disburse_trip_expense(exp, user=request.user, cash_session=session)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.TripExpenseSerializer(exp).data)

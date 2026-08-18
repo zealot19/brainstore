@@ -6,9 +6,11 @@ import { TripService } from '../../../services/voyages/trip.service';
 import { CrewMemberService } from '../../../services/voyages/crew-member.service';
 import { TripExpenseService } from '../../../services/voyages/trip-expense.service';
 import { ExpenseTypeService } from '../../../services/voyages-config/expense-type.service';
+import { SessionService } from '../../../services/treasury/session.service';
 import { Trip, TripSeat, TripCrew, TripExpense, EligibleVehicle } from '../../../models/voyages.models';
 import { CrewMember } from '../../../models/crew.models';
 import { ExpenseType } from '../../../models/voyages-config.models';
+import { CashSession } from '../../../models/treasury.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 @Component({
@@ -32,6 +34,8 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   expenses: TripExpense[] = [];
   expenseTypes: ExpenseType[] = [];
+  openSessions: CashSession[] = [];
+  disburseSession = '';
   newExpType = ''; newExpAmount: number | null = null; expError = '';
 
   tbVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
@@ -50,12 +54,14 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   constructor(private svc: TripService, private crewSvc: CrewMemberService,
               private expSvc: TripExpenseService, private expTypeSvc: ExpenseTypeService,
+              private sessionSvc: SessionService,
               private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id') || '';
     this.crewSvc.list().subscribe(d => this.members = d.filter(m => m.is_active));
     this.expTypeSvc.list().subscribe(d => this.expenseTypes = d.filter(t => t.is_active));
+    this.sessionSvc.list({ status: 'open' }).subscribe(d => this.openSessions = d);
     this.loadExpenses();
     this.reload();
   }
@@ -70,8 +76,9 @@ export class VoyagesTripDetailComponent implements OnInit {
       error: e => this.expError = e?.error?.detail ?? 'Ajout impossible.' });
   }
   disburseExpense(e: TripExpense): void {
+    if (!this.disburseSession) { this.expError = 'Choisissez d’abord la caisse de décaissement.'; return; }
     this.expError = '';
-    this.expSvc.disburse(this.id, e.id).subscribe({ next: () => this.loadExpenses(),
+    this.expSvc.disburse(this.id, e.id, this.disburseSession).subscribe({ next: () => this.loadExpenses(),
       error: err => this.expError = err?.error?.detail ?? 'Décaissement impossible.' });
   }
   removeExpense(e: TripExpense): void {
