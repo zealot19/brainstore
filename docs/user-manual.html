@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brainstore Transport Package — User Manual</title>
+<style>
+  :root{
+    --ink:#1f2937; --ink2:#374151; --muted:#6b7280; --line:#e5e7eb;
+    --slate:#334155; --slate-d:#0f172a; --accent:#0d9488; --accent-d:#0f766e;
+    --bg-soft:#f7f8fa; --bg-soft2:#f1f5f4;
+  }
+  @page{ size:A4; margin:18mm 16mm 16mm 16mm; }
+  *{ box-sizing:border-box; }
+  body{ font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; color:var(--ink);
+        font-size:11px; line-height:1.55; margin:0; }
+  h1,h2,h3,h4{ color:var(--slate-d); font-weight:700; line-height:1.2; }
+  p{ margin:0 0 8px; }
+  a{ color:var(--accent-d); text-decoration:none; }
+  code{ background:#eef2f1; border-radius:3px; padding:1px 4px; font-family:ui-monospace,Menlo,monospace; font-size:10px; color:#0f172a; }
+  strong{ color:var(--ink2); }
+
+  /* Cover */
+  .cover{ height:262mm; display:flex; flex-direction:column; justify-content:center;
+          background:linear-gradient(150deg,#0f172a 0%,#1e293b 55%,#0f766e 140%);
+          color:#fff; padding:0 22mm; margin:-18mm -16mm 0 -16mm; }
+  .cover .kicker{ letter-spacing:3px; text-transform:uppercase; font-size:12px; color:#5eead4; font-weight:600; }
+  .cover h1{ color:#fff; font-size:42px; line-height:1.08; margin:14px 0 6px; letter-spacing:-.5px; }
+  .cover .sub{ font-size:15px; color:#cbd5e1; max-width:120mm; }
+  .cover .rule{ width:64px; height:4px; background:#2dd4bf; border-radius:3px; margin:26px 0; }
+  .cover .meta{ margin-top:40px; font-size:12px; color:#94a3b8; }
+  .cover .meta b{ color:#e2e8f0; }
+
+  /* Layout helpers */
+  .chapter{ page-break-before:always; break-before:page; }
+  .chapnum{ display:inline-block; font-size:12px; font-weight:700; letter-spacing:2px;
+            color:var(--accent-d); text-transform:uppercase; }
+  h2.title{ font-size:25px; margin:2px 0 4px; border-bottom:3px solid var(--slate); padding-bottom:8px; }
+  h3{ font-size:15px; margin:20px 0 6px; color:var(--slate); }
+  h4{ font-size:12.5px; margin:14px 0 4px; color:var(--ink2); }
+  .lead{ color:var(--muted); font-size:11.5px; margin:6px 0 12px; }
+
+  ol.steps{ counter-reset:s; list-style:none; padding-left:0; margin:8px 0 12px; }
+  ol.steps>li{ counter-increment:s; position:relative; padding:3px 0 6px 28px; margin:0; }
+  ol.steps>li::before{ content:counter(s); position:absolute; left:0; top:2px; width:19px; height:19px;
+       background:var(--accent); color:#fff; border-radius:50%; font-size:10px; font-weight:700;
+       display:flex; align-items:center; justify-content:center; }
+  ul.tight{ margin:4px 0 10px; padding-left:18px; }
+  ul.tight>li{ margin:2px 0; }
+
+  .path{ background:#eef2f1; border:1px solid #dbe4e2; color:#0f172a; border-radius:5px;
+         padding:2px 7px; font-weight:600; font-size:10.5px; white-space:nowrap; }
+
+  .scenario{ break-inside:avoid; background:var(--bg-soft2); border:1px solid #d7e3e0;
+             border-left:4px solid var(--accent); border-radius:8px; padding:12px 14px; margin:14px 0; }
+  .scenario .tag{ font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+                  color:var(--accent-d); }
+  .scenario h4{ margin:3px 0 6px; color:var(--slate-d); font-size:12.5px; }
+
+  .note{ break-inside:avoid; background:#f8f9fb; border:1px solid var(--line); border-left:4px solid #9aa0a6;
+         border-radius:8px; padding:10px 13px; margin:12px 0; color:#4b5563; font-size:10.5px; }
+  .note .tag{ font-weight:700; color:#6b7280; text-transform:uppercase; font-size:9.5px; letter-spacing:1px; }
+
+  table{ width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:10.5px; break-inside:avoid; }
+  th,td{ border:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+  th{ background:#eef1f4; color:var(--slate-d); font-weight:700; }
+  tr:nth-child(even) td{ background:#fafbfc; }
+
+  /* TOC */
+  .toc{ page-break-after:always; break-after:page; }
+  .toc h2{ font-size:20px; border-bottom:2px solid var(--line); padding-bottom:6px; }
+  .toc ol{ list-style:none; counter-reset:t; padding-left:0; font-size:12px; }
+  .toc ol>li{ counter-increment:t; padding:6px 0; border-bottom:1px dotted var(--line); }
+  .toc ol>li::before{ content:counter(t) ".\00a0\00a0"; color:var(--accent-d); font-weight:700; }
+  .toc small{ color:var(--muted); display:block; margin-left:20px; font-size:10px; }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="cover">
+  <div class="kicker">Brainstore Group · Transport ERP</div>
+  <h1>Brainstore Transport<br>Package</h1>
+  <div class="rule"></div>
+  <div class="sub">Comprehensive user manual — operating the platform end to end: administration, fleet, journeys, reservations, parcels, baggage, treasury, accounting and reporting.</div>
+  <div class="meta"><b>Version 1.0</b> &nbsp;·&nbsp; August 2026 &nbsp;·&nbsp; User Manual</div>
+</section>
+
+<!-- ===================== TOC ===================== -->
+<section class="toc">
+  <h2>Table of contents</h2>
+  <ol>
+    <li>Getting started <small>Roles, signing in, the interface</small></li>
+    <li>Administration <small>Institutions, agencies, users, roles &amp; permissions</small></li>
+    <li>Configuration <small>System &amp; journey configuration (routes, fares, seating, expense barème…)</small></li>
+    <li>Fleet (Flotte) <small>Vehicles, drivers, fuel, maintenance, contracts, documents</small></li>
+    <li>Journeys (Voyages) <small>Create trips, assign vehicle &amp; crew, lifecycle, expenses</small></li>
+    <li>Reservations (Réservations) <small>Passengers, ticket sales at the counter</small></li>
+    <li>Parcels (Colis) <small>Register, pay, track, deliver</small></li>
+    <li>Baggage (Bagages) <small>Check-in, pay, deliver</small></li>
+    <li>Treasury (Trésorerie) <small>Cash registers, sessions, transactions, transfers</small></li>
+    <li>Accounting (Comptabilité) <small>Chart of accounts, journals, automatic entries</small></li>
+    <li>Reporting <small>Generating branded reports (PDF / Excel / CSV)</small></li>
+    <li>Appendix <small>Glossary &amp; everyday tips</small></li>
+  </ol>
+</section>
+
+<!-- ===================== 1. GETTING STARTED ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 1</span>
+  <h2 class="title">Getting started</h2>
+  <p class="lead">The Brainstore Transport Package is a multi-company platform for running a passenger-transport business. Each company (institution) works in complete isolation from the others.</p>
+
+  <h3>1.1 Who does what — the three roles</h3>
+  <table>
+    <tr><th>Role</th><th>Purpose</th><th>Typical tasks</th></tr>
+    <tr><td><b>Super Admin</b></td><td>Runs the platform</td><td>Create institutions, manage packages &amp; subscriptions, oversee agencies.</td></tr>
+    <tr><td><b>Institution Admin</b></td><td>Runs one company</td><td>Create agencies &amp; users, configure journeys and fleet, define roles.</td></tr>
+    <tr><td><b>Agent / Operator</b></td><td>Day-to-day counter work</td><td>Sell tickets, register parcels/baggage, open a cash register, run trips.</td></tr>
+  </table>
+
+  <h3>1.2 Signing in</h3>
+  <ol class="steps">
+    <li>Open the application URL in your browser.</li>
+    <li>On the <b>Sign In</b> page, enter your <b>email</b> (or username) and <b>password</b>.</li>
+    <li>Click <b>Sign In</b>. If you forgot your password, use <b>Forgot Password?</b>.</li>
+  </ol>
+  <div class="note"><span class="tag">Note</span> &nbsp;What you see in the left menu depends on your <b>permissions</b>. If a module or button is missing, your role does not grant it — ask your Institution Admin.</div>
+
+  <h3>1.3 Finding your way around</h3>
+  <p>The <b>left sidebar</b> groups everything by module: <span class="path">Voyages</span> <span class="path">Flotte</span> <span class="path">Trésorerie</span> <span class="path">Comptabilité</span> <span class="path">Administration</span> <span class="path">Reporting</span>, plus <span class="path">Config Voyages</span> for setup. Click a module to expand its sub-pages. Throughout this manual a path such as <span class="path">Trésorerie → Caisses</span> means "open Trésorerie in the sidebar, then click Caisses".</p>
+</section>
+
+<!-- ===================== 2. ADMINISTRATION ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 2</span>
+  <h2 class="title">Administration</h2>
+  <p class="lead">Administration is where the company, its agencies, its people and their access rights are defined. Do this first — everything else builds on it.</p>
+
+  <h3>2.1 Creating an institution (Super Admin)</h3>
+  <p>An institution is a company on the platform. Creating one automatically seeds its SYSCOHADA chart of accounts, journals, treasury mappings and default journey configuration — so it is ready to operate.</p>
+  <ol class="steps">
+    <li>Go to <span class="path">Super Admin → Institutions</span> and click <b>New institution</b>.</li>
+    <li>Fill in the identity: name, legal form, capital, RCCM, NIU/tax id, address, phone, currency, accounting plan.</li>
+    <li>Optionally provide the <b>first admin</b> (email, first name, last name) — the platform creates the Institution Admin account.</li>
+    <li>Save. The company is created and bootstrapped.</li>
+  </ol>
+
+  <h3>2.2 Creating agencies</h3>
+  <p class="lead">An agency is a branch/office of your company (e.g. BAMENDA, BIYEM-ASSI). Cash registers and ticket-selling points attach to agencies.</p>
+  <ol class="steps">
+    <li>As Institution Admin, open <span class="path">Administration → Agences</span>.</li>
+    <li>Click <b>Nouvelle agence</b>, enter the name, code, type (Siège, Agence, Dépôt…), email and phone.</li>
+    <li>Save. Repeat for each branch. You can nest agencies under a parent to model a hierarchy.</li>
+  </ol>
+
+  <h3>2.3 Creating users</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Administration → Utilisateurs</span> and click <b>New user</b>.</li>
+    <li>Enter identity and email; set the user's <b>company</b> and <b>default agency</b>.</li>
+    <li>Save — the user receives credentials and can sign in.</li>
+  </ol>
+
+  <h3>2.4 Roles &amp; permissions (RBAC)</h3>
+  <p>Access is controlled by <b>permissions</b> (e.g. <code>voyage.trip.create</code>, <code>treasury.session.manage</code>). You bundle permissions into a <b>role</b>, then assign the role to a user. Institution Admins and Super Admins bypass these checks.</p>
+  <h4>To grant an agent the right to sell tickets and run a caisse</h4>
+  <ol class="steps">
+    <li>Go to <span class="path">Administration → Rôles</span> and click <b>New role</b> (e.g. "Guichetier").</li>
+    <li>Tick the permissions: ticketing/booking, <code>treasury.session.view/manage</code>, <code>voyage.trip.view</code>, etc.</li>
+    <li>Save the role.</li>
+    <li>Open the user, assign the <b>role</b>, and save. The agent now sees exactly those modules.</li>
+  </ol>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Onboarding a new agency with one counter agent</h4>
+    <p><b>Goal:</b> open the BAMENDA agency and give agent <i>Chantal</i> the ability to sell tickets.</p>
+    <ol class="steps">
+      <li><span class="path">Administration → Agences</span> → <b>Nouvelle agence</b> → name "BAMENDA", code "BAM" → Save.</li>
+      <li><span class="path">Administration → Utilisateurs</span> → create Chantal, company = your company, default agency = BAMENDA.</li>
+      <li><span class="path">Administration → Rôles</span> → create "Guichetier" with ticketing + treasury.session + voyage.expense permissions.</li>
+      <li>Assign "Guichetier" to Chantal. She can now open a caisse at BAMENDA and sell.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 3. CONFIGURATION ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 3</span>
+  <h2 class="title">Configuration</h2>
+  <p class="lead">Configuration is the reference data journeys rely on: where you travel, at what price, in which seats, and what a trip costs. It lives under <span class="path">Config Voyages</span>.</p>
+
+  <h3>3.1 The building blocks</h3>
+  <table>
+    <tr><th>Item</th><th>What it is</th></tr>
+    <tr><td>Villes / Points de service</td><td>Towns and their stations/agencies. A ticket-selling point is linked to an agency.</td></tr>
+    <tr><td>Trajets (Routes)</td><td>An origin → destination line (e.g. Bamenda → Douala).</td></tr>
+    <tr><td>Catégories tarifaires (Fare Classes)</td><td>Commercial tiers: CLASS, VIP, VIP PREM…</td></tr>
+    <tr><td>Plans de salle (Seating plans)</td><td>Seat layout of a bus type; assigned to vehicles.</td></tr>
+    <tr><td>Types d'équipage</td><td>Crew roles: Chauffeur, Convoyeur, Contrôleur… (a driver type is flagged "conducteur").</td></tr>
+    <tr><td>Types &amp; natures de colis</td><td>Parcel categories used when registering colis/bagages.</td></tr>
+    <tr><td>Types de dépense &amp; Barème</td><td>Expense categories (Carburant, Péage, Ration…) and standard costs per route &amp; class — see §3.3.</td></tr>
+  </table>
+
+  <h3>3.2 Creating a route</h3>
+  <ol class="steps">
+    <li>Ensure the towns and their service points exist (<span class="path">Config Voyages → Points de service</span>).</li>
+    <li>Open <span class="path">Config Voyages → Trajets</span> → <b>Nouveau trajet</b>.</li>
+    <li>Pick the <b>origine</b> and <b>destination</b> stations, give it a code (e.g. BDA-DLA), optional distance/duration.</li>
+    <li>Save. The route is now selectable when creating trips and fares.</li>
+  </ol>
+
+  <h3>3.3 Expense types &amp; the barème (standard trip costs)</h3>
+  <p>Define once, and every matching trip inherits its costs automatically.</p>
+  <h4>Step A — expense types</h4>
+  <ol class="steps">
+    <li>Open <span class="path">Config Voyages → Types de dépense</span> → <b>Nouveau type</b>.</li>
+    <li>Enter a name (e.g. Carburant) and pick its <b>OHADA charge account</b> from the dropdown (e.g. 604).</li>
+    <li>Save. Repeat for Péage, Ration chauffeur, Ration convoyeur, Autres…</li>
+  </ol>
+  <h4>Step B — the barème</h4>
+  <ol class="steps">
+    <li>Open <span class="path">Config Voyages → Barème dépenses</span> → <b>Nouveau barème</b>.</li>
+    <li>Choose the <b>Trajet</b> and the <b>Catégorie tarifaire</b> (e.g. Bamenda→Douala, VIP).</li>
+    <li>Add lines: for each expense type, enter the standard amount (Carburant 40 000, Ration chauffeur 10 000, Péage 3 000…).</li>
+    <li>Save. Every VIP trip created on that route will now start with these expenses pre-filled.</li>
+  </ol>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Setting up a brand-new line</h4>
+    <p><b>Goal:</b> open the Bamenda → Douala VIP line with a fare and cost barème.</p>
+    <ol class="steps">
+      <li>Create the two stations under Points de service (Bamenda gare, Douala gare).</li>
+      <li>Create the <b>Trajet</b> Bamenda → Douala.</li>
+      <li>Create/confirm the <b>VIP</b> fare class and its fare (Config Voyages → Tarifs).</li>
+      <li>Create the <b>Barème</b> for (Bamenda→Douala, VIP) with carburant/ration/péage lines.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 4. FLEET ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 4</span>
+  <h2 class="title">Fleet (Flotte)</h2>
+  <p class="lead">The fleet module tracks your vehicles and everything they consume and cost: fuel, maintenance, insurance contracts, documents, missions and accidents.</p>
+
+  <h3>4.1 Prepare the fleet reference data</h3>
+  <p>Under Fleet configuration, define the reusable lists first: vehicle categories, fuel types, transmissions, brands &amp; models, document types, tags, intervention types, suppliers and parkings.</p>
+
+  <h3>4.2 Registering a vehicle</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Flotte → Véhicules</span> → <b>New vehicle</b>.</li>
+    <li>Select the <b>model</b> (brand/model), enter the <b>licence plate</b>, VIN, colour, year, category, and the owning agency.</li>
+    <li>Optionally fill acquisition and fiscal values (purchase, catalogue, residual), tank capacity and current odometer.</li>
+    <li>Save. The vehicle is <b>Available</b> and can be assigned to trips.</li>
+  </ol>
+
+  <h3>4.3 Recording fuel</h3>
+  <ol class="steps">
+    <li>Open the vehicle (or <span class="path">Flotte → Carburant</span>) and click <b>New fuel log</b>.</li>
+    <li>Enter date, odometer at fill-up, litres, cost per litre (total is computed), station, and whether it was a full tank.</li>
+    <li>Save. Fuel logs feed the vehicle's consumption &amp; cost history.</li>
+  </ol>
+  <div class="note"><span class="tag">Good to know</span> &nbsp;Fleet fuel logs are the <b>actual</b> fill-ups (litres, odometer). The "Carburant" line on a trip's expenses is a separate <b>per-trip allowance</b> — the two are intentionally kept apart.</div>
+
+  <h3>4.4 Maintenance &amp; contracts</h3>
+  <ul class="tight">
+    <li><b>Services / entretien</b> — plan a service (intervention type, supplier, planned date). When done, record start/done dates, odometer and cost, plus the next due (km or date).</li>
+    <li><b>Contrats</b> — insurance and other contracts: supplier, policy number, start/expiry dates, activation cost, deductible, billing period, plus recurring costs.</li>
+    <li><b>Documents</b> — carte grise, assurance, visite technique… with issue/expiry dates for reminders.</li>
+    <li><b>Accidents</b> — severity, at-fault, third party, police report, insurance claim, estimated vs actual repair cost.</li>
+  </ul>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Putting a new bus into service</h4>
+    <ol class="steps">
+      <li>Create the brand/model if new, then register the vehicle with its plate at your agency.</li>
+      <li>Attach its documents (assurance, visite technique) with expiry dates.</li>
+      <li>Log the first fuel fill-up and schedule the first maintenance with a next-due km.</li>
+      <li>The bus now appears among eligible vehicles when you assign one to a trip.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 5. JOURNEYS ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 5</span>
+  <h2 class="title">Journeys (Voyages)</h2>
+  <p class="lead">A journey (trip) is one scheduled departure on a route. This chapter covers creating it, assigning a bus and crew, running its lifecycle, and recording its expenses.</p>
+
+  <h3>5.1 Creating a trip</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Voyages → Voyages</span> → <b>New trip</b>.</li>
+    <li>Choose the <b>trajet</b>, the <b>catégorie tarifaire</b>, and the scheduled departure &amp; arrival times.</li>
+    <li>Save. The trip is created as a <b>Draft</b>. If a barème exists for (route, class), its expenses are copied in automatically.</li>
+  </ol>
+
+  <h3>5.2 Assigning a vehicle &amp; crew</h3>
+  <ol class="steps">
+    <li>Open the trip. Under <b>Véhicule</b>, pick an eligible bus and confirm — this generates the seat map from the bus's seating plan.</li>
+    <li>Under <b>Équipage</b>, add crew members (at least one must be a <b>driver</b>). Select each member and click add.</li>
+    <li>Optionally block seats you do not want sold (maintenance, reserved) under the seat grid.</li>
+  </ol>
+
+  <h3>5.3 The trip lifecycle</h3>
+  <table>
+    <tr><th>Action</th><th>Meaning &amp; requirement</th></tr>
+    <tr><td><b>Soumettre</b> (Submit)</td><td>Draft → Pending. Requires a vehicle (with seat plan) and at least one driver.</td></tr>
+    <tr><td><b>Départ</b> (Depart)</td><td>Pending → Departed. Marks the bus as gone.</td></tr>
+    <tr><td><b>Compléter</b> (Complete)</td><td>Departed → Completed. The trip is finished.</td></tr>
+    <tr><td>Annuler / Suspendre / Reprendre</td><td>Cancel, temporarily suspend, or resume a trip.</td></tr>
+    <tr><td>Marquer en retard</td><td>Flag a delay with a reason.</td></tr>
+    <tr><td><b>Transbordement</b></td><td>Move passengers/parcels/baggage to another bus or trip (e.g. breakdown or overflow).</td></tr>
+  </table>
+
+  <h3>5.4 Trip expenses &amp; disbursing from a caisse</h3>
+  <p>On the trip's <b>Dépenses</b> card you see the inherited/added expenses (status <i>Prévue</i>). To pay one out:</p>
+  <ol class="steps">
+    <li>Add or adjust any expense lines while they are <i>Prévue</i> (choose the type and amount).</li>
+    <li>In <b>Caisse de décaissement</b>, choose the open cash register the money leaves from.</li>
+    <li>Click <b>Décaisser</b> on the line. The amount leaves that caisse, an OHADA entry is posted (debit the charge account, credit the caisse), and the line becomes <i>Décaissée</i>.</li>
+  </ol>
+  <div class="note"><span class="tag">Requirement</span> &nbsp;You must have an <b>open cash session</b> to disburse. If the dropdown is empty, open your caisse first (see Chapter 9).</div>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Running the 08:00 Bamenda → Douala departure</h4>
+    <ol class="steps">
+      <li>Create the trip (Bamenda→Douala, VIP, today 08:00). Its expenses pre-fill from the barème.</li>
+      <li>Assign bus <i>LT 762 MF</i> and add the driver + convoyeur.</li>
+      <li>Open your caisse; on the Dépenses card choose that caisse and <b>Décaisser</b> the carburant and rations.</li>
+      <li>Sell tickets (Chapter 6), then <b>Soumettre</b> → <b>Départ</b> at departure time → <b>Compléter</b> on arrival.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 6. RESERVATIONS ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 6</span>
+  <h2 class="title">Reservations (Réservations)</h2>
+  <p class="lead">Selling tickets at the counter. Each paid booking automatically records a treasury movement and an accounting entry.</p>
+
+  <h3>6.1 Selling a ticket</h3>
+  <ol class="steps">
+    <li>Make sure your <b>cash session is open</b> (Chapter 9) — cash sales require it.</li>
+    <li>Open the sales/booking screen and pick the <b>trip</b> (departure) and <b>seat(s)</b>.</li>
+    <li>Enter the <b>passenger</b> (or select an existing one) and the <b>fare class</b>.</li>
+    <li>Choose the <b>payment method</b> and the amount received; confirm. The ticket is issued and can be printed.</li>
+  </ol>
+  <div class="note"><span class="tag">Behind the scenes</span> &nbsp;A cash sale posts an income movement in your caisse and an OHADA entry (debit 571 caisse, credit 706 ticket sales). Non-cash (transfer/mobile money) posts to the bank account.</div>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Two VIP tickets for tonight's departure</h4>
+    <ol class="steps">
+      <li>Open your caisse for the day.</li>
+      <li>Select the 20:00 Bamenda → Biyem-Assi VIP trip and pick two seats.</li>
+      <li>Enter each passenger, confirm cash payment. Two tickets print; your caisse balance rises by the total.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 7. PARCELS ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 7</span>
+  <h2 class="title">Parcels (Colis)</h2>
+  <p class="lead">Registering, paying, tracking and delivering cargo sent between service points.</p>
+
+  <h3>7.1 Registering a parcel</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Voyages → Colis</span> → <b>New parcel</b>.</li>
+    <li>Choose the <b>point de départ</b> and <b>point d'arrivée</b> (they must differ), the parcel <b>type</b>, description, weight and pieces.</li>
+    <li>Enter the <b>sender</b> and <b>recipient</b> details (name, phone, recipient ID).</li>
+    <li>Enter the <b>amount due</b> and the amount received / payment method; save. A reference (e.g. COL00042) is generated and the shipping fee is booked to treasury (account 707).</li>
+  </ol>
+
+  <h3>7.2 Tracking &amp; delivery</h3>
+  <ul class="tight">
+    <li>Status flows: <b>Enregistré → Chargé → Réceptionné → Livré</b> (or Annulé).</li>
+    <li>When loaded onto a trip, link the trip; on arrival mark it <b>Réceptionné</b>.</li>
+    <li>To deliver: mark <b>Livré</b>, record who collected it and the ID they presented.</li>
+  </ul>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Send a parcel from Bamenda to Douala</h4>
+    <ol class="steps">
+      <li>Register the parcel (Bamenda → Douala), sender &amp; recipient, amount 8 000, cash — fee posts to treasury.</li>
+      <li>Load it on the departing trip (status Chargé).</li>
+      <li>At Douala, mark Réceptionné; when the recipient collects it with ID, mark Livré.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 8. BAGGAGE ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 8</span>
+  <h2 class="title">Baggage (Bagages)</h2>
+  <p class="lead">Checking in a passenger's baggage on a known trip, charging any excess, and delivering it at destination.</p>
+
+  <h3>8.1 Checking in baggage</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Voyages → Bagages</span> → <b>New baggage</b>.</li>
+    <li>Select the <b>trip</b> (the departure is known at check-in). Optionally link the passenger's <b>ticket</b>; otherwise enter the sender's identity.</li>
+    <li>Enter the type, description, weight and number of items. The system computes any <b>excess</b> over the free allowance.</li>
+    <li>Enter the fare and amount received / payment method; save. A tag (e.g. BAG00007) is generated and the fee is booked to treasury (account 706). Free baggage (0) generates no movement.</li>
+  </ol>
+
+  <h3>8.2 Delivery</h3>
+  <p>Status flows <b>Enregistré → Chargé → Retiré</b>. To hand it over, mark <b>Retiré</b> and add a collection comment if needed.</p>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>Excess baggage at check-in</h4>
+    <ol class="steps">
+      <li>Open baggage check-in for the passenger's trip and link their ticket.</li>
+      <li>Enter 30 kg — the system charges the excess over the free allowance.</li>
+      <li>Collect the fee (cash) → it posts to your caisse; print the tag.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 9. TREASURY ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 9</span>
+  <h2 class="title">Treasury (Trésorerie)</h2>
+  <p class="lead">Cash registers, daily sessions, movements and transfers. Every sale (tickets, parcels, baggage) and every disbursed trip expense flows through here — and posts automatically to accounting.</p>
+
+  <h3>9.1 Cash registers &amp; the daily session</h3>
+  <ol class="steps">
+    <li>Create a caisse under <span class="path">Trésorerie → Caisses</span> (name it, attach it to an <b>agency</b>).</li>
+    <li>Each day, <b>open a session</b> (<span class="path">Trésorerie → Sessions</span> → <b>Open session</b>): pick the caisse and confirm the opening balance.</li>
+    <li>Work through the day — sales and expenses move money in/out of this open session.</li>
+    <li>At day's end, <b>close</b> the session: enter the <b>counted</b> balance. The system computes the expected balance and the <b>écart</b> (excédent/manquant).</li>
+  </ol>
+
+  <h3>9.2 Movements &amp; transfers</h3>
+  <ul class="tight">
+    <li><b>Transactions</b> — income/expense movements with a category; most are created automatically by sales &amp; expenses, but you can add others.</li>
+    <li><b>Transferts</b> — move money between caisses and bank accounts (posts a matching OD accounting entry).</li>
+    <li><b>Comptes bancaires</b> — bank accounts used for non-cash receipts.</li>
+  </ul>
+  <div class="note"><span class="tag">Automatic accounting</span> &nbsp;Opening/using a caisse never requires manual bookkeeping: each movement posts an OHADA entry, and closing differences post to écart accounts (658 shortfall / 758 surplus).</div>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>A cashier's day</h4>
+    <ol class="steps">
+      <li>Morning: open your caisse with the opening float.</li>
+      <li>Day: sell tickets, register parcels/baggage, disburse trip expenses — all from this caisse.</li>
+      <li>Evening: count the cash, close the session; the écart shows any surplus/shortfall.</li>
+      <li>Run <b>Journaux de vente</b> in Reporting to review the session (see Chapter 11).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 10. ACCOUNTING ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 10</span>
+  <h2 class="title">Accounting (Comptabilité)</h2>
+  <p class="lead">The SYSCOHADA-compliant ledger. Most entries are generated automatically from treasury; accountants can also post manual entries and review the books.</p>
+  <ul class="tight">
+    <li><b>Plan comptable</b> — the chart of accounts (class 5 treasury, class 6 charges, class 7 products…), seeded per company.</li>
+    <li><b>Journaux</b> — sales, purchases, cash (CAISSE), bank (BANQUE), miscellaneous (OD).</li>
+    <li><b>Exercices &amp; Périodes</b> — fiscal years and periods; close a period when done.</li>
+    <li><b>Écritures</b> — double-entry, gap-less numbering, immutable once posted, reversible by contre-passation.</li>
+  </ul>
+  <div class="note"><span class="tag">Where entries come from</span> &nbsp;Ticket sales → 706, parcels → 707, baggage → 706, trip expenses → their configured charge account; each balanced against the caisse (571) or bank (521).</div>
+</section>
+
+<!-- ===================== 11. REPORTING ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 11</span>
+  <h2 class="title">Reporting</h2>
+  <p class="lead">Generate branded statements as PDF, Excel or CSV, filtered by period, agency, caisse, vehicle or year.</p>
+
+  <h3>11.1 Generating a report</h3>
+  <ol class="steps">
+    <li>Open <span class="path">Reporting → Rapports</span>.</li>
+    <li>Choose the <b>report</b> from the list.</li>
+    <li>Fill the <b>filters</b> shown for that report (dates, agency, caisse, vehicle, year).</li>
+    <li>Pick the <b>format</b> (PDF / Excel / CSV) and click <b>Générer</b> — the file downloads.</li>
+  </ol>
+
+  <h3>11.2 Available reports</h3>
+  <table>
+    <tr><th>Report</th><th>What it shows</th></tr>
+    <tr><td>Dépense</td><td>Trip expenses paid, by trip/vehicle/type and the caisse that paid.</td></tr>
+    <tr><td>Recette</td><td>Ticket receipts grouped by caisse (and cashier).</td></tr>
+    <tr><td>CA (production)</td><td>Turnover by agency × month.</td></tr>
+    <tr><td>Récapitulatif</td><td>Per vehicle: revenue (voyage/bagage/colis) − expenses = margin.</td></tr>
+    <tr><td>Journaux de vente</td><td>Per session: opening/expected/actual balance and écart.</td></tr>
+    <tr><td>Voyages</td><td>Trips with reservation &amp; parcel totals.</td></tr>
+    <tr><td>Réservation / Bagages / Colis</td><td>Transactional lists of tickets, baggage and parcels.</td></tr>
+  </table>
+
+  <div class="scenario">
+    <span class="tag">Scenario</span>
+    <h4>End-of-day review for a manager</h4>
+    <ol class="steps">
+      <li>Run <b>Journaux de vente</b> for today, filtered to the agency — check each caisse's écart.</li>
+      <li>Run <b>Recette</b> for today to see receipts by cashier.</li>
+      <li>Run <b>Récapitulatif</b> for the period to see each bus's margin (revenue − expenses).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== 12. APPENDIX ===================== -->
+<section class="chapter">
+  <span class="chapnum">Chapter 12</span>
+  <h2 class="title">Appendix</h2>
+
+  <h3>Glossary</h3>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>Institution</td><td>A company on the platform (fully isolated from others).</td></tr>
+    <tr><td>Agence</td><td>A branch/office; caisses and selling points attach to it.</td></tr>
+    <tr><td>Caisse / Session</td><td>A cash register and its daily open/close cycle.</td></tr>
+    <tr><td>Trajet</td><td>A route (origin → destination).</td></tr>
+    <tr><td>Voyage</td><td>One scheduled departure on a trajet.</td></tr>
+    <tr><td>Barème</td><td>Standard trip costs per (route × fare class).</td></tr>
+    <tr><td>Décaisser</td><td>Pay an expense out of a chosen caisse.</td></tr>
+    <tr><td>Écart</td><td>Difference between counted and expected cash at close (surplus/shortfall).</td></tr>
+    <tr><td>OHADA / SYSCOHADA</td><td>The West/Central-African accounting standard used by the ledger.</td></tr>
+  </table>
+
+  <h3>Everyday tips</h3>
+  <ul class="tight">
+    <li>Open your caisse <b>before</b> selling or disbursing — cash operations need an open session.</li>
+    <li>Configure the <b>barème</b> once per line so every trip inherits its costs.</li>
+    <li>If a menu/button is missing, it is a <b>permission</b> — ask your Institution Admin.</li>
+    <li>Reports are always available in <b>PDF, Excel and CSV</b> — use Excel/CSV for further analysis.</li>
+    <li>Keep vehicle <b>documents</b> up to date with expiry dates so nothing lapses.</li>
+  </ul>
+
+  <div class="note" style="margin-top:22px; text-align:center; border-left:none; border-top:3px solid var(--accent);">
+    <b>Brainstore Transport Package</b> — User Manual · Version 1.0 · August 2026
+  </div>
+</section>
+
+</body>
+</html>
