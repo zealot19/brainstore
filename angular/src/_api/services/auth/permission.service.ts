@@ -4,11 +4,13 @@ import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
 import { AUTH } from '../../config/api.config';
 
 const STORAGE_KEY = 'drp_permissions';
+const MODULES_KEY = 'drp_modules';
 
 interface PermissionsResponse {
   // Le corps est déjà désemballé par apiUnwrapInterceptor ({success,data} -> data).
   permissions: string[];
   is_superuser: boolean;
+  modules: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -18,9 +20,13 @@ export class PermissionService {
 
   private _codes$ = new BehaviorSubject<Set<string>>(this._loadFromStorage());
   private _superuser$ = new BehaviorSubject<boolean>(false);
+  private _modules$ = new BehaviorSubject<Set<string>>(this._loadModules());
 
   /** Observable du set complet de codes (rafraîchi après login) */
   readonly permissions$ = this._codes$.asObservable();
+
+  /** Observable des modules activés pour la société (rafraîchi après login) */
+  readonly modules$ = this._modules$.asObservable();
 
   // ── Requête serveur ─────────────────────────────────────────────────────────
 
@@ -31,11 +37,14 @@ export class PermissionService {
   load(): Observable<PermissionsResponse> {
     return this.http.get<PermissionsResponse>(AUTH.mePermissions).pipe(
       tap(res => {
-        const { permissions, is_superuser } = res;
+        const { permissions, is_superuser, modules } = res;
         this._superuser$.next(is_superuser ?? false);
         const codes = new Set(permissions ?? []);
         this._codes$.next(codes);
         localStorage.setItem(STORAGE_KEY, JSON.stringify([...codes]));
+        const mods = new Set(modules ?? []);
+        this._modules$.next(mods);
+        localStorage.setItem(MODULES_KEY, JSON.stringify([...mods]));
       }),
       catchError(() => of({} as PermissionsResponse))
     );
@@ -45,7 +54,9 @@ export class PermissionService {
   clear(): void {
     this._codes$.next(new Set());
     this._superuser$.next(false);
+    this._modules$.next(new Set());
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(MODULES_KEY);
   }
 
   // ── Vérification synchrone ───────────────────────────────────────────────────
@@ -66,11 +77,25 @@ export class PermissionService {
     return codes.every(c => this.has(c));
   }
 
+  /** Retourne true si le module est inclus dans l'offre de la société (ou superuser) */
+  hasModule(code: string): boolean {
+    return this._superuser$.getValue() || this._modules$.getValue().has(code);
+  }
+
   // ── Lecture interne ─────────────────────────────────────────────────────────
 
   private _loadFromStorage(): Set<string> {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
+    } catch {
+      return new Set();
+    }
+  }
+
+  private _loadModules(): Set<string> {
+    try {
+      const raw = localStorage.getItem(MODULES_KEY);
       return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
     } catch {
       return new Set();
