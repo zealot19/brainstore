@@ -107,6 +107,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.TenantMiddleware",             # multi-tenant
+    "apps.core.entitlement_middleware.EntitlementMiddleware",  # modules inclus (entitlements)
 ]
 
 # ── URLs ──────────────────────────────────────────────────────────────────────
