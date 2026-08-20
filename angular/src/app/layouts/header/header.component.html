@@ -17,30 +17,24 @@
     </a>
 
     <!-- Header Menu -->
-    <ul class="nav user-menu align-items-center">
+    <ul class="nav user-menu align-items-center justify-content-end">
 
-      <!-- Raccourcis -->
+      <!-- Raccourcis (le <span> évite la règle .user-menu.nav>li>a qui écrase le style .btn) -->
       <ng-container *hasModule="'voyage'">
         <li class="nav-item me-2" *hasPermission="'ticketing.booking.create'">
-          <a class="btn btn-primary btn-sm d-flex align-items-center" [routerLink]="routes.vbBookingNew">
-            <i class="ti ti-ticket me-1"></i>Nouvelle réservation
-          </a>
+          <span class="d-inline-flex"><a class="btn btn-primary" [routerLink]="routes.vbBookingNew">Nouvelle réservation</a></span>
         </li>
       </ng-container>
 
       <ng-container *hasModule="'colis'">
         <li class="nav-item me-2" *hasPermission="'ticketing.parcel.manage'">
-          <a class="btn btn-outline-primary btn-sm d-flex align-items-center" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">
-            <i class="ti ti-package me-1"></i>Nouveau colis
-          </a>
+          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">Nouveau colis</a></span>
         </li>
       </ng-container>
 
       <ng-container *hasModule="'bagages'">
         <li class="nav-item me-3" *hasPermission="'ticketing.luggage.manage'">
-          <a class="btn btn-outline-primary btn-sm d-flex align-items-center" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">
-            <i class="ti ti-briefcase me-1"></i>Nouveau bagage
-          </a>
+          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">Nouveau bagage</a></span>
         </li>
       </ng-container>
 
