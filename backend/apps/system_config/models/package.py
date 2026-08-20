@@ -31,6 +31,17 @@ class Package(BaseModel):
     has_advanced_reports = models.BooleanField(_("rapports avancés"), default=False)
     has_sso          = models.BooleanField(_("SSO"), default=False)
 
+    # ── Modules inclus (entitlements) ─────────────────────────────────────
+    # Défaut True : les sociétés existantes gardent tous les modules.
+    has_administration = models.BooleanField(_("module Administration"), default=True)
+    has_fleet          = models.BooleanField(_("module Flotte"), default=True)
+    has_voyages        = models.BooleanField(_("module Voyages"), default=True)
+    has_colis          = models.BooleanField(_("module Colis"), default=True)
+    has_bagages        = models.BooleanField(_("module Bagages"), default=True)
+    has_treasury       = models.BooleanField(_("module Trésorerie"), default=True)
+    has_accounting     = models.BooleanField(_("module Comptabilité"), default=True)
+    has_reporting      = models.BooleanField(_("module Reporting"), default=True)
+
     sort_order = models.PositiveSmallIntegerField(_("ordre d'affichage"), default=0)
 
     class Meta(BaseModel.Meta):
