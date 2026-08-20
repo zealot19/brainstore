@@ -1,136 +1,52 @@
 import { Component } from '@angular/core';
-import { NavigationStart, Router, Event as RouterEvent, RouterLink } from '@angular/router';
-import { CommonService, routes, SidebarService } from '../../core/core.index';
-import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { routes, SidebarService } from '../../core/core.index';
 import { AuthService } from '../.././../_api/services/auth/auth.service';
-
+import { HasModuleDirective } from '../../shared/directives/has-module.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 @Component({
-    selector: 'app-header',
-    templateUrl: './header.component.html',
-    styleUrls: ['./header.component.scss'],
-    imports: [FormsModule,RouterLink,CommonModule],
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss'],
+  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective],
 })
-export class HeaderComponent  {
+export class HeaderComponent {
   routes = routes;
-  inputValue = '';
-  activePath = '';
-  showSearch = false;
-  public changeLayout = '1';
-  public darkTheme = false;
-  public logoPath = '';
-  public miniSidebar = false;
-  elem = document.documentElement;
-  public addClass = false;
-  base = '';
-  page = '';
-  last = '';
+  currentLang = (localStorage.getItem('drp_lang') || 'FR').toUpperCase();
 
-  constructor(
-    private Router: Router,
-    private common: CommonService,
-    private sidebar: SidebarService,
-    private authService: AuthService,
-  ) {
-    this.activePath = this.Router.url.split('/')[2];
-    this.Router.events.subscribe((data: RouterEvent) => {
-      if (data instanceof NavigationStart) {
-        this.activePath = data.url.split('/')[2];
-      }
-    });
-    this.sidebar.sideBarPosition.subscribe((res: string) => {
-      if (res == 'true') {
-        this.miniSidebar = true;
-      } else {
-        this.miniSidebar = false;
-      }
-    });
-    this.common.base.subscribe((base: string) => {
-      this.base = base;
-    });
-    this.common.page.subscribe((page: string) => {
-      this.page = page;
-    });
-    this.common.last.subscribe((last: string) => {
-      this.last = last;
-    });
+  constructor(private sidebar: SidebarService, private authService: AuthService) {}
+
+  // ── Utilisateur connecté ─────────────────────────────────────────────────
+  get userName(): string {
+    const u = this.authService.currentUser;
+    if (!u) return '';
+    return u.full_name || `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || u.email;
+  }
+  get userTitle(): string {
+    const u = this.authService.currentUser;
+    if (!u) return '';
+    if (u.is_superuser) return 'Super Admin';
+    if (u.is_institution_admin) return 'Administrateur';
+    return u.job_title || 'Utilisateur';
+  }
+  get userInitials(): string {
+    const parts = this.userName.trim().split(/\s+/);
+    return (((parts[0]?.[0]) || '') + ((parts[1]?.[0]) || '')).toUpperCase() || '?';
   }
 
-
-
-
-
-  logout(): void {
-    this.authService.logout();
+  // ── Langue (placeholder : i18n non encore branché) ────────────────────────
+  setLang(lang: string): void {
+    this.currentLang = lang.toUpperCase();
+    localStorage.setItem('drp_lang', this.currentLang);
   }
 
-  public toggleSidebar(): void {
-    this.sidebar.switchSideMenuPosition();
-  }
-
-  public togglesMobileSideBar(): void {
-    this.sidebar.switchMobileSideBarPosition();
-  }
-
-  public miniSideBarMouseHover(position: string): void {
-    if (position == 'over') {
-      this.sidebar.expandSideBar.next(true);
-    } else {
-      this.sidebar.expandSideBar.next(false);
-    }
-  }
-
-  fullscreen() {
-    if (!document.fullscreenElement) {
-      this.elem.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }
-
-  evaluate(expression: string): string {
-    try {
-      return new Function('return ' + expression)();
-    } catch {
-      return 'Error';
-    }
-  }
-
-  clearCal(): string {
-    return '';
-  }
-
-  backspacemain(value: string): string {
-    return value.slice(0, -1);
-  }
-  onKeyPress(event: KeyboardEvent) {
-    const validKeys = /[0-9+\-*/%.]/;
-    
-    if (validKeys.test(event.key)) {
-      this.inputValue += event.key;
-    } else if (event.key === 'Backspace' || event.key === 'Delete') {
-      this.inputValue = this.backspacemain(this.inputValue);
-    } else if (event.key === 'Enter') {
-      this.solve();
-    } else if (event.key.toLowerCase() === 'c') {
-      this.clear();
-    }
-  }
-
-  solve(): void {
-    this.inputValue = this.evaluate(this.inputValue);
-  }
-
-  clear(): void {
-    this.inputValue = this.clearCal();
-  }
-
-  backspace(): void {
-    this.inputValue = this.backspacemain(this.inputValue);
-  }
-
-  addValue(val: string): void {
-    this.inputValue += val;
+  // ── Actions ───────────────────────────────────────────────────────────────
+  logout(): void { this.authService.logout(); }
+  toggleSidebar(): void { this.sidebar.switchSideMenuPosition(); }
+  togglesMobileSideBar(): void { this.sidebar.switchMobileSideBarPosition(); }
+  miniSideBarMouseHover(position: string): void {
+    this.sidebar.expandSideBar.next(position === 'over');
   }
 }

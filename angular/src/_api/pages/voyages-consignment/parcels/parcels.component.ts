@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
@@ -30,7 +31,7 @@ export class VcgParcelsComponent implements OnInit {
 
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
               private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
-              private fb: FormBuilder) {}
+              private fb: FormBuilder, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -46,6 +47,10 @@ export class VcgParcelsComponent implements OnInit {
     this.ctSvc.list().subscribe(d => this.types = d);
     this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.reload();
+    // Ouverture directe du formulaire depuis le raccourci "Nouveau colis" (navbar) : ?new=1
+    this.route.queryParams.subscribe(q => {
+      if (q['new']) setTimeout(() => document.querySelector<HTMLElement>('[data-bs-target="#parcel-modal"]')?.click(), 150);
+    });
   }
 
   reload(): void {
