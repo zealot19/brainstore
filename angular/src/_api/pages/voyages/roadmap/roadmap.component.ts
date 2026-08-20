@@ -34,10 +34,15 @@ export class VbRoadmapComponent implements OnInit {
     this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   printDoc(which: 'voyages' | 'colis'): void {
-    document.body.classList.add('printing-' + which);
-    const cleanup = () => { document.body.classList.remove('printing-voyages', 'printing-colis'); window.removeEventListener('afterprint', cleanup); };
-    window.addEventListener('afterprint', cleanup);
-    setTimeout(() => window.print(), 50);
+    // PDF serveur (WeasyPrint) : ouvre le bordereau dans un nouvel onglet pour visualiser/imprimer.
+    this.svc.pdf(this.tripId, which).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      },
+      error: () => alert('Impossible de générer le PDF du bordereau.'),
+    });
   }
   back(): void { this.router.navigate(['/voyages/list']); }
 }

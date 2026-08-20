@@ -361,6 +361,7 @@ export const VOYAGES_BOOKING = {
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
   tripRoadmap: (tripId: string) => `${VB}/trips/${tripId}/roadmap/`,
+  tripRoadmapPdf: (tripId: string) => `${VB}/trips/${tripId}/roadmap/pdf/`,
   tripBoardAll: (tripId: string) => `${VB}/trips/${tripId}/board-all/`,
 };
 
