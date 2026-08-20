@@ -95,6 +95,10 @@ export class SidebarOneComponent implements OnDestroy {
           .filter((item: any) =>
             !(item.hasSubRoute && Array.isArray(item.subMenus)) || item.subMenus.length > 0),
       }))
+      // Entitlement : masquer les sections dont le module n'est pas inclus dans l'offre
+      // (non contourné par l'admin d'institution ; superuser voit tout via hasModule).
+      .filter((section: any) =>
+        !section.module || isSuperAdmin || this.permissionService.hasModule(section.module))
       // Module (section) masqué s'il ne reste aucune entrée visible.
       .filter((section: any) => Array.isArray(section.menu) && section.menu.length > 0);
   }

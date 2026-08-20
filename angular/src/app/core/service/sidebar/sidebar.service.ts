@@ -52,6 +52,7 @@ export class SidebarService {
   public sidebarData1 = [
     {
       tittle: 'Voyages',
+      module: 'voyage',
       showAsTab: false,
       separateRoute: false,
       hasSubRoute: false,
@@ -124,6 +125,7 @@ export class SidebarService {
     },
     {
       tittle: 'Flotte',
+      module: 'fleet',
       showAsTab: false,
       separateRoute: false,
       hasSubRoute: false,
@@ -175,6 +177,7 @@ export class SidebarService {
     },
     {
       tittle: 'Trésorerie',
+      module: 'treasury',
       showAsTab: false,
       separateRoute: false,
       menu: [
@@ -197,6 +200,7 @@ export class SidebarService {
     },
     {
       tittle: 'Comptabilité',
+      module: 'accounting',
       showAsTab: false,
       separateRoute: false,
       menu: [
@@ -216,6 +220,7 @@ export class SidebarService {
     },
     {
       tittle: 'Reporting',
+      module: 'reporting',
       showAsTab: false,
       separateRoute: false,
       menu: [
@@ -233,6 +238,7 @@ export class SidebarService {
     },
     {
       tittle: 'Administration',
+      module: 'administration',
       showAsTab: false,
       separateRoute: false,
       hasSubRoute: false,
