@@ -155,9 +155,14 @@ class MePermissionsView(APIView):
         perms = get_user_permissions(request.user, company_id)
         # Admin d'institution = accès complet à sa société (miroir du bypass backend).
         is_admin = request.user.is_superuser or getattr(request.user, "is_institution_admin", False)
+        # Modules activés : super admin (plateforme, sans société) -> tous ;
+        # sinon modules du package de la société (entitlement NON contourné par l'admin d'institution).
+        from apps.system_config.selectors.entitlements import enabled_modules, ALL_MODULES
+        modules = sorted(ALL_MODULES) if (request.user.is_superuser or not company) else sorted(enabled_modules(company))
         return success_response({
             "permissions": ["*"] if (is_admin or "*" in perms) else sorted(perms),
             "is_superuser": request.user.is_superuser,
+            "modules": modules,
         })
 
 
