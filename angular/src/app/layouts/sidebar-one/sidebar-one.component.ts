@@ -76,7 +76,9 @@ export class SidebarOneComponent implements OnDestroy {
       (Array.isArray(p) ? this.permissionService.hasAny(...p) : this.permissionService.has(p));
 
     const roleOk = (item: any): boolean => {
-      if (item.role === 'institution_admin') return isInstitutionAdmin || isSuperAdmin;
+      // L'administration de société est réservée aux admins d'institution ; les super
+      // admins ont leur propre groupe « Super Admin » (évite les doublons dans le menu).
+      if (item.role === 'institution_admin') return isInstitutionAdmin;
       if (item.role === 'super_admin')       return isSuperAdmin;
       return true;
     };

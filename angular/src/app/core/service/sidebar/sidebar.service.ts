@@ -245,81 +245,7 @@ export class SidebarService {
       showSubRoute: true,
       menu: [
         {
-          menuValue: 'Structure',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'settings-2',
-          base: 'admin',
-          subMenus: [
-            { menuValue: 'Agences', route: routes.admAgencies, base: 'agencies', permission: 'system.agency.view' },
-          ],
-        },
-        {
-          menuValue: 'Config Système',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'settings-2',
-          base: 'system-config',
-          role: 'super_admin',
-          subMenus: [
-            {
-              menuValue: 'Companies',
-              route: routes.superadminCompanies,
-              base: 'companies',
-            },
-            {
-              menuValue: 'Agences',
-              route: routes.superadminAgencies,
-              base: 'agencies',
-            },
-            {
-              menuValue: 'Packages',
-              route: routes.superadminPackages,
-              base: 'packages',
-            },
-            {
-              menuValue: 'Paramètres',
-              route: routes.systemParameters,
-              base: 'parameters',
-            },
-            {
-              menuValue: 'Feature Flags',
-              route: routes.systemFeatureFlags,
-              base: 'feature-flags',
-            },
-          ],
-        },
-        {
-          menuValue: 'Admin RBAC',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'shield-lock',
-          base: 'admin-rbac',
-          role: 'super_admin',
-          subMenus: [
-            {
-              menuValue: 'Rôles',
-              route: routes.rbacRoles,
-              base: 'roles',
-            },
-            {
-              menuValue: 'Profils',
-              route: routes.rbacProfiles,
-              base: 'profiles',
-            },
-          ],
-        },
-        {
-          menuValue: 'Utilisateurs',
-          hasSubRoute: false,
-          showSubRoute: false,
-          icon2: 'users',
-          route: routes.adminUsers,
-          base: 'users',
-          role: 'super_admin',
-          subMenus: [],
-        },
-        {
+          // Administration de la société (admin d'institution)
           menuValue: 'Administration',
           hasSubRoute: true,
           showSubRoute: false,
@@ -327,29 +253,15 @@ export class SidebarService {
           base: 'admin',
           role: 'institution_admin',
           subMenus: [
-            {
-              menuValue: 'Utilisateurs',
-              route: routes.adminInstUsers,
-              base: 'users',
-            },
-            {
-              menuValue: 'Profils',
-              route: routes.adminInstProfiles,
-              base: 'profiles',
-            },
-            {
-              menuValue: 'Rôles',
-              route: routes.adminInstRoles,
-              base: 'roles',
-            },
-            {
-              menuValue: 'Journal d\'audit',
-              route: routes.adminInstAudit,
-              base: 'audit',
-            },
+            { menuValue: 'Agences',          route: routes.admAgencies,       base: 'agencies' },
+            { menuValue: 'Utilisateurs',     route: routes.adminInstUsers,    base: 'users' },
+            { menuValue: 'Profils',          route: routes.adminInstProfiles, base: 'profiles' },
+            { menuValue: 'Rôles',            route: routes.adminInstRoles,    base: 'roles' },
+            { menuValue: 'Journal d\'audit', route: routes.adminInstAudit,    base: 'audit' },
           ],
         },
         {
+          // Plateforme (super admin) — fusion de Config Système + Admin RBAC + Super Admin
           menuValue: 'Super Admin',
           hasSubRoute: true,
           showSubRoute: false,
@@ -357,32 +269,17 @@ export class SidebarService {
           base: 'super-admin',
           role: 'super_admin',
           subMenus: [
-            {
-              menuValue: 'Dashboard',
-              route: routes.superadminDashboard,
-              base: 'dashboard'
-            },
-            {
-              menuValue: 'Companies',
-              route: routes.superadminCompanies,
-              base: 'dashboard'
-            },
-            {
-              menuValue: 'Subscriptions',
-              route: routes.superadminSubscriptions,
-            },
-            {
-              menuValue: 'Packages',
-              route: routes.superadminPackages,
-            },
-            {
-              menuValue: 'Domain',
-              route: routes.superadminDomain,
-            },
-            {
-              menuValue: 'Purchase Transaction',
-              route: routes.purchaseTransaction,
-            },
+            { menuValue: 'Dashboard',     route: routes.superadminDashboard,     base: 'dashboard' },
+            { menuValue: 'Companies',     route: routes.superadminCompanies,     base: 'companies' },
+            { menuValue: 'Agences',       route: routes.superadminAgencies,      base: 'agencies' },
+            { menuValue: 'Utilisateurs',  route: routes.adminUsers,              base: 'users' },
+            { menuValue: 'Packages',      route: routes.superadminPackages,      base: 'packages' },
+            { menuValue: 'Subscriptions', route: routes.superadminSubscriptions, base: 'subscriptions' },
+            { menuValue: 'Paramètres',    route: routes.systemParameters,        base: 'parameters' },
+            { menuValue: 'Feature Flags', route: routes.systemFeatureFlags,      base: 'feature-flags' },
+            { menuValue: 'Rôles',         route: routes.rbacRoles,               base: 'roles' },
+            { menuValue: 'Profils',       route: routes.rbacProfiles,            base: 'profiles' },
+            { menuValue: 'Domain',        route: routes.superadminDomain,        base: 'domain' },
           ],
         },
         {
