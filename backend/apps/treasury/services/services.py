@@ -90,6 +90,14 @@ def delete_bank_account(account, *, deleted_by):
 @transaction.atomic
 def open_session(*, company, cash_register, opening_balance=None, notes="", created_by):
     from apps.treasury.selectors import get_active_session
+    from apps.treasury.scoping import register_agency_scope
+    # Restriction d'agence : un guichetier n'ouvre une session que sur une caisse de son agence.
+    scoped, agency_id = register_agency_scope(created_by)
+    if scoped:
+        if not agency_id:
+            raise ApplicationError(_("Aucune agence ne vous est attribuée : impossible d'ouvrir une caisse."))
+        if cash_register.agency_id != agency_id:
+            raise ApplicationError(_("Vous ne pouvez ouvrir une session que sur une caisse de votre agence."))
     existing = get_active_session(cash_register.id, company.id)
     if existing:
         raise ApplicationError(
