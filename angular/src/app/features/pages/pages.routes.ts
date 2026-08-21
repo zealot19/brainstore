@@ -138,7 +138,7 @@ export const Pages_routes: Routes = [
       {
         path: 'dashboard', loadComponent: () => import('./dashboards/dashboard.component').then(m => m.DashboardComponent),
         children: [
-          { path: 'index', loadComponent: () => import('./dashboards/admin-dashboard-1/admin-dashboard-1.component').then(m => m.AdminDashboard1Component) },
+          { path: 'index', loadComponent: () => import('../../../_api/pages/dashboard/home/home-dashboard.component').then(m => m.HomeDashboardComponent) },
           { path: 'admin-dashboard', loadComponent: () => import('./dashboards/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
           { path: 'sales-dashboard', loadComponent: () => import('./dashboards/sales-dashboard/sales-dashboard.component').then(m => m.SalesDashboardComponent) },
         ]

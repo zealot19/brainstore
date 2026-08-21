@@ -312,6 +312,7 @@ export const VOYAGES_CONFIG = {
 const VT = `${API_BASE}/voyages/trips`;
 
 export const VOYAGES = {
+  tripsStats: `${VT}/stats/`,
   trips: `${VT}/`, trip: (id: string) => `${VT}/${id}/`,
   eligibleVehicles: (id: string) => `${VT}/${id}/eligible-vehicles/`,
   assignVehicle: (id: string) => `${VT}/${id}/assign-vehicle/`,
@@ -345,6 +346,7 @@ export const VOYAGES_PRICING = {
 const VB = `${API_BASE}/voyages/booking`;
 
 export const VOYAGES_BOOKING = {
+  stats: `${VB}/stats/`,
   passengers: `${VB}/passengers/`,
   passenger: (id: string) => `${VB}/passengers/${id}/`,
   passengerLoyalty: (id: string) => `${VB}/passengers/${id}/loyalty/`,
@@ -368,6 +370,7 @@ export const VOYAGES_BOOKING = {
 const VCG = `${API_BASE}/voyages/consignment`;
 
 export const VOYAGES_CONSIGNMENT = {
+  stats: `${VCG}/stats/`,
   parcels: `${VCG}/parcels/`,
   parcel: (id: string) => `${VCG}/parcels/${id}/`,
   parcelsPending: `${VCG}/parcels/pending/`,
@@ -409,6 +412,7 @@ const TRZ = `${API_BASE}/treasury`;
 
 export const TREASURY = {
   stats:     `${TRZ}/stats/`,
+  movements: `${TRZ}/transactions/`,
   registers: `${TRZ}/registers/`,   register: (id: string) => `${TRZ}/registers/${id}/`,
   banks:     `${TRZ}/banks/`,       bank:     (id: string) => `${TRZ}/banks/${id}/`,
   sessions:     `${TRZ}/sessions/`,       session:      (id: string) => `${TRZ}/sessions/${id}/`,
