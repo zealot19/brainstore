@@ -100,7 +100,7 @@ page = '';
             show: false,
           }
         },
-        colors: ['#FE9F43', '#FFE3CB'],
+        colors: ['#0068B8', '#B3D2EA'],
         responsive: [{
           breakpoint: 480,
           options: {
@@ -295,12 +295,12 @@ page = '';
           ranges: [{
               from: 0,
               to: 99,
-              color: '#FFE3CB'
+              color: '#B3D2EA'
             },
             {
               from: 100,
               to: 200,
-              color: '#FE9F43'
+              color: '#0068B8'
             },
           ],
         },
@@ -626,7 +626,7 @@ page = '';
           datasets: [{
             label:'',
               data: [16, 24, 50],
-              backgroundColor: ['#092C4C', '#E04F16', '#FE9F43'],
+              backgroundColor: ['#092C4C', '#E04F16', '#0068B8'],
               borderWidth: 5,
       borderRadius: 10,
               borderColor: '#fff', // Border between segments

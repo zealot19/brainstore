@@ -103,7 +103,7 @@ export class PrimeNgComponent implements OnInit{
             label: 'Sales',
             data: [12, 9, 3, 5, 2, 3],
             backgroundColor: [
-              '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#ffab00', '#ef4b4b'
+              '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#1A78C0', '#ef4b4b'
             ],
             borderWidth: 1
         }]
@@ -194,7 +194,7 @@ doughcharts() {
       datasets: [{
           data: [12, 9, 3, 5, 2, 3],
           backgroundColor: [
-            '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#ffab00', '#ef4b4b'
+            '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#1A78C0', '#ef4b4b'
           ],
           borderWidth: 1
       }]
@@ -209,7 +209,7 @@ piecharts() {
       datasets: [{
           data: [12, 9, 3, 5, 2, 3],
           backgroundColor: [
-            '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#ffab00', '#ef4b4b'
+            '#664dc9', '#44c4fa', '#38cb89', '#3e80eb', '#1A78C0', '#ef4b4b'
           ],
           borderWidth: 1
       }]
