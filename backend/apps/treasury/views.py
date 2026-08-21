@@ -7,6 +7,7 @@ from apps.core.pagination import StandardResultsSetPagination
 from apps.core.exceptions import ApplicationError
 
 from apps.treasury import selectors, services
+from apps.treasury.scoping import register_agency_scope
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
 from apps.treasury.serializers import (
     CashRegisterReadSerializer, CashRegisterWriteSerializer, CashRegisterUpdateSerializer,
@@ -43,6 +44,7 @@ class CashRegisterListView(APIView):
         qs = selectors.list_cash_registers(
             _company(request).id,
             active_only=request.query_params.get("active") == "true",
+            agency_scope=register_agency_scope(request.user),
         )
         return Response(CashRegisterReadSerializer(qs, many=True).data)
 
@@ -177,6 +179,7 @@ class CashSessionListView(APIView):
             status=params.get("status"),
             date_from=params.get("date_from"),
             date_to=params.get("date_to"),
+            agency_scope=register_agency_scope(request.user),
         )
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)

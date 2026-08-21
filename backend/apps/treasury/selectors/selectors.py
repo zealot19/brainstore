@@ -6,14 +6,25 @@ from apps.treasury.models import CashRegister, BankAccount, CashSession, Transac
 
 # ── Cash registers ─────────────────────────────────────────────────────────────
 
-def list_cash_registers(company_id, *, active_only=False):
+def _apply_agency_scope(qs, agency_scope, field):
+    """Restreint `qs` à l'agence de l'utilisateur. `agency_scope` = (scoped, agency_id)
+    ou None (aucune restriction). `field` = chemin ORM vers agency_id."""
+    if not agency_scope:
+        return qs
+    scoped, agency_id = agency_scope
+    if not scoped:
+        return qs
+    return qs.filter(**{field: agency_id}) if agency_id else qs.none()
+
+
+def list_cash_registers(company_id, *, active_only=False, agency_scope=None):
     qs = (CashRegister.objects
           .filter(company_id=company_id, is_deleted=False)
           .select_related("terminal__city", "responsible")
           .order_by("name"))
     if active_only:
         qs = qs.filter(is_active=True)
-    return qs
+    return _apply_agency_scope(qs, agency_scope, "agency_id")
 
 
 def get_cash_register(register_id, company_id):
@@ -56,11 +67,12 @@ def get_active_session(register_id, company_id):
 
 
 def list_sessions(company_id, *, register_id=None, status=None,
-                  date_from=None, date_to=None):
+                  date_from=None, date_to=None, agency_scope=None):
     qs = (CashSession.objects
           .filter(company_id=company_id, is_deleted=False)
           .select_related("cash_register", "opened_by", "closed_by")
           .order_by("-opened_at"))
+    qs = _apply_agency_scope(qs, agency_scope, "cash_register__agency_id")
     if register_id:
         qs = qs.filter(cash_register_id=register_id)
     if status:
