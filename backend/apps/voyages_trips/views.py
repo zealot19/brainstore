@@ -583,3 +583,14 @@ class TripExpenseDisburseView(APIView):
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.TripExpenseSerializer(exp).data)
+
+
+class TripStatsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.trip.view"}
+
+    def get(self, request):
+        from apps.voyages_trips.stats import get_trip_stats
+        if not request.user.company_id:
+            return error_response("Aucune institution.", status_code=400)
+        return success_response(get_trip_stats(request.user.company_id))
