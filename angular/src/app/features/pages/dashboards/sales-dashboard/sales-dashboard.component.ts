@@ -85,7 +85,7 @@ export class SalesDashboardComponent {
         enabled: false
       }
     },
-    colors: ['#FF9F43'],
+    colors: ['#0068B8'],
     dataLabels: {
       enabled: false
     },

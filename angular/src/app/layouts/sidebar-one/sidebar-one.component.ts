@@ -8,7 +8,7 @@ import { NgScrollbar } from 'ngx-scrollbar';
 import { ConnectedOverlayScrollHandler } from 'primeng/dom';
 import { AuthService } from '../../../_api/services/auth/auth.service';
 import { PermissionService } from '../../../_api/services/auth/permission.service';
-import { Subscription } from 'rxjs';
+import { Subscription, merge } from 'rxjs';
 
 
 interface MenuItem {
@@ -54,8 +54,13 @@ export class SidebarOneComponent implements OnDestroy {
     });
     this.getRoutes(this.router);
     this.side_bar_data = this.buildMenuForUser();
-    // Reconstruire le menu quand les permissions arrivent (chargées en async après login).
-    this.permSub = this.permissionService.permissions$.subscribe(() => {
+    // Reconstruire le menu dès qu'une de ces sources arrive en async après login
+    // (permissions, modules OU profil utilisateur) — évite une sidebar vide au 1er chargement.
+    this.permSub = merge(
+      this.permissionService.permissions$,
+      this.permissionService.modules$,
+      this.authService.currentUser$,
+    ).subscribe(() => {
       this.side_bar_data = this.buildMenuForUser();
     });
   }

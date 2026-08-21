@@ -39,12 +39,15 @@ export class PermissionService {
       tap(res => {
         const { permissions, is_superuser, modules } = res;
         this._superuser$.next(is_superuser ?? false);
-        const codes = new Set(permissions ?? []);
-        this._codes$.next(codes);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify([...codes]));
+        // Modules AVANT permissions : la sidebar se reconstruit sur permissions$ et lit
+        // hasModule() de façon synchrone — les modules doivent déjà être posés (sinon les
+        // sections filtrées par module disparaissent jusqu'au prochain rafraîchissement).
         const mods = new Set(modules ?? []);
         this._modules$.next(mods);
         localStorage.setItem(MODULES_KEY, JSON.stringify([...mods]));
+        const codes = new Set(permissions ?? []);
+        this._codes$.next(codes);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...codes]));
       }),
       catchError(() => of({} as PermissionsResponse))
     );
