@@ -428,3 +428,14 @@ class BaggageLabelView(APIView):
         tpl = ticket_render.get_or_create_template(request.user.company)
         html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user))
         return success_response({"html": html})
+
+
+class ParcelStatsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "ticketing.parcel.view"}
+
+    def get(self, request):
+        from apps.voyages_consignment.stats import get_parcel_stats
+        if not request.user.company_id:
+            return error_response("Aucune institution.", status_code=400)
+        return success_response(get_parcel_stats(request.user.company_id))
