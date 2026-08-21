@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../../services/dashboard/dashboard.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { HasModuleDirective } from '../../../../app/shared/directives/has-module.directive';
@@ -9,7 +8,7 @@ import { HasModuleDirective } from '../../../../app/shared/directives/has-module
   selector: 'app-home-dashboard',
   standalone: true,
   templateUrl: './home-dashboard.component.html',
-  imports: [CommonModule, RouterLink, HasModuleDirective],
+  imports: [CommonModule, HasModuleDirective],
 })
 export class HomeDashboardComponent implements OnInit {
   private dash = inject(DashboardService);

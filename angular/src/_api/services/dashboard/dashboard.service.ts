@@ -18,7 +18,7 @@ export class DashboardService {
       { params: new HttpParams().set('page_size', String(limit)) });
   }
   recentMovements(limit = 6): Observable<any> {
-    return this.http.get(`${API_BASE}/treasury/movements/`,
+    return this.http.get(`${API_BASE}/treasury/transactions/`,
       { params: new HttpParams().set('page_size', String(limit)) });
   }
 }
