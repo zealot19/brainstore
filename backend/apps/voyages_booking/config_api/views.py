@@ -454,3 +454,14 @@ class BookingPrintView(APIView):
             "created_at": b.created_at,
             "tickets": tickets,
         })
+
+
+class BookingStatsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "ticketing.booking.view"}
+
+    def get(self, request):
+        from apps.voyages_booking.stats import get_booking_stats
+        if not request.user.company_id:
+            return error_response("Aucune institution.", status_code=400)
+        return success_response(get_booking_stats(request.user.company_id))
