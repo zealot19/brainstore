@@ -66,6 +66,7 @@ export class SidebarService {
           base: 'voyages',
           subMenus: [
             { menuValue: 'Voyages', route: routes.voyagesList, base: 'list', permission: 'voyage.trip.view' },
+            { menuValue: 'Nouveau voyage', route: routes.voyagesList, queryParams: { new: 1 }, base: 'list', permission: 'voyage.trip.create' },
           ],
         },
         {
@@ -89,9 +90,11 @@ export class SidebarService {
           base: 'voyages-consignment',
           subMenus: [
             { menuValue: 'Colis',            route: routes.vcgParcels,   base: 'parcels',   permission: 'ticketing.parcel.view' },
+            { menuValue: 'Nouveau colis',    route: routes.vcgParcels,   queryParams: { new: 1 }, base: 'parcels', permission: 'ticketing.parcel.manage' },
             { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception', permission: 'ticketing.parcel.view' },
             { menuValue: 'Manifeste voyage', route: routes.vcgManifest,  base: 'manifest',  permission: 'ticketing.parcel.view' },
             { menuValue: 'Bagages',          route: routes.vcgBaggage,   base: 'baggage',   permission: 'ticketing.luggage.view' },
+            { menuValue: 'Nouveau bagage',   route: routes.vcgBaggage,   queryParams: { new: 1 }, base: 'baggage', permission: 'ticketing.luggage.manage' },
           ],
         },
         {
