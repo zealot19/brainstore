@@ -2,3 +2,22 @@
   width: 100%;
 }
 
+/* Le thème ne stylise que les icônes SVG/img du menu ; on garantit l'affichage
+   des icônes tabler (<i class="ti ...">) utilisées par le menu ERP. */
+.sidebar-menu i.ti {
+  font-family: "tabler-icons" !important;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  min-width: 18px;
+  margin-right: 10px;
+  color: #637381;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-menu li a.active > i.ti,
+.sidebar-menu li a:hover > i.ti {
+  color: #0068B8;
+}
+

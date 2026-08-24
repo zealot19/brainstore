@@ -88,7 +88,7 @@ export class SidebarOneComponent implements OnDestroy {
       return true;
     };
 
-    return this.sidebar.sidebarData1
+    const sections = this.sidebar.sidebarData1
       .map((section: any) => ({
         ...section,
         menu: section.menu
@@ -108,6 +108,21 @@ export class SidebarOneComponent implements OnDestroy {
         !section.module || isSuperAdmin || this.permissionService.hasModule(section.module))
       // Module (section) masqué s'il ne reste aucune entrée visible.
       .filter((section: any) => Array.isArray(section.menu) && section.menu.length > 0);
+
+    // Ouvrir automatiquement le groupe qui contient la route active (au chargement/refresh).
+    sections.forEach((sec: any) => (sec.menu || []).forEach((m: any) => {
+      if (this.isMenuActive(m)) m.showSubRoute = true;
+    }));
+    return sections;
+  }
+
+  /** Un groupe (menu déroulant ou lien direct) est actif si l'URL courante correspond
+   *  à son lien ou à l'un de ses sous-liens. Sert au surlignage du parent. */
+  isMenuActive(menu: any): boolean {
+    const url = (this.router.url || '').split('?')[0];
+    const match = (r: string) => !!r && (url === r || url.startsWith(r + '/'));
+    if (menu?.hasSubRoute === false && menu?.route) return match(menu.route);
+    return (menu?.subMenus || []).some((s: any) => match(s.route));
   }
 
   private getRoutes(route: url): void {
