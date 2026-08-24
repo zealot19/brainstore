@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TripService } from '../../../services/voyages/trip.service';
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
@@ -35,7 +35,7 @@ export class VoyagesListComponent implements OnInit {
 
   constructor(private svc: TripService, private routeSvc: RouteService, private fcSvc: FareClassService,
               private spSvc: ServicePatternService, private vehicleSvc: VehicleService,
-              private fb: FormBuilder, private router: Router) {}
+              private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -48,6 +48,10 @@ export class VoyagesListComponent implements OnInit {
     this.spSvc.list().subscribe(d => this.patterns = d);
     this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.load();
+    // Ouverture directe du formulaire depuis le raccourci "Nouveau voyage" (sidebar) : ?new=1
+    this.route.queryParams.subscribe(q => {
+      if (q['new']) setTimeout(() => document.querySelector<HTMLElement>('[data-bs-target="#trip-modal"]')?.click(), 150);
+    });
   }
   load(): void {
     this.loading = true;
