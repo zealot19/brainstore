@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { VehicleModelService } from '../../../services/fleet/vehicle-model.service';
@@ -55,6 +56,7 @@ export class FleetVehiclesComponent implements OnInit {
     private categoryService: VehicleCategoryCfgService,
     private tagService: TagService,
     private fb: FormBuilder,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -106,6 +108,10 @@ export class FleetVehiclesComponent implements OnInit {
     this.tagService.list().subscribe(d => this.tags = d);
     this.parkingService.list().subscribe(d => this.parkings = d);
     this.load();
+    // Ouverture directe du formulaire depuis le raccourci "Nouveau véhicule" (sidebar) : ?new=1
+    this.route.queryParams.subscribe(q => {
+      if (q['new']) setTimeout(() => document.querySelector<HTMLElement>('[data-bs-target="#create-vehicle-modal"]')?.click(), 150);
+    });
   }
 
   load(): void {

@@ -86,12 +86,12 @@
                 
               <li class="submenu">
                   <a href="javascript:void(0);" (click)="expandSubMenus(menu)" class="sub-active"
-                  [ngClass]="{ 'subdrop': menu.showSubRoute === true }" [class.active]="base===menu.base ||  page === menu.page">
+                  [ngClass]="{ 'subdrop': menu.showSubRoute === true }" [class.active]="isMenuActive(menu)">
                     @if (menu.icon){
                       <i class="fs-16 feather" [class]="'icon-' + menu.icon"></i>
                     }
                     @if (menu.icon2){
-                    <i class="fs-16 ti" [class]="'ti-' + menu.icon2"></i>
+                    <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
                     <span>{{menu.menuValue}}</span>
                     <span class="menu-arrow"></span>
@@ -122,7 +122,7 @@
                         <a href="https://dreamspos.dreamstechnologies.com/{{subMenu.route}}/angular/auth/login" target="_blank" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue}}</a>
                       }
                       @else{
-                        <a [routerLink]="subMenu.route" routerLinkActive="active" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue}}</a>
+                        <a [routerLink]="subMenu.route" [queryParams]="subMenu.queryParams" routerLinkActive="active" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue}}</a>
                       }
                         }
                       }
@@ -135,12 +135,12 @@
                   @if (menu.hasSubRouteTwo === true) {
                 <li class="submenu">
                   <a [routerLink]=""  (click)="expandSubMenus(menu)" [ngClass]="{ 'subdrop': menu.showSubRoute === true}"
-                    [class.active]="base === menu.base">
+                    [class.active]="isMenuActive(menu)">
                     @if (menu.icon){
                       <i class="feather" [class]="'icon-' + menu.icon"></i>
                     }
                     @if (menu.icon2){
-                    <i class="fs-16 ti" [class]="'ti-' + menu.icon2"></i>
+                    <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
                     <span>
                       {{menu.menuValue }}</span><span class="menu-arrow"></span></a>
@@ -172,13 +172,13 @@
                 </li> 
                 }
                 @if(menu.hasSubRoute===false){
-                  <li routerLinkActive="active">
-                    <a [routerLink]="menu.route"   (click)="expandSubMenus(menu)">
+                  <li class="submenu">
+                    <a [routerLink]="menu.route" class="sub-active" [class.active]="isMenuActive(menu)">
                       @if (menu.icon){
-                      <i class="feather" [class]="'icon-' + menu.icon"></i>
+                      <i class="fs-16 feather" [class]="'icon-' + menu.icon"></i>
                     }
                     @if (menu.icon2){
-                    <i class="fs-16 ti" [class]="'ti-' + menu.icon2"></i>
+                    <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
                   <span>{{menu.menuValue}}</span>
                     </a>
