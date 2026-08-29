@@ -9,6 +9,8 @@ from .seed import seed_treasury_mapping
 from .booking_sales import record_booking_payment
 from .consignment_sales import record_parcel_payment, record_baggage_payment
 from .trip_expense_sales import record_trip_expense
+from .general_expense_sales import record_general_expense
+from .expense_shared import resolve_disbursement_session
 
 __all__ = [
     "create_cash_register", "update_cash_register", "delete_cash_register",
@@ -20,4 +22,5 @@ __all__ = [
     "record_booking_payment",
     "record_parcel_payment", "record_baggage_payment",
     "record_trip_expense",
+    "record_general_expense", "resolve_disbursement_session",
 ]

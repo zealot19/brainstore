@@ -23,14 +23,12 @@ def apply_expense_schedule(trip) -> int:
 
 @transaction.atomic
 def disburse_trip_expense(trip_expense, *, user, cash_session=None):
-    from apps.treasury.selectors.selectors import get_open_session_for_user
     from apps.treasury.services import record_trip_expense
+    from apps.treasury.services.expense_shared import resolve_disbursement_session
     if trip_expense.status == TripExpense.Status.PAID:
         return trip_expense
-    # La caisse est choisie explicitement par l'opérateur ; à défaut, la session ouverte de l'utilisateur.
-    session = cash_session or get_open_session_for_user(trip_expense.trip.company_id, user)
-    if not session:
-        raise ApplicationError(_("Choisissez une caisse (session ouverte) pour décaisser."))
+    # Caisse choisie explicitement ou session ouverte de l'utilisateur (helper partagé, DRY).
+    session = resolve_disbursement_session(trip_expense.trip.company_id, user, cash_session)
     record_trip_expense(trip_expense.trip.company, trip_expense=trip_expense, cash_session=session, user=user)
     trip_expense.status = TripExpense.Status.PAID
     trip_expense.cash_session = session
