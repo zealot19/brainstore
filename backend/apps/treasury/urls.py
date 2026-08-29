@@ -26,4 +26,11 @@ urlpatterns = [
     # ── Transfers ──────────────────────────────────────────────────────────────
     path("transfers/",                        views.TransferListView.as_view(),   name="transfer-list"),
     path("transfers/<uuid:transfer_id>/",     views.TransferDetailView.as_view(), name="transfer-detail"),
+
+    # ── Dépenses (générales + voyage) ────────────────────────────────────────────
+    path("expenses/general/",                    views.GeneralExpenseListView.as_view(),     name="gexp-list"),
+    path("expenses/general/<uuid:pk>/",          views.GeneralExpenseDetailView.as_view(),   name="gexp-detail"),
+    path("expenses/general/<uuid:pk>/disburse/", views.GeneralExpenseDisburseView.as_view(), name="gexp-disburse"),
+    path("expenses/voyage/",                     views.VoyageExpenseListView.as_view(),      name="vexp-list"),
+    path("expenses/dashboard/",                  views.ExpenseDashboardView.as_view(),       name="exp-dashboard"),
 ]

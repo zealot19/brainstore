@@ -204,41 +204,6 @@
         </div>
       </div></div>
 
-      <!-- Dépenses -->
-      <div class="card mb-3" *hasPermission="'voyage.expense.view'"><div class="card-header"><h6 class="mb-0">Dépenses</h6></div><div class="card-body">
-        @if (expError) { <div class="alert alert-danger py-1 px-2 small">{{ expError }}</div> }
-        <div class="mb-2" *hasPermission="'voyage.expense.manage'">
-          <label class="form-label small mb-1">Caisse de décaissement</label>
-          <select class="form-select form-select-sm" [(ngModel)]="disburseSession">
-            <option value="">— Choisir la caisse —</option>
-            @for (s of openSessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
-          </select>
-          @if (openSessions.length === 0) { <div class="text-muted small mt-1">Aucune caisse ouverte. Ouvrez une session de caisse pour décaisser.</div> }
-        </div>
-        <div class="table-responsive"><table class="table table-sm mb-2">
-          <thead><tr><th>Type</th><th class="text-end">Montant</th><th>Statut</th><th></th></tr></thead>
-          <tbody>
-            @for (e of expenses; track e.id) {
-              <tr>
-                <td>{{ e.expense_type_name || expTypeName(e.expense_type) }}</td>
-                <td class="text-end">{{ e.amount | number }}</td>
-                <td>@if (e.status === 'paid') { <span class="badge bg-success">Décaissée</span> } @else { <span class="badge bg-warning text-dark">Prévue</span> }</td>
-                <td class="text-end">
-                  @if (e.status !== 'paid') {
-                    <a class="text-success me-2" *hasPermission="'voyage.expense.manage'" (click)="disburseExpense(e)" title="Décaisser"><i class="ti ti-cash"></i></a>
-                    <a class="text-danger" *hasPermission="'voyage.expense.manage'" (click)="removeExpense(e)" title="Supprimer"><i class="ti ti-trash"></i></a>
-                  }
-                </td>
-              </tr>
-            } @empty { <tr><td colspan="4" class="text-muted text-center">Aucune dépense.</td></tr> }
-          </tbody>
-        </table></div>
-        <div class="row g-2" *hasPermission="'voyage.expense.manage'">
-          <div class="col-6"><select class="form-select form-select-sm" [(ngModel)]="newExpType"><option value="">— Type —</option>@for (t of expenseTypes; track t.id) { <option [value]="t.id">{{ t.name }}</option> }</select></div>
-          <div class="col-4"><input type="number" class="form-control form-control-sm" placeholder="Montant" [(ngModel)]="newExpAmount" min="0" /></div>
-          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" (click)="addExpense()" [disabled]="!newExpType || !newExpAmount">+</button></div>
-        </div>
-      </div></div>
     </div>
 
     <div class="col-lg-8">
