@@ -6,14 +6,17 @@ import { TripExpenseService } from '../../../../services/voyages/trip-expense.se
 import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
+import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-voyage-expenses',
   standalone: true,
   templateUrl: './voyage-expenses.component.html',
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
 })
 export class VoyageExpensesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   private svc = inject(ExpenseService);
   private tripExpSvc = inject(TripExpenseService);
   private sessionSvc = inject(SessionService);

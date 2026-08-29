@@ -7,13 +7,16 @@ import { TripService } from '../../../services/voyages/trip.service';
 import { Booking } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vb-bookings',
   templateUrl: './bookings.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VbBookingsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Booking[] = []; loading = false; statusFilter = ''; q = '';
   typeFilter = ''; channelFilter = ''; tripFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
   trips: { id: string; number?: string; code?: string }[] = [];

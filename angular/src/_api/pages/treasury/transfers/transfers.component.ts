@@ -7,13 +7,16 @@ import { BankService } from '../../../services/treasury/bank.service';
 import { Transfer, CashRegister, BankAccount } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-trz-transfers',
   templateUrl: './transfers.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzTransfersComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Transfer[] = []; loading = true;
   registers: CashRegister[] = []; banks: BankAccount[] = [];
   form!: FormGroup; saving = false; errorMsg = '';

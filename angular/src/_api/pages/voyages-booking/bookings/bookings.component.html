@@ -48,7 +48,7 @@
         <thead class="thead-light"><tr>
           <th>Référence</th><th>Acheteur</th><th>Type</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (b of rows; track b.id) {
+          @for (b of rows | paginate:pg.page:pg.size; track b.id) {
             <tr>
               <td class="fw-medium"><a href="javascript:void(0);" (click)="open(b)">{{ b.reference }}</a></td>
               <td>{{ b.buyer_name }}</td>
@@ -68,6 +68,7 @@
           } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucune réservation.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

@@ -7,13 +7,16 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { CashSession, CashRegister } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-trz-sessions',
   templateUrl: './sessions.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzSessionsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
   openForm!: FormGroup; closeForm!: FormGroup; saving = false; errorMsg = ''; closingId: string | null = null;

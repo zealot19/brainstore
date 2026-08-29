@@ -11,13 +11,16 @@ import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-voyages-list',
   templateUrl: './voyages-list.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VoyagesListComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Trip[] = []; filtered: Trip[] = []; loading = true; filterStatus = '';
   filterRoute = ''; filterVehicle = ''; dateField = 'departure'; dateFrom = ''; dateTo = '';
   vehicles: { id: string; license_plate: string }[] = [];

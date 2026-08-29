@@ -42,7 +42,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Numéro</th><th>Trajet</th><th>Véhicule</th><th>Départ prévu</th><th>Places</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (t of filtered; track t.id) {
+          @for (t of filtered | paginate:pg.page:pg.size; track t.id) {
             <tr>
               <td class="fw-medium">{{ t.number }}</td>
               <td>{{ t.route_code || '—' }}</td>
@@ -61,6 +61,7 @@
           } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun voyage.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>
