@@ -11,7 +11,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Matricule</th><th>Nom complet</th><th>Poste</th><th>Téléphone</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (r of filtered; track r.id) {
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.employee_number }}</td>
               <td>{{ r.full_name || (r.first_name + ' ' + r.last_name) }}</td>
@@ -28,6 +28,7 @@
           } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun employé.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

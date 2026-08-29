@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let o of filtered">
+          <tr *ngFor="let o of filtered | paginate:pg.page:pg.size">
             <td class="fw-semibold">{{ o.vehicle_plate }}</td>
             <td>{{ o.intervention_type_name }}</td>
             <td>{{ o.supplier_name || '—' }}</td>
@@ -87,6 +87,7 @@
           </tr>
         </tbody>
       </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     </div>
   </div>
 </div>

@@ -15,7 +15,7 @@
         <div class="table-responsive"><table class="table datanew">
           <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Aller</th><th>Payé</th><th class="no-sort">Action</th></tr></thead>
           <tbody>
-            @for (b of rows; track b.id) {
+            @for (b of rows | paginate:pg.page:pg.size; track b.id) {
               <tr>
                 <td class="fw-medium">{{ b.reference }}</td>
                 <td>{{ b.buyer_name }}</td>
@@ -26,6 +26,7 @@
             } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun retour ouvert à traiter.</td></tr> }
           </tbody>
         </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
       }
     </div>
   </div>

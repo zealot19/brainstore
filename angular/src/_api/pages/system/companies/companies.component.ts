@@ -4,13 +4,16 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { CompanyService } from '../../../services/system/company.service';
 import { PackageService } from '../../../services/system/package.service';
 import { Company, CompanyStatus, Package } from '../../../models/system.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-companies',
   templateUrl: './companies.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class CompaniesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   companies:  Company[] = [];
   filtered:   Company[] = [];

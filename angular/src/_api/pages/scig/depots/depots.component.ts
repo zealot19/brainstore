@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScigService } from '../../../services/scig/scig.service';
 import { Depot } from '../../../models/scig.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-scig-depots',
   templateUrl: './depots.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule],
 })
 export class DepotsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   depots:   Depot[] = [];
   filtered: Depot[] = [];

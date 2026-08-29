@@ -5,13 +5,16 @@ import { VehicleDocumentService } from '../../../services/fleet/vehicle-document
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { VehicleDocument, VehicleListItem } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-documents',
   templateUrl: './documents.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetDocumentsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   vehicles:         VehicleListItem[]  = [];
   docs:             VehicleDocument[]  = [];

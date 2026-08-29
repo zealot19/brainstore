@@ -5,15 +5,18 @@ import { ParcelService } from '../../../services/voyages-consignment/parcel.serv
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 interface RowState { received: number; missing: number; damaged: number; }
 
 @Component({
   selector: 'app-vcg-reception',
   templateUrl: './reception.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcgReceptionComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; q = '';
   selected = new Set<string>();
   state: Record<string, RowState> = {};

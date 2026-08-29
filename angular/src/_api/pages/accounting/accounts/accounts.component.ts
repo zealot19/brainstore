@@ -5,13 +5,16 @@ import { AccountService } from '../../../services/accounting/account.service';
 import { Account, ACCOUNT_TYPES, accountTypeLabel } from '../../../models/accounting.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-acc-accounts',
   templateUrl: './accounts.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class AccAccountsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Account[] = []; filtered: Account[] = []; loading = true;
   search = ''; typeFilter = '';
   types = ACCOUNT_TYPES; typeLabel = accountTypeLabel;

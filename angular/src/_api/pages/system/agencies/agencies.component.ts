@@ -4,13 +4,16 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { AgencyService } from '../../../services/system/agency.service';
 import { CompanyService } from '../../../services/system/company.service';
 import { Agency, AgencyType, Company } from '../../../models/system.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-agencies',
   templateUrl: './agencies.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AgenciesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   agencies:  Agency[]  = [];
   filtered:  Agency[]  = [];

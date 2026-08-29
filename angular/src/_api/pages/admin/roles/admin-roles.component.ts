@@ -5,13 +5,16 @@ import { Router } from '@angular/router';
 import { RoleService } from '../../../services/rbac/role.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Role } from '../../../models/rbac.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-admin-roles',
   templateUrl: './admin-roles.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AdminRolesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   roles:    Role[] = [];
   filtered: Role[] = [];

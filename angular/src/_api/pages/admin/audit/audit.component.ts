@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditService, AuditLog, AuditFilters } from '../../../services/audit/audit.service';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 const MODULES = [
   { value: 'SCIG',      label: 'Sync SCIG / Sage 100' },
@@ -35,9 +37,10 @@ const ACTIONS = [
 @Component({
   selector: 'app-audit-log',
   templateUrl: './audit.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule],
 })
 export class AuditLogComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   private readonly auditService = inject(AuditService);
 

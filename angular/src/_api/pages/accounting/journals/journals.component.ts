@@ -6,13 +6,16 @@ import { AccountService } from '../../../services/accounting/account.service';
 import { Journal, Account, JOURNAL_TYPES, journalTypeLabel } from '../../../models/accounting.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-acc-journals',
   templateUrl: './journals.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class AccJournalsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Journal[] = []; filtered: Journal[] = []; accounts: Account[] = []; loading = true;
   search = ''; types = JOURNAL_TYPES; typeLabel = journalTypeLabel;
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

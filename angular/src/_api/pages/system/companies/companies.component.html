@@ -98,7 +98,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (c of filtered; track c.id) {
+            @for (c of filtered | paginate:pg.page:pg.size; track c.id) {
               <tr>
                 <td>
                   <div class="d-flex align-items-center">
@@ -153,6 +153,7 @@
             }
           </tbody>
         </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
       </div>
     }
   </div>

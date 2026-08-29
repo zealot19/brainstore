@@ -27,7 +27,7 @@
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
           <th>De</th><th>À</th><th>Catégorie</th><th>Type de voyage</th><th>Montant</th><th>Validité</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (r of rows; track r.id) {
+          @for (r of rows | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
               <td class="fw-medium">{{ r.origin_point_name }}</td>
@@ -47,6 +47,7 @@
           } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun tarif pour ce trajet.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

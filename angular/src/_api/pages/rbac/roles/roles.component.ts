@@ -4,13 +4,16 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { Router } from '@angular/router';
 import { RoleService } from '../../../services/rbac/role.service';
 import { Role } from '../../../models/rbac.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-roles',
   templateUrl: './roles.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class RolesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   roles:    Role[] = [];
   filtered: Role[] = [];

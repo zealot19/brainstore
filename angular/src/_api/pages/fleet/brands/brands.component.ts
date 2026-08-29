@@ -4,13 +4,16 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { VehicleBrandService } from '../../../services/fleet/vehicle-brand.service';
 import { VehicleBrand } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-brands',
   templateUrl: './brands.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetBrandsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   brands:   VehicleBrand[] = [];
   filtered: VehicleBrand[] = [];

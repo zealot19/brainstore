@@ -5,13 +5,16 @@ import { FuelLogService } from '../../../services/fleet/fuel-log.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { FuelLog, VehicleListItem } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-fuel-logs',
   templateUrl: './fuel-logs.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetFuelLogsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   vehicles:        VehicleListItem[] = [];
   logs:            FuelLog[]         = [];
