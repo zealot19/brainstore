@@ -35,3 +35,27 @@ def test_dashboard_and_voyage_list_ok():
     c, company, admin, et = _client_company()
     assert c.get("/api/v1/treasury/expenses/dashboard/").status_code == 200
     assert c.get("/api/v1/treasury/expenses/voyage/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_general_expense_filters_status_and_date():
+    c, company, admin, et = _client_company()
+    c.post("/api/v1/treasury/expenses/general/",
+           {"expense_type_id": str(et.id), "label": "Vieux", "amount": "1000", "expense_date": "2026-01-10"}, format="json")
+    c.post("/api/v1/treasury/expenses/general/",
+           {"expense_type_id": str(et.id), "label": "Recent", "amount": "2000", "expense_date": "2026-08-20"}, format="json")
+
+    def _rows(qs):
+        r = c.get("/api/v1/treasury/expenses/general/" + qs)
+        body = r.json()
+        if isinstance(body, dict) and "data" in body:
+            return body["data"]
+        if isinstance(body, dict) and "results" in body:
+            return body["results"]
+        return body
+
+    assert len(_rows("")) == 2
+    assert len(_rows("?date_from=2026-06-01")) == 1                       # only Recent
+    assert len(_rows("?date_from=2026-01-01&date_to=2026-03-01")) == 1   # only Vieux
+    assert len(_rows("?status=unpaid")) == 2                             # both unpaid
+    assert len(_rows("?status=paid")) == 0

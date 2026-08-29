@@ -403,9 +403,10 @@ class GeneralExpenseListView(APIView):
     permission_map = {"GET": "treasury.expense.view", "POST": "treasury.expense.manage"}
 
     def get(self, request):
+        p = request.query_params
         qs = expense_selectors.list_general_expenses(
             _company(request).id, agency_scope=register_agency_scope(request.user),
-            status=request.query_params.get("status"))
+            status=p.get("status"), date_from=p.get("date_from"), date_to=p.get("date_to"))
         page = StandardResultsSetPagination()
         return page.get_paginated_response(
             GeneralExpenseReadSerializer(page.paginate_queryset(qs, request), many=True).data)
@@ -498,8 +499,10 @@ class VoyageExpenseListView(APIView):
     permission_map = {"GET": "treasury.expense.view"}
 
     def get(self, request):
-        qs = expense_selectors.list_voyage_expenses(_company(request).id,
-                                                    status=request.query_params.get("status"))
+        p = request.query_params
+        qs = expense_selectors.list_voyage_expenses(
+            _company(request).id, status=p.get("status"),
+            date_from=p.get("date_from"), date_to=p.get("date_to"))
         page = StandardResultsSetPagination()
         return page.get_paginated_response(
             VoyageExpenseRowSerializer(page.paginate_queryset(qs, request), many=True).data)

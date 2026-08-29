@@ -8,9 +8,9 @@ import { TREASURY } from '../../config/api.config';
 export class GeneralExpenseService {
   private http = inject(HttpClient);
 
-  list(status?: string): Observable<any[]> {
-    let p = new HttpParams();
-    if (status) p = p.set('status', status);
+  list(filters: { status?: string; date_from?: string; date_to?: string } = {}): Observable<any[]> {
+    let p = new HttpParams().set('page_size', '500');
+    Object.entries(filters).forEach(([k, v]) => { if (v) p = p.set(k, v); });
     return this.http.get<any>(TREASURY.expGeneral, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   create(body: any): Observable<any> { return this.http.post<any>(TREASURY.expGeneral, body).pipe(map(r => r.data ?? r)); }

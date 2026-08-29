@@ -24,6 +24,7 @@ export class GeneralExpensesComponent implements OnInit {
   rows: any[] = []; types: any[] = []; sessions: any[] = [];
   loading = false; saving = false; editId: string | null = null;
   disburseSession = ''; errorMsg = '';
+  fStatus = ''; fFrom = ''; fTo = '';
 
   form = this.fb.group({
     expense_type_id: [null as string | null, Validators.required],
@@ -40,8 +41,11 @@ export class GeneralExpensesComponent implements OnInit {
 
   reload(): void {
     this.loading = true;
-    this.svc.list().subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.list({ status: this.fStatus || undefined, date_from: this.fFrom || undefined, date_to: this.fTo || undefined })
+      .subscribe({ next: d => { this.rows = d; this.pg.page = 1; this.loading = false; }, error: () => this.loading = false });
   }
+
+  clearFilters(): void { this.fStatus = this.fFrom = this.fTo = ''; this.reload(); }
 
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset(); }
   openEdit(e: any): void {

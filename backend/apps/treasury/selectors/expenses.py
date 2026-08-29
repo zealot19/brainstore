@@ -5,20 +5,28 @@ from apps.voyages_trips.models import TripExpense
 from apps.treasury.selectors.selectors import _apply_agency_scope
 
 
-def list_general_expenses(company_id, *, agency_scope=None, status=None):
+def list_general_expenses(company_id, *, agency_scope=None, status=None, date_from=None, date_to=None):
     qs = (GeneralExpense.objects.filter(company_id=company_id, is_deleted=False)
           .select_related("expense_type", "agency", "cash_session").order_by("-expense_date", "-id"))
     qs = _apply_agency_scope(qs, agency_scope, "agency_id")
     if status:
         qs = qs.filter(status=status)
+    if date_from:
+        qs = qs.filter(expense_date__gte=date_from)
+    if date_to:
+        qs = qs.filter(expense_date__lte=date_to)
     return qs
 
 
-def list_voyage_expenses(company_id, *, status=None):
+def list_voyage_expenses(company_id, *, status=None, date_from=None, date_to=None):
     qs = (TripExpense.objects.filter(trip__company_id=company_id, is_deleted=False)
           .select_related("expense_type", "trip").order_by("-date", "-id"))
     if status:
         qs = qs.filter(status=status)
+    if date_from:
+        qs = qs.filter(date__gte=date_from)
+    if date_to:
+        qs = qs.filter(date__lte=date_to)
     return qs
 
 

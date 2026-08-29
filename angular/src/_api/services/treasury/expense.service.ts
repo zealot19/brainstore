@@ -8,9 +8,9 @@ import { TREASURY } from '../../config/api.config';
 export class ExpenseService {
   private http = inject(HttpClient);
 
-  voyage(status?: string): Observable<any[]> {
+  voyage(filters: { status?: string; date_from?: string; date_to?: string } = {}): Observable<any[]> {
     let p = new HttpParams().set('page_size', '500');
-    if (status) p = p.set('status', status);
+    Object.entries(filters).forEach(([k, v]) => { if (v) p = p.set(k, v); });
     return this.http.get<any>(TREASURY.expVoyage, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   dashboard(): Observable<any> { return this.http.get<any>(TREASURY.expDashboard).pipe(map(r => r.data ?? r)); }
