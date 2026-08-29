@@ -240,3 +240,36 @@ class TreasuryStatsSerializer(serializers.Serializer):
     today_expense      = serializers.DecimalField(max_digits=12, decimal_places=2)
     today_net          = serializers.DecimalField(max_digits=12, decimal_places=2)
     open_sessions      = serializers.IntegerField()
+
+
+# ── Dépenses (générales + voyage) ────────────────────────────────────────────
+
+from apps.treasury.models import GeneralExpense  # noqa: E402
+
+
+class GeneralExpenseReadSerializer(serializers.ModelSerializer):
+    expense_type_name = serializers.CharField(source="expense_type.name", read_only=True)
+    agency_name = serializers.CharField(source="agency.name", read_only=True, default=None)
+
+    class Meta:
+        model = GeneralExpense
+        fields = ["id", "expense_type", "expense_type_name", "agency", "agency_name",
+                  "label", "amount", "expense_date", "status", "cash_session", "created_at"]
+
+
+class GeneralExpenseWriteSerializer(serializers.Serializer):
+    expense_type_id = serializers.UUIDField()
+    label = serializers.CharField(max_length=200)
+    amount = serializers.DecimalField(max_digits=14, decimal_places=2)
+    expense_date = serializers.DateField(required=False)
+    agency_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+class VoyageExpenseRowSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    trip_id = serializers.UUIDField()
+    trip_number = serializers.CharField(source="trip.number")
+    expense_type_name = serializers.CharField(source="expense_type.name")
+    amount = serializers.DecimalField(max_digits=14, decimal_places=2)
+    status = serializers.CharField()
+    date = serializers.DateField()

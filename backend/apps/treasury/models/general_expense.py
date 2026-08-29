@@ -20,7 +20,7 @@ class GeneralExpense(BaseModel):
                                      related_name="general_expenses", verbose_name=_("type de dépense"))
     label        = models.CharField(_("libellé"), max_length=200)
     amount       = models.DecimalField(_("montant"), max_digits=14, decimal_places=2)
-    expense_date = models.DateField(_("date"), default=timezone.now)
+    expense_date = models.DateField(_("date"), default=timezone.localdate)
     status       = models.CharField(_("statut"), max_length=10, choices=Status.choices,
                                     default=Status.UNPAID)
     cash_session = models.ForeignKey("treasury.CashSession", on_delete=models.SET_NULL,

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.permissions import IsAuthenticated, HasModulePermission
+from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.pagination import StandardResultsSetPagination
 from apps.core.exceptions import ApplicationError
 
@@ -383,3 +384,131 @@ class TransferDetailView(APIView):
         if not obj:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(TransferReadSerializer(obj).data)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DÉPENSES (générales + voyage) — module Trésorerie
+# ══════════════════════════════════════════════════════════════════════════════
+
+from apps.treasury.selectors import expenses as expense_selectors  # noqa: E402
+from apps.treasury.services import general_expense_services as gx  # noqa: E402
+from apps.voyages_config.models import ExpenseType  # noqa: E402
+from apps.system_config.models import Agency  # noqa: E402
+from apps.treasury.serializers import (  # noqa: E402
+    GeneralExpenseReadSerializer, GeneralExpenseWriteSerializer, VoyageExpenseRowSerializer)
+
+
+class GeneralExpenseListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view", "POST": "treasury.expense.manage"}
+
+    def get(self, request):
+        qs = expense_selectors.list_general_expenses(
+            _company(request).id, agency_scope=register_agency_scope(request.user),
+            status=request.query_params.get("status"))
+        page = StandardResultsSetPagination()
+        return page.get_paginated_response(
+            GeneralExpenseReadSerializer(page.paginate_queryset(qs, request), many=True).data)
+
+    def post(self, request):
+        ser = GeneralExpenseWriteSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        company = _company(request)
+        et = ExpenseType.objects.filter(company=company, id=d["expense_type_id"], is_deleted=False).first()
+        if not et:
+            return error_response("Type de dépense introuvable.", status_code=404)
+        agency = None
+        if d.get("agency_id"):
+            agency = Agency.objects.filter(company=company, id=d["agency_id"], is_deleted=False).first()
+        try:
+            e = gx.create_general_expense(company=company, expense_type=et, label=d["label"],
+                                          amount=d["amount"], expense_date=d.get("expense_date"),
+                                          agency=agency, created_by=request.user)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return created_response(GeneralExpenseReadSerializer(e).data)
+
+
+class GeneralExpenseDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view", "PATCH": "treasury.expense.manage",
+                      "DELETE": "treasury.expense.manage"}
+
+    def _obj(self, request, pk):
+        from apps.treasury.models import GeneralExpense
+        return GeneralExpense.objects.filter(company=_company(request), id=pk, is_deleted=False).first()
+
+    def get(self, request, pk):
+        obj = self._obj(request, pk)
+        return success_response(GeneralExpenseReadSerializer(obj).data) if obj else error_response("Introuvable.", status_code=404)
+
+    def patch(self, request, pk):
+        obj = self._obj(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        ser = GeneralExpenseWriteSerializer(data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        fields = {"label": d.get("label"), "amount": d.get("amount"), "expense_date": d.get("expense_date")}
+        if "expense_type_id" in d:
+            fields["expense_type"] = ExpenseType.objects.filter(company=obj.company, id=d["expense_type_id"]).first()
+        if "agency_id" in d:
+            fields["agency"] = Agency.objects.filter(company=obj.company, id=d["agency_id"]).first() if d.get("agency_id") else None
+        try:
+            gx.update_general_expense(obj, updated_by=request.user, **fields)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return success_response(GeneralExpenseReadSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._obj(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        try:
+            gx.delete_general_expense(obj, deleted_by=request.user)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return no_content_response()
+
+
+class GeneralExpenseDisburseView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.expense.manage"}
+
+    def post(self, request, pk):
+        from apps.treasury.models import GeneralExpense, CashSession
+        obj = GeneralExpense.objects.filter(company=_company(request), id=pk, is_deleted=False).first()
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        session = None
+        sid = request.data.get("cash_session_id")
+        if sid:
+            session = CashSession.objects.filter(company=obj.company, id=sid,
+                                                 status=CashSession.Status.OPEN, is_deleted=False).first()
+        try:
+            gx.disburse_general_expense(obj, user=request.user, cash_session=session)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return success_response(GeneralExpenseReadSerializer(obj).data)
+
+
+class VoyageExpenseListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view"}
+
+    def get(self, request):
+        qs = expense_selectors.list_voyage_expenses(_company(request).id,
+                                                    status=request.query_params.get("status"))
+        page = StandardResultsSetPagination()
+        return page.get_paginated_response(
+            VoyageExpenseRowSerializer(page.paginate_queryset(qs, request), many=True).data)
+
+
+class ExpenseDashboardView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view"}
+
+    def get(self, request):
+        return success_response(expense_selectors.expenses_dashboard(
+            _company(request).id, agency_scope=register_agency_scope(request.user)))
