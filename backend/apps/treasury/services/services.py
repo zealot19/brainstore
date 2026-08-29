@@ -119,6 +119,10 @@ def open_session(*, company, cash_register, opening_balance=None, notes="", crea
 def close_session(session, *, closing_balance, notes="", updated_by):
     if session.status != CashSession.Status.OPEN:
         raise ApplicationError(_("This session is already closed."))
+    # Seul l'utilisateur qui a ouvert la caisse peut la clôturer (ou un administrateur).
+    is_admin = getattr(updated_by, "is_superuser", False) or getattr(updated_by, "is_institution_admin", False)
+    if not is_admin and session.opened_by_id != getattr(updated_by, "id", None):
+        raise ApplicationError(_("Seul l'utilisateur qui a ouvert la caisse (ou un administrateur) peut la clôturer."))
 
     # Compute expected: opening + all income - all expense in this session
     income = (session.transactions
