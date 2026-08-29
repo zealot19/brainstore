@@ -272,6 +272,18 @@ export class SidebarService {
             { menuValue: 'Transferts',        route: routes.trzTransfers, base: 'transfers', permission: 'treasury.transfer.view' },
           ],
         },
+        {
+          menuValue: 'Dépenses',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'receipt',
+          base: 'treasury-expenses',
+          subMenus: [
+            { menuValue: 'Tableau de bord',  route: routes.trzExpensesDashboard, base: 'expenses-dashboard', permission: 'treasury.expense.view' },
+            { menuValue: 'Dépense voyage',   route: routes.trzExpensesVoyage,    base: 'expenses-voyage',    permission: 'treasury.expense.view' },
+            { menuValue: 'Dépense générale', route: routes.trzExpensesGeneral,   base: 'expenses-general',   permission: 'treasury.expense.view' },
+          ],
+        },
       ],
     },
     {

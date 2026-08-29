@@ -1,0 +1,76 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Dépenses générales</h4><h6>Dépenses d'agence non liées à un voyage</h6></div></div>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gexp-modal"
+       *hasPermission="'treasury.expense.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouvelle dépense</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr><th>Type</th><th>Libellé</th><th>Agence</th><th class="text-end">Montant</th><th>Date</th><th>Statut</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+          @if (loading) { <tr><td colspan="7" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
+          @for (e of rows; track e.id) {
+            <tr>
+              <td>{{ e.expense_type_name || typeName(e.expense_type) }}</td>
+              <td class="fw-medium">{{ e.label }}</td>
+              <td>{{ e.agency_name || '—' }}</td>
+              <td class="text-end">{{ e.amount | number }}</td>
+              <td>{{ e.expense_date | date:'dd/MM/yyyy' }}</td>
+              <td>@if (e.status === 'paid') { <span class="badge bg-success">Décaissée</span> } @else { <span class="badge bg-warning text-dark">À décaisser</span> }</td>
+              <td class="text-end">
+                @if (e.status !== 'paid') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#gexp-modal"
+                     *hasPermission="'treasury.expense.manage'" (click)="openEdit(e)" title="Modifier"><i class="ti ti-edit"></i></a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger me-1"
+                     *hasPermission="'treasury.expense.manage'" (click)="remove(e)" title="Supprimer"><i class="ti ti-trash"></i></a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-success"
+                     *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" title="Décaisser"><i class="ti ti-cash me-1"></i>Décaisser</a>
+                }
+              </td>
+            </tr>
+          } @empty { @if (!loading) { <tr><td colspan="7" class="text-center text-muted py-3">Aucune dépense.</td></tr> } }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Caisse de décaissement (session ouverte) -->
+<div class="mt-2 d-flex align-items-center gap-2" *hasPermission="'treasury.expense.manage'">
+  <label class="small text-muted mb-0">Caisse de décaissement :</label>
+  <select class="form-select form-select-sm w-auto" [(ngModel)]="disburseSession">
+    <option value="">Ma caisse ouverte</option>
+    @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
+  </select>
+</div>
+
+<!-- Modale création / édition -->
+<div class="modal fade" id="gexp-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier la dépense' : 'Nouvelle dépense' }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="save()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
+    <div class="mb-2">
+      <label class="form-label small">Type de dépense</label>
+      <select class="form-select" formControlName="expense_type_id">
+        <option [ngValue]="null">— Type —</option>
+        @for (t of types; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+      </select>
+    </div>
+    <div class="mb-2"><label class="form-label small">Libellé</label><input class="form-control" formControlName="label" placeholder="ex. Papier toilette x10" /></div>
+    <div class="row g-2">
+      <div class="col-6"><label class="form-label small">Montant</label><input type="number" class="form-control" formControlName="amount" min="1" /></div>
+      <div class="col-6"><label class="form-label small">Date</label><input type="date" class="form-control" formControlName="expense_date" /></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+  </div></form>
+</div></div></div>
