@@ -4,6 +4,7 @@ from .cash_session  import CashSession
 from .transaction   import Transaction
 from .transfer      import Transfer
 from .posting_rule  import MovementAccountMapping
+from .general_expense import GeneralExpense
 
 __all__ = ["CashRegister", "BankAccount", "CashSession", "Transaction", "Transfer",
-           "MovementAccountMapping"]
+           "MovementAccountMapping", "GeneralExpense"]
