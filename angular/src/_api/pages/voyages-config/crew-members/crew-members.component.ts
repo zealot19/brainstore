@@ -7,13 +7,16 @@ import { CrewMemberTypeService } from '../../../services/voyages-config/crew-mem
 import { CrewMemberType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-crew-members',
   templateUrl: './crew-members.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcCrewMembersComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: CrewMember[] = []; filtered: CrewMember[] = []; loading = true; search = '';
   types: CrewMemberType[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

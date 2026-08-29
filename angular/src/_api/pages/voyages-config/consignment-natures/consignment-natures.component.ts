@@ -5,13 +5,16 @@ import { ConsignmentNatureService } from '../../../services/voyages-config/consi
 import { ConsignmentNature } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-consignment-natures',
   templateUrl: './consignment-natures.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcConsignmentNaturesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: ConsignmentNature[] = []; filtered: ConsignmentNature[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: ConsignmentNatureService, private fb: FormBuilder) {}

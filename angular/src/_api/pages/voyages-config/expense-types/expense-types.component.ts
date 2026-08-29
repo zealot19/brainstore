@@ -7,13 +7,16 @@ import { ExpenseType } from '../../../models/voyages-config.models';
 import { Account } from '../../../models/accounting.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-expense-types',
   templateUrl: './expense-types.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcExpenseTypesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: ExpenseType[] = []; filtered: ExpenseType[] = []; loading = true; search = '';
   accounts: Account[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

@@ -8,13 +8,16 @@ import { FareClassService } from '../../../services/voyages-config/fare-class.se
 import { ExpenseSchedule, ExpenseScheduleLine, ExpenseType, Route, FareClass } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-expense-schedules',
   templateUrl: './expense-schedules.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcExpenseSchedulesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: ExpenseSchedule[] = []; loading = true;
   routes: Route[] = []; fareClasses: FareClass[] = []; types: ExpenseType[] = [];
   editId: string | null = null; errorMsg = ''; saving = false;

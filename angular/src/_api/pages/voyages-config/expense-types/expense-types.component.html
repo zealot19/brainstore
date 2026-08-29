@@ -11,7 +11,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Code</th><th>Nom</th><th>Compte</th><th>Actif</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (r of filtered; track r.id) {
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.code }}</td><td>{{ r.name }}</td>
               <td>{{ accountLabel(r.account_code) }}</td>
@@ -24,6 +24,7 @@
           } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun type.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

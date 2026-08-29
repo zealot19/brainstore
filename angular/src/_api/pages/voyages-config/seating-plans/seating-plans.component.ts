@@ -5,14 +5,17 @@ import { SeatingPlanService } from '../../../services/voyages-config/seating-pla
 import { SeatingPlan, PlanSeat, SeatType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-seating-plans',
   templateUrl: './seating-plans.component.html',
   styleUrls: ['./seating-plans.component.scss'],
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcSeatingPlansComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: SeatingPlan[] = []; filtered: SeatingPlan[] = []; loading = true; search = '';
   saving = false; errorMsg = ''; editId: string | null = null;
 

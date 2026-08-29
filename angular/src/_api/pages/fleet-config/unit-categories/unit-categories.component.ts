@@ -5,13 +5,16 @@ import { UnitCategoryService } from '../../../services/fleet-config/unit-categor
 import { UnitCategory } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fc-unit-categories',
   templateUrl: './unit-categories.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcUnitCategoriesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: UnitCategory[] = []; filtered: UnitCategory[] = []; loading = true; search = '';
   selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

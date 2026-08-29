@@ -6,13 +6,16 @@ import { ServicePointService } from '../../../services/voyages-config/service-po
 import { Route, RouteStop, ServicePoint } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-routes',
   templateUrl: './routes.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcRoutesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Route[] = []; filtered: Route[] = []; loading = true; search = '';
   servicePoints: ServicePoint[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
