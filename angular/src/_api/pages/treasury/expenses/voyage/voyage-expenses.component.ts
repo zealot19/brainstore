@@ -23,6 +23,7 @@ export class VoyageExpensesComponent implements OnInit {
 
   rows: any[] = []; sessions: any[] = []; loading = false; disburseSession = '';
   voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
+  fStatus = ''; fFrom = ''; fTo = '';
 
   ngOnInit(): void {
     this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
@@ -31,17 +32,20 @@ export class VoyageExpensesComponent implements OnInit {
 
   reload(): void {
     this.loading = true;
-    this.svc.voyage().subscribe({
+    this.svc.voyage({ status: this.fStatus || undefined, date_from: this.fFrom || undefined, date_to: this.fTo || undefined }).subscribe({
       next: d => {
         this.rows = d;
         const seen = new Map<string, string>();
         d.forEach((r: any) => { if (r.trip_id && !seen.has(r.trip_id)) seen.set(r.trip_id, r.trip_number); });
         this.voyageOptions = [...seen].map(([id, number]) => ({ id, number }));
+        this.pg.page = 1;
         this.loading = false;
       },
       error: () => this.loading = false,
     });
   }
+
+  clearFilters(): void { this.fStatus = this.fFrom = this.fTo = ''; this.selectedVoyage = ''; this.reload(); }
 
   get filtered(): any[] {
     return this.selectedVoyage ? this.rows.filter(r => r.trip_id === this.selectedVoyage) : this.rows;

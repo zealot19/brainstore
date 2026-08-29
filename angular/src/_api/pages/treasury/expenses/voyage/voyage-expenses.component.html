@@ -5,13 +5,29 @@
 <!-- Filtres / décaissement (en haut) -->
 <div class="card mb-3"><div class="card-body">
   <div class="row g-3 align-items-end">
-    <div class="col-md-5">
+    <div class="col-md-4">
       <label class="form-label small mb-1">Voyage</label>
       <app-searchable-select [items]="voyageOptions" labelKey="number" valueKey="id"
         placeholder="— Tous les voyages —" [(ngModel)]="selectedVoyage"></app-searchable-select>
     </div>
-    <div class="col-md-5" *hasPermission="'treasury.expense.manage'">
-      <label class="form-label small mb-1">Caisse de décaissement</label>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Statut</label>
+      <select class="form-select" [(ngModel)]="fStatus" (ngModelChange)="reload()">
+        <option value="">Tous</option>
+        <option value="planned">Prévues</option>
+        <option value="paid">Décaissées</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Du</label>
+      <input type="date" class="form-control" [(ngModel)]="fFrom" (ngModelChange)="reload()" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Au</label>
+      <input type="date" class="form-control" [(ngModel)]="fTo" (ngModelChange)="reload()" />
+    </div>
+    <div class="col-md-2" *hasPermission="'treasury.expense.manage'">
+      <label class="form-label small mb-1">Caisse</label>
       <select class="form-select" [(ngModel)]="disburseSession">
         <option value="">Ma caisse ouverte</option>
         @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
