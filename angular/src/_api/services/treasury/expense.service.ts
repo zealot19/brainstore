@@ -9,7 +9,7 @@ export class ExpenseService {
   private http = inject(HttpClient);
 
   voyage(status?: string): Observable<any[]> {
-    let p = new HttpParams();
+    let p = new HttpParams().set('page_size', '500');
     if (status) p = p.set('status', status);
     return this.http.get<any>(TREASURY.expVoyage, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
