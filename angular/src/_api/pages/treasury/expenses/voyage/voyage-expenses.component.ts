@@ -5,12 +5,13 @@ import { ExpenseService } from '../../../../services/treasury/expense.service';
 import { TripExpenseService } from '../../../../services/voyages/trip-expense.service';
 import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
+import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-voyage-expenses',
   standalone: true,
   templateUrl: './voyage-expenses.component.html',
-  imports: [CommonModule, FormsModule, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
 })
 export class VoyageExpensesComponent implements OnInit {
   private svc = inject(ExpenseService);
@@ -18,15 +19,31 @@ export class VoyageExpensesComponent implements OnInit {
   private sessionSvc = inject(SessionService);
 
   rows: any[] = []; sessions: any[] = []; loading = false; disburseSession = '';
+  voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
 
   ngOnInit(): void {
     this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
     this.reload();
   }
+
   reload(): void {
     this.loading = true;
-    this.svc.voyage().subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.voyage().subscribe({
+      next: d => {
+        this.rows = d;
+        const seen = new Map<string, string>();
+        d.forEach((r: any) => { if (r.trip_id && !seen.has(r.trip_id)) seen.set(r.trip_id, r.trip_number); });
+        this.voyageOptions = [...seen].map(([id, number]) => ({ id, number }));
+        this.loading = false;
+      },
+      error: () => this.loading = false,
+    });
   }
+
+  get filtered(): any[] {
+    return this.selectedVoyage ? this.rows.filter(r => r.trip_id === this.selectedVoyage) : this.rows;
+  }
+
   disburse(e: any): void {
     this.tripExpSvc.disburse(e.trip_id, e.id, this.disburseSession)
       .subscribe({ next: () => this.reload(), error: err => alert(err?.error?.error?.message ?? err?.error?.detail ?? 'Erreur.') });
