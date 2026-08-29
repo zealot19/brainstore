@@ -12,13 +12,16 @@ import { ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgBaggageComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';
   tripFilter = ''; typeFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
   filterTrips: { id: string; number?: string; code?: string }[] = [];

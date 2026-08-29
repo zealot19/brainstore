@@ -4,13 +4,16 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ParkingService } from '../../../services/fleet/parking.service';
 import { Parking } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-parking',
   templateUrl: './parking.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetParkingComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   rows:     Parking[] = [];
   filtered: Parking[] = [];

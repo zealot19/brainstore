@@ -12,13 +12,16 @@ import { Contract, RecurringCost, VehicleListItem, Supplier, ExternalDriver } fr
 import { InterventionType, Period } from '../../../models/fleet-config.models';
 import { Employee } from '../../../models/hr.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-contracts',
   templateUrl: './contracts.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetContractsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   contracts:  Contract[]         = [];
   filtered:   Contract[]         = [];

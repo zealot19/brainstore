@@ -5,14 +5,17 @@ import { GeneralExpenseService } from '../../../../services/treasury/general-exp
 import { ExpenseTypeService } from '../../../../services/voyages-config/expense-type.service';
 import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-general-expenses',
   standalone: true,
   templateUrl: './general-expenses.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective],
 })
 export class GeneralExpensesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   private svc = inject(GeneralExpenseService);
   private typeSvc = inject(ExpenseTypeService);
   private sessionSvc = inject(SessionService);

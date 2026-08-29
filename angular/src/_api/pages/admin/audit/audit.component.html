@@ -101,7 +101,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (log of filtered; track log.id) {
+            @for (log of filtered | paginate:pg.page:pg.size; track log.id) {
               <tr>
                 <td class="text-muted small text-nowrap">
                   {{ log.timestamp | date:'dd/MM/yy HH:mm:ss' }}
@@ -162,6 +162,7 @@
             }
           </tbody>
         </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
       </div>
     }
   </div>

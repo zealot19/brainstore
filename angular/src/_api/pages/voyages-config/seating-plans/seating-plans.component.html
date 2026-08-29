@@ -11,7 +11,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Code</th><th>Nom</th><th>Grille</th><th>Places vendables</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (p of filtered; track p.id) {
+          @for (p of filtered | paginate:pg.page:pg.size; track p.id) {
             <tr>
               <td class="fw-medium">{{ p.code }}</td>
               <td>{{ p.name }}</td>
@@ -28,6 +28,7 @@
           } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun plan.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

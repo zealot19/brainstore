@@ -21,7 +21,7 @@
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
           <th>Code</th><th>Libellé</th><th>Début</th><th>Fin</th><th>Ordre</th><th>Périmètre</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (r of filtered; track r.id) {
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
               <td class="fw-medium">{{ r.code }}</td>
@@ -41,6 +41,7 @@
           } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucune entrée.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

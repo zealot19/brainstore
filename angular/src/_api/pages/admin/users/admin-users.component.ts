@@ -9,13 +9,16 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { AppUser, UserStats, UserCreateForm, UserUpdateForm } from '../../../models/user.models';
 import { Agency } from '../../../models/system.models';
 import { Profile } from '../../../models/rbac.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-admin-users',
   templateUrl: './admin-users.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AdminUsersComponent implements OnInit, OnDestroy {
+  pg: PageState = { page: 1, size: 25 };
 
   users:    AppUser[] = [];
   filtered: AppUser[] = [];

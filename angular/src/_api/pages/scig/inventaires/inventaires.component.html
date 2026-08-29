@@ -104,7 +104,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (s of filtered; track s.id) {
+            @for (s of filtered | paginate:pg.page:pg.size; track s.id) {
               <tr>
                 <td class="fw-medium">{{ s.name }}</td>
                 <td>{{ s.depot_name }}</td>
@@ -140,6 +140,7 @@
             }
           </tbody>
         </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
       </div>
     }
   </div>

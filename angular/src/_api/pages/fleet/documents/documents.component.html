@@ -58,7 +58,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let d of docs">
+              <tr *ngFor="let d of docs | paginate:pg.page:pg.size">
                 <td><span class="badge bg-primary">{{ d.doc_type_display }}</span></td>
                 <td class="fw-semibold">{{ d.name }}</td>
                 <td>{{ d.number || '—' }}</td>
@@ -89,6 +89,7 @@
               </tr>
             </tbody>
           </table>
+        <app-table-paginator [total]="docs.length" [state]="pg"></app-table-paginator>
         </div>
       </div>
     </div>

@@ -5,13 +5,16 @@ import { EmployeeService } from '../../../services/hr/employee.service';
 import { Employee } from '../../../models/hr.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-hr-employees',
   templateUrl: './employees.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class HrEmployeesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Employee[] = []; filtered: Employee[] = []; loading = true; search = '';
   genders = [{ value: '', label: '—' }, { value: 'M', label: 'Masculin' }, { value: 'F', label: 'Féminin' }];
   form!: FormGroup; termForm!: FormGroup; saving = false; errorMsg = '';

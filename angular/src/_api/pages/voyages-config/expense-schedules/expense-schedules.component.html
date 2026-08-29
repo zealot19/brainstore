@@ -9,7 +9,7 @@
     <div class="table-responsive"><table class="table datanew">
       <thead class="thead-light"><tr><th>Trajet</th><th>Catégorie</th><th>Lignes</th><th class="no-sort">Actions</th></tr></thead>
       <tbody>
-        @for (s of rows; track s.id) {
+        @for (s of rows | paginate:pg.page:pg.size; track s.id) {
           <tr>
             <td class="fw-medium">{{ s.route_name || routeLabel(s.route) }}</td>
             <td>{{ s.fare_class_name || fcLabel(s.fare_class) }}</td>
@@ -22,6 +22,7 @@
         } @empty { <tr><td colspan="4" class="text-center py-4 text-muted">Aucun barème.</td></tr> }
       </tbody>
     </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
   }
 </div></div>
 <div class="modal fade" id="es-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">

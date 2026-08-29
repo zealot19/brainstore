@@ -5,13 +5,16 @@ import { TagService } from '../../../services/fleet-config/tag.service';
 import { Tag } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fc-tags',
   templateUrl: './tags.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcTagsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Tag[] = []; filtered: Tag[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: TagService, private fb: FormBuilder) {}

@@ -10,7 +10,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Réf</th><th>Source</th><th>Destination</th><th>Montant</th><th>Date</th><th>Par</th></tr></thead>
         <tbody>
-          @for (r of rows; track r.id) {
+          @for (r of rows | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.reference }}</td>
               <td>{{ r.from_label }}</td>
@@ -22,6 +22,7 @@
           } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun transfert.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

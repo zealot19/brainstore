@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PackageService } from '../../../services/system/package.service';
 import { Package, PackageTier } from '../../../models/system.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-packages',
   templateUrl: './packages.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class PackagesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   packages: Package[] = [];
   filtered: Package[] = [];

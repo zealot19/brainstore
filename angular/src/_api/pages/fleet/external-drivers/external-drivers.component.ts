@@ -6,13 +6,16 @@ import { ExternalDriver } from '../../../models/fleet.models';
 import { EmployeeService } from '../../../services/hr/employee.service';
 import { Employee } from '../../../models/hr.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-external-drivers',
   templateUrl: './external-drivers.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetExternalDriversComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   drivers:  ExternalDriver[] = [];
   filtered: ExternalDriver[] = [];

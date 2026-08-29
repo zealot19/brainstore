@@ -6,13 +6,16 @@ import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
 import { AssignmentListItem, VehicleListItem, ExternalDriver } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fleet-assignments',
   templateUrl: './assignments.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetAssignmentsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   assignments:    AssignmentListItem[] = [];
   filtered:       AssignmentListItem[] = [];

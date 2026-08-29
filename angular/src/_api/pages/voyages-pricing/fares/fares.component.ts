@@ -8,13 +8,16 @@ import { Fare, RoutePoint } from '../../../models/voyages-pricing.models';
 import { Route, FareClass } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-fares',
   templateUrl: './fares.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcFaresComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   routes: Route[] = []; fareClasses: FareClass[] = [];
   selectedRoute: string | null = null;
   points: RoutePoint[] = [];

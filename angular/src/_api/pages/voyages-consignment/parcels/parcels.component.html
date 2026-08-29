@@ -58,7 +58,7 @@
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
           <th>Référence</th><th>Trajet</th><th>Destinataire</th><th class="text-center">Pièces</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (p of rows; track p.id) {
+          @for (p of rows | paginate:pg.page:pg.size; track p.id) {
             <tr>
               <td>@if (p.status !== 'picked_up' && p.status !== 'cancelled') { <input type="checkbox" class="form-check-input" [checked]="isSelected(p.id)" (change)="toggle(p.id)" /> }</td>
               <td class="fw-medium"><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)">{{ p.reference }}</a></td>
@@ -84,6 +84,7 @@
           } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

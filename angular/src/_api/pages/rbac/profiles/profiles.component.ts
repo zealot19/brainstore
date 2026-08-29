@@ -6,13 +6,16 @@ import { RoleService } from '../../../services/rbac/role.service';
 import { CompanyService } from '../../../services/system/company.service';
 import { Profile, Role } from '../../../models/rbac.models';
 import { Company } from '../../../models/system.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-profiles',
   templateUrl: './profiles.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class ProfilesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   profiles:  Profile[] = [];
   filtered:  Profile[] = [];

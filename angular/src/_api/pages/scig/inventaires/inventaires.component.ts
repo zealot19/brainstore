@@ -5,13 +5,16 @@ import { RouterModule } from '@angular/router';
 import { ScigService } from '../../../services/scig/scig.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { Depot, InventorySession } from '../../../models/scig.models';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-scig-inventaires',
   templateUrl: './inventaires.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
 })
 export class InventairesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
 
   readonly perm = inject(PermissionService);
 

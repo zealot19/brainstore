@@ -5,13 +5,16 @@ import { PeriodService } from '../../../services/fleet-config/period.service';
 import { Period } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fc-periods',
   templateUrl: './periods.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcPeriodsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Period[] = []; filtered: Period[] = []; loading = true; search = '';
   selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

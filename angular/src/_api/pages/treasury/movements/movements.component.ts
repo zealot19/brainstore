@@ -7,13 +7,16 @@ import { BankService } from '../../../services/treasury/bank.service';
 import { Transaction, CashSession, BankAccount, MOVEMENT_CATEGORIES, PAYMENT_MODES } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-trz-movements',
   templateUrl: './movements.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzMovementsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Transaction[] = []; loading = true; typeFilter = '';
   openSessions: CashSession[] = []; banks: BankAccount[] = [];
   paymentModes = PAYMENT_MODES;

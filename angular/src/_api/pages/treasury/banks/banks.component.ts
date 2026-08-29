@@ -8,13 +8,16 @@ import { JournalService } from '../../../services/accounting/journal.service';
 import { Account, Journal } from '../../../models/accounting.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-trz-banks',
   templateUrl: './banks.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzBanksComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: BankAccount[] = []; filtered: BankAccount[] = []; loading = true; search = '';
   accounts: Account[] = []; journals: Journal[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

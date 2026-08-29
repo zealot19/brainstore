@@ -5,13 +5,16 @@ import { InterventionTypeService } from '../../../services/fleet-config/interven
 import { InterventionType } from '../../../models/fleet-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-fc-intervention-types',
   templateUrl: './intervention-types.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class FcInterventionTypesComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: InterventionType[] = []; filtered: InterventionType[] = []; loading = true; search = '';
   categories = [
     { value: 'SERVICE',  label: 'Service' },

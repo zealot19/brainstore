@@ -5,13 +5,16 @@ import { TimeSlotService } from '../../../services/voyages-config/time-slot.serv
 import { TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-time-slots',
   templateUrl: './time-slots.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcTimeSlotsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: TimeSlot[] = []; filtered: TimeSlot[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: TimeSlotService, private fb: FormBuilder) {}

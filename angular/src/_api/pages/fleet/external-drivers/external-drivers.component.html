@@ -53,7 +53,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let d of filtered">
+              <tr *ngFor="let d of filtered | paginate:pg.page:pg.size">
                 <td class="fw-semibold">{{ d.employee_name || d.full_name }}</td>
                 <td>{{ d.employee_number || '—' }}</td>
                 <td>{{ d.license_number }}</td>
@@ -78,6 +78,7 @@
               </tr>
             </tbody>
           </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
         </div>
       </div>
     </div>

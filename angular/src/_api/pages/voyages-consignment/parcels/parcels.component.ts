@@ -11,13 +11,16 @@ import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.mo
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vcg-parcels',
   templateUrl: './parcels.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgParcelsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
   dateField = 'created'; dateFrom = ''; dateTo = '';

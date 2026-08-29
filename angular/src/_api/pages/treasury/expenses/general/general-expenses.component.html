@@ -15,7 +15,7 @@
         </thead>
         <tbody>
           @if (loading) { <tr><td colspan="7" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
-          @for (e of rows; track e.id) {
+          @for (e of rows | paginate:pg.page:pg.size; track e.id) {
             <tr>
               <td>{{ e.expense_type_name || typeName(e.expense_type) }}</td>
               <td class="fw-medium">{{ e.label }}</td>
@@ -37,6 +37,7 @@
           } @empty { @if (!loading) { <tr><td colspan="7" class="text-center text-muted py-3">Aucune dépense.</td></tr> } }
         </tbody>
       </table>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     </div>
   </div>
 </div>

@@ -8,13 +8,16 @@ import { VehicleSeatingAssignment, SeatingPlan } from '../../../models/voyages-c
 import { VehicleListItem } from '../../../models/fleet.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 
 @Component({
   selector: 'app-vc-vehicle-assignments',
   templateUrl: './vehicle-assignments.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcVehicleAssignmentsComponent implements OnInit {
+  pg: PageState = { page: 1, size: 25 };
   rows: VehicleSeatingAssignment[] = []; filtered: VehicleSeatingAssignment[] = []; loading = true; search = ''; selected = new Set<string>();
   vehicles: VehicleListItem[] = []; plans: SeatingPlan[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;

@@ -15,7 +15,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Caisse</th><th>Statut</th><th>Ouverture</th><th>Attendu</th><th>Écart</th><th>Ouvert par</th><th>Ouvert le</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (s of rows; track s.id) {
+          @for (s of rows | paginate:pg.page:pg.size; track s.id) {
             <tr>
               <td class="fw-medium">{{ s.register_name }}</td>
               <td>@if (s.status === 'open') { <span class="badge bg-success">Ouverte</span> } @else { <span class="badge bg-secondary">Clôturée</span> }</td>
@@ -32,6 +32,7 @@
           } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucune session.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

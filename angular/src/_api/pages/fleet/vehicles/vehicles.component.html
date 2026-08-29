@@ -105,7 +105,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (v of filtered; track v.id) {
+            @for (v of filtered | paginate:pg.page:pg.size; track v.id) {
               <tr>
                 <td class="fw-medium">{{ v.license_plate }}</td>
                 <td>
@@ -159,6 +159,7 @@
             }
           </tbody>
         </table>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
       </div>
     }
   </div>

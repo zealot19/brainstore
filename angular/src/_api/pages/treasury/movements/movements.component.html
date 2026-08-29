@@ -15,7 +15,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr><th>Réf</th><th>Type</th><th>Catégorie</th><th>Compte</th><th>Montant</th><th>Mode</th><th>Date</th><th>Compta</th><th class="no-sort">Actions</th></tr></thead>
         <tbody>
-          @for (r of rows; track r.id) {
+          @for (r of rows | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.reference }}</td>
               <td>@if (r.transaction_type === 'income') { <span class="badge bg-success">Recette</span> } @else { <span class="badge bg-danger">Dépense</span> }</td>
@@ -32,6 +32,7 @@
           } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun mouvement.</td></tr> }
         </tbody>
       </table></div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>
