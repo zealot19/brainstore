@@ -108,7 +108,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
             "id", "register_name", "status", "status_display",
             "opening_balance", "closing_balance",
             "expected_closing", "difference",
-            "opened_by_name", "closed_by_name",
+            "opened_by", "opened_by_name", "closed_by_name",
             "opened_at", "closed_at",
             "notes", "created_at",
         ]

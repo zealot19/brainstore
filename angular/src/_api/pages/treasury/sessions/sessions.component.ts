@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SessionService } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { CashSession, CashRegister } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -17,7 +18,15 @@ export class TrzSessionsComponent implements OnInit {
   registers: CashRegister[] = [];
   openForm!: FormGroup; closeForm!: FormGroup; saving = false; errorMsg = ''; closingId: string | null = null;
 
-  constructor(private svc: SessionService, private regSvc: RegisterService, private fb: FormBuilder) {}
+  constructor(private svc: SessionService, private regSvc: RegisterService, private fb: FormBuilder,
+              private auth: AuthService) {}
+
+  /** Seul l'ouvreur de la caisse (ou un admin) peut la clôturer. */
+  canClose(s: any): boolean {
+    const u = this.auth.currentUser;
+    if (!u) return false;
+    return !!u.is_superuser || !!u.is_institution_admin || s.opened_by === u.id;
+  }
 
   ngOnInit(): void {
     this.openForm = this.fb.group({ cash_register_id: [null, Validators.required], opening_balance: [null], notes: [''] });
