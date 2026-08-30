@@ -35,4 +35,12 @@ urlpatterns = [
     path("expenses/voyage/",                     views.VoyageExpenseListView.as_view(),      name="vexp-list"),
     path("expenses/voyage/<uuid:pk>/voucher/",   views.VoyageExpenseVoucherView.as_view(),   name="vexp-voucher"),
     path("expenses/dashboard/",                  views.ExpenseDashboardView.as_view(),       name="exp-dashboard"),
+
+    # ── Recettes (voyage + colis + bagage + autre) ───────────────────────────────
+    path("recettes/voyage/",            views.IncomeVoyageListView.as_view(),  name="income-voyage"),
+    path("recettes/parcel/",            views.IncomeParcelListView.as_view(),  name="income-parcel"),
+    path("recettes/baggage/",           views.IncomeBaggageListView.as_view(), name="income-baggage"),
+    path("recettes/other/",             views.IncomeOtherListView.as_view(),   name="income-other"),
+    path("recettes/dashboard/",         views.IncomeDashboardView.as_view(),   name="income-dashboard"),
+    path("recettes/<uuid:pk>/receipt/", views.IncomeReceiptView.as_view(),     name="income-receipt"),
 ]

@@ -1,0 +1,109 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ title }}</h4><h6>Recettes encaissées</h6></div></div>
+  <div class="page-btn" *ngIf="isOther">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recette-modal"
+       *hasPermission="'treasury.income.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouvelle recette</a>
+  </div>
+</div>
+
+<div class="card mb-3"><div class="card-body">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4" *ngIf="kind === 'voyage'">
+      <label class="form-label small mb-1">Voyage</label>
+      <app-searchable-select [items]="voyageOptions" labelKey="number" valueKey="id"
+        placeholder="— Tous les voyages —" [(ngModel)]="selectedVoyage"></app-searchable-select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Du</label>
+      <input type="date" class="form-control" [(ngModel)]="fFrom" (ngModelChange)="reload()" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Au</label>
+      <input type="date" class="form-control" [(ngModel)]="fTo" (ngModelChange)="reload()" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small mb-1">Mode</label>
+      <select class="form-select" [(ngModel)]="fMode" (ngModelChange)="reload()">
+        <option value="">Tous</option>
+        <option value="cash">Espèces</option>
+        <option value="mobile_money">Mobile Money</option>
+        <option value="transfer">Virement</option>
+        <option value="check">Chèque</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-light w-100" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Réinitialiser</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Réf.</th><th>Source</th><th>Client/Tiers</th>
+            <th class="text-end">Montant</th><th>Mode</th>
+            <th>Caisse</th><th>Agence</th><th>Date</th><th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) { <tr><td colspan="9" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
+            <tr>
+              <td>{{ r.reference }}</td>
+              <td>{{ (kind === 'voyage' ? (r.trip_number || r.source_ref) : r.source_ref) || '—' }}</td>
+              <td>{{ r.source_party || '—' }}</td>
+              <td class="text-end">{{ r.amount | number }}</td>
+              <td>{{ r.payment_display }}</td>
+              <td>{{ r.cash_register_name || '—' }}</td>
+              <td>{{ r.agency_name || '—' }}</td>
+              <td>{{ r.transaction_date | date:'dd/MM/yyyy' }}</td>
+              <td class="text-end">
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"
+                   (click)="printReceipt(r)" title="Imprimer le reçu"><i class="ti ti-printer"></i></a>
+              </td>
+            </tr>
+          } @empty { @if (!loading) { <tr><td colspan="9" class="text-center text-muted py-3">Aucune recette.</td></tr> } }
+        </tbody>
+      </table>
+      <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- Modale Nouvelle recette (autre) -->
+<div class="modal fade" id="recette-modal" tabindex="-1" *ngIf="isOther">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Nouvelle recette</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="modal-body">
+        @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
+        <div class="mb-2"><label class="form-label small">Montant</label>
+          <input type="number" class="form-control" formControlName="amount" min="1" /></div>
+        <div class="mb-2"><label class="form-label small">Mode de paiement</label>
+          <select class="form-select" formControlName="payment_mode">
+            <option value="cash">Espèces</option>
+            <option value="mobile_money">Mobile Money</option>
+            <option value="transfer">Virement</option>
+            <option value="check">Chèque</option>
+          </select></div>
+        <div class="mb-2"><label class="form-label small">Libellé</label>
+          <input type="text" class="form-control" formControlName="description" placeholder="ex. Vente carton" /></div>
+        <div class="mb-2"><label class="form-label small">Caisse</label>
+          <select class="form-select" formControlName="cash_session_id">
+            <option [ngValue]="null">Ma session ouverte</option>
+            @for (s of sessions; track s.id) { <option [ngValue]="s.id">{{ s.register_name }}</option> }
+          </select></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+      </div>
+    </form>
+  </div></div>
+</div>

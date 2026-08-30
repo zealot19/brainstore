@@ -406,6 +406,11 @@ export const routes={
   trzExpensesDashboard: '/treasury/expenses-dashboard',
   trzExpensesVoyage:    '/treasury/expenses-voyage',
   trzExpensesGeneral:   '/treasury/expenses-general',
+  trzRecettesDashboard: '/treasury/recettes-dashboard',
+  trzRecettesVoyage:    '/treasury/recettes-voyage',
+  trzRecettesColis:     '/treasury/recettes-colis',
+  trzRecettesBagage:    '/treasury/recettes-bagage',
+  trzRecettesAutre:     '/treasury/recettes-autre',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

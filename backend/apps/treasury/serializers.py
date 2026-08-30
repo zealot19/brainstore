@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
 
@@ -282,3 +283,76 @@ class VoyageExpenseRowSerializer(serializers.Serializer):
 
     def get_cash_register_name(self, obj):
         return obj.cash_session.cash_register.name if obj.cash_session_id else None
+
+
+# ── Recettes (income) ────────────────────────────────────────────────────────
+
+class IncomeRowSerializer(serializers.ModelSerializer):
+    category_display = serializers.CharField(source="get_category_display", read_only=True)
+    payment_display  = serializers.CharField(source="get_payment_mode_display", read_only=True)
+    cash_register_name = serializers.SerializerMethodField()
+    agency_name        = serializers.SerializerMethodField()
+    account_label      = serializers.SerializerMethodField()
+    source_ref         = serializers.SerializerMethodField()
+    source_party       = serializers.SerializerMethodField()
+    trip_id            = serializers.SerializerMethodField()
+    trip_number        = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Transaction
+        fields = [
+            "id", "reference", "category", "category_display",
+            "amount", "payment_mode", "payment_display", "transaction_date",
+            "cash_register_name", "agency_name", "account_label",
+            "source_ref", "source_party", "trip_id", "trip_number",
+            "description", "created_at",
+        ]
+
+    def get_trip_id(self, obj):
+        if obj.category == Transaction.Category.TICKET_SALES and obj.voyage_booking_id:
+            return str(obj.voyage_booking.outbound_trip_id) if obj.voyage_booking.outbound_trip_id else None
+        return None
+
+    def get_trip_number(self, obj):
+        if (obj.category == Transaction.Category.TICKET_SALES and obj.voyage_booking_id
+                and obj.voyage_booking.outbound_trip_id):
+            return obj.voyage_booking.outbound_trip.number or None
+        return None
+
+    def get_cash_register_name(self, obj):
+        return obj.cash_session.cash_register.name if obj.cash_session_id else None
+
+    def get_agency_name(self, obj):
+        if obj.cash_session_id and obj.cash_session.cash_register.agency_id:
+            return obj.cash_session.cash_register.agency.name
+        return None
+
+    def get_account_label(self, obj):
+        if obj.account_type == "cash" and obj.cash_session_id:
+            return obj.cash_session.cash_register.name
+        if obj.account_type == "bank" and obj.bank_account_id:
+            return str(obj.bank_account)
+        return None
+
+    def get_source_ref(self, obj):
+        if obj.category == Transaction.Category.TICKET_SALES and obj.voyage_booking_id:
+            return getattr(obj.voyage_booking, "reference", "") or ""
+        if obj.category == Transaction.Category.PARCEL_SHIPPING and obj.voyages_parcel_id:
+            return getattr(obj.voyages_parcel, "reference", "") or ""
+        if obj.category == Transaction.Category.BAGGAGE and obj.voyages_baggage_id:
+            return getattr(obj.voyages_baggage, "tag_number", "") or ""
+        return ""
+
+    def get_source_party(self, obj):
+        if obj.category == Transaction.Category.PARCEL_SHIPPING and obj.voyages_parcel_id:
+            return getattr(obj.voyages_parcel, "sender_name", "") or ""
+        if obj.category == Transaction.Category.BAGGAGE and obj.voyages_baggage_id:
+            return getattr(obj.voyages_baggage, "sender_name", "") or ""
+        return ""
+
+
+class OtherIncomeWriteSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal("0.01"))
+    payment_mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices)
+    description = serializers.CharField(required=False, allow_blank=True, default="")
+    cash_session_id = serializers.UUIDField(required=False, allow_null=True)

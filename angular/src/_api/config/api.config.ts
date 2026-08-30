@@ -426,6 +426,12 @@ export const TREASURY = {
   expVoyage:          `${TRZ}/expenses/voyage/`,
   expVoyageVoucher:   (id: string) => `${TRZ}/expenses/voyage/${id}/voucher/`,
   expDashboard:       `${TRZ}/expenses/dashboard/`,
+  incVoyage:   `${TRZ}/recettes/voyage/`,
+  incParcel:   `${TRZ}/recettes/parcel/`,
+  incBaggage:  `${TRZ}/recettes/baggage/`,
+  incOther:    `${TRZ}/recettes/other/`,
+  incDashboard:`${TRZ}/recettes/dashboard/`,
+  incReceipt:  (id: string) => `${TRZ}/recettes/${id}/receipt/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */
