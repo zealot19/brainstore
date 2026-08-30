@@ -284,6 +284,20 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Recettes',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'coin',
+          base: 'treasury-income',
+          subMenus: [
+            { menuValue: 'Tableau de bord', route: routes.trzRecettesDashboard, base: 'recettes-dashboard', permission: 'treasury.income.view' },
+            { menuValue: 'Recette voyage',  route: routes.trzRecettesVoyage,    base: 'recettes-voyage',    permission: 'treasury.income.view' },
+            { menuValue: 'Recette colis',   route: routes.trzRecettesColis,     base: 'recettes-colis',     permission: 'treasury.income.view' },
+            { menuValue: 'Recette bagage',  route: routes.trzRecettesBagage,    base: 'recettes-bagage',    permission: 'treasury.income.view' },
+            { menuValue: 'Autre recette',   route: routes.trzRecettesAutre,     base: 'recettes-autre',     permission: 'treasury.income.view' },
+          ],
+        },
+        {
           menuValue: 'Config Trésorerie',
           hasSubRoute: true,
           showSubRoute: false,
