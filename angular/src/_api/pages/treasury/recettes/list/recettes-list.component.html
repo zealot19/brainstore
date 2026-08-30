@@ -1,0 +1,106 @@
+<div class="page-wrapper">
+  <div class="content">
+    <div class="page-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">{{ title }}</h4>
+      <ng-container *ngIf="isOther">
+        <button class="btn btn-primary" *hasPermission="'treasury.income.manage'"
+                data-bs-toggle="modal" data-bs-target="#recette-modal" (click)="openCreate()">
+          Nouvelle recette
+        </button>
+      </ng-container>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label mb-1">Du</label>
+          <input type="date" class="form-control" [(ngModel)]="fFrom"></div>
+        <div><label class="form-label mb-1">Au</label>
+          <input type="date" class="form-control" [(ngModel)]="fTo"></div>
+        <div><label class="form-label mb-1">Mode</label>
+          <select class="form-select" [(ngModel)]="fMode">
+            <option value="">Tous</option>
+            <option value="cash">Espèces</option>
+            <option value="mobile_money">Mobile Money</option>
+            <option value="transfer">Virement</option>
+            <option value="check">Chèque</option>
+          </select></div>
+        <button class="btn btn-outline-primary" (click)="reload()">Filtrer</button>
+        <button class="btn btn-outline-secondary" (click)="clearFilters()">Réinitialiser</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Réf.</th><th>Source</th><th>Client/Tiers</th>
+                <th class="text-end">Montant</th><th>Mode</th>
+                <th>Caisse</th><th>Agence</th><th>Date</th><th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of rows | paginate:pg.page:pg.size">
+                <td>{{ r.reference }}</td>
+                <td>{{ r.source_ref || '—' }}</td>
+                <td>{{ r.source_party || '—' }}</td>
+                <td class="text-end">{{ r.amount | number:'1.0-0' }} FCFA</td>
+                <td>{{ r.payment_display }}</td>
+                <td>{{ r.cash_register_name || '—' }}</td>
+                <td>{{ r.agency_name || '—' }}</td>
+                <td>{{ r.transaction_date }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="printReceipt(r)" title="Reçu">
+                    <i class="ti ti-printer"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!loading && rows.length === 0">
+                <td colspan="9" class="text-center text-muted py-4">Aucune recette.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nouvelle recette (autre) -->
+<div class="modal fade" id="recette-modal" tabindex="-1" *ngIf="isOther">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle recette</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="modal-body">
+          <div class="alert alert-danger" *ngIf="errorMsg">{{ errorMsg }}</div>
+          <div class="mb-3"><label class="form-label">Montant</label>
+            <input type="number" class="form-control" formControlName="amount"></div>
+          <div class="mb-3"><label class="form-label">Mode de paiement</label>
+            <select class="form-select" formControlName="payment_mode">
+              <option value="cash">Espèces</option>
+              <option value="mobile_money">Mobile Money</option>
+              <option value="transfer">Virement</option>
+              <option value="check">Chèque</option>
+            </select></div>
+          <div class="mb-3"><label class="form-label">Libellé</label>
+            <input type="text" class="form-control" formControlName="description"></div>
+          <div class="mb-3"><label class="form-label">Caisse</label>
+            <select class="form-select" formControlName="cash_session_id">
+              <option [ngValue]="null">Ma session ouverte</option>
+              <option *ngFor="let s of sessions" [ngValue]="s.id">{{ s.register_name }}</option>
+            </select></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
