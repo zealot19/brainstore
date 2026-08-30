@@ -89,7 +89,7 @@ export class PackagesComponent implements OnInit {
       : this.packageService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('package-modal'); },
+      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('package-modal') : this.openCreate()); },
       error: err => {
         this.saving = false;
         const raw = err?.error?.detail ?? 'Une erreur est survenue.';

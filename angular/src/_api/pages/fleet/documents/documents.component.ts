@@ -107,7 +107,7 @@ export class FleetDocumentsComponent implements OnInit {
       ? this.svc.update(this.editId, payload)
       : this.svc.create(this.selectedVehicleId, payload);
     action.subscribe({
-      next: () => { this.saving = false; this.loadDocs(); this.closeModal('doc-modal'); },
+      next: () => { this.saving = false; this.loadDocs(); (this.editId ? this.closeModal('doc-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

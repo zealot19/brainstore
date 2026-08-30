@@ -135,7 +135,7 @@ export class FleetServicesComponent implements OnInit {
     };
     const action = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     action.subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('service-modal'); },
+      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('service-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

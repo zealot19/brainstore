@@ -95,7 +95,7 @@ export class AdminProfilesComponent implements OnInit {
       : this.profileService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('admin-profile-modal'); },
+      next: () => { this.saving = false; this.load(); (this.editProfile ? this.closeModal('admin-profile-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

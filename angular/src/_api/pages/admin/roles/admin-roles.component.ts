@@ -86,7 +86,7 @@ export class AdminRolesComponent implements OnInit {
       : this.roleService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('admin-role-modal'); },
+      next: () => { this.saving = false; this.load(); (this.editRole ? this.closeModal('admin-role-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

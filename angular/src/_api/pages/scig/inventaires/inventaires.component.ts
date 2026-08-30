@@ -86,7 +86,7 @@ export class InventairesComponent implements OnInit {
       depot_id: v.depot_id,
       notes:    v.notes || '',
     }).subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('inv-create-modal'); },
+      next: () => { this.saving = false; this.load(); this.openCreate(); },
       error: err => {
         this.saving = false;
         const e = err?.error;
