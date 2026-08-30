@@ -12,7 +12,8 @@ from apps.voyages_trips.models import TripSeat
 from apps.voyages_config.models import ServicePoint
 from apps.voyages_pricing.selectors.fare_selectors import resolve_fare, route_points
 
-_PRE_DEPARTURE = ["draft", "pending"]
+# Un voyage n'est réservable qu'une fois soumis (statut « pending »), pas en brouillon.
+_BOOKABLE = ["pending"]
 
 
 def _booking_reference():
@@ -28,8 +29,8 @@ def _ticket_number():
 
 
 def _assert_bookable(trip):
-    if trip.status not in _PRE_DEPARTURE:
-        raise ApplicationError(_("Ce voyage n'est pas ouvert à la réservation."))
+    if trip.status not in _BOOKABLE:
+        raise ApplicationError(_("Le voyage doit être soumis avant toute réservation (les brouillons ne sont pas réservables)."))
     if not TripSeat.objects.filter(is_deleted=False, trip=trip).exists():
         raise ApplicationError(_("Les sièges de ce voyage ne sont pas encore générés."))
 

@@ -90,6 +90,12 @@ export class VoyagesTripDetailComponent implements OnInit {
   }
 
   // ── crew ──
+  /** Membres actifs non encore affectés à ce voyage (évite les doublons). */
+  get availableMembers(): CrewMember[] {
+    const assigned = new Set((this.trip?.crew ?? []).map(c => c.member));
+    return this.members.filter(m => !assigned.has(m.id));
+  }
+
   addCrew(): void {
     if (!this.newMember) return;
     this.svc.addCrew(this.id, this.newMember).subscribe({ next: () => { this.newMember = null; this.reload(); }, error: e => alert(e?.error?.detail ?? 'Ajout impossible.') });

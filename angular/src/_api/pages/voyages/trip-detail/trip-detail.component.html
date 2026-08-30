@@ -199,7 +199,7 @@
           @empty { <li class="list-group-item text-muted">Aucun équipage.</li> }
         </ul>
         <div class="row g-2">
-          <div class="col-10"><select class="form-select form-select-sm" [(ngModel)]="newMember"><option [ngValue]="null">— Membre d'équipage —</option>@for (m of members; track m.id) { <option [ngValue]="m.id">{{ m.full_name }} ({{ m.member_type_name }})</option> }</select></div>
+          <div class="col-10"><select class="form-select form-select-sm" [(ngModel)]="newMember"><option [ngValue]="null">— Membre d'équipage —</option>@for (m of availableMembers; track m.id) { <option [ngValue]="m.id">{{ m.full_name }} ({{ m.member_type_name }})</option> }</select></div>
           <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newMember">+</button></div>
         </div>
       </div></div>

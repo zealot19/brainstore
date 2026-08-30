@@ -6,7 +6,8 @@ from apps.voyages_config.models import TimeSlot
 from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
 from apps.core.filters import resolve_date_field, apply_date_range
 
-_PRE_DEPARTURE = ["draft", "pending"]
+# Réservable uniquement lorsque le voyage est soumis (« pending »), pas en brouillon.
+_BOOKABLE = ["pending"]
 
 
 def find_passengers(company, q=None):
@@ -19,7 +20,7 @@ def find_passengers(company, q=None):
 
 def bookable_trips(company, fare_class_id=None, time_slot_id=None, travel_date=None):
     qs = (Trip.objects.filter(is_deleted=False, company=company,
-                              status__in=_PRE_DEPARTURE,
+                              status__in=_BOOKABLE,
                               scheduled_departure__gte=timezone.now())
           .filter(seats__isnull=False).distinct()
           .select_related("route", "origin", "destination", "fare_class", "service_pattern")
