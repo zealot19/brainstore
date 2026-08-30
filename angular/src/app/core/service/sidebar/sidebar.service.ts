@@ -298,7 +298,7 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Config Trésorerie',
+          menuValue: 'Configuration',
           hasSubRoute: true,
           showSubRoute: false,
           icon2: 'settings-cog',

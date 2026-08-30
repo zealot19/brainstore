@@ -219,7 +219,7 @@ export class FleetContractsComponent implements OnInit {
     });
   }
 
-  closeAndReload(): void { this.load(); this.closeModal('contract-modal'); }
+  closeAndReload(): void { this.load(); (this.editId ? this.closeModal('contract-modal') : this.openCreate()); }
 
   private closeModal(id: string): void {
     document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click'));

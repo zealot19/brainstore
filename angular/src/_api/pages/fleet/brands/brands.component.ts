@@ -78,7 +78,7 @@ export class FleetBrandsComponent implements OnInit {
       : this.brandService.create(v);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('brand-modal'); },
+      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('brand-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

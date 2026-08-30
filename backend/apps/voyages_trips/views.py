@@ -188,6 +188,8 @@ class TripCrewView(APIView):
                                            company=company, is_deleted=False).first()
         if not member:
             return error_response("Membre d'équipage introuvable.", status_code=404)
+        if trip.crew.filter(is_deleted=False, member=member).exists():
+            return error_response("Ce membre est déjà affecté à ce voyage.")
         crew = TripCrew.objects.create(trip=trip, member=member, created_by=request.user)
         return created_response(S.TripCrewSerializer(crew).data)
 

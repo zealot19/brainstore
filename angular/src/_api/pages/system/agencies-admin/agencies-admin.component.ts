@@ -47,7 +47,7 @@ export class AgenciesAdminComponent implements OnInit {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const payload = this.form.value as AgencyForm;   // company injecté côté backend
     const a = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.close(); },
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   delete(r: Agency): void {

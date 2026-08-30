@@ -76,6 +76,6 @@ export class VcRoutesComponent implements OnInit {
     if (!this.stopFor || !confirm('Retirer cette escale ?')) return;
     this.svc.deleteStop(this.stopFor, stopId).subscribe({ next: () => this.loadStops(this.stopFor!), error: e => alert(e?.error?.detail ?? 'Impossible.') });
   }
-  closeAndReload(): void { this.load(); this.close(); }
+  closeAndReload(): void { this.load(); this.editId ? this.close() : this.openCreate(); }
   private close(): void { document.getElementById('route-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }
