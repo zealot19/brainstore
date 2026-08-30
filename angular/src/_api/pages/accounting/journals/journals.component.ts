@@ -45,7 +45,7 @@ export class AccJournalsComponent implements OnInit {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = this.form.value;
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.close(); },
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   private close(): void { document.getElementById('jrn-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

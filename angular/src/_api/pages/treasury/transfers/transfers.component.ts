@@ -42,7 +42,7 @@ export class TrzTransfersComponent implements OnInit {
     const payload: Record<string, unknown> = { amount: v.amount, description: v.description, transfer_date: v.transfer_date };
     payload[v.from_type === 'cash' ? 'from_cash_register_id' : 'from_bank_account_id'] = v.from_id;
     payload[v.to_type === 'cash' ? 'to_cash_register_id' : 'to_bank_account_id'] = v.to_id;
-    this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.close(); },
+    this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   private close(): void { document.getElementById('trz-trf-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

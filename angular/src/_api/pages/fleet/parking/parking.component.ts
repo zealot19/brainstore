@@ -59,7 +59,7 @@ export class FleetParkingComponent implements OnInit {
     this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);
     a.subscribe({
-      next: () => { this.saving = false; this.load(); this.close(); },
+      next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; },
     });
   }

@@ -56,13 +56,13 @@ export class HrEmployeesComponent implements OnInit {
     if (this.editId) {
       const payload = { first_name: v.first_name, last_name: v.last_name, gender: v.gender || '',
                         phone: v.phone || '', personal_email: v.personal_email || '' };
-      this.svc.update(this.editId, payload).subscribe({ next: () => { this.saving = false; this.load(); this.close('hr-emp-modal'); },
+      this.svc.update(this.editId, payload).subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close('hr-emp-modal') : this.openCreate(); },
         error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
     } else {
       const payload: Record<string, unknown> = { first_name: v.first_name, last_name: v.last_name, hire_date: v.hire_date,
         gender: v.gender || '', phone: v.phone || '', personal_email: v.personal_email || '' };
       if (v.employee_number) payload['employee_number'] = v.employee_number;
-      this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.close('hr-emp-modal'); },
+      this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close('hr-emp-modal') : this.openCreate(); },
         error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
     }
   }

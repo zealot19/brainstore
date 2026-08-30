@@ -52,7 +52,7 @@ export class TrzMovementsComponent implements OnInit {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = { ...this.form.value };
     if (v.account_type === 'cash') { v.bank_account_id = null; } else { v.cash_session_id = null; }
-    this.svc.create(v).subscribe({ next: () => { this.saving = false; this.load(); this.close(); },
+    this.svc.create(v).subscribe({ next: () => { this.saving = false; this.load(); this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   delete(r: Transaction): void {

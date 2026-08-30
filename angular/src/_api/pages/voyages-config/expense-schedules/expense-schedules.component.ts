@@ -47,7 +47,7 @@ export class VcExpenseSchedulesComponent implements OnInit {
     this.saving = true; this.errorMsg = '';
     const body = { route: this.fRoute, fare_class: this.fFareClass, lines };
     const a = this.editId ? this.svc.update(this.editId, body) : this.svc.create(body);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.close(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   delete(s: ExpenseSchedule): void { if (!confirm('Supprimer ce barème ?')) return; this.svc.delete(s.id).subscribe({ next: () => this.load() }); }
   private close(): void { document.getElementById('es-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

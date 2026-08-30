@@ -65,7 +65,7 @@ export class VcFaresComponent implements OnInit {
     this.saving = true; this.errorMsg = '';
     const v = { ...this.form.value, route_id: this.selectedRoute, valid_from: this.form.value.valid_from || null, valid_to: this.form.value.valid_to || null };
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
-    a.subscribe({ next: () => { this.saving = false; this.reload(); this.close(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+    a.subscribe({ next: () => { this.saving = false; this.reload(); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   delete(r: Fare): void { if (r.scope === 'global') { alert('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ce tarif ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Suppression impossible.') }); }
   private close(): void { document.getElementById('fare-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
