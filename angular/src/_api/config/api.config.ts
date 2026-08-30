@@ -422,7 +422,9 @@ export const TREASURY = {
   expGeneral:         `${TRZ}/expenses/general/`,
   expGeneralItem:     (id: string) => `${TRZ}/expenses/general/${id}/`,
   expGeneralDisburse: (id: string) => `${TRZ}/expenses/general/${id}/disburse/`,
+  expGeneralVoucher:  (id: string) => `${TRZ}/expenses/general/${id}/voucher/`,
   expVoyage:          `${TRZ}/expenses/voyage/`,
+  expVoyageVoucher:   (id: string) => `${TRZ}/expenses/voyage/${id}/voucher/`,
   expDashboard:       `${TRZ}/expenses/dashboard/`,
 };
 

@@ -31,6 +31,8 @@ urlpatterns = [
     path("expenses/general/",                    views.GeneralExpenseListView.as_view(),     name="gexp-list"),
     path("expenses/general/<uuid:pk>/",          views.GeneralExpenseDetailView.as_view(),   name="gexp-detail"),
     path("expenses/general/<uuid:pk>/disburse/", views.GeneralExpenseDisburseView.as_view(), name="gexp-disburse"),
+    path("expenses/general/<uuid:pk>/voucher/",  views.GeneralExpenseVoucherView.as_view(),  name="gexp-voucher"),
     path("expenses/voyage/",                     views.VoyageExpenseListView.as_view(),      name="vexp-list"),
+    path("expenses/voyage/<uuid:pk>/voucher/",   views.VoyageExpenseVoucherView.as_view(),   name="vexp-voucher"),
     path("expenses/dashboard/",                  views.ExpenseDashboardView.as_view(),       name="exp-dashboard"),
 ]
