@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IncomeService } from '../../../../services/treasury/income.service';
 import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
+import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
 
@@ -19,7 +20,7 @@ const TITLES: Record<Kind, string> = {
   selector: 'app-recettes-list',
   standalone: true,
   templateUrl: './recettes-list.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, SearchableSelectComponent],
 })
 export class RecettesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
@@ -31,6 +32,7 @@ export class RecettesListComponent implements OnInit {
   kind: Kind = 'voyage';
   title = '';
   rows: any[] = []; sessions: any[] = [];
+  voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
   loading = false; saving = false; errorMsg = '';
   fFrom = ''; fTo = ''; fMode = '';
 
@@ -56,12 +58,25 @@ export class RecettesListComponent implements OnInit {
       date_from: this.fFrom || undefined, date_to: this.fTo || undefined,
       payment_mode: this.fMode || undefined,
     }).subscribe({
-      next: d => { this.rows = d; this.pg.page = 1; this.loading = false; },
+      next: d => {
+        this.rows = d;
+        if (this.kind === 'voyage') {
+          const seen = new Map<string, string>();
+          d.forEach((r: any) => { if (r.trip_id && !seen.has(r.trip_id)) seen.set(r.trip_id, r.trip_number || r.trip_id); });
+          this.voyageOptions = [...seen].map(([id, number]) => ({ id, number }));
+        }
+        this.pg.page = 1;
+        this.loading = false;
+      },
       error: () => this.loading = false,
     });
   }
 
-  clearFilters(): void { this.fFrom = this.fTo = this.fMode = ''; this.reload(); }
+  get filtered(): any[] {
+    return this.selectedVoyage ? this.rows.filter(r => r.trip_id === this.selectedVoyage) : this.rows;
+  }
+
+  clearFilters(): void { this.fFrom = this.fTo = this.fMode = ''; this.selectedVoyage = ''; this.reload(); }
 
   openCreate(): void { this.errorMsg = ''; this.form.reset({ payment_mode: 'cash' }); }
 

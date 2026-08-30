@@ -295,6 +295,8 @@ class IncomeRowSerializer(serializers.ModelSerializer):
     account_label      = serializers.SerializerMethodField()
     source_ref         = serializers.SerializerMethodField()
     source_party       = serializers.SerializerMethodField()
+    trip_id            = serializers.SerializerMethodField()
+    trip_number        = serializers.SerializerMethodField()
 
     class Meta:
         model = Transaction
@@ -302,8 +304,20 @@ class IncomeRowSerializer(serializers.ModelSerializer):
             "id", "reference", "category", "category_display",
             "amount", "payment_mode", "payment_display", "transaction_date",
             "cash_register_name", "agency_name", "account_label",
-            "source_ref", "source_party", "description", "created_at",
+            "source_ref", "source_party", "trip_id", "trip_number",
+            "description", "created_at",
         ]
+
+    def get_trip_id(self, obj):
+        if obj.category == Transaction.Category.TICKET_SALES and obj.voyage_booking_id:
+            return str(obj.voyage_booking.outbound_trip_id) if obj.voyage_booking.outbound_trip_id else None
+        return None
+
+    def get_trip_number(self, obj):
+        if (obj.category == Transaction.Category.TICKET_SALES and obj.voyage_booking_id
+                and obj.voyage_booking.outbound_trip_id):
+            return obj.voyage_booking.outbound_trip.number or None
+        return None
 
     def get_cash_register_name(self, obj):
         return obj.cash_session.cash_register.name if obj.cash_session_id else None

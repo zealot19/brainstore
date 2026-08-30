@@ -24,7 +24,8 @@ def list_income(company_id, *, category=None, agency_scope=None,
           .filter(company_id=company_id, is_deleted=False,
                   transaction_type=Transaction.Type.INCOME)
           .select_related("cash_session__cash_register__agency", "bank_account",
-                          "voyage_booking", "voyages_parcel", "voyages_baggage", "trip")
+                          "voyage_booking__outbound_trip", "voyages_parcel",
+                          "voyages_baggage", "trip")
           .order_by("-transaction_date", "-created_at"))
     qs = _apply_income_agency_scope(qs, agency_scope)
     if category:
