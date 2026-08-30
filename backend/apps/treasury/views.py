@@ -17,6 +17,7 @@ from apps.treasury.serializers import (
     TransactionReadSerializer, TransactionWriteSerializer,
     TransferReadSerializer, TransferWriteSerializer,
     TreasuryStatsSerializer,
+    IncomeRowSerializer, OtherIncomeWriteSerializer,
 )
 
 
@@ -569,4 +570,104 @@ class VoyageExpenseVoucherView(APIView):
             kind_label="Dépense voyage")
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="bon-depense-voyage-{str(e.id)[:8]}.pdf"'
+        return resp
+
+
+# ── Recettes (income) ────────────────────────────────────────────────────────
+
+from apps.treasury.selectors import incomes as income_selectors  # noqa: E402
+
+
+class _IncomeListBase(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.income.view"}
+    category = None
+
+    def get(self, request):
+        p = request.query_params
+        qs = income_selectors.list_income(
+            _company(request).id, category=self.category,
+            agency_scope=register_agency_scope(request.user),
+            date_from=p.get("date_from"), date_to=p.get("date_to"),
+            payment_mode=p.get("payment_mode"))
+        page = StandardResultsSetPagination()
+        return page.get_paginated_response(
+            IncomeRowSerializer(page.paginate_queryset(qs, request), many=True).data)
+
+
+class IncomeVoyageListView(_IncomeListBase):
+    category = Transaction.Category.TICKET_SALES
+
+
+class IncomeParcelListView(_IncomeListBase):
+    category = Transaction.Category.PARCEL_SHIPPING
+
+
+class IncomeBaggageListView(_IncomeListBase):
+    category = Transaction.Category.BAGGAGE
+
+
+class IncomeOtherListView(_IncomeListBase):
+    category = Transaction.Category.OTHER_INCOME
+    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.manage"}
+
+    def post(self, request):
+        ser = OtherIncomeWriteSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        company = _company(request)
+        session = None
+        if d.get("cash_session_id"):
+            session = CashSession.objects.filter(
+                company=company, id=d["cash_session_id"],
+                status=CashSession.Status.OPEN, is_deleted=False).first()
+        try:
+            txn = services.record_other_income(
+                company, amount=d["amount"], payment_mode=d["payment_mode"],
+                description=d.get("description", ""), user=request.user,
+                cash_session=session)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return created_response(IncomeRowSerializer(txn).data)
+
+
+class IncomeDashboardView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.income.view"}
+
+    def get(self, request):
+        return success_response(income_selectors.income_dashboard(
+            _company(request).id, agency_scope=register_agency_scope(request.user)))
+
+
+class IncomeReceiptView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.income.view"}
+
+    def get(self, request, pk):
+        from django.http import HttpResponse
+        from apps.treasury.income_receipt import render_income_receipt
+        company = _company(request)
+        txn = Transaction.objects.select_related(
+            "cash_session__cash_register__agency", "bank_account",
+            "voyage_booking", "voyages_parcel", "voyages_baggage", "created_by"
+        ).filter(company=company, id=pk, is_deleted=False,
+                 transaction_type=Transaction.Type.INCOME).first()
+        if not txn:
+            return error_response("Introuvable.", status_code=404)
+        row = IncomeRowSerializer(txn).data
+        source_label = f"{txn.get_category_display()} {row['source_ref']}".strip()
+        caisse = txn.cash_session.cash_register.name if txn.cash_session_id else None
+        agency = (txn.cash_session.cash_register.agency.name
+                  if txn.cash_session_id and txn.cash_session.cash_register.agency_id else None)
+        pdf = render_income_receipt(
+            company=company, ref=txn.reference or str(txn.id)[:8].upper(),
+            date=txn.transaction_date, source_label=source_label,
+            party=row["source_party"], amount=txn.amount,
+            payment_label=txn.get_payment_mode_display(), caisse_label=caisse,
+            agency_name=agency,
+            created_by=txn.created_by.get_full_name() if txn.created_by_id else None,
+            kind_label=f"Recette {txn.get_category_display()}")
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="recu-recette-{str(txn.id)[:8]}.pdf"'
         return resp
