@@ -133,7 +133,6 @@ export class SidebarService {
           subMenus: [
             { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes',         permission: 'transport.fareclass.view' },
             { menuValue: 'Tarifs',              route: routes.vcFares,              base: 'fares',                permission: 'transport.fare.view' },
-            { menuValue: "Types de dépense",    route: routes.vcExpenseTypes,       base: 'expense-types',        permission: 'transport.config.view' },
             { menuValue: "Barème dépenses",     route: routes.vcExpenseSchedules,   base: 'expense-schedules',    permission: 'transport.config.view' },
             { menuValue: 'Fidélité',            route: routes.vcLoyalty,            base: 'loyalty-rules',        permission: 'transport.config.view' },
           ],
@@ -282,6 +281,16 @@ export class SidebarService {
             { menuValue: 'Tableau de bord',  route: routes.trzExpensesDashboard, base: 'expenses-dashboard', permission: 'treasury.expense.view' },
             { menuValue: 'Dépense voyage',   route: routes.trzExpensesVoyage,    base: 'expenses-voyage',    permission: 'treasury.expense.view' },
             { menuValue: 'Dépense générale', route: routes.trzExpensesGeneral,   base: 'expenses-general',   permission: 'treasury.expense.view' },
+          ],
+        },
+        {
+          menuValue: 'Config Trésorerie',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'treasury-config',
+          subMenus: [
+            { menuValue: 'Types de dépense', route: routes.vcExpenseTypes, base: 'expense-types', permission: 'transport.config.view' },
           ],
         },
       ],
