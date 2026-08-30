@@ -55,4 +55,11 @@ export class VoyageExpensesComponent implements OnInit {
     this.tripExpSvc.disburse(e.trip_id, e.id, this.disburseSession)
       .subscribe({ next: () => this.reload(), error: err => alert(err?.error?.error?.message ?? err?.error?.detail ?? 'Erreur.') });
   }
+
+  printVoucher(e: any): void {
+    this.svc.voyageVoucher(e.id).subscribe({
+      next: blob => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60000); },
+      error: () => alert('Impossible de générer le bon de dépense.'),
+    });
+  }
 }

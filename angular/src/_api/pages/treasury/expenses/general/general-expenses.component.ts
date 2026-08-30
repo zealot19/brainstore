@@ -73,6 +73,13 @@ export class GeneralExpensesComponent implements OnInit {
       .subscribe({ next: () => this.reload(), error: err => alert(err?.error?.error?.message ?? 'Erreur.') });
   }
 
+  printVoucher(e: any): void {
+    this.svc.voucher(e.id).subscribe({
+      next: blob => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60000); },
+      error: () => alert('Impossible de générer le bon de dépense.'),
+    });
+  }
+
   typeName(id: string): string { return this.types.find(t => t.id === id)?.name ?? id; }
   private close(id: string): void {
     document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click'));

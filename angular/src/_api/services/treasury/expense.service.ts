@@ -14,4 +14,5 @@ export class ExpenseService {
     return this.http.get<any>(TREASURY.expVoyage, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   dashboard(): Observable<any> { return this.http.get<any>(TREASURY.expDashboard).pipe(map(r => r.data ?? r)); }
+  voyageVoucher(id: string): Observable<Blob> { return this.http.get(TREASURY.expVoyageVoucher(id), { responseType: 'blob' }); }
 }

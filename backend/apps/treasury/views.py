@@ -515,3 +515,58 @@ class ExpenseDashboardView(APIView):
     def get(self, request):
         return success_response(expense_selectors.expenses_dashboard(
             _company(request).id, agency_scope=register_agency_scope(request.user)))
+
+
+class GeneralExpenseVoucherView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view"}
+
+    def get(self, request, pk):
+        from django.http import HttpResponse
+        from apps.treasury.models import GeneralExpense
+        from apps.treasury.expense_voucher import render_expense_voucher
+        company = _company(request)
+        e = GeneralExpense.objects.select_related(
+            "expense_type", "agency", "cash_session__cash_register", "created_by", "updated_by"
+        ).filter(company=company, id=pk, is_deleted=False).first()
+        if not e:
+            return error_response("Introuvable.", status_code=404)
+        caisse = e.cash_session.cash_register.name if e.cash_session_id else None
+        pdf = render_expense_voucher(
+            company=company, ref=str(e.id)[:8].upper(), date=e.expense_date,
+            type_name=e.expense_type.name, label=e.label, amount=e.amount,
+            agency_name=e.agency.name if e.agency_id else None, caisse_label=caisse,
+            status_label=e.get_status_display(),
+            created_by=e.created_by.get_full_name() if e.created_by_id else None,
+            disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
+            kind_label="Dépense générale")
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="bon-depense-{str(e.id)[:8]}.pdf"'
+        return resp
+
+
+class VoyageExpenseVoucherView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.expense.view"}
+
+    def get(self, request, pk):
+        from django.http import HttpResponse
+        from apps.voyages_trips.models import TripExpense
+        from apps.treasury.expense_voucher import render_expense_voucher
+        company = _company(request)
+        e = TripExpense.objects.select_related(
+            "expense_type", "trip", "cash_session__cash_register", "created_by", "updated_by"
+        ).filter(trip__company=company, id=pk, is_deleted=False).first()
+        if not e:
+            return error_response("Introuvable.", status_code=404)
+        caisse = e.cash_session.cash_register.name if e.cash_session_id else None
+        pdf = render_expense_voucher(
+            company=company, ref=e.trip.number or str(e.id)[:8].upper(), date=e.date,
+            type_name=e.expense_type.name, label=e.description or e.expense_type.name, amount=e.amount,
+            agency_name=None, caisse_label=caisse, status_label=e.get_status_display(),
+            created_by=e.created_by.get_full_name() if e.created_by_id else None,
+            disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
+            kind_label="Dépense voyage")
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="bon-depense-voyage-{str(e.id)[:8]}.pdf"'
+        return resp

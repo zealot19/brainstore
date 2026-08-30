@@ -19,4 +19,7 @@ export class GeneralExpenseService {
   disburse(id: string, cashSessionId?: string): Observable<any> {
     return this.http.post<any>(TREASURY.expGeneralDisburse(id), cashSessionId ? { cash_session_id: cashSessionId } : {}).pipe(map(r => r.data ?? r));
   }
+  voucher(id: string): Observable<Blob> {
+    return this.http.get(TREASURY.expGeneralVoucher(id), { responseType: 'blob' });
+  }
 }

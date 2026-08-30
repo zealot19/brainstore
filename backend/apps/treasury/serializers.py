@@ -250,11 +250,16 @@ from apps.treasury.models import GeneralExpense  # noqa: E402
 class GeneralExpenseReadSerializer(serializers.ModelSerializer):
     expense_type_name = serializers.CharField(source="expense_type.name", read_only=True)
     agency_name = serializers.CharField(source="agency.name", read_only=True, default=None)
+    cash_register_name = serializers.SerializerMethodField()
 
     class Meta:
         model = GeneralExpense
         fields = ["id", "expense_type", "expense_type_name", "agency", "agency_name",
-                  "label", "amount", "expense_date", "status", "cash_session", "created_at"]
+                  "label", "amount", "expense_date", "status", "cash_session",
+                  "cash_register_name", "created_at"]
+
+    def get_cash_register_name(self, obj):
+        return obj.cash_session.cash_register.name if obj.cash_session_id else None
 
 
 class GeneralExpenseWriteSerializer(serializers.Serializer):
@@ -273,3 +278,7 @@ class VoyageExpenseRowSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=14, decimal_places=2)
     status = serializers.CharField()
     date = serializers.DateField()
+    cash_register_name = serializers.SerializerMethodField()
+
+    def get_cash_register_name(self, obj):
+        return obj.cash_session.cash_register.name if obj.cash_session_id else None
