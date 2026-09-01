@@ -138,6 +138,10 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     from apps.treasury.services.seed import seed_treasury_mapping
     seed_treasury_mapping(company, created_by=created_by)
 
+    # Moyens de paiement par défaut de la société.
+    from apps.treasury.services.seed import seed_payment_methods
+    seed_payment_methods(company, created_by=created_by)
+
     # Types de membre d'équipage par défaut (Voyages).
     from apps.voyages_config.services.crew_seed import seed_crew_member_types
     seed_crew_member_types(company, created_by=created_by)

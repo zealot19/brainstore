@@ -31,3 +31,24 @@ def seed_treasury_mapping(company, created_by=None) -> int:
         MovementAccountMapping.objects.create(company=company, category=category, account=acc, created_by=created_by)
         created += 1
     return created
+
+
+_PAYMENT_METHODS = [
+    ("cash",         "Espèces",            True,  "cash"),
+    ("orange_money", "Orange Money",       True,  "mobile_money"),
+    ("mobile_money", "Mobile Money (MTN)", True,  "mobile_money"),
+    ("loyalty",      "Point fidélité",     False, "cash"),
+    ("unpaid",       "Non payé",           False, "cash"),
+]
+
+
+def seed_payment_methods(company, created_by=None) -> int:
+    from apps.treasury.models import PaymentMethod
+    created = 0
+    for code, name, requires, mode in _PAYMENT_METHODS:
+        _, was_created = PaymentMethod.objects.get_or_create(
+            company=company, code=code,
+            defaults={"name": name, "requires_payment": requires, "mode": mode,
+                      "is_system": True, "created_by": created_by})
+        created += int(was_created)
+    return created
