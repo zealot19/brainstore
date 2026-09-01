@@ -21,6 +21,10 @@ from apps.treasury.serializers import (
 )
 
 
+_PDF_UNAVAILABLE = ("Génération PDF indisponible : le moteur WeasyPrint n'est pas configuré sur ce serveur "
+                    "(librairies Pango/Cairo manquantes). Contactez l'administrateur.")
+
+
 def _company(request):
     return request.user.company
 
@@ -542,14 +546,17 @@ class GeneralExpenseVoucherView(APIView):
         if not e:
             return error_response("Introuvable.", status_code=404)
         caisse = e.cash_session.cash_register.name if e.cash_session_id else None
-        pdf = render_expense_voucher(
-            company=company, ref=str(e.id)[:8].upper(), date=e.expense_date,
-            type_name=e.expense_type.name, label=e.label, amount=e.amount,
-            agency_name=e.agency.name if e.agency_id else None, caisse_label=caisse,
-            status_label=e.get_status_display(),
-            created_by=e.created_by.get_full_name() if e.created_by_id else None,
-            disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
-            kind_label="Dépense générale")
+        try:
+            pdf = render_expense_voucher(
+                company=company, ref=str(e.id)[:8].upper(), date=e.expense_date,
+                type_name=e.expense_type.name, label=e.label, amount=e.amount,
+                agency_name=e.agency.name if e.agency_id else None, caisse_label=caisse,
+                status_label=e.get_status_display(),
+                created_by=e.created_by.get_full_name() if e.created_by_id else None,
+                disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
+                kind_label="Dépense générale")
+        except (ImportError, OSError):
+            return error_response(_PDF_UNAVAILABLE, status_code=503)
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="bon-depense-{str(e.id)[:8]}.pdf"'
         return resp
@@ -570,13 +577,16 @@ class VoyageExpenseVoucherView(APIView):
         if not e:
             return error_response("Introuvable.", status_code=404)
         caisse = e.cash_session.cash_register.name if e.cash_session_id else None
-        pdf = render_expense_voucher(
-            company=company, ref=e.trip.number or str(e.id)[:8].upper(), date=e.date,
-            type_name=e.expense_type.name, label=e.description or e.expense_type.name, amount=e.amount,
-            agency_name=None, caisse_label=caisse, status_label=e.get_status_display(),
-            created_by=e.created_by.get_full_name() if e.created_by_id else None,
-            disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
-            kind_label="Dépense voyage")
+        try:
+            pdf = render_expense_voucher(
+                company=company, ref=e.trip.number or str(e.id)[:8].upper(), date=e.date,
+                type_name=e.expense_type.name, label=e.description or e.expense_type.name, amount=e.amount,
+                agency_name=None, caisse_label=caisse, status_label=e.get_status_display(),
+                created_by=e.created_by.get_full_name() if e.created_by_id else None,
+                disbursed_by=(e.updated_by.get_full_name() if e.updated_by_id else None) if e.status == "paid" else None,
+                kind_label="Dépense voyage")
+        except (ImportError, OSError):
+            return error_response(_PDF_UNAVAILABLE, status_code=503)
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="bon-depense-voyage-{str(e.id)[:8]}.pdf"'
         return resp
@@ -669,14 +679,17 @@ class IncomeReceiptView(APIView):
         caisse = txn.cash_session.cash_register.name if txn.cash_session_id else None
         agency = (txn.cash_session.cash_register.agency.name
                   if txn.cash_session_id and txn.cash_session.cash_register.agency_id else None)
-        pdf = render_income_receipt(
-            company=company, ref=txn.reference or str(txn.id)[:8].upper(),
-            date=txn.transaction_date, source_label=source_label,
-            party=row["source_party"], amount=txn.amount,
-            payment_label=txn.get_payment_mode_display(), caisse_label=caisse,
-            agency_name=agency,
-            created_by=txn.created_by.get_full_name() if txn.created_by_id else None,
-            kind_label=f"Recette {txn.get_category_display()}")
+        try:
+            pdf = render_income_receipt(
+                company=company, ref=txn.reference or str(txn.id)[:8].upper(),
+                date=txn.transaction_date, source_label=source_label,
+                party=row["source_party"], amount=txn.amount,
+                payment_label=txn.get_payment_mode_display(), caisse_label=caisse,
+                agency_name=agency,
+                created_by=txn.created_by.get_full_name() if txn.created_by_id else None,
+                kind_label=f"Recette {txn.get_category_display()}")
+        except (ImportError, OSError):
+            return error_response(_PDF_UNAVAILABLE, status_code=503)
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="recu-recette-{str(txn.id)[:8]}.pdf"'
         return resp
