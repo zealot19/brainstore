@@ -346,7 +346,13 @@ class TripRoadmapPdfView(APIView):
             return error_response("Voyage introuvable.", status_code=404)
         doc = "colis" if request.query_params.get("doc") == "colis" else "voyages"
         data = build_roadmap_data(trip, request)
-        pdf = render_roadmap_pdf(data, doc)
+        try:
+            pdf = render_roadmap_pdf(data, doc)
+        except (ImportError, OSError):
+            return error_response(
+                "Génération PDF indisponible : le moteur WeasyPrint n'est pas configuré sur ce serveur "
+                "(librairies Pango/Cairo manquantes). Contactez l'administrateur.",
+                status_code=503)
         filename = f"bordereau-{doc}-{trip.number}.pdf".replace("/", "-")
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="{filename}"'

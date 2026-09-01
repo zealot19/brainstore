@@ -11,6 +11,10 @@ from .models import TripCrew, TripSeat, CrewMember, TripExpense
 from apps.voyages_config.models import CrewMemberType
 
 
+# Un voyage terminé ou annulé est figé : on n'ajoute/retire plus d'équipage.
+_CREW_LOCKED_STATUSES = ("completed", "cancelled")
+
+
 def _scope(request):
     """Return the company for this request (non-null operational scope), or (None, error)."""
     if request.user.is_superuser:
@@ -197,6 +201,8 @@ class TripCrewView(APIView):
             return error_response("Voyage introuvable.", status_code=404)
         payload = S.TripCrewWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
+        if trip.status in _CREW_LOCKED_STATUSES:
+            return error_response("Impossible de modifier l'équipage d'un voyage terminé ou annulé.")
         member = CrewMember.objects.filter(id=payload.validated_data["member_id"],
                                            company=company, is_deleted=False).first()
         if not member:
@@ -225,6 +231,8 @@ class TripCrewDetailView(APIView):
         trip = selectors.get_trip(company, trip_id)
         if not trip:
             return error_response("Voyage introuvable.", status_code=404)
+        if trip.status in _CREW_LOCKED_STATUSES:
+            return error_response("Impossible de modifier l'équipage d'un voyage terminé ou annulé.")
         crew = trip.crew.filter(id=crew_id, is_deleted=False).first()
         if not crew:
             return error_response("Équipage introuvable.", status_code=404)
