@@ -16,6 +16,7 @@ _DEFAULTS = {
     "other_expense":   "658",
     "voyage_expense":  "658",
     "general_expense": "658",
+    "refund":          "706",
 }
 
 
