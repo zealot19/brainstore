@@ -31,7 +31,7 @@ def test_recapitulatif_margin():
     dep = timezone.now()
     trip = create_trip(company=company, route=route, fare_class=fc,
                        scheduled_departure=dep, scheduled_arrival=dep + timedelta(hours=6), user=admin)
-    p = Passenger.objects.create(company=company, first_name="A", last_name="B", phone="600000000")
+    p = Passenger.objects.create(company=company, name="A B", phone="600000000")
     booking = Booking.objects.create(company=company, outbound_trip=trip, buyer=p)
     reg = create_cash_register(company=company, name="C1", created_by=admin)
     session = open_session(company=company, cash_register=reg, created_by=admin)
