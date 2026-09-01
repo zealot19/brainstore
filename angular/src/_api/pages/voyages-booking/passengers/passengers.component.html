@@ -43,8 +43,7 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Prénom <span class="text-danger">*</span></label><input formControlName="first_name" type="text" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="last_name" type="text" class="form-control" /></div>
+      <div class="col-md-12 mb-3"><label class="form-label">Nom <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
     </div>
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">Genre</label>

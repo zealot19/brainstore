@@ -38,8 +38,8 @@ def _book(company, admin, trip):
     seat = trip.seats.order_by("column").first()
     return create_booking(
         company, trip_type="one_way", outbound_trip=trip, return_trip=None,
-        buyer_spec={"first_name": "Cli", "last_name": "Ent", "phone": "690"},
-        items=[{"passenger": {"first_name": "Cli", "last_name": "Ent", "phone": "690"},
+        buyer_spec={"name": "Cli Ent", "phone": "690"},
+        items=[{"passenger": {"name": "Cli Ent", "phone": "690"},
                 "destination_point_id": None, "outbound_seat_id": str(seat.id)}],
         payment_method="cash", user=admin)
 

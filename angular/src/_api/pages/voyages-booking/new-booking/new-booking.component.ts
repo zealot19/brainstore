@@ -9,6 +9,7 @@ import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
 import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, PassengerSpec } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
+import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 interface PaxRow extends PassengerSpec { destination_point_id: string; }
@@ -16,7 +17,7 @@ interface PaxRow extends PassengerSpec { destination_point_id: string; }
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent, ClientAutocompleteComponent],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
@@ -114,7 +115,7 @@ export class VbNewBookingComponent implements OnInit {
     const rows: PaxRow[] = [];
     for (let i = 0; i < this.selOutbound.length; i++) {
       rows.push(this.passengers[i] ?? {
-        first_name: '', last_name: '', phone: '', id_type: 'cni', id_number: '',
+        name: '', phone: '', id_type: 'cni', id_number: '',
         destination_point_id: this.defaultDestId,
       });
     }
@@ -143,7 +144,7 @@ export class VbNewBookingComponent implements OnInit {
     if (this.saving || !this.outboundTripId || !this.selOutbound.length) return false;
     if (this.needReturnSel && (!this.returnTripId || this.selReturn.length !== this.selOutbound.length)) return false;
     if (this.anyMissingFare) return false;
-    if (this.passengers.some(p => !p.first_name || !p.last_name || !p.phone)) return false;
+    if (this.passengers.some(p => !p.name || !p.phone)) return false;
     if ((this.amountReceived ?? 0) < this.total) return false;
     return true;
   }
@@ -154,7 +155,7 @@ export class VbNewBookingComponent implements OnInit {
     const items: BookingItem[] = this.selOutbound.map((seat, i) => {
       const p = this.passengers[i];
       return {
-        passenger: { first_name: p.first_name, last_name: p.last_name, phone: p.phone,
+        passenger: { id: p.id, name: p.name, phone: p.phone,
                      id_type: p.id_type, id_number: p.id_number },
         destination_point_id: p.destination_point_id || null,
         outbound_seat_id: seat.id,

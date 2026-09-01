@@ -23,7 +23,7 @@ export class VbPassengersComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      first_name: [null, Validators.required], last_name: [null, Validators.required],
+      name: [null, Validators.required],
       gender: [''], birth_date: [null], phone: [null, Validators.required], email: [''],
       id_type: ['cni'], id_number: [''], notes: [''],
     });
@@ -38,7 +38,7 @@ export class VbPassengersComponent implements OnInit {
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ gender: '', id_type: 'cni', birth_date: null }); }
   openEdit(r: Passenger): void {
     this.editId = r.id; this.errorMsg = '';
-    this.form.patchValue({ first_name: r.first_name, last_name: r.last_name, gender: r.gender,
+    this.form.patchValue({ name: r.name, gender: r.gender,
       birth_date: r.birth_date, phone: r.phone, email: r.email, id_type: r.id_type, id_number: r.id_number, notes: r.notes });
   }
   submit(): void {

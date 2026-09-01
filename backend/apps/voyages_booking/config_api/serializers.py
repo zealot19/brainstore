@@ -9,14 +9,13 @@ class PassengerRead(serializers.ModelSerializer):
 
     class Meta:
         model = Passenger
-        fields = ["id", "first_name", "last_name", "full_name", "gender", "gender_display",
+        fields = ["id", "name", "full_name", "gender", "gender_display",
                   "birth_date", "phone", "email", "id_type", "id_type_display", "id_number",
                   "notes", "company", "is_active", "created_at", "updated_at"]
 
 
 class PassengerWrite(serializers.Serializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    name = serializers.CharField(max_length=300)
     gender = serializers.ChoiceField(choices=Passenger.Gender.choices, required=False, allow_blank=True, default="")
     birth_date = serializers.DateField(required=False, allow_null=True, default=None)
     phone = serializers.CharField(max_length=30)

@@ -11,10 +11,9 @@ _BOOKABLE = ["pending"]
 
 
 def find_passengers(company, q=None):
-    qs = Passenger.objects.filter(is_deleted=False, company=company).order_by("last_name", "first_name")
+    qs = Passenger.objects.filter(is_deleted=False, company=company).order_by("name")
     if q:
-        qs = qs.filter(Q(phone__icontains=q) | Q(id_number__icontains=q) |
-                       Q(first_name__icontains=q) | Q(last_name__icontains=q))
+        qs = qs.filter(Q(name__icontains=q) | Q(phone__icontains=q) | Q(id_number__icontains=q))
     return qs
 
 

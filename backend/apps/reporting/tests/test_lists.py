@@ -46,7 +46,7 @@ def test_reservation_total():
     from apps.reporting.registry import REPORTS
     company, admin = _company("Res Co", "res@x.com")
     ctx = _base(company, admin)
-    p = Passenger.objects.create(company=company, first_name="A", last_name="B", phone="600")
+    p = Passenger.objects.create(company=company, name="A B", phone="600")
     booking = Booking.objects.create(company=company, outbound_trip=ctx["trip"], buyer=p)
     Ticket.objects.create(booking=booking, passenger=p, trip=ctx["trip"], fare_class=ctx["fc"],
                           origin_point=ctx["o"], destination_point=ctx["d"], trip_seat=ctx["seat"],
@@ -81,7 +81,7 @@ def test_voyages_reservation_and_parcel_sums():
     from apps.reporting.registry import REPORTS
     company, admin = _company("Voy Co", "voy@x.com")
     ctx = _base(company, admin)
-    p = Passenger.objects.create(company=company, first_name="A", last_name="B", phone="600")
+    p = Passenger.objects.create(company=company, name="A B", phone="600")
     booking = Booking.objects.create(company=company, outbound_trip=ctx["trip"], buyer=p)
     Ticket.objects.create(booking=booking, passenger=p, trip=ctx["trip"], fare_class=ctx["fc"],
                           origin_point=ctx["o"], destination_point=ctx["d"], trip_seat=ctx["seat"],

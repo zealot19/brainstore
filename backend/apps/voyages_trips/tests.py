@@ -87,7 +87,7 @@ def _graph():
     dest = _trip(c, route, fc, a, b, plan_dest)
 
     booking = Booking.objects.create(company=c, outbound_trip=src,
-                                     buyer=Passenger.objects.create(company=c, first_name="Ach", last_name="Eteur", phone="600"),
+                                     buyer=Passenger.objects.create(company=c, name="Ach Eteur", phone="600"),
                                      trip_type="one_way")
     seats = list(src.seats.order_by("column"))
     tickets = []
@@ -95,7 +95,7 @@ def _graph():
         seat = seats[i]
         seat.status = TripSeat.Status.SOLD
         seat.save(update_fields=["status"])
-        p = Passenger.objects.create(company=c, first_name=f"P{i}", last_name="X", phone=f"61{i}")
+        p = Passenger.objects.create(company=c, name=f"P{i} X", phone=f"61{i}")
         tk = Ticket.objects.create(booking=booking, passenger=p, trip=src, trip_seat=seat,
                                    fare_class=fc, direction="outbound", origin_point=a, destination_point=b,
                                    status="sold")
