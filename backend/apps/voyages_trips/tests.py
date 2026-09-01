@@ -267,3 +267,35 @@ def test_trip_create_permission():
 def test_staff_without_voyage_perm_denied():
     company, admin, staff = _make_staff([])
     assert _status(TripListCreateView, "get", staff) == 403
+
+
+@pytest.mark.django_db
+def test_transbord_selection_new_bus_creates_full_voyage_with_expenses():
+    """Un transbordement-sélection vers un NOUVEAU bus crée un vrai voyage :
+    numéro attribué + dépenses générées depuis le barème."""
+    from decimal import Decimal
+    from apps.voyages_trips.services.transbordement import transbord_selection
+    from apps.voyages_trips.models import Trip, TripExpense
+    from apps.fleet.models import Vehicle, VehicleBrand, VehicleModel
+    from apps.voyages_config.models import (VehicleSeatingAssignment, ExpenseType,
+                                            ExpenseSchedule, ExpenseScheduleLine)
+    g = _graph()
+    c, src = g["company"], g["src"]
+    brand = VehicleBrand.objects.create(name="Toyota")
+    model = VehicleModel.objects.create(brand=brand, name="Coaster")
+    veh = Vehicle.objects.create(company=c, model=model, license_plate="LT-9",
+                                 status="available", is_active=True)
+    VehicleSeatingAssignment.objects.create(company=c, vehicle=veh, seating_plan=g["plan_big"],
+                                            valid_from=src.scheduled_departure.date(), is_active=True)
+    et = ExpenseType.objects.create(company=c, code="CARB", name="Carburant", account_code="601")
+    sch = ExpenseSchedule.objects.create(company=c, route=src.route, fare_class=src.fare_class)
+    ExpenseScheduleLine.objects.create(schedule=sch, expense_type=et, amount=Decimal("15000"))
+
+    t0 = g["tickets"][0]
+    res = transbord_selection(src, ticket_ids=[str(t0.id)], parcel_ids=[], baggage_ids=[],
+                              dest_vehicle=veh, user=None)
+    dest = Trip.objects.get(id=res["destination_trip_id"])
+    assert dest.number                      # numéro -> vrai voyage
+    assert dest.vehicle_id == veh.id and dest.status == "pending"
+    exps = TripExpense.objects.filter(trip=dest, is_deleted=False)
+    assert exps.count() == 1 and exps.first().amount == Decimal("15000")
