@@ -43,6 +43,7 @@ export class VoyagesListComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       route_id: [null, Validators.required], service_pattern_id: [null], fare_class_id: [null, Validators.required],
+      service_date: [''],
       scheduled_departure: ['', Validators.required], scheduled_arrival: ['', Validators.required],
       code: [''], notes: [''],
     });
@@ -73,16 +74,40 @@ export class VoyagesListComponent implements OnInit {
   statusCss(s: string): string { return this.statuses.find(x => x.value === s)?.css ?? ''; }
   statusLabel(s: string): string { return this.statuses.find(x => x.value === s)?.label ?? s; }
 
+  private readonly manualFields = ['route_id', 'fare_class_id', 'scheduled_departure', 'scheduled_arrival'];
+
+  get selectedPattern(): ServicePattern | undefined {
+    return this.patterns.find(x => x.id === this.form.value.service_pattern_id);
+  }
+  get patternMode(): boolean { return !!this.form.value.service_pattern_id; }
+
+  /** Bascule les validateurs : en mode planification, seule la date est requise. */
   onPatternChange(): void {
-    const p = this.patterns.find(x => x.id === this.form.value.service_pattern_id);
-    if (p) this.form.patchValue({ fare_class_id: p.fare_class });
+    const p = this.selectedPattern;
+    if (p) {
+      this.manualFields.forEach(c => { this.form.get(c)?.clearValidators(); this.form.get(c)?.updateValueAndValidity(); });
+      this.form.get('service_date')?.setValidators(Validators.required);
+      this.form.patchValue({ route_id: p.route, fare_class_id: p.fare_class });
+    } else {
+      this.manualFields.forEach(c => { this.form.get(c)?.setValidators(Validators.required); this.form.get(c)?.updateValueAndValidity(); });
+      this.form.get('service_date')?.clearValidators();
+    }
+    this.form.get('service_date')?.updateValueAndValidity();
   }
 
-  openCreate(): void { this.errorMsg = ''; this.form.reset({ route_id: null, service_pattern_id: null, fare_class_id: null, scheduled_departure: '', scheduled_arrival: '', code: '', notes: '' }); }
+  openCreate(): void {
+    this.errorMsg = '';
+    this.form.reset({ route_id: null, service_pattern_id: null, fare_class_id: null, service_date: '',
+                      scheduled_departure: '', scheduled_arrival: '', code: '', notes: '' });
+    this.onPatternChange();  // restaure les validateurs du mode manuel
+  }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
-    const v = { ...this.form.value, service_pattern_id: this.form.value.service_pattern_id || null };
-    this.svc.create(v).subscribe({
+    const f = this.form.value;
+    const payload = f.service_pattern_id
+      ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes }
+      : { ...f, service_pattern_id: null };
+    this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; },
     });

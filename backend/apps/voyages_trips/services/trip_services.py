@@ -36,6 +36,40 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
     return trip
 
 
+_WEEKDAY_FIELDS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+
+@transaction.atomic
+def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="", user):
+    """Crée un voyage à partir d'une planification : trajet, catégorie, plan et
+    horaires sont dérivés du modèle ; l'utilisateur ne choisit que la date."""
+    from datetime import datetime, timedelta
+
+    # La planification doit circuler ce jour-là et être dans sa période de validité.
+    if not getattr(pattern, _WEEKDAY_FIELDS[service_date.weekday()]):
+        raise ApplicationError(_("Cette planification ne circule pas ce jour-là."))
+    if pattern.valid_from and service_date < pattern.valid_from:
+        raise ApplicationError(_("Cette planification n'est pas encore valide à cette date."))
+    if pattern.valid_to and service_date > pattern.valid_to:
+        raise ApplicationError(_("Cette planification n'est plus valide à cette date."))
+
+    ts = pattern.time_slot
+    departure = timezone.make_aware(datetime.combine(service_date, ts.start_time))
+    arrival = timezone.make_aware(datetime.combine(service_date, ts.end_time))
+    if ts.end_time <= ts.start_time:  # créneau de nuit -> arrivée le lendemain
+        arrival += timedelta(days=1)
+
+    trip = create_trip(
+        company=company, route=pattern.route, fare_class=pattern.fare_class,
+        scheduled_departure=departure, scheduled_arrival=arrival,
+        service_pattern=pattern, code=code, notes=notes, user=user)
+    if pattern.default_seating_plan_id:
+        trip.seating_plan = pattern.default_seating_plan
+        trip.updated_by = user
+        trip.save(update_fields=["seating_plan", "updated_by", "updated_at"])
+    return trip
+
+
 @transaction.atomic
 def submit_trip(trip, *, user):
     if trip.status != Trip.Status.DRAFT:

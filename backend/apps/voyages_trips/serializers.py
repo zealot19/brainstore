@@ -95,15 +95,28 @@ class TripDetailSerializer(TripListSerializer):
 
 
 class TripCreateSerializer(serializers.Serializer):
-    route_id = serializers.UUIDField()
-    fare_class_id = serializers.UUIDField()
+    # Mode « planification » : service_pattern_id + service_date (le reste est dérivé).
+    # Mode « manuel » : route_id + fare_class_id + horaires explicites.
+    route_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    fare_class_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     service_pattern_id = serializers.UUIDField(required=False, allow_null=True, default=None)
-    scheduled_departure = serializers.DateTimeField()
-    scheduled_arrival = serializers.DateTimeField()
+    service_date = serializers.DateField(required=False, allow_null=True, default=None)
+    scheduled_departure = serializers.DateTimeField(required=False, allow_null=True, default=None)
+    scheduled_arrival = serializers.DateTimeField(required=False, allow_null=True, default=None)
     origin_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     destination_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     code = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
     notes = serializers.CharField(required=False, allow_blank=True, default="")
+
+    def validate(self, attrs):
+        pattern_mode = bool(attrs.get("service_pattern_id") and attrs.get("service_date"))
+        if not pattern_mode:
+            missing = [f for f in ("route_id", "fare_class_id", "scheduled_departure", "scheduled_arrival")
+                       if not attrs.get(f)]
+            if missing:
+                raise serializers.ValidationError(
+                    "Sans planification, le trajet, la catégorie et les horaires sont requis.")
+        return attrs
 
 
 class TripUpdateSerializer(serializers.Serializer):
