@@ -107,3 +107,24 @@ def test_refund_rate_api():
     r = c.get("/api/v1/treasury/refund-rate/")
     d = r.json().get("data", r.json())
     assert Decimal(str(d["rate"])) == Decimal("25")
+
+
+@pytest.mark.django_db
+def test_refunds_appear_in_general_expenses_list():
+    from rest_framework.test import APIClient
+    from apps.treasury.services.refund_config import set_refund_rate
+    from apps.treasury.services.refund import refund_on_cancel
+    from apps.treasury.services import create_cash_register, open_session
+    company, admin = _company(name="GxRef", email="gxr@x.com")
+    set_refund_rate(company, 100, user=admin)
+    reg = create_cash_register(company=company, name="C1", created_by=admin)
+    open_session(company=company, cash_register=reg, created_by=admin)
+    refund_on_cancel(company, amount_paid=Decimal("4000"), user=admin, description="Remb test")
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.get("/api/v1/treasury/expenses/general/")
+    assert r.status_code == 200
+    body = r.json(); data = body["data"] if "data" in body else body
+    refunds = [x for x in data if x.get("kind") == "refund"]
+    assert len(refunds) == 1
+    assert refunds[0]["expense_type_name"] == "Remboursement"
+    assert Decimal(str(refunds[0]["amount"])) == Decimal("4000")
