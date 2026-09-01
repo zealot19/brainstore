@@ -90,6 +90,11 @@ export class VoyagesTripDetailComponent implements OnInit {
   }
 
   // ── crew ──
+  /** Un voyage terminé ou annulé est figé : on ne modifie plus l'équipage. */
+  get crewLocked(): boolean {
+    return this.trip?.status === 'completed' || this.trip?.status === 'cancelled';
+  }
+
   /** Membres actifs non encore affectés à ce voyage (évite les doublons). */
   get availableMembers(): CrewMember[] {
     const assigned = new Set((this.trip?.crew ?? []).map(c => c.member));

@@ -41,7 +41,7 @@ export class VbRoadmapComponent implements OnInit {
         window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 60000);
       },
-      error: () => alert('Impossible de générer le PDF du bordereau.'),
+      error: () => alert('Impossible de générer le PDF du bordereau (moteur PDF non disponible sur le serveur).'),
     });
   }
   back(): void { this.router.navigate(['/voyages/list']); }

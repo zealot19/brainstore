@@ -193,15 +193,19 @@
           @for (c of trip.crew; track c.id) {
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{ c.member_name }} <span class="badge bg-light text-dark ms-1">{{ c.member_type_name }}</span></span>
-              <a class="text-danger" *hasPermission="'voyage.crew.manage'" (click)="removeCrew(c)" title="Retirer"><i class="ti ti-trash"></i></a>
+              @if (!crewLocked) { <a class="text-danger" *hasPermission="'voyage.crew.manage'" (click)="removeCrew(c)" title="Retirer"><i class="ti ti-trash"></i></a> }
             </li>
           }
           @empty { <li class="list-group-item text-muted">Aucun équipage.</li> }
         </ul>
-        <div class="row g-2">
-          <div class="col-10"><select class="form-select form-select-sm" [(ngModel)]="newMember"><option [ngValue]="null">— Membre d'équipage —</option>@for (m of availableMembers; track m.id) { <option [ngValue]="m.id">{{ m.full_name }} ({{ m.member_type_name }})</option> }</select></div>
-          <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newMember">+</button></div>
-        </div>
+        @if (crewLocked) {
+          <div class="text-muted small"><i class="ti ti-lock me-1"></i>Voyage {{ trip.status_display | lowercase }} : l'équipage ne peut plus être modifié.</div>
+        } @else {
+          <div class="row g-2">
+            <div class="col-10"><select class="form-select form-select-sm" [(ngModel)]="newMember"><option [ngValue]="null">— Membre d'équipage —</option>@for (m of availableMembers; track m.id) { <option [ngValue]="m.id">{{ m.full_name }} ({{ m.member_type_name }})</option> }</select></div>
+            <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.crew.manage'" (click)="addCrew()" [disabled]="!newMember">+</button></div>
+          </div>
+        }
       </div></div>
 
     </div>
