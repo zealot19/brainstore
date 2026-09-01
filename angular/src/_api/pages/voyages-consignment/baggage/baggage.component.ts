@@ -6,6 +6,7 @@ import { BaggageService } from '../../../services/voyages-consignment/baggage.se
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
 import { TripService } from '../../../services/voyages/trip.service';
+import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Baggage, BaggageCreate } from '../../../models/voyages-consignment.models';
 import { TripOption } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
@@ -31,9 +32,11 @@ export class VcgBaggageComponent implements OnInit {
   selected = new Set<string>();
   deliverTarget: Baggage | null = null; deliverComment = '';
 
+  paymentMethods: any[] = [];
   constructor(private svc: BaggageService, private booking: BookingService,
               private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
-              private fb: FormBuilder, private route: ActivatedRoute) {}
+              private fb: FormBuilder, private route: ActivatedRoute,
+              private pmSvc: PaymentMethodService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -46,6 +49,7 @@ export class VcgBaggageComponent implements OnInit {
     this.booking.bookableTrips().subscribe(t => this.trips = t);
     this.ctSvc.list().subscribe(d => this.types = d);
     this.tripSvc.list().subscribe(d => this.filterTrips = d as any);
+    this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau bagage" (navbar) : ?new=1
     this.route.queryParams.subscribe(q => {

@@ -124,8 +124,9 @@
     <h6 class="mb-3"><span class="badge bg-primary me-2">5</span>Encaissement</h6>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">Mode de paiement</label>
-        <select class="form-select" [(ngModel)]="paymentMethod">
-          <option value="" disabled selected>(module trésorerie à venir)</option>
+        <select class="form-select" [(ngModel)]="paymentMethod" (ngModelChange)="onPaymentMethodChange()">
+          <option value="" disabled selected>— Choisir —</option>
+          @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
       <div class="col-md-3 mb-3"><label class="form-label">Total à payer</label>
         <input class="form-control fw-bold" [value]="(total | number:'1.0-0') + ' XAF'" disabled /></div>
