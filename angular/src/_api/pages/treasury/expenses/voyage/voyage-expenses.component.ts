@@ -59,7 +59,7 @@ export class VoyageExpensesComponent implements OnInit {
   printVoucher(e: any): void {
     this.svc.voyageVoucher(e.id).subscribe({
       next: blob => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60000); },
-      error: () => alert('Impossible de générer le bon de dépense.'),
+      error: () => alert('Impossible de générer le bon de dépense (moteur PDF non disponible sur le serveur).'),
     });
   }
 }

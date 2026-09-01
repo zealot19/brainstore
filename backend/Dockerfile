@@ -9,9 +9,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Dépendances système WeasyPrint (rendu PDF des rapports).
+# Dépendances système WeasyPrint 63 (rendu PDF des rapports ET des bons/reçus).
+# libpangoft2 + libglib/libgobject + harfbuzz/fontconfig sont requis par WeasyPrint ;
+# sans eux, `from weasyprint import HTML` lève OSError (libgobject/libpangoft2 introuvable).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libcairo2 libffi8 \
+    libglib2.0-0 libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
+    libgdk-pixbuf-2.0-0 libcairo2 libffi8 libharfbuzz0b libfontconfig1 \
     shared-mime-info fonts-dejavu \
     && rm -rf /var/lib/apt/lists/*
 
