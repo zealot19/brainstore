@@ -145,9 +145,11 @@ export class SidebarOneComponent implements OnDestroy {
     this.side_bar_data.map((mainMenus: MenuItem) => {
 
       mainMenus.menu.map((resMenu) => {
-        // collapse other submenus which are open
-        if (resMenu.menuValue == menu.menuValue) {
-          menu.showSubRoute = !menu.showSubRoute;
+        // Compare par référence d'objet : deux menus peuvent partager le même
+        // libellé (ex. « Configuration » dans Flotte ET Trésorerie), donc on ne
+        // peut pas se fier à menuValue sous peine de double-toggle (menu « vide »).
+        if (resMenu === menu) {
+          resMenu.showSubRoute = !resMenu.showSubRoute;
         } else {
           resMenu.showSubRoute = false;
         }
