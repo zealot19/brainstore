@@ -106,7 +106,9 @@ export class VoyagesListComponent implements OnInit {
     const f = this.form.value;
     const payload = f.service_pattern_id
       ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes }
-      : { ...f, service_pattern_id: null };
+      : { route_id: f.route_id, fare_class_id: f.fare_class_id,
+          scheduled_departure: f.scheduled_departure, scheduled_arrival: f.scheduled_arrival,
+          code: f.code, notes: f.notes, service_pattern_id: null };
     this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; },
