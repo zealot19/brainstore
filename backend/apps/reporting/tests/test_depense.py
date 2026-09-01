@@ -39,3 +39,32 @@ def test_depense_report_totals_paid_only():
                                                    "register": None, "vehicle": None})
     assert result.totals["montant"] == Decimal("15000")
     assert result.groups[0].rows[0]["cat"] == "Carburant"
+
+
+@pytest.mark.django_db
+def test_depense_includes_general_and_refund():
+    from apps.system_config.services import create_company
+    from apps.voyages_config.models import ExpenseType
+    from apps.treasury.models import GeneralExpense, Transaction
+    from apps.treasury.services.services import create_cash_register, open_session, create_transaction
+    from apps.reporting.registry import REPORTS
+    company, _ = create_company(name="Dep Co", admin_email="depc@x.com", admin_first_name="A", admin_last_name="B")
+    admin = User.objects.get(email="depc@x.com")
+    reg = create_cash_register(company=company, name="C1", created_by=admin)
+    session = open_session(company=company, cash_register=reg, created_by=admin)
+    et = ExpenseType.objects.filter(company=company).first() or ExpenseType.objects.create(
+        company=company, code="DIV", name="Divers", account_code="605")
+    GeneralExpense.objects.create(company=company, expense_type=et, label="Savon",
+                                  amount=Decimal("2000"), status="paid", cash_session=session, created_by=admin)
+    create_transaction(company=company, transaction_type=Transaction.Type.EXPENSE,
+                       category=Transaction.Category.REFUND, account_type=Transaction.AccountType.CASH,
+                       cash_session=session, amount=Decimal("1500"),
+                       payment_mode=Transaction.PaymentMode.CASH, description="Remb", created_by=admin)
+    result = REPORTS["depense"]["build"](company, {"date_from": None, "date_to": None,
+                                                   "agency": None, "register": None, "vehicle": None})
+    natures = {r["nature"] for r in result.groups[0].rows}
+    assert {"Générale", "Remboursement"} <= natures
+    assert result.totals["montant"] == Decimal("3500")
+    filtered = REPORTS["depense"]["build"](company, {"date_from": None, "date_to": None, "agency": None,
+                                                     "register": None, "vehicle": "00000000-0000-0000-0000-000000000000"})
+    assert all(r["nature"] == "Voyage" for r in filtered.groups[0].rows)
