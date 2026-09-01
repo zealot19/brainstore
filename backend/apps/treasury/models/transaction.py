@@ -28,6 +28,7 @@ class Transaction(BaseModel):
         OTHER_EXPENSE   = "other_expense",   _("Other Expense")
         VOYAGE_EXPENSE  = "voyage_expense",  _("Dépense voyage")
         GENERAL_EXPENSE = "general_expense", _("Dépense générale")
+        REFUND          = "refund",          _("Remboursement")
 
     class PaymentMode(models.TextChoices):
         CASH         = "cash",         _("Cash")

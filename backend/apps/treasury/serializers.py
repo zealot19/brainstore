@@ -379,3 +379,8 @@ class PaymentMethodWriteSerializer(serializers.Serializer):
     mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices, required=False,
                                    default=Transaction.PaymentMode.CASH)
     is_active = serializers.BooleanField(required=False, default=True)
+
+
+class RefundRateSerializer(serializers.Serializer):
+    rate = serializers.DecimalField(max_digits=5, decimal_places=2,
+                                    min_value=Decimal("0"), max_value=Decimal("100"))

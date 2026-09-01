@@ -47,4 +47,7 @@ urlpatterns = [
     # ── Moyens de paiement (config) ──────────────────────────────────────────────
     path("payment-methods/",           views.PaymentMethodListView.as_view(),   name="paymentmethod-list"),
     path("payment-methods/<uuid:pk>/", views.PaymentMethodDetailView.as_view(), name="paymentmethod-detail"),
+
+    # ── Config remboursement ─────────────────────────────────────────────────────
+    path("refund-rate/", views.RefundRateView.as_view(), name="refund-rate"),
 ]
