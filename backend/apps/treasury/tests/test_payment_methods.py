@@ -29,3 +29,33 @@ def test_seed_payment_methods_idempotent():
     n_before = PaymentMethod.objects.filter(company=company).count()
     seed_payment_methods(company)  # re-run
     assert PaymentMethod.objects.filter(company=company).count() == n_before
+
+
+@pytest.mark.django_db
+def test_booking_payment_requires_payment_records_income():
+    # orange_money -> mode mobile_money (non-cash) -> bank branch needs exactly 1 active bank.
+    from apps.treasury.services.booking_sales import record_booking_payment
+    from apps.treasury.services import create_bank_account
+    from decimal import Decimal
+    company = _company(name="Req", email="req@x.com")
+    from apps.authentication.models import User
+    admin = User.objects.get(email="req@x.com")
+    create_bank_account(company=company, bank_name="BICEC", account_name="Cpt", account_number="1", created_by=admin)
+    txn = record_booking_payment(company, booking=None, amount=Decimal("5000"),
+                                 payment_method="orange_money", user=admin)
+    assert txn is not None and txn.payment_mode == "mobile_money"
+
+
+@pytest.mark.django_db
+def test_no_payment_method_records_no_income():
+    from apps.treasury.services.booking_sales import record_booking_payment
+    from apps.treasury.models import Transaction
+    from decimal import Decimal
+    company = _company(name="Free", email="free@x.com")
+    from apps.authentication.models import User
+    admin = User.objects.get(email="free@x.com")
+    before = Transaction.objects.count()
+    txn = record_booking_payment(company, booking=None, amount=Decimal("5000"),
+                                 payment_method="loyalty", user=admin)
+    assert txn is None
+    assert Transaction.objects.count() == before  # no session needed, no income
