@@ -59,6 +59,19 @@ class TripListCreateView(APIView):
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
         from apps.voyages_config.models import Route, FareClass, ServicePattern, ServicePoint
+        # Mode « planification » : tout est dérivé du modèle + de la date.
+        if d.get("service_pattern_id") and d.get("service_date"):
+            pattern = _cfg(ServicePattern, d["service_pattern_id"], company)
+            if not pattern:
+                return error_response("Planification introuvable.", status_code=404)
+            try:
+                trip = services.create_trip_from_pattern(
+                    company=company, pattern=pattern, service_date=d["service_date"],
+                    code=d["code"], notes=d["notes"], user=request.user)
+            except ApplicationError as e:
+                return error_response(str(e))
+            return created_response(S.TripDetailSerializer(trip).data)
+        # Mode manuel.
         route = _cfg(Route, d["route_id"], company)
         if not route:
             return error_response("Trajet introuvable.", status_code=404)

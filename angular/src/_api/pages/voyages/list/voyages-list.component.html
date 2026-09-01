@@ -70,20 +70,32 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Trajet <span class="text-danger">*</span></label>
-        <select formControlName="route_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }</select></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Planification (préremplissage)</label>
-        <select formControlName="service_pattern_id" class="form-select" (change)="onPatternChange()"><option [ngValue]="null">— Aucune —</option>@for (p of patterns; track p.id) { <option [ngValue]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }</select></div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
-        <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">Planification</label>
+        <select formControlName="service_pattern_id" class="form-select" (change)="onPatternChange()"><option [ngValue]="null">— Aucune (saisie manuelle) —</option>@for (p of patterns; track p.id) { <option [ngValue]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }</select></div>
       <div class="col-md-6 mb-3"><label class="form-label">Code</label><input formControlName="code" type="text" class="form-control" /></div>
     </div>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Départ prévu <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Arrivée prévue <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
-    </div>
+
+    @if (patternMode) {
+      <div class="alert alert-info py-2 mb-3">
+        <div><strong>Trajet :</strong> {{ selectedPattern?.route_code }}</div>
+        <div><strong>Horaire :</strong> {{ selectedPattern?.time_slot_label }}</div>
+        <div><strong>Catégorie :</strong> {{ selectedPattern?.fare_class_name }}</div>
+        <small class="text-muted">Trajet, catégorie et horaires sont définis par la planification.</small>
+      </div>
+      <div class="mb-3"><label class="form-label">Date du voyage <span class="text-danger">*</span></label>
+        <input formControlName="service_date" type="date" class="form-control" /></div>
+    } @else {
+      <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Trajet <span class="text-danger">*</span></label>
+          <select formControlName="route_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }</select></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
+          <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">Départ prévu <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">Arrivée prévue <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
+      </div>
+    }
     <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Création…' : 'Créer' }}</button></div></form>
 </div></div></div>
