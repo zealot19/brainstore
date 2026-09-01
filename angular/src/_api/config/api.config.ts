@@ -432,6 +432,8 @@ export const TREASURY = {
   incOther:    `${TRZ}/recettes/other/`,
   incDashboard:`${TRZ}/recettes/dashboard/`,
   incReceipt:  (id: string) => `${TRZ}/recettes/${id}/receipt/`,
+  paymentMethods: `${TRZ}/payment-methods/`,
+  paymentMethod:  (id: string) => `${TRZ}/payment-methods/${id}/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */

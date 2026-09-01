@@ -305,6 +305,7 @@ export class SidebarService {
           base: 'treasury-config',
           subMenus: [
             { menuValue: 'Types de dépense', route: routes.vcExpenseTypes, base: 'expense-types', permission: 'transport.config.view' },
+            { menuValue: 'Moyens de paiement', route: routes.trzPaymentMethods, base: 'payment-methods', permission: 'treasury.paymentmethod.view' },
           ],
         },
       ],
