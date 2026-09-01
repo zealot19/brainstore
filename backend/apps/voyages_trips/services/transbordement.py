@@ -123,16 +123,21 @@ def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note=""):
 
 
 def _clone_trip_for_vehicle(trip, vehicle, *, user):
-    """Crée un nouveau voyage (copié du source) desservi par `vehicle`, sièges matérialisés."""
+    """Crée un VRAI voyage (via create_trip) desservi par `vehicle` : numéro, étapes et
+    dépenses (barème) inclus, puis rattache le bus, matérialise les sièges et le rend « en attente »."""
     from apps.voyages_trips.models import Trip
     from apps.voyages_trips.selectors.eligibility import active_seating_plan
     from apps.voyages_trips.services.assignment import materialise_seats
-    plan = active_seating_plan(vehicle, trip.scheduled_departure.date())
-    dest = Trip.objects.create(
+    from apps.voyages_trips.services.trip_services import create_trip
+    dest = create_trip(
         company=trip.company, route=trip.route, fare_class=trip.fare_class,
-        origin=trip.origin, destination=trip.destination, vehicle=vehicle, seating_plan=plan,
         scheduled_departure=trip.scheduled_departure, scheduled_arrival=trip.scheduled_arrival,
-        status="pending", created_by=user)
+        origin=trip.origin, destination=trip.destination, user=user)
+    dest.vehicle = vehicle
+    dest.seating_plan = active_seating_plan(vehicle, trip.scheduled_departure.date())
+    dest.status = Trip.Status.PENDING
+    dest.updated_by = user
+    dest.save(update_fields=["vehicle", "seating_plan", "status", "updated_by", "updated_at"])
     materialise_seats(dest)
     return dest
 
