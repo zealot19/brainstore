@@ -24,7 +24,14 @@ export class GeneralExpensesComponent implements OnInit {
   rows: any[] = []; types: any[] = []; sessions: any[] = [];
   loading = false; saving = false; editId: string | null = null;
   disburseSession = ''; errorMsg = '';
-  fStatus = ''; fFrom = ''; fTo = '';
+  fStatus = ''; fFrom = ''; fTo = ''; fType = '';
+
+  /** Filtre par type de dépense (côté client) : '' = tous, '__refund__' = remboursements, sinon un type. */
+  get filtered(): any[] {
+    if (!this.fType) return this.rows;
+    if (this.fType === '__refund__') return this.rows.filter(r => r.kind === 'refund');
+    return this.rows.filter(r => r.expense_type === this.fType);
+  }
 
   form = this.fb.group({
     expense_type_id: [null as string | null, Validators.required],
@@ -45,7 +52,7 @@ export class GeneralExpensesComponent implements OnInit {
       .subscribe({ next: d => { this.rows = d; this.pg.page = 1; this.loading = false; }, error: () => this.loading = false });
   }
 
-  clearFilters(): void { this.fStatus = this.fFrom = this.fTo = ''; this.reload(); }
+  clearFilters(): void { this.fStatus = this.fFrom = this.fTo = this.fType = ''; this.reload(); }
 
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset(); }
   openEdit(e: any): void {

@@ -8,7 +8,22 @@
 
 <div class="card mb-3"><div class="card-body">
   <div class="row g-3 align-items-end">
+    <div class="col-md-3" *hasPermission="'treasury.expense.manage'">
+      <label class="form-label small mb-1">Caisse de décaissement</label>
+      <select class="form-select" [(ngModel)]="disburseSession">
+        <option value="">Ma caisse ouverte</option>
+        @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
+      </select>
+    </div>
     <div class="col-md-3">
+      <label class="form-label small mb-1">Type de dépense</label>
+      <select class="form-select" [(ngModel)]="fType">
+        <option value="">Tous</option>
+        @for (t of types; track t.id) { <option [value]="t.id">{{ t.name }}</option> }
+        <option value="__refund__">Remboursement</option>
+      </select>
+    </div>
+    <div class="col-md-2">
       <label class="form-label small mb-1">Statut</label>
       <select class="form-select" [(ngModel)]="fStatus" (ngModelChange)="reload()">
         <option value="">Toutes</option>
@@ -16,16 +31,16 @@
         <option value="paid">Décaissées</option>
       </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <label class="form-label small mb-1">Du</label>
       <input type="date" class="form-control" [(ngModel)]="fFrom" (ngModelChange)="reload()" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <label class="form-label small mb-1">Au</label>
       <input type="date" class="form-control" [(ngModel)]="fTo" (ngModelChange)="reload()" />
     </div>
-    <div class="col-md-3">
-      <button class="btn btn-light w-100" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Réinitialiser</button>
+    <div class="col-md-12">
+      <button class="btn btn-light" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Réinitialiser</button>
     </div>
   </div>
 </div></div>
@@ -39,9 +54,9 @@
         </thead>
         <tbody>
           @if (loading) { <tr><td colspan="8" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
-          @for (e of rows | paginate:pg.page:pg.size; track e.id) {
+          @for (e of filtered | paginate:pg.page:pg.size; track e.id) {
             <tr>
-              <td>{{ e.expense_type_name || typeName(e.expense_type) }}</td>
+              <td>@if (e.kind === 'refund') { <span class="badge bg-info-subtle text-info-emphasis">Remboursement</span> } @else { {{ e.expense_type_name || typeName(e.expense_type) }} }</td>
               <td class="fw-medium">{{ e.label }}</td>
               <td>{{ e.agency_name || '—' }}</td>
               <td>{{ e.cash_register_name || '—' }}</td>
@@ -49,33 +64,26 @@
               <td>{{ e.expense_date | date:'dd/MM/yyyy' }}</td>
               <td>@if (e.status === 'paid') { <span class="badge bg-success">Décaissée</span> } @else { <span class="badge bg-warning text-dark">À décaisser</span> }</td>
               <td class="text-end">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1"
-                   (click)="printVoucher(e)" title="Imprimer le bon de dépense"><i class="ti ti-printer"></i></a>
-                @if (e.status !== 'paid') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#gexp-modal"
-                     *hasPermission="'treasury.expense.manage'" (click)="openEdit(e)" title="Modifier"><i class="ti ti-edit"></i></a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger me-1"
-                     *hasPermission="'treasury.expense.manage'" (click)="remove(e)" title="Supprimer"><i class="ti ti-trash"></i></a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-success"
-                     *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" title="Décaisser"><i class="ti ti-cash me-1"></i>Décaisser</a>
-                }
+                @if (e.kind !== 'refund') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1"
+                     (click)="printVoucher(e)" title="Imprimer le bon de dépense"><i class="ti ti-printer"></i></a>
+                  @if (e.status !== 'paid') {
+                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#gexp-modal"
+                       *hasPermission="'treasury.expense.manage'" (click)="openEdit(e)" title="Modifier"><i class="ti ti-edit"></i></a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger me-1"
+                       *hasPermission="'treasury.expense.manage'" (click)="remove(e)" title="Supprimer"><i class="ti ti-trash"></i></a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-success"
+                       *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" title="Décaisser"><i class="ti ti-cash me-1"></i>Décaisser</a>
+                  }
+                } @else { <span class="text-muted small">—</span> }
               </td>
             </tr>
           } @empty { @if (!loading) { <tr><td colspan="8" class="text-center text-muted py-3">Aucune dépense.</td></tr> } }
         </tbody>
       </table>
-        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     </div>
   </div>
-</div>
-
-<!-- Caisse de décaissement (session ouverte) -->
-<div class="mt-2 d-flex align-items-center gap-2" *hasPermission="'treasury.expense.manage'">
-  <label class="small text-muted mb-0">Caisse de décaissement :</label>
-  <select class="form-select form-select-sm w-auto" [(ngModel)]="disburseSession">
-    <option value="">Ma caisse ouverte</option>
-    @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
-  </select>
 </div>
 
 <!-- Modale création / édition -->
