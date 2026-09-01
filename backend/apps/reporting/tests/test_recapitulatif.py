@@ -44,9 +44,20 @@ def test_recapitulatif_margin():
     et = ExpenseType.objects.get(company=company, code="CARBURANT")
     TripExpense.objects.create(trip=trip, expense_type=et, amount=Decimal("3000"),
                                status=TripExpense.Status.PAID, created_by=admin)
+    from apps.treasury.models import GeneralExpense
+    GeneralExpense.objects.create(company=company, expense_type=et, label="Savon",
+                                  amount=Decimal("1000"), status="paid", cash_session=session, created_by=admin)
+    create_transaction(company=company, transaction_type=Transaction.Type.EXPENSE,
+                       category=Transaction.Category.REFUND, account_type=Transaction.AccountType.CASH,
+                       cash_session=session, amount=Decimal("500"),
+                       payment_mode=Transaction.PaymentMode.CASH, description="Remb", created_by=admin)
+    create_transaction(company=company, transaction_type=Transaction.Type.INCOME,
+                       category=Transaction.Category.OTHER_INCOME, account_type=Transaction.AccountType.CASH,
+                       cash_session=session, amount=Decimal("2000"),
+                       payment_mode=Transaction.PaymentMode.CASH, description="Divers", created_by=admin)
     result = REPORTS["recapitulatif"]["build"](company, {"date_from": None, "date_to": None, "vehicle": None})
-    row = result.groups[0].rows[0]
-    assert row["voyage"] == Decimal("10000")
-    assert row["depense"] == Decimal("3000")
-    assert row["marge"] == Decimal("7000")
-    assert result.totals["marge"] == Decimal("7000")
+    # dépense totale = voyage(3000) + générale(1000) + remboursement(500) = 4500
+    assert result.totals["depense"] == Decimal("4500")
+    assert result.totals["autre"] == Decimal("2000")
+    # marge nette = (10000 voyage + 2000 autre) - 4500 = 7500
+    assert result.totals["marge"] == Decimal("7500")

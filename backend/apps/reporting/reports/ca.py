@@ -14,7 +14,10 @@ def build(company, f):
     year = f.get("year") or timezone.now().year
     agg = (Transaction.objects.filter(company=company, is_deleted=False,
                                       transaction_type=Transaction.Type.INCOME,
-                                      category=Transaction.Category.TICKET_SALES,
+                                      category__in=[Transaction.Category.TICKET_SALES,
+                                                    Transaction.Category.PARCEL_SHIPPING,
+                                                    Transaction.Category.BAGGAGE,
+                                                    Transaction.Category.OTHER_INCOME],
                                       transaction_date__year=year)
            .annotate(month=ExtractMonth("transaction_date"))
            .values("cash_session__cash_register__agency__name", "month")
