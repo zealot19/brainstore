@@ -252,12 +252,16 @@ class GeneralExpenseReadSerializer(serializers.ModelSerializer):
     expense_type_name = serializers.CharField(source="expense_type.name", read_only=True)
     agency_name = serializers.CharField(source="agency.name", read_only=True, default=None)
     cash_register_name = serializers.SerializerMethodField()
+    kind = serializers.SerializerMethodField()
 
     class Meta:
         model = GeneralExpense
-        fields = ["id", "expense_type", "expense_type_name", "agency", "agency_name",
+        fields = ["id", "kind", "expense_type", "expense_type_name", "agency", "agency_name",
                   "label", "amount", "expense_date", "status", "cash_session",
                   "cash_register_name", "created_at"]
+
+    def get_kind(self, obj):
+        return "expense"
 
     def get_cash_register_name(self, obj):
         return obj.cash_session.cash_register.name if obj.cash_session_id else None

@@ -18,6 +18,46 @@ def list_general_expenses(company_id, *, agency_scope=None, status=None, date_fr
     return qs
 
 
+def list_refunds(company_id, *, agency_scope=None, date_from=None, date_to=None):
+    """Mouvements de remboursement (Transaction expense/refund) — affichés parmi les dépenses générales."""
+    from apps.treasury.models import Transaction
+    qs = (Transaction.objects.filter(company_id=company_id, is_deleted=False,
+                                     transaction_type=Transaction.Type.EXPENSE,
+                                     category=Transaction.Category.REFUND)
+          .select_related("cash_session__cash_register__agency")
+          .order_by("-transaction_date", "-created_at"))
+    if agency_scope:
+        scoped, agency_id = agency_scope
+        if scoped:
+            qs = qs.filter(cash_session__cash_register__agency_id=agency_id)
+    if date_from:
+        qs = qs.filter(transaction_date__gte=date_from)
+    if date_to:
+        qs = qs.filter(transaction_date__lte=date_to)
+    return qs
+
+
+def refund_row(t):
+    """Ligne remboursement au même format que GeneralExpenseReadSerializer (kind='refund')."""
+    reg = t.cash_session.cash_register if t.cash_session_id else None
+    agency_id = reg.agency_id if reg else None
+    return {
+        "id": str(t.id),
+        "kind": "refund",
+        "expense_type": None,
+        "expense_type_name": "Remboursement",
+        "agency": str(agency_id) if agency_id else None,
+        "agency_name": reg.agency.name if agency_id else None,
+        "label": t.description,
+        "amount": str(t.amount),
+        "expense_date": t.transaction_date.isoformat(),
+        "status": "paid",
+        "cash_session": str(t.cash_session_id) if t.cash_session_id else None,
+        "cash_register_name": reg.name if reg else None,
+        "created_at": t.created_at.isoformat(),
+    }
+
+
 def list_voyage_expenses(company_id, *, status=None, date_from=None, date_to=None):
     qs = (TripExpense.objects.filter(trip__company_id=company_id, is_deleted=False)
           .select_related("expense_type", "trip").order_by("-date", "-id"))

@@ -405,12 +405,21 @@ class GeneralExpenseListView(APIView):
 
     def get(self, request):
         p = request.query_params
+        company_id = _company(request).id
+        scope = register_agency_scope(request.user)
         qs = expense_selectors.list_general_expenses(
-            _company(request).id, agency_scope=register_agency_scope(request.user),
+            company_id, agency_scope=scope,
             status=p.get("status"), date_from=p.get("date_from"), date_to=p.get("date_to"))
+        rows = list(GeneralExpenseReadSerializer(qs, many=True).data)
+        # Fusionne les remboursements (mouvements refund) sauf si on filtre sur un statut « à décaisser ».
+        if p.get("status") != "unpaid":
+            refunds = expense_selectors.list_refunds(
+                company_id, agency_scope=scope,
+                date_from=p.get("date_from"), date_to=p.get("date_to"))
+            rows += [expense_selectors.refund_row(t) for t in refunds]
+            rows.sort(key=lambda r: r["expense_date"], reverse=True)
         page = StandardResultsSetPagination()
-        return page.get_paginated_response(
-            GeneralExpenseReadSerializer(page.paginate_queryset(qs, request), many=True).data)
+        return page.get_paginated_response(page.paginate_queryset(rows, request))
 
     def post(self, request):
         ser = GeneralExpenseWriteSerializer(data=request.data)
