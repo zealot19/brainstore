@@ -91,13 +91,12 @@
     <hr>
     <h6 class="mb-3"><span class="badge bg-primary me-2">4</span>Passagers &amp; point de descente</h6>
     <div class="table-responsive"><table class="table align-middle">
-      <thead><tr><th>Siège</th><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>N° pièce</th><th>Descente</th><th class="text-end">Tarif</th><th class="text-center">Acheteur</th></tr></thead>
+      <thead><tr><th>Siège</th><th>Nom</th><th>Téléphone</th><th>N° pièce</th><th>Descente</th><th class="text-end">Tarif</th><th class="text-center">Acheteur</th></tr></thead>
       <tbody>
         @for (p of passengers; track $index) {
           <tr>
             <td><span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span>@if (needReturnSel && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
-            <td><input class="form-control form-control-sm" [(ngModel)]="p.first_name" /></td>
-            <td><input class="form-control form-control-sm" [(ngModel)]="p.last_name" /></td>
+            <td><app-client-autocomplete [row]="p"></app-client-autocomplete></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.phone" /></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.id_number" /></td>
             <td>

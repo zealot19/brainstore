@@ -1,0 +1,15 @@
+<div class="position-relative">
+  <input class="form-control form-control-sm" [ngModel]="row.name"
+         (ngModelChange)="onInput($event)" (blur)="hide()" placeholder="Nom du client" />
+  @if (open) {
+    <ul class="list-group position-absolute w-100 shadow-sm" style="z-index:1080; max-height:220px; overflow:auto;">
+      @for (p of results; track p.id) {
+        <li class="list-group-item list-group-item-action py-1 px-2" style="cursor:pointer;"
+            (mousedown)="pick(p)">
+          <span class="fw-medium">{{ p.name }}</span>
+          <small class="text-muted"> · {{ p.phone }}</small>
+        </li>
+      }
+    </ul>
+  }
+</div>
