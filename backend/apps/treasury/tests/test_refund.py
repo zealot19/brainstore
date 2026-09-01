@@ -91,3 +91,19 @@ def test_cancel_parcel_refunds():
     cancel_parcel(p, user=admin)
     assert p.status == "cancelled"
     assert Transaction.objects.filter(company=company, category="refund", amount=3000).exists()
+
+
+@pytest.mark.django_db
+def test_refund_rate_api():
+    from rest_framework.test import APIClient
+    company, admin = _company(name="RfApi", email="rfa@x.com")
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.get("/api/v1/treasury/refund-rate/")
+    assert r.status_code == 200
+    body = r.json(); d = body["data"] if "data" in body else body
+    assert Decimal(str(d["rate"])) == Decimal("0")
+    r = c.put("/api/v1/treasury/refund-rate/", {"rate": 25}, format="json")
+    assert r.status_code == 200, r.content
+    r = c.get("/api/v1/treasury/refund-rate/")
+    d = r.json().get("data", r.json())
+    assert Decimal(str(d["rate"])) == Decimal("25")

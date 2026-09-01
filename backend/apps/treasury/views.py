@@ -741,3 +741,25 @@ class PaymentMethodDetailView(APIView):
             return error_response("Ce moyen de paiement système ne peut pas être supprimé (désactivez-le).")
         obj.soft_delete(user=request.user)
         return no_content_response()
+
+
+from apps.treasury.serializers import RefundRateSerializer  # noqa: E402
+
+
+class RefundRateView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.config.view", "PUT": "treasury.config.manage"}
+
+    def get(self, request):
+        from apps.treasury.services.refund_config import get_refund_rate
+        return success_response({"rate": str(get_refund_rate(_company(request)))})
+
+    def put(self, request):
+        from apps.treasury.services.refund_config import set_refund_rate
+        ser = RefundRateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            rate = set_refund_rate(_company(request), ser.validated_data["rate"], user=request.user)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return success_response({"rate": str(rate)})
