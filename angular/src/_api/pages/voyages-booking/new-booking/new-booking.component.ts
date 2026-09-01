@@ -10,6 +10,7 @@ import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, Pass
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
+import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 
 interface PaxRow extends PassengerSpec { destination_point_id: string; }
@@ -30,14 +31,22 @@ export class VbNewBookingComponent implements OnInit {
   selOutbound: SeatCell[] = []; selReturn: SeatCell[] = [];
   passengers: PaxRow[] = []; buyerIndex = 0;
   paymentMethod = ''; amountReceived: number | null = null;
+  paymentMethods: any[] = [];
   returnOpen = false;
   saving = false; errorMsg = '';
 
   constructor(private svc: BookingService, private fcSvc: FareClassService,
-              private tsSvc: TimeSlotService, private router: Router) {}
+              private tsSvc: TimeSlotService, private router: Router,
+              private pmSvc: PaymentMethodService) {}
   ngOnInit(): void {
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
     this.tsSvc.list().subscribe(d => this.timeSlots = d);
+    this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
+  }
+
+  onPaymentMethodChange(): void {
+    const pm = this.paymentMethods.find(m => m.code === this.paymentMethod);
+    if (pm && !pm.requires_payment) this.amountReceived = 0;
   }
 
   get isRound(): boolean { return this.tripType === 'round_trip'; }

@@ -6,6 +6,7 @@ import { ParcelService } from '../../../services/voyages-consignment/parcel.serv
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
 import { TripService } from '../../../services/voyages/trip.service';
+import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -32,9 +33,11 @@ export class VcgParcelsComponent implements OnInit {
   editId: string | null = null;
   selected = new Set<string>();
 
+  paymentMethods: any[] = [];
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
               private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
-              private fb: FormBuilder, private route: ActivatedRoute) {}
+              private fb: FormBuilder, private route: ActivatedRoute,
+              private pmSvc: PaymentMethodService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -49,6 +52,7 @@ export class VcgParcelsComponent implements OnInit {
     this.spSvc.list().subscribe(d => this.points = d);
     this.ctSvc.list().subscribe(d => this.types = d);
     this.tripSvc.list().subscribe(d => this.trips = d as any);
+    this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau colis" (navbar) : ?new=1
     this.route.queryParams.subscribe(q => {

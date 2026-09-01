@@ -1,0 +1,63 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Moyens de paiement</h4><h6>Configurez les modes de règlement et s'ils exigent un paiement</h6></div></div>
+  <div class="page-btn">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pm-modal"
+       *hasPermission="'treasury.paymentmethod.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau moyen</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr><th>Nom</th><th>Code</th><th>Mode trésorerie</th><th>Exige paiement</th><th>Actif</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+          @if (loading) { <tr><td colspan="6" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
+          @for (r of rows | paginate:pg.page:pg.size; track r.id) {
+            <tr>
+              <td class="fw-medium">{{ r.name }}@if (r.is_system) { <span class="badge bg-light text-muted ms-1">système</span> }</td>
+              <td><code>{{ r.code }}</code></td>
+              <td>{{ r.mode_display }}</td>
+              <td>@if (r.requires_payment) { <span class="badge bg-success">Oui</span> } @else { <span class="badge bg-secondary">Non</span> }</td>
+              <td>@if (r.is_active) { <span class="badge bg-success">Actif</span> } @else { <span class="badge bg-warning text-dark">Inactif</span> }</td>
+              <td class="text-end">
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#pm-modal"
+                   *hasPermission="'treasury.paymentmethod.manage'" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit"></i></a>
+                @if (!r.is_system) {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger"
+                     *hasPermission="'treasury.paymentmethod.manage'" (click)="remove(r)" title="Supprimer"><i class="ti ti-trash"></i></a>
+                }
+              </td>
+            </tr>
+          } @empty { @if (!loading) { <tr><td colspan="6" class="text-center text-muted py-3">Aucun moyen de paiement.</td></tr> } }
+        </tbody>
+      </table>
+      <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- Modale création / édition -->
+<div class="modal fade" id="pm-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le moyen' : 'Nouveau moyen de paiement' }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="save()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
+    <div class="mb-2"><label class="form-label small">Nom</label><input class="form-control" formControlName="name" placeholder="ex. Orange Money" /></div>
+    <div class="mb-2"><label class="form-label small">Code (optionnel)</label><input class="form-control" formControlName="code" placeholder="généré depuis le nom si vide" /></div>
+    <div class="mb-2"><label class="form-label small">Mode trésorerie</label>
+      <select class="form-select" formControlName="mode">
+        @for (m of modes; track m.v) { <option [value]="m.v">{{ m.l }}</option> }
+      </select></div>
+    <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="pm-req" formControlName="requires_payment" />
+      <label class="form-check-label" for="pm-req">Exige un paiement (enregistre une recette)</label></div>
+    <div class="form-check"><input class="form-check-input" type="checkbox" id="pm-act" formControlName="is_active" />
+      <label class="form-check-label" for="pm-act">Actif</label></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+  </div></form>
+</div></div></div>

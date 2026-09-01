@@ -124,7 +124,10 @@
     <h6 class="text-muted">Encaissement</h6>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">Mode de paiement</label>
-        <select formControlName="payment_method" class="form-select"><option value="" disabled selected>(module trésorerie à venir)</option></select></div>
+        <select formControlName="payment_method" class="form-select">
+          <option value="" disabled selected>— Choisir —</option>
+          @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
+        </select></div>
       <div class="col-md-3 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Encaissé</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">Monnaie rendue</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>

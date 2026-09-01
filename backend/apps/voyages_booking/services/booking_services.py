@@ -143,15 +143,18 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
             ret_seat.updated_by = user
             ret_seat.save(update_fields=["status", "booking_id", "updated_by", "updated_at"])
 
-    received = Decimal(str(amount_received)) if amount_received is not None else total
-    if received < total:
+    from apps.treasury.services.payment_resolution import resolve_payment
+    _pm = resolve_payment(company, payment_method)
+    no_payment = _pm is not None and not _pm.requires_payment
+    received = Decimal("0") if no_payment else (Decimal(str(amount_received)) if amount_received is not None else total)
+    if not no_payment and received < total:
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(t)s.") % {"r": received, "t": total})
 
     booking.amount_due = total
     booking.amount_paid = total
     booking.amount_received = received
-    booking.change_due = received - total
+    booking.change_due = Decimal("0") if no_payment else received - total
     booking.payment_method = payment_method or ""
     booking.updated_by = user
     booking.save(update_fields=["amount_due", "amount_paid", "amount_received", "change_due",

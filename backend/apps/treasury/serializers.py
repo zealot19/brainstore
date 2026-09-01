@@ -356,3 +356,26 @@ class OtherIncomeWriteSerializer(serializers.Serializer):
     payment_mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices)
     description = serializers.CharField(required=False, allow_blank=True, default="")
     cash_session_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+# ── Moyens de paiement ──────────────────────────────────────────────────────
+
+from apps.treasury.models import PaymentMethod  # noqa: E402
+
+
+class PaymentMethodReadSerializer(serializers.ModelSerializer):
+    mode_display = serializers.CharField(source="get_mode_display", read_only=True)
+
+    class Meta:
+        model = PaymentMethod
+        fields = ["id", "code", "name", "requires_payment", "mode", "mode_display",
+                  "is_active", "is_system", "created_at"]
+
+
+class PaymentMethodWriteSerializer(serializers.Serializer):
+    code = serializers.SlugField(max_length=40, required=False, allow_blank=True)
+    name = serializers.CharField(max_length=100)
+    requires_payment = serializers.BooleanField(required=False, default=True)
+    mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices, required=False,
+                                   default=Transaction.PaymentMode.CASH)
+    is_active = serializers.BooleanField(required=False, default=True)

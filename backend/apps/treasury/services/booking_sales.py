@@ -27,7 +27,11 @@ def record_booking_payment(company, *, booking, amount, payment_method, user):
     if booking is not None and Transaction.objects.filter(voyage_booking=booking, is_deleted=False).exists():
         return None  # idempotent
 
-    mode, is_cash = _normalize_payment(payment_method)
+    from apps.treasury.services.payment_resolution import resolve_payment, resolve_mode
+    pm = resolve_payment(company, payment_method)
+    if pm is not None and not pm.requires_payment:
+        return None
+    mode, is_cash = resolve_mode(pm, payment_method, _normalize_payment)
     ref = getattr(booking, "reference", "") or ""
     common = dict(company=company, transaction_type=Transaction.Type.INCOME,
                   category=Transaction.Category.TICKET_SALES, amount=amount, payment_mode=mode,
