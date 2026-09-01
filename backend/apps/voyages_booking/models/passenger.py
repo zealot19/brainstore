@@ -17,8 +17,7 @@ class Passenger(BaseModel):
 
     company    = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                    on_delete=models.CASCADE, related_name="voyages_passengers")
-    first_name = models.CharField(_("prénom"), max_length=150)
-    last_name  = models.CharField(_("nom"), max_length=150)
+    name       = models.CharField(_("nom"), max_length=300)
     gender     = models.CharField(_("genre"), max_length=1, choices=Gender.choices, blank=True)
     birth_date = models.DateField(_("date de naissance"), null=True, blank=True)
     phone      = models.CharField(_("téléphone"), max_length=30, db_index=True)
@@ -29,11 +28,11 @@ class Passenger(BaseModel):
 
     class Meta(BaseModel.Meta):
         verbose_name = _("passager")
-        ordering = ["last_name", "first_name"]
+        ordering = ["name"]
 
     def __str__(self):
         return f"{self.full_name} ({self.phone})"
 
     @property
     def full_name(self) -> str:
-        return f"{self.first_name} {self.last_name}".strip()
+        return self.name
