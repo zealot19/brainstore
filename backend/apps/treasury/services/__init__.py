@@ -12,6 +12,8 @@ from .trip_expense_sales import record_trip_expense
 from .general_expense_sales import record_general_expense
 from .expense_shared import resolve_disbursement_session
 from .other_income import record_other_income
+from .refund_config import get_refund_rate, set_refund_rate
+from .refund import refund_on_cancel
 
 __all__ = [
     "create_cash_register", "update_cash_register", "delete_cash_register",
@@ -25,4 +27,5 @@ __all__ = [
     "record_trip_expense",
     "record_general_expense", "resolve_disbursement_session",
     "record_other_income",
+    "get_refund_rate", "set_refund_rate", "refund_on_cancel",
 ]
