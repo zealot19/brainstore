@@ -38,7 +38,30 @@ def blocking_reasons(vehicle, *, window_start, window_end, exclude_trip=None):
         other = other.exclude(id=exclude_trip.id)
     if other.exists():
         reasons.append("Ce véhicule est déjà affecté à un voyage sur ce créneau.")
+
+    # Mission flotte (Assignment) en cours/à venir chevauchant le créneau.
+    from apps.fleet.models import Assignment
+    missions = Assignment.objects.filter(
+        vehicle=vehicle, is_deleted=False,
+        status__in=[Assignment.Status.PENDING, Assignment.Status.IN_PROGRESS],
+        planned_departure__lt=window_end,
+    ).filter(Q(planned_return__isnull=True) | Q(planned_return__gt=window_start))
+    if missions.exists():
+        reasons.append("Ce véhicule est en mission (flotte) sur ce créneau.")
     return reasons
+
+
+def crew_member_conflict(company, member, *, window_start, window_end, exclude_trip=None):
+    """Autre voyage (non terminé/annulé) chevauchant le créneau où ce membre est déjà affecté."""
+    qs = Trip.objects.filter(
+        company=company, is_deleted=False,
+        status__in=[Trip.Status.DRAFT, Trip.Status.PENDING, Trip.Status.DEPARTED],
+        scheduled_departure__lt=window_end, scheduled_arrival__gt=window_start,
+        crew__member=member, crew__is_deleted=False,
+    )
+    if exclude_trip:
+        qs = qs.exclude(id=exclude_trip.id)
+    return qs.first()
 
 
 def document_warnings(vehicle, *, before_date, alert_days):
