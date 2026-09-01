@@ -43,4 +43,8 @@ urlpatterns = [
     path("recettes/other/",             views.IncomeOtherListView.as_view(),   name="income-other"),
     path("recettes/dashboard/",         views.IncomeDashboardView.as_view(),   name="income-dashboard"),
     path("recettes/<uuid:pk>/receipt/", views.IncomeReceiptView.as_view(),     name="income-receipt"),
+
+    # ── Moyens de paiement (config) ──────────────────────────────────────────────
+    path("payment-methods/",           views.PaymentMethodListView.as_view(),   name="paymentmethod-list"),
+    path("payment-methods/<uuid:pk>/", views.PaymentMethodDetailView.as_view(), name="paymentmethod-detail"),
 ]

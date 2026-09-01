@@ -59,3 +59,23 @@ def test_no_payment_method_records_no_income():
                                  payment_method="loyalty", user=admin)
     assert txn is None
     assert Transaction.objects.count() == before  # no session needed, no income
+
+
+@pytest.mark.django_db
+def test_payment_method_crud_api():
+    from rest_framework.test import APIClient
+    from apps.authentication.models import User
+    from apps.treasury.models import PaymentMethod
+    company = _company(name="Api", email="api2@x.com")
+    admin = User.objects.get(email="api2@x.com")
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.get("/api/v1/treasury/payment-methods/")
+    assert r.status_code == 200
+    body = r.json(); data = body["data"] if "data" in body else body
+    assert any(m["code"] == "orange_money" for m in data)
+    r = c.post("/api/v1/treasury/payment-methods/",
+               {"code": "wave", "name": "Wave", "requires_payment": True, "mode": "mobile_money"}, format="json")
+    assert r.status_code in (200, 201), r.content
+    sysm = PaymentMethod.objects.get(company=company, code="cash")
+    r = c.delete(f"/api/v1/treasury/payment-methods/{sysm.id}/")
+    assert r.status_code == 400

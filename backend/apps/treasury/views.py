@@ -671,3 +671,73 @@ class IncomeReceiptView(APIView):
         resp = HttpResponse(pdf, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="recu-recette-{str(txn.id)[:8]}.pdf"'
         return resp
+
+
+# ── Moyens de paiement ──────────────────────────────────────────────────────
+
+from apps.treasury.serializers import PaymentMethodReadSerializer, PaymentMethodWriteSerializer  # noqa: E402
+from django.utils.text import slugify  # noqa: E402
+
+
+class PaymentMethodListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.paymentmethod.view", "POST": "treasury.paymentmethod.manage"}
+
+    def get(self, request):
+        from apps.treasury.models import PaymentMethod
+        qs = PaymentMethod.objects.filter(company=_company(request), is_deleted=False)
+        if request.query_params.get("active") == "true":
+            qs = qs.filter(is_active=True)
+        return success_response(PaymentMethodReadSerializer(qs.order_by("name"), many=True).data)
+
+    def post(self, request):
+        from apps.treasury.models import PaymentMethod
+        ser = PaymentMethodWriteSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        company = _company(request)
+        code = d.get("code") or slugify(d["name"])
+        if PaymentMethod.objects.filter(company=company, code=code, is_deleted=False).exists():
+            return error_response("Un moyen de paiement avec ce code existe déjà.")
+        pm = PaymentMethod.objects.create(
+            company=company, code=code, name=d["name"],
+            requires_payment=d.get("requires_payment", True), mode=d.get("mode", "cash"),
+            is_active=d.get("is_active", True), created_by=request.user)
+        return created_response(PaymentMethodReadSerializer(pm).data)
+
+
+class PaymentMethodDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.paymentmethod.view", "PATCH": "treasury.paymentmethod.manage",
+                      "DELETE": "treasury.paymentmethod.manage"}
+
+    def _obj(self, request, pk):
+        from apps.treasury.models import PaymentMethod
+        return PaymentMethod.objects.filter(company=_company(request), id=pk, is_deleted=False).first()
+
+    def get(self, request, pk):
+        obj = self._obj(request, pk)
+        return success_response(PaymentMethodReadSerializer(obj).data) if obj else error_response("Introuvable.", status_code=404)
+
+    def patch(self, request, pk):
+        obj = self._obj(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        ser = PaymentMethodWriteSerializer(data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        for k, v in ser.validated_data.items():
+            if k == "code" and obj.is_system:
+                continue
+            setattr(obj, k, v)
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(PaymentMethodReadSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._obj(request, pk)
+        if not obj:
+            return error_response("Introuvable.", status_code=404)
+        if obj.is_system:
+            return error_response("Ce moyen de paiement système ne peut pas être supprimé (désactivez-le).")
+        obj.soft_delete(user=request.user)
+        return no_content_response()
