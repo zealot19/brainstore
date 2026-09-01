@@ -206,13 +206,13 @@ class Command(BaseCommand):
             s = seats(t_out, 2)
             booking_services.create_booking(
                 company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
-                buyer_spec={"first_name": "Alice", "last_name": "Ngo", "phone": "699000001",
+                buyer_spec={"name": "Alice Ngo", "phone": "699000001",
                             "id_type": "cni", "id_number": "CNI001"},
                 items=[
-                    {"passenger": {"first_name": "Alice", "last_name": "Ngo", "phone": "699000001",
+                    {"passenger": {"name": "Alice Ngo", "phone": "699000001",
                                    "id_type": "cni", "id_number": "CNI001"},
                      "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None},
-                    {"passenger": {"first_name": "Bruno", "last_name": "Foka", "phone": "699000002",
+                    {"passenger": {"name": "Bruno Foka", "phone": "699000002",
                                    "id_type": "cni", "id_number": "CNI002"},
                      "destination_point_id": None, "outbound_seat_id": s[1].id, "return_seat_id": None},
                 ], payment_method="Espèces", amount_received=10000, user=None)
@@ -221,9 +221,9 @@ class Command(BaseCommand):
             s = seats(t_out, 1)
             booking_services.create_booking(
                 company, trip_type="one_way", outbound_trip=t_out, return_trip=None,
-                buyer_spec={"first_name": "Carine", "last_name": "Meli", "phone": "699000003",
+                buyer_spec={"name": "Carine Meli", "phone": "699000003",
                             "id_type": "cni", "id_number": "CNI003"},
-                items=[{"passenger": {"first_name": "Carine", "last_name": "Meli", "phone": "699000003",
+                items=[{"passenger": {"name": "Carine Meli", "phone": "699000003",
                                       "id_type": "cni", "id_number": "CNI003"},
                         "destination_point_id": None, "outbound_seat_id": s[0].id, "return_seat_id": None}],
                 payment_method="Espèces", amount_received=5000, user=None)
@@ -233,9 +233,9 @@ class Command(BaseCommand):
             sr = seats(t_ret, 1)
             booking_services.create_booking(
                 company, trip_type="round_trip", outbound_trip=t_out, return_trip=t_ret,
-                buyer_spec={"first_name": "David", "last_name": "Sone", "phone": "699000004",
+                buyer_spec={"name": "David Sone", "phone": "699000004",
                             "id_type": "cni", "id_number": "CNI004"},
-                items=[{"passenger": {"first_name": "David", "last_name": "Sone", "phone": "699000004",
+                items=[{"passenger": {"name": "David Sone", "phone": "699000004",
                                       "id_type": "cni", "id_number": "CNI004"},
                         "destination_point_id": None, "outbound_seat_id": so[0].id, "return_seat_id": sr[0].id}],
                 payment_method="Espèces", amount_received=10000, user=None)

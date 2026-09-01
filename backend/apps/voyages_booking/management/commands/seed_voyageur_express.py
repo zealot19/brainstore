@@ -236,7 +236,7 @@ class Command(BaseCommand):
             return list(trip.seats.filter(status="available").order_by("row", "column")[:k])
 
         def pax(fn, ln, phone, idn):
-            return {"first_name": fn, "last_name": ln, "phone": phone, "id_type": "cni", "id_number": idn}
+            return {"name": f"{fn} {ln}", "phone": phone, "id_type": "cni", "id_number": idn}
 
         edea_id = edea.id if edea else None
 

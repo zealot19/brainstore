@@ -44,8 +44,8 @@ def _resolve_passenger(company, spec, user):
     return get_or_create_passenger(
         company, user=user,
         id_type=spec.get("id_type", "cni"), id_number=spec.get("id_number", ""),
-        phone=spec.get("phone", ""), first_name=spec.get("first_name", ""),
-        last_name=spec.get("last_name", ""), gender=spec.get("gender", ""),
+        phone=spec.get("phone", ""), name=spec.get("name", ""),
+        gender=spec.get("gender", ""),
         birth_date=spec.get("birth_date"), email=spec.get("email", ""))
 
 

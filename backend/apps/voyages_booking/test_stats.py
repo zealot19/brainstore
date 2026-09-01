@@ -24,7 +24,7 @@ def test_booking_stats_endpoint():
     trip = Trip.objects.create(company=company, route=route, fare_class=fc, origin=o, destination=d,
                                scheduled_departure=dep, scheduled_arrival=dep + timedelta(hours=3),
                                created_by=admin)
-    pax = Passenger.objects.create(company=company, first_name="J", last_name="D", phone="690")
+    pax = Passenger.objects.create(company=company, name="J D", phone="690")
     Booking.objects.create(company=company, reference="B1", outbound_trip=trip, buyer=pax,
                            amount_paid=15000, created_by=admin)
     tok = str(CustomRefreshToken.for_user(admin).access_token)
