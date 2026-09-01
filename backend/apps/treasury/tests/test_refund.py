@@ -60,3 +60,34 @@ def test_refund_on_cancel_needs_session_when_positive():
     set_refund_rate(company, 50, user=admin)
     with pytest.raises(ApplicationError):
         refund_on_cancel(company, amount_paid=Decimal("10000"), user=admin, description="Remb")
+
+
+def _make_parcel(company, **kw):
+    from apps.voyages_config.models import Town, ServicePoint, ConsignmentNature, ConsignmentType
+    from apps.voyages_consignment.models import Parcel
+    town = Town.objects.create(company=company, name="Douala")
+    a = ServicePoint.objects.create(company=company, town=town, code="A", name="Gare A")
+    b = ServicePoint.objects.create(company=company, town=town, code="B", name="Gare B")
+    nature = ConsignmentNature.objects.create(company=company, code="GEN", name="Général")
+    ct = ConsignmentType.objects.create(company=company, code="STD", label="Standard", nature=nature)
+    return Parcel.objects.create(
+        company=company, reference="COL/1", status="registered",
+        origin_point=a, destination_point=b, consignment_type=ct,
+        sender_name="A", sender_phone="1", recipient_name="B", recipient_phone="2",
+        **kw)
+
+
+@pytest.mark.django_db
+def test_cancel_parcel_refunds():
+    from apps.treasury.services.refund_config import set_refund_rate
+    from apps.treasury.services import create_cash_register, open_session
+    from apps.treasury.models import Transaction
+    from apps.voyages_consignment.services.parcel_services import cancel_parcel
+    company, admin = _company(name="Pc", email="pc@x.com")
+    set_refund_rate(company, 100, user=admin)
+    reg = create_cash_register(company=company, name="C1", created_by=admin)
+    open_session(company=company, cash_register=reg, created_by=admin)
+    p = _make_parcel(company, amount_due=3000, amount_received=3000)
+    cancel_parcel(p, user=admin)
+    assert p.status == "cancelled"
+    assert Transaction.objects.filter(company=company, category="refund", amount=3000).exists()

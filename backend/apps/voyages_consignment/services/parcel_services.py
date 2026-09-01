@@ -178,4 +178,7 @@ def cancel_parcel(parcel, *, user):
     parcel.updated_by = user
     parcel.save(update_fields=["status", "updated_by", "updated_at"])
     _event(parcel, ParcelEvent.Kind.CANCELLED, user=user)
+    from apps.treasury.services.refund import refund_on_cancel
+    refund_on_cancel(parcel.company, amount_paid=parcel.amount_received, user=user,
+                     description=f"Remboursement colis {parcel.reference}")
     return parcel

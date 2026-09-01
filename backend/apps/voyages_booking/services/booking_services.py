@@ -220,6 +220,17 @@ def cancel_booking(booking, *, user):
     booking.updated_by = user
     booking.save(update_fields=["status", "updated_by", "updated_at"])
     loyalty_services.reverse(booking, user=user)
+
+    # Annuler les bagages liés aux billets, puis un seul remboursement combiné.
+    from apps.voyages_consignment.models import Baggage
+    from apps.voyages_consignment.services.baggage_services import cancel_baggage
+    from apps.treasury.services.refund import refund_on_cancel
+    bag_total = Decimal("0")
+    for bag in Baggage.objects.filter(ticket__booking=booking, is_deleted=False).exclude(status="cancelled"):
+        cancel_baggage(bag, user=user, _skip_refund=True)
+        bag_total += bag.amount_received or Decimal("0")
+    refund_on_cancel(booking.company, amount_paid=(booking.amount_paid or Decimal("0")) + bag_total,
+                     user=user, description=f"Remboursement réservation {booking.reference}")
     return booking
 
 

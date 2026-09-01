@@ -108,7 +108,7 @@ def deliver_baggage(baggage, *, comment="", delivered_at=None, user):
 
 
 @transaction.atomic
-def cancel_baggage(baggage, *, user):
+def cancel_baggage(baggage, *, user, _skip_refund=False):
     if baggage.status == Baggage.Status.DELIVERED:
         raise ApplicationError(_("Un bagage retiré ne peut pas être annulé."))
     if baggage.status == Baggage.Status.CANCELLED:
@@ -116,4 +116,8 @@ def cancel_baggage(baggage, *, user):
     baggage.status = Baggage.Status.CANCELLED
     baggage.updated_by = user
     baggage.save(update_fields=["status", "updated_by", "updated_at"])
+    if not _skip_refund:
+        from apps.treasury.services.refund import refund_on_cancel
+        refund_on_cancel(baggage.company, amount_paid=baggage.amount_received, user=user,
+                         description=f"Remboursement bagage {baggage.tag_number or baggage.id}")
     return baggage
