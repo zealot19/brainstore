@@ -48,7 +48,7 @@ export class VbPassengersComponent implements OnInit {
     this.saving = true; this.errorMsg = '';
     const v = this.form.value;
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
-    a.subscribe({ next: () => { this.saving = false; this.reload(); this.editId ? this.close() : this.openCreate(); },
+    a.subscribe({ next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   delete(r: Passenger): void {

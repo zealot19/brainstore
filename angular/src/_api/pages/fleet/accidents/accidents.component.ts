@@ -116,7 +116,7 @@ export class FleetAccidentsComponent implements OnInit {
       notes: v.notes || '',
     };
     this.svc.create(payload).subscribe({
-      next: () => { this.saving = false; this.load(); this.openCreate(); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }
@@ -136,7 +136,7 @@ export class FleetAccidentsComponent implements OnInit {
       actual_repair_cost: v.actual_repair_cost ? Number(v.actual_repair_cost) : null,
       notes: v.notes || null,
     }).subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('close-accident-modal'); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('close-accident-modal'); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

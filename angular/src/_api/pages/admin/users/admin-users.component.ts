@@ -209,11 +209,11 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.userService.update(this.editUser.id, payload).subscribe({
       next: () => {
         const u = this.editUser!;
-        const afterEdit = () => { this.saving = false; this.load(); this.closeModal('admin-user-edit-modal'); };
+        const afterEdit = () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('admin-user-edit-modal'); };
         if (v.profile_id && this.companyId) {
           this.profileService.assignToUser(u.id, v.profile_id, this.companyId).subscribe({
             next:  () => afterEdit(),
-            error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); },
+            error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); this.toast.success('Enregistré.'); },
           });
         } else {
           afterEdit();

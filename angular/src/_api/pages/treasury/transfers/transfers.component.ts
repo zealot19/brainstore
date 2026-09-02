@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TransferService } from '../../../services/treasury/transfer.service';
@@ -9,6 +9,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-trz-transfers',
@@ -16,6 +17,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzTransfersComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Transfer[] = []; loading = true;
   registers: CashRegister[] = []; banks: BankAccount[] = [];
@@ -42,7 +44,7 @@ export class TrzTransfersComponent implements OnInit {
     const payload: Record<string, unknown> = { amount: v.amount, description: v.description, transfer_date: v.transfer_date };
     payload[v.from_type === 'cash' ? 'from_cash_register_id' : 'from_bank_account_id'] = v.from_id;
     payload[v.to_type === 'cash' ? 'to_cash_register_id' : 'to_bank_account_id'] = v.to_id;
-    this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.openCreate(); },
+    this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   private close(): void { document.getElementById('trz-trf-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

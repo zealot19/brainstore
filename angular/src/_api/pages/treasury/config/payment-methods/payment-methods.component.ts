@@ -5,6 +5,7 @@ import { PaymentMethodService } from '../../../../services/treasury/payment-meth
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-payment-methods',
@@ -13,6 +14,7 @@ import { TablePaginatorComponent, PageState } from '../../../../../app/shared/ta
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective],
 })
 export class PaymentMethodsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   private svc = inject(PaymentMethodService);
   private fb = inject(FormBuilder);
@@ -41,7 +43,7 @@ export class PaymentMethodsComponent implements OnInit {
     this.saving = true;
     const req = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);
     req.subscribe({
-      next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
     });
   }

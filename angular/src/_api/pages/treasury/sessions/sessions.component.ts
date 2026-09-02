@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SessionService } from '../../../services/treasury/session.service';
@@ -9,6 +9,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-trz-sessions',
@@ -16,6 +17,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class TrzSessionsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
@@ -45,13 +47,13 @@ export class TrzSessionsComponent implements OnInit {
   openCreate(): void { this.errorMsg = ''; this.openForm.reset({ cash_register_id: null, opening_balance: null, notes: '' }); }
   submitOpen(): void {
     if (this.openForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
-    this.svc.open(this.openForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.close('trz-open-modal'); },
+    this.svc.open(this.openForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.close('trz-open-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   openClose(s: CashSession): void { this.closingId = s.id; this.errorMsg = ''; this.closeForm.reset({ closing_balance: null, notes: '' }); }
   submitClose(): void {
     if (this.closeForm.invalid || this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
-    this.svc.close(this.closingId, this.closeForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.close('trz-close-modal'); },
+    this.svc.close(this.closingId, this.closeForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.close('trz-close-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

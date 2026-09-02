@@ -107,7 +107,7 @@ export class ProfilesComponent implements OnInit {
       : this.profileService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('profile-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('profile-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

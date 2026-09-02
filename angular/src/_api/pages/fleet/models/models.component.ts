@@ -126,7 +126,7 @@ export class FleetModelsComponent implements OnInit {
       : this.modelService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('model-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('model-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

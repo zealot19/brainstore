@@ -7,6 +7,7 @@ import { PermissionService } from '../../../services/auth/permission.service';
 import { Depot, InventorySession } from '../../../models/scig.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-scig-inventaires',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
 })
 export class InventairesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   readonly perm = inject(PermissionService);
@@ -86,7 +88,7 @@ export class InventairesComponent implements OnInit {
       depot_id: v.depot_id,
       notes:    v.notes || '',
     }).subscribe({
-      next: () => { this.saving = false; this.load(); this.openCreate(); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: err => {
         this.saving = false;
         const e = err?.error;

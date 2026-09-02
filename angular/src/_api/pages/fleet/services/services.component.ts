@@ -137,7 +137,7 @@ export class FleetServicesComponent implements OnInit {
     };
     const action = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('service-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('service-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }
@@ -164,7 +164,7 @@ export class FleetServicesComponent implements OnInit {
       odometer_km: v.odometer_km ? Number(v.odometer_km) : null,
       notes:       v.notes       || null,
     }).subscribe({
-      next: () => { this.saving = false; this.load(); this.closeModal('complete-service-modal'); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('complete-service-modal'); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

@@ -80,7 +80,7 @@ export class VcSeatingPlansComponent implements OnInit {
     const meta = { code: this.code, name: this.name, rows: this.nrows, columns: this.ncols };
     const after = (id: string) => {
       this.svc.replaceSeats(id, this.seatList).subscribe({
-        next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
+        next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
         error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur (sièges).'; },
       });
     };

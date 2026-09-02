@@ -56,7 +56,7 @@ export class VcServicePointsComponent implements OnInit {
     v.agency_id = (v.is_station && v.station_kind === 'AGENCY') ? v.agency_id : null;
     v.latitude = v.latitude || null; v.longitude = v.longitude || null;
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   delete(r: ServicePoint): void { if (r.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
   private close(): void { document.getElementById('vc-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

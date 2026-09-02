@@ -100,7 +100,7 @@ export class FleetExternalDriversComponent implements OnInit {
       ? this.svc.update(this.editId, payload)
       : this.svc.create(payload);
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('driver-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('driver-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

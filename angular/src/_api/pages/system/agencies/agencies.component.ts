@@ -121,7 +121,7 @@ export class AgenciesComponent implements OnInit {
       : this.agencyService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editId ? this.closeModal('agency-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('agency-modal') : this.openCreate()); },
       error: err => {
         this.saving = false;
         const e = err?.error;

@@ -115,7 +115,7 @@ export class VcgParcelsComponent implements OnInit {
     this.saving = true; this.errorMsg = '';
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(this.form.value);
     req.subscribe({
-      next: () => { this.saving = false; this.reload(); this.close('parcel-modal'); },
+      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }

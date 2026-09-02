@@ -86,7 +86,7 @@ export class RecettesListComponent implements OnInit {
     if (this.form.invalid || this.saving) return;
     this.saving = true;
     this.income.createOther(this.form.value).subscribe({
-      next: () => { this.saving = false; this.reload(); this.openCreate(); },
+      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
     });
   }

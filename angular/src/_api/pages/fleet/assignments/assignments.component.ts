@@ -95,7 +95,7 @@ export class FleetAssignmentsComponent implements OnInit {
       notes:              v.notes              || '',
     };
     this.svc.create(payload).subscribe({
-      next: () => { this.saving = false; this.load(); this.openCreate(); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }
