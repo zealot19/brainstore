@@ -44,7 +44,7 @@ export class PaymentMethodsComponent implements OnInit {
     const req = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);
     req.subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
   remove(r: any): void {

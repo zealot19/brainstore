@@ -71,12 +71,12 @@ class ParcelDetailView(APIView):
 
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
-        return success_response(S.ParcelRead(p).data) if p else error_response("Introuvable.", status_code=404)
+        return success_response(S.ParcelRead(p).data) if p else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelEditSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         try:
@@ -88,7 +88,7 @@ class ParcelDetailView(APIView):
     def delete(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             services.cancel_parcel(p, user=request.user)
         except ApplicationError as e:
@@ -112,7 +112,7 @@ class ParcelAssignTripView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.AssignTripSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
@@ -134,7 +134,7 @@ class ParcelArrivedView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelReceiveSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -154,7 +154,7 @@ class ParcelUnloadView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             p = services.unload_parcel(p, user=request.user)
         except ApplicationError as e:
@@ -169,7 +169,7 @@ class ParcelPickupView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelPickupSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -188,7 +188,7 @@ class ParcelCancelView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             p = services.cancel_parcel(p, user=request.user)
         except ApplicationError as e:
@@ -255,12 +255,12 @@ class BaggageDetailView(APIView):
 
     def get(self, request, pk):
         b = self._get(request, pk)
-        return success_response(S.BaggageRead(b).data) if b else error_response("Introuvable.", status_code=404)
+        return success_response(S.BaggageRead(b).data) if b else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         b = self._get(request, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.BaggageEditSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         try:
@@ -272,7 +272,7 @@ class BaggageDetailView(APIView):
     def delete(self, request, pk):
         b = self._get(request, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             services.cancel_baggage(b, user=request.user)
         except ApplicationError as e:
@@ -287,7 +287,7 @@ class BaggageLoadView(APIView):
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             b = services.load_baggage(b, user=request.user)
         except ApplicationError as e:
@@ -302,7 +302,7 @@ class BaggageDeliverView(APIView):
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.BaggageDeliverSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -392,7 +392,7 @@ class ParcelReceiptView(APIView):
         p = (Parcel.objects.filter(is_deleted=False, company=request.user.company, id=pk)
              .select_related("origin_point", "destination_point").first())
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         logo_url = ticket_render._abs(request, tpl.logo)
         html = doc_render.build_parcel_receipt(p, tpl, agent=_agent(request.user), logo_url=logo_url)
@@ -408,7 +408,7 @@ class BaggageTicketView(APIView):
              .select_related("trip", "trip__route", "trip__destination", "trip__vehicle",
                              "ticket", "ticket__passenger").first())
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         logo_url = ticket_render._abs(request, tpl.logo)
         html = doc_render.build_baggage_ticket(b, tpl, agent=_agent(request.user), logo_url=logo_url)
@@ -424,7 +424,7 @@ class BaggageLabelView(APIView):
              .select_related("trip", "trip__route", "trip__destination",
                              "ticket", "ticket__passenger").first())
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user))
         return success_response({"html": html})
@@ -437,5 +437,5 @@ class ParcelStatsView(APIView):
     def get(self, request):
         from apps.voyages_consignment.stats import get_parcel_stats
         if not request.user.company_id:
-            return error_response("Aucune institution.", status_code=400)
+            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
         return success_response(get_parcel_stats(request.user.company_id))

@@ -87,7 +87,7 @@ export class RecettesListComponent implements OnInit {
     this.saving = true;
     this.income.createOther(this.form.value).subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

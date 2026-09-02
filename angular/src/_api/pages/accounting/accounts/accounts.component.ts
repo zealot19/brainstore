@@ -49,7 +49,7 @@ export class AccAccountsComponent implements OnInit {
     const v = this.form.value;
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   toggleDeprecated(r: Account): void {
     this.svc.update(r.id, { deprecated: !r.deprecated }).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Action impossible.') });

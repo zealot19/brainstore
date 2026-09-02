@@ -33,10 +33,10 @@ export class VbRoadmapComponent implements OnInit {
   get canBoard(): boolean { return this.data?.trip.status === 'pending' || this.data?.trip.status === 'departed'; }
 
   board(ticketId: string): void {
-    this.booking.board(ticketId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.booking.board(ticketId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   boardAll(): void {
-    this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   printDoc(which: 'voyages' | 'colis'): void {
     // Impression côté navigateur : le CSS d'impression (styles.scss) masque le chrome et

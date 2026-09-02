@@ -88,6 +88,6 @@ export class VbOpenReturnsComponent implements OnInit {
     const items = this.outboundTickets.map((t, i) => ({ outbound_ticket_id: t.id, return_seat_id: this.selReturn[i].id }));
     this.svc.assignReturn(this.target.id, { return_trip_id: this.returnTripId, items }).subscribe({
       next: b => this.router.navigate(['/voyages-booking/bookings', b.id]),
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
 }

@@ -59,7 +59,7 @@ export class VcRoutesComponent implements OnInit {
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
     a.subscribe({
       next: r => { this.saving = false; if (!this.editId) { this.editId = r.id; this.stopFor = r.id; this.loadStops(r.id); } this.load(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
   delete(r: Route): void { if (r.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ce trajet ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
@@ -76,7 +76,7 @@ export class VcRoutesComponent implements OnInit {
   }
   deleteStop(stopId: string): void {
     if (!this.stopFor || !confirm('Retirer cette escale ?')) return;
-    this.svc.deleteStop(this.stopFor, stopId).subscribe({ next: () => this.loadStops(this.stopFor!), error: e => this.toast.error(e?.error?.detail ?? 'Impossible.') });
+    this.svc.deleteStop(this.stopFor, stopId).subscribe({ next: () => this.loadStops(this.stopFor!), error: e => this.toast.error(e?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur.") });
   }
   closeAndReload(): void { this.load(); this.editId ? this.close() : this.openCreate(); }
   private close(): void { document.getElementById('route-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

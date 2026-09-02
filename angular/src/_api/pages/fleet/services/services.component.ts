@@ -138,13 +138,13 @@ export class FleetServicesComponent implements OnInit {
     const action = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     action.subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editId ? this.closeModal('service-modal') : this.openCreate()); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
   startService(id: string): void {
     if (!confirm('Démarrer cette intervention ?')) return;
-    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   openComplete(id: string): void {
@@ -165,18 +165,18 @@ export class FleetServicesComponent implements OnInit {
       notes:       v.notes       || null,
     }).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('complete-service-modal'); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
   cancelService(id: string): void {
     if (!confirm('Annuler cette intervention ?')) return;
-    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer cette intervention ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur.") });
   }
 
   // ── Création rapide de fournisseur ──
@@ -219,7 +219,7 @@ export class FleetServicesComponent implements OnInit {
     if (!this.attachFor || !confirm('Supprimer cette pièce jointe ?')) return;
     this.svc.deleteAttachment(this.attachFor, attId).subscribe({
       next: () => this.loadAttachments(this.attachFor!),
-      error: err => this.toast.error(err?.error?.detail ?? 'Impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur."),
     });
   }
 

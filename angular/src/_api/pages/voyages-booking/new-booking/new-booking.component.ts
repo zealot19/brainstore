@@ -180,6 +180,6 @@ export class VbNewBookingComponent implements OnInit {
     };
     this.svc.create(body).subscribe({
       next: b => this.router.navigate(['/voyages-booking/bookings', b.id]),
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
 }

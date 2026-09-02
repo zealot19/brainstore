@@ -256,7 +256,7 @@ class TripCrewListView(APIView):
         try:
             user = User.objects.get(id=d["user_id"])
         except User.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Utilisateur introuvable."}, status=status.HTTP_404_NOT_FOUND)
 
         try:
             member = services.add_crew_member(

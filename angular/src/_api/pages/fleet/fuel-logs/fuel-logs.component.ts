@@ -108,7 +108,7 @@ export class FleetFuelLogsComponent implements OnInit {
       : this.svc.create(this.selectedVehicleId, payload);
     action.subscribe({
       next: () => { this.saving = false; this.loadLogs(); (this.editId ? this.closeModal('fuel-log-modal') : this.openCreate()); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

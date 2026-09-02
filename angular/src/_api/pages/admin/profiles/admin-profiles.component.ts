@@ -98,7 +98,7 @@ export class AdminProfilesComponent implements OnInit {
 
     action.subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editProfile ? this.closeModal('admin-profile-modal') : this.openCreate()); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -141,7 +141,7 @@ export class AdminProfilesComponent implements OnInit {
         this.applyFilter();
         this.closeModal('admin-profile-roles-modal');
       },
-      error: err => { this.savingRoles = false; this.rolesErrorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.savingRoles = false; this.rolesErrorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

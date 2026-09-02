@@ -65,7 +65,7 @@ def delete_customer(customer, *, deleted_by):
     if customer.bookings.filter(is_deleted=False,
                                  status__in=[Booking.Status.CONFIRMED,
                                              Booking.Status.BOARDED]).exists():
-        raise ApplicationError(_("Customer has active bookings and cannot be deleted."))
+        raise ApplicationError(_("Ce client a des réservations actives : il ne peut pas être supprimé."))
     customer.soft_delete(user=deleted_by)
 
 
@@ -81,9 +81,9 @@ def create_booking(
     from apps.voyage.models import Trip as TripModel
 
     if trip.status in (TripModel.Status.ARRIVED, TripModel.Status.CANCELLED):
-        raise ApplicationError(_("Cannot book a trip that has ended or been cancelled."))
+        raise ApplicationError(_("Impossible de réserver : ce voyage est terminé ou annulé."))
     if trip.status == TripModel.Status.DEPARTED:
-        raise ApplicationError(_("Cannot book a trip that has already departed."))
+        raise ApplicationError(_("Impossible de réserver : ce voyage est déjà parti."))
 
     # Seat availability check (annotate on the fly)
     from django.db.models import Count, Q
@@ -172,9 +172,9 @@ def board_by_qr(qr_code, company_id, *, updated_by):
     from apps.ticketing.selectors import get_ticket_by_qr
     ticket = get_ticket_by_qr(qr_code, company_id)
     if not ticket:
-        raise ApplicationError(_("Ticket not found."))
+        raise ApplicationError(_("Billet introuvable."))
     if ticket.is_used:
-        raise ApplicationError(_("This ticket has already been used."))
+        raise ApplicationError(_("Ce billet a déjà été utilisé."))
     return board_passenger(ticket.booking, updated_by=updated_by)
 
 
@@ -239,5 +239,5 @@ def update_luggage_status(luggage, *, new_status: str, updated_by):
 
 def delete_luggage(luggage, *, deleted_by):
     if luggage.status in (Luggage.Status.LOADED, Luggage.Status.DELIVERED):
-        raise ApplicationError(_("Cannot remove luggage that has been loaded or delivered."))
+        raise ApplicationError(_("Impossible de retirer un bagage déjà chargé ou livré."))
     luggage.soft_delete(user=deleted_by)

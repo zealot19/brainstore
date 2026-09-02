@@ -19,7 +19,7 @@ def resolve_company_or_global(request):
         try:
             return Company.objects.get(id=cid), None
         except Company.DoesNotExist:
-            return None, error_response("Company not found.", status_code=404)
+            return None, error_response("Institution introuvable.", status_code=404)
     if not request.user.company_id:
         return None, error_response("Votre compte n'est lié à aucune institution.")
     return request.user.company, None

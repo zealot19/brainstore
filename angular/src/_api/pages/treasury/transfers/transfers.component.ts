@@ -45,7 +45,7 @@ export class TrzTransfersComponent implements OnInit {
     payload[v.from_type === 'cash' ? 'from_cash_register_id' : 'from_bank_account_id'] = v.from_id;
     payload[v.to_type === 'cash' ? 'to_cash_register_id' : 'to_bank_account_id'] = v.to_id;
     this.svc.create(payload).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   private close(): void { document.getElementById('trz-trf-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

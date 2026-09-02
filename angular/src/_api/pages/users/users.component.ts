@@ -202,7 +202,7 @@ export class UsersComponent implements OnInit, OnDestroy {
           afterCreate();
         }
       },
-      error: err => { this.creating = false; this.createError = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.creating = false; this.createError = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -255,7 +255,7 @@ export class UsersComponent implements OnInit, OnDestroy {
           afterEdit();
         }
       },
-      error: err => { this.saving = false; this.editError = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.editError = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -263,12 +263,12 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   toggleActive(u: AppUser): void {
     const action = u.is_active ? this.userService.deactivate(u.id) : this.userService.activate(u.id);
-    action.subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    action.subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   unlock(u: AppUser): void {
     if (!confirm(`Déverrouiller le compte de ${u.full_name} ?`)) return;
-    this.userService.unlock(u.id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.userService.unlock(u.id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   // ── Réinitialisation mot de passe ─────────────────────────────────────────────
@@ -286,7 +286,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     const v = this.resetForm.value;
     this.userService.resetPassword(this.resetUser.id, v.new_password, v.must_change).subscribe({
       next: () => { this.resetting = false; this.closeModal('user-reset-modal'); },
-      error: err => { this.resetting = false; this.resetError = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.resetting = false; this.resetError = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

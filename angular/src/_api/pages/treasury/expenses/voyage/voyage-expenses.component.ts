@@ -55,7 +55,7 @@ export class VoyageExpensesComponent implements OnInit {
 
   disburse(e: any): void {
     this.tripExpSvc.disburse(e.trip_id, e.id, this.disburseSession)
-      .subscribe({ next: () => { this.reload(); this.toast.success('Dépense décaissée.'); }, error: err => this.toast.error(err?.error?.error?.message ?? err?.error?.detail ?? 'Erreur.') });
+      .subscribe({ next: () => { this.reload(); this.toast.success('Dépense décaissée.'); }, error: err => this.toast.error(err?.error?.error?.message ?? err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   printVoucher(e: any): void {

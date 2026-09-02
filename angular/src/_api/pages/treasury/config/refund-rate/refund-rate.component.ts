@@ -20,7 +20,7 @@ export class RefundRateComponent implements OnInit {
     this.saving = true; this.saved = false; this.errorMsg = '';
     this.svc.set(this.rate).subscribe({
       next: r => { this.rate = r; this.saving = false; this.saved = true; },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 }

@@ -69,7 +69,7 @@ export class GeneralExpensesComponent implements OnInit {
     const req = this.editId ? this.svc.update(this.editId, body) : this.svc.create(body);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.editId ? this.close('gexp-modal') : this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -79,7 +79,7 @@ export class GeneralExpensesComponent implements OnInit {
 
   disburse(e: any): void {
     this.svc.disburse(e.id, this.disburseSession || undefined)
-      .subscribe({ next: () => { this.reload(); this.toast.success('Dépense décaissée.'); }, error: err => this.toast.error(err?.error?.error?.message ?? 'Erreur.') });
+      .subscribe({ next: () => { this.reload(); this.toast.success('Dépense décaissée.'); }, error: err => this.toast.error(err?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   printVoucher(e: any): void {

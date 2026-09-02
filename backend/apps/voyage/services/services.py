@@ -27,10 +27,10 @@ def create_trip(
     free_seating: bool = False, notes: str = "", created_by,
 ):
     if departure_datetime <= timezone.now():
-        raise ApplicationError(_("Departure date must be in the future."))
+        raise ApplicationError(_("La date de départ doit être dans le futur."))
 
     if vehicle and vehicle.company_id != company.id:
-        raise ApplicationError(_("This vehicle does not belong to your company."))
+        raise ApplicationError(_("Ce véhicule n'appartient pas à votre institution."))
 
     if vehicle and vehicle.status not in ("available",):
         raise ApplicationError(
@@ -73,7 +73,7 @@ def update_trip(trip, *, updated_by, **fields):
         "vehicle_id", "fare_class_id", "free_seating", "notes",
     }
     if "departure_datetime" in fields and fields["departure_datetime"] <= timezone.now():
-        raise ApplicationError(_("Departure date must be in the future."))
+        raise ApplicationError(_("La date de départ doit être dans le futur."))
     for key, val in fields.items():
         if key in allowed:
             setattr(trip, key, val)
@@ -140,7 +140,7 @@ def arrive_trip(trip, *, actual_arrival=None, updated_by):
 @transaction.atomic
 def cancel_trip(trip, *, updated_by):
     if trip.status in (Trip.Status.DEPARTED, Trip.Status.ARRIVED):
-        raise ApplicationError(_("Departed or arrived trips cannot be cancelled."))
+        raise ApplicationError(_("Un voyage déjà parti ou arrivé ne peut pas être annulé."))
 
     was_departed = trip.status == Trip.Status.DEPARTED
     trip.status = Trip.Status.CANCELLED
@@ -157,7 +157,7 @@ def cancel_trip(trip, *, updated_by):
 
 def delete_trip(trip, *, deleted_by):
     if trip.status in (Trip.Status.DEPARTED, Trip.Status.ARRIVED):
-        raise ApplicationError(_("Departed or arrived trips cannot be deleted."))
+        raise ApplicationError(_("Un voyage déjà parti ou arrivé ne peut pas être supprimé."))
     trip.soft_delete(user=deleted_by)
 
 
@@ -167,7 +167,7 @@ def delete_trip(trip, *, deleted_by):
 def add_crew_member(*, trip, user, role: str = TripCrew.Role.CONDUCTOR,
                     notes: str = "", created_by):
     if trip.status in (Trip.Status.ARRIVED, Trip.Status.CANCELLED):
-        raise ApplicationError(_("Cannot modify crew for a finished or cancelled trip."))
+        raise ApplicationError(_("Impossible de modifier l'équipage d'un voyage terminé ou annulé."))
     if TripCrew.objects.filter(trip=trip, user=user, is_deleted=False).exists():
         raise ApplicationError(
             _("{name} is already assigned to this trip.").format(
@@ -182,5 +182,5 @@ def add_crew_member(*, trip, user, role: str = TripCrew.Role.CONDUCTOR,
 
 def remove_crew_member(crew_member, *, deleted_by):
     if crew_member.trip.status in (Trip.Status.ARRIVED, Trip.Status.CANCELLED):
-        raise ApplicationError(_("Cannot modify crew for a finished or cancelled trip."))
+        raise ApplicationError(_("Impossible de modifier l'équipage d'un voyage terminé ou annulé."))
     crew_member.soft_delete(user=deleted_by)

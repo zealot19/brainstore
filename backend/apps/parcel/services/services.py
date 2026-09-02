@@ -66,7 +66,7 @@ def create_parcel(
     trip=None, notes="", created_by,
 ):
     if from_terminal.id == to_terminal.id:
-        raise ApplicationError(_("Origin and destination terminals must be different."))
+        raise ApplicationError(_("Les points d'origine et de destination doivent être différents."))
 
     reference = _next_parcel_reference(company)
     parcel = Parcel.objects.create(
@@ -120,7 +120,7 @@ def assign_trip(parcel, *, trip, updated_by):
     if parcel.status not in (Parcel.Status.REGISTERED,):
         raise ApplicationError(_("Only registered parcels can be assigned to a trip."))
     if trip.company_id != parcel.company_id:
-        raise ApplicationError(_("The trip does not belong to the same company."))
+        raise ApplicationError(_("Ce voyage n'appartient pas à votre institution."))
     parcel.trip = trip
     parcel.updated_by = updated_by
     parcel.save(update_fields=["trip", "updated_by", "updated_at"])
@@ -173,7 +173,7 @@ def mark_lost(parcel, *, note="", updated_by):
 @transaction.atomic
 def record_payment(parcel, *, payment_mode: str, updated_by):
     if parcel.payment_status == Parcel.PaymentStatus.PAID:
-        raise ApplicationError(_("This parcel has already been paid."))
+        raise ApplicationError(_("Ce colis a déjà été payé."))
     parcel.payment_status = Parcel.PaymentStatus.PAID
     parcel.payment_mode = payment_mode
     parcel.paid_at = timezone.now()

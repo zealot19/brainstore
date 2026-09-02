@@ -187,7 +187,7 @@ export class FleetVehiclesComponent implements OnInit {
     };
     this.vehicleService.create(payload).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -238,7 +238,7 @@ export class FleetVehiclesComponent implements OnInit {
     };
     this.vehicleService.update(this.selectedId, payload).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('edit-vehicle-modal'); },
-      error: err => { this.saving = false; this.editErrorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.editErrorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -259,7 +259,7 @@ export class FleetVehiclesComponent implements OnInit {
       note:     v.note  || '',
     }).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('odometer-modal'); },
-      error: err => { this.saving = false; this.odometerMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.odometerMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

@@ -235,7 +235,7 @@ class ExternalDriverListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         drivers = selectors.list_external_drivers(company_id, search=request.query_params.get("search"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(drivers, request)
@@ -304,7 +304,7 @@ class VehicleListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         vehicles = selectors.list_vehicles(
             company_id,
             agency_id=request.query_params.get("agency_id"),
@@ -408,7 +408,7 @@ class ParkingListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         rows = selectors.list_parkings(company_id, search=request.query_params.get("search"))
         return success_response(ParkingSerializer(rows, many=True).data)
 
@@ -457,7 +457,7 @@ class SupplierListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         rows = selectors.list_suppliers(company_id, search=request.query_params.get("search"))
         return success_response(SupplierSerializer(rows, many=True).data)
 
@@ -555,7 +555,7 @@ class FleetAlertsView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         try:
             days = int(request.query_params.get("days", 30))
         except (ValueError, TypeError):
@@ -575,7 +575,7 @@ class FleetStatsView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         return success_response(selectors.get_fleet_stats(company_id))
 
 
@@ -653,7 +653,7 @@ class ServiceListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         services_qs = selectors.list_services(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),
@@ -668,7 +668,7 @@ class ServiceListView(APIView):
     def post(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         payload = ServiceCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -925,7 +925,7 @@ class ContractListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         qs = selectors.list_contracts(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),
@@ -938,7 +938,7 @@ class ContractListView(APIView):
     def post(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         payload = ContractWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -1167,7 +1167,7 @@ class AssignmentListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         assignments = selectors.list_assignments(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),
@@ -1335,7 +1335,7 @@ class AccidentListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         accidents = selectors.list_accidents(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),

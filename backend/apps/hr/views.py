@@ -65,7 +65,7 @@ class GradeListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         grades = selectors.list_grades(company_id, search=request.query_params.get("search"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(grades, request)
@@ -242,7 +242,7 @@ class DepartmentListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         depts = selectors.list_departments(
             company_id,
             parent_id=request.query_params.get("parent_id"),
@@ -278,7 +278,7 @@ class DepartmentTreeView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         roots = selectors.list_root_departments(company_id)
         return success_response(DepartmentTreeSerializer(roots, many=True).data)
 
@@ -328,7 +328,7 @@ class JobPositionListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         jps = selectors.list_job_positions(
             company_id,
             department_id=request.query_params.get("department_id"),
@@ -404,7 +404,7 @@ class EmployeeListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         employees = selectors.list_employees(
             company_id,
             agency_id=request.query_params.get("agency_id"),
@@ -623,7 +623,7 @@ class LeaveRequestListView(APIView):
     def get(self, request):
         company_id = _scope_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."))
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         requests = selectors.list_leave_requests(
             company_id,
             employee_id=request.query_params.get("employee_id"),
