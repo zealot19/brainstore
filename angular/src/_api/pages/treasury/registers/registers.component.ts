@@ -59,7 +59,7 @@ export class TrzRegistersComponent implements OnInit {
     if (this.editId) { payload['is_active'] = v.is_active; } else { payload['opening_balance'] = v.opening_balance; }
     const a = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   delete(r: CashRegister): void {
     if (!confirm('Supprimer cette caisse ?')) return;

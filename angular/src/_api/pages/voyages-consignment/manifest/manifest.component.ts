@@ -34,18 +34,18 @@ export class VcgManifestComponent implements OnInit {
              checked_in: 'bg-warning', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   load(p: Parcel): void {
-    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   loadAll(): void {
     if (!this.pending.length) return;
     let remaining = this.pending.length;
     this.pending.forEach(p => this.parcels.assignTrip(p.id, this.tripId).subscribe({
       next: () => { if (--remaining === 0) this.onTripChange(); },
-      error: e => { this.toast.error(e?.error?.detail ?? 'Erreur.'); if (--remaining === 0) this.onTripChange(); } }));
+      error: e => { this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); if (--remaining === 0) this.onTripChange(); } }));
   }
   unload(p: Parcel): void {
-    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
-  deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') }); }
-  loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') }); }
+  deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") }); }
+  loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") }); }
 }

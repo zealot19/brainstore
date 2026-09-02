@@ -89,7 +89,7 @@ export class AdminRolesComponent implements OnInit {
 
     action.subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editRole ? this.closeModal('admin-role-modal') : this.openCreate()); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

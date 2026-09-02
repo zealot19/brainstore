@@ -278,7 +278,7 @@ class AgencyListView(APIView):
     def get(self, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
         if not company_id and not request.user.is_superuser:
-            return error_response(_("company_id requis."), status_code=400)
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."), status_code=400)
         agencies = selectors.list_agencies(
             company_id or None,
             parent_id=request.query_params.get("parent") or None,
@@ -373,7 +373,7 @@ class AgencyTreeView(APIView):
     def get(self, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
         if not company_id:
-            return error_response(_("company_id requis."), status_code=400)
+            return error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."), status_code=400)
         roots = selectors.get_agency_tree(company_id)
         return success_response(AgencyTreeSerializer(roots, many=True).data)
 

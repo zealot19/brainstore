@@ -204,7 +204,7 @@ export class RolePermissionsComponent implements OnInit {
     this.saving = true; this.saved = false; this.errorMsg = '';
     this.roleService.setPermissions(this.role.id, [...this.selectedPermIds]).subscribe({
       next: () => { this.saving = false; this.saved = true; setTimeout(() => this.saved = false, 3000); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

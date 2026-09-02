@@ -20,7 +20,7 @@ def _scope(request):
     if request.user.is_superuser:
         cid = request.query_params.get("company_id") or request.data.get("company_id")
         if not cid:
-            return None, error_response("company_id requis.")
+            return None, error_response("Veuillez préciser l'institution concernée (paramètre company_id).")
         c = Company.objects.filter(id=cid).first()
         return (c, None) if c else (None, error_response("Institution introuvable.", status_code=404))
     if not request.user.company_id:
@@ -515,12 +515,12 @@ class CrewMemberDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(S.CrewMemberSerializer(o).data) if o else error_response("Introuvable.", status_code=404)
+        return success_response(S.CrewMemberSerializer(o).data) if o else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         d = request.data
         for f in ("first_name", "last_name", "phone", "license_number", "is_active"):
             if f in d:
@@ -537,7 +537,7 @@ class CrewMemberDetailView(APIView):
     def delete(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         o.is_deleted = True; o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message="Membre supprimé.")
@@ -622,5 +622,5 @@ class TripStatsView(APIView):
     def get(self, request):
         from apps.voyages_trips.stats import get_trip_stats
         if not request.user.company_id:
-            return error_response("Aucune institution.", status_code=400)
+            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
         return success_response(get_trip_stats(request.user.company_id))

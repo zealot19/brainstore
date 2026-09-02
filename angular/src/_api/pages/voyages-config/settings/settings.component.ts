@@ -25,7 +25,7 @@ export class VcSettingsComponent implements OnInit {
     if (this.saving) return; this.saving = true; this.errorMsg = ''; this.okMsg = '';
     this.svc.update(this.form.value).subscribe({
       next: () => { this.saving = false; this.okMsg = 'Paramètres enregistrés.'; },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 }

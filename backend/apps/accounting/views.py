@@ -51,12 +51,12 @@ class AccountDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(AccountSerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+        return success_response(AccountSerializer(o).data) if o else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         for f in ("name", "account_type", "reconcile", "deprecated", "note"):
             if f in request.data:
                 setattr(o, f, request.data[f])
@@ -69,7 +69,7 @@ class AccountDetailView(APIView):
     def delete(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         o.is_deleted = True
         o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -104,12 +104,12 @@ class JournalDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(JournalSerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+        return success_response(JournalSerializer(o).data) if o else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         for f in ("name", "journal_type", "sequence_prefix", "active"):
             if f in request.data:
                 setattr(o, f, request.data[f])
@@ -162,7 +162,7 @@ class PeriodCloseView(APIView):
     def post(self, request, pk):
         o = AccountingPeriod.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         if o.state != "open":
             return error_response(_("La période n'est pas ouverte."))
         o.state = "closed"
@@ -203,12 +203,12 @@ class PartnerDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(PartnerSerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+        return success_response(PartnerSerializer(o).data) if o else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         for f in ("partner_type", "name", "source_model", "active", "note"):
             if f in request.data:
                 setattr(o, f, request.data[f])
@@ -219,7 +219,7 @@ class PartnerDetailView(APIView):
     def delete(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         o.is_deleted = True
         o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -266,12 +266,12 @@ class EntryDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(JournalEntrySerializer(o).data) if o else error_response(_("Introuvable."), status_code=404)
+        return success_response(JournalEntrySerializer(o).data) if o else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         if o.state != "draft":
             return error_response(_("Une pièce validée est immuable."))
         for f in ("label", "reference"):
@@ -284,7 +284,7 @@ class EntryDetailView(APIView):
     def delete(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         if o.state != "draft":
             return error_response(_("Seule une pièce en brouillon peut être supprimée."))
         o.is_deleted = True
@@ -300,7 +300,7 @@ class EntryPostView(APIView):
     def post(self, request, pk):
         o = JournalEntry.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             entry = AccountingService.post_entry(o.id, posted_by=request.user)
         except ApplicationError as e:
@@ -315,7 +315,7 @@ class EntryCancelView(APIView):
     def post(self, request, pk):
         o = JournalEntry.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
         if not o:
-            return error_response(_("Introuvable."), status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             reversal = AccountingService.cancel_entry(o.id, reason=request.data.get("reason", ""), cancelled_by=request.user)
         except ApplicationError as e:

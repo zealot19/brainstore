@@ -56,16 +56,16 @@ export class VcTicketTemplateComponent implements OnInit {
     this.saving = true; this.msg = '';
     this.svc.save(this.buildFd()).subscribe({
       next: t => { this.m = t; this.logoFile = null; this.bgFile = null; this.saving = false; this.msg = 'Enregistré.'; setTimeout(() => this.msg = '', 2500); },
-      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? 'Erreur.'); } });
+      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); } });
   }
   reset(): void {
     if (!confirm('Réinitialiser au défaut ? Vos réglages seront perdus.')) return;
-    this.svc.reset().subscribe({ next: t => { this.m = t; this.msg = 'Réinitialisé.'; setTimeout(() => this.msg = '', 2500); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.reset().subscribe({ next: t => { this.m = t; this.msg = 'Réinitialisé.'; setTimeout(() => this.msg = '', 2500); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   preview(): void {
     if (!this.m) return;
     this.svc.preview(this.buildFd()).subscribe({
       next: r => { const w = window.open('', '_blank'); if (w) { w.document.write(r.html); w.document.close(); } },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 }

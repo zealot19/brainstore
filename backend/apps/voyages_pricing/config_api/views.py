@@ -61,12 +61,12 @@ class FareDetailView(APIView):
 
     def get(self, request, pk):
         fare = self._get(request, pk)
-        return success_response(S.FareRead(fare).data) if fare else error_response("Introuvable.", status_code=404)
+        return success_response(S.FareRead(fare).data) if fare else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         fare = self._get(request, pk)
         if not fare:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.FareWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -101,7 +101,7 @@ class FareDetailView(APIView):
     def delete(self, request, pk):
         fare = self._get(request, pk)
         if not fare:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         services.delete_fare(fare, user=request.user)
         return no_content_response()
 

@@ -85,9 +85,9 @@ export class VcSeatingPlansComponent implements OnInit {
       });
     };
     if (this.editId) {
-      this.svc.update(this.editId, meta).subscribe({ next: () => after(this.editId!), error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      this.svc.update(this.editId, meta).subscribe({ next: () => after(this.editId!), error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
     } else {
-      this.svc.create(meta).subscribe({ next: p => { this.editId = p.id; after(p.id); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      this.svc.create(meta).subscribe({ next: p => { this.editId = p.id; after(p.id); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
     }
   }
   delete(p: SeatingPlan): void { if (p.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ce plan ?')) return; this.svc.delete(p.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }

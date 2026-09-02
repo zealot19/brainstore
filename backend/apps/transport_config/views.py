@@ -35,7 +35,7 @@ def _resolve_company(request, body_company_id=None):
         try:
             return Company.objects.get(id=cid), None
         except Company.DoesNotExist:
-            return None, error_response(_("Company not found."), status_code=404)
+            return None, error_response(_("Institution introuvable."), status_code=404)
     company = request.user.company
     if not company:
         return None, error_response(_("Your account is not linked to a company."))
@@ -159,13 +159,13 @@ class TerminalDetailView(APIView):
     def get(self, request, terminal_id):
         t = self._get(request, terminal_id)
         if not t:
-            return error_response(_("Terminal not found."), status_code=404)
+            return error_response(_("Point de service introuvable."), status_code=404)
         return success_response(TerminalSerializer(t).data)
 
     def patch(self, request, terminal_id):
         t = self._get(request, terminal_id)
         if not t:
-            return error_response(_("Terminal not found."), status_code=404)
+            return error_response(_("Point de service introuvable."), status_code=404)
         payload = TerminalWriteSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -183,7 +183,7 @@ class TerminalDetailView(APIView):
     def delete(self, request, terminal_id):
         t = self._get(request, terminal_id)
         if not t:
-            return error_response(_("Terminal not found."), status_code=404)
+            return error_response(_("Point de service introuvable."), status_code=404)
         try:
             services.delete_terminal(t, deleted_by=request.user)
         except ApplicationError as e:
@@ -294,7 +294,7 @@ class RouteStopListView(APIView):
         d = payload.validated_data
         terminal = selectors.get_terminal(d["terminal_id"], company_id)
         if not terminal:
-            return error_response(_("Terminal not found."), status_code=404)
+            return error_response(_("Point de service introuvable."), status_code=404)
         try:
             stop = services.add_route_stop(
                 route=route, terminal=terminal,

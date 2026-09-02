@@ -45,7 +45,7 @@ export class VcgReceptionComponent implements OnInit {
   receiveOne(p: Parcel): void {
     const s = this.state[p.id];
     this.svc.receive(p.id, { received_pieces: s.received, missing_pieces: s.missing, damaged_pieces: s.damaged })
-      .subscribe({ next: () => this.reload(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      .subscribe({ next: () => this.reload(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   /** Réception groupée = réception complète (toutes les pièces) des colis sélectionnés. */
@@ -53,6 +53,6 @@ export class VcgReceptionComponent implements OnInit {
     if (!this.selected.size) return;
     this.svc.bulk([...this.selected], 'receive').subscribe({
       next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 }

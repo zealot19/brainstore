@@ -55,7 +55,7 @@ export class TrzMovementsComponent implements OnInit {
     const v = { ...this.form.value };
     if (v.account_type === 'cash') { v.bank_account_id = null; } else { v.cash_session_id = null; }
     this.svc.create(v).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   delete(r: Transaction): void {
     if (!confirm('Supprimer ce mouvement ?')) return;

@@ -135,7 +135,7 @@ export class VcgBaggageComponent implements OnInit {
     const req = this.isEdit ? this.svc.edit(this.editId!, v) : this.svc.create(v);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('baggage-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
 
   // Sélection multiple + actions groupées
@@ -149,7 +149,7 @@ export class VcgBaggageComponent implements OnInit {
     if (action === 'cancel' && !confirm(`Annuler ${this.selected.size} bagage(s) ?`)) return;
     this.svc.bulk([...this.selected], action).subscribe({
       next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   askDeliver(b: Baggage): void { this.deliverTarget = b; this.deliverComment = ''; }
@@ -157,11 +157,11 @@ export class VcgBaggageComponent implements OnInit {
     if (!this.deliverTarget) return;
     this.svc.deliver(this.deliverTarget.id, { comment: this.deliverComment }).subscribe({
       next: () => { this.deliverTarget = null; this.reload(); this.close('deliver-modal'); },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   cancel(b: Baggage): void {
     if (!confirm('Annuler ce bagage ?')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Bagage annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Bagage annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 

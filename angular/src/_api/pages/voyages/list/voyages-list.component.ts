@@ -111,7 +111,7 @@ export class VoyagesListComponent implements OnInit {
           code: f.code, notes: f.notes, service_pattern_id: null };
     this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
   open(t: Trip): void { this.router.navigate(['/voyages/trip', t.id]); }

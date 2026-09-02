@@ -96,28 +96,28 @@ export class FleetAssignmentsComponent implements OnInit {
     };
     this.svc.create(payload).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
   startAssignment(id: string): void {
     if (!confirm('Démarrer cette mission ?')) return;
-    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   completeAssignment(id: string): void {
     if (!confirm('Clôturer cette mission ?')) return;
-    this.svc.complete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.complete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   cancelAssignment(id: string): void {
     if (!confirm('Annuler cette mission ?')) return;
-    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer cette mission ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur.") });
   }
 
   private closeModal(id: string): void {

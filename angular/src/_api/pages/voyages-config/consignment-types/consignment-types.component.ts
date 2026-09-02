@@ -46,7 +46,7 @@ export class VcConsignmentTypesComponent implements OnInit {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = { ...this.form.value, max_weight_kg: this.form.value.max_weight_kg || null, max_volume_m3: this.form.value.max_volume_m3 || null };
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   delete(r: ConsignmentType): void { if (r.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
   private close(): void { document.getElementById('vc-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

@@ -37,12 +37,12 @@ class PassengerDetailView(APIView):
 
     def get(self, request, pk):
         p = self._get(request, pk)
-        return success_response(S.PassengerRead(p).data) if p else error_response("Introuvable.", status_code=404)
+        return success_response(S.PassengerRead(p).data) if p else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         p = self._get(request, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.PassengerWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         for k, v in payload.validated_data.items():
@@ -54,7 +54,7 @@ class PassengerDetailView(APIView):
     def delete(self, request, pk):
         p = self._get(request, pk)
         if not p:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         p.is_deleted = True
         p.updated_by = request.user
         p.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -159,7 +159,7 @@ class BookingAssignReturnView(APIView):
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.AssignReturnSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -179,12 +179,12 @@ class BookingDetailView(APIView):
 
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
-        return success_response(S.BookingRead(b).data) if b else error_response("Introuvable.", status_code=404)
+        return success_response(S.BookingRead(b).data) if b else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def delete(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         services.cancel_booking(b, user=request.user)
         return success_response(S.BookingRead(b).data)
 
@@ -196,7 +196,7 @@ class BookingCancelView(APIView):
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         services.cancel_booking(b, user=request.user)
         return success_response(S.BookingRead(b).data)
 
@@ -208,7 +208,7 @@ class BookingNoShowView(APIView):
     def post(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
             b = services.mark_no_show(b, user=request.user)
         except ApplicationError as e:
@@ -386,7 +386,7 @@ class BookingRenderTicketsView(APIView):
         from apps.voyages_config.models import VoyagesSettings
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         company = request.user.company
         tpl = ticket_render.get_or_create_template(company)
         base = ticket_render.company_tokens(company, request)
@@ -432,7 +432,7 @@ class BookingPrintView(APIView):
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tickets = []
         for t in b.tickets.filter(is_deleted=False).exclude(status="cancelled").order_by("direction"):
             trip = t.trip if t.trip_id else None
@@ -469,5 +469,5 @@ class BookingStatsView(APIView):
     def get(self, request):
         from apps.voyages_booking.stats import get_booking_stats
         if not request.user.company_id:
-            return error_response("Aucune institution.", status_code=400)
+            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
         return success_response(get_booking_stats(request.user.company_id))

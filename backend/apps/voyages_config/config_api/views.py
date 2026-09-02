@@ -74,12 +74,12 @@ class _ConfigDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(self.read(obj).data) if obj else error_response("Introuvable.", status_code=404)
+        return success_response(self.read(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = self.write(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         data = dict(payload.validated_data)
@@ -100,7 +100,7 @@ class _ConfigDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -346,12 +346,12 @@ class RouteDetailView(APIView):
 
     def get(self, request, pk):
         route = self._get(request, pk)
-        return success_response(S.RouteRead(route).data) if route else error_response("Introuvable.", status_code=404)
+        return success_response(S.RouteRead(route).data) if route else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         route = self._get(request, pk)
         if not route:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.RouteWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -381,7 +381,7 @@ class RouteDetailView(APIView):
     def delete(self, request, pk):
         route = self._get(request, pk)
         if not route:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         route.is_deleted = True
         route.updated_by = request.user
         route.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -561,7 +561,7 @@ class VehicleSeatingAssignmentDetailView(APIView):
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.VehicleSeatingAssignmentWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -585,7 +585,7 @@ class VehicleSeatingAssignmentDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -660,12 +660,12 @@ class ServicePatternDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(S.ServicePatternRead(obj).data) if obj else error_response("Introuvable.", status_code=404)
+        return success_response(S.ServicePatternRead(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ServicePatternWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -681,7 +681,7 @@ class ServicePatternDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])

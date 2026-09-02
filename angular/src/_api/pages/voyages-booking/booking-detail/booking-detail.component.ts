@@ -45,11 +45,11 @@ export class VbBookingDetailComponent implements OnInit {
   }
   board(ticketId: string): void {
     this.svc.board(ticketId).subscribe({ next: () => this.booking && this.load(this.booking.id),
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   cancel(): void {
     if (!this.booking || !confirm('Annuler cette réservation ?')) return;
-    this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   back(): void { this.router.navigate(['/voyages-booking/bookings']); }
   goAssignReturn(): void { this.router.navigate(['/voyages-booking/open-returns']); }

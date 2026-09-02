@@ -117,7 +117,7 @@ export class FleetAccidentsComponent implements OnInit {
     };
     this.svc.create(payload).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
@@ -137,17 +137,17 @@ export class FleetAccidentsComponent implements OnInit {
       notes: v.notes || null,
     }).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('close-accident-modal'); },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
   setStatus(id: string, status: string): void {
-    this.svc.setStatus(id, status).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
+    this.svc.setStatus(id, status).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer cet accident ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur.") });
   }
 
   private closeModal(id: string): void {

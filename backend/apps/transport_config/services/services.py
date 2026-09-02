@@ -14,7 +14,7 @@ def create_city(*, name: str, code: str, region: str = "", country: str = "Camer
                 is_active: bool = True, created_by):
     code = code.upper().strip()
     if City.objects.filter(code=code, is_deleted=False).exists():
-        raise ApplicationError(_("A city with this code already exists."))
+        raise ApplicationError(_("Une ville portant ce code existe déjà."))
     return City.objects.create(
         name=name, code=code, region=region,
         country=country, is_active=is_active, created_by=created_by,
@@ -27,7 +27,7 @@ def update_city(city, *, updated_by, **fields):
     if "code" in fields:
         code = fields["code"].upper().strip()
         if City.objects.filter(code=code, is_deleted=False).exclude(id=city.id).exists():
-            raise ApplicationError(_("A city with this code already exists."))
+            raise ApplicationError(_("Une ville portant ce code existe déjà."))
         fields["code"] = code
     for key, val in fields.items():
         if key in allowed:
@@ -39,7 +39,7 @@ def update_city(city, *, updated_by, **fields):
 
 def delete_city(city, *, deleted_by):
     if city.terminals.filter(is_deleted=False).exists():
-        raise ApplicationError(_("Cannot delete a city that has active terminals."))
+        raise ApplicationError(_("Impossible de supprimer cette ville : elle contient encore des points de service actifs."))
     city.soft_delete(user=deleted_by)
 
 
@@ -51,7 +51,7 @@ def create_terminal(*, company, city, name: str, address: str = "",
                     is_active: bool = True, notes: str = "", created_by):
     if Terminal.objects.filter(company=company, city=city,
                                 name__iexact=name, is_deleted=False).exists():
-        raise ApplicationError(_("A terminal with this name already exists in this city."))
+        raise ApplicationError(_("Un point de service portant ce nom existe déjà dans cette ville."))
     return Terminal.objects.create(
         company=company, city=city, name=name, address=address,
         phone=phone, gps_lat=gps_lat, gps_lng=gps_lng,
@@ -73,7 +73,7 @@ def update_terminal(terminal, *, updated_by, **fields):
 def delete_terminal(terminal, *, deleted_by):
     if (terminal.routes_from.filter(is_deleted=False).exists() or
             terminal.routes_to.filter(is_deleted=False).exists()):
-        raise ApplicationError(_("Cannot delete a terminal used in active routes."))
+        raise ApplicationError(_("Impossible de supprimer ce point de service : il est utilisé par des trajets actifs."))
     terminal.soft_delete(user=deleted_by)
 
 
@@ -84,10 +84,10 @@ def create_route(*, company, from_terminal, to_terminal, name: str = "",
                  distance_km=None, duration_minutes=None,
                  is_active: bool = True, notes: str = "", created_by):
     if from_terminal.id == to_terminal.id:
-        raise ApplicationError(_("Departure and arrival terminals must be different."))
+        raise ApplicationError(_("Les points de départ et d'arrivée doivent être différents."))
     if Route.objects.filter(company=company, from_terminal=from_terminal,
                              to_terminal=to_terminal, is_deleted=False).exists():
-        raise ApplicationError(_("This route already exists."))
+        raise ApplicationError(_("Ce trajet existe déjà."))
     return Route.objects.create(
         company=company,
         from_terminal=from_terminal,
@@ -121,11 +121,11 @@ def add_route_stop(*, route, terminal, stop_order: int,
                    arrival_offset_minutes: int = 0, distance_from_start_km=None,
                    created_by):
     if terminal.id == route.from_terminal.id or terminal.id == route.to_terminal.id:
-        raise ApplicationError(_("This terminal is already the departure or arrival of the route."))
+        raise ApplicationError(_("Ce point de service est déjà le départ ou l'arrivée du trajet."))
     if RouteStop.objects.filter(route=route, stop_order=stop_order, is_deleted=False).exists():
-        raise ApplicationError(_("Stop order {n} is already taken on this route.").format(n=stop_order))
+        raise ApplicationError(_("L'ordre d'escale {n} est déjà utilisé sur ce trajet.").format(n=stop_order))
     if RouteStop.objects.filter(route=route, terminal=terminal, is_deleted=False).exists():
-        raise ApplicationError(_("This terminal is already a stop on this route."))
+        raise ApplicationError(_("Ce point de service est déjà une escale de ce trajet."))
     return RouteStop.objects.create(
         route=route, terminal=terminal,
         stop_order=stop_order,
@@ -214,7 +214,7 @@ def update_fare_class(fare_class, *, updated_by, **fields):
 
 def delete_fare_class(fare_class, *, deleted_by):
     if fare_class.fares.filter(is_deleted=False, is_active=True).exists():
-        raise ApplicationError(_("Cannot delete a fare class with active fares."))
+        raise ApplicationError(_("Impossible de supprimer cette catégorie tarifaire : des tarifs actifs l'utilisent encore."))
     fare_class.soft_delete(user=deleted_by)
 
 
@@ -228,7 +228,7 @@ def create_fare(*, company, route, vehicle_category, fare_class,
         company=company, route=route, vehicle_category=vehicle_category,
         fare_class=fare_class, passenger_type=passenger_type, is_deleted=False,
     ).exists():
-        raise ApplicationError(_("A fare already exists for this combination."))
+        raise ApplicationError(_("Un tarif existe déjà pour cette combinaison (trajet et catégorie)."))
     return Fare.objects.create(
         company=company, route=route,
         vehicle_category=vehicle_category, fare_class=fare_class,

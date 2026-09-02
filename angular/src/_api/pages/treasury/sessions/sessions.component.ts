@@ -48,13 +48,13 @@ export class TrzSessionsComponent implements OnInit {
   submitOpen(): void {
     if (this.openForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     this.svc.open(this.openForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.close('trz-open-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   openClose(s: CashSession): void { this.closingId = s.id; this.errorMsg = ''; this.closeForm.reset({ closing_balance: null, notes: '' }); }
   submitClose(): void {
     if (this.closeForm.invalid || this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
     this.svc.close(this.closingId, this.closeForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.close('trz-close-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

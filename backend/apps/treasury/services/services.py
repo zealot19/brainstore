@@ -118,7 +118,7 @@ def open_session(*, company, cash_register, opening_balance=None, notes="", crea
 @transaction.atomic
 def close_session(session, *, closing_balance, notes="", updated_by):
     if session.status != CashSession.Status.OPEN:
-        raise ApplicationError(_("This session is already closed."))
+        raise ApplicationError(_("Cette session de caisse est déjà clôturée."))
     # Seul l'utilisateur qui a ouvert la caisse peut la clôturer (ou un administrateur).
     is_admin = getattr(updated_by, "is_superuser", False) or getattr(updated_by, "is_institution_admin", False)
     if not is_admin and session.opened_by_id != getattr(updated_by, "id", None):
@@ -166,7 +166,7 @@ def create_transaction(
     created_by,
 ):
     if amount <= 0:
-        raise ApplicationError(_("Amount must be positive."))
+        raise ApplicationError(_("Le montant doit être supérieur à zéro."))
 
     # Validate account source
     if account_type == Transaction.AccountType.CASH:
@@ -176,7 +176,7 @@ def create_transaction(
             raise ApplicationError(_("The cash session is closed."))
     elif account_type == Transaction.AccountType.BANK:
         if not bank_account:
-            raise ApplicationError(_("A bank account is required for bank transactions."))
+            raise ApplicationError(_("Un compte bancaire est requis pour un règlement par banque."))
 
     reference = _next_ref(Transaction, company, "TXN")
     txn = Transaction.objects.create(
@@ -254,17 +254,17 @@ def create_transfer(
     created_by,
 ):
     if amount <= 0:
-        raise ApplicationError(_("Transfer amount must be positive."))
+        raise ApplicationError(_("Le montant du transfert doit être supérieur à zéro."))
 
     # Validate source
     sources = [x for x in [from_cash_register, from_bank_account] if x]
     dests   = [x for x in [to_cash_register, to_bank_account] if x]
     if len(sources) != 1:
-        raise ApplicationError(_("Exactly one source account must be specified."))
+        raise ApplicationError(_("Indiquez exactement un compte source."))
     if len(dests) != 1:
-        raise ApplicationError(_("Exactly one destination account must be specified."))
+        raise ApplicationError(_("Indiquez exactement un compte de destination."))
     if sources[0] is dests[0]:
-        raise ApplicationError(_("Source and destination must be different."))
+        raise ApplicationError(_("La source et la destination doivent être différentes."))
 
     # Deduct from source
     if from_cash_register:

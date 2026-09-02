@@ -47,9 +47,9 @@ export class VbBookingsComponent implements OnInit {
   open(b: Booking): void { this.router.navigate(['/voyages-booking/bookings', b.id]); }
   cancel(b: Booking): void {
     if (!confirm('Annuler cette réservation ?')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation annulée.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation annulée.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   noShow(b: Booking): void {
-    this.svc.noShow(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation marquée « non présentée ».'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.noShow(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation marquée « non présentée ».'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
 }

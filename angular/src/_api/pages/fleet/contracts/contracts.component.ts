@@ -170,13 +170,13 @@ export class FleetContractsComponent implements OnInit {
         if (!this.editId) { this.editId = c.id; this.costFor = c.id; this.loadCosts(c.id); }
         this.load();
       },
-      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
+      error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer ce contrat ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur.") });
   }
 
   // ── Création rapide de fournisseur ──
@@ -209,7 +209,7 @@ export class FleetContractsComponent implements OnInit {
       currency: v.currency || 'XAF', period_id: v.period_id,
     }).subscribe({
       next: () => { this.savingCost = false; this.costForm.reset({ currency: 'XAF' }); this.loadCosts(this.costFor!); },
-      error: err => { this.savingCost = false; this.toast.error(err?.error?.detail ?? 'Impossible.'); },
+      error: err => { this.savingCost = false; this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur."); },
     });
   }
 
@@ -217,7 +217,7 @@ export class FleetContractsComponent implements OnInit {
     if (!this.costFor || !confirm('Supprimer cette ligne ?')) return;
     this.svc.deleteRecurringCost(this.costFor, rcId).subscribe({
       next: () => this.loadCosts(this.costFor!),
-      error: err => this.toast.error(err?.error?.detail ?? 'Impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? "Opération impossible. Réessayez ou contactez un administrateur."),
     });
   }
 

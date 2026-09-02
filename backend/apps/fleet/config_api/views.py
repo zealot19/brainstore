@@ -64,12 +64,12 @@ class _ConfigDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(self.read(obj).data) if obj else error_response("Introuvable.", status_code=404)
+        return success_response(self.read(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = self.write(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         data = dict(payload.validated_data)
@@ -90,7 +90,7 @@ class _ConfigDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Introuvable.", status_code=404)
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])

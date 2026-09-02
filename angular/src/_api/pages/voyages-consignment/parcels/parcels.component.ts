@@ -85,7 +85,7 @@ export class VcgParcelsComponent implements OnInit {
     if (!this.selected.size || !confirm(`Annuler ${this.selected.size} colis ?`)) return;
     this.svc.bulk([...this.selected], 'cancel').subscribe({
       next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   statusClass(s: string): string {
     return { registered: 'bg-warning', loaded: 'bg-info', arrived: 'bg-primary',
@@ -116,7 +116,7 @@ export class VcgParcelsComponent implements OnInit {
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(this.form.value);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
   askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupName = ''; this.pickupId = ''; }
@@ -124,11 +124,11 @@ export class VcgParcelsComponent implements OnInit {
     if (!this.pickupTarget || !this.pickupName) return;
     this.svc.pickup(this.pickupTarget.id, this.pickupName, this.pickupId).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
-      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   cancel(p: Parcel): void {
     if (!confirm('Annuler ce colis ?')) return;
-    this.svc.cancel(p.id).subscribe({ next: () => { this.reload(); this.toast.success('Colis annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(p.id).subscribe({ next: () => { this.reload(); this.toast.success('Colis annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 

@@ -38,13 +38,13 @@ export class AccFiscalYearsComponent implements OnInit {
   submitYear(): void {
     if (this.fyForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     this.fySvc.create(this.fyForm.value).subscribe({ next: () => { this.saving = false; this.loadYears(); this.closeModal('fy-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   openCreatePeriod(): void { this.errorMsg = ''; this.pForm.reset({ code: '', name: '', date_start: '', date_end: '' }); }
   submitPeriod(): void {
     if (this.pForm.invalid || this.saving || !this.selected) return; this.saving = true; this.errorMsg = '';
     this.pSvc.create({ ...this.pForm.value, fiscal_year: this.selected.id }).subscribe({ next: () => { this.saving = false; this.select(this.selected!); this.closeModal('per-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   closePeriod(p: AccountingPeriod): void {
     if (!confirm(`Clôturer la période « ${p.name} » ?`)) return;

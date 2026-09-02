@@ -44,7 +44,31 @@ export const apiUnwrapInterceptor: HttpInterceptorFn = (req, next) => {
           headers: err.headers,
         }));
       }
-      return throwError(() => err);
+      // Pas d'enveloppe { success, error } : erreur réseau / serveur / passerelle.
+      // On synthétise un message clair et actionnable selon le statut HTTP.
+      return throwError(() => new HttpErrorResponse({
+        error: { detail: statusMessage(err) },
+        status: err.status,
+        statusText: err.statusText,
+        url: err.url ?? undefined,
+        headers: err.headers,
+      }));
     })
   );
 };
+
+/** Message clair et compréhensible quand le serveur ne fournit pas de message. */
+function statusMessage(err: HttpErrorResponse): string {
+  const s = err.status;
+  if (s === 0) return "Serveur injoignable. Vérifiez votre connexion internet, puis réessayez.";
+  if (s === 400) return "La demande n'a pas pu être traitée : vérifiez les informations saisies.";
+  if (s === 401) return "Votre session a expiré. Veuillez vous reconnecter.";
+  if (s === 403) return "Accès refusé : vous n'avez pas la permission d'effectuer cette action.";
+  if (s === 404) return "Élément introuvable : il a peut-être été supprimé ou déplacé.";
+  if (s === 409) return "Conflit : cette opération entre en conflit avec l'état actuel des données.";
+  if (s === 413) return "Fichier trop volumineux : réduisez sa taille et réessayez.";
+  if (s === 422) return "Données invalides : corrigez les champs signalés et réessayez.";
+  if (s === 429) return "Trop de requêtes : patientez un instant avant de réessayer.";
+  if (s >= 500) return "Erreur inattendue du serveur. Réessayez ; si le problème persiste, contactez un administrateur.";
+  return "L'opération a échoué. Réessayez ; si le problème persiste, contactez un administrateur.";
+}
