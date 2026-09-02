@@ -134,7 +134,7 @@ export class VcgBaggageComponent implements OnInit {
     const v = this.form.getRawValue() as BaggageCreate;
     const req = this.isEdit ? this.svc.edit(this.editId!, v) : this.svc.create(v);
     req.subscribe({
-      next: () => { this.saving = false; this.reload(); this.close('baggage-modal'); },
+      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('baggage-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
 

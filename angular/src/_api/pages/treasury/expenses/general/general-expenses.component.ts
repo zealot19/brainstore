@@ -68,7 +68,7 @@ export class GeneralExpensesComponent implements OnInit {
     const body: any = this.form.value;
     const req = this.editId ? this.svc.update(this.editId, body) : this.svc.create(body);
     req.subscribe({
-      next: () => { this.saving = false; this.reload(); this.editId ? this.close('gexp-modal') : this.openCreate(); },
+      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.editId ? this.close('gexp-modal') : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? 'Erreur.'; },
     });
   }

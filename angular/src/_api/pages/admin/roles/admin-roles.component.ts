@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { Role } from '../../../models/rbac.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-admin-roles',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AdminRolesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   roles:    Role[] = [];
@@ -86,7 +88,7 @@ export class AdminRolesComponent implements OnInit {
       : this.roleService.create(payload);
 
     action.subscribe({
-      next: () => { this.saving = false; this.load(); (this.editRole ? this.closeModal('admin-role-modal') : this.openCreate()); },
+      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); (this.editRole ? this.closeModal('admin-role-modal') : this.openCreate()); },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? 'Erreur.'; },
     });
   }

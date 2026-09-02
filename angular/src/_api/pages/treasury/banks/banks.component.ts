@@ -56,7 +56,7 @@ export class TrzBanksComponent implements OnInit {
     const payload: Record<string, unknown> = { bank_name: v.bank_name, account_name: v.account_name, account_number: v.account_number, notes: v.notes, account_id: v.account_id, journal_id: v.journal_id };
     if (this.editId) { payload['is_active'] = v.is_active; } else { payload['opening_balance'] = v.opening_balance; }
     const a = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
-    a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); },
+    a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
   delete(r: BankAccount): void {

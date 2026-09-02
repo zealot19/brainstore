@@ -245,11 +245,11 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.userService.update(this.editUser.id, payload).subscribe({
       next: () => {
         const u = this.editUser!;
-        const afterEdit = () => { this.saving = false; this.load(); this.closeModal('user-edit-modal'); };
+        const afterEdit = () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('user-edit-modal'); };
         if (v.profile_id && u.company_id) {
           this.profileService.assignToUser(u.id, v.profile_id, u.company_id).subscribe({
             next:  () => afterEdit(),
-            error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); },
+            error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); this.toast.success('Enregistré.'); },
           });
         } else {
           afterEdit();
