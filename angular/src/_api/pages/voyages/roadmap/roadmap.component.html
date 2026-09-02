@@ -94,3 +94,9 @@
     </table>
   </div>
 }
+@else if (!loading) {
+  <div class="alert alert-warning no-print">
+    <i class="ti ti-alert-triangle me-1"></i>{{ errorMsg || 'Feuille de route indisponible.' }}
+    <button class="btn btn-sm btn-outline-secondary ms-2" (click)="load()">Réessayer</button>
+  </div>
+}

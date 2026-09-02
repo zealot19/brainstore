@@ -297,9 +297,9 @@ def build_roadmap_data(trip, request):
         "description": p.description, "quantity": p.quantity,
     } for p in manifest["parcels"]]
 
-    crew = [{"role_display": c.get_role_display(),
-             "driver_name": c.driver.full_name if c.driver_id else ""}
-            for c in trip.crew.filter(is_deleted=False)]
+    crew = [{"role_display": (c.member.member_type.name if (c.member_id and c.member.member_type_id) else ""),
+             "driver_name": c.member.full_name if c.member_id else ""}
+            for c in trip.crew.filter(is_deleted=False).select_related("member__member_type")]
 
     return {
         "company": _company_header(trip.company, request),

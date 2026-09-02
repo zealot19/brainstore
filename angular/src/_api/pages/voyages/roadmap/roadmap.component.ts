@@ -13,7 +13,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule],
 })
 export class VbRoadmapComponent implements OnInit {
-  tripId = ''; data: Roadmap | null = null; loading = false;
+  tripId = ''; data: Roadmap | null = null; loading = false; errorMsg = '';
 
   constructor(private svc: RoadmapService, private booking: BookingService,
               private route: ActivatedRoute, private router: Router) {}
@@ -22,8 +22,11 @@ export class VbRoadmapComponent implements OnInit {
     this.load();
   }
   load(): void {
-    this.loading = true;
-    this.svc.get(this.tripId).subscribe({ next: d => { this.data = d; this.loading = false; }, error: () => this.loading = false });
+    this.loading = true; this.errorMsg = '';
+    this.svc.get(this.tripId).subscribe({
+      next: d => { this.data = d; this.loading = false; },
+      error: e => { this.loading = false; this.errorMsg = e?.error?.detail ?? 'Impossible de charger la feuille de route.'; },
+    });
   }
   get canBoard(): boolean { return this.data?.trip.status === 'pending' || this.data?.trip.status === 'departed'; }
 
@@ -34,15 +37,13 @@ export class VbRoadmapComponent implements OnInit {
     this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
   }
   printDoc(which: 'voyages' | 'colis'): void {
-    // PDF serveur (WeasyPrint) : ouvre le bordereau dans un nouvel onglet pour visualiser/imprimer.
-    this.svc.pdf(this.tripId, which).subscribe({
-      next: blob => {
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-      },
-      error: () => alert('Impossible de générer le PDF du bordereau (moteur PDF non disponible sur le serveur).'),
-    });
+    // Impression côté navigateur : le CSS d'impression (styles.scss) masque le chrome et
+    // n'imprime que le bordereau ciblé via la classe body.printing-<which>. Aucun moteur PDF serveur requis.
+    const cls = `printing-${which}`;
+    const cleanup = () => { document.body.classList.remove(cls); window.removeEventListener('afterprint', cleanup); };
+    document.body.classList.add(cls);
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(() => window.print(), 50);
   }
   back(): void { this.router.navigate(['/voyages/list']); }
 }
