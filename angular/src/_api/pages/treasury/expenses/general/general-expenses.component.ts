@@ -7,6 +7,7 @@ import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-general-expenses',
@@ -15,6 +16,7 @@ import { TablePaginatorComponent, PageState } from '../../../../../app/shared/ta
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective],
 })
 export class GeneralExpensesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   private svc = inject(GeneralExpenseService);
   private typeSvc = inject(ExpenseTypeService);
@@ -72,18 +74,18 @@ export class GeneralExpensesComponent implements OnInit {
   }
 
   remove(e: any): void {
-    if (confirm('Supprimer cette dépense ?')) this.svc.remove(e.id).subscribe(() => this.reload());
+    if (confirm('Supprimer cette dépense ?')) this.svc.remove(e.id).subscribe(() => { this.reload(); this.toast.success('Dépense supprimée.'); });
   }
 
   disburse(e: any): void {
     this.svc.disburse(e.id, this.disburseSession || undefined)
-      .subscribe({ next: () => this.reload(), error: err => alert(err?.error?.error?.message ?? 'Erreur.') });
+      .subscribe({ next: () => { this.reload(); this.toast.success('Dépense décaissée.'); }, error: err => this.toast.error(err?.error?.error?.message ?? 'Erreur.') });
   }
 
   printVoucher(e: any): void {
     this.svc.voucher(e.id).subscribe({
       next: blob => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60000); },
-      error: () => alert('Impossible de générer le bon de dépense (moteur PDF non disponible sur le serveur).'),
+      error: () => this.toast.error('Impossible de générer le bon de dépense (moteur PDF non disponible sur le serveur).'),
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouteService } from '../../../services/voyages-config/route.service';
@@ -8,6 +8,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vc-routes',
@@ -15,6 +16,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcRoutesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Route[] = []; filtered: Route[] = []; loading = true; search = '';
   servicePoints: ServicePoint[] = [];
@@ -60,7 +62,7 @@ export class VcRoutesComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; },
     });
   }
-  delete(r: Route): void { if (r.scope === 'global') { alert('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ce trajet ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Suppression impossible.') }); }
+  delete(r: Route): void { if (r.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ce trajet ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
 
   // ── escales ──
   loadStops(routeId: string): void { this.svc.listStops(routeId).subscribe(s => this.stops = s); }
@@ -69,12 +71,12 @@ export class VcRoutesComponent implements OnInit {
     this.savingStop = true;
     this.svc.addStop(this.stopFor, { service_point_id: this.newStopSp, distance_from_origin_km: this.newStopDistance || null }).subscribe({
       next: () => { this.savingStop = false; this.newStopSp = null; this.newStopDistance = null; this.loadStops(this.stopFor!); },
-      error: e => { this.savingStop = false; alert(e?.error?.detail ?? 'Ajout impossible.'); },
+      error: e => { this.savingStop = false; this.toast.error(e?.error?.detail ?? 'Ajout impossible.'); },
     });
   }
   deleteStop(stopId: string): void {
     if (!this.stopFor || !confirm('Retirer cette escale ?')) return;
-    this.svc.deleteStop(this.stopFor, stopId).subscribe({ next: () => this.loadStops(this.stopFor!), error: e => alert(e?.error?.detail ?? 'Impossible.') });
+    this.svc.deleteStop(this.stopFor, stopId).subscribe({ next: () => this.loadStops(this.stopFor!), error: e => this.toast.error(e?.error?.detail ?? 'Impossible.') });
   }
   closeAndReload(): void { this.load(); this.editId ? this.close() : this.openCreate(); }
   private close(): void { document.getElementById('route-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }

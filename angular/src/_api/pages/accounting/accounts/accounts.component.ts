@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AccountService } from '../../../services/accounting/account.service';
@@ -7,6 +7,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-acc-accounts',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class AccAccountsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Account[] = []; filtered: Account[] = []; loading = true;
   search = ''; typeFilter = '';
@@ -50,7 +52,7 @@ export class AccAccountsComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
   toggleDeprecated(r: Account): void {
-    this.svc.update(r.id, { deprecated: !r.deprecated }).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Action impossible.') });
+    this.svc.update(r.id, { deprecated: !r.deprecated }).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Action impossible.') });
   }
   private close(): void { document.getElementById('acc-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

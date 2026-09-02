@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import { CrewMemberService } from '../../../services/voyages/crew-member.service
 import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyages.models';
 import { CrewMember } from '../../../models/crew.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-voyages-trip-detail',
@@ -15,6 +16,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule, FormsModule, RouterModule],
 })
 export class VoyagesTripDetailComponent implements OnInit {
+  private toast = inject(ToastService);
   id = '';
   trip: Trip | null = null;
   loading = true;
@@ -103,7 +105,7 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   addCrew(): void {
     if (!this.newMember) return;
-    this.svc.addCrew(this.id, this.newMember).subscribe({ next: () => { this.newMember = null; this.reload(); }, error: e => alert(e?.error?.detail ?? 'Ajout impossible.') });
+    this.svc.addCrew(this.id, this.newMember).subscribe({ next: () => { this.newMember = null; this.reload(); }, error: e => this.toast.error(e?.error?.detail ?? 'Ajout impossible.') });
   }
   removeCrew(c: TripCrew): void { if (!confirm('Retirer ce membre ?')) return; this.svc.removeCrew(this.id, c.id).subscribe(() => this.reload()); }
 

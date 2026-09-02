@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TicketTemplateService, TicketTemplate, TicketAgency } from '../../../services/voyages-config/ticket-template.service';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vc-ticket-template',
@@ -11,6 +12,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcTicketTemplateComponent implements OnInit {
+  private toast = inject(ToastService);
   m: TicketTemplate | null = null;
   loading = false; saving = false; msg = '';
   logoFile: File | null = null; bgFile: File | null = null;
@@ -54,16 +56,16 @@ export class VcTicketTemplateComponent implements OnInit {
     this.saving = true; this.msg = '';
     this.svc.save(this.buildFd()).subscribe({
       next: t => { this.m = t; this.logoFile = null; this.bgFile = null; this.saving = false; this.msg = 'Enregistré.'; setTimeout(() => this.msg = '', 2500); },
-      error: e => { this.saving = false; alert(e?.error?.detail ?? 'Erreur.'); } });
+      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? 'Erreur.'); } });
   }
   reset(): void {
     if (!confirm('Réinitialiser au défaut ? Vos réglages seront perdus.')) return;
-    this.svc.reset().subscribe({ next: t => { this.m = t; this.msg = 'Réinitialisé.'; setTimeout(() => this.msg = '', 2500); }, error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.reset().subscribe({ next: t => { this.m = t; this.msg = 'Réinitialisé.'; setTimeout(() => this.msg = '', 2500); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   preview(): void {
     if (!this.m) return;
     this.svc.preview(this.buildFd()).subscribe({
       next: r => { const w = window.open('', '_blank'); if (w) { w.document.write(r.html); w.document.close(); } },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
 }

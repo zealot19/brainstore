@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -11,6 +11,7 @@ import { Company, Agency } from '../../models/system.models';
 import { Profile } from '../../models/rbac.models';
 import { PaginatePipe } from '../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-users',
@@ -18,6 +19,7 @@ import { TablePaginatorComponent, PageState } from '../../../app/shared/table-pa
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class UsersComponent implements OnInit, OnDestroy {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   users:     AppUser[] = [];
@@ -261,12 +263,12 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   toggleActive(u: AppUser): void {
     const action = u.is_active ? this.userService.deactivate(u.id) : this.userService.activate(u.id);
-    action.subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    action.subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   unlock(u: AppUser): void {
     if (!confirm(`Déverrouiller le compte de ${u.full_name} ?`)) return;
-    this.userService.unlock(u.id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.userService.unlock(u.id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   // ── Réinitialisation mot de passe ─────────────────────────────────────────────

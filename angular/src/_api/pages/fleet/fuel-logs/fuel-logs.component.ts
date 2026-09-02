@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FuelLogService } from '../../../services/fleet/fuel-log.service';
@@ -7,6 +7,7 @@ import { FuelLog, VehicleListItem } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-fuel-logs',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetFuelLogsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   vehicles:        VehicleListItem[] = [];
@@ -114,7 +116,7 @@ export class FleetFuelLogsComponent implements OnInit {
     if (!confirm('Supprimer cet enregistrement carburant ?')) return;
     this.svc.delete(id).subscribe({
       next: () => this.loadLogs(),
-      error: err => alert(err?.error?.detail ?? 'Suppression impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Suppression impossible.'),
     });
   }
 

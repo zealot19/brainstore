@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
@@ -7,6 +7,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 interface RowState { received: number; missing: number; damaged: number; }
 
@@ -16,6 +17,7 @@ interface RowState { received: number; missing: number; damaged: number; }
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcgReceptionComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; q = '';
   selected = new Set<string>();
@@ -43,14 +45,14 @@ export class VcgReceptionComponent implements OnInit {
   receiveOne(p: Parcel): void {
     const s = this.state[p.id];
     this.svc.receive(p.id, { received_pieces: s.received, missing_pieces: s.missing, damaged_pieces: s.damaged })
-      .subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      .subscribe({ next: () => this.reload(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
 
   /** Réception groupée = réception complète (toutes les pièces) des colis sélectionnés. */
   receiveSelectedFull(): void {
     if (!this.selected.size) return;
     this.svc.bulk([...this.selected], 'receive').subscribe({
-      next: r => { if (r.errors?.length) alert(r.errors.join('\n')); this.reload(); },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
 }

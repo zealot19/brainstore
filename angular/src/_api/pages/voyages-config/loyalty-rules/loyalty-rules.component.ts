@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoyaltyRuleService } from '../../../services/voyages-config/loyalty-rule.service';
@@ -7,6 +7,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vc-loyalty-rules',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcLoyaltyRulesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: LoyaltyRule[] = []; filtered: LoyaltyRule[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
@@ -29,7 +31,7 @@ export class VcLoyaltyRulesComponent implements OnInit {
   bulkDelete(): void {
     if (!this.selected.size) return;
     if (!confirm(`Supprimer ${this.selected.size} élément(s) ?`)) return;
-    this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => alert(e?.error?.detail ?? 'Suppression impossible.') });
+    this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ name: '', points_per_one_way: 1, points_per_round_trip: 2, reward_threshold: 10, reward_label: '1 billet gratuit', valid_from: null, valid_to: null, is_active: true }); }
   openEdit(r: LoyaltyRule): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ name: r.name, points_per_one_way: r.points_per_one_way, points_per_round_trip: r.points_per_round_trip, reward_threshold: r.reward_threshold, reward_label: r.reward_label, valid_from: r.valid_from, valid_to: r.valid_to, is_active: r.is_active }); }
@@ -39,6 +41,6 @@ export class VcLoyaltyRulesComponent implements OnInit {
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? 'Erreur.'; } });
   }
-  delete(r: LoyaltyRule): void { if (r.scope === 'global') { alert('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Suppression impossible.') }); }
+  delete(r: LoyaltyRule): void { if (r.scope === 'global') { this.toast.error('Entrée globale — non modifiable ici.'); return; } if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
   private close(): void { document.getElementById('vc-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

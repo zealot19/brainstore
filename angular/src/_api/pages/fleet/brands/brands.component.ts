@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VehicleBrandService } from '../../../services/fleet/vehicle-brand.service';
@@ -6,6 +6,7 @@ import { VehicleBrand } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-brands',
@@ -13,6 +14,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetBrandsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   brands:   VehicleBrand[] = [];
@@ -87,7 +89,7 @@ export class FleetBrandsComponent implements OnInit {
     if (!confirm('Supprimer cette marque ?')) return;
     this.brandService.delete(id).subscribe({
       next: () => this.load(),
-      error: err => alert(err?.error?.detail ?? 'Suppression impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Suppression impossible.'),
     });
   }
 

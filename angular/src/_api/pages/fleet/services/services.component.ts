@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceService } from '../../../services/fleet/service.service';
@@ -11,6 +11,7 @@ import { InterventionType } from '../../../models/fleet-config.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-services',
@@ -18,6 +19,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetServicesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   services:     Service[]          = [];
@@ -142,7 +144,7 @@ export class FleetServicesComponent implements OnInit {
 
   startService(id: string): void {
     if (!confirm('Démarrer cette intervention ?')) return;
-    this.svc.start(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   openComplete(id: string): void {
@@ -169,12 +171,12 @@ export class FleetServicesComponent implements OnInit {
 
   cancelService(id: string): void {
     if (!confirm('Annuler cette intervention ?')) return;
-    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer cette intervention ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
   }
 
   // ── Création rapide de fournisseur ──
@@ -189,7 +191,7 @@ export class FleetServicesComponent implements OnInit {
         this.createForm.patchValue({ supplier_id: s.id });
         this.newSupplierName = ''; this.newSupplierPhone = ''; this.showNewSupplier = false;
       },
-      error: err => { this.creatingSupplier = false; alert(err?.error?.detail ?? 'Création impossible.'); },
+      error: err => { this.creatingSupplier = false; this.toast.error(err?.error?.detail ?? 'Création impossible.'); },
     });
   }
 
@@ -209,7 +211,7 @@ export class FleetServicesComponent implements OnInit {
     this.uploading = true;
     this.svc.uploadAttachment(this.attachFor, fd).subscribe({
       next: () => { this.uploading = false; input.value = ''; this.loadAttachments(this.attachFor!); },
-      error: err => { this.uploading = false; alert(err?.error?.detail ?? 'Envoi impossible.'); },
+      error: err => { this.uploading = false; this.toast.error(err?.error?.detail ?? 'Envoi impossible.'); },
     });
   }
 
@@ -217,7 +219,7 @@ export class FleetServicesComponent implements OnInit {
     if (!this.attachFor || !confirm('Supprimer cette pièce jointe ?')) return;
     this.svc.deleteAttachment(this.attachFor, attId).subscribe({
       next: () => this.loadAttachments(this.attachFor!),
-      error: err => alert(err?.error?.detail ?? 'Impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Impossible.'),
     });
   }
 

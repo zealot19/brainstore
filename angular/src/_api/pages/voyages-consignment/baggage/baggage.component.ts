@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -15,6 +15,7 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vcg-baggage',
@@ -22,6 +23,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgBaggageComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';
   tripFilter = ''; typeFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
@@ -146,8 +148,8 @@ export class VcgBaggageComponent implements OnInit {
     if (!this.selected.size) return;
     if (action === 'cancel' && !confirm(`Annuler ${this.selected.size} bagage(s) ?`)) return;
     this.svc.bulk([...this.selected], action).subscribe({
-      next: r => { if (r.errors?.length) alert(r.errors.join('\n')); this.reload(); },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
 
   askDeliver(b: Baggage): void { this.deliverTarget = b; this.deliverComment = ''; }
@@ -155,11 +157,11 @@ export class VcgBaggageComponent implements OnInit {
     if (!this.deliverTarget) return;
     this.svc.deliver(this.deliverTarget.id, { comment: this.deliverComment }).subscribe({
       next: () => { this.deliverTarget = null; this.reload(); this.close('deliver-modal'); },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   cancel(b: Baggage): void {
     if (!confirm('Annuler ce bagage ?')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Bagage annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 

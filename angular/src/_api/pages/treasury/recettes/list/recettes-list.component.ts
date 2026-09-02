@@ -8,6 +8,7 @@ import { HasPermissionDirective } from '../../../../../app/shared/directives/has
 import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../../app/shared/toast/toast.service';
 
 type Kind = 'voyage' | 'parcel' | 'baggage' | 'other';
 
@@ -23,6 +24,7 @@ const TITLES: Record<Kind, string> = {
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, SearchableSelectComponent],
 })
 export class RecettesListComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   private income = inject(IncomeService);
   private sessionSvc = inject(SessionService);
@@ -92,7 +94,7 @@ export class RecettesListComponent implements OnInit {
   printReceipt(row: any): void {
     this.income.receipt(row.id).subscribe({
       next: blob => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60000); },
-      error: () => alert('Impossible de générer le reçu (moteur PDF non disponible sur le serveur).'),
+      error: () => this.toast.error('Impossible de générer le reçu (moteur PDF non disponible sur le serveur).'),
     });
   }
 

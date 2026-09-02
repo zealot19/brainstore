@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FiscalYearService } from '../../../services/accounting/fiscal-year.service';
@@ -6,6 +6,7 @@ import { PeriodService } from '../../../services/accounting/period.service';
 import { FiscalYear, AccountingPeriod } from '../../../models/accounting.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-acc-fiscal-years',
@@ -13,6 +14,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class AccFiscalYearsComponent implements OnInit {
+  private toast = inject(ToastService);
   years: FiscalYear[] = []; periods: AccountingPeriod[] = [];
   selected: FiscalYear | null = null; loadingYears = true; loadingPeriods = false;
   fyForm!: FormGroup; pForm!: FormGroup; saving = false; errorMsg = '';
@@ -46,7 +48,7 @@ export class AccFiscalYearsComponent implements OnInit {
   }
   closePeriod(p: AccountingPeriod): void {
     if (!confirm(`Clôturer la période « ${p.name} » ?`)) return;
-    this.pSvc.close(p.id).subscribe({ next: () => this.select(this.selected!), error: e => alert(e?.error?.detail ?? e?.error?.message ?? 'Clôture impossible.') });
+    this.pSvc.close(p.id).subscribe({ next: () => this.select(this.selected!), error: e => this.toast.error(e?.error?.detail ?? e?.error?.message ?? 'Clôture impossible.') });
   }
   private closeModal(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }
