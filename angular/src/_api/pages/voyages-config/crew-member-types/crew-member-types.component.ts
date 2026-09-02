@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CrewMemberTypeService } from '../../../services/voyages-config/crew-member-type.service';
@@ -7,6 +7,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vc-crew-member-types',
@@ -14,6 +15,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
 })
 export class VcCrewMemberTypesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: CrewMemberType[] = []; filtered: CrewMemberType[] = []; loading = true; search = '';
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
@@ -28,6 +30,6 @@ export class VcCrewMemberTypesComponent implements OnInit {
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? 'Erreur.'; } });
   }
-  delete(r: CrewMemberType): void { if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Suppression impossible.') }); }
+  delete(r: CrewMemberType): void { if (!confirm('Supprimer ?')) return; this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') }); }
   private close(): void { document.getElementById('cmt-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

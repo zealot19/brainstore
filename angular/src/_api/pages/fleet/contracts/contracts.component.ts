@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContractService } from '../../../services/fleet/contract.service';
@@ -14,6 +14,7 @@ import { Employee } from '../../../models/hr.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-contracts',
@@ -21,6 +22,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetContractsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   contracts:  Contract[]         = [];
@@ -174,7 +176,7 @@ export class FleetContractsComponent implements OnInit {
 
   delete(id: string): void {
     if (!confirm('Supprimer ce contrat ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
   }
 
   // ── Création rapide de fournisseur ──
@@ -189,7 +191,7 @@ export class FleetContractsComponent implements OnInit {
         this.form.patchValue({ supplier_id: s.id });
         this.newSupplierName = ''; this.newSupplierPhone = ''; this.showNewSupplier = false;
       },
-      error: err => { this.creatingSupplier = false; alert(err?.error?.detail ?? 'Création impossible.'); },
+      error: err => { this.creatingSupplier = false; this.toast.error(err?.error?.detail ?? 'Création impossible.'); },
     });
   }
 
@@ -207,7 +209,7 @@ export class FleetContractsComponent implements OnInit {
       currency: v.currency || 'XAF', period_id: v.period_id,
     }).subscribe({
       next: () => { this.savingCost = false; this.costForm.reset({ currency: 'XAF' }); this.loadCosts(this.costFor!); },
-      error: err => { this.savingCost = false; alert(err?.error?.detail ?? 'Impossible.'); },
+      error: err => { this.savingCost = false; this.toast.error(err?.error?.detail ?? 'Impossible.'); },
     });
   }
 
@@ -215,7 +217,7 @@ export class FleetContractsComponent implements OnInit {
     if (!this.costFor || !confirm('Supprimer cette ligne ?')) return;
     this.svc.deleteRecurringCost(this.costFor, rcId).subscribe({
       next: () => this.loadCosts(this.costFor!),
-      error: err => alert(err?.error?.detail ?? 'Impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Impossible.'),
     });
   }
 

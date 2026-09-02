@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vb-bookings',
@@ -16,6 +17,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VbBookingsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Booking[] = []; loading = false; statusFilter = ''; q = '';
   typeFilter = ''; channelFilter = ''; tripFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
@@ -45,9 +47,9 @@ export class VbBookingsComponent implements OnInit {
   open(b: Booking): void { this.router.navigate(['/voyages-booking/bookings', b.id]); }
   cancel(b: Booking): void {
     if (!confirm('Annuler cette réservation ?')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation annulée.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   noShow(b: Booking): void {
-    this.svc.noShow(b.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.noShow(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation marquée « non présentée ».'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
 }

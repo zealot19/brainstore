@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProfileService } from '../../../services/rbac/profile.service';
@@ -8,6 +8,7 @@ import { Profile, Role } from '../../../models/rbac.models';
 import { Company } from '../../../models/system.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-profiles',
@@ -15,6 +16,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class ProfilesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   profiles:  Profile[] = [];
@@ -115,7 +117,7 @@ export class ProfilesComponent implements OnInit {
     if (!confirm(`Supprimer le profil « ${p.name} » ?`)) return;
     this.profileService.delete(p.id).subscribe({
       next: () => this.load(),
-      error: err => alert(err?.error?.detail ?? 'Suppression impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Suppression impossible.'),
     });
   }
 

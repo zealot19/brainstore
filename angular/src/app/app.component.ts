@@ -8,12 +8,13 @@ import {
 } from '@angular/router';
 import { SpinnerService } from './core/core.index';
 import { LoaderComponent } from './layouts/loader/loader.component';
+import { ToastContainerComponent } from './shared/toast/toast-container.component';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    imports: [RouterModule,LoaderComponent]
+    imports: [RouterModule,LoaderComponent,ToastContainerComponent]
 })
 export class AppComponent {
   title = 'template';

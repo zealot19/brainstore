@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupplierService } from '../../../services/fleet/supplier.service';
@@ -6,6 +6,7 @@ import { Supplier } from '../../../models/fleet.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-suppliers',
@@ -13,6 +14,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetSuppliersComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   rows:     Supplier[] = [];
@@ -86,7 +88,7 @@ export class FleetSuppliersComponent implements OnInit {
 
   delete(r: Supplier): void {
     if (!confirm('Supprimer ce fournisseur ?')) return;
-    this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Suppression impossible.') });
+    this.svc.delete(r.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
 
   private close(): void {

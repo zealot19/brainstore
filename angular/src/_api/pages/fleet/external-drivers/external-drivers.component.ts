@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
@@ -8,6 +8,7 @@ import { Employee } from '../../../models/hr.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-external-drivers',
@@ -15,6 +16,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetExternalDriversComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   drivers:  ExternalDriver[] = [];
@@ -107,7 +109,7 @@ export class FleetExternalDriversComponent implements OnInit {
     if (!confirm('Supprimer ce conducteur ?')) return;
     this.svc.delete(id).subscribe({
       next: () => this.load(),
-      error: err => alert(err?.error?.detail ?? 'Suppression impossible.'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Suppression impossible.'),
     });
   }
 

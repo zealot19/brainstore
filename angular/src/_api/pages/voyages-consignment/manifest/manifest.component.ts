@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
@@ -8,6 +8,7 @@ import { Parcel, Baggage, Manifest } from '../../../models/voyages-consignment.m
 import { TripOption } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vcg-manifest',
@@ -15,6 +16,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
 })
 export class VcgManifestComponent implements OnInit {
+  private toast = inject(ToastService);
   trips: TripOption[] = []; tripId = '';
   pending: Parcel[] = []; manifest: Manifest | null = null;
 
@@ -32,18 +34,18 @@ export class VcgManifestComponent implements OnInit {
              checked_in: 'bg-warning', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   load(p: Parcel): void {
-    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   loadAll(): void {
     if (!this.pending.length) return;
     let remaining = this.pending.length;
     this.pending.forEach(p => this.parcels.assignTrip(p.id, this.tripId).subscribe({
       next: () => { if (--remaining === 0) this.onTripChange(); },
-      error: e => { alert(e?.error?.detail ?? 'Erreur.'); if (--remaining === 0) this.onTripChange(); } }));
+      error: e => { this.toast.error(e?.error?.detail ?? 'Erreur.'); if (--remaining === 0) this.onTripChange(); } }));
   }
   unload(p: Parcel): void {
-    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
-  deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
-  loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => alert(e?.error?.detail ?? 'Erreur.') }); }
+  deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') }); }
+  loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') }); }
 }

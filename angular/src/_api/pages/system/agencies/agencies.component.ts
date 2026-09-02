@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AgencyService } from '../../../services/system/agency.service';
@@ -6,6 +6,7 @@ import { CompanyService } from '../../../services/system/company.service';
 import { Agency, AgencyType, Company } from '../../../models/system.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-agencies',
@@ -13,6 +14,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class AgenciesComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   agencies:  Agency[]  = [];
@@ -132,7 +134,7 @@ export class AgenciesComponent implements OnInit {
     if (!confirm('Supprimer cette agence ?')) return;
     this.agencyService.delete(id).subscribe({
       next: () => this.load(),
-      error: err => alert(err?.error?.detail ?? 'Suppression impossible (enfants actifs ?).'),
+      error: err => this.toast.error(err?.error?.detail ?? 'Suppression impossible (enfants actifs ?).'),
     });
   }
 

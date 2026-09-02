@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vcg-parcels',
@@ -21,6 +22,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent],
 })
 export class VcgParcelsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
@@ -82,8 +84,8 @@ export class VcgParcelsComponent implements OnInit {
   bulkCancel(): void {
     if (!this.selected.size || !confirm(`Annuler ${this.selected.size} colis ?`)) return;
     this.svc.bulk([...this.selected], 'cancel').subscribe({
-      next: r => { if (r.errors?.length) alert(r.errors.join('\n')); this.reload(); },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   statusClass(s: string): string {
     return { registered: 'bg-warning', loaded: 'bg-info', arrived: 'bg-primary',
@@ -122,11 +124,11 @@ export class VcgParcelsComponent implements OnInit {
     if (!this.pickupTarget || !this.pickupName) return;
     this.svc.pickup(this.pickupTarget.id, this.pickupName, this.pickupId).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   cancel(p: Parcel): void {
     if (!confirm('Annuler ce colis ?')) return;
-    this.svc.cancel(p.id).subscribe({ next: () => this.reload(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(p.id).subscribe({ next: () => { this.reload(); this.toast.success('Colis annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 

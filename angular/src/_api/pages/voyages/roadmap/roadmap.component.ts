@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { Roadmap } from '../../../models/voyages-roadmap.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vb-roadmap',
@@ -13,6 +14,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule],
 })
 export class VbRoadmapComponent implements OnInit {
+  private toast = inject(ToastService);
   tripId = ''; data: Roadmap | null = null; loading = false; errorMsg = '';
 
   constructor(private svc: RoadmapService, private booking: BookingService,
@@ -31,10 +33,10 @@ export class VbRoadmapComponent implements OnInit {
   get canBoard(): boolean { return this.data?.trip.status === 'pending' || this.data?.trip.status === 'departed'; }
 
   board(ticketId: string): void {
-    this.booking.board(ticketId).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.booking.board(ticketId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   boardAll(): void {
-    this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.boardAll(this.tripId).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   printDoc(which: 'voyages' | 'colis'): void {
     // Impression côté navigateur : le CSS d'impression (styles.scss) masque le chrome et

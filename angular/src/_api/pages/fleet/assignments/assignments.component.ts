@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AssignmentService } from '../../../services/fleet/assignment.service';
@@ -8,6 +8,7 @@ import { AssignmentListItem, VehicleListItem, ExternalDriver } from '../../../mo
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-fleet-assignments',
@@ -15,6 +16,7 @@ import { TablePaginatorComponent, PageState } from '../../../../app/shared/table
   imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class FleetAssignmentsComponent implements OnInit {
+  private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
   assignments:    AssignmentListItem[] = [];
@@ -100,22 +102,22 @@ export class FleetAssignmentsComponent implements OnInit {
 
   startAssignment(id: string): void {
     if (!confirm('Démarrer cette mission ?')) return;
-    this.svc.start(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.svc.start(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   completeAssignment(id: string): void {
     if (!confirm('Clôturer cette mission ?')) return;
-    this.svc.complete(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.svc.complete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   cancelAssignment(id: string): void {
     if (!confirm('Annuler cette mission ?')) return;
-    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Erreur.') });
   }
 
   delete(id: string): void {
     if (!confirm('Supprimer cette mission ?')) return;
-    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => alert(err?.error?.detail ?? 'Impossible.') });
+    this.svc.delete(id).subscribe({ next: () => this.load(), error: err => this.toast.error(err?.error?.detail ?? 'Impossible.') });
   }
 
   private closeModal(id: string): void {

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { Booking } from '../../../models/voyages-booking.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-vb-booking-detail',
@@ -11,6 +12,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
   imports: [HasPermissionDirective, CommonModule],
 })
 export class VbBookingDetailComponent implements OnInit {
+  private toast = inject(ToastService);
   booking: Booking | null = null; loading = false;
   printData: any = null;
   constructor(private svc: BookingService, private route: ActivatedRoute, private router: Router) {}
@@ -28,13 +30,13 @@ export class VbBookingDetailComponent implements OnInit {
     this.svc.renderTickets(this.booking.id).subscribe({
       next: r => {
         const w = window.open('', '_blank');
-        if (!w) { alert('Autorisez les fenêtres pop-up pour imprimer.'); return; }
+        if (!w) { this.toast.error('Autorisez les fenêtres pop-up pour imprimer.'); return; }
         w.document.write(r.html);
         w.document.close();
         w.focus();
         setTimeout(() => { w.print(); }, 300);
       },
-      error: e => alert(e?.error?.detail ?? 'Impression impossible.'),
+      error: e => this.toast.error(e?.error?.detail ?? 'Impression impossible.'),
     });
   }
   statusClass(s: string): string {
@@ -43,11 +45,11 @@ export class VbBookingDetailComponent implements OnInit {
   }
   board(ticketId: string): void {
     this.svc.board(ticketId).subscribe({ next: () => this.booking && this.load(this.booking.id),
-      error: e => alert(e?.error?.detail ?? 'Erreur.') });
+      error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   cancel(): void {
     if (!this.booking || !confirm('Annuler cette réservation ?')) return;
-    this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => alert(e?.error?.detail ?? 'Erreur.') });
+    this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => this.toast.error(e?.error?.detail ?? 'Erreur.') });
   }
   back(): void { this.router.navigate(['/voyages-booking/bookings']); }
   goAssignReturn(): void { this.router.navigate(['/voyages-booking/open-returns']); }
