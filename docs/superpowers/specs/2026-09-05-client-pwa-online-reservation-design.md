@@ -38,7 +38,9 @@ that backend.
 - Minimal public layout (no sidebar/topbar), lazy-loaded, unguarded.
 - Reservation flow: search → trip detail → seat pick → passenger & payment → status/ticket.
 - PWA packaging: manifest + service worker (production only), installable, offline ticket viewing.
-- One additive backend change: expose applicable **fares/prices** on the public trip payload.
+- Two additive backend changes: (a) a public **served-cities** endpoint so the
+  search dropdowns can be populated; (b) expose applicable **fares/prices** on
+  the public trip payload.
 
 ### Out of scope (explicit v1 scope calls)
 - **Single passenger per reservation** — the backend `initiate_booking` handles
@@ -96,11 +98,26 @@ the secret, matching the backend contract.
    Clear pending countdown (15-min expiry), failed, and expired states, each
    with a sensible next action (Réessayer / retour recherche).
 
-## 6. Backend Change (only one)
+## 6. Backend Changes (two, both additive)
 
-`PublicTripSerializer` (and/or the trip detail view) currently exposes
-`fare_class` but **not the actual fares/prices**, yet `InitiateBooking` requires
-`fare_id` + `amount`. Add an applicable-fares list to the public trip payload:
+### 6.1 Public served-cities endpoint
+The search page needs `from_city_id` / `to_city_id`, but the only city listing
+(`CityListView`) requires `IsInstitutionAdmin`. Add a public, `AllowAny`
+endpoint:
+
+```
+GET /online/<company_id>/cities/
+→ [ { "id": "<uuid>", "name": "<city>" } ]
+```
+
+Returns the distinct cities that are endpoints (from or to) of the company's
+active (`is_deleted=False`) routes — i.e. the cities a client can actually
+travel between. Sorted by name. TDD-covered.
+
+### 6.2 Applicable fares on the public trip payload
+`PublicTripSerializer` currently exposes `fare_class` but **not the actual
+fares/prices**, yet `InitiateBooking` requires `fare_id` + `amount`. Add an
+applicable-fares list to the public trip payload:
 
 ```
 fares: [
@@ -109,9 +126,12 @@ fares: [
 ]
 ```
 
-Sourced from the route's active (`is_deleted=False`) `Fare` rows matching the
-trip's `fare_class`. Additive, `AllowAny`, TDD-covered. No other backend change:
-search, seat map, initiate, status, webhook, and ticket issuance are reused as-is.
+Sourced from the trip's active (`is_active=True`, `is_deleted=False`) `Fare`
+rows matching the trip's `route`, `vehicle_category`, and (when set)
+`fare_class`. Additive, `AllowAny`, TDD-covered.
+
+No other backend change: search, seat map, initiate, status, webhook, and ticket
+issuance are reused as-is.
 
 ## 7. PWA Packaging
 
@@ -138,9 +158,10 @@ search, seat map, initiate, status, webhook, and ticket issuance are reused as-i
 
 ## 9. Testing
 
-- **Backend:** pytest (TDD) for the new `fares` field on the public trip
-  payload — correct fares for the trip's route/fare_class, empty when none,
-  still `AllowAny`. Full suite stays green.
+- **Backend:** pytest (TDD) for the served-cities endpoint (distinct route
+  endpoints, `AllowAny`, unknown company → 404) and the new `fares` field on the
+  public trip payload (correct fares for the trip's route/vehicle/fare_class,
+  empty when none, still `AllowAny`). Full suite stays green.
 - **Frontend:** `ng build` green (prod build compiles service worker + manifest).
   Service worker only activates in the production build, so dev is unaffected.
 
