@@ -6,6 +6,15 @@ from apps.voyage.models import Trip
 from apps.ticketing.models import Booking
 
 
+def get_served_towns(company_id):
+    """Towns that are endpoints (origin or destination) of the company's routes."""
+    from apps.voyages_config.models import Route, Town
+    routes = Route.objects.filter(company_id=company_id, is_deleted=False)
+    town_ids = set(routes.values_list("origin__town_id", flat=True)) | \
+        set(routes.values_list("destination__town_id", flat=True))
+    return Town.objects.filter(id__in=town_ids, is_deleted=False).order_by("name")
+
+
 def search_trips(company_id, *, from_city_id, to_city_id, travel_date):
     """Available trips for online booking — same logic as voyage.selectors.search_trips."""
     return (Trip.objects

@@ -2,6 +2,11 @@ from rest_framework import serializers
 from apps.online_booking.models import OnlineBookingRequest
 
 
+class PublicTownSerializer(serializers.Serializer):
+    id   = serializers.UUIDField()
+    name = serializers.CharField()
+
+
 # ── Trip search & detail (public) ─────────────────────────────────────────────
 
 class PublicTripSerializer(serializers.Serializer):

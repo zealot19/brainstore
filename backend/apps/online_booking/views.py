@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from apps.core.exceptions import ApplicationError
 from apps.online_booking import selectors, services
 from apps.online_booking.serializers import (
+    PublicTownSerializer,
     PublicTripSerializer, TripSearchQuerySerializer, SeatMapSerializer,
     InitiateBookingSerializer, BookingRequestStatusSerializer,
     CampayWebhookSerializer,
@@ -25,6 +26,19 @@ def _get_company(company_id):
         return Company.objects.get(id=company_id, is_deleted=False)
     except Company.DoesNotExist:
         return None
+
+
+# ── Served towns ─────────────────────────────────────────────────────────────
+
+class PublicTownListView(APIView):
+    """Public: towns the company serves (route endpoints)."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, company_id):
+        company = _get_company(company_id)
+        if not company:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(PublicTownSerializer(selectors.get_served_towns(company.id), many=True).data)
 
 
 # ── Trip search ────────────────────────────────────────────────────────────────
