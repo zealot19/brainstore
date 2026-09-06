@@ -24,8 +24,14 @@ class OnlineBookingRequest(BaseModel):
     # ── Company & trip ─────────────────────────────────────────────────────────
     company = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                  on_delete=models.CASCADE, related_name="online_booking_requests")
-    trip    = models.ForeignKey("voyage.Trip", verbose_name=_("trip"),
+    trip    = models.ForeignKey("voyages_trips.Trip", verbose_name=_("trip"),
                                  on_delete=models.PROTECT, related_name="online_booking_requests")
+    trip_seat = models.ForeignKey("voyages_trips.TripSeat", verbose_name=_("siège"),
+                                  on_delete=models.SET_NULL, null=True, blank=True,
+                                  related_name="online_booking_requests")
+    destination_point = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("descente"),
+                                          on_delete=models.SET_NULL, null=True, blank=True,
+                                          related_name="online_booking_requests")
 
     # ── Passenger info ─────────────────────────────────────────────────────────
     passenger_name  = models.CharField(_("passenger name"),  max_length=150)
@@ -34,9 +40,7 @@ class OnlineBookingRequest(BaseModel):
     passenger_type  = models.CharField(_("passenger type"), max_length=20, default="adult")
     seat_number     = models.CharField(_("seat number"), max_length=10, blank=True)
 
-    # ── Fare & amount ──────────────────────────────────────────────────────────
-    fare   = models.ForeignKey("transport_config.Fare", verbose_name=_("fare"),
-                                on_delete=models.SET_NULL, null=True, blank=True)
+    # ── Amount (resolved server-side) ────────────────────────────────────────────
     amount = models.DecimalField(_("amount"), max_digits=10, decimal_places=2)
 
     # ── Payment ────────────────────────────────────────────────────────────────
@@ -52,7 +56,7 @@ class OnlineBookingRequest(BaseModel):
     expires_at = models.DateTimeField(_("expires at"))
 
     # ── Resulting booking (set on success) ────────────────────────────────────
-    booking = models.OneToOneField("ticketing.Booking", verbose_name=_("booking"),
+    booking = models.OneToOneField("voyages_booking.Booking", verbose_name=_("booking"),
                                     on_delete=models.SET_NULL,
                                     null=True, blank=True,
                                     related_name="online_request")
@@ -63,7 +67,8 @@ class OnlineBookingRequest(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.passenger_name} — {self.trip.reference} [{self.status}]"
+        ref = self.trip.number or self.trip.code or self.trip_id
+        return f"{self.passenger_name} — {ref} [{self.status}]"
 
     @property
     def is_expired(self) -> bool:
