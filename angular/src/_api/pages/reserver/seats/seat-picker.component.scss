@@ -1,0 +1,39 @@
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seat {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #adb5bd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: .85rem;
+}
+.seat.taken {
+  background: #dee2e6;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+.seat.selected {
+  background: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+.seat-legend .dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.seat-legend .dot.free { background: #fff; border: 1px solid #adb5bd; }
+.seat-legend .dot.selected { background: #0d6efd; }
+.seat-legend .dot.taken { background: #dee2e6; }

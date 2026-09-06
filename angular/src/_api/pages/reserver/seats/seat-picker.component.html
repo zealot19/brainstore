@@ -1,0 +1,18 @@
+<div class="seat-grid">
+  @for (row of rows(); track row) {
+    <div class="seat-row">
+      @for (cell of seatsInRow(row); track cell.id) {
+        <button type="button" class="seat"
+                [class.taken]="isTaken(cell)"
+                [class.selected]="selected() === cell.id"
+                [disabled]="isTaken(cell)"
+                (click)="pick(cell)">{{ cell.seat_number }}</button>
+      }
+    </div>
+  }
+</div>
+<div class="seat-legend small text-muted mt-2">
+  <span class="dot free"></span> Libre
+  <span class="dot selected ms-3"></span> Sélectionné
+  <span class="dot taken ms-3"></span> Occupé
+</div>
