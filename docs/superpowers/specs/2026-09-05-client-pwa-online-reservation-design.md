@@ -1,178 +1,222 @@
 # Client PWA — Online Reservation — Design Spec
 
-**Date:** 2026-09-05
-**Status:** Approved (design), pending implementation plan
+**Date:** 2026-09-05 (revised: re-pointed to the modern `voyages_*` stack)
+**Status:** Approved (design), pending implementation
 **Author:** shimi
 
 ## 1. Goal
 
 Give clients a public, installable Progressive Web App to reserve and pay for
 their trips online, without a staff account. The PWA is a new public front-end
-that drives the already-complete `online_booking` backend channel.
+that drives the `online_booking` backend channel — which is re-pointed onto the
+live `voyages_*` stack the ERP actually uses.
 
 ## 2. Context & Motivation
 
-The backend `online_booking` app (`/api/v1/online/`) is complete and mature:
+The `online_booking` app (`/api/v1/online/`) already exposes an anonymous,
+per-company booking channel with Campay Mobile Money payment (initiate → webhook
+/ poll → confirm). However, it was built against a **legacy first-generation
+stack** (`voyage`, `ticketing`, `transport_config`) that the live ERP no longer
+populates. Operators manage trips, routes, fares, seats, and bookings in the
+**modern `voyages_*` stack** (`voyages_trips`, `voyages_config`,
+`voyages_pricing`, `voyages_booking`), which is what the staff back-office,
+reporting, and treasury/recettes all use.
 
-- `GET  /online/<company_id>/trips/` — public trip search (from_city, to_city, date)
-- `GET  /online/<company_id>/trips/<trip_id>/` — public trip detail
-- `GET  /online/<company_id>/trips/<trip_id>/seats/` — seat availability map
-- `POST /online/<company_id>/trips/<trip_id>/book/` — initiate booking + Campay MoMo payment
-- `GET  /online/requests/<request_id>/` — booking-request status (UUID is the secret; polls Campay if pending)
-- `POST /online/webhooks/campay/` — Campay payment confirmation webhook
+Therefore this project does two things:
 
-All endpoints are `AllowAny`. The channel is **fully anonymous** (no client
-account; status tracked by request UUID) and **per-company** (URLs keyed by
-`company_id`). On payment success, `confirm_payment` already creates the real
-`Booking` + `Ticket` (with QR).
+1. **Re-point `online_booking`'s data + service layer onto the modern stack**, so
+   online reservations use the real trips operators run, and confirmed online
+   bookings appear in the staff booking list, reporting, and treasury/recettes
+   (tagged `channel = online`). The Campay payment orchestration is reused.
+2. **Build the client-facing front-end + PWA packaging** (the current Angular app
+   is the JWT-guarded staff back-office; there is no public client UI).
 
-What is missing is entirely the **client-facing front-end + PWA packaging**.
-The existing Angular app is the staff back-office (JWT-guarded, heavy sidebar
-layout). This spec adds a public, installable reservation front-end that reuses
-that backend.
+### Modern-stack building blocks reused
+- `voyages_booking.selectors.bookable_trips(company, …, travel_date)` — submitted
+  (`status="pending"`), seat-materialised, future trips.
+- `voyages_booking.selectors.seat_map(trip)` — `TripSeat` rows
+  (`id, seat_number, row, column, seat_type, status`).
+- `voyages_pricing.selectors.resolve_fare(company, route, origin, destination,
+  fare_class, trip_type)` — the applicable `Fare` (amount + currency).
+- `voyages_booking.services.create_booking(...)` — creates Passenger + Booking +
+  Tickets and locks the `TripSeat`. Takes `buyer_spec`, `items`, and `user`.
+- `Booking.Channel.ONLINE` — first-class online-sale channel.
+- Network model: `Town → ServicePoint (is_station) → Route (origin/destination
+  ServicePoint)`; `Trip` has `origin`/`destination` ServicePoints, one
+  `fare_class`, and a `seating_plan` that materialises `TripSeat`s.
 
 ## 3. Scope
 
 ### In scope
-- A new public feature area in the existing Angular project (`features/reserver/`).
-- Minimal public layout (no sidebar/topbar), lazy-loaded, unguarded.
-- Reservation flow: search → trip detail → seat pick → passenger & payment → status/ticket.
-- PWA packaging: manifest + service worker (production only), installable, offline ticket viewing.
-- Two additive backend changes: (a) a public **served-cities** endpoint so the
-  search dropdowns can be populated; (b) expose applicable **fares/prices** on
-  the public trip payload.
+- Re-point `online_booking` selectors, serializers, views, and the
+  `OnlineBookingRequest` model onto the modern stack (new migration).
+- Public, `AllowAny` endpoints: served-towns, trip search, trip detail (with
+  single resolved price), seat map, initiate booking, request status. Campay
+  webhook reused as-is.
+- A new public feature area in the existing Angular project (`_api/pages/reserver/`):
+  minimal layout, lazy-loaded, unguarded.
+- Reservation flow: search → trip detail (price) → seat pick → passenger &
+  payment → status/ticket.
+- PWA packaging: manifest + service worker (production only), installable,
+  offline ticket viewing.
 
 ### Out of scope (explicit v1 scope calls)
-- **Single passenger per reservation** — the backend `initiate_booking` handles
-  one passenger per request; multi-passenger is a future extension.
-- **Mobile Money only (Campay)** — no reserve-now-pay-at-agency; the current
-  channel always initiates a MoMo payment.
+- **Single passenger per reservation** — one `TripSeat`, one ticket per request;
+  multi-passenger is a future extension.
+- **One-way to the trip's final destination** — no intermediate drop-point
+  picker in v1 (the backend still resolves the fare via `destination_point`, and
+  the model stores it, so adding a picker later is additive).
+- **Mobile Money only (Campay)** — no reserve-now-pay-at-agency.
 - **One fixed company** — `company_id` is a build config value; no institution picker.
 - No client accounts / login / booking history beyond the request-UUID permalink.
 
 ## 4. Architecture
 
-### 4.1 Placement
-- New route tree `angular/src/app/features/reserver/`, lazy-loaded from
-  `app.routes.ts`, **without** `authGuard`.
-- Its own minimal public layout component (logo header + footer, no
-  sidebar/topbar).
-- Calls existing `/api/v1/online/<company_id>/…` endpoints. `company_id` is a
-  fixed value read from `environment.ts` (exposed via `api.config.ts`), so
-  clients land straight on trip search.
+### 4.1 Placement (Angular)
+- New route tree `angular/src/_api/pages/reserver/`, lazy-loaded from
+  `app.routes.ts` as a top-level sibling **without** `authGuard`, with its own
+  minimal public layout (logo header + footer, no back-office shell).
+- `company_id` read from `environment.onlineCompanyId`.
+- Reuses `apiUnwrapInterceptor`, `ToastService`, and the HTTP provider chain.
+  `/online/` endpoints are `AllowAny` and return **bare** payloads (no
+  `{success,data}` envelope).
 
-### 4.2 Reuse of existing infrastructure
-- `apiUnwrapInterceptor` — unwraps `{success,data}` envelope, normalizes errors
-  to explicit French messages (already in place).
-- `ToastService` / `ToastContainerComponent` — top-right toasts for errors/success.
-- `jwtInterceptor` — harmless for anonymous clients (no token stored);
-  `/online/` endpoints are `AllowAny`.
-- Existing HTTP provider chain in `app.config.ts` is unchanged.
+### 4.2 Backend re-point (data + service layer)
+`OnlineBookingRequest` FKs change:
+- `trip`: `voyage.Trip` → `voyages_trips.Trip`
+- add `trip_seat`: `voyages_trips.TripSeat` (nullable)
+- add `destination_point`: `voyages_config.ServicePoint` (nullable; defaults to
+  trip final destination)
+- `booking`: `ticketing.Booking` → `voyages_booking.Booking`
+- remove `fare`: `transport_config.Fare` (price resolved server-side, stored in
+  the existing `amount` field)
+
+`services.initiate_booking(...)` resolves the fare server-side via
+`resolve_fare` (client no longer supplies `amount`/`fare_id`), stores the
+`amount`, `trip_seat`, `destination_point`, then initiates Campay payment
+(reused). `services.confirm_payment(...)` builds the real booking via
+`voyages_booking.create_booking(company, trip_type="one_way",
+outbound_trip=trip, return_trip=None, buyer_spec={name,phone,email},
+items=[{passenger, destination_point_id, outbound_seat_id}], channel=ONLINE,
+user=<system context>)` and links `booking_request.booking`.
+
+`voyages_booking.create_booking` gains an optional `channel` parameter (default
+`Booking.Channel.COUNTER`, additive) so the online path tags `channel=ONLINE`.
 
 ### 4.3 Data flow
 ```
-[Recherche] --GET /online/<co>/trips/--> trip list (with price)
-[Détail]    --GET /online/<co>/trips/<id>/--> detail + fares
-[Sièges]    --GET /online/<co>/trips/<id>/seats/--> seat map (skipped if free_seating)
-[Paiement]  --POST /online/<co>/trips/<id>/book/--> { id (UUID), status: pending }
-[Statut]    --GET /online/requests/<uuid>/ (poll)--> paid|failed|expired
+[Towns]     GET  /online/<co>/towns/                       -> [{id,name}]
+[Recherche] GET  /online/<co>/trips/?from_town_id&to_town_id&travel_date
+                                                            -> [trip + price]
+[Détail]    GET  /online/<co>/trips/<id>/                   -> trip + price + fare_class
+[Sièges]    GET  /online/<co>/trips/<id>/seats/             -> [TripSeat {id,seat_number,row,column,status}]
+[Paiement]  POST /online/<co>/trips/<id>/book/
+              { passenger_name, passenger_phone, passenger_email?,
+                seat_id, payment_method, payment_phone }     -> { id (UUID), status: pending }
+[Statut]    GET  /online/requests/<uuid>/ (poll)            -> paid|failed|expired
                                           on paid: { ticket: {ticket_number, qr_code} }
+[Webhook]   POST /online/webhooks/campay/  (Campay → confirm/fail)  [reused]
 ```
-The status page is reachable by permalink `/reserver/statut/<uuid>`; the UUID is
-the secret, matching the backend contract.
+The status page is reached by permalink `/reserver/statut/<uuid>`; the UUID is
+the secret.
 
 ## 5. Client Flow (screens)
 
-1. **Recherche** — from-city, to-city, travel date → trip results list; each
-   result shows route, times, available seats, and price.
-2. **Détail voyage** — departure/arrival times, terminals, vehicle amenities,
-   available seats, and a **fare selector** (label + price per passenger type).
-3. **Sièges** — visual seat-map picker built from the seat-map payload
-   (`seat_rows`, `seat_cols`, `aisle_after_col`, `has_back_row`, `booked_seats`).
-   Skipped entirely when `free_seating` is true.
-4. **Passager & paiement** — passenger name, phone, optional email, passenger
-   type, MoMo method (MTN / Orange) + payment phone. Submits to `…/book/`.
-5. **Statut / billet** — polls `GET /online/requests/<uuid>/` every few seconds
-   (backend syncs Campay while pending) until `paid` / `failed` / `expired`.
-   On `paid`, shows the ticket details + **QR code** (cached for offline).
-   Clear pending countdown (15-min expiry), failed, and expired states, each
-   with a sensible next action (Réessayer / retour recherche).
+1. **Recherche** — from-town, to-town (from `/towns/`), travel date → trip list;
+   each result shows route, times, available seats, and the single price.
+2. **Détail voyage** — times, service points, vehicle/amenities, available
+   seats, and the price + a **Réserver** button (no fare picker).
+3. **Sièges** — seat-map picker from `TripSeat` rows; a seat is selectable when
+   `status == "available"`; selection yields a `seat_id` (UUID).
+4. **Passager & paiement** — passenger name, phone, optional email, MoMo method
+   (MTN/Orange) + payment phone → `POST …/book/` (amount resolved server-side).
+5. **Statut / billet** — polls `GET /online/requests/<uuid>/` until
+   `paid`/`failed`/`expired`; on `paid` shows ticket + **QR** (offline-cached),
+   with clear pending (15-min countdown), failed, and expired states.
 
-## 6. Backend Changes (two, both additive)
+## 6. Backend Changes
 
-### 6.1 Public served-cities endpoint
-The search page needs `from_city_id` / `to_city_id`, but the only city listing
-(`CityListView`) requires `IsInstitutionAdmin`. Add a public, `AllowAny`
-endpoint:
+### 6.1 Served-towns endpoint
+`GET /online/<company_id>/towns/` (`AllowAny`) → `[{ "id": uuid, "name": str }]`,
+distinct towns that are endpoints of the company's routes carrying bookable
+trips, sorted by name. Unknown company → 404.
 
-```
-GET /online/<company_id>/cities/
-→ [ { "id": "<uuid>", "name": "<city>" } ]
-```
+### 6.2 Search by town + single resolved price on trip payload
+- Public search selector: `bookable_trips(company, travel_date=…)` filtered by
+  `origin__town_id = from_town_id` and `destination__town_id = to_town_id`.
+- `PublicTripSerializer` (rewritten for the modern `Trip`) exposes: `id`,
+  `number`/`reference`, `status`, `scheduled_departure`, `scheduled_arrival`,
+  `from_town`, `to_town`, `origin` `{id,name}`, `destination` `{id,name}`,
+  `vehicle_category` name/amenities (from the trip's seating plan / vehicle),
+  `fare_class` `{id,name}`, `total_seats`, `available_seats`, and `price`
+  (+ `currency`) = `resolve_fare(origin→destination, fare_class, one_way).amount`
+  or `null` when unpriced.
 
-Returns the distinct cities that are endpoints (from or to) of the company's
-active (`is_deleted=False`) routes — i.e. the cities a client can actually
-travel between. Sorted by name. TDD-covered.
+### 6.3 Seat map (modern)
+`GET /online/<co>/trips/<id>/seats/` → `seat_map(trip)` serialised as
+`[{ id, seat_number, row, column, seat_type, status }]` (+ `free_seating: false`
+— the modern stack always materialises seats).
 
-### 6.2 Applicable fares on the public trip payload
-`PublicTripSerializer` currently exposes `fare_class` but **not the actual
-fares/prices**, yet `InitiateBooking` requires `fare_id` + `amount`. Add an
-applicable-fares list to the public trip payload:
+### 6.4 Model re-point + booking creation
+As described in §4.2. `initiate_booking` resolves the fare server-side and
+validates the seat is `available`; `confirm_payment` calls `create_booking(...,
+channel=ONLINE)`. `create_booking` gains an optional `channel` param.
 
-```
-fares: [
-  { "fare_id": "<uuid>", "label": "<fare class / passenger type>",
-    "passenger_type": "adult|child|student|senior", "price": <decimal> }
-]
-```
-
-Sourced from the trip's active (`is_active=True`, `is_deleted=False`) `Fare`
-rows matching the trip's `route`, `vehicle_category`, and (when set)
-`fare_class`. Additive, `AllowAny`, TDD-covered.
-
-No other backend change: search, seat map, initiate, status, webhook, and ticket
-issuance are reused as-is.
+### 6.5 System-user handling
+`create_booking` and `get_or_create_passenger` require a `user` (for
+`created_by`). In the webhook/public context there is none. The implementation
+will pass `user=None` if `BaseModel.created_by` and those services tolerate it;
+otherwise it will resolve a dedicated per-company system user. The chosen
+approach is verified against the code during implementation and documented in
+the plan.
 
 ## 7. PWA Packaging
 
-- Add `@angular/service-worker`, `ngsw-config.json`, and `manifest.webmanifest`
-  (via `ng add @angular/pwa`). Service worker registered **only in production**
-  (`isDevMode()` guard / production build).
-- **Cache strategy scoped to avoid poisoning the staff app:**
-  - App shell + static assets: `prefetch` (install-time).
-  - `/api/v1/online/…` data: `freshness` (network-first, short-lived cache).
+- Add `@angular/service-worker`, `ngsw-config.json`, `manifest.webmanifest`
+  (via `ng add @angular/pwa`). SW registered **only in production**.
+- Cache strategy scoped to avoid poisoning the staff app:
+  - App shell + static assets: `prefetch` / `lazy+prefetch`.
+  - `/api/v1/online/…` data: `freshness` (network-first, short cache).
   - **Never** cache authenticated staff `/api/v1/` endpoints.
-  - The confirmed ticket/QR view cached so it is **viewable offline at boarding**.
-- Manifest: app name, icons (multiple sizes), `theme_color`, `background_color`,
+  - The confirmed ticket/QR view cached for **offline viewing at boarding**.
+- Manifest: name, icons, `theme_color`, `background_color`,
   `display: standalone`, `start_url` → `/reserver`.
 
 ## 8. Error Handling
 
-- Reuses the explicit French error messages produced by `apiUnwrapInterceptor`
-  and surfaced via toasts.
-- Network failures during search/detail show inline retry states.
-- Booking initiation errors (e.g., seat taken, trip departed) surface the
+- `apiUnwrapInterceptor` gains a fallback: bare `{detail: "..."}` bodies (used by
+  `/online/`) keep their explicit French message (instead of a generic
+  status-code message). Surfaced via toasts.
+- Booking initiation errors (seat taken, trip not bookable, no fare) surface the
   backend's explicit French `ApplicationError` message.
-- Status page distinguishes pending (with countdown), failed, and expired, each
-  with a next action.
+- Status page distinguishes pending (countdown), failed, and expired, each with a
+  next action.
 
 ## 9. Testing
 
-- **Backend:** pytest (TDD) for the served-cities endpoint (distinct route
-  endpoints, `AllowAny`, unknown company → 404) and the new `fares` field on the
-  public trip payload (correct fares for the trip's route/vehicle/fare_class,
-  empty when none, still `AllowAny`). Full suite stays green.
-- **Frontend:** `ng build` green (prod build compiles service worker + manifest).
-  Service worker only activates in the production build, so dev is unaffected.
+- **Backend (pytest, TDD):**
+  - served-towns endpoint: distinct town endpoints of bookable trips, `AllowAny`,
+    unknown company → 404.
+  - search by town + `price` on trip payload: correct trips for from/to town +
+    date; `price` resolved from `resolve_fare`; `null` when unpriced.
+  - seat map returns modern `TripSeat` rows.
+  - `initiate_booking`: resolves fare server-side, rejects an unavailable seat,
+    stores `trip_seat`/`destination_point`/`amount`.
+  - `confirm_payment`: creates a `voyages_booking.Booking` with `channel=ONLINE`,
+    a `Ticket`, and the `TripSeat` marked `sold`; links `booking_request.booking`.
+  - `create_booking` still works for the existing counter path (channel default
+    unchanged) — existing suite stays green.
+- **Frontend:** `ng build` green; production build emits the service worker +
+  manifest. SW only active in production.
 
 ## 10. Units & Boundaries
 
-- `reserver` feature module — public reservation UI; depends only on the
-  `/online/` API service and shared toast/pipes. No dependency on back-office
-  features.
-- `online` API service (Angular) — typed wrapper over the `/online/` endpoints,
-  injecting the fixed `company_id`. Single responsibility: talk to the public
-  channel.
+- `online_booking` (backend) — anonymous public channel; depends on
+  `voyages_trips`/`voyages_config`/`voyages_pricing` selectors and
+  `voyages_booking.create_booking`. Owns the Campay orchestration and
+  `OnlineBookingRequest`.
+- `reserver` feature (Angular) — public reservation UI; depends only on the
+  `/online/` API service + shared toast/pipes. No back-office coupling.
+- `OnlineBookingService` (Angular) — typed wrapper over `/online/`, injecting the
+  fixed `company_id`.
 - Public layout component — chrome only; no data logic.
-- Backend fares addition — isolated to the online_booking serializer/selector;
-  no change to booking, treasury, or ticketing services.
