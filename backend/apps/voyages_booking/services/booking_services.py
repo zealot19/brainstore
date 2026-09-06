@@ -86,7 +86,8 @@ def _price(company, trip, destination_point, trip_type):
 
 @transaction.atomic
 def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec, items,
-                   payment_method="", amount_received=None, return_open=False, user):
+                   payment_method="", amount_received=None, return_open=False,
+                   channel=Booking.Channel.COUNTER, user=None):
     """Create a fully-paid booking in a single step (no hold/confirm phase).
 
     items: [{"passenger": <spec>, "destination_point_id": UUID|None,
@@ -109,7 +110,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
         company=company, reference=_booking_reference(), status=Booking.Status.CONFIRMED,
         trip_type=trip_type, outbound_trip=outbound_trip,
         return_trip=return_trip if (is_round and not open_return) else None,
-        return_open=open_return, buyer=buyer, created_by=user)
+        return_open=open_return, buyer=buyer, channel=channel, created_by=user)
 
     total = Decimal("0")
     for item in items:
