@@ -85,26 +85,23 @@ class SeatSerializer(serializers.Serializer):
 # ── Booking request ────────────────────────────────────────────────────────────
 
 class InitiateBookingSerializer(serializers.Serializer):
-    passenger_name  = serializers.CharField(max_length=150)
-    passenger_phone = serializers.CharField(max_length=30)
-    passenger_email = serializers.EmailField(required=False, allow_blank=True, default="")
-    passenger_type  = serializers.ChoiceField(
-        choices=["adult", "child", "student", "senior"], default="adult"
-    )
-    seat_number     = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
-    fare_id         = serializers.UUIDField(required=False, allow_null=True)
-    amount          = serializers.DecimalField(max_digits=10, decimal_places=2)
-    payment_method  = serializers.ChoiceField(choices=OnlineBookingRequest.PaymentMethod.choices)
-    payment_phone   = serializers.CharField(max_length=30)
+    passenger_name       = serializers.CharField(max_length=150)
+    passenger_phone      = serializers.CharField(max_length=30)
+    passenger_email      = serializers.EmailField(required=False, allow_blank=True, default="")
+    seat_id              = serializers.UUIDField()
+    destination_point_id = serializers.UUIDField(required=False, allow_null=True)
+    payment_method       = serializers.ChoiceField(choices=OnlineBookingRequest.PaymentMethod.choices)
+    payment_phone        = serializers.CharField(max_length=30)
 
 
 class BookingRequestStatusSerializer(serializers.ModelSerializer):
-    status_display        = serializers.CharField(source="get_status_display", read_only=True)
+    status_display         = serializers.CharField(source="get_status_display", read_only=True)
     payment_method_display = serializers.CharField(source="get_payment_method_display", read_only=True)
-    expires_at            = serializers.DateTimeField(read_only=True)
-    is_expired            = serializers.BooleanField(read_only=True)
-    ticket                = serializers.SerializerMethodField()
-    trip_summary          = serializers.SerializerMethodField()
+    expires_at             = serializers.DateTimeField(read_only=True)
+    is_expired             = serializers.BooleanField(read_only=True)
+    seat_number            = serializers.SerializerMethodField()
+    ticket                 = serializers.SerializerMethodField()
+    trip_summary           = serializers.SerializerMethodField()
 
     class Meta:
         model = OnlineBookingRequest
@@ -112,7 +109,7 @@ class BookingRequestStatusSerializer(serializers.ModelSerializer):
             "id",
             "status", "status_display",
             "passenger_name", "passenger_phone",
-            "passenger_type", "seat_number",
+            "seat_number",
             "amount", "payment_method", "payment_method_display",
             "payment_reference",
             "expires_at", "is_expired",
@@ -120,22 +117,24 @@ class BookingRequestStatusSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def get_seat_number(self, obj):
+        return obj.trip_seat.seat_number if obj.trip_seat_id else ""
+
     def get_ticket(self, obj):
-        if obj.booking_id and hasattr(obj.booking, "ticket"):
-            t = obj.booking.ticket
-            return {
-                "ticket_number": t.ticket_number,
-                "qr_code":       str(t.qr_code),
-            }
-        return None
+        if not obj.booking_id:
+            return None
+        t = obj.booking.tickets.first()
+        if not t:
+            return None
+        return {"ticket_number": t.number, "qr_code": t.number}
 
     def get_trip_summary(self, obj):
         trip = obj.trip
         return {
-            "reference":          trip.reference,
-            "from_city":          trip.from_city,
-            "to_city":            trip.to_city,
-            "departure_datetime": trip.departure_datetime.isoformat(),
+            "reference":  trip.number or trip.code or str(trip.id),
+            "from_town":  trip.origin.town.name,
+            "to_town":    trip.destination.town.name,
+            "departure":  trip.scheduled_departure.isoformat(),
         }
 
 

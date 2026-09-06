@@ -105,20 +105,12 @@ class InitiateBookingView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         trip = selectors.get_public_trip(trip_id, company.id)
         if not trip:
-            return Response({"detail": "Trip not found or no longer available."},
+            return Response({"detail": "Voyage introuvable ou plus disponible."},
                             status=status.HTTP_404_NOT_FOUND)
 
         ser = InitiateBookingSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
-
-        fare = None
-        if d.get("fare_id"):
-            from apps.transport_config.models import Fare
-            try:
-                fare = Fare.objects.get(id=d["fare_id"], is_deleted=False)
-            except Fare.DoesNotExist:
-                return Response({"detail": "Fare not found."}, status=status.HTTP_404_NOT_FOUND)
 
         try:
             booking_request = services.initiate_booking(
@@ -126,9 +118,8 @@ class InitiateBookingView(APIView):
                 passenger_name=d["passenger_name"],
                 passenger_phone=d["passenger_phone"],
                 passenger_email=d.get("passenger_email", ""),
-                passenger_type=d.get("passenger_type", "adult"),
-                seat_number=d.get("seat_number", ""),
-                fare=fare, amount=d["amount"],
+                seat_id=d["seat_id"],
+                destination_point_id=d.get("destination_point_id"),
                 payment_method=d["payment_method"],
                 payment_phone=d["payment_phone"],
             )
