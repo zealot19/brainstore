@@ -445,3 +445,13 @@ export const PUBLIC_URLS: string[] = [
   AUTH.passwordReset,
   AUTH.passwordResetConfirm,
 ];
+
+/** Réservation en ligne publique (PWA client) — endpoints anonymes /online/ */
+export const ONLINE = {
+  towns:   (co: string) => `${API_BASE}/online/${co}/towns/`,
+  trips:   (co: string) => `${API_BASE}/online/${co}/trips/`,
+  trip:    (co: string, id: string) => `${API_BASE}/online/${co}/trips/${id}/`,
+  seatMap: (co: string, id: string) => `${API_BASE}/online/${co}/trips/${id}/seats/`,
+  book:    (co: string, id: string) => `${API_BASE}/online/${co}/trips/${id}/book/`,
+  status:  (reqId: string) => `${API_BASE}/online/requests/${reqId}/`,
+};
