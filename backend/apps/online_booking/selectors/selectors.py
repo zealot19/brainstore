@@ -1,9 +1,5 @@
-from django.db.models import Count, Q
-from django.utils import timezone
-
 from apps.online_booking.models import OnlineBookingRequest
-from apps.voyage.models import Trip
-from apps.ticketing.models import Booking
+from apps.voyages_trips.models import Trip, TripSeat
 
 
 def get_served_towns(company_id):
@@ -15,66 +11,52 @@ def get_served_towns(company_id):
     return Town.objects.filter(id__in=town_ids, is_deleted=False).order_by("name")
 
 
-def search_trips(company_id, *, from_city_id, to_city_id, travel_date):
-    """Available trips for online booking — same logic as voyage.selectors.search_trips."""
-    return (Trip.objects
-            .filter(company_id=company_id, is_deleted=False,
-                    status__in=[Trip.Status.SCHEDULED, Trip.Status.BOARDING],
-                    departure_datetime__date=travel_date,
-                    departure_datetime__gt=timezone.now(),
-                    route__from_terminal__city_id=from_city_id,
-                    route__to_terminal__city_id=to_city_id)
-            .select_related(
-                "route__from_terminal__city",
-                "route__to_terminal__city",
-                "vehicle_category", "fare_class",
-            )
-            .annotate(booked_seats=Count("bookings", filter=Q(
-                bookings__is_deleted=False,
-                bookings__status__in=[Booking.Status.CONFIRMED, Booking.Status.BOARDED]
-            )))
-            .order_by("departure_datetime"))
+def search_trips(company_id, *, from_town_id, to_town_id, travel_date):
+    """Bookable trips between two towns on a date (modern voyages_* stack)."""
+    from apps.system_config.models import Company
+    from apps.voyages_booking.selectors import bookable_trips
+    company = Company.objects.get(id=company_id)
+    trips = bookable_trips(company, travel_date=travel_date)
+    return [t for t in trips
+            if t.origin.town_id == from_town_id and t.destination.town_id == to_town_id]
 
 
 def get_public_trip(trip_id, company_id):
-    """Single trip detail for public display."""
-    try:
-        return (Trip.objects
-                .filter(company_id=company_id, is_deleted=False,
-                        status__in=[Trip.Status.SCHEDULED, Trip.Status.BOARDING])
-                .select_related(
-                    "route__from_terminal__city",
-                    "route__to_terminal__city",
-                    "vehicle_category", "fare_class",
-                )
-                .annotate(booked_seats=Count("bookings", filter=Q(
-                    bookings__is_deleted=False,
-                    bookings__status__in=[Booking.Status.CONFIRMED, Booking.Status.BOARDED]
-                )))
-                .get(id=trip_id))
-    except Trip.DoesNotExist:
-        return None
+    """Single bookable trip for public display, or None."""
+    return (Trip.objects
+            .filter(company_id=company_id, is_deleted=False, status="pending")
+            .select_related("route", "origin__town", "destination__town",
+                            "fare_class", "seating_plan", "vehicle")
+            .filter(id=trip_id).first())
 
 
-def get_booked_seats(trip_id):
-    """Return list of taken seat numbers for assigned-seating trips."""
-    return list(
-        Booking.objects
-        .filter(trip_id=trip_id, is_deleted=False,
-                status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED,
-                             Booking.Status.BOARDED],
-                seat_number__gt="")
-        .values_list("seat_number", flat=True)
-    )
+def trip_price(trip):
+    """The applicable one-way Fare for origin → final destination, or None."""
+    from apps.voyages_pricing.selectors.fare_selectors import resolve_fare
+    return resolve_fare(trip.company, trip.route, trip.origin, trip.destination,
+                        trip.fare_class, trip_type="one_way")
+
+
+def trip_seat_counts(trip):
+    """(total, available) seat counts for a trip."""
+    total = TripSeat.objects.filter(is_deleted=False, trip=trip).count()
+    available = TripSeat.objects.filter(is_deleted=False, trip=trip,
+                                        status=TripSeat.Status.AVAILABLE).count()
+    return total, available
+
+
+def get_seat_map(trip):
+    """TripSeat rows for a trip (modern seat map)."""
+    from apps.voyages_booking.selectors import seat_map
+    return seat_map(trip)
 
 
 def get_booking_request(request_id):
     """Fetch an online booking request — no company check (UUID is the secret)."""
     try:
         return (OnlineBookingRequest.objects
-                .select_related("trip__route__from_terminal__city",
-                                "trip__route__to_terminal__city",
-                                "booking__ticket")
+                .select_related("trip__origin__town", "trip__destination__town",
+                                "trip_seat", "booking")
                 .get(id=request_id, is_deleted=False))
     except OnlineBookingRequest.DoesNotExist:
         return None

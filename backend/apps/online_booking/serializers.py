@@ -10,65 +10,76 @@ class PublicTownSerializer(serializers.Serializer):
 # ── Trip search & detail (public) ─────────────────────────────────────────────
 
 class PublicTripSerializer(serializers.Serializer):
-    id                        = serializers.UUIDField()
-    reference                 = serializers.CharField()
-    status                    = serializers.CharField()
-    departure_datetime        = serializers.DateTimeField()
-    estimated_arrival_datetime = serializers.DateTimeField(allow_null=True)
-    from_city                 = serializers.CharField()
-    to_city                   = serializers.CharField()
-    from_terminal             = serializers.SerializerMethodField()
-    to_terminal               = serializers.SerializerMethodField()
-    vehicle_category          = serializers.SerializerMethodField()
-    fare_class                = serializers.SerializerMethodField()
-    total_seats               = serializers.IntegerField()
-    booked_seats              = serializers.IntegerField(default=0)
-    available_seats           = serializers.SerializerMethodField()
-    free_seating              = serializers.BooleanField()
+    """Modern voyages_trips.Trip serialised for the public booking channel."""
+    id                  = serializers.UUIDField()
+    reference           = serializers.SerializerMethodField()
+    status              = serializers.CharField()
+    scheduled_departure = serializers.DateTimeField()
+    scheduled_arrival   = serializers.DateTimeField()
+    from_town           = serializers.SerializerMethodField()
+    to_town             = serializers.SerializerMethodField()
+    origin              = serializers.SerializerMethodField()
+    destination         = serializers.SerializerMethodField()
+    vehicle_category    = serializers.SerializerMethodField()
+    fare_class          = serializers.SerializerMethodField()
+    total_seats         = serializers.SerializerMethodField()
+    available_seats     = serializers.SerializerMethodField()
+    free_seating        = serializers.SerializerMethodField()
+    price               = serializers.SerializerMethodField()
+    currency            = serializers.SerializerMethodField()
 
-    def get_from_terminal(self, obj):
-        t = obj.route.from_terminal
-        return {"id": str(t.id), "name": t.name, "city": t.city.name}
+    def get_reference(self, o):    return o.number or o.code or str(o.id)
+    def get_from_town(self, o):    return o.origin.town.name
+    def get_to_town(self, o):      return o.destination.town.name
+    def get_origin(self, o):       return {"id": str(o.origin.id), "name": o.origin.name}
+    def get_destination(self, o):  return {"id": str(o.destination.id), "name": o.destination.name}
 
-    def get_to_terminal(self, obj):
-        t = obj.route.to_terminal
-        return {"id": str(t.id), "name": t.name, "city": t.city.name}
+    def get_vehicle_category(self, o):
+        return {"name": o.seating_plan.name if o.seating_plan_id else "", "amenities": []}
 
-    def get_vehicle_category(self, obj):
-        c = obj.vehicle_category
-        return {
-            "id": str(c.id), "name": c.name,
-            "total_seats": c.total_seats,
-            "amenities": c.amenities_list,
-        }
+    def get_fare_class(self, o):
+        return {"id": str(o.fare_class.id), "name": o.fare_class.name} if o.fare_class_id else None
 
-    def get_fare_class(self, obj):
-        if obj.fare_class_id:
-            return {"id": str(obj.fare_class.id), "name": obj.fare_class.name}
-        return None
+    def _counts(self, o):
+        from apps.online_booking import selectors
+        if not hasattr(o, "_seat_counts"):
+            o._seat_counts = selectors.trip_seat_counts(o)
+        return o._seat_counts
 
-    def get_available_seats(self, obj):
-        booked = getattr(obj, "booked_seats", 0) or 0
-        return max(0, obj.total_seats - booked)
+    def get_total_seats(self, o):     return self._counts(o)[0]
+    def get_available_seats(self, o): return self._counts(o)[1]
+    def get_free_seating(self, o):    return False
+
+    def _fare(self, o):
+        from apps.online_booking import selectors
+        if not hasattr(o, "_fare_cache"):
+            o._fare_cache = selectors.trip_price(o)
+        return o._fare_cache
+
+    def get_price(self, o):
+        f = self._fare(o)
+        return str(f.amount) if f else None
+
+    def get_currency(self, o):
+        f = self._fare(o)
+        return f.currency if f else "XAF"
 
 
 class TripSearchQuerySerializer(serializers.Serializer):
-    from_city_id = serializers.UUIDField()
-    to_city_id   = serializers.UUIDField()
+    from_town_id = serializers.UUIDField()
+    to_town_id   = serializers.UUIDField()
     travel_date  = serializers.DateField()
 
 
 # ── Seat map ───────────────────────────────────────────────────────────────────
 
-class SeatMapSerializer(serializers.Serializer):
-    total_seats     = serializers.IntegerField()
-    free_seating    = serializers.BooleanField()
-    seat_rows       = serializers.IntegerField()
-    seat_cols       = serializers.IntegerField()
-    aisle_after_col = serializers.IntegerField(allow_null=True)
-    has_back_row    = serializers.BooleanField()
-    booked_seats    = serializers.ListField(child=serializers.CharField())
-    available_count = serializers.IntegerField()
+class SeatSerializer(serializers.Serializer):
+    id          = serializers.UUIDField()
+    seat_number = serializers.CharField()
+    row         = serializers.IntegerField()
+    column      = serializers.IntegerField()
+    seat_type   = serializers.CharField()
+    status      = serializers.CharField()
 
 
 # ── Booking request ────────────────────────────────────────────────────────────

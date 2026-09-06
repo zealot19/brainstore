@@ -12,7 +12,7 @@ from apps.core.exceptions import ApplicationError
 from apps.online_booking import selectors, services
 from apps.online_booking.serializers import (
     PublicTownSerializer,
-    PublicTripSerializer, TripSearchQuerySerializer, SeatMapSerializer,
+    PublicTripSerializer, TripSearchQuerySerializer, SeatSerializer,
     InitiateBookingSerializer, BookingRequestStatusSerializer,
     CampayWebhookSerializer,
 )
@@ -58,8 +58,8 @@ class PublicTripSearchView(APIView):
 
         trips = selectors.search_trips(
             company.id,
-            from_city_id=d["from_city_id"],
-            to_city_id=d["to_city_id"],
+            from_town_id=d["from_town_id"],
+            to_town_id=d["to_town_id"],
             travel_date=d["travel_date"],
         )
         return Response(PublicTripSerializer(trips, many=True).data)
@@ -90,22 +90,7 @@ class PublicSeatMapView(APIView):
         trip = selectors.get_public_trip(trip_id, company.id)
         if not trip:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        cat          = trip.vehicle_category
-        booked_seats = selectors.get_booked_seats(trip_id)
-        available    = max(0, trip.total_seats - len(booked_seats))
-
-        data = SeatMapSerializer({
-            "total_seats":     trip.total_seats,
-            "free_seating":    trip.free_seating,
-            "seat_rows":       cat.seat_rows,
-            "seat_cols":       cat.seat_cols,
-            "aisle_after_col": cat.aisle_after_col,
-            "has_back_row":    cat.has_back_row,
-            "booked_seats":    booked_seats,
-            "available_count": available,
-        })
-        return Response(data.data)
+        return Response(SeatSerializer(selectors.get_seat_map(trip), many=True).data)
 
 
 # ── Booking initiation ─────────────────────────────────────────────────────────
