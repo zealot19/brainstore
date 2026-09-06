@@ -1,0 +1,29 @@
+.rsv-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f6f8fb;
+}
+.rsv-header {
+  padding: 16px 20px;
+  background: #0d6efd;
+  color: #fff;
+}
+.rsv-brand {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+.rsv-content {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.rsv-footer {
+  padding: 16px 20px;
+  text-align: center;
+  color: #6c757d;
+}

@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.online_booking.models import OnlineBookingRequest
 from apps.online_booking.campay import CampayClient, CampayError
-from apps.ticketing.models import Booking
 
 logger = logging.getLogger(__name__)
 
@@ -20,68 +19,28 @@ def _redirect_url() -> str:
     return getattr(settings, "CAMPAY_REDIRECT_URL", "")
 
 
-# ── Booking initiation ─────────────────────────────────────────────────────────
+def _actor(company):
+    """A real user to attribute a system-initiated online booking to.
 
-@transaction.atomic
-def initiate_booking(
-    *, company, trip,
-    passenger_name, passenger_phone, passenger_email="",
-    passenger_type="adult", seat_number="",
-    fare=None, amount,
-    payment_method, payment_phone,
-):
+    create_booking / get_or_create_passenger stamp created_by; online sales have no
+    logged-in user, so we attribute them to the institution's admin.
     """
-    Validate availability, create the OnlineBookingRequest and call Campay.
-    Returns the created request (with payment_reference set).
-    """
-    from django.db.models import Count, Q
+    from apps.authentication.models import User
+    return (User.objects.filter(company=company, is_institution_admin=True, is_active=True)
+            .order_by("date_joined").first())
 
-    if trip.status in (trip.Status.ARRIVED, trip.Status.CANCELLED, trip.Status.DEPARTED):
-        raise ApplicationError(_("This trip is no longer available for booking."))
 
-    # Seat availability
-    annotated = (
-        type(trip).objects
-        .annotate(booked_seats=Count("bookings", filter=Q(
-            bookings__is_deleted=False,
-            bookings__status__in=[Booking.Status.CONFIRMED, Booking.Status.BOARDED]
-        )))
-        .get(id=trip.id)
-    )
-    available = annotated.total_seats - annotated.booked_seats
-    if available <= 0:
-        raise ApplicationError(_("No seats available on this trip."))
-
-    # Seat uniqueness for assigned seating
-    if seat_number and not trip.free_seating:
-        if Booking.objects.filter(
-            trip=trip, seat_number=seat_number, is_deleted=False,
-            status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED, Booking.Status.BOARDED]
-        ).exists():
-            raise ApplicationError(
-                _("Seat {seat} is already taken.").format(seat=seat_number)
-            )
-
-    # Create pending request
-    booking_request = OnlineBookingRequest.objects.create(
-        company=company, trip=trip,
-        passenger_name=passenger_name, passenger_phone=passenger_phone,
-        passenger_email=passenger_email,
-        passenger_type=passenger_type, seat_number=seat_number,
-        fare=fare, amount=amount,
-        payment_method=payment_method, payment_phone=payment_phone,
-        status=OnlineBookingRequest.Status.PENDING,
-    )
-
-    # Call Campay
+def _start_campay_payment(booking_request):
+    """Initiate the Mobile Money collection with Campay and store its reference."""
+    trip = booking_request.trip
     try:
         client = CampayClient()
         resp = client.collect(
-            amount=str(int(amount)),
-            from_phone=payment_phone,
+            amount=str(int(booking_request.amount)),
+            from_phone=booking_request.payment_phone,
             description=(
-                f"Booking {trip.route} — {passenger_name} "
-                f"[{trip.departure_datetime:%Y-%m-%d %H:%M}]"
+                f"Réservation {trip.route} — {booking_request.passenger_name} "
+                f"[{trip.scheduled_departure:%Y-%m-%d %H:%M}]"
             ),
             external_reference=str(booking_request.id),
             webhook_url=_webhook_url(),
@@ -94,20 +53,57 @@ def initiate_booking(
         booking_request.status = OnlineBookingRequest.Status.FAILED
         booking_request.save(update_fields=["status"])
         raise ApplicationError(
-            _("Payment initiation failed. Please try again later.")
+            _("L'initiation du paiement a échoué. Veuillez réessayer dans un instant.")
         ) from exc
-
     return booking_request
 
 
-# ── Payment confirmation (called by webhook) ───────────────────────────────────
+# ── Booking initiation ─────────────────────────────────────────────────────────
+
+@transaction.atomic
+def initiate_booking(
+    *, company, trip,
+    passenger_name, passenger_phone, passenger_email="",
+    seat_id, payment_method, payment_phone,
+    destination_point_id=None,
+):
+    """Validate the seat, resolve the fare server-side, create the request, call Campay."""
+    from apps.voyages_trips.models import TripSeat
+    from apps.voyages_config.models import ServicePoint
+    from apps.voyages_pricing.selectors.fare_selectors import resolve_fare
+
+    seat = TripSeat.objects.filter(is_deleted=False, trip=trip, id=seat_id).first()
+    if not seat:
+        raise ApplicationError(_("Siège introuvable pour ce voyage."))
+    if seat.status != TripSeat.Status.AVAILABLE:
+        raise ApplicationError(_("Ce siège vient d'être pris. Veuillez en choisir un autre."))
+
+    dest = trip.destination
+    if destination_point_id:
+        dest = (ServicePoint.objects.filter(is_deleted=False, company=company,
+                                            id=destination_point_id).first()
+                or trip.destination)
+
+    fare = resolve_fare(company, trip.route, trip.origin, dest, trip.fare_class,
+                        trip_type="one_way")
+    if not fare:
+        raise ApplicationError(_("Aucun tarif n'est défini pour ce trajet. Contactez l'agence."))
+
+    booking_request = OnlineBookingRequest.objects.create(
+        company=company, trip=trip, trip_seat=seat, destination_point=dest,
+        passenger_name=passenger_name, passenger_phone=passenger_phone,
+        passenger_email=passenger_email, amount=fare.amount,
+        payment_method=payment_method, payment_phone=payment_phone,
+        status=OnlineBookingRequest.Status.PENDING,
+    )
+    return _start_campay_payment(booking_request)
+
+
+# ── Payment confirmation (called by webhook / status poll) ──────────────────────
 
 @transaction.atomic
 def confirm_payment(booking_request, *, operator_ref=""):
-    """
-    Called when Campay confirms a successful payment.
-    Creates a Customer + Booking + Ticket in the ticketing module.
-    """
+    """Called when Campay confirms a successful payment: create the real booking."""
     if booking_request.status != OnlineBookingRequest.Status.PENDING:
         return booking_request  # already processed
 
@@ -116,35 +112,32 @@ def confirm_payment(booking_request, *, operator_ref=""):
         booking_request.save(update_fields=["status"])
         return booking_request
 
-    from apps.ticketing.models import Customer
-    from apps.ticketing.services import create_booking
+    from apps.voyages_booking.services import create_booking
+    from apps.voyages_booking.models import Booking
 
-    # Get or create customer by phone
-    customer, _ = Customer.objects.get_or_create(
-        company=booking_request.company,
-        phone=booking_request.passenger_phone,
-        defaults={
-            "first_name": booking_request.passenger_name.split()[0],
-            "last_name":  " ".join(booking_request.passenger_name.split()[1:]) or "-",
-            "email":      booking_request.passenger_email,
-        },
-    )
-
-    # Create booking as system action (no user — use None-safe pattern)
+    passenger_spec = {
+        "name": booking_request.passenger_name,
+        "phone": booking_request.passenger_phone,
+        "email": booking_request.passenger_email,
+    }
     booking = create_booking(
-        company=booking_request.company,
-        trip=booking_request.trip,
-        customer=customer,
-        passenger_type=booking_request.passenger_type,
-        seat_number=booking_request.seat_number,
-        fare=booking_request.fare,
-        amount_paid=booking_request.amount,
-        notes="Online booking via Mobile Money",
-        created_by=None,
+        booking_request.company,
+        trip_type="one_way",
+        outbound_trip=booking_request.trip,
+        return_trip=None,
+        buyer_spec=passenger_spec,
+        items=[{
+            "passenger": passenger_spec,
+            "destination_point_id": booking_request.destination_point_id,
+            "outbound_seat_id": booking_request.trip_seat_id,
+        }],
+        payment_method=booking_request.payment_method,
+        channel=Booking.Channel.ONLINE,
+        user=_actor(booking_request.company),
     )
 
     booking_request.booking = booking
-    booking_request.status  = OnlineBookingRequest.Status.PAID
+    booking_request.status = OnlineBookingRequest.Status.PAID
     if operator_ref:
         booking_request.payment_operator_ref = operator_ref
     booking_request.save(update_fields=["booking", "status", "payment_operator_ref"])
@@ -166,10 +159,7 @@ def fail_payment(booking_request, *, operator_ref=""):
 # ── Status polling (fallback if webhook not received) ─────────────────────────
 
 def sync_payment_status(booking_request):
-    """
-    Polls Campay for the current status of a pending payment.
-    Called when the customer checks their booking status.
-    """
+    """Poll Campay for the current status of a pending payment."""
     if booking_request.status != OnlineBookingRequest.Status.PENDING:
         return booking_request
     if booking_request.is_expired:
@@ -181,22 +171,14 @@ def sync_payment_status(booking_request):
 
     try:
         client = CampayClient()
-        resp   = client.check_transaction(booking_request.payment_reference)
+        resp = client.check_transaction(booking_request.payment_reference)
         campay_status = resp.get("status", "")
-
         if campay_status == "SUCCESSFUL":
-            return confirm_payment(
-                booking_request,
-                operator_ref=resp.get("operator_reference", ""),
-            )
+            return confirm_payment(booking_request, operator_ref=resp.get("operator_reference", ""))
         elif campay_status == "FAILED":
-            return fail_payment(
-                booking_request,
-                operator_ref=resp.get("operator_reference", ""),
-            )
+            return fail_payment(booking_request, operator_ref=resp.get("operator_reference", ""))
     except CampayError as exc:
-        logger.warning("Could not sync payment status for %s: %s",
-                       booking_request.id, exc)
+        logger.warning("Could not sync payment status for %s: %s", booking_request.id, exc)
 
     return booking_request
 
@@ -204,12 +186,8 @@ def sync_payment_status(booking_request):
 # ── Expiry helper ──────────────────────────────────────────────────────────────
 
 def expire_stale_requests():
-    """
-    Mark all PENDING requests past their expiry as EXPIRED.
-    Call from a management command or periodic task.
-    """
-    updated = (OnlineBookingRequest.objects
-               .filter(status=OnlineBookingRequest.Status.PENDING,
-                       expires_at__lt=timezone.now())
-               .update(status=OnlineBookingRequest.Status.EXPIRED))
-    return updated
+    """Mark all PENDING requests past their expiry as EXPIRED."""
+    return (OnlineBookingRequest.objects
+            .filter(status=OnlineBookingRequest.Status.PENDING,
+                    expires_at__lt=timezone.now())
+            .update(status=OnlineBookingRequest.Status.EXPIRED))

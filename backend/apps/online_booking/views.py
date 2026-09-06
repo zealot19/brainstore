@@ -11,7 +11,8 @@ from rest_framework.views import APIView
 from apps.core.exceptions import ApplicationError
 from apps.online_booking import selectors, services
 from apps.online_booking.serializers import (
-    PublicTripSerializer, TripSearchQuerySerializer, SeatMapSerializer,
+    PublicTownSerializer,
+    PublicTripSerializer, TripSearchQuerySerializer, SeatSerializer,
     InitiateBookingSerializer, BookingRequestStatusSerializer,
     CampayWebhookSerializer,
 )
@@ -25,6 +26,19 @@ def _get_company(company_id):
         return Company.objects.get(id=company_id, is_deleted=False)
     except Company.DoesNotExist:
         return None
+
+
+# ── Served towns ─────────────────────────────────────────────────────────────
+
+class PublicTownListView(APIView):
+    """Public: towns the company serves (route endpoints)."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, company_id):
+        company = _get_company(company_id)
+        if not company:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(PublicTownSerializer(selectors.get_served_towns(company.id), many=True).data)
 
 
 # ── Trip search ────────────────────────────────────────────────────────────────
@@ -44,8 +58,8 @@ class PublicTripSearchView(APIView):
 
         trips = selectors.search_trips(
             company.id,
-            from_city_id=d["from_city_id"],
-            to_city_id=d["to_city_id"],
+            from_town_id=d["from_town_id"],
+            to_town_id=d["to_town_id"],
             travel_date=d["travel_date"],
         )
         return Response(PublicTripSerializer(trips, many=True).data)
@@ -76,22 +90,7 @@ class PublicSeatMapView(APIView):
         trip = selectors.get_public_trip(trip_id, company.id)
         if not trip:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        cat          = trip.vehicle_category
-        booked_seats = selectors.get_booked_seats(trip_id)
-        available    = max(0, trip.total_seats - len(booked_seats))
-
-        data = SeatMapSerializer({
-            "total_seats":     trip.total_seats,
-            "free_seating":    trip.free_seating,
-            "seat_rows":       cat.seat_rows,
-            "seat_cols":       cat.seat_cols,
-            "aisle_after_col": cat.aisle_after_col,
-            "has_back_row":    cat.has_back_row,
-            "booked_seats":    booked_seats,
-            "available_count": available,
-        })
-        return Response(data.data)
+        return Response(SeatSerializer(selectors.get_seat_map(trip), many=True).data)
 
 
 # ── Booking initiation ─────────────────────────────────────────────────────────
@@ -106,20 +105,12 @@ class InitiateBookingView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         trip = selectors.get_public_trip(trip_id, company.id)
         if not trip:
-            return Response({"detail": "Trip not found or no longer available."},
+            return Response({"detail": "Voyage introuvable ou plus disponible."},
                             status=status.HTTP_404_NOT_FOUND)
 
         ser = InitiateBookingSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
-
-        fare = None
-        if d.get("fare_id"):
-            from apps.transport_config.models import Fare
-            try:
-                fare = Fare.objects.get(id=d["fare_id"], is_deleted=False)
-            except Fare.DoesNotExist:
-                return Response({"detail": "Fare not found."}, status=status.HTTP_404_NOT_FOUND)
 
         try:
             booking_request = services.initiate_booking(
@@ -127,9 +118,8 @@ class InitiateBookingView(APIView):
                 passenger_name=d["passenger_name"],
                 passenger_phone=d["passenger_phone"],
                 passenger_email=d.get("passenger_email", ""),
-                passenger_type=d.get("passenger_type", "adult"),
-                seat_number=d.get("seat_number", ""),
-                fare=fare, amount=d["amount"],
+                seat_id=d["seat_id"],
+                destination_point_id=d.get("destination_point_id"),
                 payment_method=d["payment_method"],
                 payment_phone=d["payment_phone"],
             )

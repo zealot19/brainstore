@@ -12,6 +12,9 @@ export const routes: Routes = [
   //Pages
   {path:'',loadChildren: () => import('./features/pages/pages.routes').then((m) => m.Pages_routes,)},
 
+  //Réservation en ligne (PWA publique, non protégée)
+  {path:'reserver',loadChildren: () => import('../_api/pages/reserver/reserver.routes').then((m) => m.Reserver_routes,)},
+
   //Error
   {
     path: 'error', loadComponent: () => import('./features/error/error.component').then((m) => m.ErrorComponent,),

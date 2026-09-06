@@ -7,6 +7,7 @@ from apps.treasury.services.services import create_transaction
 
 _NON_CASH = {
     "mobile_money": "mobile_money", "mobile": "mobile_money", "momo": "mobile_money", "om": "mobile_money",
+    "mtn_momo": "mobile_money", "orange_money": "mobile_money",
     "transfer": "transfer", "virement": "transfer", "bank": "transfer",
     "check": "check", "cheque": "check", "chèque": "check",
 }

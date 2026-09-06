@@ -10,6 +10,9 @@ urlpatterns = [
          name="booking-request-status"),
 
     # ── Per-company public endpoints ──────────────────────────────────────────
+    path("<uuid:company_id>/towns/",
+         views.PublicTownListView.as_view(), name="online-public-towns"),
+
     path("<uuid:company_id>/trips/",
          views.PublicTripSearchView.as_view(), name="public-trip-search"),
 

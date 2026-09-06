@@ -4,4 +4,6 @@
 export const environment = {
   production: true,
   apiUrl: 'https://brainstore-production.up.railway.app/api/v1',
+  // Institution servie par la PWA de réservation en ligne (définir au déploiement).
+  onlineCompanyId: '00000000-0000-0000-0000-000000000000',
 };

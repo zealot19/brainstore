@@ -1,0 +1,7 @@
+.rsv-trip {
+  cursor: pointer;
+  transition: box-shadow .15s ease;
+}
+.rsv-trip:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+}

@@ -44,6 +44,18 @@ export const apiUnwrapInterceptor: HttpInterceptorFn = (req, next) => {
           headers: err.headers,
         }));
       }
+      // Corps nu { detail: "..." } (ex. endpoints publics /online/) : on conserve
+      // le message explicite du backend plutôt qu'un message générique de statut.
+      const bareDetail = err?.error?.detail;
+      if (typeof bareDetail === 'string' && bareDetail.trim()) {
+        return throwError(() => new HttpErrorResponse({
+          error: { detail: bareDetail },
+          status: err.status,
+          statusText: err.statusText,
+          url: err.url ?? undefined,
+          headers: err.headers,
+        }));
+      }
       // Pas d'enveloppe { success, error } : erreur réseau / serveur / passerelle.
       // On synthétise un message clair et actionnable selon le statut HTTP.
       return throwError(() => new HttpErrorResponse({
