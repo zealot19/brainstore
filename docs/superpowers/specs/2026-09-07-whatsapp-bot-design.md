@@ -11,6 +11,13 @@ conversational channel over the existing `online_booking` backend, using the
 **WhatsApp Cloud API** (Meta, official). Confirmed tickets (with a QR image) are
 pushed back to the user in-chat.
 
+**v1 uses a simulated ("fake") payment**, controlled by a shared
+`settings.FAKE_PAYMENTS` flag on `online_booking`, so the whole flow works end
+to end without Campay/Mobile Money credentials. The conversation is identical to
+the real flow (the user "approves" by replying **PAYER**, which stands in for the
+Mobile Money phone prompt), so going live later is a one-setting flip — no
+conversation or code-shape change.
+
 ## 2. Context & Motivation
 
 `online_booking` (`/api/v1/online/`) already implements the full anonymous,
@@ -32,10 +39,12 @@ Reused building blocks (called in-process, same as the PWA):
 - A new Django app **`whatsapp_bot`** in this backend.
 - Cloud API webhook (verification GET + inbound POST, signed).
 - Conversation state machine: search → select trip → passenger name → payment
-  number → confirm → initiate payment.
+  number → confirm → **simulated payment (reply PAYER)**.
 - **Auto-assigned seat** (next available).
 - **Payment number always asked** (defaults offered as the user's WhatsApp
   number in copy, but the step is always shown).
+- **Simulated payment** via a shared `FAKE_PAYMENTS` toggle (skips Campay;
+  confirms on the PAYER step).
 - Push **confirmed ticket + QR image** on payment success.
 - Single fixed company (`settings.WHATSAPP_COMPANY_ID`).
 
@@ -45,6 +54,8 @@ Reused building blocks (called in-process, same as the PWA):
 - Status lookup ("where is my booking") and cancellations/refunds via chat.
 - Multi-passenger bookings (one seat / one ticket per conversation).
 - Languages other than French.
+- **Real Mobile Money charge (Campay)** — deferred; the code path stays intact
+  and is re-enabled by setting `FAKE_PAYMENTS = false`.
 
 ## 4. Architecture
 
@@ -80,7 +91,7 @@ Wired in `api/v1/router.py`: `path("whatsapp/", include("apps.whatsapp_bot.urls"
   treated as expired → restart.
 
 Steps: `START → ASK_FROM → ASK_TO → ASK_DATE → SHOW_TRIPS → ASK_NAME →
-ASK_PAYMENT_PHONE → CONFIRM → INITIATED`.
+ASK_PAY_METHOD → ASK_PAYMENT_PHONE → CONFIRM → AWAIT_PAYMENT → DONE`.
 
 `handle_message` is a pure-ish reducer: given the current session + inbound
 value, it validates, mutates `context`, advances `step`, and returns the list of
@@ -97,7 +108,7 @@ with `Authorization: Bearer <WHATSAPP_TOKEN>`):
 - `send_image(to, media_id, caption)`
 All calls go through one `_post` helper; in tests this is the single mock point.
 
-### 4.5 Booking + auto-assign seat
+### 4.5 Booking, auto-assign seat, simulated payment
 On `CONFIRM`, the engine calls
 `initiate_booking(company, trip, passenger_name, passenger_phone=wa_id,
 seat_id=<first_available>, payment_method, payment_phone, source="whatsapp")`.
@@ -105,7 +116,21 @@ Seat comes from a new selector `first_available_seat(trip)` (returns an
 `AVAILABLE` TripSeat, or raises `ApplicationError` if the trip is full).
 
 Payment method: the engine offers MTN / Orange via reply buttons before asking
-the payment number.
+the payment number (kept for realism even though the charge is simulated).
+
+**Simulated payment.** `initiate_booking` checks `settings.FAKE_PAYMENTS`:
+- **Fake (v1):** it does **not** call Campay; it stores a placeholder
+  `payment_reference = "FAKE-<id>"` and leaves the request `PENDING`.
+- **Real (later):** it calls `_start_campay_payment` exactly as today.
+
+After initiate, the engine → step `AWAIT_PAYMENT` and prompts the user to
+approve. In fake mode it shows a **PAYER** reply button (and accepts the text
+"PAYER"); tapping it calls `services.simulate_payment(request)`, which — only
+when `FAKE_PAYMENTS` is on — invokes `confirm_payment(request,
+operator_ref="FAKE")`. Confirmation then flows through the **same notify hook**
+(§4.6) that a real Campay webhook would trigger, so the ticket delivery path is
+identical in both modes. In real mode the engine instead says "approuvez sur
+votre téléphone" and the Campay webhook drives confirmation (no PAYER button).
 
 ### 4.6 Notify-on-paid hook
 `confirm_payment` is the single choke point (called by the Campay webhook and by
@@ -127,11 +152,24 @@ guarantees a bot/Meta failure can never break payment confirmation.
 ## 5. Small additions to `online_booking`
 - `OnlineBookingRequest.source` — CharField, default `"pwa"`, values
   `"pwa"|"whatsapp"` (migration).
-- `initiate_booking(..., source="pwa")` — new param, stored on the request.
+- `initiate_booking(..., source="pwa")` — new param, stored on the request; and
+  a `FAKE_PAYMENTS` branch: skip Campay + set `payment_reference="FAKE-<id>"`
+  when the flag is on.
+- `services.simulate_payment(booking_request)` — new; when `FAKE_PAYMENTS` is on,
+  calls `confirm_payment(..., operator_ref="FAKE")`; otherwise a no-op (guarded,
+  so it can never confirm real bookings).
+- `sync_payment_status` — when `FAKE_PAYMENTS` is on and the request is still
+  `PENDING`, auto-confirm (so the **PWA** status poll also completes in fake
+  mode, without a "PAYER" action).
 - `selectors.first_available_seat(trip)` — next `AVAILABLE` TripSeat.
-- `confirm_payment` — the guarded notify hook above.
+- `confirm_payment` — the guarded notify hook above (unchanged for real mode).
 
-The PWA path is unaffected (defaults `source="pwa"`, sends `seat_id` explicitly).
+Fake bookings are **real** `voyages_booking.Booking`s (they appear in the staff
+list / reporting); only the **external Campay charge** is skipped. Confirmation
+still runs `create_booking` exactly like a real online sale, including its normal
+treasury recording (a no-op unless the company has a single bank account, as in
+the demo). The PWA path is otherwise unaffected (defaults `source="pwa"`, sends
+`seat_id` explicitly).
 
 ## 6. Conversation Flow (French)
 
@@ -148,11 +186,13 @@ The PWA path is unaffected (defaults `source="pwa"`, sends `seat_id` explicitly)
    WhatsApp number; they can send another).
 8. `CONFIRM` → summary (trajet, date/heure, siège auto, prix, numéro) +
    buttons **Confirmer / Annuler**.
-9. Confirmer → `initiate_booking` → "✅ Demande envoyée. Approuvez le paiement
-   Mobile Money sur `<numéro>`." Session → `INITIATED`.
-10. Campay paid webhook → `notify_ticket` → "🎫 Réservation confirmée" + ticket
-    number + **QR image**. Failure/expiry (via poll or a later message) → clear
-    message + offer to restart.
+9. Confirmer → `initiate_booking` → session → `AWAIT_PAYMENT`. In **fake mode**:
+   "✅ Demande envoyée. Répondez **PAYER** pour simuler l'approbation Mobile
+   Money." + a **PAYER** button. (Real mode: "Approuvez sur votre téléphone
+   `<numéro>`" and the Campay webhook confirms.)
+10. User taps/says **PAYER** → `simulate_payment` → `confirm_payment` → the
+    notify hook sends "🎫 Réservation confirmée" + ticket number + **QR image**.
+    Cancel/expiry/backend error → clear French message + offer to restart.
 
 ## 7. Configuration (env / settings)
 - `WHATSAPP_TOKEN` — permanent access token.
@@ -162,6 +202,9 @@ The PWA path is unaffected (defaults `source="pwa"`, sends `seat_id` explicitly)
 - `WHATSAPP_COMPANY_ID` — the served company UUID.
 - `WHATSAPP_API_VERSION` (default e.g. `v21.0`), `WHATSAPP_SESSION_TTL_MIN`
   (default 30).
+- `FAKE_PAYMENTS` — bool (default **true** in v1). When true, `online_booking`
+  skips Campay and confirms via `simulate_payment` (bot) / status poll (PWA).
+  Set to `false` (and configure Campay) to go live with real Mobile Money.
 All read via `settings` from env; nothing hard-coded. Absent config → the app
 imports fine but the webhook logs and no-ops (so tests/dev don't require Meta).
 
@@ -183,6 +226,13 @@ imports fine but the webhook logs and no-ops (so tests/dev don't require Meta).
   - Confirm step calls `initiate_booking` with `source="whatsapp"`, auto seat,
     `passenger_phone == wa_id`.
   - `first_available_seat` returns an available seat / raises when full.
+  - **Fake payment:** with `FAKE_PAYMENTS=true`, `initiate_booking` does not call
+    Campay (no `_start_campay_payment`) and sets `payment_reference` to `FAKE-…`;
+    `simulate_payment` confirms the request (status → PAID, booking created);
+    with `FAKE_PAYMENTS=false`, `simulate_payment` is a no-op.
+  - **PAYER step:** the engine's `AWAIT_PAYMENT` handler on "PAYER" calls
+    `simulate_payment` and the notify hook fires once (ticket not double-sent).
+  - `sync_payment_status` auto-confirms a pending request when `FAKE_PAYMENTS`.
   - Notify hook: `confirm_payment` on a `source="whatsapp"` request triggers
     `notify_ticket` (mocked); on `source="pwa"` it does not.
   - Message-id dedupe: a repeated id is ignored.
