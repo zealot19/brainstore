@@ -22,6 +22,15 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 # Paiements simulés (v1 réservation en ligne / bot WhatsApp) — passer à False pour Campay réel.
 FAKE_PAYMENTS = env.bool("FAKE_PAYMENTS", default=True)
 
+# ── WhatsApp Cloud API (bot de réservation) ──────────────────────────────────
+WHATSAPP_TOKEN           = env("WHATSAPP_TOKEN", default="")
+WHATSAPP_PHONE_NUMBER_ID = env("WHATSAPP_PHONE_NUMBER_ID", default="")
+WHATSAPP_VERIFY_TOKEN    = env("WHATSAPP_VERIFY_TOKEN", default="")
+WHATSAPP_APP_SECRET      = env("WHATSAPP_APP_SECRET", default="")
+WHATSAPP_COMPANY_ID      = env("WHATSAPP_COMPANY_ID", default="")
+WHATSAPP_API_VERSION     = env("WHATSAPP_API_VERSION", default="v21.0")
+WHATSAPP_SESSION_TTL_MIN = env.int("WHATSAPP_SESSION_TTL_MIN", default=30)
+
 # ── Applications ─────────────────────────────────────────────────────────────
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -84,6 +93,8 @@ LOCAL_APPS = [
     "apps.treasury",
     # ── Réservation en ligne ──
     "apps.online_booking",
+    # ── Bot WhatsApp (canal de réservation) ──
+    "apps.whatsapp_bot",
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ──
     "apps.sync_scig_sage",
 ]
