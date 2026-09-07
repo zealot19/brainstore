@@ -51,6 +51,18 @@ def get_seat_map(trip):
     return seat_map(trip)
 
 
+def first_available_seat(trip):
+    """Next AVAILABLE TripSeat for a trip, or raise if the trip is full."""
+    from apps.core.exceptions import ApplicationError
+    from django.utils.translation import gettext as _
+    seat = (TripSeat.objects.filter(is_deleted=False, trip=trip,
+                                    status=TripSeat.Status.AVAILABLE)
+            .order_by("row", "column").first())
+    if not seat:
+        raise ApplicationError(_("Ce voyage est complet."))
+    return seat
+
+
 def get_booking_request(request_id):
     """Fetch an online booking request — no company check (UUID is the secret)."""
     try:

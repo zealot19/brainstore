@@ -65,7 +65,7 @@ def initiate_booking(
     *, company, trip,
     passenger_name, passenger_phone, passenger_email="",
     seat_id, payment_method, payment_phone,
-    destination_point_id=None,
+    destination_point_id=None, source="pwa",
 ):
     """Validate the seat, resolve the fare server-side, create the request, call Campay."""
     from apps.voyages_trips.models import TripSeat
@@ -94,7 +94,7 @@ def initiate_booking(
         passenger_name=passenger_name, passenger_phone=passenger_phone,
         passenger_email=passenger_email, amount=fare.amount,
         payment_method=payment_method, payment_phone=payment_phone,
-        status=OnlineBookingRequest.Status.PENDING,
+        status=OnlineBookingRequest.Status.PENDING, source=source,
     )
     return _start_campay_payment(booking_request)
 
