@@ -17,8 +17,9 @@ def search_trips(company_id, *, from_town_id, to_town_id, travel_date):
     from apps.voyages_booking.selectors import bookable_trips
     company = Company.objects.get(id=company_id)
     trips = bookable_trips(company, travel_date=travel_date)
+    frm, to = str(from_town_id), str(to_town_id)
     return [t for t in trips
-            if t.origin.town_id == from_town_id and t.destination.town_id == to_town_id]
+            if str(t.origin.town_id) == frm and str(t.destination.town_id) == to]
 
 
 def get_public_trip(trip_id, company_id):
