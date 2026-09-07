@@ -145,6 +145,13 @@ def confirm_payment(booking_request, *, operator_ref=""):
     if operator_ref:
         booking_request.payment_operator_ref = operator_ref
     booking_request.save(update_fields=["booking", "status", "payment_operator_ref"])
+
+    if booking_request.source == "whatsapp":
+        try:
+            from apps.whatsapp_bot.services.tickets import notify_ticket
+            notify_ticket(booking_request)
+        except Exception:
+            logger.exception("Notification WhatsApp du billet échouée pour %s", booking_request.id)
     return booking_request
 
 
