@@ -54,6 +54,7 @@ class OnlineBookingRequest(BaseModel):
     status     = models.CharField(_("status"), max_length=20,
                                    choices=Status.choices, default=Status.PENDING)
     expires_at = models.DateTimeField(_("expires at"))
+    source     = models.CharField(_("canal"), max_length=20, default="pwa")  # pwa | whatsapp
 
     # ── Resulting booking (set on success) ────────────────────────────────────
     booking = models.OneToOneField("voyages_booking.Booking", verbose_name=_("booking"),

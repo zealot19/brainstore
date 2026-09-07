@@ -65,7 +65,7 @@ def initiate_booking(
     *, company, trip,
     passenger_name, passenger_phone, passenger_email="",
     seat_id, payment_method, payment_phone,
-    destination_point_id=None,
+    destination_point_id=None, source="pwa",
 ):
     """Validate the seat, resolve the fare server-side, create the request, call Campay."""
     from apps.voyages_trips.models import TripSeat
@@ -94,8 +94,12 @@ def initiate_booking(
         passenger_name=passenger_name, passenger_phone=passenger_phone,
         passenger_email=passenger_email, amount=fare.amount,
         payment_method=payment_method, payment_phone=payment_phone,
-        status=OnlineBookingRequest.Status.PENDING,
+        status=OnlineBookingRequest.Status.PENDING, source=source,
     )
+    if getattr(settings, "FAKE_PAYMENTS", False):
+        booking_request.payment_reference = f"FAKE-{booking_request.id}"
+        booking_request.save(update_fields=["payment_reference"])
+        return booking_request
     return _start_campay_payment(booking_request)
 
 
@@ -141,7 +145,21 @@ def confirm_payment(booking_request, *, operator_ref=""):
     if operator_ref:
         booking_request.payment_operator_ref = operator_ref
     booking_request.save(update_fields=["booking", "status", "payment_operator_ref"])
+
+    if booking_request.source == "whatsapp":
+        try:
+            from apps.whatsapp_bot.services.tickets import notify_ticket
+            notify_ticket(booking_request)
+        except Exception:
+            logger.exception("Notification WhatsApp du billet échouée pour %s", booking_request.id)
     return booking_request
+
+
+def simulate_payment(booking_request, *, operator_ref="FAKE"):
+    """Confirm a pending request without a real charge — only when FAKE_PAYMENTS."""
+    if not getattr(settings, "FAKE_PAYMENTS", False):
+        return booking_request
+    return confirm_payment(booking_request, operator_ref=operator_ref)
 
 
 @transaction.atomic
@@ -166,6 +184,8 @@ def sync_payment_status(booking_request):
         booking_request.status = OnlineBookingRequest.Status.EXPIRED
         booking_request.save(update_fields=["status"])
         return booking_request
+    if getattr(settings, "FAKE_PAYMENTS", False):
+        return confirm_payment(booking_request, operator_ref="FAKE")
     if not booking_request.payment_reference:
         return booking_request
 

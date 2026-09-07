@@ -17,8 +17,9 @@ def search_trips(company_id, *, from_town_id, to_town_id, travel_date):
     from apps.voyages_booking.selectors import bookable_trips
     company = Company.objects.get(id=company_id)
     trips = bookable_trips(company, travel_date=travel_date)
+    frm, to = str(from_town_id), str(to_town_id)
     return [t for t in trips
-            if t.origin.town_id == from_town_id and t.destination.town_id == to_town_id]
+            if str(t.origin.town_id) == frm and str(t.destination.town_id) == to]
 
 
 def get_public_trip(trip_id, company_id):
@@ -49,6 +50,18 @@ def get_seat_map(trip):
     """TripSeat rows for a trip (modern seat map)."""
     from apps.voyages_booking.selectors import seat_map
     return seat_map(trip)
+
+
+def first_available_seat(trip):
+    """Next AVAILABLE TripSeat for a trip, or raise if the trip is full."""
+    from apps.core.exceptions import ApplicationError
+    from django.utils.translation import gettext as _
+    seat = (TripSeat.objects.filter(is_deleted=False, trip=trip,
+                                    status=TripSeat.Status.AVAILABLE)
+            .order_by("row", "column").first())
+    if not seat:
+        raise ApplicationError(_("Ce voyage est complet."))
+    return seat
 
 
 def get_booking_request(request_id):

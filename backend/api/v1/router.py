@@ -59,6 +59,9 @@ urlpatterns = [
     # ── Réservation en ligne (public) ───────────────────────────────────────────
     path("online/",     include("apps.online_booking.urls")),
 
+    # ── Bot WhatsApp (webhook Cloud API) ────────────────────────────────────────
+    path("whatsapp/",   include("apps.whatsapp_bot.urls")),
+
     # ── Reporting (états PDF/Excel/CSV) ────────────────────────────────────────
     path("reporting/",  include("apps.reporting.urls")),
 
