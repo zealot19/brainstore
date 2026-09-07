@@ -96,6 +96,10 @@ def initiate_booking(
         payment_method=payment_method, payment_phone=payment_phone,
         status=OnlineBookingRequest.Status.PENDING, source=source,
     )
+    if getattr(settings, "FAKE_PAYMENTS", False):
+        booking_request.payment_reference = f"FAKE-{booking_request.id}"
+        booking_request.save(update_fields=["payment_reference"])
+        return booking_request
     return _start_campay_payment(booking_request)
 
 
@@ -144,6 +148,13 @@ def confirm_payment(booking_request, *, operator_ref=""):
     return booking_request
 
 
+def simulate_payment(booking_request, *, operator_ref="FAKE"):
+    """Confirm a pending request without a real charge — only when FAKE_PAYMENTS."""
+    if not getattr(settings, "FAKE_PAYMENTS", False):
+        return booking_request
+    return confirm_payment(booking_request, operator_ref=operator_ref)
+
+
 @transaction.atomic
 def fail_payment(booking_request, *, operator_ref=""):
     """Called when Campay reports a failed payment."""
@@ -166,6 +177,8 @@ def sync_payment_status(booking_request):
         booking_request.status = OnlineBookingRequest.Status.EXPIRED
         booking_request.save(update_fields=["status"])
         return booking_request
+    if getattr(settings, "FAKE_PAYMENTS", False):
+        return confirm_payment(booking_request, operator_ref="FAKE")
     if not booking_request.payment_reference:
         return booking_request
 

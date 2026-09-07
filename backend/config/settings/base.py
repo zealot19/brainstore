@@ -19,6 +19,9 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
+# Paiements simulés (v1 réservation en ligne / bot WhatsApp) — passer à False pour Campay réel.
+FAKE_PAYMENTS = env.bool("FAKE_PAYMENTS", default=True)
+
 # ── Applications ─────────────────────────────────────────────────────────────
 DJANGO_APPS = [
     "django.contrib.admin",
