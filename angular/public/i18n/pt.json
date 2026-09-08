@@ -24,7 +24,8 @@
       "no": "Não",
       "loading": "A carregar…",
       "no_data": "Sem dados",
-      "all": "Todos"
+      "all": "Todos",
+      "actions": "Ações"
     },
     "language": {
       "label": "Idioma",
@@ -157,5 +158,50 @@
     "depots": "Depósitos",
     "inventaires": "Inventários",
     "configuration_sage": "Configuração Sage"
+  },
+  "booking": {
+    "list": {
+      "title": "Reservas",
+      "subtitle": "Gestão de reservas e bilhetes",
+      "info": "Uma reserva agrupa um ou mais bilhetes (um por passageiro e lugar). O pagamento será associado ao módulo de tesouraria mais tarde.",
+      "empty": "Sem reservas."
+    },
+    "actions": {
+      "new": "Nova reserva",
+      "detail": "Detalhe",
+      "noshow": "No-show"
+    },
+    "filter": {
+      "all_statuses": "Todos os estados",
+      "all_types": "Todos os tipos",
+      "all_channels": "Todos os canais",
+      "all_trips": "Todas as viagens",
+      "date_created": "Data de criação",
+      "date_departure": "Data de partida",
+      "date_arrival": "Data de chegada",
+      "search_placeholder": "Referência, comprador…",
+      "clear": "Limpar"
+    },
+    "status": {
+      "paid": "Pago",
+      "boarded": "Embarcado",
+      "cancelled": "Cancelado",
+      "no_show": "Não compareceu"
+    },
+    "type": {
+      "one_way": "Só ida",
+      "round_trip": "Ida e volta"
+    },
+    "channel": {
+      "counter": "Balcão",
+      "online": "Online"
+    },
+    "col": {
+      "reference": "Referência",
+      "buyer": "Comprador",
+      "type": "Tipo",
+      "amount": "Montante",
+      "status": "Estado"
+    }
   }
 }

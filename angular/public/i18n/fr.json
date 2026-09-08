@@ -24,7 +24,8 @@
       "no": "Non",
       "loading": "Chargement…",
       "no_data": "Aucune donnée",
-      "all": "Tous"
+      "all": "Tous",
+      "actions": "Actions"
     },
     "language": {
       "label": "Langue",
@@ -157,5 +158,50 @@
     "depots": "Dépôts",
     "inventaires": "Inventaires",
     "configuration_sage": "Configuration Sage"
+  },
+  "booking": {
+    "list": {
+      "title": "Réservations",
+      "subtitle": "Gestion des réservations et billets",
+      "info": "Une réservation regroupe un ou plusieurs billets (un par passager et par siège). Le paiement sera relié au module trésorerie ultérieurement.",
+      "empty": "Aucune réservation."
+    },
+    "actions": {
+      "new": "Nouvelle réservation",
+      "detail": "Détail",
+      "noshow": "No-show"
+    },
+    "filter": {
+      "all_statuses": "Tous les statuts",
+      "all_types": "Tous types",
+      "all_channels": "Tous canaux",
+      "all_trips": "Tous voyages",
+      "date_created": "Date création",
+      "date_departure": "Date départ",
+      "date_arrival": "Date arrivée",
+      "search_placeholder": "Référence, acheteur…",
+      "clear": "Effacer"
+    },
+    "status": {
+      "paid": "Payé",
+      "boarded": "Embarqué",
+      "cancelled": "Annulé",
+      "no_show": "Non présenté"
+    },
+    "type": {
+      "one_way": "Aller simple",
+      "round_trip": "Aller-retour"
+    },
+    "channel": {
+      "counter": "Guichet",
+      "online": "En ligne"
+    },
+    "col": {
+      "reference": "Référence",
+      "buyer": "Acheteur",
+      "type": "Type",
+      "amount": "Montant",
+      "status": "Statut"
+    }
   }
 }

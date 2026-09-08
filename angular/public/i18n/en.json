@@ -24,7 +24,8 @@
       "no": "No",
       "loading": "Loading…",
       "no_data": "No data",
-      "all": "All"
+      "all": "All",
+      "actions": "Actions"
     },
     "language": {
       "label": "Language",
@@ -157,5 +158,50 @@
     "depots": "Depots",
     "inventaires": "Inventories",
     "configuration_sage": "Sage configuration"
+  },
+  "booking": {
+    "list": {
+      "title": "Bookings",
+      "subtitle": "Manage bookings and tickets",
+      "info": "A booking groups one or more tickets (one per passenger and seat). Payment will be linked to the treasury module later.",
+      "empty": "No bookings."
+    },
+    "actions": {
+      "new": "New booking",
+      "detail": "Details",
+      "noshow": "No-show"
+    },
+    "filter": {
+      "all_statuses": "All statuses",
+      "all_types": "All types",
+      "all_channels": "All channels",
+      "all_trips": "All trips",
+      "date_created": "Created date",
+      "date_departure": "Departure date",
+      "date_arrival": "Arrival date",
+      "search_placeholder": "Reference, buyer…",
+      "clear": "Clear"
+    },
+    "status": {
+      "paid": "Paid",
+      "boarded": "Boarded",
+      "cancelled": "Cancelled",
+      "no_show": "No-show"
+    },
+    "type": {
+      "one_way": "One way",
+      "round_trip": "Round trip"
+    },
+    "channel": {
+      "counter": "Counter",
+      "online": "Online"
+    },
+    "col": {
+      "reference": "Reference",
+      "buyer": "Buyer",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status"
+    }
   }
 }
