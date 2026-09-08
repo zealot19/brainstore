@@ -1,29 +1,29 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Retours à traiter</h4><h6>Affecter le voyage retour des aller-retours à retour ouvert</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'booking.returns.title' | transloco }}</h4><h6>{{ 'booking.returns.subtitle' | transloco }}</h6></div></div>
 </div>
-<app-info-banner text="Ces réservations aller-retour sont déjà payées ; le retour n'a pas encore été daté. Le jour du retour, choisissez la réservation, sélectionnez le voyage retour et les sièges, puis affectez — les billets retour sont émis (aucun encaissement)."></app-info-banner>
+<app-info-banner [text]="'booking.returns.info' | transloco"></app-info-banner>
 
 @if (!target) {
   <div class="card table-list-card">
     <div class="card-header d-flex align-items-center gap-2">
-      <input type="text" class="form-control w-auto" placeholder="Référence, acheteur, téléphone…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <input type="text" class="form-control w-auto" [placeholder]="'booking.returns.search_placeholder' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
     </div>
     <div class="card-body p-0">
       @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
       @else {
         <div class="table-responsive"><table class="table datanew">
-          <thead class="thead-light"><tr><th>Référence</th><th>Acheteur</th><th>Aller</th><th>Payé</th><th class="no-sort">Action</th></tr></thead>
+          <thead class="thead-light"><tr><th>{{ 'booking.col.reference' | transloco }}</th><th>{{ 'booking.col.buyer' | transloco }}</th><th>{{ 'booking.returns.col_outbound' | transloco }}</th><th>{{ 'booking.returns.col_paid' | transloco }}</th><th class="no-sort">{{ 'booking.returns.col_action' | transloco }}</th></tr></thead>
           <tbody>
             @for (b of rows | paginate:pg.page:pg.size; track b.id) {
               <tr>
                 <td class="fw-medium">{{ b.reference }}</td>
                 <td>{{ b.buyer_name }}</td>
-                <td>{{ b.tickets.length ? b.tickets[0].passenger_name : '' }} <span class="badge bg-light text-dark">{{ b.tickets.length }} billet(s)</span></td>
+                <td>{{ b.tickets.length ? b.tickets[0].passenger_name : '' }} <span class="badge bg-light text-dark">{{ b.tickets.length }} {{ 'booking.returns.tickets_count' | transloco }}</span></td>
                 <td>{{ b.amount_paid | number:'1.0-0' }} XAF</td>
-                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.booking.update'" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>Affecter le retour</a></td>
+                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.booking.update'" (click)="pick(b)"><i class="ti ti-arrow-back-up me-1"></i>{{ 'booking.returns.assign' | transloco }}</a></td>
               </tr>
-            } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">Aucun retour ouvert à traiter.</td></tr> }
+            } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">{{ 'booking.returns.empty' | transloco }}</td></tr> }
           </tbody>
         </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
@@ -35,32 +35,32 @@
 @if (target) {
   <div class="card"><div class="card-body">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Affecter le retour — {{ target.reference }} <small class="text-muted">({{ outboundTickets.length }} passager(s))</small></h5>
-      <button class="btn btn-sm btn-light" (click)="cancelPick()"><i class="ti ti-arrow-left me-1"></i>Retour à la liste</button>
+      <h5 class="mb-0">{{ 'booking.returns.assign' | transloco }} — {{ target.reference }} <small class="text-muted">({{ outboundTickets.length }} {{ 'booking.returns.passengers_count' | transloco }})</small></h5>
+      <button class="btn btn-sm btn-light" (click)="cancelPick()"><i class="ti ti-arrow-left me-1"></i>{{ 'booking.returns.back_to_list' | transloco }}</button>
     </div>
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
     <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">Classe tarifaire <span class="text-danger">*</span></label>
-        <app-searchable-select [items]="fareClasses" labelKey="name" valueKey="id" placeholder="— Choisir —" [(ngModel)]="fareClassId" (ngModelChange)="search()"></app-searchable-select></div>
-      <div class="col-md-4 mb-3"><label class="form-label">Date retour <span class="text-danger">*</span></label>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'booking.returns.fare_class' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select [items]="fareClasses" labelKey="name" valueKey="id" [placeholder]="'booking.returns.choose' | transloco" [(ngModel)]="fareClassId" (ngModelChange)="search()"></app-searchable-select></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'booking.returns.return_date' | transloco }} <span class="text-danger">*</span></label>
         <input type="date" class="form-control" [(ngModel)]="date" (ngModelChange)="search()" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">Plage horaire <span class="text-danger">*</span></label>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'booking.returns.time_slot' | transloco }} <span class="text-danger">*</span></label>
         <select class="form-select" [(ngModel)]="slotId" (ngModelChange)="search()">
-          <option value="">— Choisir —</option>
+          <option value="">{{ 'booking.returns.choose' | transloco }}</option>
           @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
         </select></div>
     </div>
 
     @if (ready) {
-      <div class="mb-3"><label class="form-label">Voyage retour <span class="text-danger">*</span></label>
-        <app-searchable-select [items]="trips" [labelFn]="tripLabel" valueKey="id" placeholder="— Choisir —" [(ngModel)]="returnTripId" (ngModelChange)="onTripChange()"></app-searchable-select>
-        @if (!trips.length) { <small class="text-muted">Aucun voyage retour pour ces critères.</small> }
+      <div class="mb-3"><label class="form-label">{{ 'booking.returns.return_trip' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select [items]="trips" [labelFn]="tripLabel" valueKey="id" [placeholder]="'booking.returns.choose' | transloco" [(ngModel)]="returnTripId" (ngModelChange)="onTripChange()"></app-searchable-select>
+        @if (!trips.length) { <small class="text-muted">{{ 'booking.returns.no_return_trip' | transloco }}</small> }
       </div>
     }
 
     @if (seats.length) {
-      <h6 class="mt-2">Sièges retour — sélectionnez {{ outboundTickets.length }} siège(s)</h6>
+      <h6 class="mt-2">{{ 'booking.returns.seats_hint' | transloco }} {{ outboundTickets.length }} {{ 'booking.returns.seats_word' | transloco }}</h6>
       <div class="mb-2">
         @for (row of rowsOf(seats); track row) {
           <div class="d-flex gap-2 mb-2">
@@ -70,11 +70,11 @@
           </div>
         }
       </div>
-      <p class="text-muted small">Sélectionnés : {{ selReturn.length }} / {{ outboundTickets.length }}</p>
+      <p class="text-muted small">{{ 'booking.returns.selected' | transloco }} : {{ selReturn.length }} / {{ outboundTickets.length }}</p>
     }
 
     <div class="d-flex justify-content-end mt-2">
-      <button class="btn btn-success" [disabled]="!canAssign" *hasPermission="'ticketing.booking.update'" (click)="assign()"><i class="ti ti-check me-1"></i>Affecter le retour &amp; émettre les billets</button>
+      <button class="btn btn-success" [disabled]="!canAssign" *hasPermission="'ticketing.booking.update'" (click)="assign()"><i class="ti ti-check me-1"></i>{{ 'booking.returns.assign_and_issue' | transloco }}</button>
     </div>
   </div></div>
 }
