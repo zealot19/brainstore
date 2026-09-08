@@ -174,7 +174,9 @@ from django.utils.translation import gettext_lazy as _
 LANGUAGES = [
     ("fr", _("Français")),
     ("en", _("English")),
-    ("ar", _("العربية")),
+    ("es", _("Español")),
+    ("pt", _("Português")),
+    # ("ar", _("العربية")),  # RTL — préparé, activé dans une tranche dédiée ultérieure
 ]
 
 TIME_ZONE = env("TIME_ZONE", default="Africa/Abidjan")

@@ -12,11 +12,12 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vb-open-returns',
   templateUrl: './open-returns.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
 })
 export class VbOpenReturnsComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };

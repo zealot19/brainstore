@@ -1,44 +1,44 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Réservations</h4><h6>Gestion des réservations et billets</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'booking.list.title' | transloco }}</h4><h6>{{ 'booking.list.subtitle' | transloco }}</h6></div></div>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" *hasPermission="'ticketing.booking.create'" (click)="newBooking()"><i class="ti ti-circle-plus me-2"></i>Nouvelle réservation</a>
+    <a href="javascript:void(0);" class="btn btn-primary" *hasPermission="'ticketing.booking.create'" (click)="newBooking()"><i class="ti ti-circle-plus me-2"></i>{{ 'booking.actions.new' | transloco }}</a>
   </div>
 </div>
-<app-info-banner text="Une réservation regroupe un ou plusieurs billets (un par passager et par siège). Le paiement sera relié au module trésorerie ultérieurement."></app-info-banner>
+<app-info-banner [text]="'booking.list.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2">
       <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
-        <option value="">Tous les statuts</option>
-        <option value="confirmed">Payé</option>
-        <option value="boarded">Embarqué</option>
-        <option value="cancelled">Annulé</option>
-        <option value="no_show">Non présenté</option>
+        <option value="">{{ 'booking.filter.all_statuses' | transloco }}</option>
+        <option value="confirmed">{{ 'booking.status.paid' | transloco }}</option>
+        <option value="boarded">{{ 'booking.status.boarded' | transloco }}</option>
+        <option value="cancelled">{{ 'booking.status.cancelled' | transloco }}</option>
+        <option value="no_show">{{ 'booking.status.no_show' | transloco }}</option>
       </select>
       <select class="form-select w-auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
-        <option value="">Tous types</option>
-        <option value="one_way">Aller simple</option>
-        <option value="round_trip">Aller-retour</option>
+        <option value="">{{ 'booking.filter.all_types' | transloco }}</option>
+        <option value="one_way">{{ 'booking.type.one_way' | transloco }}</option>
+        <option value="round_trip">{{ 'booking.type.round_trip' | transloco }}</option>
       </select>
       <select class="form-select w-auto" [(ngModel)]="channelFilter" (ngModelChange)="reload()">
-        <option value="">Tous canaux</option>
-        <option value="counter">Guichet</option>
-        <option value="online">En ligne</option>
+        <option value="">{{ 'booking.filter.all_channels' | transloco }}</option>
+        <option value="counter">{{ 'booking.channel.counter' | transloco }}</option>
+        <option value="online">{{ 'booking.channel.online' | transloco }}</option>
       </select>
       <select class="form-select w-auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
-        <option value="">Tous voyages</option>
+        <option value="">{{ 'booking.filter.all_trips' | transloco }}</option>
         @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
       </select>
       <select class="form-select w-auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
-        <option value="created">Date création</option>
-        <option value="departure">Date départ</option>
-        <option value="arrival">Date arrivée</option>
+        <option value="created">{{ 'booking.filter.date_created' | transloco }}</option>
+        <option value="departure">{{ 'booking.filter.date_departure' | transloco }}</option>
+        <option value="arrival">{{ 'booking.filter.date_arrival' | transloco }}</option>
       </select>
       <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
       <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
-      <input type="text" class="form-control w-auto" placeholder="Référence, acheteur…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
-      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button>
+      <input type="text" class="form-control w-auto" [placeholder]="'booking.filter.search_placeholder' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'booking.filter.clear' | transloco }}</button>
     </div>
   </div>
   <div class="card-body p-0">
@@ -46,7 +46,7 @@
     @else {
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
-          <th>Référence</th><th>Acheteur</th><th>Type</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+          <th>{{ 'booking.col.reference' | transloco }}</th><th>{{ 'booking.col.buyer' | transloco }}</th><th>{{ 'booking.col.type' | transloco }}</th><th>{{ 'booking.col.amount' | transloco }}</th><th>{{ 'booking.col.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (b of rows | paginate:pg.page:pg.size; track b.id) {
             <tr>
@@ -56,16 +56,16 @@
               <td>{{ b.amount_due | number:'1.0-0' }} XAF</td>
               <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(b)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(b)" [title]="'booking.actions.detail' | transloco"><i class="ti ti-eye me-1"></i>{{ 'booking.actions.detail' | transloco }}</a>
                 @if (b.status === 'confirmed') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-dark me-1" *hasPermission="'ticketing.booking.noshow'" (click)="noShow(b)" title="Non présenté"><i class="ti ti-user-x me-1"></i>No-show</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-dark me-1" *hasPermission="'ticketing.booking.noshow'" (click)="noShow(b)" [title]="'booking.status.no_show' | transloco"><i class="ti ti-user-x me-1"></i>{{ 'booking.actions.noshow' | transloco }}</a>
                 }
                 @if (b.status === 'confirmed') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.booking.cancel'" (click)="cancel(b)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.booking.cancel'" (click)="cancel(b)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a>
                 }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucune réservation.</td></tr> }
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'booking.list.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>

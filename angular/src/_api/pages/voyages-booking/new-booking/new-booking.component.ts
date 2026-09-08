@@ -12,13 +12,14 @@ import { SearchableSelectComponent } from '../../shared/searchable-select/search
 import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface PaxRow extends PassengerSpec { destination_point_id: string; }
 
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent, ClientAutocompleteComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent, ClientAutocompleteComponent, TranslocoModule],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';

@@ -84,9 +84,23 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: railway up --ci --service "${{ vars.RAILWAY_SERVICE || 'erp-backend' }}"
 
+  # ── 2b. Parité des traductions i18n (barrière : clés en/es/pt == fr) ────────
+  i18n:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: angular
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Vérifier la parité des clés de traduction
+        run: node scripts/i18n-check.mjs
+
   # ── 3. Déploiement frontend → Vercel ────────────────────────────────────────
   deploy-frontend:
-    needs: [test, migrations-postgres]
+    needs: [test, migrations-postgres, i18n]
     if: github.repository == 'zealot19/brainstore'
     runs-on: ubuntu-latest
     defaults:

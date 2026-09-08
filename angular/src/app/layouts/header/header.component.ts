@@ -5,16 +5,17 @@ import { routes, SidebarService } from '../../core/core.index';
 import { AuthService } from '../.././../_api/services/auth/auth.service';
 import { HasModuleDirective } from '../../shared/directives/has-module.directive';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective],
+  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective, LanguageSwitcherComponent, TranslocoModule],
 })
 export class HeaderComponent {
   routes = routes;
-  currentLang = (localStorage.getItem('drp_lang') || 'FR').toUpperCase();
 
   constructor(private sidebar: SidebarService, private authService: AuthService) {}
 
@@ -34,12 +35,6 @@ export class HeaderComponent {
   get userInitials(): string {
     const parts = this.userName.trim().split(/\s+/);
     return (((parts[0]?.[0]) || '') + ((parts[1]?.[0]) || '')).toUpperCase() || '?';
-  }
-
-  // ── Langue (placeholder : i18n non encore branché) ────────────────────────
-  setLang(lang: string): void {
-    this.currentLang = lang.toUpperCase();
-    localStorage.setItem('drp_lang', this.currentLang);
   }
 
   // ── Actions ───────────────────────────────────────────────────────────────

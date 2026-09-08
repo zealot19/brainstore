@@ -5,11 +5,12 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { Booking } from '../../../models/voyages-booking.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vb-booking-detail',
   templateUrl: './booking-detail.component.html',
-  imports: [HasPermissionDirective, CommonModule],
+  imports: [HasPermissionDirective, CommonModule, TranslocoModule],
 })
 export class VbBookingDetailComponent implements OnInit {
   private toast = inject(ToastService);
