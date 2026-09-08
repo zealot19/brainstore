@@ -99,11 +99,6 @@ def create_user(
                 defaults={"is_default": str(aid) == str(default_agency_id)},
             )
 
-    from apps.core.services.audit_service import log_action
-    log_action(user=created_by, action="CREATE", module="USERS",
-               target_type="User", target_id=user.id,
-               description=f"Création de l'utilisateur {email}", company=company)
-
     return user, temp_password
 
 
@@ -163,11 +158,6 @@ def deactivate_user(user, updated_by):
     user.is_active = False
     user.save(update_fields=["is_active"])
     logout_all_sessions(user)
-    from apps.core.services.audit_service import log_action
-    log_action(user=updated_by, action="DELETE", module="USERS",
-               target_type="User", target_id=user.id,
-               description=f"Désactivation de l'utilisateur {user.email}",
-               company=getattr(user, "company", None))
     return user
 
 
