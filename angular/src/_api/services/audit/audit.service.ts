@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AUDIT } from '../../config/api.config';
 
 export interface AuditLog {
@@ -43,8 +42,7 @@ export class AuditService {
     if (filters.date_from) params = params.set('date_from', filters.date_from);
     if (filters.date_to)   params = params.set('date_to',   filters.date_to);
 
-    return this.http.get<{ data: AuditLog[] }>(AUDIT.logs, { params }).pipe(
-      map(res => res.data ?? [])
-    );
+    // The apiUnwrapInterceptor already unwraps {success, data} → bare array.
+    return this.http.get<AuditLog[]>(AUDIT.logs, { params });
   }
 }
