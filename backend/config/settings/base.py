@@ -29,6 +29,8 @@ NODE_ID    = env("NODE_ID", default="")                   # uuid unique de l'ins
 NODE_AGENCY_ID = env("NODE_AGENCY_ID", default="")        # agence servie (nœud agence)
 SYNC_MASTER_URL = env("SYNC_MASTER_URL", default="")      # URL du master (nœud agence)
 SYNC_TOKEN = env("SYNC_TOKEN", default="")                # jeton d'authentification inter-instances
+SYNC_HEARTBEAT_TTL = env.int("SYNC_HEARTBEAT_TTL", default=90)   # s — fraîcheur présence agence
+SYNC_JOB_TIMEOUT = env.int("SYNC_JOB_TIMEOUT", default=15)       # s — attente réservation en ligne
 
 # ── WhatsApp Cloud API (bot de réservation) ──────────────────────────────────
 WHATSAPP_TOKEN           = env("WHATSAPP_TOKEN", default="")

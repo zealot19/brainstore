@@ -30,12 +30,12 @@ _DOWN = [
     "voyages_config.SeatingPlan",
     "voyages_config.PlanSeat",
     "voyages_pricing.Fare",
-    # departures + seat skeleton
-    "voyages_trips.Trip",
-    "voyages_trips.TripSeat",
 ]
 
 _UP = [
+    # departures + seats: owned by the origin agency (it sells offline)
+    "voyages_trips.Trip",
+    "voyages_trips.TripSeat",
     "voyages_booking.Passenger",
     "voyages_booking.Booking",
     "voyages_booking.Ticket",
