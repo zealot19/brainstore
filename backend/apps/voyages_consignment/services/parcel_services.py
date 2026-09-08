@@ -39,7 +39,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
     parcel = Parcel.objects.create(
-        company=company, reference=_parcel_reference(), status=Parcel.Status.REGISTERED,
+        company=company, agency=origin_point.agency,
+        reference=_parcel_reference(), status=Parcel.Status.REGISTERED,
         origin_point=origin_point, destination_point=destination_point, consignment_type=consignment_type,
         sender_name=sender_name, sender_phone=sender_phone, recipient_name=recipient_name,
         recipient_phone=recipient_phone, recipient_address=recipient_address,
