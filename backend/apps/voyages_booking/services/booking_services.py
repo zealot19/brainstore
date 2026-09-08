@@ -16,16 +16,16 @@ from apps.voyages_pricing.selectors.fare_selectors import resolve_fare, route_po
 _BOOKABLE = ["pending"]
 
 
-def _booking_reference():
+def _booking_reference(agency=None):
     Sequence.objects.get_or_create(
         code="BOOK", defaults={"name": "Réservations", "prefix": "BOOK", "padding": 5, "reset_yearly": True})
-    return next_number("BOOK")
+    return next_number("BOOK", agency=agency)
 
 
-def _ticket_number():
+def _ticket_number(agency=None):
     Sequence.objects.get_or_create(
         code="TKT", defaults={"name": "Billets", "prefix": "TKT", "padding": 5, "reset_yearly": True})
-    return next_number("TKT")
+    return next_number("TKT", agency=agency)
 
 
 def _assert_bookable(trip):
@@ -107,7 +107,8 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
     buyer = _resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
-        company=company, reference=_booking_reference(), status=Booking.Status.CONFIRMED,
+        company=company, reference=_booking_reference(outbound_trip.origin.agency),
+        status=Booking.Status.CONFIRMED,
         trip_type=trip_type, outbound_trip=outbound_trip,
         return_trip=return_trip if (is_round and not open_return) else None,
         return_open=open_return, buyer=buyer, channel=channel, created_by=user)
@@ -120,7 +121,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
         out_seat = _lock_seat(outbound_trip, item["outbound_seat_id"])
         out_ticket = Ticket.objects.create(
-            booking=booking, number=_ticket_number(), passenger=passenger, trip=outbound_trip,
+            booking=booking, number=_ticket_number(outbound_trip.origin.agency), passenger=passenger, trip=outbound_trip,
             trip_seat=out_seat, origin_point=outbound_trip.origin, destination_point=dest,
             direction=Ticket.Direction.OUTBOUND, fare=fare, fare_class=outbound_trip.fare_class,
             amount=fare.amount, status=Ticket.Status.SOLD, created_by=user)
@@ -135,7 +136,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
                 raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
             ret_seat = _lock_seat(return_trip, item["return_seat_id"])
             Ticket.objects.create(
-                booking=booking, number=_ticket_number(), passenger=passenger, trip=return_trip,
+                booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=passenger, trip=return_trip,
                 trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
                 direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
                 fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)
@@ -188,7 +189,7 @@ def assign_return(booking, return_trip, *, items, user):
             raise ApplicationError(_("Un billet retour existe déjà pour ce passager."))
         ret_seat = _lock_seat(return_trip, item["return_seat_id"])
         Ticket.objects.create(
-            booking=booking, number=_ticket_number(), passenger=out_ticket.passenger, trip=return_trip,
+            booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=out_ticket.passenger, trip=return_trip,
             trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
             direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
             fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)
