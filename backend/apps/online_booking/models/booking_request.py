@@ -55,6 +55,9 @@ class OnlineBookingRequest(BaseModel):
                                    choices=Status.choices, default=Status.PENDING)
     expires_at = models.DateTimeField(_("expires at"))
     source     = models.CharField(_("canal"), max_length=20, default="pwa")  # pwa | whatsapp
+    # In hub-and-spoke, the booking is authored at the origin agency (relay); its
+    # ticket number is surfaced here before the real Booking syncs up to the master.
+    ticket_number = models.CharField(_("n° billet (relais)"), max_length=40, blank=True)
 
     # ── Resulting booking (set on success) ────────────────────────────────────
     booking = models.OneToOneField("voyages_booking.Booking", verbose_name=_("booking"),

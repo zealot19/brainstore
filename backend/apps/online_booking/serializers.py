@@ -121,12 +121,14 @@ class BookingRequestStatusSerializer(serializers.ModelSerializer):
         return obj.trip_seat.seat_number if obj.trip_seat_id else ""
 
     def get_ticket(self, obj):
-        if not obj.booking_id:
-            return None
-        t = obj.booking.tickets.first()
-        if not t:
-            return None
-        return {"ticket_number": t.number, "qr_code": t.number}
+        if obj.booking_id:
+            t = obj.booking.tickets.first()
+            if t:
+                return {"ticket_number": t.number, "qr_code": t.number}
+        # Relay (hub-and-spoke): booking authored at the agency, not yet synced up.
+        if obj.ticket_number:
+            return {"ticket_number": obj.ticket_number, "qr_code": obj.ticket_number}
+        return None
 
     def get_trip_summary(self, obj):
         trip = obj.trip

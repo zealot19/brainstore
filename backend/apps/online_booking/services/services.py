@@ -84,6 +84,15 @@ def initiate_booking(
                                             id=destination_point_id).first()
                 or trip.destination)
 
+    # Hub-and-spoke: the origin agency is the seat authority — refuse online sales
+    # for its departures when it is offline (option A).
+    if getattr(settings, "SYNC_ENABLED", False) and getattr(trip.origin, "agency_id", None):
+        from apps.sync.presence import is_agency_online
+        if not is_agency_online(trip.origin.agency_id):
+            raise ApplicationError(
+                _("Réservation en ligne indisponible pour ce départ (agence hors ligne).")
+            )
+
     fare = resolve_fare(company, trip.route, trip.origin, dest, trip.fare_class,
                         trip_type="one_way")
     if not fare:
@@ -115,6 +124,11 @@ def confirm_payment(booking_request, *, operator_ref=""):
         booking_request.status = OnlineBookingRequest.Status.EXPIRED
         booking_request.save(update_fields=["status"])
         return booking_request
+
+    # Hub-and-spoke: relay to the origin agency (the seat authority) instead of
+    # creating the booking on the master.
+    if getattr(settings, "SYNC_ENABLED", False) and getattr(booking_request.trip.origin, "agency_id", None):
+        return _relay_confirm(booking_request, operator_ref=operator_ref)
 
     from apps.voyages_booking.services import create_booking
     from apps.voyages_booking.models import Booking
@@ -152,6 +166,52 @@ def confirm_payment(booking_request, *, operator_ref=""):
             notify_ticket(booking_request)
         except Exception:
             logger.exception("Notification WhatsApp du billet échouée pour %s", booking_request.id)
+    return booking_request
+
+
+def _wait_for_job(job_id, timeout):
+    """Poll a relay job until done/failed, or expire it on timeout."""
+    import time
+    from apps.sync.models import OnlineBookingJob
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        j = OnlineBookingJob.objects.filter(id=job_id).first()
+        if j and j.status in (OnlineBookingJob.DONE, OnlineBookingJob.FAILED):
+            return {"_status": j.status, **(j.result or {})}
+        time.sleep(0.5)
+    OnlineBookingJob.objects.filter(id=job_id, status=OnlineBookingJob.PENDING).update(
+        status=OnlineBookingJob.EXPIRED)
+    return None
+
+
+def _relay_confirm(booking_request, *, operator_ref=""):
+    """Enqueue a relay job for the origin agency and wait for it to author the booking."""
+    from apps.sync.models import OnlineBookingJob
+    job = OnlineBookingJob.objects.create(
+        trip_id=booking_request.trip_id,
+        agency_id=booking_request.trip.origin.agency_id,
+        passenger_name=booking_request.passenger_name,
+        passenger_phone=booking_request.passenger_phone,
+        passenger_email=booking_request.passenger_email,
+        payment_method=booking_request.payment_method,
+        payment_phone=booking_request.payment_phone,
+    )
+    result = _wait_for_job(job.id, getattr(settings, "SYNC_JOB_TIMEOUT", 15))
+    if result and result.get("_status") == OnlineBookingJob.DONE:
+        booking_request.ticket_number = result.get("ticket_number", "")
+        booking_request.status = OnlineBookingRequest.Status.PAID
+        if operator_ref:
+            booking_request.payment_operator_ref = operator_ref
+        booking_request.save(update_fields=["ticket_number", "status", "payment_operator_ref"])
+        if booking_request.source == "whatsapp":
+            try:
+                from apps.whatsapp_bot.services.tickets import notify_ticket
+                notify_ticket(booking_request)
+            except Exception:
+                logger.exception("Notification WhatsApp échouée pour %s", booking_request.id)
+    else:
+        booking_request.status = OnlineBookingRequest.Status.FAILED
+        booking_request.save(update_fields=["status"])
     return booking_request
 
 

@@ -22,7 +22,8 @@ def notify_ticket(booking_request):
     """
     booking = booking_request.booking
     ticket = booking.tickets.first() if booking else None
-    number = ticket.number if ticket else str(booking_request.id)
+    number = (getattr(booking_request, "ticket_number", "")
+              or (ticket.number if ticket else str(booking_request.id)))
     to = booking_request.passenger_phone
     trip = booking_request.trip
     seat = booking_request.trip_seat.seat_number if booking_request.trip_seat_id else "-"
