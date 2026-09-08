@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from apps.sync import registry
 from apps.sync.apply import apply_change
 from apps.sync.models import ChangeLog
+from apps.sync.schema import schema_fingerprint
 from apps.sync.serializers import entry_to_dict
 
 _PULL_BATCH = 500
@@ -22,12 +23,27 @@ class IsSyncPeer(BasePermission):
         return request.headers.get("Authorization", "") == f"Bearer {token}"
 
 
+def _schema_mismatch(request):
+    """None if the peer's schema matches ours; else a 409 Response to return."""
+    incoming = request.headers.get("X-Schema-Version", "")
+    if incoming != schema_fingerprint():
+        return Response(
+            {"detail": "Schéma incompatible entre instances : mettez à jour puis migrez "
+                       "avant de synchroniser."},
+            status=409,
+        )
+    return None
+
+
 class SyncPushView(APIView):
     """Agency → master: apply a batch of agency-owned (UP) changes."""
     authentication_classes = []  # inter-instance token, not JWT
     permission_classes = [IsSyncPeer]
 
     def post(self, request):
+        mismatch = _schema_mismatch(request)
+        if mismatch:
+            return mismatch
         changes = request.data.get("changes", []) or []
         applied = 0
         for entry in changes:
@@ -46,6 +62,9 @@ class SyncSnapshotView(APIView):
     permission_classes = [IsSyncPeer]
 
     def get(self, request):
+        mismatch = _schema_mismatch(request)
+        if mismatch:
+            return mismatch
         from apps.sync.snapshot import full_down_snapshot
         entries = full_down_snapshot()
         cursor = ChangeLog.objects.order_by("-id").values_list("id", flat=True).first() or 0
@@ -58,6 +77,9 @@ class SyncPullView(APIView):
     permission_classes = [IsSyncPeer]
 
     def get(self, request):
+        mismatch = _schema_mismatch(request)
+        if mismatch:
+            return mismatch
         try:
             since = int(request.query_params.get("since", 0))
         except (TypeError, ValueError):
