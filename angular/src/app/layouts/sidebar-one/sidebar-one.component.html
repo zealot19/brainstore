@@ -79,7 +79,7 @@
    
 
           <li  class="submenu-open">
-            <h6 class="submenu-hdr">{{ mainMenus.tittle }}</h6>
+            <h6 class="submenu-hdr">{{ mainMenus.tittle | navLabel }}</h6>
             <ul>
               @for(menu of mainMenus.menu;track menu){
                 @if(menu.hasSubRoute===true){
@@ -93,7 +93,7 @@
                     @if (menu.icon2){
                     <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
-                    <span>{{menu.menuValue}}</span>
+                    <span>{{menu.menuValue | navLabel}}</span>
                     <span class="menu-arrow"></span>
                   </a>
                   <ul [ngClass]="
@@ -106,12 +106,12 @@
                       @if(subMenu.hasSubRouteTwo2===true){
 											<li class="submenu submenu-two">
 												<a [routerLink]="subMenu.route" [class.active]="page===subMenu.page" (click)="openSubmenuOne(subMenu)" [class.active]="page===subMenu.page"
-                        [ngClass]="{ subdrop: openSubmenuOneItem === subMenu }">{{subMenu.menuValue}}<span class="menu-arrow inside-submenu"></span></a>
+                        [ngClass]="{ subdrop: openSubmenuOneItem === subMenu }">{{subMenu.menuValue | navLabel}}<span class="menu-arrow inside-submenu"></span></a>
                         												<ul [ngClass]="
                                                 openSubmenuOneItem === subMenu ? 'd-block' : 'd-none'
                                               ">
                           @for(subMenu2 of subMenu.subMenus;track subMenu2){
-													<li><a [routerLink]="subMenu2.route" routerLinkActive="active" >{{subMenu2.menuValue}}</a></li>
+													<li><a [routerLink]="subMenu2.route" routerLinkActive="active" >{{subMenu2.menuValue | navLabel}}</a></li>
                           
                           }
 												</ul>
@@ -119,10 +119,10 @@
                     }
                     @else{
                       @if(subMenu.menuValue === 'POS 6' || subMenu.menuValue === 'POS 7'){
-                        <a href="https://dreamspos.dreamstechnologies.com/{{subMenu.route}}/angular/auth/login" target="_blank" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue}}</a>
+                        <a href="https://dreamspos.dreamstechnologies.com/{{subMenu.route}}/angular/auth/login" target="_blank" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue | navLabel}}</a>
                       }
                       @else{
-                        <a [routerLink]="subMenu.route" [queryParams]="subMenu.queryParams" routerLinkActive="active" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue}}</a>
+                        <a [routerLink]="subMenu.route" [queryParams]="subMenu.queryParams" routerLinkActive="active" (click)="openSubmenuOne(subMenu)">{{subMenu.menuValue | navLabel}}</a>
                       }
                         }
                       }
@@ -143,24 +143,24 @@
                     <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
                     <span>
-                      {{menu.menuValue }}</span><span class="menu-arrow"></span></a>
+                      {{menu.menuValue | navLabel}}</span><span class="menu-arrow"></span></a>
                   <ul [ngClass]="menu.showSubRoute === true ? 'show-sub-menu' : 'hide-sub-menu'">
                     @for (subMenus of menu.subMenus; track subMenus) {
                     @if (subMenus.customSubmenuTwo === false) {
-                    <li><a [routerLink]="subMenus.route" routerLinkActive="active">{{ subMenus.menuValue }}</a></li>
+                    <li><a [routerLink]="subMenus.route" routerLinkActive="active">{{ subMenus.menuValue | navLabel }}</a></li>
                     }
                     @if (subMenus.customSubmenuTwo === true) {
                     <li class="submenu submenu-two">
                       <a [routerLink]=""
                         [class.active]="page === subMenus.page1 || page === subMenus.page2 || page === subMenus.page3 || page === subMenus.page4 || page === subMenus.page5 || page === subMenus.page6 || page === subMenus.page7 || page === subMenus.page8"
                         (click)="openSubmenuOne(subMenus)" [ngClass]="{'subdrop' : openSubmenuOneItem === subMenus}">
-                        {{ subMenus.menuValue }}
+                        {{ subMenus.menuValue | navLabel }}
                         <span class="menu-arrow inside-submenu"></span>
                       </a>
                       <ul [ngClass]="openSubmenuOneItem === subMenus ? 'd-block' : 'd-none'">
                         @for (subMenuTwo of subMenus.subMenusTwo; track subMenuTwo) {
                         <li>
-                          <a [routerLink]="subMenuTwo.route" routerLinkActive="active">{{ subMenuTwo.menuValue
+                          <a [routerLink]="subMenuTwo.route" routerLinkActive="active">{{ subMenuTwo.menuValue | navLabel
                             }}</a>
                         </li>
                         }
@@ -180,7 +180,7 @@
                     @if (menu.icon2){
                     <i class="fs-16 ti ti-{{ menu.icon2 }}"></i>
                     }
-                  <span>{{menu.menuValue}}</span>
+                  <span>{{menu.menuValue | navLabel}}</span>
                     </a>
                   </li>
                 }

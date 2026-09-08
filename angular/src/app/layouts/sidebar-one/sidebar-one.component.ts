@@ -9,6 +9,7 @@ import { ConnectedOverlayScrollHandler } from 'primeng/dom';
 import { AuthService } from '../../../_api/services/auth/auth.service';
 import { PermissionService } from '../../../_api/services/auth/permission.service';
 import { Subscription, merge } from 'rxjs';
+import { NavLabelPipe } from '../../core/i18n/nav-label.pipe';
 
 
 interface MenuItem {
@@ -27,7 +28,7 @@ interface SubMenu {
     selector: 'app-sidebar-one',
     templateUrl: './sidebar-one.component.html',
     styleUrls: ['./sidebar-one.component.scss'],
-    imports: [RouterLink,CommonModule,NgScrollbar,RouterLinkActive],
+    imports: [RouterLink,CommonModule,NgScrollbar,RouterLinkActive,NavLabelPipe],
 })
 export class SidebarOneComponent implements OnDestroy {
   routes = routes;
