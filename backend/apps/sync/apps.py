@@ -5,3 +5,8 @@ class SyncConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.sync"
     verbose_name = "Synchronisation multi-instances"
+
+    def ready(self):
+        from apps.sync import registrations, capture
+        registrations.register_all()
+        capture.connect()

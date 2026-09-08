@@ -23,6 +23,7 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 FAKE_PAYMENTS = env.bool("FAKE_PAYMENTS", default=True)
 
 # ── Synchronisation multi-instances (hub-and-spoke) ───────────────────────────
+SYNC_ENABLED = env.bool("SYNC_ENABLED", default=False)   # capture CDC changes (master/agency nodes)
 NODE_ROLE  = env("NODE_ROLE", default="master")          # "master" | "agency"
 NODE_ID    = env("NODE_ID", default="")                   # uuid unique de l'instance
 NODE_AGENCY_ID = env("NODE_AGENCY_ID", default="")        # agence servie (nœud agence)
