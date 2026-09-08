@@ -9,12 +9,13 @@ import { SearchableSelectComponent } from '../../../shared/searchable-select/sea
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-voyage-expenses',
   standalone: true,
   templateUrl: './voyage-expenses.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, TranslocoModule],
 })
 export class VoyageExpensesComponent implements OnInit {
   private toast = inject(ToastService);

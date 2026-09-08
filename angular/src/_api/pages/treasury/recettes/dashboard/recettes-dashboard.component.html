@@ -1,41 +1,41 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Recettes — Tableau de bord</h4><h6>Synthèse des encaissements</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.rec_dash.title' | transloco }}</h4><h6>{{ 'treasury.rec_dash.subtitle' | transloco }}</h6></div></div>
 </div>
 
 <div class="row" *ngIf="d">
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Total du mois</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.month_total' | transloco }}</p>
           <h4>{{ d.month_total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Recette voyage</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.voyage_total' | transloco }}</p>
           <h4>{{ d.voyage_total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Recette colis</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.parcel_total' | transloco }}</p>
           <h4>{{ d.parcel_total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Recette bagage</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.baggage_total' | transloco }}</p>
           <h4>{{ d.baggage_total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Autre recette</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.other_total' | transloco }}</p>
           <h4>{{ d.other_total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>
       <div class="col-lg-3 col-sm-6 mb-3">
         <div class="card"><div class="card-body">
-          <p class="mb-1 text-muted">Total ({{ d.count }})</p>
+          <p class="mb-1 text-muted">{{ 'treasury.rec_dash.total' | transloco }} ({{ d.count }})</p>
           <h4>{{ d.total | number:'1.0-0' }} FCFA</h4>
         </div></div>
       </div>

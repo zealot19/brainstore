@@ -1,12 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IncomeService } from '../../../../services/treasury/income.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-recettes-dashboard',
   standalone: true,
   templateUrl: './recettes-dashboard.component.html',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
 })
 export class RecettesDashboardComponent implements OnInit {
   private income = inject(IncomeService);

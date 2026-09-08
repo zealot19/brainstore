@@ -1,13 +1,13 @@
-<div class="page-header"><div class="add-item d-flex"><div class="page-title"><h4>Trésorerie — Tableau de bord</h4><h6>Vue d'ensemble des liquidités</h6></div></div></div>
+<div class="page-header"><div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.dashboard.title' | transloco }}</h4><h6>{{ 'treasury.dashboard.subtitle' | transloco }}</h6></div></div></div>
 @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
 @else if (stats) {
   <div class="row g-3">
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Solde caisses</h6><h3>{{ stats.total_cash_balance }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Solde banques</h6><h3>{{ stats.total_bank_balance }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Solde total</h6><h3>{{ stats.total_balance }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Recettes du jour</h6><h3 class="text-success">{{ stats.today_income }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Dépenses du jour</h6><h3 class="text-danger">{{ stats.today_expense }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Net du jour</h6><h3>{{ stats.today_net }}</h3></div></div></div>
-    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">Sessions ouvertes</h6><h3>{{ stats.open_sessions }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.cash_balance' | transloco }}</h6><h3>{{ stats.total_cash_balance }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.bank_balance' | transloco }}</h6><h3>{{ stats.total_bank_balance }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.total_balance' | transloco }}</h6><h3>{{ stats.total_balance }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.today_income' | transloco }}</h6><h3 class="text-success">{{ stats.today_income }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.today_expense' | transloco }}</h6><h3 class="text-danger">{{ stats.today_expense }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.today_net' | transloco }}</h6><h3>{{ stats.today_net }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h6 class="text-muted">{{ 'treasury.dashboard.open_sessions' | transloco }}</h6><h3>{{ stats.open_sessions }}</h3></div></div></div>
   </div>
 }

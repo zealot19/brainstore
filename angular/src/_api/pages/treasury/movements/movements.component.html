@@ -1,35 +1,35 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Mouvements</h4><h6>Recettes et dépenses de trésorerie</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-mov-modal" *hasPermission="'treasury.transaction.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau mouvement</a></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.movement.title' | transloco }}</h4><h6>{{ 'treasury.movement.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-mov-modal" *hasPermission="'treasury.transaction.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.movement.add' | transloco }}</a></div>
 </div>
-<app-info-banner text="Chaque mouvement génère automatiquement l'écriture comptable correspondante (badge « Comptabilisé »). Les mouvements de caisse requièrent une session ouverte."></app-info-banner>
+<app-info-banner [text]="'treasury.movement.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center gap-2">
     <select [(ngModel)]="typeFilter" (ngModelChange)="load()" class="form-select w-auto">
-      <option value="">Tous types</option><option value="income">Recettes</option><option value="expense">Dépenses</option>
+      <option value="">{{ 'treasury.movement.filter_all_types' | transloco }}</option><option value="income">{{ 'treasury.movement.filter_income' | transloco }}</option><option value="expense">{{ 'treasury.movement.filter_expense' | transloco }}</option>
     </select>
   </div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Réf</th><th>Type</th><th>Catégorie</th><th>Compte</th><th>Montant</th><th>Mode</th><th>Date</th><th>Compta</th><th class="no-sort">Actions</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'treasury.common.ref' | transloco }}</th><th>{{ 'treasury.movement.f_type' | transloco }}</th><th>{{ 'treasury.movement.col_category' | transloco }}</th><th>{{ 'treasury.common.account' | transloco }}</th><th>{{ 'treasury.common.amount' | transloco }}</th><th>{{ 'treasury.movement.col_mode' | transloco }}</th><th>{{ 'treasury.common.date' | transloco }}</th><th>{{ 'treasury.movement.col_posting' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of rows | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.reference }}</td>
-              <td>@if (r.transaction_type === 'income') { <span class="badge bg-success">Recette</span> } @else { <span class="badge bg-danger">Dépense</span> }</td>
+              <td>@if (r.transaction_type === 'income') { <span class="badge bg-success">{{ 'treasury.movement.income_badge' | transloco }}</span> } @else { <span class="badge bg-danger">{{ 'treasury.movement.expense_badge' | transloco }}</span> }</td>
               <td>{{ r.category_display }}</td>
               <td>{{ r.account_label || '—' }}</td>
               <td>{{ r.amount }}</td>
               <td>{{ r.payment_display }}</td>
               <td>{{ r.transaction_date }}</td>
-              <td>@if (r.journal_entry) { <span class="badge bg-success">Comptabilisé</span> } @else { <span class="badge bg-warning">Non comptabilisé</span> }</td>
+              <td>@if (r.journal_entry) { <span class="badge bg-success">{{ 'treasury.movement.posted' | transloco }}</span> } @else { <span class="badge bg-warning">{{ 'treasury.movement.not_posted' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.transaction.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.transaction.manage'" (click)="delete(r)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun mouvement.</td></tr> }
+          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">{{ 'treasury.movement.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
@@ -37,37 +37,37 @@
   </div>
 </div>
 <div class="modal fade" id="trz-mov-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Nouveau mouvement</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.movement.add' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Type <span class="text-danger">*</span></label>
-        <select formControlName="transaction_type" (change)="onTypeChange()" class="form-select"><option value="income">Recette</option><option value="expense">Dépense</option></select>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.movement.f_type' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="transaction_type" (change)="onTypeChange()" class="form-select"><option value="income">{{ 'treasury.movement.income_badge' | transloco }}</option><option value="expense">{{ 'treasury.movement.expense_badge' | transloco }}</option></select>
       </div>
-      <div class="col-md-6 mb-3"><label class="form-label">Catégorie <span class="text-danger">*</span></label>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.movement.col_category' | transloco }} <span class="text-danger">*</span></label>
         <select formControlName="category" class="form-select">@for (c of categories; track c.value) { <option [value]="c.value">{{ c.label }}</option> }</select>
       </div>
     </div>
-    <div class="mb-3"><label class="form-label">Compte <span class="text-danger">*</span></label>
-      <select formControlName="account_type" class="form-select"><option value="cash">Caisse</option><option value="bank">Banque</option></select>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.movement.f_account' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="account_type" class="form-select"><option value="cash">{{ 'treasury.common.opt_cash' | transloco }}</option><option value="bank">{{ 'treasury.common.opt_bank' | transloco }}</option></select>
     </div>
     @if (form.value.account_type === 'cash') {
-      <div class="mb-3"><label class="form-label">Session de caisse (ouverte) <span class="text-danger">*</span></label>
-        <select formControlName="cash_session_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of openSessions; track s.id) { <option [ngValue]="s.id">{{ s.register_name }} ({{ s.opened_at | date:'short' }})</option> }</select>
-        @if (!openSessions.length) { <small class="text-danger">Aucune session ouverte — ouvrez d'abord une session.</small> }
+      <div class="mb-3"><label class="form-label">{{ 'treasury.movement.f_session' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="cash_session_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (s of openSessions; track s.id) { <option [ngValue]="s.id">{{ s.register_name }} ({{ s.opened_at | date:'short' }})</option> }</select>
+        @if (!openSessions.length) { <small class="text-danger">{{ 'treasury.movement.no_session' | transloco }}</small> }
       </div>
     } @else {
-      <div class="mb-3"><label class="form-label">Compte bancaire <span class="text-danger">*</span></label>
-        <select formControlName="bank_account_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (b of banks; track b.id) { <option [ngValue]="b.id">{{ b.bank_name }} — {{ b.account_name }}</option> }</select>
+      <div class="mb-3"><label class="form-label">{{ 'treasury.movement.f_bank' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="bank_account_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (b of banks; track b.id) { <option [ngValue]="b.id">{{ b.bank_name }} — {{ b.account_name }}</option> }</select>
       </div>
     }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount" type="number" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Mode <span class="text-danger">*</span></label>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.common.amount' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount" type="number" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.movement.col_mode' | transloco }} <span class="text-danger">*</span></label>
         <select formControlName="payment_mode" class="form-select">@for (m of paymentModes; track m.value) { <option [value]="m.value">{{ m.label }}</option> }</select>
       </div>
     </div>
-    <div class="mb-3"><label class="form-label">Date</label><input formControlName="transaction_date" type="date" class="form-control" /></div>
-    <div class="mb-3"><label class="form-label">Description</label><textarea formControlName="description" class="form-control" rows="2"></textarea></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">Enregistrer</button></div></form>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.date' | transloco }}</label><input formControlName="transaction_date" type="date" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.description' | transloco }}</label><textarea formControlName="description" class="form-control" rows="2"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ 'shared.actions.save' | transloco }}</button></div></form>
 </div></div></div>
