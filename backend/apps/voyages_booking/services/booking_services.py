@@ -35,6 +35,26 @@ def _assert_bookable(trip):
         raise ApplicationError(_("Les sièges de ce voyage ne sont pas encore générés."))
 
 
+def _assert_can_sell(user, trip):
+    """Only the origin agency may sell a departure's seats (multi-instance rule).
+
+    Exempt: system/online actor (user is None) and institution admins (manage all
+    agencies). Skipped when the departure has no owning agency (legacy/unowned).
+    """
+    if user is None or getattr(user, "is_institution_admin", False):
+        return
+    origin_agency_id = trip.origin.agency_id
+    if not origin_agency_id:
+        return
+    member_ids = set(user.agencies.values_list("id", flat=True))
+    if getattr(user, "default_agency_id", None):
+        member_ids.add(user.default_agency_id)
+    if origin_agency_id not in member_ids:
+        raise ApplicationError(
+            _("Vous ne pouvez vendre que les voyages au départ de votre agence.")
+        )
+
+
 def _resolve_passenger(company, spec, user):
     if spec.get("id"):
         p = Passenger.objects.filter(is_deleted=False, company=company, id=spec["id"]).first()
@@ -99,6 +119,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     """
     if not items:
         raise ApplicationError(_("Aucun passager sélectionné."))
+    _assert_can_sell(user, outbound_trip)
     _assert_bookable(outbound_trip)
     is_round = trip_type == Booking.TripType.ROUND_TRIP
     open_return = is_round and (return_open or not return_trip)
@@ -177,6 +198,8 @@ def assign_return(booking, return_trip, *, items, user):
     """
     if booking.trip_type != Booking.TripType.ROUND_TRIP or not booking.return_open:
         raise ApplicationError(_("Cette réservation n'a pas de retour ouvert à affecter."))
+    # The return leg leaves from the destination agency — only it may validate it.
+    _assert_can_sell(user, return_trip)
     _assert_bookable(return_trip)
     outbound_tickets = list(booking.tickets.filter(is_deleted=False, direction=Ticket.Direction.OUTBOUND))
     if len(items) != len(outbound_tickets):
