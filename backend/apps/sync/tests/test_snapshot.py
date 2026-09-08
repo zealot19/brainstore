@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 
 from apps.sync.apply import apply_change
 from apps.sync.snapshot import full_down_snapshot
+from apps.sync.schema import schema_fingerprint
 from apps.voyages_config.models import Town
 from apps.system_config.services import create_company
 
@@ -36,7 +37,8 @@ def test_snapshot_endpoint_requires_token():
 def test_snapshot_endpoint_returns_changes_and_cursor():
     c = _co("s2@x.com")
     Town.objects.create(company=c, name="Yaoundé")
-    r = APIClient().get(reverse("sync-snapshot"), HTTP_AUTHORIZATION="Bearer secret")
+    r = APIClient().get(reverse("sync-snapshot"), HTTP_AUTHORIZATION="Bearer secret",
+                        HTTP_X_SCHEMA_VERSION=schema_fingerprint())
     assert r.status_code == 200
     assert "voyages_config.town" in {e["entity"] for e in r.data["changes"]}
     assert "cursor" in r.data

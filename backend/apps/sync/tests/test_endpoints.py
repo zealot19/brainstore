@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from apps.sync.capture import snapshot
+from apps.sync.schema import schema_fingerprint
 from apps.voyages_config.models import Town
 from apps.system_config.services import create_company
 
@@ -16,7 +17,8 @@ def _cfg(settings):
 
 
 def _auth():
-    return {"HTTP_AUTHORIZATION": "Bearer secret"}
+    return {"HTTP_AUTHORIZATION": "Bearer secret",
+            "HTTP_X_SCHEMA_VERSION": schema_fingerprint()}
 
 
 def _co(email):
