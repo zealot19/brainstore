@@ -29,6 +29,16 @@ class ChangeLog(models.Model):
         return f"{self.op} {self.entity}:{self.object_id}"
 
 
+class AgencyPresence(models.Model):
+    """Master-side liveness of each agency node (for online seat-authority relay)."""
+    agency = models.OneToOneField("system_config.Agency", on_delete=models.CASCADE,
+                                  related_name="sync_presence")
+    last_seen = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.agency_id} @ {self.last_seen}"
+
+
 class SyncCursor(models.Model):
     """Agency-side watermark: last ChangeLog id pulled from the master."""
     pull_cursor = models.BigIntegerField(default=0)

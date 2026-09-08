@@ -35,6 +35,23 @@ def _schema_mismatch(request):
     return None
 
 
+class SyncHeartbeatView(APIView):
+    """Agency → master: liveness ping (for online seat-authority relay)."""
+    authentication_classes = []
+    permission_classes = [IsSyncPeer]
+
+    def post(self, request):
+        mismatch = _schema_mismatch(request)
+        if mismatch:
+            return mismatch
+        from apps.sync.presence import touch
+        agency_id = request.data.get("agency_id")
+        if not agency_id:
+            return Response({"detail": "agency_id requis."}, status=400)
+        touch(agency_id)
+        return Response({"ok": True})
+
+
 class SyncPushView(APIView):
     """Agency → master: apply a batch of agency-owned (UP) changes."""
     authentication_classes = []  # inter-instance token, not JWT
