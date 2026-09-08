@@ -116,6 +116,10 @@ class LogoutView(APIView):
         payload = LogoutInputSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         services.logout_user(payload.validated_data["refresh"])
+        from apps.core.services.audit_service import log_action
+        log_action(user=request.user, action="LOGOUT", module="AUTH",
+                   description="Déconnexion", ip_address=_get_client_ip(request),
+                   company=getattr(request.user, "company", None))
         return success_response(message=_("Déconnexion réussie."))
 
 
