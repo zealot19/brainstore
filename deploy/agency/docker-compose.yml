@@ -1,0 +1,46 @@
+# Per-agency stack (hub-and-spoke sync). Copy .env.example → .env and fill it in.
+# One-time seed:  docker compose run --rm web python manage.py bootstrap_from_master
+# Build context is the repo's backend/ (its Dockerfile).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - agency_pgdata:/var/lib/postgresql/data
+
+  web:
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    # Dockerfile CMD already runs `migrate` then gunicorn.
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    depends_on:
+      - db
+
+  # Push agency transactions up + pull master config down.
+  sync_worker:
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py sync_once || true; sleep ${SYNC_INTERVAL:-90}; done'
+    depends_on:
+      - db
+      - web
+
+  # Heartbeat + fulfil online-booking relay jobs (PWA + WhatsApp bot).
+  reserve_worker:
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py reserve_worker || true; sleep ${RESERVE_INTERVAL:-20}; done'
+    depends_on:
+      - db
+      - web
+
+volumes:
+  agency_pgdata:
