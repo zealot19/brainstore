@@ -1,7 +1,10 @@
 from django.conf import settings
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from apps.core.permissions import IsInstitutionAdmin
+from apps.core.responses import success_response
 
 from apps.sync import registry
 from apps.sync.apply import apply_change
@@ -33,6 +36,15 @@ def _schema_mismatch(request):
             status=409,
         )
     return None
+
+
+class SyncStatusView(APIView):
+    """Admin monitoring: agency presence, relay-job counts, recent failures."""
+    permission_classes = [IsAuthenticated, IsInstitutionAdmin]
+
+    def get(self, request):
+        from apps.sync.status import sync_status
+        return success_response(sync_status())
 
 
 class SyncHeartbeatView(APIView):
