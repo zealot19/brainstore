@@ -1,0 +1,37 @@
+{
+  "shared": {
+    "actions": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "add": "Ajouter",
+      "search": "Rechercher",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "back": "Retour",
+      "export": "Exporter",
+      "print": "Imprimer"
+    },
+    "validation": {
+      "required": "Ce champ est obligatoire.",
+      "email": "Adresse e-mail invalide.",
+      "min_length": "Trop court.",
+      "max_length": "Trop long."
+    },
+    "common": {
+      "yes": "Oui",
+      "no": "Non",
+      "loading": "Chargement…",
+      "no_data": "Aucune donnée",
+      "all": "Tous"
+    },
+    "language": {
+      "label": "Langue",
+      "fr": "Français",
+      "en": "English",
+      "es": "Español",
+      "pt": "Português"
+    }
+  }
+}

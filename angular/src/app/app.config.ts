@@ -10,11 +10,15 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgxMaskModule } from 'ngx-mask';
 
+import { provideTransloco } from '@jsverse/transloco';
+
 import { routes } from './app.routes';
 import { jwtInterceptor }      from '../_api/interceptors/jwt.interceptor';
 import { errorInterceptor }    from '../_api/interceptors/error.interceptor';
 import { apiUnwrapInterceptor } from '../_api/interceptors/api-unwrap.interceptor';
 import { AuthService }          from '../_api/services/auth/auth.service';
+import { TranslocoHttpLoader } from './core/i18n/transloco-loader';
+import { TRANSLOCO_APP_CONFIG } from './core/i18n/transloco.config';
 
 
 export const appConfig: ApplicationConfig = {
@@ -24,6 +28,10 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(BsDatepickerModule),
     provideAnimations(),
     provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor, apiUnwrapInterceptor])),
+    provideTransloco({
+      config: TRANSLOCO_APP_CONFIG,
+      loader: TranslocoHttpLoader,
+    }),
     NgxMaskModule.forRoot({ showMaskTyped: false }).providers!,
     // Rafraîchit silencieusement le profil utilisateur au démarrage
     {
