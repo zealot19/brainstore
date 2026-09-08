@@ -27,3 +27,15 @@ class ChangeLog(models.Model):
 
     def __str__(self):
         return f"{self.op} {self.entity}:{self.object_id}"
+
+
+class SyncCursor(models.Model):
+    """Agency-side watermark: last ChangeLog id pulled from the master."""
+    pull_cursor = models.BigIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
