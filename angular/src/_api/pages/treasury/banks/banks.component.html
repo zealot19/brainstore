@@ -1,15 +1,15 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Comptes bancaires</h4><h6>Comptes en banque de l'institution</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-bank-modal" *hasPermission="'treasury.bank.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau compte</a></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.bank.title' | transloco }}</h4><h6>{{ 'treasury.bank.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-bank-modal" *hasPermission="'treasury.bank.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.bank.add' | transloco }}</a></div>
 </div>
-<app-info-banner text="Liez chaque compte bancaire à un compte de trésorerie (52x) et à un journal de banque pour l'imputation comptable automatique."></app-info-banner>
+<app-info-banner [text]="'treasury.bank.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
-  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher…" /></div></div></div>
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'treasury.common.search_ph' | transloco" /></div></div></div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Banque</th><th>Intitulé</th><th>N° compte</th><th>Solde</th><th>Compte</th><th>Journal</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'treasury.bank.col_bank' | transloco }}</th><th>{{ 'treasury.bank.col_name' | transloco }}</th><th>{{ 'treasury.bank.col_number' | transloco }}</th><th>{{ 'treasury.common.balance' | transloco }}</th><th>{{ 'treasury.common.account' | transloco }}</th><th>{{ 'treasury.common.journal' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
@@ -19,13 +19,13 @@
               <td>{{ r.current_balance }}</td>
               <td>{{ r.account_code || '—' }}</td>
               <td>{{ r.journal_code || '—' }}</td>
-              <td>@if (r.is_active) { <span class="badge bg-success">Actif</span> } @else { <span class="badge bg-secondary">Inactif</span> }</td>
+              <td>@if (r.is_active) { <span class="badge bg-success">{{ 'treasury.bank.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'treasury.bank.inactive' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-bank-modal" *hasPermission="'treasury.bank.manage'" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
-                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.bank.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
+                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-bank-modal" *hasPermission="'treasury.bank.manage'" (click)="openEdit(r)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.bank.manage'" (click)="delete(r)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun compte bancaire.</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'treasury.bank.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -33,22 +33,22 @@
   </div>
 </div>
 <div class="modal fade" id="trz-bank-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le compte' : 'Nouveau compte' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'treasury.bank.edit_title' : 'treasury.bank.add') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Banque <span class="text-danger">*</span></label><input formControlName="bank_name" type="text" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Intitulé <span class="text-danger">*</span></label><input formControlName="account_name" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.bank.col_bank' | transloco }} <span class="text-danger">*</span></label><input formControlName="bank_name" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.bank.col_name' | transloco }} <span class="text-danger">*</span></label><input formControlName="account_name" type="text" class="form-control" /></div>
     </div>
-    <div class="mb-3"><label class="form-label">N° de compte <span class="text-danger">*</span></label><input formControlName="account_number" type="text" class="form-control" /></div>
-    <div class="mb-3"><label class="form-label">Compte comptable (52x)</label>
-      <select formControlName="account_id" class="form-select"><option [ngValue]="null">— Aucun —</option>@for (a of accounts; track a.id) { <option [ngValue]="a.id">{{ a.code }} — {{ a.name }}</option> }</select>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.bank.f_number' | transloco }} <span class="text-danger">*</span></label><input formControlName="account_number" type="text" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.bank.f_account' | transloco }}</label>
+      <select formControlName="account_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.none_m' | transloco }}</option>@for (a of accounts; track a.id) { <option [ngValue]="a.id">{{ a.code }} — {{ a.name }}</option> }</select>
     </div>
-    <div class="mb-3"><label class="form-label">Journal de banque</label>
-      <select formControlName="journal_id" class="form-select"><option [ngValue]="null">— Aucun —</option>@for (j of journals; track j.id) { <option [ngValue]="j.id">{{ j.code }} — {{ j.name }}</option> }</select>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.bank.f_journal' | transloco }}</label>
+      <select formControlName="journal_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.none_m' | transloco }}</option>@for (j of journals; track j.id) { <option [ngValue]="j.id">{{ j.code }} — {{ j.name }}</option> }</select>
     </div>
-    @if (!editId) { <div class="mb-3"><label class="form-label">Solde d'ouverture</label><input formControlName="opening_balance" type="number" class="form-control" /></div> }
-    @if (editId) { <div class="form-check form-switch mb-3"><input formControlName="is_active" type="checkbox" class="form-check-input" id="trz-bank-active" /><label class="form-check-label" for="trz-bank-active">Actif</label></div> }
-    <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ editId ? 'Enregistrer' : 'Créer' }}</button></div></form>
+    @if (!editId) { <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input formControlName="opening_balance" type="number" class="form-control" /></div> }
+    @if (editId) { <div class="form-check form-switch mb-3"><input formControlName="is_active" type="checkbox" class="form-check-input" id="trz-bank-active" /><label class="form-check-label" for="trz-bank-active">{{ 'treasury.bank.active' | transloco }}</label></div> }
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>
