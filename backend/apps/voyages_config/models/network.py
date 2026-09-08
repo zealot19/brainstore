@@ -38,6 +38,16 @@ class ServicePoint(_CompanyScoped):
         verbose_name = _("point de service")
         ordering = ["town__name", "name"]
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        super().clean()
+        # Départs de synchronisation multi-instances : une gare/agence doit être
+        # rattachée à une agence (le propriétaire des voyages qui en partent).
+        if self.is_station and not self.agency_id:
+            raise ValidationError(
+                {"agency": _("Une gare/agence doit être rattachée à une agence.")}
+            )
+
     def __str__(self):
         return f"{self.name} ({self.code})"
 
