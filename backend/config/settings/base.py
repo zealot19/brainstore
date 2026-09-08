@@ -22,6 +22,14 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 # Paiements simulés (v1 réservation en ligne / bot WhatsApp) — passer à False pour Campay réel.
 FAKE_PAYMENTS = env.bool("FAKE_PAYMENTS", default=True)
 
+# ── Synchronisation multi-instances (hub-and-spoke) ───────────────────────────
+SYNC_ENABLED = env.bool("SYNC_ENABLED", default=False)   # capture CDC changes (master/agency nodes)
+NODE_ROLE  = env("NODE_ROLE", default="master")          # "master" | "agency"
+NODE_ID    = env("NODE_ID", default="")                   # uuid unique de l'instance
+NODE_AGENCY_ID = env("NODE_AGENCY_ID", default="")        # agence servie (nœud agence)
+SYNC_MASTER_URL = env("SYNC_MASTER_URL", default="")      # URL du master (nœud agence)
+SYNC_TOKEN = env("SYNC_TOKEN", default="")                # jeton d'authentification inter-instances
+
 # ── WhatsApp Cloud API (bot de réservation) ──────────────────────────────────
 WHATSAPP_TOKEN           = env("WHATSAPP_TOKEN", default="")
 WHATSAPP_PHONE_NUMBER_ID = env("WHATSAPP_PHONE_NUMBER_ID", default="")
@@ -95,6 +103,8 @@ LOCAL_APPS = [
     "apps.online_booking",
     # ── Bot WhatsApp (canal de réservation) ──
     "apps.whatsapp_bot",
+    # ── Synchronisation multi-instances (hub-and-spoke) ──
+    "apps.sync",
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ──
     "apps.sync_scig_sage",
 ]

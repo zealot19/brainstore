@@ -62,6 +62,9 @@ urlpatterns = [
     # ── Bot WhatsApp (webhook Cloud API) ────────────────────────────────────────
     path("whatsapp/",   include("apps.whatsapp_bot.urls")),
 
+    # ── Synchronisation multi-instances (push/pull inter-instances) ─────────────
+    path("sync/",       include("apps.sync.urls")),
+
     # ── Reporting (états PDF/Excel/CSV) ────────────────────────────────────────
     path("reporting/",  include("apps.reporting.urls")),
 
