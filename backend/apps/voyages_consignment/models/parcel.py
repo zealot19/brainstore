@@ -13,6 +13,9 @@ class Parcel(BaseModel):
 
     company           = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                            on_delete=models.CASCADE, related_name="voyages_parcels")
+    agency            = models.ForeignKey("system_config.Agency", verbose_name=_("agence"),
+                                           on_delete=models.SET_NULL, null=True, blank=True,
+                                           related_name="voyages_parcels")
     reference         = models.CharField(_("référence"), max_length=40, blank=True)
     status            = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.REGISTERED)
     origin_point      = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("point de départ"),

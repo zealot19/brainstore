@@ -179,8 +179,9 @@ def create_transaction(
             raise ApplicationError(_("Un compte bancaire est requis pour un règlement par banque."))
 
     reference = _next_ref(Transaction, company, "TXN")
+    agency = cash_session.cash_register.agency if cash_session else None
     txn = Transaction.objects.create(
-        company=company, reference=reference,
+        company=company, agency=agency, reference=reference,
         transaction_type=transaction_type, category=category,
         account_type=account_type,
         cash_session=cash_session, bank_account=bank_account,

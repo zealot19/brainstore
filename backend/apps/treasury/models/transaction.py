@@ -42,6 +42,9 @@ class Transaction(BaseModel):
 
     company          = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                           on_delete=models.CASCADE, related_name="transactions")
+    agency           = models.ForeignKey("system_config.Agency", verbose_name=_("agence"),
+                                          on_delete=models.SET_NULL, null=True, blank=True,
+                                          related_name="transactions")
     reference        = models.CharField(_("reference"), max_length=30, blank=True)
     transaction_type = models.CharField(_("type"), max_length=10, choices=Type.choices)
     category         = models.CharField(_("category"), max_length=30, choices=Category.choices)
