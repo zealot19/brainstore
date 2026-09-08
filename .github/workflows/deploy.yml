@@ -28,9 +28,45 @@ jobs:
           DJANGO_SETTINGS_MODULE: config.settings.local
         run: python -m pytest -q
 
+  # ── 1b. Migrations sur Postgres (barrière : attrape les casts type/DDL que
+  #        SQLite tolère mais que Postgres refuse — ex. bigint→uuid) ───────────
+  migrations-postgres:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: erp_ci
+          POSTGRES_USER: erp_ci
+          POSTGRES_PASSWORD: erp_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U erp_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements/local.txt
+      - name: makemigrations --check + migrate (Postgres)
+        env:
+          SECRET_KEY: ci-test-secret-key
+          DJANGO_SETTINGS_MODULE: config.settings.local
+          DATABASE_URL: postgres://erp_ci:erp_ci@localhost:5432/erp_ci
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate --noinput
+
   # ── 2. Déploiement backend → Railway ────────────────────────────────────────
   deploy-backend:
-    needs: test
+    needs: [test, migrations-postgres]
     if: github.repository == 'zealot19/brainstore'
     runs-on: ubuntu-latest
     defaults:
@@ -50,7 +86,7 @@ jobs:
 
   # ── 3. Déploiement frontend → Vercel ────────────────────────────────────────
   deploy-frontend:
-    needs: test
+    needs: [test, migrations-postgres]
     if: github.repository == 'zealot19/brainstore'
     runs-on: ubuntu-latest
     defaults:
