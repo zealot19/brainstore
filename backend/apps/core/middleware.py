@@ -68,3 +68,82 @@ class TenantMiddleware:
             "agency_id":  token.get("agency_id"),
             "user_id":    token.get("user_id"),
         }
+
+
+# ── Journalisation d'audit automatique ────────────────────────────────────────
+_MUTATIONS = {"POST": "CREATE", "PUT": "UPDATE", "PATCH": "UPDATE", "DELETE": "DELETE"}
+_AUDIT_SKIP_PREFIXES = ("/api/v1/auth/", "/api/v1/sync/", "/api/v1/audit/")
+
+
+def _audit_client_ip(request):
+    xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+def _audit_module_for_path(path):
+    p = path[len("/api/v1/"):]
+    parts = p.split("/")
+    seg = parts[0] if parts else ""
+    two = "/".join(parts[:2])
+    if seg == "treasury":
+        return "TREASURY"
+    if two == "voyages/booking" or seg == "ticketing":
+        return "TICKETING"
+    if two == "voyages/consignment" or seg in ("parcels", "parcel"):
+        return "PARCELS"
+    if seg in ("voyage", "voyages"):
+        return "VOYAGE"
+    if seg in ("fleet", "fleet-config"):
+        return "FLEET"
+    if seg == "rbac":
+        return "RBAC"
+    if seg == "users":
+        return "USERS"
+    return "SYSTEM"
+
+
+class AuditMiddleware:
+    """Journalise chaque action modifiante (POST/PUT/PATCH/DELETE réussie) d'un
+    utilisateur authentifié par JWT — couverture globale du journal d'audit.
+
+    Les endpoints /auth/ (journalisés explicitement), /sync/ (inter-instances) et
+    /audit/ (lecture) sont exclus. Silencieux en cas d'erreur.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        try:
+            self._log(request, response)
+        except Exception:
+            pass
+        return response
+
+    def _log(self, request, response):
+        action = _MUTATIONS.get(request.method)
+        if not action or response.status_code >= 400:
+            return
+        path = request.path
+        if not path.startswith("/api/v1/") or any(path.startswith(s) for s in _AUDIT_SKIP_PREFIXES):
+            return
+
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+        try:
+            result = JWTAuthentication().authenticate(request)
+        except Exception:
+            result = None
+        if not result:
+            return
+        user = result[0]
+
+        from apps.core.services.audit_service import log_action
+        log_action(
+            user=user, action=action, module=_audit_module_for_path(path),
+            description=f"{request.method} {path}",
+            ip_address=_audit_client_ip(request),
+            company=getattr(user, "company", None),
+        )
