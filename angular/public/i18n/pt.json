@@ -1,37 +1,53 @@
 {
   "shared": {
     "actions": {
-      "save": "Enregistrer",
-      "cancel": "Annuler",
-      "delete": "Supprimer",
-      "edit": "Modifier",
-      "add": "Ajouter",
-      "search": "Rechercher",
-      "close": "Fermer",
-      "confirm": "Confirmer",
-      "back": "Retour",
-      "export": "Exporter",
-      "print": "Imprimer"
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "add": "Adicionar",
+      "search": "Pesquisar",
+      "close": "Fechar",
+      "confirm": "Confirmar",
+      "back": "Voltar",
+      "export": "Exportar",
+      "print": "Imprimir"
     },
     "validation": {
-      "required": "Ce champ est obligatoire.",
-      "email": "Adresse e-mail invalide.",
-      "min_length": "Trop court.",
-      "max_length": "Trop long."
+      "required": "Este campo é obrigatório.",
+      "email": "Endereço de e-mail inválido.",
+      "min_length": "Demasiado curto.",
+      "max_length": "Demasiado longo."
     },
     "common": {
-      "yes": "Oui",
-      "no": "Non",
-      "loading": "Chargement…",
-      "no_data": "Aucune donnée",
-      "all": "Tous"
+      "yes": "Sim",
+      "no": "Não",
+      "loading": "A carregar…",
+      "no_data": "Sem dados",
+      "all": "Todos"
     },
     "language": {
-      "label": "Langue",
+      "label": "Idioma",
       "fr": "Français",
       "en": "English",
       "es": "Español",
       "pt": "Português"
+    },
+    "nav": {
+      "dashboard": "Painel",
+      "hr": "Recursos humanos",
+      "fleet": "Frota",
+      "voyages": "Viagens",
+      "ticketing": "Bilhética",
+      "parcels": "Encomendas",
+      "treasury": "Tesouraria",
+      "accounting": "Contabilidade",
+      "users": "Utilizadores",
+      "rbac": "Perfis e permissões",
+      "config": "Configuração",
+      "audit": "Registo de auditoria",
+      "logout": "Terminar sessão",
+      "profile": "O meu perfil"
     }
   }
 }

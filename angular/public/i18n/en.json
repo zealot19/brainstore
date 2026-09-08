@@ -32,6 +32,22 @@
       "en": "English",
       "es": "Español",
       "pt": "Português"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "hr": "Human Resources",
+      "fleet": "Fleet",
+      "voyages": "Trips",
+      "ticketing": "Ticketing",
+      "parcels": "Parcels",
+      "treasury": "Treasury",
+      "accounting": "Accounting",
+      "users": "Users",
+      "rbac": "Roles & Permissions",
+      "config": "Configuration",
+      "audit": "Audit Log",
+      "logout": "Log out",
+      "profile": "My Profile"
     }
   }
 }

@@ -6,12 +6,13 @@ import { AuthService } from '../.././../_api/services/auth/auth.service';
 import { HasModuleDirective } from '../../shared/directives/has-module.directive';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective, LanguageSwitcherComponent],
+  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective, LanguageSwitcherComponent, TranslocoModule],
 })
 export class HeaderComponent {
   routes = routes;

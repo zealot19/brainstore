@@ -7,7 +7,7 @@ import pt from '../../../../../public/i18n/pt.json';
 export function getTranslocoModule(options: TranslocoTestingOptions = {}) {
   return TranslocoTestingModule.forRoot({
     langs: { fr, en, es, pt },
-    translocoConfig: { availableLangs: ['fr', 'en', 'es', 'pt'], defaultLang: 'fr' },
+    translocoConfig: { availableLangs: ['fr', 'en', 'es', 'pt'], defaultLang: 'fr', reRenderOnLangChange: true },
     preloadLangs: true,
     ...options,
   });
