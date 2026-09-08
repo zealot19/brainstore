@@ -210,4 +210,4 @@ def expire_stale_requests():
     return (OnlineBookingRequest.objects
             .filter(status=OnlineBookingRequest.Status.PENDING,
                     expires_at__lt=timezone.now())
-            .update(status=OnlineBookingRequest.Status.EXPIRED))
+            .update(status=OnlineBookingRequest.Status.EXPIRED, updated_at=timezone.now()))

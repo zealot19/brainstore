@@ -38,7 +38,7 @@ class Profile(BaseModel):
         return f"{self.name} [{scope}]"
 
 
-class ProfileRole(models.Model):
+class ProfileRole(BaseModel):
     """Table de jointure Profile ↔ Role."""
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="profile_roles")
     role    = models.ForeignKey("admin_rbac.Role", on_delete=models.CASCADE)

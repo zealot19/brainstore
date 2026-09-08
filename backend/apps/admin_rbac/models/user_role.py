@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from apps.core.models import BaseModel
 
 
-class UserRole(models.Model):
+class UserRole(BaseModel):
     """
     Attribution directe d'un rôle à un utilisateur (en dehors du profil).
     Peut être limité à une agence et avoir une date d'expiration.
@@ -49,7 +50,7 @@ class UserRole(models.Model):
         return timezone.now() > self.expires_at
 
 
-class UserProfile(models.Model):
+class UserProfile(BaseModel):
     """Lien entre un utilisateur et son profil dans une institution."""
     user    = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_("utilisateur"),

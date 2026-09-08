@@ -16,16 +16,16 @@ from apps.voyages_pricing.selectors.fare_selectors import resolve_fare, route_po
 _BOOKABLE = ["pending"]
 
 
-def _booking_reference():
+def _booking_reference(agency=None):
     Sequence.objects.get_or_create(
         code="BOOK", defaults={"name": "Réservations", "prefix": "BOOK", "padding": 5, "reset_yearly": True})
-    return next_number("BOOK")
+    return next_number("BOOK", agency=agency)
 
 
-def _ticket_number():
+def _ticket_number(agency=None):
     Sequence.objects.get_or_create(
         code="TKT", defaults={"name": "Billets", "prefix": "TKT", "padding": 5, "reset_yearly": True})
-    return next_number("TKT")
+    return next_number("TKT", agency=agency)
 
 
 def _assert_bookable(trip):
@@ -33,6 +33,26 @@ def _assert_bookable(trip):
         raise ApplicationError(_("Le voyage doit être soumis avant toute réservation (les brouillons ne sont pas réservables)."))
     if not TripSeat.objects.filter(is_deleted=False, trip=trip).exists():
         raise ApplicationError(_("Les sièges de ce voyage ne sont pas encore générés."))
+
+
+def _assert_can_sell(user, trip):
+    """Only the origin agency may sell a departure's seats (multi-instance rule).
+
+    Exempt: system/online actor (user is None) and institution admins (manage all
+    agencies). Skipped when the departure has no owning agency (legacy/unowned).
+    """
+    if user is None or getattr(user, "is_institution_admin", False):
+        return
+    origin_agency_id = trip.origin.agency_id
+    if not origin_agency_id:
+        return
+    member_ids = set(user.agencies.values_list("id", flat=True))
+    if getattr(user, "default_agency_id", None):
+        member_ids.add(user.default_agency_id)
+    if origin_agency_id not in member_ids:
+        raise ApplicationError(
+            _("Vous ne pouvez vendre que les voyages au départ de votre agence.")
+        )
 
 
 def _resolve_passenger(company, spec, user):
@@ -99,6 +119,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     """
     if not items:
         raise ApplicationError(_("Aucun passager sélectionné."))
+    _assert_can_sell(user, outbound_trip)
     _assert_bookable(outbound_trip)
     is_round = trip_type == Booking.TripType.ROUND_TRIP
     open_return = is_round and (return_open or not return_trip)
@@ -107,7 +128,9 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
     buyer = _resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
-        company=company, reference=_booking_reference(), status=Booking.Status.CONFIRMED,
+        company=company, agency=outbound_trip.origin.agency,
+        reference=_booking_reference(outbound_trip.origin.agency),
+        status=Booking.Status.CONFIRMED,
         trip_type=trip_type, outbound_trip=outbound_trip,
         return_trip=return_trip if (is_round and not open_return) else None,
         return_open=open_return, buyer=buyer, channel=channel, created_by=user)
@@ -120,7 +143,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
         out_seat = _lock_seat(outbound_trip, item["outbound_seat_id"])
         out_ticket = Ticket.objects.create(
-            booking=booking, number=_ticket_number(), passenger=passenger, trip=outbound_trip,
+            booking=booking, number=_ticket_number(outbound_trip.origin.agency), passenger=passenger, trip=outbound_trip,
             trip_seat=out_seat, origin_point=outbound_trip.origin, destination_point=dest,
             direction=Ticket.Direction.OUTBOUND, fare=fare, fare_class=outbound_trip.fare_class,
             amount=fare.amount, status=Ticket.Status.SOLD, created_by=user)
@@ -135,7 +158,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
                 raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
             ret_seat = _lock_seat(return_trip, item["return_seat_id"])
             Ticket.objects.create(
-                booking=booking, number=_ticket_number(), passenger=passenger, trip=return_trip,
+                booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=passenger, trip=return_trip,
                 trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
                 direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
                 fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)
@@ -175,6 +198,8 @@ def assign_return(booking, return_trip, *, items, user):
     """
     if booking.trip_type != Booking.TripType.ROUND_TRIP or not booking.return_open:
         raise ApplicationError(_("Cette réservation n'a pas de retour ouvert à affecter."))
+    # The return leg leaves from the destination agency — only it may validate it.
+    _assert_can_sell(user, return_trip)
     _assert_bookable(return_trip)
     outbound_tickets = list(booking.tickets.filter(is_deleted=False, direction=Ticket.Direction.OUTBOUND))
     if len(items) != len(outbound_tickets):
@@ -188,7 +213,7 @@ def assign_return(booking, return_trip, *, items, user):
             raise ApplicationError(_("Un billet retour existe déjà pour ce passager."))
         ret_seat = _lock_seat(return_trip, item["return_seat_id"])
         Ticket.objects.create(
-            booking=booking, number=_ticket_number(), passenger=out_ticket.passenger, trip=return_trip,
+            booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=out_ticket.passenger, trip=return_trip,
             trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
             direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
             fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)

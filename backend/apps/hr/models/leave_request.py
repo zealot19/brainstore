@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel
 
 
-class LeaveBalance(models.Model):
+class LeaveBalance(BaseModel):
     """Solde de congé d'un employé pour un type de congé et une année donnée."""
 
     employee   = models.ForeignKey("hr.Employee",  verbose_name=_("employé"),

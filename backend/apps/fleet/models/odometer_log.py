@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from apps.core.models import BaseModel
 
 
-class OdometerLog(models.Model):
+class OdometerLog(BaseModel):
     """Historique des relevés kilométriques d'un véhicule."""
 
     class Source(models.TextChoices):
@@ -19,12 +19,8 @@ class OdometerLog(models.Model):
     source     = models.CharField(_("source"), max_length=20, choices=Source.choices,
                                   default=Source.MANUAL)
     note       = models.CharField(_("note"), max_length=255, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("enregistré par"),
-                                   on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name="+")
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         verbose_name = _("relevé kilométrique")
         verbose_name_plural = _("relevés kilométriques")
         ordering = ["-date", "-created_at"]

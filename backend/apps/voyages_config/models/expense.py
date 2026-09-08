@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .base import _CompanyScoped
+from apps.core.models import BaseModel
 
 
 class ExpenseType(_CompanyScoped):
@@ -33,7 +34,7 @@ class ExpenseSchedule(_CompanyScoped):
         return f"{self.route_id} · {self.fare_class_id}"
 
 
-class ExpenseScheduleLine(models.Model):
+class ExpenseScheduleLine(BaseModel):
     schedule     = models.ForeignKey(ExpenseSchedule, on_delete=models.CASCADE, related_name="lines")
     expense_type = models.ForeignKey("voyages_config.ExpenseType", on_delete=models.PROTECT)
     amount       = models.DecimalField(_("montant"), max_digits=14, decimal_places=2)

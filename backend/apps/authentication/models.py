@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from apps.core.models import BaseModel
 
 
 class User(AbstractUser):
@@ -32,6 +33,7 @@ class User(AbstractUser):
         "system_config.Agency",
         verbose_name=_("agences"),
         through="UserAgency",
+        through_fields=("user", "agency"),
         related_name="users",
         blank=True,
     )
@@ -84,7 +86,7 @@ class User(AbstractUser):
         self.save(update_fields=["failed_login_attempts", "locked_until"])
 
 
-class UserAgency(models.Model):
+class UserAgency(BaseModel):
     """Table de liaison User ↔ Agency avec indicateur d'agence par défaut."""
     user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_agencies")
     agency     = models.ForeignKey("system_config.Agency", on_delete=models.CASCADE, related_name="agency_users")

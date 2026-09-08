@@ -194,7 +194,7 @@ def change_package(company, package_id, billing_cycle=Subscription.BillingCycle.
     # Clôturer l'ancienne souscription active
     Subscription.objects.filter(
         company=company, status=Subscription.Status.ACTIVE
-    ).update(status=Subscription.Status.CANCELLED)
+    ).update(status=Subscription.Status.CANCELLED, updated_at=timezone.now())
 
     company.package = package
     company.updated_by = updated_by
@@ -233,7 +233,7 @@ def cancel_company(company, updated_by=None):
     company.save(update_fields=["status", "updated_by", "updated_at"])
     Subscription.objects.filter(company=company, status__in=[
         Subscription.Status.ACTIVE, Subscription.Status.TRIAL
-    ]).update(status=Subscription.Status.CANCELLED)
+    ]).update(status=Subscription.Status.CANCELLED, updated_at=timezone.now())
 
 
 def start_trial(company, package_id, trial_days=30, updated_by=None):

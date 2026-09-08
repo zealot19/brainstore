@@ -37,8 +37,8 @@ class Role(BaseModel):
         return f"{self.name} [{scope}]"
 
 
-class RolePermission(models.Model):
-    """Table de jointure Role ↔ Permission (without BaseModel pour rester léger)."""
+class RolePermission(BaseModel):
+    """Table de jointure Role ↔ Permission (UUID pour la synchronisation multi-instances)."""
     role       = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="role_permissions")
     permission = models.ForeignKey("admin_rbac.Permission", on_delete=models.CASCADE)
     granted_by = models.ForeignKey(
