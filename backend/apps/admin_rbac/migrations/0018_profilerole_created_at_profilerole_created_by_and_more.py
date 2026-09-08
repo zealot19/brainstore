@@ -6,6 +6,8 @@ import uuid
 from django.conf import settings
 from django.db import migrations, models
 
+from apps.core.migration_utils import int_pk_to_uuid
+
 
 class Migration(migrations.Migration):
 
@@ -295,48 +297,8 @@ class Migration(migrations.Migration):
                 verbose_name="modifié par",
             ),
         ),
-        migrations.AlterField(
-            model_name="profilerole",
-            name="id",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                verbose_name="identifiant",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="rolepermission",
-            name="id",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                verbose_name="identifiant",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="userprofile",
-            name="id",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                verbose_name="identifiant",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="userrole",
-            name="id",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                verbose_name="identifiant",
-            ),
-        ),
+        int_pk_to_uuid("admin_rbac", "profilerole", "admin_rbac_profilerole"),
+        int_pk_to_uuid("admin_rbac", "rolepermission", "admin_rbac_rolepermission"),
+        int_pk_to_uuid("admin_rbac", "userprofile", "admin_rbac_userprofile"),
+        int_pk_to_uuid("admin_rbac", "userrole", "admin_rbac_userrole"),
     ]
