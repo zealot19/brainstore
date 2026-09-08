@@ -20,6 +20,9 @@ class Booking(BaseModel):
 
     company        = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                         on_delete=models.CASCADE, related_name="voyages_bookings")
+    agency         = models.ForeignKey("system_config.Agency", verbose_name=_("agence"),
+                                        on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name="voyages_bookings")
     reference      = models.CharField(_("référence"), max_length=40, blank=True)
     status         = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.CONFIRMED)
     trip_type      = models.CharField(_("type de voyage"), max_length=12, choices=TripType.choices, default=TripType.ONE_WAY)

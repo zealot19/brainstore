@@ -107,7 +107,8 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
     buyer = _resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
-        company=company, reference=_booking_reference(outbound_trip.origin.agency),
+        company=company, agency=outbound_trip.origin.agency,
+        reference=_booking_reference(outbound_trip.origin.agency),
         status=Booking.Status.CONFIRMED,
         trip_type=trip_type, outbound_trip=outbound_trip,
         return_trip=return_trip if (is_round and not open_return) else None,
