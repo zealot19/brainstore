@@ -1,46 +1,46 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Dépenses générales</h4><h6>Dépenses d'agence non liées à un voyage</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.exp_gen.title' | transloco }}</h4><h6>{{ 'treasury.exp_gen.subtitle' | transloco }}</h6></div></div>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gexp-modal"
-       *hasPermission="'treasury.expense.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouvelle dépense</a>
+       *hasPermission="'treasury.expense.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.exp_gen.add' | transloco }}</a>
   </div>
 </div>
 
 <div class="card mb-3"><div class="card-body">
   <div class="row g-3 align-items-end">
     <div class="col-md-3" *hasPermission="'treasury.expense.manage'">
-      <label class="form-label small mb-1">Caisse de décaissement</label>
+      <label class="form-label small mb-1">{{ 'treasury.exp_gen.disburse_register' | transloco }}</label>
       <select class="form-select" [(ngModel)]="disburseSession">
-        <option value="">Ma caisse ouverte</option>
+        <option value="">{{ 'treasury.common.my_open_register' | transloco }}</option>
         @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
       </select>
     </div>
     <div class="col-md-3">
-      <label class="form-label small mb-1">Type de dépense</label>
+      <label class="form-label small mb-1">{{ 'treasury.exp_gen.f_type' | transloco }}</label>
       <select class="form-select" [(ngModel)]="fType">
-        <option value="">Tous</option>
+        <option value="">{{ 'treasury.common.all_m' | transloco }}</option>
         @for (t of types; track t.id) { <option [value]="t.id">{{ t.name }}</option> }
-        <option value="__refund__">Remboursement</option>
+        <option value="__refund__">{{ 'treasury.exp_gen.refund' | transloco }}</option>
       </select>
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Statut</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.status' | transloco }}</label>
       <select class="form-select" [(ngModel)]="fStatus" (ngModelChange)="reload()">
-        <option value="">Toutes</option>
-        <option value="unpaid">À décaisser</option>
-        <option value="paid">Décaissées</option>
+        <option value="">{{ 'treasury.common.all_f' | transloco }}</option>
+        <option value="unpaid">{{ 'treasury.exp_gen.st_unpaid' | transloco }}</option>
+        <option value="paid">{{ 'treasury.exp_gen.st_paid' | transloco }}</option>
       </select>
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Du</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.from' | transloco }}</label>
       <input type="date" class="form-control" [(ngModel)]="fFrom" (ngModelChange)="reload()" />
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Au</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.to' | transloco }}</label>
       <input type="date" class="form-control" [(ngModel)]="fTo" (ngModelChange)="reload()" />
     </div>
     <div class="col-md-12">
-      <button class="btn btn-light" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Réinitialiser</button>
+      <button class="btn btn-light" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'treasury.common.reset' | transloco }}</button>
     </div>
   </div>
 </div></div>
@@ -50,35 +50,35 @@
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead class="table-light">
-          <tr><th>Type</th><th>Libellé</th><th>Agence</th><th>Caisse</th><th class="text-end">Montant</th><th>Date</th><th>Statut</th><th class="text-end">Actions</th></tr>
+          <tr><th>{{ 'treasury.exp_voyage.col_type' | transloco }}</th><th>{{ 'treasury.common.label' | transloco }}</th><th>{{ 'treasury.exp_gen.col_agency' | transloco }}</th><th>{{ 'treasury.session.col_register' | transloco }}</th><th class="text-end">{{ 'treasury.common.amount' | transloco }}</th><th>{{ 'treasury.common.date' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th class="text-end">{{ 'shared.common.actions' | transloco }}</th></tr>
         </thead>
         <tbody>
           @if (loading) { <tr><td colspan="8" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
           @for (e of filtered | paginate:pg.page:pg.size; track e.id) {
             <tr>
-              <td>@if (e.kind === 'refund') { <span class="badge bg-info-subtle text-info-emphasis">Remboursement</span> } @else { {{ e.expense_type_name || typeName(e.expense_type) }} }</td>
+              <td>@if (e.kind === 'refund') { <span class="badge bg-info-subtle text-info-emphasis">{{ 'treasury.exp_gen.refund' | transloco }}</span> } @else { {{ e.expense_type_name || typeName(e.expense_type) }} }</td>
               <td class="fw-medium">{{ e.label }}</td>
               <td>{{ e.agency_name || '—' }}</td>
               <td>{{ e.cash_register_name || '—' }}</td>
               <td class="text-end">{{ e.amount | number }}</td>
               <td>{{ e.expense_date | date:'dd/MM/yyyy' }}</td>
-              <td>@if (e.status === 'paid') { <span class="badge bg-success">Décaissée</span> } @else { <span class="badge bg-warning text-dark">À décaisser</span> }</td>
+              <td>@if (e.status === 'paid') { <span class="badge bg-success">{{ 'treasury.exp_gen.badge_paid' | transloco }}</span> } @else { <span class="badge bg-warning text-dark">{{ 'treasury.exp_gen.badge_unpaid' | transloco }}</span> }</td>
               <td class="text-end">
                 @if (e.kind !== 'refund') {
                   <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1"
-                     (click)="printVoucher(e)" title="Imprimer le bon de dépense"><i class="ti ti-printer"></i></a>
+                     (click)="printVoucher(e)" [title]="'treasury.exp_voyage.print_voucher' | transloco"><i class="ti ti-printer"></i></a>
                   @if (e.status !== 'paid') {
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#gexp-modal"
-                       *hasPermission="'treasury.expense.manage'" (click)="openEdit(e)" title="Modifier"><i class="ti ti-edit"></i></a>
+                       *hasPermission="'treasury.expense.manage'" (click)="openEdit(e)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit"></i></a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger me-1"
-                       *hasPermission="'treasury.expense.manage'" (click)="remove(e)" title="Supprimer"><i class="ti ti-trash"></i></a>
+                       *hasPermission="'treasury.expense.manage'" (click)="remove(e)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash"></i></a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-success"
-                       *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" title="Décaisser"><i class="ti ti-cash me-1"></i>Décaisser</a>
+                       *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" [title]="'treasury.exp_voyage.disburse' | transloco"><i class="ti ti-cash me-1"></i>{{ 'treasury.exp_voyage.disburse' | transloco }}</a>
                   }
                 } @else { <span class="text-muted small">—</span> }
               </td>
             </tr>
-          } @empty { @if (!loading) { <tr><td colspan="8" class="text-center text-muted py-3">Aucune dépense.</td></tr> } }
+          } @empty { @if (!loading) { <tr><td colspan="8" class="text-center text-muted py-3">{{ 'treasury.exp_gen.empty' | transloco }}</td></tr> } }
         </tbody>
       </table>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -88,25 +88,25 @@
 
 <!-- Modale création / édition -->
 <div class="modal fade" id="gexp-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier la dépense' : 'Nouvelle dépense' }}</h5>
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'treasury.exp_gen.edit_title' : 'treasury.exp_gen.add') | transloco }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="save()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
     <div class="mb-2">
-      <label class="form-label small">Type de dépense</label>
+      <label class="form-label small">{{ 'treasury.exp_gen.f_type' | transloco }}</label>
       <select class="form-select" formControlName="expense_type_id">
-        <option [ngValue]="null">— Type —</option>
+        <option [ngValue]="null">{{ 'treasury.exp_gen.opt_type' | transloco }}</option>
         @for (t of types; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
       </select>
     </div>
-    <div class="mb-2"><label class="form-label small">Libellé</label><input class="form-control" formControlName="label" placeholder="ex. Papier toilette x10" /></div>
+    <div class="mb-2"><label class="form-label small">{{ 'treasury.common.label' | transloco }}</label><input class="form-control" formControlName="label" [placeholder]="'treasury.exp_gen.ph_label' | transloco" /></div>
     <div class="row g-2">
-      <div class="col-6"><label class="form-label small">Montant</label><input type="number" class="form-control" formControlName="amount" min="1" /></div>
-      <div class="col-6"><label class="form-label small">Date</label><input type="date" class="form-control" formControlName="expense_date" /></div>
+      <div class="col-6"><label class="form-label small">{{ 'treasury.common.amount' | transloco }}</label><input type="number" class="form-control" formControlName="amount" min="1" /></div>
+      <div class="col-6"><label class="form-label small">{{ 'treasury.common.date' | transloco }}</label><input type="date" class="form-control" formControlName="expense_date" /></div>
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'treasury.common.saving' : 'shared.actions.save') | transloco }}</button>
   </div></form>
 </div></div></div>

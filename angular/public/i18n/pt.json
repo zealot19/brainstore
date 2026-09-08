@@ -353,7 +353,21 @@
       "opt_cash": "Caixa",
       "opt_bank": "Banco",
       "description": "Descrição",
-      "name": "Nome"
+      "name": "Nome",
+      "saving": "A guardar…",
+      "all_m": "Todos",
+      "all_f": "Todas",
+      "reset": "Repor",
+      "from": "De",
+      "to": "Até",
+      "mode_cash": "Numerário",
+      "mode_momo": "Mobile Money",
+      "mode_transfer": "Transferência",
+      "mode_check": "Cheque",
+      "my_open_register": "A minha caixa aberta",
+      "my_open_session": "A minha sessão aberta",
+      "label": "Descrição",
+      "payment_method": "Método de pagamento"
     },
     "dashboard": {
       "title": "Tesouraria — Painel",
@@ -451,6 +465,93 @@
       "col_by": "Por",
       "empty": "Sem transferências.",
       "submit": "Transferir"
+    },
+    "exp_dash": {
+      "title": "Painel de despesas",
+      "subtitle": "Viagem + gerais",
+      "to_disburse": "Por desembolsar",
+      "expense_count": "despesa(s)",
+      "paid_month": "Pago este mês",
+      "voyage_expenses": "Despesas de viagem",
+      "general_expenses": "Despesas gerais"
+    },
+    "exp_voyage": {
+      "title": "Despesas de viagem",
+      "subtitle": "Despesas ligadas às viagens (geradas pela tabela) — desembolso",
+      "f_voyage": "Viagem",
+      "all_voyages": "— Todas as viagens —",
+      "st_planned": "Previstas",
+      "st_paid": "Desembolsadas",
+      "col_type": "Tipo",
+      "badge_paid": "Desembolsada",
+      "badge_planned": "Prevista",
+      "print_voucher": "Imprimir o comprovativo de despesa",
+      "disburse": "Desembolsar",
+      "empty": "Sem despesas de viagem."
+    },
+    "exp_gen": {
+      "title": "Despesas gerais",
+      "subtitle": "Despesas de agência não ligadas a uma viagem",
+      "add": "Nova despesa",
+      "disburse_register": "Caixa de desembolso",
+      "f_type": "Tipo de despesa",
+      "refund": "Reembolso",
+      "st_unpaid": "Por desembolsar",
+      "st_paid": "Desembolsadas",
+      "col_agency": "Agência",
+      "badge_paid": "Desembolsada",
+      "badge_unpaid": "Por desembolsar",
+      "empty": "Sem despesas.",
+      "edit_title": "Editar despesa",
+      "opt_type": "— Tipo —",
+      "ph_label": "ex. Papel higiénico x10"
+    },
+    "rec_dash": {
+      "title": "Receitas — Painel",
+      "subtitle": "Síntese das cobranças",
+      "month_total": "Total do mês",
+      "voyage_total": "Receita de viagem",
+      "parcel_total": "Receita de encomendas",
+      "baggage_total": "Receita de bagagem",
+      "other_total": "Outra receita",
+      "total": "Total"
+    },
+    "rec_list": {
+      "subtitle": "Receitas cobradas",
+      "add": "Nova receita",
+      "f_voyage": "Viagem",
+      "all_voyages": "— Todas as viagens —",
+      "col_source": "Origem",
+      "col_party": "Cliente/Terceiro",
+      "col_agency": "Agência",
+      "empty": "Sem receitas.",
+      "ph_label": "ex. Venda de caixa",
+      "print_receipt": "Imprimir o recibo"
+    },
+    "pm": {
+      "title": "Métodos de pagamento",
+      "subtitle": "Configure os métodos de pagamento e se exigem pagamento",
+      "add": "Novo método",
+      "col_code": "Código",
+      "col_mode": "Modo de tesouraria",
+      "col_requires": "Exige pagamento",
+      "col_active": "Ativo",
+      "system_badge": "sistema",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "empty": "Sem métodos de pagamento.",
+      "edit_title": "Editar método",
+      "new_title": "Novo método de pagamento",
+      "f_code": "Código (opcional)",
+      "ph_code": "gerado a partir do nome se vazio",
+      "f_requires": "Exige um pagamento (regista uma receita)"
+    },
+    "refund": {
+      "title": "Reembolso",
+      "subtitle": "Taxa aplicada ao montante pago numa anulação",
+      "saved": "Taxa guardada.",
+      "label": "Taxa de reembolso (%)",
+      "hint": "0 % = sem reembolso. O reembolso sai da caixa aberta do agente."
     }
   }
 }

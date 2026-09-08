@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RefundRateService } from '../../../../services/treasury/refund-rate.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-refund-rate',
   standalone: true,
   templateUrl: './refund-rate.component.html',
-  imports: [CommonModule, FormsModule, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, TranslocoModule],
 })
 export class RefundRateComponent implements OnInit {
   private svc = inject(RefundRateService);

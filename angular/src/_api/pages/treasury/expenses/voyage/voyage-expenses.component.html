@@ -1,35 +1,35 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Dépenses voyage</h4><h6>Dépenses liées aux voyages (générées par le barème) — décaissement</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.exp_voyage.title' | transloco }}</h4><h6>{{ 'treasury.exp_voyage.subtitle' | transloco }}</h6></div></div>
 </div>
 
 <!-- Filtres / décaissement (en haut) -->
 <div class="card mb-3"><div class="card-body">
   <div class="row g-3 align-items-end">
     <div class="col-md-4">
-      <label class="form-label small mb-1">Voyage</label>
+      <label class="form-label small mb-1">{{ 'treasury.exp_voyage.f_voyage' | transloco }}</label>
       <app-searchable-select [items]="voyageOptions" labelKey="number" valueKey="id"
-        placeholder="— Tous les voyages —" [(ngModel)]="selectedVoyage"></app-searchable-select>
+        [placeholder]="'treasury.exp_voyage.all_voyages' | transloco" [(ngModel)]="selectedVoyage"></app-searchable-select>
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Statut</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.status' | transloco }}</label>
       <select class="form-select" [(ngModel)]="fStatus" (ngModelChange)="reload()">
-        <option value="">Tous</option>
-        <option value="planned">Prévues</option>
-        <option value="paid">Décaissées</option>
+        <option value="">{{ 'treasury.common.all_m' | transloco }}</option>
+        <option value="planned">{{ 'treasury.exp_voyage.st_planned' | transloco }}</option>
+        <option value="paid">{{ 'treasury.exp_voyage.st_paid' | transloco }}</option>
       </select>
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Du</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.from' | transloco }}</label>
       <input type="date" class="form-control" [(ngModel)]="fFrom" (ngModelChange)="reload()" />
     </div>
     <div class="col-md-2">
-      <label class="form-label small mb-1">Au</label>
+      <label class="form-label small mb-1">{{ 'treasury.common.to' | transloco }}</label>
       <input type="date" class="form-control" [(ngModel)]="fTo" (ngModelChange)="reload()" />
     </div>
     <div class="col-md-2" *hasPermission="'treasury.expense.manage'">
-      <label class="form-label small mb-1">Caisse</label>
+      <label class="form-label small mb-1">{{ 'treasury.session.col_register' | transloco }}</label>
       <select class="form-select" [(ngModel)]="disburseSession">
-        <option value="">Ma caisse ouverte</option>
+        <option value="">{{ 'treasury.common.my_open_register' | transloco }}</option>
         @for (s of sessions; track s.id) { <option [value]="s.id">{{ s.register_name }}@if (s.opened_by_name) { — {{ s.opened_by_name }} }</option> }
       </select>
     </div>
@@ -41,7 +41,7 @@
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead class="table-light">
-          <tr><th>Voyage</th><th>Type</th><th class="text-end">Montant</th><th>Caisse</th><th>Date</th><th>Statut</th><th class="text-end">Actions</th></tr>
+          <tr><th>{{ 'treasury.exp_voyage.f_voyage' | transloco }}</th><th>{{ 'treasury.exp_voyage.col_type' | transloco }}</th><th class="text-end">{{ 'treasury.common.amount' | transloco }}</th><th>{{ 'treasury.session.col_register' | transloco }}</th><th>{{ 'treasury.common.date' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th class="text-end">{{ 'shared.common.actions' | transloco }}</th></tr>
         </thead>
         <tbody>
           @if (loading) { <tr><td colspan="7" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr> }
@@ -52,17 +52,17 @@
               <td class="text-end">{{ e.amount | number }}</td>
               <td>{{ e.cash_register_name || '—' }}</td>
               <td>{{ e.date | date:'dd/MM/yyyy' }}</td>
-              <td>@if (e.status === 'paid') { <span class="badge bg-success">Décaissée</span> } @else { <span class="badge bg-warning text-dark">Prévue</span> }</td>
+              <td>@if (e.status === 'paid') { <span class="badge bg-success">{{ 'treasury.exp_voyage.badge_paid' | transloco }}</span> } @else { <span class="badge bg-warning text-dark">{{ 'treasury.exp_voyage.badge_planned' | transloco }}</span> }</td>
               <td class="text-end">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1"
-                   (click)="printVoucher(e)" title="Imprimer le bon de dépense"><i class="ti ti-printer"></i></a>
+                   (click)="printVoucher(e)" [title]="'treasury.exp_voyage.print_voucher' | transloco"><i class="ti ti-printer"></i></a>
                 @if (e.status === 'planned') {
                   <a href="javascript:void(0);" class="btn btn-sm btn-outline-success"
-                     *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" title="Décaisser"><i class="ti ti-cash me-1"></i>Décaisser</a>
+                     *hasPermission="'treasury.expense.manage'" (click)="disburse(e)" [title]="'treasury.exp_voyage.disburse' | transloco"><i class="ti ti-cash me-1"></i>{{ 'treasury.exp_voyage.disburse' | transloco }}</a>
                 }
               </td>
             </tr>
-          } @empty { @if (!loading) { <tr><td colspan="7" class="text-center text-muted py-3">Aucune dépense voyage.</td></tr> } }
+          } @empty { @if (!loading) { <tr><td colspan="7" class="text-center text-muted py-3">{{ 'treasury.exp_voyage.empty' | transloco }}</td></tr> } }
         </tbody>
       </table>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>

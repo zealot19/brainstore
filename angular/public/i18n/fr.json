@@ -353,7 +353,21 @@
       "opt_cash": "Caisse",
       "opt_bank": "Banque",
       "description": "Description",
-      "name": "Nom"
+      "name": "Nom",
+      "saving": "Enregistrement…",
+      "all_m": "Tous",
+      "all_f": "Toutes",
+      "reset": "Réinitialiser",
+      "from": "Du",
+      "to": "Au",
+      "mode_cash": "Espèces",
+      "mode_momo": "Mobile Money",
+      "mode_transfer": "Virement",
+      "mode_check": "Chèque",
+      "my_open_register": "Ma caisse ouverte",
+      "my_open_session": "Ma session ouverte",
+      "label": "Libellé",
+      "payment_method": "Mode de paiement"
     },
     "dashboard": {
       "title": "Trésorerie — Tableau de bord",
@@ -451,6 +465,93 @@
       "col_by": "Par",
       "empty": "Aucun transfert.",
       "submit": "Transférer"
+    },
+    "exp_dash": {
+      "title": "Tableau de bord des dépenses",
+      "subtitle": "Voyage + générales",
+      "to_disburse": "À décaisser",
+      "expense_count": "dépense(s)",
+      "paid_month": "Payé ce mois",
+      "voyage_expenses": "Dépenses voyage",
+      "general_expenses": "Dépenses générales"
+    },
+    "exp_voyage": {
+      "title": "Dépenses voyage",
+      "subtitle": "Dépenses liées aux voyages (générées par le barème) — décaissement",
+      "f_voyage": "Voyage",
+      "all_voyages": "— Tous les voyages —",
+      "st_planned": "Prévues",
+      "st_paid": "Décaissées",
+      "col_type": "Type",
+      "badge_paid": "Décaissée",
+      "badge_planned": "Prévue",
+      "print_voucher": "Imprimer le bon de dépense",
+      "disburse": "Décaisser",
+      "empty": "Aucune dépense voyage."
+    },
+    "exp_gen": {
+      "title": "Dépenses générales",
+      "subtitle": "Dépenses d'agence non liées à un voyage",
+      "add": "Nouvelle dépense",
+      "disburse_register": "Caisse de décaissement",
+      "f_type": "Type de dépense",
+      "refund": "Remboursement",
+      "st_unpaid": "À décaisser",
+      "st_paid": "Décaissées",
+      "col_agency": "Agence",
+      "badge_paid": "Décaissée",
+      "badge_unpaid": "À décaisser",
+      "empty": "Aucune dépense.",
+      "edit_title": "Modifier la dépense",
+      "opt_type": "— Type —",
+      "ph_label": "ex. Papier toilette x10"
+    },
+    "rec_dash": {
+      "title": "Recettes — Tableau de bord",
+      "subtitle": "Synthèse des encaissements",
+      "month_total": "Total du mois",
+      "voyage_total": "Recette voyage",
+      "parcel_total": "Recette colis",
+      "baggage_total": "Recette bagage",
+      "other_total": "Autre recette",
+      "total": "Total"
+    },
+    "rec_list": {
+      "subtitle": "Recettes encaissées",
+      "add": "Nouvelle recette",
+      "f_voyage": "Voyage",
+      "all_voyages": "— Tous les voyages —",
+      "col_source": "Source",
+      "col_party": "Client/Tiers",
+      "col_agency": "Agence",
+      "empty": "Aucune recette.",
+      "ph_label": "ex. Vente carton",
+      "print_receipt": "Imprimer le reçu"
+    },
+    "pm": {
+      "title": "Moyens de paiement",
+      "subtitle": "Configurez les modes de règlement et s'ils exigent un paiement",
+      "add": "Nouveau moyen",
+      "col_code": "Code",
+      "col_mode": "Mode trésorerie",
+      "col_requires": "Exige paiement",
+      "col_active": "Actif",
+      "system_badge": "système",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "empty": "Aucun moyen de paiement.",
+      "edit_title": "Modifier le moyen",
+      "new_title": "Nouveau moyen de paiement",
+      "f_code": "Code (optionnel)",
+      "ph_code": "généré depuis le nom si vide",
+      "f_requires": "Exige un paiement (enregistre une recette)"
+    },
+    "refund": {
+      "title": "Remboursement",
+      "subtitle": "Taux appliqué au montant payé lors d'une annulation",
+      "saved": "Taux enregistré.",
+      "label": "Taux de remboursement (%)",
+      "hint": "0 % = aucun remboursement. Le remboursement sort de la caisse ouverte de l'agent."
     }
   }
 }
