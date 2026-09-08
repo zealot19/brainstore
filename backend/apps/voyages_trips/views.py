@@ -272,9 +272,9 @@ class _TripSeatStatusView(APIView):
             return error_response("Voyage introuvable.", status_code=404)
         payload = S.SeatIdsSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
-        seats = trip.seats.filter(id__in=payload.validated_data["seat_ids"],
-                                  is_deleted=False, status=self.from_status)
-        count = seats.update(status=self.target, updated_by=request.user)
+        from apps.voyages_trips.services.assignment import set_seats_status
+        count = set_seats_status(trip, payload.validated_data["seat_ids"], self.target,
+                                 from_status=self.from_status, user=request.user)
         return success_response({"updated": count})
 
 

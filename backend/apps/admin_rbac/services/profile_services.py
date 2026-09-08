@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from ..models import Profile, ProfileRole, Role
@@ -11,7 +12,8 @@ def create_profile(*, name, description="", company_id=None, role_ids=None,
 
     # Un seul profil par défaut par institution
     if is_default and company_id:
-        Profile.objects.filter(company_id=company_id, is_default=True).update(is_default=False)
+        Profile.objects.filter(company_id=company_id, is_default=True).update(
+            is_default=False, updated_at=timezone.now())
 
     profile = Profile.objects.create(
         name=name, description=description,
@@ -29,7 +31,7 @@ def update_profile(profile, *, updated_by=None, **fields):
     if fields.get("is_default") and profile.company_id:
         Profile.objects.filter(
             company_id=profile.company_id, is_default=True
-        ).exclude(id=profile.id).update(is_default=False)
+        ).exclude(id=profile.id).update(is_default=False, updated_at=timezone.now())
     for k, v in fields.items():
         if k not in ("id", "is_system"):
             setattr(profile, k, v)

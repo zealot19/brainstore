@@ -118,7 +118,7 @@ def terminate_employee(employee, *, termination_date, reason: str = "", updated_
     employee.save(update_fields=["status", "termination_date", "updated_by", "updated_at"])
     # Clôturer les contrats en cours
     employee.contracts.filter(is_current=True, is_deleted=False).update(
-        is_current=False, end_date=termination_date
+        is_current=False, end_date=termination_date, updated_at=timezone.now()
     )
     return employee
 
@@ -144,7 +144,8 @@ def create_contract(
     notes: str = "",
 ):
     # Désactiver l'ancien contrat courant
-    employee.contracts.filter(is_current=True, is_deleted=False).update(is_current=False)
+    employee.contracts.filter(is_current=True, is_deleted=False).update(
+        is_current=False, updated_at=timezone.now())
 
     contract = Contract(
         employee=employee,
