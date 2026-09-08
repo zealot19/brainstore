@@ -7,6 +7,7 @@ class SyncConfig(AppConfig):
     verbose_name = "Synchronisation multi-instances"
 
     def ready(self):
-        from apps.sync import registrations, capture
+        from apps.sync import registrations, capture, guard
         registrations.register_all()
         capture.connect()
+        guard.connect()
