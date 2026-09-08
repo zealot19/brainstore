@@ -85,6 +85,10 @@ def generate_tokens(user: User, ip: str = None, user_agent: str = "") -> dict:
         expires_at=timezone.now() + timezone.timedelta(days=7),
     )
 
+    from apps.core.services.audit_service import log_action
+    log_action(user=user, action="LOGIN", module="AUTH",
+               description="Connexion", ip_address=ip, company=user.company)
+
     return {
         "access":  str(access),
         "refresh": str(refresh),
