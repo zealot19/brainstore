@@ -40,6 +40,18 @@ class SyncPushView(APIView):
         return Response({"received": len(changes), "applied": applied})
 
 
+class SyncSnapshotView(APIView):
+    """Master → new agency: full current DOWN config to seed a fresh instance."""
+    authentication_classes = []
+    permission_classes = [IsSyncPeer]
+
+    def get(self, request):
+        from apps.sync.snapshot import full_down_snapshot
+        entries = full_down_snapshot()
+        cursor = ChangeLog.objects.order_by("-id").values_list("id", flat=True).first() or 0
+        return Response({"changes": entries, "cursor": cursor})
+
+
 class SyncPullView(APIView):
     """Master → agency: DOWN (config) changes since the given cursor."""
     authentication_classes = []  # inter-instance token, not JWT

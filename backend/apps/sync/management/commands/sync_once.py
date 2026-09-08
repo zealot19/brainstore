@@ -1,27 +1,14 @@
-import json
-import urllib.error
-import urllib.request
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.sync import registry
 from apps.sync.apply import apply_change
+from apps.sync.client import request_json as _req
 from apps.sync.models import ChangeLog, SyncCursor
 from apps.sync.serializers import entry_to_dict
 
 _BATCH = 500
-
-
-def _req(url, token, method="GET", body=None):
-    data = json.dumps(body).encode() if body is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode() or "{}")
 
 
 class Command(BaseCommand):
