@@ -578,7 +578,13 @@
       "none_m": "— None —",
       "new_type": "New type",
       "edit_type": "Edit type",
-      "empty_type": "No types."
+      "empty_type": "No types.",
+      "type": "Type",
+      "route": "Route",
+      "fare_class": "Fare class",
+      "time_slot": "Time slot",
+      "valid_from": "Valid from",
+      "valid_to": "Valid to"
     },
     "towns": {
       "title": "Cities",
@@ -685,6 +691,81 @@
       "info": "Commercial classes (VIP, Classic…). Distinct from the physical seat type: a VIP class can be sold on a standard seat during a reroute.",
       "col_rank": "Rank",
       "col_color": "Color"
+    },
+    "cm": {
+      "title": "Crew members",
+      "subtitle": "Drivers, attendants, inspectors",
+      "new": "New member",
+      "info": "Roster of crew members assignable to trips. The type determines the role (including \"driver\").",
+      "col_phone": "Phone",
+      "col_license": "License no.",
+      "empty": "No members.",
+      "edit_title": "Edit member",
+      "f_first": "First name",
+      "f_last": "Last name",
+      "f_license": "License number"
+    },
+    "va": {
+      "title": "Plan assignments",
+      "subtitle": "Bus layout per vehicle (configuration history)",
+      "info": "Links a bus layout to a vehicle over a period. Keeps the history of seat reconfigurations.",
+      "col_vehicle": "Vehicle",
+      "col_plan": "Layout",
+      "new_title": "New assignment",
+      "f_plan": "Bus layout"
+    },
+    "spat": {
+      "title": "Schedules",
+      "subtitle": "Service templates (route · slot · days)",
+      "info": "Templates that pre-fill the New trip form and are used to resolve the trip (route + date + slot + vehicle). No automatic generation.",
+      "col_slot": "Slot",
+      "col_category": "Class",
+      "col_days": "Days",
+      "empty": "No schedules.",
+      "new_title": "New schedule",
+      "f_default_plan": "Default layout",
+      "days_label": "Operating days"
+    },
+    "es": {
+      "title": "Expense schedule",
+      "subtitle": "Standard costs per route and fare class",
+      "new": "New schedule",
+      "info": "Define standard costs (fuel, allowance, toll…) per route and fare class. Each trip created on this route will automatically inherit these expenses.",
+      "col_category": "Class",
+      "col_lines": "Lines",
+      "lines_count": "line(s)",
+      "empty": "No schedules.",
+      "edit_title": "Edit schedule",
+      "f_lines": "Expense lines",
+      "add": "Add",
+      "col_amount": "Amount",
+      "no_lines": "No lines."
+    },
+    "lr": {
+      "title": "Loyalty",
+      "subtitle": "Loyalty program rules",
+      "new": "New rule",
+      "info": "Configure the number of points per trip and the threshold (number of points) from which the passenger gets a free ticket.",
+      "col_pts_ow": "One-way pts",
+      "col_pts_rt": "Round-trip pts",
+      "col_threshold": "Threshold",
+      "col_reward": "Reward",
+      "f_pts_ow": "One-way points",
+      "f_pts_rt": "Round-trip points",
+      "f_threshold": "Reward threshold"
+    },
+    "set": {
+      "title": "Trips settings",
+      "subtitle": "Lead times, shifts and notifications",
+      "info": "General settings of the Trips module for your institution: departure/arrival lead times, ticket expiry, shift duration, document alerts and default notifications.",
+      "f_departure_lead": "Departure lead (h)",
+      "f_arrival_grace": "Arrival grace (h)",
+      "f_ticket_expiry": "Ticket expiry (days)",
+      "f_shift": "Shift duration (h)",
+      "f_doc_alert": "Document alert (days)",
+      "f_archive": "Archive delay (days)",
+      "f_autoprint": "Auto-print by default",
+      "f_sms": "SMS notifications by default"
     }
   }
 }

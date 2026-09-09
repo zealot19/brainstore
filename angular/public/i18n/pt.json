@@ -578,7 +578,13 @@
       "none_m": "— Nenhum —",
       "new_type": "Novo tipo",
       "edit_type": "Editar tipo",
-      "empty_type": "Sem tipos."
+      "empty_type": "Sem tipos.",
+      "type": "Tipo",
+      "route": "Rota",
+      "fare_class": "Categoria tarifária",
+      "time_slot": "Período horário",
+      "valid_from": "Válido de",
+      "valid_to": "Válido até"
     },
     "towns": {
       "title": "Cidades",
@@ -685,6 +691,81 @@
       "info": "Classes comerciais (VIP, Classic…). Distintas do tipo físico de lugar: uma classe VIP pode ser vendida num lugar padrão durante um desvio.",
       "col_rank": "Classificação",
       "col_color": "Cor"
+    },
+    "cm": {
+      "title": "Membros da tripulação",
+      "subtitle": "Motoristas, acompanhantes, fiscais",
+      "new": "Novo membro",
+      "info": "Lista de membros de tripulação atribuíveis às viagens. O tipo determina a função (incluindo «condutor»).",
+      "col_phone": "Telefone",
+      "col_license": "N.º carta",
+      "empty": "Sem membros.",
+      "edit_title": "Editar membro",
+      "f_first": "Nome próprio",
+      "f_last": "Apelido",
+      "f_license": "N.º de carta"
+    },
+    "va": {
+      "title": "Atribuições de planta",
+      "subtitle": "Planta de autocarro por veículo (histórico de configuração)",
+      "info": "Associa uma planta de autocarro a um veículo durante um período. Mantém o histórico de reconfigurações de lugares.",
+      "col_vehicle": "Veículo",
+      "col_plan": "Planta",
+      "new_title": "Nova atribuição",
+      "f_plan": "Planta de autocarro"
+    },
+    "spat": {
+      "title": "Planeamentos",
+      "subtitle": "Modelos de serviço (rota · período · dias)",
+      "info": "Modelos que preenchem o formulário Nova viagem e servem para resolver a viagem (rota + data + período + veículo). Sem geração automática.",
+      "col_slot": "Período",
+      "col_category": "Categoria",
+      "col_days": "Dias",
+      "empty": "Sem planeamentos.",
+      "new_title": "Novo planeamento",
+      "f_default_plan": "Planta por defeito",
+      "days_label": "Dias de circulação"
+    },
+    "es": {
+      "title": "Tabela de despesas",
+      "subtitle": "Custos padrão por rota e categoria tarifária",
+      "new": "Nova tabela",
+      "info": "Defina os custos padrão (combustível, ração, portagem…) por rota e categoria tarifária. Cada viagem criada nesta rota herdará automaticamente estas despesas.",
+      "col_category": "Categoria",
+      "col_lines": "Linhas",
+      "lines_count": "linha(s)",
+      "empty": "Sem tabelas.",
+      "edit_title": "Editar tabela",
+      "f_lines": "Linhas de despesa",
+      "add": "Adicionar",
+      "col_amount": "Montante",
+      "no_lines": "Sem linhas."
+    },
+    "lr": {
+      "title": "Fidelidade",
+      "subtitle": "Regras do programa de fidelidade",
+      "new": "Nova regra",
+      "info": "Configure o número de pontos por viagem e o limiar (número de pontos) a partir do qual o passageiro recebe um bilhete grátis.",
+      "col_pts_ow": "Pts ida",
+      "col_pts_rt": "Pts ida e volta",
+      "col_threshold": "Limiar",
+      "col_reward": "Recompensa",
+      "f_pts_ow": "Pontos ida",
+      "f_pts_rt": "Pontos ida e volta",
+      "f_threshold": "Limiar de recompensa"
+    },
+    "set": {
+      "title": "Definições de viagens",
+      "subtitle": "Prazos, turnos e notificações",
+      "info": "Definições gerais do módulo Viagens para a sua instituição: prazos de partida/chegada, expiração de bilhetes, duração de turno, alertas de documentos e notificações por defeito.",
+      "f_departure_lead": "Prazo de partida (h)",
+      "f_arrival_grace": "Prazo de chegada (h)",
+      "f_ticket_expiry": "Expiração bilhete (dias)",
+      "f_shift": "Duração de turno (h)",
+      "f_doc_alert": "Alerta documentos (dias)",
+      "f_archive": "Prazo de arquivo (dias)",
+      "f_autoprint": "Impressão automática por defeito",
+      "f_sms": "Notificações SMS por defeito"
     }
   }
 }

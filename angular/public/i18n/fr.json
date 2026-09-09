@@ -578,7 +578,13 @@
       "none_m": "— Aucun —",
       "new_type": "Nouveau type",
       "edit_type": "Modifier le type",
-      "empty_type": "Aucun type."
+      "empty_type": "Aucun type.",
+      "type": "Type",
+      "route": "Trajet",
+      "fare_class": "Catégorie tarifaire",
+      "time_slot": "Plage horaire",
+      "valid_from": "Valide du",
+      "valid_to": "Valide au"
     },
     "towns": {
       "title": "Villes",
@@ -685,6 +691,81 @@
       "info": "Classes commerciales (VIP, Classic…). Distinctes du type physique de siège : une classe VIP peut être vendue sur un siège standard lors d’un déroutement.",
       "col_rank": "Rang",
       "col_color": "Couleur"
+    },
+    "cm": {
+      "title": "Membres d'équipage",
+      "subtitle": "Chauffeurs, convoyeurs, contrôleurs",
+      "new": "Nouveau membre",
+      "info": "Roster des membres d'équipage affectables aux voyages. Le type détermine le rôle (dont « conducteur »).",
+      "col_phone": "Téléphone",
+      "col_license": "N° permis",
+      "empty": "Aucun membre.",
+      "edit_title": "Modifier le membre",
+      "f_first": "Prénom",
+      "f_last": "Nom",
+      "f_license": "N° de permis"
+    },
+    "va": {
+      "title": "Affectations de plan",
+      "subtitle": "Plan de bus par véhicule (historique de configuration)",
+      "info": "Associe un plan de bus à un véhicule sur une période. Conserve l'historique des reconfigurations de sièges.",
+      "col_vehicle": "Véhicule",
+      "col_plan": "Plan",
+      "new_title": "Nouvelle affectation",
+      "f_plan": "Plan de bus"
+    },
+    "spat": {
+      "title": "Planifications",
+      "subtitle": "Modèles de service (trajet · plage · jours)",
+      "info": "Modèles qui préremplissent le formulaire Nouveau voyage et servent à résoudre le voyage (trajet + date + plage + véhicule). Aucune génération automatique.",
+      "col_slot": "Plage",
+      "col_category": "Catégorie",
+      "col_days": "Jours",
+      "empty": "Aucune planification.",
+      "new_title": "Nouvelle planification",
+      "f_default_plan": "Plan par défaut",
+      "days_label": "Jours de circulation"
+    },
+    "es": {
+      "title": "Barème de dépenses",
+      "subtitle": "Frais standard par trajet et catégorie tarifaire",
+      "new": "Nouveau barème",
+      "info": "Définissez les frais standard (carburant, ration, péage…) par trajet et catégorie tarifaire. Chaque voyage créé sur ce trajet héritera automatiquement de ces dépenses.",
+      "col_category": "Catégorie",
+      "col_lines": "Lignes",
+      "lines_count": "ligne(s)",
+      "empty": "Aucun barème.",
+      "edit_title": "Modifier le barème",
+      "f_lines": "Lignes de dépense",
+      "add": "Ajouter",
+      "col_amount": "Montant",
+      "no_lines": "Aucune ligne."
+    },
+    "lr": {
+      "title": "Fidélité",
+      "subtitle": "Règles du programme de fidélité",
+      "new": "Nouvelle règle",
+      "info": "Configurez le nombre de points par voyage et le seuil (nombre de points) à partir duquel le passager reçoit un billet gratuit.",
+      "col_pts_ow": "Pts aller",
+      "col_pts_rt": "Pts A/R",
+      "col_threshold": "Seuil",
+      "col_reward": "Récompense",
+      "f_pts_ow": "Points aller simple",
+      "f_pts_rt": "Points aller-retour",
+      "f_threshold": "Seuil de récompense"
+    },
+    "set": {
+      "title": "Paramètres Voyages",
+      "subtitle": "Délais, quarts et notifications",
+      "info": "Paramètres généraux du module Voyages pour votre institution : délais de démarrage/arrêt, expiration des billets, durée de quart, alertes documents et notifications par défaut.",
+      "f_departure_lead": "Délai de démarrage (h)",
+      "f_arrival_grace": "Délai d'arrêt (h)",
+      "f_ticket_expiry": "Expiration billet (jours)",
+      "f_shift": "Durée de quart (h)",
+      "f_doc_alert": "Alerte documents (jours)",
+      "f_archive": "Délai d'archivage (jours)",
+      "f_autoprint": "Impression automatique par défaut",
+      "f_sms": "Notifications SMS par défaut"
     }
   }
 }
