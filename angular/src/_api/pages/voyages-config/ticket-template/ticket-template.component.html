@@ -1,12 +1,12 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Config billets</h4><h6>Personnalisez le billet (formulaire) — aucune connaissance HTML requise</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'vcfg.tt.title' | transloco }}</h4><h6>{{ 'vcfg.tt.subtitle' | transloco }}</h6></div></div>
   <div class="page-btn d-flex gap-2">
-    <a href="javascript:void(0);" class="btn btn-outline-secondary" (click)="preview()"><i class="ti ti-eye me-1"></i>Aperçu</a>
-    <a href="javascript:void(0);" class="btn btn-outline-danger" *hasPermission="'transport.config.manage'" (click)="reset()"><i class="ti ti-refresh me-1"></i>Réinitialiser</a>
-    <a href="javascript:void(0);" class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</a>
+    <a href="javascript:void(0);" class="btn btn-outline-secondary" (click)="preview()"><i class="ti ti-eye me-1"></i>{{ 'vcfg.tt.preview' | transloco }}</a>
+    <a href="javascript:void(0);" class="btn btn-outline-danger" *hasPermission="'transport.config.manage'" (click)="reset()"><i class="ti ti-refresh me-1"></i>{{ 'vcfg.tt.reset' | transloco }}</a>
+    <a href="javascript:void(0);" class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()"><i class="ti ti-device-floppy me-1"></i>{{ (saving ? 'vcfg.common.saving' : 'shared.actions.save') | transloco }}</a>
   </div>
 </div>
-<app-info-banner text="Remplissez les infos fixes du billet (entreprise, couleurs, logos, conditions, agences). Seules les données voyage/passager sont dynamiques. Un QR code contenant les infos du billet est ajouté (scannable). « Aperçu » affiche le rendu avec des données d'exemple."></app-info-banner>
+<app-info-banner [text]="'vcfg.tt.info' | transloco"></app-info-banner>
 
 @if (msg) { <div class="alert alert-success py-2">{{ msg }}</div> }
 
@@ -14,86 +14,86 @@
 @else {
   <div class="row">
     <!-- Entreprise -->
-    <div class="col-lg-6"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">Entreprise (billet)</h6></div>
+    <div class="col-lg-6"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'vcfg.tt.sec_company' | transloco }}</h6></div>
       <div class="card-body"><div class="row">
-        <div class="col-md-6 mb-3"><label class="form-label">Nom affiché</label><input class="form-control" [(ngModel)]="m.brand_name" /></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Slogan</label><input class="form-control" [(ngModel)]="m.slogan" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_brand' | transloco }}</label><input class="form-control" [(ngModel)]="m.brand_name" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_slogan' | transloco }}</label><input class="form-control" [(ngModel)]="m.slogan" /></div>
         <div class="col-md-6 mb-3"><label class="form-label">NIU</label><input class="form-control" [(ngModel)]="m.niu" /></div>
         <div class="col-md-6 mb-3"><label class="form-label">RCCM</label><input class="form-control" [(ngModel)]="m.rccm" /></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Téléphone</label><input class="form-control" [(ngModel)]="m.phone" /></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Email</label><input class="form-control" [(ngModel)]="m.email" /></div>
-        <div class="col-12 mb-1"><label class="form-label">Adresse</label><input class="form-control" [(ngModel)]="m.address" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_phone' | transloco }}</label><input class="form-control" [(ngModel)]="m.phone" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_email' | transloco }}</label><input class="form-control" [(ngModel)]="m.email" /></div>
+        <div class="col-12 mb-1"><label class="form-label">{{ 'vcfg.tt.f_address' | transloco }}</label><input class="form-control" [(ngModel)]="m.address" /></div>
       </div></div></div>
     </div>
 
     <!-- Images + Couleurs + Options -->
     <div class="col-lg-6">
-      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Images</h6></div>
+      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'vcfg.tt.sec_images' | transloco }}</h6></div>
         <div class="card-body"><div class="row">
-          <div class="col-md-6 mb-3"><label class="form-label">Logo (en-tête)</label><input type="file" class="form-control" accept="image/*" (change)="onLogo($event)" />
-            @if (m.logo_url) { <a [href]="m.logo_url" target="_blank" class="small">logo actuel</a> }</div>
-          <div class="col-md-6 mb-3"><label class="form-label">Logo d'arrière-plan (filigrane)</label><input type="file" class="form-control" accept="image/*" (change)="onBg($event)" />
-            @if (m.background_logo_url) { <a [href]="m.background_logo_url" target="_blank" class="small">image actuelle</a> }</div>
+          <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_logo' | transloco }}</label><input type="file" class="form-control" accept="image/*" (change)="onLogo($event)" />
+            @if (m.logo_url) { <a [href]="m.logo_url" target="_blank" class="small">{{ 'vcfg.tt.logo_current' | transloco }}</a> }</div>
+          <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.tt.f_bg' | transloco }}</label><input type="file" class="form-control" accept="image/*" (change)="onBg($event)" />
+            @if (m.background_logo_url) { <a [href]="m.background_logo_url" target="_blank" class="small">{{ 'vcfg.tt.bg_current' | transloco }}</a> }</div>
         </div></div></div>
 
-      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Couleurs</h6></div>
+      <div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'vcfg.tt.sec_colors' | transloco }}</h6></div>
         <div class="card-body"><div class="row">
-          <div class="col-md-4 mb-2"><label class="form-label">Encre</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_ink" /></div>
-          <div class="col-md-4 mb-2"><label class="form-label">Accent</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_accent" /></div>
-          <div class="col-md-4 mb-2"><label class="form-label">Bande</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_band" /></div>
+          <div class="col-md-4 mb-2"><label class="form-label">{{ 'vcfg.tt.f_ink' | transloco }}</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_ink" /></div>
+          <div class="col-md-4 mb-2"><label class="form-label">{{ 'vcfg.tt.f_accent' | transloco }}</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_accent" /></div>
+          <div class="col-md-4 mb-2"><label class="form-label">{{ 'vcfg.tt.f_band' | transloco }}</label><input type="color" class="form-control form-control-color" [(ngModel)]="m.color_band" /></div>
         </div></div></div>
 
-      <div class="card"><div class="card-header"><h6 class="mb-0">Options</h6></div>
+      <div class="card"><div class="card-header"><h6 class="mb-0">{{ 'vcfg.tt.sec_options' | transloco }}</h6></div>
         <div class="card-body d-flex flex-wrap gap-3">
-          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-verso" [(ngModel)]="m.show_verso" /><label class="form-check-label" for="o-verso">Verso</label></div>
-          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-stub" [(ngModel)]="m.show_stub" /><label class="form-check-label" for="o-stub">Talon détachable</label></div>
-          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-wm" [(ngModel)]="m.show_watermark" /><label class="form-check-label" for="o-wm">Filigrane</label></div>
-          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-qr" [(ngModel)]="m.show_qr" /><label class="form-check-label" for="o-qr">QR code</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-verso" [(ngModel)]="m.show_verso" /><label class="form-check-label" for="o-verso">{{ 'vcfg.tt.opt_verso' | transloco }}</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-stub" [(ngModel)]="m.show_stub" /><label class="form-check-label" for="o-stub">{{ 'vcfg.tt.opt_stub' | transloco }}</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-wm" [(ngModel)]="m.show_watermark" /><label class="form-check-label" for="o-wm">{{ 'vcfg.tt.opt_watermark' | transloco }}</label></div>
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="o-qr" [(ngModel)]="m.show_qr" /><label class="form-check-label" for="o-qr">{{ 'vcfg.tt.opt_qr' | transloco }}</label></div>
         </div></div>
     </div>
 
     <!-- Conditions & Agences -->
-    <div class="col-12"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">Textes</h6></div>
+    <div class="col-12"><div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'vcfg.tt.sec_texts' | transloco }}</h6></div>
       <div class="card-body"><div class="row">
-        <div class="col-12 mb-3"><label class="form-label">Note (bas du recto)</label><input class="form-control" [(ngModel)]="m.recto_notice" /></div>
-        <div class="col-12 mb-3"><label class="form-label">Conditions (verso) — une par ligne</label><textarea class="form-control" rows="5" [(ngModel)]="m.verso_conditions"></textarea></div>
+        <div class="col-12 mb-3"><label class="form-label">{{ 'vcfg.tt.f_recto_notice' | transloco }}</label><input class="form-control" [(ngModel)]="m.recto_notice" /></div>
+        <div class="col-12 mb-3"><label class="form-label">{{ 'vcfg.tt.f_verso_conditions' | transloco }}</label><textarea class="form-control" rows="5" [(ngModel)]="m.verso_conditions"></textarea></div>
 
         <div class="col-12">
           <label class="form-label d-flex justify-content-between align-items-center">
-            <span>Agences (bas du verso)</span>
-            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAgency()"><i class="ti ti-plus me-1"></i>Ajouter une agence</button>
+            <span>{{ 'vcfg.tt.agencies_label' | transloco }}</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAgency()"><i class="ti ti-plus me-1"></i>{{ 'vcfg.tt.add_agency' | transloco }}</button>
           </label>
           @if (!m.agencies_list.length) {
-            <p class="text-muted small mb-2">Aucune agence. Ajoutez-en pour les afficher au bas du verso (nom, quartier, téléphone).</p>
+            <p class="text-muted small mb-2">{{ 'vcfg.tt.no_agency' | transloco }}</p>
           }
           @for (a of m.agencies_list; track trackByIndex($index)) {
             <div class="row g-2 mb-2 align-items-center">
-              <div class="col-md-4"><input class="form-control" placeholder="Ville / Agence (ex. YAOUNDE)" [(ngModel)]="a.name" [ngModelOptions]="{ standalone: true }" /></div>
-              <div class="col-md-4"><input class="form-control" placeholder="Quartier / Lieu (ex. OLEMBE)" [(ngModel)]="a.location" [ngModelOptions]="{ standalone: true }" /></div>
-              <div class="col-md-3"><input class="form-control" placeholder="Téléphone" [(ngModel)]="a.phone" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-4"><input class="form-control" [placeholder]="'vcfg.tt.ph_agency_name' | transloco" [(ngModel)]="a.name" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-4"><input class="form-control" [placeholder]="'vcfg.tt.ph_agency_location' | transloco" [(ngModel)]="a.location" [ngModelOptions]="{ standalone: true }" /></div>
+              <div class="col-md-3"><input class="form-control" [placeholder]="'vcfg.tt.ph_phone' | transloco" [(ngModel)]="a.phone" [ngModelOptions]="{ standalone: true }" /></div>
               <div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger w-100" (click)="removeAgency($index)"><i class="ti ti-trash"></i></button></div>
             </div>
           }
         </div>
 
-        <div class="col-md-3 mb-3"><label class="form-label">Largeur billet (mm)</label>
+        <div class="col-md-3 mb-3"><label class="form-label">{{ 'vcfg.tt.f_width' | transloco }}</label>
           <input type="number" step="0.01" class="form-control" [(ngModel)]="m.ticket_width_mm" [ngModelOptions]="{standalone:true}" /></div>
-        <div class="col-md-3 mb-3"><label class="form-label">Hauteur billet (mm)</label>
+        <div class="col-md-3 mb-3"><label class="form-label">{{ 'vcfg.tt.f_height' | transloco }}</label>
           <input type="number" step="0.01" class="form-control" [(ngModel)]="m.ticket_height_mm" [ngModelOptions]="{standalone:true}" /></div>
-        <div class="col-12 mb-3"><label class="form-label">Mention conditions (reçu colis)</label>
+        <div class="col-12 mb-3"><label class="form-label">{{ 'vcfg.tt.f_parcel_terms' | transloco }}</label>
           <textarea class="form-control" rows="2" [(ngModel)]="m.parcel_receipt_terms" [ngModelOptions]="{standalone:true}"></textarea></div>
-        <div class="col-12 mb-3"><label class="form-label">Note (ticket bagage)</label>
+        <div class="col-12 mb-3"><label class="form-label">{{ 'vcfg.tt.f_baggage_note' | transloco }}</label>
           <input class="form-control" [(ngModel)]="m.baggage_ticket_note" [ngModelOptions]="{standalone:true}" /></div>
       </div></div></div>
     </div>
 
     <!-- HTML avancé -->
     <div class="col-12"><div class="card"><div class="card-body">
-      <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="adv" [(ngModel)]="m.custom_html" /><label class="form-check-label" for="adv"><strong>HTML avancé</strong> (pour experts — remplace le gabarit par votre HTML ; tokens {{ '{{ token }}' }} + {{ '{{ qr_code }}' }})</label></div>
+      <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="adv" [(ngModel)]="m.custom_html" /><label class="form-check-label" for="adv"><strong>{{ 'vcfg.tt.adv_html' | transloco }}</strong> {{ 'vcfg.tt.adv_hint' | transloco }} {{ '{{ token }}' }} + {{ '{{ qr_code }}' }})</label></div>
       @if (m.custom_html) {
         <div class="row">
-          <div class="col-lg-6 mb-2"><label class="form-label">HTML recto</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_recto"></textarea></div>
-          <div class="col-lg-6 mb-2"><label class="form-label">HTML verso</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_verso"></textarea></div>
+          <div class="col-lg-6 mb-2"><label class="form-label">{{ 'vcfg.tt.f_html_recto' | transloco }}</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_recto"></textarea></div>
+          <div class="col-lg-6 mb-2"><label class="form-label">{{ 'vcfg.tt.f_html_verso' | transloco }}</label><textarea class="form-control" style="font-family:monospace;font-size:12px;min-height:220px" [(ngModel)]="m.html_verso"></textarea></div>
         </div>
       }
     </div></div></div>
