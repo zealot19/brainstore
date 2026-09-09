@@ -1,34 +1,34 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Contrats</h4>
-      <h6>Assurances, leasing et plans de maintenance</h6>
+      <h4>{{ 'fleet.ct.title' | transloco }}</h4>
+      <h6>{{ 'fleet.ct.subtitle' | transloco }}</h6>
     </div>
   </div>
   <div class="page-btn">
     <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#contract-modal" *hasPermission="'fleet.contract.manage'" (click)="openCreate()">
-      <i class="ti ti-circle-plus"></i>Nouveau contrat
+      <i class="ti ti-circle-plus"></i>{{ 'fleet.ct.new' | transloco }}
     </a>
   </div>
 </div>
 
 <div class="alert alert-info d-flex align-items-center" role="alert">
   <i class="ti ti-info-circle"></i>
-  Un contrat regroupe assurances, leasing ou plans de maintenance, avec leurs coûts récurrents (primes, mensualités). Le type et la périodicité sont configurables.
+  {{ 'fleet.ct.info' | transloco }}
 </div>
 
 <!-- Stats + filter -->
 <div class="row mb-3 g-3 align-items-end">
   <div class="col-md-2">
-    <div class="card p-3 text-center"><h4 class="mb-0 text-success">{{ totalActive }}</h4><small class="text-muted">Actifs</small></div>
+    <div class="card p-3 text-center"><h4 class="mb-0 text-success">{{ totalActive }}</h4><small class="text-muted">{{ 'fleet.ct.stat_active' | transloco }}</small></div>
   </div>
   <div class="col-md-2">
-    <div class="card p-3 text-center"><h4 class="mb-0 text-warning">{{ totalExpiring }}</h4><small class="text-muted">Échéance ≤ 30j</small></div>
+    <div class="card p-3 text-center"><h4 class="mb-0 text-warning">{{ totalExpiring }}</h4><small class="text-muted">{{ 'fleet.ct.stat_expiring' | transloco }}</small></div>
   </div>
   <div class="col-md-4">
-    <label class="form-label fw-semibold">Filtrer par statut</label>
+    <label class="form-label fw-semibold">{{ 'fleet.common.filter_status' | transloco }}</label>
     <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
-      <option value="">Tous les statuts</option>
+      <option value="">{{ 'fleet.common.all_statuses' | transloco }}</option>
       <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
     </select>
   </div>
@@ -42,13 +42,13 @@
       <table class="table table-hover mb-0">
         <thead class="thead-light">
           <tr>
-            <th>Contrat</th>
-            <th>Véhicule</th>
-            <th>Type</th>
-            <th>Fournisseur</th>
-            <th>Échéance</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th>{{ 'fleet.ct.col_contract' | transloco }}</th>
+            <th>{{ 'fleet.common.vehicle' | transloco }}</th>
+            <th>{{ 'fleet.ct.col_type' | transloco }}</th>
+            <th>{{ 'fleet.common.supplier' | transloco }}</th>
+            <th>{{ 'fleet.ct.col_expiry' | transloco }}</th>
+            <th>{{ 'fleet.common.status' | transloco }}</th>
+            <th>{{ 'shared.common.actions' | transloco }}</th>
           </tr>
         </thead>
         <tbody>
@@ -64,16 +64,16 @@
             </td>
             <td><span class="badge" [class]="statusCss(c.status)">{{ statusLabel(c.status) }}</span></td>
             <td>
-              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#contract-modal" *hasPermission="'fleet.contract.manage'" (click)="openEdit(c)" title="Modifier">
-                <i class="ti ti-edit me-1"></i>Modifier
+              <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#contract-modal" *hasPermission="'fleet.contract.manage'" (click)="openEdit(c)" [title]="'shared.actions.edit' | transloco">
+                <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
               </a>
-              <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.contract.manage'" (click)="delete(c.id)" title="Supprimer">
-                <i class="ti ti-trash me-1"></i>Supprimer
+              <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.contract.manage'" (click)="delete(c.id)" [title]="'shared.actions.delete' | transloco">
+                <i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}
               </a>
             </td>
           </tr>
           <tr *ngIf="filtered.length === 0">
-            <td colspan="7" class="text-center text-muted py-4">Aucun contrat trouvé.</td>
+            <td colspan="7" class="text-center text-muted py-4">{{ 'fleet.ct.empty' | transloco }}</td>
           </tr>
         </tbody>
       </table>
@@ -87,7 +87,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Nouveau' }} contrat</h5>
+        <h5 class="modal-title">{{ (editId ? 'fleet.ct.modal_edit' : 'fleet.ct.new') | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="form" (ngSubmit)="submit()">
@@ -95,148 +95,148 @@
           <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Nom du contrat *</label>
+              <label class="form-label">{{ 'fleet.ct.f_name' | transloco }} *</label>
               <input type="text" class="form-control" formControlName="name">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Référence externe</label>
+              <label class="form-label">{{ 'fleet.ct.f_reference' | transloco }}</label>
               <input type="text" class="form-control" formControlName="reference">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Véhicule *</label>
+              <label class="form-label">{{ 'fleet.common.vehicle' | transloco }} *</label>
               <select class="form-select" formControlName="vehicle_id">
-                <option value="">-- Sélectionner --</option>
+                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
                 <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Type *</label>
+              <label class="form-label">{{ 'fleet.ct.col_type' | transloco }} *</label>
               <select class="form-select" formControlName="intervention_type_id">
-                <option value="">-- Sélectionner --</option>
+                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
                 <option *ngFor="let t of itypes" [value]="t.id">{{ t.name }}</option>
               </select>
             </div>
             <div class="col-12">
-              <label class="form-label">Services inclus</label>
+              <label class="form-label">{{ 'fleet.ct.f_included_services' | transloco }}</label>
               <select class="form-select" formControlName="included_service_ids" multiple size="3">
                 <option *ngFor="let t of itypes" [value]="t.id">{{ t.name }}</option>
               </select>
-              <small class="text-muted">Maintenez Ctrl (Cmd) pour sélectionner plusieurs.</small>
+              <small class="text-muted">{{ 'fleet.ct.multi_hint' | transloco }}</small>
             </div>
             <div class="col-md-6">
               <label class="form-label d-flex justify-content-between">
-                <span>Fournisseur</span>
+                <span>{{ 'fleet.common.supplier' | transloco }}</span>
                 <a href="javascript:void(0)" class="small" (click)="showNewSupplier = !showNewSupplier">
-                  {{ showNewSupplier ? 'Choisir un existant' : '+ Nouveau fournisseur' }}
+                  {{ (showNewSupplier ? 'fleet.common.choose_existing' : 'fleet.common.new_supplier_toggle') | transloco }}
                 </a>
               </label>
               <select *ngIf="!showNewSupplier" class="form-select" formControlName="supplier_id">
-                <option [ngValue]="null">— Aucun —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
                 <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}</option>
               </select>
               <div *ngIf="showNewSupplier" class="border rounded p-2">
-                <input type="text" class="form-control form-control-sm mb-1" placeholder="Nom du fournisseur *" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
-                <input type="text" class="form-control form-control-sm mb-1" placeholder="Téléphone" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
-                <button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.supplier.manage'" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">Créer et sélectionner</button>
+                <input type="text" class="form-control form-control-sm mb-1" [placeholder]="'fleet.common.ph_supplier_name' | transloco" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
+                <input type="text" class="form-control form-control-sm mb-1" [placeholder]="'fleet.common.phone' | transloco" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
+                <button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.supplier.manage'" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">{{ 'fleet.common.create_select' | transloco }}</button>
               </div>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Responsable</label>
+              <label class="form-label">{{ 'fleet.ct.f_responsible' | transloco }}</label>
               <select class="form-select" formControlName="responsible_id">
-                <option [ngValue]="null">— Aucun —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
                 <option *ngFor="let e of employees" [ngValue]="e.id">{{ e.full_name }}</option>
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Conducteur</label>
+              <label class="form-label">{{ 'fleet.asg.col_driver' | transloco }}</label>
               <select class="form-select" formControlName="driver_id">
-                <option [ngValue]="null">— Aucun —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
                 <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.full_name }}</option>
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">N° de police / référence</label>
+              <label class="form-label">{{ 'fleet.ct.f_policy' | transloco }}</label>
               <input type="text" class="form-control" formControlName="policy_number">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Date de début *</label>
+              <label class="form-label">{{ 'fleet.ct.f_start' | transloco }} *</label>
               <input type="date" class="form-control" formControlName="start_date">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Date d'échéance *</label>
+              <label class="form-label">{{ 'fleet.ct.f_end' | transloco }} *</label>
               <input type="date" class="form-control" formControlName="end_date">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Date de signature</label>
+              <label class="form-label">{{ 'fleet.ct.f_signature' | transloco }}</label>
               <input type="date" class="form-control" formControlName="creation_date">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Périodicité de facturation</label>
+              <label class="form-label">{{ 'fleet.ct.f_billing_period' | transloco }}</label>
               <select class="form-select" formControlName="billing_period_id">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 <option *ngFor="let p of periods" [ngValue]="p.id">{{ p.name }}</option>
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label">Coût d'activation</label>
+              <label class="form-label">{{ 'fleet.ct.f_activation_cost' | transloco }}</label>
               <input type="number" class="form-control" formControlName="activation_cost" min="0" step="0.01">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Franchise</label>
+              <label class="form-label">{{ 'fleet.ct.f_deductible' | transloco }}</label>
               <input type="number" class="form-control" formControlName="deductible" min="0" step="0.01">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Devise</label>
+              <label class="form-label">{{ 'fleet.common.currency' | transloco }}</label>
               <input type="text" class="form-control" formControlName="currency" maxlength="3">
             </div>
             <div class="col-md-4">
-              <label class="form-label">Statut *</label>
+              <label class="form-label">{{ 'fleet.common.status' | transloco }} *</label>
               <select class="form-select" formControlName="status">
                 <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
               </select>
             </div>
             <div class="col-12">
-              <label class="form-label">Conditions générales</label>
+              <label class="form-label">{{ 'fleet.ct.f_terms' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="terms"></textarea>
             </div>
             <div class="col-12">
-              <label class="form-label">Notes</label>
+              <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="notes"></textarea>
             </div>
           </div>
 
           <!-- Coûts récurrents (édition uniquement) -->
           <div *ngIf="costFor" class="mt-4">
-            <h6 class="fw-semibold">Coûts récurrents</h6>
+            <h6 class="fw-semibold">{{ 'fleet.ct.recurring_costs' | transloco }}</h6>
             <table class="table table-sm mb-2">
-              <thead><tr><th>Description</th><th>Montant</th><th>Périodicité</th><th></th></tr></thead>
+              <thead><tr><th>{{ 'fleet.common.description' | transloco }}</th><th>{{ 'fleet.common.amount' | transloco }}</th><th>{{ 'fleet.ct.rc_period' | transloco }}</th><th></th></tr></thead>
               <tbody>
                 <tr *ngFor="let rc of costs">
                   <td>{{ rc.description }}</td>
                   <td>{{ rc.amount | number:'1.0-0' }} {{ rc.currency }}</td>
                   <td>{{ rc.period_name }}</td>
-                  <td><a class="text-danger" *hasPermission="'fleet.recurring_cost.manage'" (click)="deleteCost(rc.id)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a></td>
+                  <td><a class="text-danger" *hasPermission="'fleet.recurring_cost.manage'" (click)="deleteCost(rc.id)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}</a></td>
                 </tr>
-                <tr *ngIf="costs.length === 0"><td colspan="4" class="text-muted">Aucune ligne.</td></tr>
+                <tr *ngIf="costs.length === 0"><td colspan="4" class="text-muted">{{ 'fleet.ct.no_lines' | transloco }}</td></tr>
               </tbody>
             </table>
             <div [formGroup]="costForm" class="row g-2 align-items-end">
-              <div class="col-md-4"><label class="form-label small">Description</label><input type="text" class="form-control form-control-sm" formControlName="description"></div>
-              <div class="col-md-3"><label class="form-label small">Montant</label><input type="number" class="form-control form-control-sm" formControlName="amount" min="0" step="0.01"></div>
-              <div class="col-md-3"><label class="form-label small">Périodicité</label>
+              <div class="col-md-4"><label class="form-label small">{{ 'fleet.common.description' | transloco }}</label><input type="text" class="form-control form-control-sm" formControlName="description"></div>
+              <div class="col-md-3"><label class="form-label small">{{ 'fleet.common.amount' | transloco }}</label><input type="number" class="form-control form-control-sm" formControlName="amount" min="0" step="0.01"></div>
+              <div class="col-md-3"><label class="form-label small">{{ 'fleet.ct.rc_period' | transloco }}</label>
                 <select class="form-select form-select-sm" formControlName="period_id">
                   <option value="">--</option>
                   <option *ngFor="let p of periods" [value]="p.id">{{ p.name }}</option>
                 </select>
               </div>
-              <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.recurring_cost.manage'" (click)="addCost()" [disabled]="costForm.invalid || savingCost">Ajouter</button></div>
+              <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.recurring_cost.manage'" (click)="addCost()" [disabled]="costForm.invalid || savingCost">{{ 'fleet.ct.add' | transloco }}</button></div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="load()">Fermer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="load()">{{ 'shared.actions.close' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="saving">
-            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ editId ? 'Enregistrer' : 'Créer' }}
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}
           </button>
         </div>
       </form>
