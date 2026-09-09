@@ -1447,6 +1447,22 @@
       "roles_title": "Funções",
       "no_roles": "Nenhuma função disponível.",
       "delete_title": "Eliminar perfil"
+    },
+    "sag": {
+      "subtitle": "Gerir agências e filiais",
+      "stat_total": "Total",
+      "stat_active": "Ativas",
+      "stat_inactive": "Inativas",
+      "stat_branch": "Filiais",
+      "search_ph": "Nome ou código…",
+      "col_email_phone": "E-mail / Tel.",
+      "col_created": "Criada em",
+      "empty": "Nenhuma agência encontrada.",
+      "empty_company": "Sem agências para esta instituição.",
+      "modal_edit": "Editar agência",
+      "f_parent": "Agência-mãe",
+      "opt_none_root": "— Nenhuma (raiz) —",
+      "opt_select": "— Selecionar —"
     }
   }
 }

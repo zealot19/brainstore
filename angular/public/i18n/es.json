@@ -1447,6 +1447,22 @@
       "roles_title": "Roles",
       "no_roles": "Ningún rol disponible.",
       "delete_title": "Eliminar perfil"
+    },
+    "sag": {
+      "subtitle": "Gestionar agencias y sucursales",
+      "stat_total": "Total",
+      "stat_active": "Activas",
+      "stat_inactive": "Inactivas",
+      "stat_branch": "Sucursales",
+      "search_ph": "Nombre o código…",
+      "col_email_phone": "Email / Tel.",
+      "col_created": "Creada el",
+      "empty": "No se encontraron agencias.",
+      "empty_company": "Sin agencias para esta institución.",
+      "modal_edit": "Editar agencia",
+      "f_parent": "Agencia matriz",
+      "opt_none_root": "— Ninguna (raíz) —",
+      "opt_select": "— Seleccionar —"
     }
   }
 }

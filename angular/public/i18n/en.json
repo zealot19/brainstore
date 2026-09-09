@@ -1447,6 +1447,22 @@
       "roles_title": "Roles",
       "no_roles": "No roles available.",
       "delete_title": "Delete profile"
+    },
+    "sag": {
+      "subtitle": "Manage agencies and branches",
+      "stat_total": "Total",
+      "stat_active": "Active",
+      "stat_inactive": "Inactive",
+      "stat_branch": "Branches",
+      "search_ph": "Name or code…",
+      "col_email_phone": "Email / Phone",
+      "col_created": "Created on",
+      "empty": "No agencies found.",
+      "empty_company": "No agencies for this institution.",
+      "modal_edit": "Edit agency",
+      "f_parent": "Parent agency",
+      "opt_none_root": "— None (root) —",
+      "opt_select": "— Select —"
     }
   }
 }
