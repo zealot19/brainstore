@@ -1,46 +1,46 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Voyages</h4><h6>Gestion des départs</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip-modal" *hasPermission="'voyage.trip.create'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau voyage</a></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'trips.list.title' | transloco }}</h4><h6>{{ 'trips.list.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip-modal" *hasPermission="'voyage.trip.create'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'trips.list.new' | transloco }}</a></div>
 </div>
-<app-info-banner text="Créez et suivez les voyages. Après création, affectez un véhicule éligible (le plan de bus et les sièges sont générés automatiquement), l'équipage, puis pilotez le cycle de vie."></app-info-banner>
+<app-info-banner [text]="'trips.list.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header">
     <div class="row g-2">
       <div class="col-md-2">
         <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
-          <option value="">Tous statuts</option>
+          <option value="">{{ 'trips.list.f_all_status' | transloco }}</option>
           <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
         </select>
       </div>
       <div class="col-md-2">
         <select class="form-select" [(ngModel)]="filterRoute" (ngModelChange)="load()">
-          <option value="">Tous trajets</option>
+          <option value="">{{ 'trips.list.f_all_routes' | transloco }}</option>
           @for (r of routes; track r.id) { <option [value]="r.id">{{ r.code }}</option> }
         </select>
       </div>
       <div class="col-md-2">
         <select class="form-select" [(ngModel)]="filterVehicle" (ngModelChange)="load()">
-          <option value="">Tous véhicules</option>
+          <option value="">{{ 'trips.list.f_all_vehicles' | transloco }}</option>
           @for (v of vehicles; track v.id) { <option [value]="v.id">{{ v.license_plate }}</option> }
         </select>
       </div>
       <div class="col-md-2">
         <select class="form-select" [(ngModel)]="dateField" (ngModelChange)="load()">
-          <option value="created">Date création</option>
-          <option value="departure">Date départ</option>
-          <option value="arrival">Date arrivée</option>
+          <option value="created">{{ 'trips.list.f_date_created' | transloco }}</option>
+          <option value="departure">{{ 'trips.list.f_date_departure' | transloco }}</option>
+          <option value="arrival">{{ 'trips.list.f_date_arrival' | transloco }}</option>
         </select>
       </div>
       <div class="col-md-1"><input type="date" class="form-control" [(ngModel)]="dateFrom" (ngModelChange)="load()"></div>
       <div class="col-md-1"><input type="date" class="form-control" [(ngModel)]="dateTo" (ngModelChange)="load()"></div>
-      <div class="col-md-2"><button class="btn btn-outline-secondary w-100" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button></div>
+      <div class="col-md-2"><button class="btn btn-outline-secondary w-100" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'trips.list.clear' | transloco }}</button></div>
     </div>
   </div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Numéro</th><th>Trajet</th><th>Véhicule</th><th>Départ prévu</th><th>Places</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'trips.list.col_number' | transloco }}</th><th>{{ 'trips.list.col_route' | transloco }}</th><th>{{ 'trips.list.col_vehicle' | transloco }}</th><th>{{ 'trips.list.col_departure' | transloco }}</th><th>{{ 'trips.list.col_seats' | transloco }}</th><th>{{ 'trips.list.f_all_status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (t of filtered | paginate:pg.page:pg.size; track t.id) {
             <tr>
@@ -51,14 +51,14 @@
               <td>{{ t.seats_available }}/{{ t.seats_total }}</td>
               <td>
                 <span class="badge" [class]="statusCss(t.status)">{{ statusLabel(t.status) }}</span>
-                @if (t.is_delayed) { <span class="badge bg-warning ms-1">Retard</span> }
+                @if (t.is_delayed) { <span class="badge bg-warning ms-1">{{ 'trips.list.delayed' | transloco }}</span> }
               </td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(t)" title="Ouvrir"><i class="ti ti-eye me-1"></i>Ouvrir</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" (click)="roadmap(t)" title="Feuille de route"><i class="ti ti-clipboard-list me-1"></i>Feuille de route</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(t)" [title]="'trips.list.open' | transloco"><i class="ti ti-eye me-1"></i>{{ 'trips.list.open' | transloco }}</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" (click)="roadmap(t)" [title]="'trips.list.roadmap' | transloco"><i class="ti ti-clipboard-list me-1"></i>{{ 'trips.list.roadmap' | transloco }}</a>
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">Aucun voyage.</td></tr> }
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'trips.list.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -66,36 +66,36 @@
   </div>
 </div>
 <div class="modal fade" id="trip-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Nouveau voyage</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'trips.list.new' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Planification</label>
-        <select formControlName="service_pattern_id" class="form-select" (change)="onPatternChange()"><option [ngValue]="null">— Aucune (saisie manuelle) —</option>@for (p of patterns; track p.id) { <option [ngValue]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }</select></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Code</label><input formControlName="code" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_pattern' | transloco }}</label>
+        <select formControlName="service_pattern_id" class="form-select" (change)="onPatternChange()"><option [ngValue]="null">{{ 'trips.list.opt_no_pattern' | transloco }}</option>@for (p of patterns; track p.id) { <option [ngValue]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_code' | transloco }}</label><input formControlName="code" type="text" class="form-control" /></div>
     </div>
 
     @if (patternMode) {
       <div class="alert alert-info py-2 mb-3">
-        <div><strong>Trajet :</strong> {{ selectedPattern?.route_code }}</div>
-        <div><strong>Horaire :</strong> {{ selectedPattern?.time_slot_label }}</div>
-        <div><strong>Catégorie :</strong> {{ selectedPattern?.fare_class_name }}</div>
-        <small class="text-muted">Trajet, catégorie et horaires sont définis par la planification.</small>
+        <div><strong>{{ 'trips.list.pat_route' | transloco }}</strong> {{ selectedPattern?.route_code }}</div>
+        <div><strong>{{ 'trips.list.pat_schedule' | transloco }}</strong> {{ selectedPattern?.time_slot_label }}</div>
+        <div><strong>{{ 'trips.list.pat_category' | transloco }}</strong> {{ selectedPattern?.fare_class_name }}</div>
+        <small class="text-muted">{{ 'trips.list.pat_hint' | transloco }}</small>
       </div>
-      <div class="mb-3"><label class="form-label">Date du voyage <span class="text-danger">*</span></label>
+      <div class="mb-3"><label class="form-label">{{ 'trips.list.f_service_date' | transloco }} <span class="text-danger">*</span></label>
         <input formControlName="service_date" type="date" class="form-control" /></div>
     } @else {
       <div class="row">
-        <div class="col-md-6 mb-3"><label class="form-label">Trajet <span class="text-danger">*</span></label>
-          <select formControlName="route_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }</select></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
-          <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_route' | transloco }} <span class="text-danger">*</span></label>
+          <select formControlName="route_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>@for (r of routes; track r.id) { <option [ngValue]="r.id">{{ r.code }}</option> }</select></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_fare_class' | transloco }} <span class="text-danger">*</span></label>
+          <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
       </div>
       <div class="row">
-        <div class="col-md-6 mb-3"><label class="form-label">Départ prévu <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Arrivée prévue <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_departure' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_arrival' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
       </div>
     }
-    <div class="mb-3"><label class="form-label">Notes</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ saving ? 'Création…' : 'Créer' }}</button></div></form>
+    <div class="mb-3"><label class="form-label">{{ 'trips.list.f_notes' | transloco }}</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'trips.list.creating' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

@@ -6,12 +6,13 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { Roadmap } from '../../../models/voyages-roadmap.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vb-roadmap',
   templateUrl: './roadmap.component.html',
   styleUrls: ['./roadmap.component.scss'],
-  imports: [HasPermissionDirective, CommonModule],
+  imports: [HasPermissionDirective, CommonModule, TranslocoModule],
 })
 export class VbRoadmapComponent implements OnInit {
   private toast = inject(ToastService);
