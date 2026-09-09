@@ -573,7 +573,12 @@
       "name": "Name",
       "label": "Label",
       "choose": "— Choose —",
-      "none_f": "— None —"
+      "none_f": "— None —",
+      "yes": "Yes",
+      "none_m": "— None —",
+      "new_type": "New type",
+      "edit_type": "Edit type",
+      "empty_type": "No types."
     },
     "towns": {
       "title": "Cities",
@@ -636,6 +641,50 @@
       "f_stop_sp": "Stop (service point)",
       "f_stop_distance": "Distance from origin (km)",
       "add_stop": "+ Add"
+    },
+    "cmt": {
+      "title": "Crew types",
+      "subtitle": "Driver, Attendant, Inspector…",
+      "info": "Crew member types. Tick \"driver\" for types allowed to drive (rule: a trip requires at least one driver).",
+      "col_driver": "Driver",
+      "f_is_driver": "Is a driver"
+    },
+    "et": {
+      "title": "Expense types",
+      "subtitle": "Fuel, Toll, Allowance…",
+      "info": "Trip expense types. Each type carries an OHADA expense account (class 6) used at disbursement.",
+      "col_account": "Account",
+      "f_account": "Expense account (OHADA)"
+    },
+    "cn": {
+      "title": "Parcel natures",
+      "new": "New nature",
+      "info": "Parcel/luggage natures: fragile, to declare, prohibited. They qualify parcel types.",
+      "col_fragile": "Fragile",
+      "col_declaration": "Declaration",
+      "col_prohibited": "Prohibited",
+      "f_declaration": "Declaration required",
+      "new_title": "New nature"
+    },
+    "ct": {
+      "title": "Parcel types",
+      "info": "Pricing types for parcels/luggage (e.g. \"parcel ≤ 50 kg\"). \"Applies to\" restricts the type to luggage, parcels, or both.",
+      "col_nature": "Nature",
+      "col_max_weight": "Max weight",
+      "col_applies": "Applies to",
+      "f_max_weight": "Max weight (kg)",
+      "f_max_volume": "Max volume (m³)",
+      "f_applies": "Applies to",
+      "opt_both": "Both",
+      "opt_baggage": "Luggage",
+      "opt_parcel": "Parcel"
+    },
+    "fc": {
+      "title": "Fare classes",
+      "new": "New class",
+      "info": "Commercial classes (VIP, Classic…). Distinct from the physical seat type: a VIP class can be sold on a standard seat during a reroute.",
+      "col_rank": "Rank",
+      "col_color": "Color"
     }
   }
 }

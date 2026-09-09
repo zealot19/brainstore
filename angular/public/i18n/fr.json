@@ -573,7 +573,12 @@
       "name": "Nom",
       "label": "Libellé",
       "choose": "— Choisir —",
-      "none_f": "— Aucune —"
+      "none_f": "— Aucune —",
+      "yes": "Oui",
+      "none_m": "— Aucun —",
+      "new_type": "Nouveau type",
+      "edit_type": "Modifier le type",
+      "empty_type": "Aucun type."
     },
     "towns": {
       "title": "Villes",
@@ -636,6 +641,50 @@
       "f_stop_sp": "Escale (point de service)",
       "f_stop_distance": "Distance depuis origine (km)",
       "add_stop": "+ Ajouter"
+    },
+    "cmt": {
+      "title": "Types d'équipage",
+      "subtitle": "Chauffeur, Convoyeur, Contrôleur…",
+      "info": "Types de membre d'équipage. Cochez « conducteur » pour les types autorisés à conduire (règle : un voyage exige au moins un conducteur).",
+      "col_driver": "Conducteur",
+      "f_is_driver": "Est conducteur"
+    },
+    "et": {
+      "title": "Types de dépense",
+      "subtitle": "Carburant, Péage, Ration…",
+      "info": "Types de dépense de voyage. Chaque type porte un compte de charge OHADA (classe 6) utilisé lors du décaissement.",
+      "col_account": "Compte",
+      "f_account": "Compte de charge (OHADA)"
+    },
+    "cn": {
+      "title": "Natures de colis",
+      "new": "Nouvelle nature",
+      "info": "Natures des colis/bagages : fragile, à déclarer, interdit. Elles qualifient les types de colis.",
+      "col_fragile": "Fragile",
+      "col_declaration": "Déclaration",
+      "col_prohibited": "Interdit",
+      "f_declaration": "Déclaration requise",
+      "new_title": "Nouvelle nature"
+    },
+    "ct": {
+      "title": "Types de colis",
+      "info": "Types tarifaires de colis/bagages (ex. « colis ≤ 50 Kg »). « S'applique à » restreint le type aux bagages, aux colis, ou aux deux.",
+      "col_nature": "Nature",
+      "col_max_weight": "Poids max",
+      "col_applies": "Applique à",
+      "f_max_weight": "Poids max (kg)",
+      "f_max_volume": "Volume max (m³)",
+      "f_applies": "S'applique à",
+      "opt_both": "Les deux",
+      "opt_baggage": "Bagage",
+      "opt_parcel": "Colis"
+    },
+    "fc": {
+      "title": "Catégories tarifaires",
+      "new": "Nouvelle catégorie",
+      "info": "Classes commerciales (VIP, Classic…). Distinctes du type physique de siège : une classe VIP peut être vendue sur un siège standard lors d’un déroutement.",
+      "col_rank": "Rang",
+      "col_color": "Couleur"
     }
   }
 }

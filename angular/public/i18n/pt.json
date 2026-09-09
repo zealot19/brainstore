@@ -573,7 +573,12 @@
       "name": "Nome",
       "label": "Rótulo",
       "choose": "— Escolher —",
-      "none_f": "— Nenhuma —"
+      "none_f": "— Nenhuma —",
+      "yes": "Sim",
+      "none_m": "— Nenhum —",
+      "new_type": "Novo tipo",
+      "edit_type": "Editar tipo",
+      "empty_type": "Sem tipos."
     },
     "towns": {
       "title": "Cidades",
@@ -636,6 +641,50 @@
       "f_stop_sp": "Paragem (ponto de serviço)",
       "f_stop_distance": "Distância desde a origem (km)",
       "add_stop": "+ Adicionar"
+    },
+    "cmt": {
+      "title": "Tipos de tripulação",
+      "subtitle": "Motorista, Acompanhante, Fiscal…",
+      "info": "Tipos de membro de tripulação. Assinale «condutor» para os tipos autorizados a conduzir (regra: uma viagem exige pelo menos um condutor).",
+      "col_driver": "Condutor",
+      "f_is_driver": "É condutor"
+    },
+    "et": {
+      "title": "Tipos de despesa",
+      "subtitle": "Combustível, Portagem, Ração…",
+      "info": "Tipos de despesa de viagem. Cada tipo tem uma conta de gasto OHADA (classe 6) usada no desembolso.",
+      "col_account": "Conta",
+      "f_account": "Conta de gasto (OHADA)"
+    },
+    "cn": {
+      "title": "Naturezas de encomenda",
+      "new": "Nova natureza",
+      "info": "Naturezas de encomendas/bagagem: frágil, a declarar, proibido. Qualificam os tipos de encomenda.",
+      "col_fragile": "Frágil",
+      "col_declaration": "Declaração",
+      "col_prohibited": "Proibido",
+      "f_declaration": "Declaração exigida",
+      "new_title": "Nova natureza"
+    },
+    "ct": {
+      "title": "Tipos de encomenda",
+      "info": "Tipos tarifários de encomendas/bagagem (ex. «encomenda ≤ 50 kg»). «Aplica-se a» restringe o tipo a bagagem, encomendas ou ambos.",
+      "col_nature": "Natureza",
+      "col_max_weight": "Peso máx",
+      "col_applies": "Aplica-se a",
+      "f_max_weight": "Peso máx (kg)",
+      "f_max_volume": "Volume máx (m³)",
+      "f_applies": "Aplica-se a",
+      "opt_both": "Ambos",
+      "opt_baggage": "Bagagem",
+      "opt_parcel": "Encomenda"
+    },
+    "fc": {
+      "title": "Categorias tarifárias",
+      "new": "Nova categoria",
+      "info": "Classes comerciais (VIP, Classic…). Distintas do tipo físico de lugar: uma classe VIP pode ser vendida num lugar padrão durante um desvio.",
+      "col_rank": "Classificação",
+      "col_color": "Cor"
     }
   }
 }
