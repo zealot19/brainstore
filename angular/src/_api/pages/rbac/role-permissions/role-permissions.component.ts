@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 import { RoleService } from '../../../services/rbac/role.service';
 import { PermissionService } from '../../../services/rbac/permission.service';
 import { Role, Permission } from '../../../models/rbac.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 // Ordre et libellés des actions (générique, tous modules). Le dernier segment du
 // code `<module>.<resource>.<action>` fait foi (le champ `category` est peu fiable).
@@ -46,7 +47,7 @@ function prettify(seg: string): string {
 @Component({
   selector: 'app-role-permissions',
   templateUrl: './role-permissions.component.html',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslocoModule],
 })
 export class RolePermissionsComponent implements OnInit {
 

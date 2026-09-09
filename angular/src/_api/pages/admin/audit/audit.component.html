@@ -2,13 +2,13 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Journal d'audit</h4>
-      <h6>Historique des actions — 500 entrées max</h6>
+      <h4>{{ 'admin.audit.title' | transloco }}</h4>
+      <h6>{{ 'admin.audit.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser">
+      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco">
         <i class="ti ti-refresh"></i>
       </a>
     </li>
@@ -21,9 +21,9 @@
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-2">
-        <label class="form-label small mb-1">Module</label>
+        <label class="form-label small mb-1">{{ 'admin.audit.f_module' | transloco }}</label>
         <select class="form-select form-select-sm" [(ngModel)]="filterModule">
-          <option value="">Tous</option>
+          <option value="">{{ 'admin.audit.all_m' | transloco }}</option>
           @for (m of modules; track m.value) {
             <option [value]="m.value">{{ m.label }}</option>
           }
@@ -31,9 +31,9 @@
       </div>
 
       <div class="col-12 col-md-2">
-        <label class="form-label small mb-1">Action</label>
+        <label class="form-label small mb-1">{{ 'admin.audit.f_action' | transloco }}</label>
         <select class="form-select form-select-sm" [(ngModel)]="filterAction">
-          <option value="">Toutes</option>
+          <option value="">{{ 'admin.audit.all_f' | transloco }}</option>
           @for (a of actions; track a.value) {
             <option [value]="a.value">{{ a.label }}</option>
           }
@@ -41,19 +41,19 @@
       </div>
 
       <div class="col-12 col-md-2">
-        <label class="form-label small mb-1">Du</label>
+        <label class="form-label small mb-1">{{ 'admin.audit.from' | transloco }}</label>
         <input type="date" class="form-control form-control-sm" [(ngModel)]="filterDateFrom" />
       </div>
 
       <div class="col-12 col-md-2">
-        <label class="form-label small mb-1">Au</label>
+        <label class="form-label small mb-1">{{ 'admin.audit.to' | transloco }}</label>
         <input type="date" class="form-control form-control-sm" [(ngModel)]="filterDateTo" />
       </div>
 
       <div class="col-12 col-md-3">
-        <label class="form-label small mb-1">Recherche</label>
+        <label class="form-label small mb-1">{{ 'admin.audit.search_label' | transloco }}</label>
         <input type="text" class="form-control form-control-sm"
-               placeholder="Utilisateur, description, device…"
+               [placeholder]="'admin.audit.search_ph' | transloco"
                [(ngModel)]="search" (input)="onSearch()" />
       </div>
 
@@ -61,7 +61,7 @@
         <button class="btn btn-sm btn-primary w-100" (click)="load()">
           <i class="ti ti-search"></i>
         </button>
-        <button class="btn btn-sm btn-outline-secondary" (click)="reset()" title="Réinitialiser">
+        <button class="btn btn-sm btn-outline-secondary" (click)="reset()" [title]="'admin.audit.reset' | transloco">
           <i class="ti ti-x"></i>
         </button>
       </div>
@@ -78,7 +78,7 @@
 <!-- Tableau -->
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between">
-    <h5 class="mb-0"><i class="ti ti-history me-2 text-primary"></i>Entrées</h5>
+    <h5 class="mb-0"><i class="ti ti-history me-2 text-primary"></i>{{ 'admin.audit.entries' | transloco }}</h5>
     <span class="badge bg-outline-secondary">{{ filtered.length }} / {{ logs.length }}</span>
   </div>
   <div class="card-body p-0">
@@ -91,13 +91,13 @@
         <table class="table datanew mb-0">
           <thead class="thead-light">
             <tr>
-              <th style="min-width:140px">Horodatage</th>
-              <th>Utilisateur</th>
-              <th>Module</th>
-              <th>Action</th>
-              <th>Description</th>
-              <th>Cible</th>
-              <th>Device / IP</th>
+              <th style="min-width:140px">{{ 'admin.audit.col_timestamp' | transloco }}</th>
+              <th>{{ 'admin.audit.col_user' | transloco }}</th>
+              <th>{{ 'admin.audit.f_module' | transloco }}</th>
+              <th>{{ 'admin.audit.f_action' | transloco }}</th>
+              <th>{{ 'admin.audit.col_description' | transloco }}</th>
+              <th>{{ 'admin.audit.col_target' | transloco }}</th>
+              <th>{{ 'admin.audit.col_device_ip' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -156,7 +156,7 @@
               <tr>
                 <td colspan="7" class="text-center py-5 text-muted">
                   <i class="ti ti-history-off fs-2 d-block mb-2"></i>
-                  Aucune entrée dans le journal pour ces critères.
+                  {{ 'admin.audit.empty' | transloco }}
                 </td>
               </tr>
             }

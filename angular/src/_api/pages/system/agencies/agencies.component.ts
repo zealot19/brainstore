@@ -7,11 +7,12 @@ import { Agency, AgencyType, Company } from '../../../models/system.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-agencies',
   templateUrl: './agencies.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
 })
 export class AgenciesComponent implements OnInit {
   private toast = inject(ToastService);
