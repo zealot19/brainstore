@@ -1364,7 +1364,10 @@
       "email": "E-mail",
       "phone": "Telefone",
       "status": "Estado",
-      "description": "Descrição"
+      "description": "Descrição",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "all_f": "Todas"
     },
     "ag": {
       "title": "Agências",
@@ -1423,6 +1426,27 @@
       "col_target": "Alvo",
       "col_device_ip": "Dispositivo / IP",
       "empty": "Sem entradas no registo para estes critérios."
+    },
+    "profile": {
+      "title": "Perfis",
+      "subtitle": "Gerir os perfis e as suas funções",
+      "subtitle_users": "Gerir os perfis de utilizador e as suas funções",
+      "new": "Novo perfil",
+      "filter_all_institutions": "Todas as instituições",
+      "col_institution": "Instituição",
+      "system_label": "Sistema",
+      "col_roles": "Funções associadas",
+      "col_flags": "Sinalizadores",
+      "badge_default": "Predefinido",
+      "empty": "Nenhum perfil encontrado.",
+      "act_manage_roles": "Gerir funções",
+      "modal_edit": "Editar perfil",
+      "f_name_ph": "Ex.: Contabilista, Caixa, Gestor…",
+      "f_default": "Perfil por defeito",
+      "f_default_hint": "(atribuído automaticamente aos novos utilizadores)",
+      "roles_title": "Funções",
+      "no_roles": "Nenhuma função disponível.",
+      "delete_title": "Eliminar perfil"
     }
   }
 }

@@ -1364,7 +1364,10 @@
       "email": "Email",
       "phone": "Phone",
       "status": "Status",
-      "description": "Description"
+      "description": "Description",
+      "active": "Active",
+      "inactive": "Inactive",
+      "all_f": "All"
     },
     "ag": {
       "title": "Agencies",
@@ -1423,6 +1426,27 @@
       "col_target": "Target",
       "col_device_ip": "Device / IP",
       "empty": "No log entries for these criteria."
+    },
+    "profile": {
+      "title": "Profiles",
+      "subtitle": "Manage profiles and their roles",
+      "subtitle_users": "Manage user profiles and their roles",
+      "new": "New profile",
+      "filter_all_institutions": "All institutions",
+      "col_institution": "Institution",
+      "system_label": "System",
+      "col_roles": "Associated roles",
+      "col_flags": "Flags",
+      "badge_default": "Default",
+      "empty": "No profiles found.",
+      "act_manage_roles": "Manage roles",
+      "modal_edit": "Edit profile",
+      "f_name_ph": "e.g. Accountant, Cashier, Manager…",
+      "f_default": "Default profile",
+      "f_default_hint": "(automatically assigned to new users)",
+      "roles_title": "Roles",
+      "no_roles": "No roles available.",
+      "delete_title": "Delete profile"
     }
   }
 }

@@ -1364,7 +1364,10 @@
       "email": "Correo electrónico",
       "phone": "Teléfono",
       "status": "Estado",
-      "description": "Descripción"
+      "description": "Descripción",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "all_f": "Todas"
     },
     "ag": {
       "title": "Agencias",
@@ -1423,6 +1426,27 @@
       "col_target": "Objetivo",
       "col_device_ip": "Dispositivo / IP",
       "empty": "Sin entradas en el registro para estos criterios."
+    },
+    "profile": {
+      "title": "Perfiles",
+      "subtitle": "Gestionar los perfiles y sus roles",
+      "subtitle_users": "Gestionar los perfiles de usuario y sus roles",
+      "new": "Nuevo perfil",
+      "filter_all_institutions": "Todas las instituciones",
+      "col_institution": "Institución",
+      "system_label": "Sistema",
+      "col_roles": "Roles asociados",
+      "col_flags": "Banderas",
+      "badge_default": "Predeterminado",
+      "empty": "No se encontraron perfiles.",
+      "act_manage_roles": "Gestionar roles",
+      "modal_edit": "Editar perfil",
+      "f_name_ph": "Ej.: Contable, Cajero, Manager…",
+      "f_default": "Perfil por defecto",
+      "f_default_hint": "(asignado automáticamente a los nuevos usuarios)",
+      "roles_title": "Roles",
+      "no_roles": "Ningún rol disponible.",
+      "delete_title": "Eliminar perfil"
     }
   }
 }
