@@ -1,16 +1,16 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Utilisateurs</h4>
-      <h6>Gérer les comptes utilisateurs</h6>
+      <h4>{{ 'users.title' | transloco }}</h4>
+      <h6>{{ 'users.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
-    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#user-create-modal" (click)="openCreate()">
-      <i class="ti ti-circle-plus me-2"></i>Nouvel utilisateur
+      <i class="ti ti-circle-plus me-2"></i>{{ 'users.new' | transloco }}
     </a>
   </div>
 </div>
@@ -21,7 +21,7 @@
     <div class="col-xl col-md-4 col-6">
       <div class="card bg-purple border-0">
         <div class="card-body d-flex align-items-center justify-content-between">
-          <div><p class="mb-1 text-white">Total</p><h4 class="text-white">{{ stats.total }}</h4></div>
+          <div><p class="mb-1 text-white">{{ 'users.stat_total' | transloco }}</p><h4 class="text-white">{{ stats.total }}</h4></div>
           <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-users"></i></span>
         </div>
       </div>
@@ -29,7 +29,7 @@
     <div class="col-xl col-md-4 col-6">
       <div class="card bg-teal border-0">
         <div class="card-body d-flex align-items-center justify-content-between">
-          <div><p class="mb-1 text-white">Actifs</p><h4 class="text-white">{{ stats.active }}</h4></div>
+          <div><p class="mb-1 text-white">{{ 'users.stat_active' | transloco }}</p><h4 class="text-white">{{ stats.active }}</h4></div>
           <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-user-check"></i></span>
         </div>
       </div>
@@ -37,7 +37,7 @@
     <div class="col-xl col-md-4 col-6">
       <div class="card bg-info border-0">
         <div class="card-body d-flex align-items-center justify-content-between">
-          <div><p class="mb-1 text-white">Admins inst.</p><h4 class="text-white">{{ stats.institution_admins }}</h4></div>
+          <div><p class="mb-1 text-white">{{ 'users.stat_inst_admins' | transloco }}</p><h4 class="text-white">{{ stats.institution_admins }}</h4></div>
           <span class="avatar avatar-lg bg-info-900"><i class="ti ti-shield-check"></i></span>
         </div>
       </div>
@@ -45,7 +45,7 @@
     <div class="col-xl col-md-4 col-6">
       <div class="card bg-warning border-0">
         <div class="card-body d-flex align-items-center justify-content-between">
-          <div><p class="mb-1 text-white">Chefs agence</p><h4 class="text-white">{{ stats.agency_admins }}</h4></div>
+          <div><p class="mb-1 text-white">{{ 'users.stat_agency_admins' | transloco }}</p><h4 class="text-white">{{ stats.agency_admins }}</h4></div>
           <span class="avatar avatar-lg bg-warning-900"><i class="ti ti-building-store"></i></span>
         </div>
       </div>
@@ -53,7 +53,7 @@
     <div class="col-xl col-md-4 col-6">
       <div class="card bg-danger border-0">
         <div class="card-body d-flex align-items-center justify-content-between">
-          <div><p class="mb-1 text-white">Verrouillés</p><h4 class="text-white">{{ stats.locked }}</h4></div>
+          <div><p class="mb-1 text-white">{{ 'users.stat_locked' | transloco }}</p><h4 class="text-white">{{ stats.locked }}</h4></div>
           <span class="avatar avatar-lg bg-danger-900"><i class="ti ti-lock"></i></span>
         </div>
       </div>
@@ -69,7 +69,7 @@
         <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
         <div class="dataTables_filter">
           <label>
-            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Nom ou email…" />
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'users.search_ph' | transloco" />
           </label>
         </div>
       </div>
@@ -78,10 +78,10 @@
       <!-- Filtre institution -->
       <div class="dropdown me-2">
         <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-          {{ filterCompanyId ? companyName(filterCompanyId) : 'Toutes les institutions' }}
+          {{ filterCompanyId ? companyName(filterCompanyId) : ('users.filter_all_institutions' | transloco) }}
         </a>
         <ul class="dropdown-menu dropdown-menu-end p-3" style="max-height:260px;overflow-y:auto">
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterCompanyId=''; onCompanyFilter()">Toutes</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterCompanyId=''; onCompanyFilter()">{{ 'users.filter_all_f' | transloco }}</a></li>
           @for (c of companies; track c.id) {
             <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterCompanyId=c.id; onCompanyFilter()">{{ c.name }}</a></li>
           }
@@ -90,12 +90,12 @@
       <!-- Filtre statut -->
       <div class="dropdown me-2">
         <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-          {{ filterActive === 'true' ? 'Actifs' : filterActive === 'false' ? 'Inactifs' : 'Tous statuts' }}
+          {{ (filterActive === 'true' ? 'users.filter_active' : filterActive === 'false' ? 'users.filter_inactive' : 'users.filter_all_status') | transloco }}
         </a>
         <ul class="dropdown-menu dropdown-menu-end p-3">
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive=''; load()">Tous</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive='true'; load()">Actifs</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive='false'; load()">Inactifs</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive=''; load()">{{ 'users.filter_all' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive='true'; load()">{{ 'users.filter_active' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterActive='false'; load()">{{ 'users.filter_inactive' | transloco }}</a></li>
         </ul>
       </div>
     </div>
@@ -109,14 +109,14 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Nom</th>
-              <th>Email / Tél.</th>
-              <th>Institution</th>
-              <th>Agence</th>
-              <th>Profil</th>
-              <th>Accès admin</th>
-              <th>Statut</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'admin.common.name' | transloco }}</th>
+              <th>{{ 'users.col_email_phone' | transloco }}</th>
+              <th>{{ 'users.col_institution' | transloco }}</th>
+              <th>{{ 'users.col_agency' | transloco }}</th>
+              <th>{{ 'users.col_profile' | transloco }}</th>
+              <th>{{ 'users.col_admin_access' | transloco }}</th>
+              <th>{{ 'admin.common.status' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -146,17 +146,17 @@
                   }
                 </td>
                 <td>
-                  @if (u.is_institution_admin) { <span class="badge bg-outline-warning me-1">Admin inst.</span> }
-                  @if (u.is_agency_admin)      { <span class="badge bg-outline-info">Chef agence</span> }
+                  @if (u.is_institution_admin) { <span class="badge bg-outline-warning me-1">{{ 'users.badge_inst_admin' | transloco }}</span> }
+                  @if (u.is_agency_admin)      { <span class="badge bg-outline-info">{{ 'users.badge_agency_admin' | transloco }}</span> }
                   @if (!u.is_institution_admin && !u.is_agency_admin) { <span class="text-muted">—</span> }
                 </td>
                 <td>
                   <div class="d-flex flex-column gap-1">
                     <span class="badge" [ngClass]="u.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
-                      {{ u.is_active ? 'Actif' : 'Inactif' }}
+                      {{ (u.is_active ? 'users.badge_active' : 'users.badge_inactive') | transloco }}
                     </span>
-                    @if (u.is_locked) { <span class="badge bg-outline-danger">Verrouillé</span> }
-                    @if (u.must_change_password) { <span class="badge bg-outline-warning">MDP requis</span> }
+                    @if (u.is_locked) { <span class="badge bg-outline-danger">{{ 'users.badge_locked' | transloco }}</span> }
+                    @if (u.must_change_password) { <span class="badge bg-outline-warning">{{ 'users.badge_pwd_required' | transloco }}</span> }
                   </div>
                 </td>
                 <td class="action-table-data">
@@ -165,14 +165,14 @@
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#user-edit-modal"
-                       (click)="openEdit(u)" title="Modifier">
+                       (click)="openEdit(u)" [title]="'shared.actions.edit' | transloco">
                       <i class="ti ti-edit"></i>
                     </a>
                     <!-- Actions secondaires dans un dropdown -->
                     <div class="dropdown">
                       <a href="javascript:void(0);"
                          class="p-2 d-flex align-items-center border rounded"
-                         data-bs-toggle="dropdown" aria-expanded="false" title="Plus d'actions">
+                         data-bs-toggle="dropdown" aria-expanded="false" [title]="'users.act_more' | transloco">
                         <i class="ti ti-dots-vertical"></i>
                       </a>
                       <ul class="dropdown-menu dropdown-menu-end p-2">
@@ -180,14 +180,14 @@
                           <a href="javascript:void(0);" class="dropdown-item rounded-1"
                              data-bs-toggle="modal" data-bs-target="#user-reset-modal"
                              (click)="openResetPwd(u)">
-                            <i class="ti ti-lock-password me-2"></i>Réinitialiser MDP
+                            <i class="ti ti-lock-password me-2"></i>{{ 'users.act_reset_pwd' | transloco }}
                           </a>
                         </li>
                         @if (u.is_locked) {
                           <li>
                             <a href="javascript:void(0);" class="dropdown-item rounded-1 text-warning"
                                (click)="unlock(u)">
-                              <i class="ti ti-lock-open me-2"></i>Déverrouiller
+                              <i class="ti ti-lock-open me-2"></i>{{ 'users.act_unlock' | transloco }}
                             </a>
                           </li>
                         }
@@ -198,7 +198,7 @@
                              [ngClass]="u.is_active ? 'text-danger' : 'text-success'"
                              (click)="toggleActive(u)">
                             <i class="ti me-2" [ngClass]="u.is_active ? 'ti-user-off' : 'ti-user-check'"></i>
-                            {{ u.is_active ? 'Désactiver' : 'Activer' }}
+                            {{ (u.is_active ? 'users.act_deactivate' : 'users.act_activate') | transloco }}
                           </a>
                         </li>
                         <li>
@@ -206,7 +206,7 @@
                              class="dropdown-item rounded-1 text-danger"
                              data-bs-toggle="modal" data-bs-target="#user-delete-modal"
                              (click)="openDelete(u)">
-                            <i class="ti ti-trash me-2"></i>Supprimer
+                            <i class="ti ti-trash me-2"></i>{{ 'shared.actions.delete' | transloco }}
                           </a>
                         </li>
                       </ul>
@@ -215,7 +215,7 @@
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="8" class="text-center py-4 text-muted">Aucun utilisateur trouvé.</td></tr>
+              <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'users.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -230,23 +230,23 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvel utilisateur</h5>
+        <h5 class="modal-title">{{ 'users.new' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="tempPassword=null"></button>
       </div>
 
       @if (tempPassword) {
         <div class="modal-body">
           <div class="alert alert-success">
-            <h6 class="alert-heading"><i class="ti ti-check-circle me-1"></i>Utilisateur créé avec succès</h6>
-            <p class="mb-1">Communiquez ce mot de passe temporaire à l'utilisateur :</p>
+            <h6 class="alert-heading"><i class="ti ti-check-circle me-1"></i>{{ 'users.created_ok' | transloco }}</h6>
+            <p class="mb-1">{{ 'users.temp_pwd_share' | transloco }}</p>
             <div class="d-flex align-items-center gap-2 mt-2">
               <code class="fs-18 fw-bold px-3 py-2 bg-white border rounded flex-fill text-center">{{ tempPassword }}</code>
             </div>
-            <small class="text-muted mt-2 d-block">L'utilisateur devra le changer à sa première connexion.</small>
+            <small class="text-muted mt-2 d-block">{{ 'users.temp_pwd_hint' | transloco }}</small>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="tempPassword=null">Fermer</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="tempPassword=null">{{ 'shared.actions.close' | transloco }}</button>
         </div>
       } @else {
         <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
@@ -255,13 +255,13 @@
 
             <div class="profile-pic-upload mb-4">
               <div class="profile-pic">
-                <span><i class="ti ti-circle-plus plus-down-add me-1"></i>Photo de profil</span>
+                <span><i class="ti ti-circle-plus plus-down-add me-1"></i>{{ 'users.photo_label' | transloco }}</span>
               </div>
               <div class="input-blocks mb-0">
                 <div class="image-upload mb-0">
                   <input type="file" accept="image/*">
                   <div class="image-uploads">
-                    <h4>Ajouter une photo</h4>
+                    <h4>{{ 'users.photo_add' | transloco }}</h4>
                   </div>
                 </div>
               </div>
@@ -269,40 +269,40 @@
 
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                <label class="form-label">{{ 'users.f_first_name' | transloco }} <span class="text-danger">*</span></label>
                 <input formControlName="first_name" type="text" class="form-control" />
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label">Nom <span class="text-danger">*</span></label>
+                <label class="form-label">{{ 'users.f_last_name' | transloco }} <span class="text-danger">*</span></label>
                 <input formControlName="last_name" type="text" class="form-control" />
               </div>
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <label class="form-label">{{ 'admin.common.email' | transloco }} <span class="text-danger">*</span></label>
                 <input formControlName="email" type="email" class="form-control" />
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label">Téléphone</label>
+                <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
                 <input formControlName="phone" type="text" class="form-control" placeholder="+225 07 00 00 00 00" />
               </div>
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Institution <span class="text-danger">*</span></label>
+                <label class="form-label">{{ 'users.col_institution' | transloco }} <span class="text-danger">*</span></label>
                 <select formControlName="company_id" class="form-select">
-                  <option [ngValue]="null">— Sélectionner —</option>
+                  <option [ngValue]="null">{{ 'users.opt_select' | transloco }}</option>
                   @for (c of companies; track c.id) {
                     <option [value]="c.id">{{ c.name }}</option>
                   }
                 </select>
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label">Agence par défaut</label>
+                <label class="form-label">{{ 'users.f_agency' | transloco }}</label>
                 <select formControlName="default_agency_id" class="form-select" [attr.disabled]="!createForm.get('company_id')?.value ? '' : null">
-                  <option [ngValue]="null">— Aucune —</option>
+                  <option [ngValue]="null">{{ 'users.opt_none_f' | transloco }}</option>
                   @for (a of createAgencies; track a.id) {
                     <option [value]="a.id">{{ a.name }}</option>
                   }
@@ -311,18 +311,18 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Profil <small class="text-muted">(optionnel — attribue les droits d'accès)</small></label>
+              <label class="form-label">{{ 'users.f_profile' | transloco }} <small class="text-muted">{{ 'users.f_profile_hint' | transloco }}</small></label>
               <select formControlName="profile_id" class="form-select" [attr.disabled]="!createForm.get('company_id')?.value ? '' : null">
-                <option [ngValue]="null">— Aucun profil —</option>
+                <option [ngValue]="null">{{ 'users.opt_no_profile' | transloco }}</option>
                 @for (p of profiles; track p.id) {
-                  <option [value]="p.id">{{ p.name }}@if (p.is_system) { <ng-container> (système)</ng-container> }</option>
+                  <option [value]="p.id">{{ p.name }}@if (p.is_system) { <ng-container> {{ 'users.system_suffix' | transloco }}</ng-container> }</option>
                 }
               </select>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Mot de passe temporaire <small class="text-muted">(auto-généré si vide)</small></label>
-              <input formControlName="temp_password" type="text" class="form-control" placeholder="Laisser vide pour génération automatique" />
+              <label class="form-label">{{ 'users.f_temp_pwd' | transloco }} <small class="text-muted">{{ 'users.f_temp_pwd_hint' | transloco }}</small></label>
+              <input formControlName="temp_password" type="text" class="form-control" [placeholder]="'users.f_temp_pwd_ph' | transloco" />
             </div>
 
             <div class="d-flex gap-4">
@@ -331,22 +331,22 @@
                   <input type="checkbox" id="create-is-institution-admin" class="check" formControlName="is_institution_admin" />
                   <label for="create-is-institution-admin" class="checktoggle"></label>
                 </div>
-                <label class="form-label mb-0">Admin institution</label>
+                <label class="form-label mb-0">{{ 'users.f_inst_admin' | transloco }}</label>
               </div>
               <div class="d-flex align-items-center gap-2">
                 <div class="status-toggle">
                   <input type="checkbox" id="create-is-agency-admin" class="check" formControlName="is_agency_admin" />
                   <label for="create-is-agency-admin" class="checktoggle"></label>
                 </div>
-                <label class="form-label mb-0">Chef d'agence</label>
+                <label class="form-label mb-0">{{ 'users.f_agency_admin' | transloco }}</label>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
             <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || creating">
               @if (creating) { <span class="spinner-border spinner-border-sm me-1"></span> }
-              Créer l'utilisateur
+              {{ 'users.create_submit' | transloco }}
             </button>
           </div>
         </form>
@@ -360,7 +360,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modifier — {{ editUser?.full_name }}</h5>
+        <h5 class="modal-title">{{ 'users.edit_title' | transloco }} {{ editUser?.full_name }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="editForm" (ngSubmit)="submitEdit()">
@@ -376,7 +376,7 @@
               <div class="image-upload mb-0">
                 <input type="file" accept="image/*">
                 <div class="image-uploads">
-                  <h4>Changer la photo</h4>
+                  <h4>{{ 'users.photo_change' | transloco }}</h4>
                 </div>
               </div>
             </div>
@@ -384,24 +384,24 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Prénom <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'users.f_first_name' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="first_name" type="text" class="form-control" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Nom <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'users.f_last_name' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="last_name" type="text" class="form-control" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Téléphone</label>
+              <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
               <input formControlName="phone" type="text" class="form-control" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Agence par défaut</label>
+              <label class="form-label">{{ 'users.f_agency' | transloco }}</label>
               <select formControlName="default_agency_id" class="form-select">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'users.opt_none_f' | transloco }}</option>
                 @for (a of agencies; track a.id) {
                   <option [value]="a.id">{{ a.name }}</option>
                 }
@@ -410,11 +410,11 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Assigner un profil <small class="text-muted">(remplace le profil actuel)</small></label>
+            <label class="form-label">{{ 'users.f_assign_profile' | transloco }} <small class="text-muted">{{ 'users.f_assign_profile_hint' | transloco }}</small></label>
             <select formControlName="profile_id" class="form-select">
-              <option [ngValue]="null">— Conserver le profil actuel —</option>
+              <option [ngValue]="null">{{ 'users.opt_keep_profile' | transloco }}</option>
               @for (p of profiles; track p.id) {
-                <option [value]="p.id">{{ p.name }}@if (p.is_system) { <ng-container> (système)</ng-container> }</option>
+                <option [value]="p.id">{{ p.name }}@if (p.is_system) { <ng-container> {{ 'users.system_suffix' | transloco }}</ng-container> }</option>
               }
             </select>
           </div>
@@ -425,22 +425,22 @@
                 <input type="checkbox" id="edit-is-institution-admin" class="check" formControlName="is_institution_admin" />
                 <label for="edit-is-institution-admin" class="checktoggle"></label>
               </div>
-              <label class="form-label mb-0">Admin institution</label>
+              <label class="form-label mb-0">{{ 'users.f_inst_admin' | transloco }}</label>
             </div>
             <div class="d-flex align-items-center gap-2">
               <div class="status-toggle">
                 <input type="checkbox" id="edit-is-agency-admin" class="check" formControlName="is_agency_admin" />
                 <label for="edit-is-agency-admin" class="checktoggle"></label>
               </div>
-              <label class="form-label mb-0">Chef d'agence</label>
+              <label class="form-label mb-0">{{ 'users.f_agency_admin' | transloco }}</label>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Enregistrer
+            {{ 'shared.actions.save' | transloco }}
           </button>
         </div>
       </form>
@@ -457,20 +457,20 @@
           <span class="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
             <i class="ti ti-trash fs-24 text-danger"></i>
           </span>
-          <h4 class="fs-20 text-gray-9 fw-bold mb-2 mt-1">Supprimer l'utilisateur</h4>
+          <h4 class="fs-20 text-gray-9 fw-bold mb-2 mt-1">{{ 'users.delete_title' | transloco }}</h4>
           <p class="text-gray-6 mb-0 fs-16">
-            Êtes-vous sûr de vouloir supprimer <strong>{{ deleteUser?.full_name }}</strong> ?
+            {{ 'users.delete_confirm' | transloco }} <strong>{{ deleteUser?.full_name }}</strong> ?
           </p>
           @if (deleteError) {
             <div class="alert alert-danger py-2 mt-3 text-start">{{ deleteError }}</div>
           }
           <div class="modal-footer-btn mt-3 d-flex justify-content-center">
             <button type="button" class="btn me-2 btn-secondary fs-13 fw-medium p-2 px-3 shadow-none"
-                    data-bs-dismiss="modal">Annuler</button>
+                    data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
             <button type="button" class="btn btn-danger fs-13 fw-medium p-2 px-3"
                     [disabled]="deleting" (click)="confirmDelete()">
               @if (deleting) { <span class="spinner-border spinner-border-sm me-1"></span> }
-              Oui, supprimer
+              {{ 'users.delete_yes' | transloco }}
             </button>
           </div>
         </div>
@@ -484,17 +484,17 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="ti ti-key me-2"></i>Réinitialiser le mot de passe</h5>
+        <h5 class="modal-title"><i class="ti ti-key me-2"></i>{{ 'users.reset_title' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="resetForm" (ngSubmit)="submitReset()">
         <div class="modal-body">
           @if (resetError) { <div class="alert alert-danger py-2">{{ resetError }}</div> }
-          <p class="text-muted mb-3">Compte : <strong>{{ resetUser?.full_name }}</strong> ({{ resetUser?.email }})</p>
+          <p class="text-muted mb-3">{{ 'users.reset_account' | transloco }} <strong>{{ resetUser?.full_name }}</strong> ({{ resetUser?.email }})</p>
 
           <div class="mb-3">
-            <label class="form-label">Nouveau mot de passe <span class="text-danger">*</span></label>
-            <input formControlName="new_password" type="text" class="form-control" placeholder="8 caractères minimum" />
+            <label class="form-label">{{ 'users.f_new_pwd' | transloco }} <span class="text-danger">*</span></label>
+            <input formControlName="new_password" type="text" class="form-control" [placeholder]="'users.f_new_pwd_ph' | transloco" />
           </div>
 
           <div class="d-flex align-items-center gap-2">
@@ -502,14 +502,14 @@
               <input type="checkbox" id="reset-must-change" class="check" formControlName="must_change" />
               <label for="reset-must-change" class="checktoggle"></label>
             </div>
-            <label class="form-label mb-0">Forcer le changement à la prochaine connexion</label>
+            <label class="form-label mb-0">{{ 'users.f_force_change' | transloco }}</label>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-warning" [disabled]="resetForm.invalid || resetting">
             @if (resetting) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            <i class="ti ti-key me-1"></i>Réinitialiser
+            <i class="ti ti-key me-1"></i>{{ 'users.reset_submit' | transloco }}
           </button>
         </div>
       </form>
