@@ -1046,5 +1046,57 @@
       "col_tag": "Tag",
       "f_color": "Color"
     }
+  },
+  "fleet": {
+    "common": {
+      "refresh": "Refresh",
+      "search_ph": "Search…",
+      "active": "Active",
+      "inactive": "Inactive",
+      "status": "Status",
+      "notes": "Notes",
+      "name": "Name",
+      "code": "Code",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address"
+    },
+    "parking": {
+      "title": "Parking lots",
+      "subtitle": "Parking locations for your fleet",
+      "new": "New parking lot",
+      "total": "Total lots",
+      "col_location": "Location",
+      "empty": "No parking lots.",
+      "edit_title": "Edit parking lot",
+      "ph_location": "Address or GPS"
+    },
+    "sup": {
+      "title": "Suppliers",
+      "subtitle": "Associated companies: parts, fuel, contracts, vehicles",
+      "new": "New supplier",
+      "total": "Total suppliers",
+      "search_ph": "Search (name, code)…",
+      "col_contact": "Contact",
+      "empty": "No suppliers.",
+      "edit_title": "Edit supplier",
+      "f_tax": "Tax ID",
+      "f_contact": "Contact person",
+      "f_website": "Website",
+      "f_city": "City",
+      "f_country": "Country"
+    },
+    "br": {
+      "title": "Vehicle brands",
+      "subtitle": "Manage brands in the global reference data",
+      "new": "New brand",
+      "total": "Total brands",
+      "search_ph": "Search a brand…",
+      "col_brand": "Brand",
+      "col_country": "Country of origin",
+      "col_created": "Created on",
+      "empty": "No brands found.",
+      "edit_title": "Edit brand"
+    }
   }
 }

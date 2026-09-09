@@ -1046,5 +1046,57 @@
       "col_tag": "Étiquette",
       "f_color": "Couleur"
     }
+  },
+  "fleet": {
+    "common": {
+      "refresh": "Actualiser",
+      "search_ph": "Rechercher…",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "status": "Statut",
+      "notes": "Notes",
+      "name": "Nom",
+      "code": "Code",
+      "phone": "Téléphone",
+      "email": "Email",
+      "address": "Adresse"
+    },
+    "parking": {
+      "title": "Parkings",
+      "subtitle": "Emplacements de stationnement de votre flotte",
+      "new": "Nouveau parking",
+      "total": "Total parkings",
+      "col_location": "Emplacement",
+      "empty": "Aucun parking.",
+      "edit_title": "Modifier le parking",
+      "ph_location": "Adresse ou GPS"
+    },
+    "sup": {
+      "title": "Fournisseurs",
+      "subtitle": "Sociétés associées : pièces, carburant, contrats, véhicules",
+      "new": "Nouveau fournisseur",
+      "total": "Total fournisseurs",
+      "search_ph": "Rechercher (nom, code)…",
+      "col_contact": "Contact",
+      "empty": "Aucun fournisseur.",
+      "edit_title": "Modifier le fournisseur",
+      "f_tax": "NIU / fiscal",
+      "f_contact": "Personne de contact",
+      "f_website": "Site web",
+      "f_city": "Ville",
+      "f_country": "Pays"
+    },
+    "br": {
+      "title": "Marques de véhicule",
+      "subtitle": "Gérer les marques du référentiel global",
+      "new": "Nouvelle marque",
+      "total": "Total marques",
+      "search_ph": "Rechercher une marque…",
+      "col_brand": "Marque",
+      "col_country": "Pays d'origine",
+      "col_created": "Créée le",
+      "empty": "Aucune marque trouvée.",
+      "edit_title": "Modifier la marque"
+    }
   }
 }

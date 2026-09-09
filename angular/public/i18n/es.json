@@ -1046,5 +1046,57 @@
       "col_tag": "Etiqueta",
       "f_color": "Color"
     }
+  },
+  "fleet": {
+    "common": {
+      "refresh": "Actualizar",
+      "search_ph": "Buscar…",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "status": "Estado",
+      "notes": "Notas",
+      "name": "Nombre",
+      "code": "Código",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "address": "Dirección"
+    },
+    "parking": {
+      "title": "Aparcamientos",
+      "subtitle": "Ubicaciones de estacionamiento de su flota",
+      "new": "Nuevo aparcamiento",
+      "total": "Total aparcamientos",
+      "col_location": "Ubicación",
+      "empty": "Sin aparcamientos.",
+      "edit_title": "Editar aparcamiento",
+      "ph_location": "Dirección o GPS"
+    },
+    "sup": {
+      "title": "Proveedores",
+      "subtitle": "Empresas asociadas: piezas, combustible, contratos, vehículos",
+      "new": "Nuevo proveedor",
+      "total": "Total proveedores",
+      "search_ph": "Buscar (nombre, código)…",
+      "col_contact": "Contacto",
+      "empty": "Sin proveedores.",
+      "edit_title": "Editar proveedor",
+      "f_tax": "NIF / fiscal",
+      "f_contact": "Persona de contacto",
+      "f_website": "Sitio web",
+      "f_city": "Ciudad",
+      "f_country": "País"
+    },
+    "br": {
+      "title": "Marcas de vehículo",
+      "subtitle": "Gestionar las marcas del referencial global",
+      "new": "Nueva marca",
+      "total": "Total marcas",
+      "search_ph": "Buscar una marca…",
+      "col_brand": "Marca",
+      "col_country": "País de origen",
+      "col_created": "Creada el",
+      "empty": "No se encontraron marcas.",
+      "edit_title": "Editar marca"
+    }
   }
 }
