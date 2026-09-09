@@ -1389,7 +1389,11 @@
       "empty": "No se encontraron roles.",
       "modal_edit": "Editar rol",
       "f_name_ph": "Ej.: Cajero, Contable…",
-      "f_desc_ph": "Descripción opcional…"
+      "f_desc_ph": "Descripción opcional…",
+      "badge_own_institution": "Mi institución",
+      "delete_title": "Eliminar rol",
+      "delete_q": "¿Está seguro de que desea eliminar",
+      "confirm_delete": "Sí, eliminar"
     },
     "perm": {
       "title": "Permisos",
@@ -1399,6 +1403,26 @@
       "selected_word": "permiso(s) seleccionado(s)",
       "empty": "No se encontraron permisos.",
       "col_resource": "Recurso"
+    },
+    "audit": {
+      "title": "Registro de auditoría",
+      "subtitle": "Historial de acciones — 500 entradas máx",
+      "f_module": "Módulo",
+      "all_m": "Todos",
+      "f_action": "Acción",
+      "all_f": "Todas",
+      "from": "Desde",
+      "to": "Hasta",
+      "search_label": "Búsqueda",
+      "search_ph": "Usuario, descripción, dispositivo…",
+      "reset": "Restablecer",
+      "entries": "Entradas",
+      "col_timestamp": "Marca de tiempo",
+      "col_user": "Usuario",
+      "col_description": "Descripción",
+      "col_target": "Objetivo",
+      "col_device_ip": "Dispositivo / IP",
+      "empty": "Sin entradas en el registro para estos criterios."
     }
   }
 }

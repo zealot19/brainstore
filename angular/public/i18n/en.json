@@ -1389,7 +1389,11 @@
       "empty": "No roles found.",
       "modal_edit": "Edit role",
       "f_name_ph": "e.g. Cashier, Accountant…",
-      "f_desc_ph": "Optional description…"
+      "f_desc_ph": "Optional description…",
+      "badge_own_institution": "My institution",
+      "delete_title": "Delete role",
+      "delete_q": "Are you sure you want to delete",
+      "confirm_delete": "Yes, delete"
     },
     "perm": {
       "title": "Permissions",
@@ -1399,6 +1403,26 @@
       "selected_word": "permission(s) selected",
       "empty": "No permissions found.",
       "col_resource": "Resource"
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Action history — 500 entries max",
+      "f_module": "Module",
+      "all_m": "All",
+      "f_action": "Action",
+      "all_f": "All",
+      "from": "From",
+      "to": "To",
+      "search_label": "Search",
+      "search_ph": "User, description, device…",
+      "reset": "Reset",
+      "entries": "Entries",
+      "col_timestamp": "Timestamp",
+      "col_user": "User",
+      "col_description": "Description",
+      "col_target": "Target",
+      "col_device_ip": "Device / IP",
+      "empty": "No log entries for these criteria."
     }
   }
 }

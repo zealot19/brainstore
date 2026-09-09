@@ -1389,7 +1389,11 @@
       "empty": "Aucun rôle trouvé.",
       "modal_edit": "Modifier rôle",
       "f_name_ph": "Ex : Caissier, Comptable…",
-      "f_desc_ph": "Description optionnelle…"
+      "f_desc_ph": "Description optionnelle…",
+      "badge_own_institution": "Mon institution",
+      "delete_title": "Supprimer le rôle",
+      "delete_q": "Êtes-vous sûr de vouloir supprimer",
+      "confirm_delete": "Oui, supprimer"
     },
     "perm": {
       "title": "Permissions",
@@ -1399,6 +1403,26 @@
       "selected_word": "permission(s) sélectionnée(s)",
       "empty": "Aucune permission trouvée.",
       "col_resource": "Ressource"
+    },
+    "audit": {
+      "title": "Journal d'audit",
+      "subtitle": "Historique des actions — 500 entrées max",
+      "f_module": "Module",
+      "all_m": "Tous",
+      "f_action": "Action",
+      "all_f": "Toutes",
+      "from": "Du",
+      "to": "Au",
+      "search_label": "Recherche",
+      "search_ph": "Utilisateur, description, device…",
+      "reset": "Réinitialiser",
+      "entries": "Entrées",
+      "col_timestamp": "Horodatage",
+      "col_user": "Utilisateur",
+      "col_description": "Description",
+      "col_target": "Cible",
+      "col_device_ip": "Device / IP",
+      "empty": "Aucune entrée dans le journal pour ces critères."
     }
   }
 }

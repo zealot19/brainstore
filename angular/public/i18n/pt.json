@@ -1389,7 +1389,11 @@
       "empty": "Nenhuma função encontrada.",
       "modal_edit": "Editar função",
       "f_name_ph": "Ex.: Caixa, Contabilista…",
-      "f_desc_ph": "Descrição opcional…"
+      "f_desc_ph": "Descrição opcional…",
+      "badge_own_institution": "A minha instituição",
+      "delete_title": "Eliminar função",
+      "delete_q": "Tem a certeza de que deseja eliminar",
+      "confirm_delete": "Sim, eliminar"
     },
     "perm": {
       "title": "Permissões",
@@ -1399,6 +1403,26 @@
       "selected_word": "permissão(ões) selecionada(s)",
       "empty": "Nenhuma permissão encontrada.",
       "col_resource": "Recurso"
+    },
+    "audit": {
+      "title": "Registo de auditoria",
+      "subtitle": "Histórico de ações — 500 entradas máx",
+      "f_module": "Módulo",
+      "all_m": "Todos",
+      "f_action": "Ação",
+      "all_f": "Todas",
+      "from": "De",
+      "to": "Até",
+      "search_label": "Pesquisa",
+      "search_ph": "Utilizador, descrição, dispositivo…",
+      "reset": "Repor",
+      "entries": "Entradas",
+      "col_timestamp": "Data/hora",
+      "col_user": "Utilizador",
+      "col_description": "Descrição",
+      "col_target": "Alvo",
+      "col_device_ip": "Dispositivo / IP",
+      "empty": "Sem entradas no registo para estes critérios."
     }
   }
 }
