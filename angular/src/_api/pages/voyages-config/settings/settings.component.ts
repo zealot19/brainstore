@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angul
 import { VoyagesSettingsService } from '../../../services/voyages-config/voyages-settings.service';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vc-settings',
   templateUrl: './settings.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class VcSettingsComponent implements OnInit {
   form!: FormGroup; loading = true; saving = false; errorMsg = ''; okMsg = '';

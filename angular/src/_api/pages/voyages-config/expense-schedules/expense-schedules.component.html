@@ -1,43 +1,43 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Barème de dépenses</h4><h6>Frais standard par trajet et catégorie tarifaire</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#es-modal" *hasPermission="'transport.config.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau barème</a></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'vcfg.es.title' | transloco }}</h4><h6>{{ 'vcfg.es.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#es-modal" *hasPermission="'transport.config.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'vcfg.es.new' | transloco }}</a></div>
 </div>
-<app-info-banner text="Définissez les frais standard (carburant, ration, péage…) par trajet et catégorie tarifaire. Chaque voyage créé sur ce trajet héritera automatiquement de ces dépenses."></app-info-banner>
+<app-info-banner [text]="'vcfg.es.info' | transloco"></app-info-banner>
 <div class="card table-list-card"><div class="card-body p-0">
   @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
   @else {
     <div class="table-responsive"><table class="table datanew">
-      <thead class="thead-light"><tr><th>Trajet</th><th>Catégorie</th><th>Lignes</th><th class="no-sort">Actions</th></tr></thead>
+      <thead class="thead-light"><tr><th>{{ 'vcfg.common.route' | transloco }}</th><th>{{ 'vcfg.es.col_category' | transloco }}</th><th>{{ 'vcfg.es.col_lines' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
       <tbody>
         @for (s of rows | paginate:pg.page:pg.size; track s.id) {
           <tr>
             <td class="fw-medium">{{ s.route_name || routeLabel(s.route) }}</td>
             <td>{{ s.fare_class_name || fcLabel(s.fare_class) }}</td>
-            <td>{{ s.lines.length }} ligne(s)</td>
+            <td>{{ s.lines.length }} {{ 'vcfg.es.lines_count' | transloco }}</td>
             <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-              <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#es-modal" *hasPermission="'transport.config.manage'" (click)="openEdit(s)"><i class="ti ti-edit me-1"></i>Modifier</a>
-              <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'transport.config.manage'" (click)="delete(s)"><i class="ti ti-trash text-danger me-1"></i>Supprimer</a>
+              <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#es-modal" *hasPermission="'transport.config.manage'" (click)="openEdit(s)"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+              <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'transport.config.manage'" (click)="delete(s)"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
             </div></td>
           </tr>
-        } @empty { <tr><td colspan="4" class="text-center py-4 text-muted">Aucun barème.</td></tr> }
+        } @empty { <tr><td colspan="4" class="text-center py-4 text-muted">{{ 'vcfg.es.empty' | transloco }}</td></tr> }
       </tbody>
     </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
   }
 </div></div>
 <div class="modal fade" id="es-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le barème' : 'Nouveau barème' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'vcfg.es.edit_title' : 'vcfg.es.new') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Trajet <span class="text-danger">*</span></label>
-        <select class="form-select" [(ngModel)]="fRoute"><option value="">— Choisir —</option>@for (r of routes; track r.id) { <option [value]="r.id">{{ r.code }}</option> }</select></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Catégorie tarifaire <span class="text-danger">*</span></label>
-        <select class="form-select" [(ngModel)]="fFareClass"><option value="">— Choisir —</option>@for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.common.route' | transloco }} <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="fRoute"><option value="">{{ 'vcfg.common.choose' | transloco }}</option>@for (r of routes; track r.id) { <option [value]="r.id">{{ r.code }}</option> }</select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.common.fare_class' | transloco }} <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="fFareClass"><option value="">{{ 'vcfg.common.choose' | transloco }}</option>@for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }</select></div>
     </div>
-    <div class="d-flex justify-content-between align-items-center mb-2"><label class="form-label mb-0">Lignes de dépense</label>
-      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLine()"><i class="ti ti-plus"></i> Ajouter</button></div>
-    <table class="table table-sm"><thead><tr><th>Type</th><th style="width:180px">Montant</th><th style="width:40px"></th></tr></thead>
+    <div class="d-flex justify-content-between align-items-center mb-2"><label class="form-label mb-0">{{ 'vcfg.es.f_lines' | transloco }}</label>
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLine()"><i class="ti ti-plus"></i> {{ 'vcfg.es.add' | transloco }}</button></div>
+    <table class="table table-sm"><thead><tr><th>{{ 'vcfg.common.type' | transloco }}</th><th style="width:180px">{{ 'vcfg.es.col_amount' | transloco }}</th><th style="width:40px"></th></tr></thead>
       <tbody>
         @for (l of fLines; track $index) {
           <tr>
@@ -45,9 +45,9 @@
             <td><input type="number" class="form-control form-control-sm" [(ngModel)]="l.amount" min="0" /></td>
             <td><a class="text-danger" (click)="removeLine($index)"><i class="ti ti-trash"></i></a></td>
           </tr>
-        } @empty { <tr><td colspan="3" class="text-muted text-center">Aucune ligne.</td></tr> }
+        } @empty { <tr><td colspan="3" class="text-muted text-center">{{ 'vcfg.es.no_lines' | transloco }}</td></tr> }
       </tbody>
     </table>
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="button" class="btn btn-primary" [disabled]="!fRoute || !fFareClass || saving" (click)="submit()">{{ editId ? 'Enregistrer' : 'Créer' }}</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="!fRoute || !fFareClass || saving" (click)="submit()">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div>
 </div></div></div>
