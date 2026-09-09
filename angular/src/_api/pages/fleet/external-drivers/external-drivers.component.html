@@ -1,20 +1,20 @@
 <div class="page-header">
       <div class="add-item d-flex">
         <div class="page-title">
-          <h4>Conducteurs</h4>
-          <h6>Registre des conducteurs (identité issue du module RH)</h6>
+          <h4>{{ 'fleet.dr.title' | transloco }}</h4>
+          <h6>{{ 'fleet.dr.subtitle' | transloco }}</h6>
         </div>
       </div>
       <div class="page-btn">
         <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#driver-modal" *hasPermission="'fleet.driver.manage'" (click)="openCreate()">
-          <i class="ti ti-circle-plus"></i>Ajouter un conducteur
+          <i class="ti ti-circle-plus"></i>{{ 'fleet.dr.add' | transloco }}
         </a>
       </div>
     </div>
 
     <div class="alert alert-info d-flex align-items-center" role="alert">
       <i class="ti ti-info-circle"></i>
-      Un conducteur est un employé RH auquel on rattache les informations de permis. L'identité (nom, contact…) provient du module RH.
+      {{ 'fleet.dr.info' | transloco }}
     </div>
 
     <!-- Stats -->
@@ -22,7 +22,7 @@
       <div class="col-md-3">
         <div class="card p-3 text-center">
           <h4 class="mb-0">{{ total }}</h4>
-          <small class="text-muted">Total conducteurs</small>
+          <small class="text-muted">{{ 'fleet.dr.total' | transloco }}</small>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <div class="input-group w-auto" style="min-width:260px">
           <span class="input-group-text"><i class="ti ti-search"></i></span>
-          <input type="text" class="form-control" placeholder="Nom, matricule, permis…"
+          <input type="text" class="form-control" [placeholder]="'fleet.dr.search_ph' | transloco"
                  [(ngModel)]="search" (ngModelChange)="applyFilter()">
         </div>
       </div>
@@ -44,12 +44,12 @@
           <table class="table table-hover mb-0">
             <thead class="thead-light">
               <tr>
-                <th>Employé</th>
-                <th>Matricule</th>
-                <th>Permis N°</th>
-                <th>Catégorie</th>
-                <th>Expiry permis</th>
-                <th>Actions</th>
+                <th>{{ 'fleet.dr.col_employee' | transloco }}</th>
+                <th>{{ 'fleet.dr.col_staff_no' | transloco }}</th>
+                <th>{{ 'fleet.dr.col_license_no' | transloco }}</th>
+                <th>{{ 'fleet.dr.col_category' | transloco }}</th>
+                <th>{{ 'fleet.dr.col_license_expiry' | transloco }}</th>
+                <th>{{ 'shared.common.actions' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
@@ -66,15 +66,15 @@
                 </td>
                 <td>
                   <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#driver-modal" *hasPermission="'fleet.driver.manage'" (click)="openEdit(d)">
-                    <i class="ti ti-edit me-1"></i>Modifier
+                    <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
                   </a>
                   <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.driver.manage'" (click)="delete(d.id)">
-                    <i class="ti ti-trash me-1"></i>Supprimer
+                    <i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}
                   </a>
                 </td>
               </tr>
               <tr *ngIf="filtered.length === 0">
-                <td colspan="6" class="text-center text-muted py-4">Aucun conducteur trouvé.</td>
+                <td colspan="6" class="text-center text-muted py-4">{{ 'fleet.dr.empty' | transloco }}</td>
               </tr>
             </tbody>
           </table>
@@ -88,7 +88,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ editId ? 'Modifier' : 'Ajouter' }} un conducteur</h5>
+        <h5 class="modal-title">{{ (editId ? 'fleet.dr.edit_title' : 'fleet.dr.add') | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="form" (ngSubmit)="submit()">
@@ -96,40 +96,40 @@
           <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
           <div class="row g-3">
             <div class="col-12">
-              <label class="form-label">Employé (RH) *</label>
+              <label class="form-label">{{ 'fleet.dr.f_employee' | transloco }} *</label>
               <select class="form-select" formControlName="employee_id"
                       [class.is-invalid]="form.get('employee_id')?.invalid && form.get('employee_id')?.touched">
-                <option [ngValue]="null">— Sélectionner un employé —</option>
+                <option [ngValue]="null">{{ 'fleet.dr.opt_select_employee' | transloco }}</option>
                 <option *ngFor="let e of employees" [ngValue]="e.id">{{ e.full_name }} ({{ e.employee_number }})</option>
               </select>
-              <small *ngIf="employees.length === 0" class="text-muted">Aucun employé RH disponible. Créez d'abord des employés dans le module RH.</small>
+              <small *ngIf="employees.length === 0" class="text-muted">{{ 'fleet.dr.no_employees' | transloco }}</small>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Numéro de permis *</label>
+              <label class="form-label">{{ 'fleet.dr.f_license_no' | transloco }} *</label>
               <input type="text" class="form-control" formControlName="license_number"
                      [class.is-invalid]="form.get('license_number')?.invalid && form.get('license_number')?.touched">
             </div>
             <div class="col-md-3">
-              <label class="form-label">Catégorie *</label>
+              <label class="form-label">{{ 'fleet.dr.col_category' | transloco }} *</label>
               <select class="form-select" formControlName="license_category">
                 <option *ngFor="let cat of licenseCategories" [value]="cat">{{ cat }}</option>
               </select>
             </div>
             <div class="col-md-3">
-              <label class="form-label">Expiry permis</label>
+              <label class="form-label">{{ 'fleet.dr.col_license_expiry' | transloco }}</label>
               <input type="date" class="form-control" formControlName="license_expiry">
             </div>
             <div class="col-12">
-              <label class="form-label">Notes</label>
+              <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="notes"></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="saving">
             <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
-            {{ editId ? 'Modifier' : 'Ajouter' }}
+            {{ (editId ? 'shared.actions.edit' : 'fleet.common.add') | transloco }}
           </button>
         </div>
       </form>

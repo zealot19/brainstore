@@ -2,16 +2,16 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Modèles de véhicule</h4>
-      <h6>Référentiel des modèles par marque</h6>
+      <h4>{{ 'fleet.mo.title' | transloco }}</h4>
+      <h6>{{ 'fleet.mo.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
-    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'fleet.common.refresh' | transloco"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#model-modal" *hasPermission="'fleet.model.manage'" (click)="openCreate()">
-      <i class="ti ti-circle-plus me-2"></i>Nouveau modèle
+      <i class="ti ti-circle-plus me-2"></i>{{ 'fleet.mo.new' | transloco }}
     </a>
   </div>
 </div>
@@ -21,7 +21,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-primary border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Total modèles</p><h4 class="text-white">{{ total }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'fleet.mo.total' | transloco }}</p><h4 class="text-white">{{ total }}</h4></div>
         <span class="avatar avatar-lg bg-primary-900"><i class="ti ti-car"></i></span>
       </div>
     </div>
@@ -36,14 +36,14 @@
         <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
         <div class="dataTables_filter">
           <label>
-            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Marque ou modèle…" />
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'fleet.mo.search_ph' | transloco" />
           </label>
         </div>
       </div>
     </div>
     <div class="d-flex align-items-center flex-wrap gap-2">
       <select [(ngModel)]="filterBrandId" (ngModelChange)="onFilterChange()" class="form-select w-auto">
-        <option value="">Toutes les marques</option>
+        <option value="">{{ 'fleet.mo.filter_all_brands' | transloco }}</option>
         @for (b of brands; track b.id) { <option [value]="b.id">{{ b.name }}</option> }
       </select>
     </div>
@@ -56,12 +56,12 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Marque</th>
-              <th>Modèle</th>
-              <th>Carburant</th>
-              <th>Transmission</th>
-              <th>Places</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'fleet.br.col_brand' | transloco }}</th>
+              <th>{{ 'fleet.mo.col_model' | transloco }}</th>
+              <th>{{ 'fleet.mo.col_fuel' | transloco }}</th>
+              <th>{{ 'fleet.mo.col_transmission' | transloco }}</th>
+              <th>{{ 'fleet.mo.col_seats' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -77,19 +77,19 @@
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#model-modal"
-                       *hasPermission="'fleet.model.manage'" (click)="openEdit(m)" title="Modifier">
-                      <i class="ti ti-edit me-1"></i>Modifier
+                       *hasPermission="'fleet.model.manage'" (click)="openEdit(m)" [title]="'shared.actions.edit' | transloco">
+                      <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
                     </a>
                     <a href="javascript:void(0);"
                        class="p-2 d-flex align-items-center border rounded"
-                       *hasPermission="'fleet.model.manage'" (click)="delete(m.id)" title="Supprimer">
-                      <i class="ti ti-trash text-danger me-1"></i>Supprimer
+                       *hasPermission="'fleet.model.manage'" (click)="delete(m.id)" [title]="'shared.actions.delete' | transloco">
+                      <i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}
                     </a>
                   </div>
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="6" class="text-center py-4 text-muted">Aucun modèle trouvé.</td></tr>
+              <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'fleet.mo.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -104,7 +104,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ editId ? 'Modifier le modèle' : 'Nouveau modèle' }}</h5>
+        <h5 class="modal-title">{{ (editId ? 'fleet.mo.edit_title' : 'fleet.mo.new') | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="form" (ngSubmit)="submit()">
@@ -113,30 +113,30 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Marque <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.br.col_brand' | transloco }} <span class="text-danger">*</span></label>
               <select formControlName="brand_id" class="form-select">
-                <option value="">— Sélectionner —</option>
+                <option value="">{{ 'fleet.common.select' | transloco }}</option>
                 @for (b of brands; track b.id) { <option [value]="b.id">{{ b.name }}</option> }
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Nom du modèle <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.mo.f_model_name' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="name" type="text" class="form-control" placeholder="Corolla, Sprinter…" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Carburant <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.mo.col_fuel' | transloco }} <span class="text-danger">*</span></label>
               <select formControlName="fuel_type_id" class="form-select">
-                <option [ngValue]="null">— Choisir —</option>
+                <option [ngValue]="null">{{ 'fleet.common.choose' | transloco }}</option>
                 @for (f of fuelTypes; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Transmission</label>
+              <label class="form-label">{{ 'fleet.mo.col_transmission' | transloco }}</label>
               <select formControlName="transmission_id" class="form-select">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (t of transmissions; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
               </select>
             </div>
@@ -144,9 +144,9 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Traction</label>
+              <label class="form-label">{{ 'fleet.mo.f_traction' | transloco }}</label>
               <select formControlName="traction_type_id" class="form-select">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (t of tractions; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
               </select>
             </div>
@@ -154,28 +154,28 @@
 
           <div class="row">
             <div class="col-md-3 mb-3">
-              <label class="form-label">Places</label>
+              <label class="form-label">{{ 'fleet.mo.col_seats' | transloco }}</label>
               <input formControlName="seats" type="number" min="1" class="form-control" placeholder="5" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Portes</label>
+              <label class="form-label">{{ 'fleet.mo.f_doors' | transloco }}</label>
               <input formControlName="doors" type="number" min="1" class="form-control" placeholder="4" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Puissance (ch)</label>
+              <label class="form-label">{{ 'fleet.mo.f_hp' | transloco }}</label>
               <input formControlName="horsepower" type="number" min="1" class="form-control" placeholder="150" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Charge utile (kg)</label>
+              <label class="form-label">{{ 'fleet.mo.f_payload' | transloco }}</label>
               <input formControlName="payload_kg" type="number" min="0" class="form-control" placeholder="800" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            {{ editId ? 'Enregistrer' : 'Créer' }}
+            {{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}
           </button>
         </div>
       </form>
