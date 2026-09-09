@@ -8,12 +8,13 @@ import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyag
 import { CrewMember } from '../../../models/crew.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-voyages-trip-detail',
   templateUrl: './trip-detail.component.html',
   styleUrls: ['./trip-detail.component.scss'],
-  imports: [HasPermissionDirective, CommonModule, FormsModule, RouterModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, RouterModule, TranslocoModule],
 })
 export class VoyagesTripDetailComponent implements OnInit {
   private toast = inject(ToastService);

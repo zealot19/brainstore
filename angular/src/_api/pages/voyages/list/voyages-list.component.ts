@@ -13,11 +13,12 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-voyages-list',
   templateUrl: './voyages-list.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class VoyagesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };

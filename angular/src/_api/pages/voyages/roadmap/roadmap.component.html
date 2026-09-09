@@ -1,10 +1,10 @@
 <div class="rm-actions no-print">
   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-    <button class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-1"></i>Retour</button>
+    <button class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-1"></i>{{ 'shared.actions.back' | transloco }}</button>
     <div class="d-flex gap-2">
-      @if (canBoard) { <button class="btn btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>Tout embarquer</button> }
-      <button class="btn btn-outline-primary" (click)="printDoc('voyages')"><i class="ti ti-printer me-1"></i>Bordereau Voyages</button>
-      <button class="btn btn-outline-primary" (click)="printDoc('colis')"><i class="ti ti-printer me-1"></i>Bordereau Colis</button>
+      @if (canBoard) { <button class="btn btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>{{ 'trips.rm.board_all' | transloco }}</button> }
+      <button class="btn btn-outline-primary" (click)="printDoc('voyages')"><i class="ti ti-printer me-1"></i>{{ 'trips.rm.doc_voyages' | transloco }}</button>
+      <button class="btn btn-outline-primary" (click)="printDoc('colis')"><i class="ti ti-printer me-1"></i>{{ 'trips.rm.doc_colis' | transloco }}</button>
     </div>
   </div>
 </div>
@@ -15,9 +15,9 @@
   <div class="card mb-3 no-print"><div class="card-body">
     <h4>{{ data.trip.number }} <span class="badge bg-info ms-2">{{ data.trip.status_display }}</span></h4>
     <p class="mb-1">{{ data.trip.origin_name }} → {{ data.trip.destination_name }} · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</p>
-    <p class="mb-1 text-muted">Véhicule : {{ data.trip.vehicle_plate || '—' }} · Équipage :
+    <p class="mb-1 text-muted">{{ 'trips.rm.vehicle' | transloco }} : {{ data.trip.vehicle_plate || '—' }} · {{ 'trips.rm.crew' | transloco }} :
       @for (c of data.trip.crew; track $index) { {{ c.role_display }} {{ c.driver_name }}@if (!$last) { , } } @empty { — }</p>
-    <p class="mb-0"><strong>Remplissage :</strong> {{ data.trip.seats_sold }}/{{ data.trip.seats_total }} · <strong>Embarqués :</strong> {{ data.trip.boarded_count }}</p>
+    <p class="mb-0"><strong>{{ 'trips.rm.fill' | transloco }} :</strong> {{ data.trip.seats_sold }}/{{ data.trip.seats_total }} · <strong>{{ 'trips.rm.boarded' | transloco }} :</strong> {{ data.trip.boarded_count }}</p>
   </div></div>
 
   <!-- ===================== Bordereau Voyages ===================== -->
@@ -31,36 +31,36 @@
           <div class="rm-company-contact">{{ data.company.phone }}@if (data.company.address) {  · {{ data.company.address }} }</div>
         </div>
       </div>
-      <div class="rm-doc-title">Bordereau Voyages</div>
+      <div class="rm-doc-title">{{ 'trips.rm.doc_voyages' | transloco }}</div>
     </div>
     <div class="rm-trip-line">
       <strong>{{ data.trip.number }}</strong> — {{ data.trip.origin_name }} → {{ data.trip.destination_name }}
-      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · Véhicule {{ data.trip.vehicle_plate || '—' }}
+      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · {{ 'trips.rm.vehicle' | transloco }} {{ data.trip.vehicle_plate || '—' }}
     </div>
 
-    <h6 class="rm-section">Passagers ({{ data.passengers.length }})</h6>
+    <h6 class="rm-section">{{ 'trips.rm.passengers' | transloco }} ({{ data.passengers.length }})</h6>
     <table class="table table-bordered rm-table">
-      <thead><tr><th>#</th><th>Billet</th><th>Passager</th><th>Siège</th><th>Descente</th><th>Sens</th><th>Embarqué</th><th class="no-print rm-act">Action</th><th class="print-only">Émargement</th></tr></thead>
+      <thead><tr><th>#</th><th>{{ 'trips.rm.col_ticket' | transloco }}</th><th>{{ 'trips.rm.col_passenger' | transloco }}</th><th>{{ 'trips.rm.col_seat' | transloco }}</th><th>{{ 'trips.rm.col_dropoff' | transloco }}</th><th>{{ 'trips.rm.col_direction' | transloco }}</th><th>{{ 'trips.rm.col_boarded' | transloco }}</th><th class="no-print rm-act">{{ 'trips.rm.col_action' | transloco }}</th><th class="print-only">{{ 'trips.rm.col_signature' | transloco }}</th></tr></thead>
       <tbody>
         @for (p of data.passengers; track p.ticket_id; let i = $index) {
           <tr>
             <td>{{ i + 1 }}</td><td>{{ p.number }}</td><td>{{ p.passenger_name }}</td>
             <td>{{ p.seat_number }}</td><td>{{ p.destination_point_name }}</td><td>{{ p.direction_display }}</td>
-            <td>@if (p.boarded) { <span class="badge bg-success">Oui</span> } @else { <span class="badge bg-secondary">Non</span> }</td>
+            <td>@if (p.boarded) { <span class="badge bg-success">{{ 'trips.rm.yes' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'trips.rm.no' | transloco }}</span> }</td>
             <td class="no-print rm-act">@if (!p.boarded && canBoard) { <button class="btn btn-sm btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="board(p.ticket_id)"><i class="ti ti-user-check"></i></button> }</td>
             <td class="print-only"></td>
           </tr>
-        } @empty { <tr><td colspan="9" class="text-center text-muted">Aucun passager.</td></tr> }
+        } @empty { <tr><td colspan="9" class="text-center text-muted">{{ 'trips.rm.empty_pax' | transloco }}</td></tr> }
       </tbody>
     </table>
 
-    <h6 class="rm-section">Bagages ({{ data.baggage.length }})</h6>
+    <h6 class="rm-section">{{ 'trips.rm.baggage' | transloco }} ({{ data.baggage.length }})</h6>
     <table class="table table-bordered rm-table">
-      <thead><tr><th>Étiquette</th><th>Propriétaire</th><th>Description</th><th>Poids</th><th>Nb</th></tr></thead>
+      <thead><tr><th>{{ 'trips.rm.bg_tag' | transloco }}</th><th>{{ 'trips.rm.bg_owner' | transloco }}</th><th>{{ 'trips.rm.bg_desc' | transloco }}</th><th>{{ 'trips.rm.bg_weight' | transloco }}</th><th>{{ 'trips.rm.bg_qty' | transloco }}</th></tr></thead>
       <tbody>
         @for (b of data.baggage; track b.tag_number) {
           <tr><td>{{ b.tag_number }}</td><td>{{ b.owner_name }}</td><td>{{ b.description || '—' }}</td><td>{{ b.weight_kg || '—' }}</td><td>{{ b.quantity }}</td></tr>
-        } @empty { <tr><td colspan="5" class="text-center text-muted">Aucun bagage.</td></tr> }
+        } @empty { <tr><td colspan="5" class="text-center text-muted">{{ 'trips.rm.empty_bg' | transloco }}</td></tr> }
       </tbody>
     </table>
   </div>
@@ -76,27 +76,27 @@
           <div class="rm-company-contact">{{ data.company.phone }}@if (data.company.address) {  · {{ data.company.address }} }</div>
         </div>
       </div>
-      <div class="rm-doc-title">Bordereau Colis</div>
+      <div class="rm-doc-title">{{ 'trips.rm.doc_colis' | transloco }}</div>
     </div>
     <div class="rm-trip-line">
       <strong>{{ data.trip.number }}</strong> — {{ data.trip.origin_name }} → {{ data.trip.destination_name }}
-      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · Véhicule {{ data.trip.vehicle_plate || '—' }}
+      · {{ data.trip.scheduled_departure | date:'dd/MM/yyyy HH:mm' }} · {{ 'trips.rm.vehicle' | transloco }} {{ data.trip.vehicle_plate || '—' }}
     </div>
-    <h6 class="rm-section">Colis ({{ data.parcels.length }})</h6>
+    <h6 class="rm-section">{{ 'trips.rm.parcels' | transloco }} ({{ data.parcels.length }})</h6>
     <table class="table table-bordered rm-table">
-      <thead><tr><th>Référence</th><th>Expéditeur</th><th>Destinataire</th><th>Description</th><th>Pièces</th></tr></thead>
+      <thead><tr><th>{{ 'trips.rm.pc_ref' | transloco }}</th><th>{{ 'trips.rm.pc_sender' | transloco }}</th><th>{{ 'trips.rm.pc_recipient' | transloco }}</th><th>{{ 'trips.rm.bg_desc' | transloco }}</th><th>{{ 'trips.rm.pc_pieces' | transloco }}</th></tr></thead>
       <tbody>
         @for (c of data.parcels; track c.reference) {
           <tr><td>{{ c.reference }}</td><td>{{ c.sender_name }}<br><small>{{ c.sender_phone }}</small></td>
             <td>{{ c.recipient_name }}<br><small>{{ c.recipient_phone }}</small></td><td>{{ c.description || '—' }}</td><td>{{ c.quantity }}</td></tr>
-        } @empty { <tr><td colspan="5" class="text-center text-muted">Aucun colis chargé.</td></tr> }
+        } @empty { <tr><td colspan="5" class="text-center text-muted">{{ 'trips.rm.empty_pc' | transloco }}</td></tr> }
       </tbody>
     </table>
   </div>
 }
 @else if (!loading) {
   <div class="alert alert-warning no-print">
-    <i class="ti ti-alert-triangle me-1"></i>{{ errorMsg || 'Feuille de route indisponible.' }}
-    <button class="btn btn-sm btn-outline-secondary ms-2" (click)="load()">Réessayer</button>
+    <i class="ti ti-alert-triangle me-1"></i>{{ errorMsg || ('trips.rm.unavailable' | transloco) }}
+    <button class="btn btn-sm btn-outline-secondary ms-2" (click)="load()">{{ 'trips.rm.retry' | transloco }}</button>
   </div>
 }
