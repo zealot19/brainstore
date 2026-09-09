@@ -1,15 +1,15 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Trajets</h4><h6>Itinéraires et escales</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#route-modal" *hasPermission="'transport.route.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Nouveau trajet</a></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'vcfg.routes.title' | transloco }}</h4><h6>{{ 'vcfg.routes.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#route-modal" *hasPermission="'transport.route.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'vcfg.routes.new' | transloco }}</a></div>
 </div>
-<app-info-banner text="Un trajet relie une gare d'origine à une gare de destination. Ajoutez des escales (points de service, gares ou simples arrêts) — elles serviront à la tarification par segment."></app-info-banner>
+<app-info-banner [text]="'vcfg.routes.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
-  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher…" /></div></div></div>
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'vcfg.common.search_ph' | transloco" /></div></div></div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>Code</th><th>Libellé</th><th>Origine</th><th>Destination</th><th>Escales</th><th>Distance</th><th>Périmètre</th><th class="no-sort">Actions</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'vcfg.common.code' | transloco }}</th><th>{{ 'vcfg.common.label' | transloco }}</th><th>{{ 'vcfg.routes.col_origin' | transloco }}</th><th>{{ 'vcfg.routes.col_destination' | transloco }}</th><th>{{ 'vcfg.routes.col_stops' | transloco }}</th><th>{{ 'vcfg.routes.col_distance' | transloco }}</th><th>{{ 'vcfg.common.perimeter' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
@@ -19,15 +19,15 @@
               <td>{{ r.destination_name || '—' }}</td>
               <td><span class="badge bg-info">{{ r.stops.length }}</span></td>
               <td>{{ r.distance_km ? (r.distance_km + ' km') : '—' }}</td>
-              <td>@if (r.scope === 'global') { <span class="badge bg-secondary">Global</span> } @else { <span class="badge bg-info">Spécifique</span> }</td>
+              <td>@if (r.scope === 'global') { <span class="badge bg-secondary">{{ 'vcfg.common.scope_global' | transloco }}</span> } @else { <span class="badge bg-info">{{ 'vcfg.common.scope_specific' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 @if (r.scope !== 'global') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#route-modal" *hasPermission="'transport.route.manage'" (click)="openEdit(r)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'transport.route.manage'" (click)="delete(r)" title="Supprimer"><i class="ti ti-trash me-1"></i>Supprimer</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#route-modal" *hasPermission="'transport.route.manage'" (click)="openEdit(r)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'transport.route.manage'" (click)="delete(r)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun trajet.</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'vcfg.routes.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -35,57 +35,57 @@
   </div>
 </div>
 <div class="modal fade" id="route-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ editId ? 'Modifier le trajet' : 'Nouveau trajet' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeAndReload()"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'vcfg.routes.edit_title' : 'vcfg.routes.new') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeAndReload()"></button></div>
   <div class="modal-body">
     <form [formGroup]="form" (ngSubmit)="submit()">
       @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
       <div class="row">
-        <div class="col-md-4 mb-3"><label class="form-label">Code <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="DLA-YDE" /></div>
-        <div class="col-md-8 mb-3"><label class="form-label">Libellé</label><input formControlName="label" type="text" class="form-control" placeholder="Douala → Yaoundé" /></div>
+        <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.common.code' | transloco }} <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="DLA-YDE" /></div>
+        <div class="col-md-8 mb-3"><label class="form-label">{{ 'vcfg.common.label' | transloco }}</label><input formControlName="label" type="text" class="form-control" placeholder="Douala → Yaoundé" /></div>
       </div>
       <div class="row">
-        <div class="col-md-6 mb-3"><label class="form-label">Origine (gare) <span class="text-danger">*</span></label>
-          <select formControlName="origin_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of stations; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.routes.f_origin' | transloco }} <span class="text-danger">*</span></label>
+          <select formControlName="origin_id" class="form-select"><option [ngValue]="null">{{ 'vcfg.common.choose' | transloco }}</option>@for (s of stations; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
         </div>
-        <div class="col-md-6 mb-3"><label class="form-label">Destination (gare) <span class="text-danger">*</span></label>
-          <select formControlName="destination_id" class="form-select"><option [ngValue]="null">— Choisir —</option>@for (s of stations; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.routes.f_destination' | transloco }} <span class="text-danger">*</span></label>
+          <select formControlName="destination_id" class="form-select"><option [ngValue]="null">{{ 'vcfg.common.choose' | transloco }}</option>@for (s of stations; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 mb-3"><label class="form-label">Distance (km)</label><input formControlName="distance_km" type="number" step="0.1" min="0" class="form-control" /></div>
-        <div class="col-md-6 mb-3"><label class="form-label">Durée estimée (hh:mm:ss)</label><input formControlName="estimated_duration" type="text" class="form-control" placeholder="03:30:00" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.routes.f_distance' | transloco }}</label><input formControlName="distance_km" type="number" step="0.1" min="0" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.routes.f_duration' | transloco }}</label><input formControlName="estimated_duration" type="text" class="form-control" placeholder="03:30:00" /></div>
       </div>
-      <div class="form-check form-switch mb-2"><input formControlName="is_active" type="checkbox" class="form-check-input" id="route-active" /><label class="form-check-label" for="route-active">Actif</label></div>
-      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ editId ? 'Enregistrer' : 'Créer le trajet' }}</button>
+      <div class="form-check form-switch mb-2"><input formControlName="is_active" type="checkbox" class="form-check-input" id="route-active" /><label class="form-check-label" for="route-active">{{ 'vcfg.common.active' | transloco }}</label></div>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ (editId ? 'shared.actions.save' : 'vcfg.routes.create_route') | transloco }}</button>
     </form>
 
     <hr>
-    <h6 class="fw-semibold">Escales</h6>
+    <h6 class="fw-semibold">{{ 'vcfg.routes.stops_header' | transloco }}</h6>
     @if (!stopFor) {
-      <p class="text-muted small">Enregistrez d'abord le trajet pour ajouter des escales.</p>
+      <p class="text-muted small">{{ 'vcfg.routes.save_first' | transloco }}</p>
     } @else {
       <table class="table table-sm mb-2">
-        <thead><tr><th>Ordre</th><th>Point de service</th><th>Type</th><th>Distance</th><th></th></tr></thead>
+        <thead><tr><th>{{ 'vcfg.routes.st_order' | transloco }}</th><th>{{ 'vcfg.routes.st_sp' | transloco }}</th><th>{{ 'vcfg.routes.st_type' | transloco }}</th><th>{{ 'vcfg.routes.col_distance' | transloco }}</th><th></th></tr></thead>
         <tbody>
           @for (st of stops; track st.id) {
             <tr>
               <td>{{ st.sequence }}</td>
               <td>{{ st.service_point_name }}</td>
-              <td>@if (st.is_station) { <span class="badge bg-success">Gare</span> } @else { <span class="badge bg-light text-dark">Arrêt</span> }</td>
+              <td>@if (st.is_station) { <span class="badge bg-success">{{ 'vcfg.routes.badge_station' | transloco }}</span> } @else { <span class="badge bg-light text-dark">{{ 'vcfg.routes.badge_stop' | transloco }}</span> }</td>
               <td>{{ st.distance_from_origin_km ? (st.distance_from_origin_km + ' km') : '—' }}</td>
-              <td><a class="text-danger" (click)="deleteStop(st.id)" title="Retirer"><i class="ti ti-trash"></i></a></td>
+              <td><a class="text-danger" (click)="deleteStop(st.id)" [title]="'vcfg.routes.remove' | transloco"><i class="ti ti-trash"></i></a></td>
             </tr>
-          } @empty { <tr><td colspan="5" class="text-muted">Aucune escale.</td></tr> }
+          } @empty { <tr><td colspan="5" class="text-muted">{{ 'vcfg.routes.no_stops' | transloco }}</td></tr> }
         </tbody>
       </table>
       <div class="row g-2 align-items-end">
-        <div class="col-md-6"><label class="form-label small">Escale (point de service)</label>
-          <select class="form-select form-select-sm" [(ngModel)]="newStopSp"><option [ngValue]="null">— Choisir —</option>@for (s of servicePoints; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
+        <div class="col-md-6"><label class="form-label small">{{ 'vcfg.routes.f_stop_sp' | transloco }}</label>
+          <select class="form-select form-select-sm" [(ngModel)]="newStopSp"><option [ngValue]="null">{{ 'vcfg.common.choose' | transloco }}</option>@for (s of servicePoints; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
         </div>
-        <div class="col-md-4"><label class="form-label small">Distance depuis origine (km)</label><input type="number" step="0.1" min="0" class="form-control form-control-sm" [(ngModel)]="newStopDistance"></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'transport.route.manage'" (click)="addStop()" [disabled]="!newStopSp || savingStop">+ Ajouter</button></div>
+        <div class="col-md-4"><label class="form-label small">{{ 'vcfg.routes.f_stop_distance' | transloco }}</label><input type="number" step="0.1" min="0" class="form-control form-control-sm" [(ngModel)]="newStopDistance"></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'transport.route.manage'" (click)="addStop()" [disabled]="!newStopSp || savingStop">{{ 'vcfg.routes.add_stop' | transloco }}</button></div>
       </div>
     }
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="closeAndReload()">Fermer</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="closeAndReload()">{{ 'shared.actions.close' | transloco }}</button></div>
 </div></div></div>
