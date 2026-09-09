@@ -1,13 +1,13 @@
 <div class="page-header">
       <div class="add-item d-flex">
         <div class="page-title">
-          <h4>Missions</h4>
-          <h6>Affectations et déplacements de véhicules</h6>
+          <h4>{{ 'fleet.asg.title' | transloco }}</h4>
+          <h6>{{ 'fleet.asg.subtitle' | transloco }}</h6>
         </div>
       </div>
       <div class="page-btn">
         <a class="btn btn-added" data-bs-toggle="modal" data-bs-target="#create-assignment-modal" *hasPermission="'fleet.assignment.manage'" (click)="openCreate()">
-          <i class="ti ti-circle-plus"></i>Nouvelle mission
+          <i class="ti ti-circle-plus"></i>{{ 'fleet.asg.new' | transloco }}
         </a>
       </div>
     </div>
@@ -17,19 +17,19 @@
       <div class="col-md-2">
         <div class="card p-3 text-center">
           <h4 class="mb-0 text-info">{{ totalPlanned }}</h4>
-          <small class="text-muted">Planifiées</small>
+          <small class="text-muted">{{ 'fleet.asg.stat_planned' | transloco }}</small>
         </div>
       </div>
       <div class="col-md-2">
         <div class="card p-3 text-center">
           <h4 class="mb-0 text-warning">{{ totalInProgress }}</h4>
-          <small class="text-muted">En cours</small>
+          <small class="text-muted">{{ 'fleet.asg.stat_in_progress' | transloco }}</small>
         </div>
       </div>
       <div class="col-md-4">
-        <label class="form-label fw-semibold">Statut</label>
+        <label class="form-label fw-semibold">{{ 'fleet.common.status' | transloco }}</label>
         <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
-          <option value="">Tous</option>
+          <option value="">{{ 'fleet.common.all' | transloco }}</option>
           <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
         </select>
       </div>
@@ -42,14 +42,14 @@
           <table class="table table-hover mb-0">
             <thead class="thead-light">
               <tr>
-                <th>Véhicule</th>
-                <th>Conducteur</th>
-                <th>Objet</th>
-                <th>Destination</th>
-                <th>Départ prévu</th>
-                <th>Retour prévu</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ 'fleet.common.vehicle' | transloco }}</th>
+                <th>{{ 'fleet.asg.col_driver' | transloco }}</th>
+                <th>{{ 'fleet.asg.col_purpose' | transloco }}</th>
+                <th>{{ 'fleet.asg.col_destination' | transloco }}</th>
+                <th>{{ 'fleet.asg.col_departure' | transloco }}</th>
+                <th>{{ 'fleet.asg.col_return' | transloco }}</th>
+                <th>{{ 'fleet.common.status' | transloco }}</th>
+                <th>{{ 'shared.common.actions' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
@@ -63,24 +63,24 @@
                 <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
                 <td>
                   <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'planned'" class="btn btn-sm btn-outline-warning me-1"
-                     (click)="startAssignment(a.id)" title="Démarrer">
-                    <i class="ti ti-player-play me-1"></i>Démarrer
+                     (click)="startAssignment(a.id)" [title]="'fleet.asg.act_start' | transloco">
+                    <i class="ti ti-player-play me-1"></i>{{ 'fleet.asg.act_start' | transloco }}
                   </a></ng-container>
                   <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'in_progress'" class="btn btn-sm btn-outline-success me-1"
-                     (click)="completeAssignment(a.id)" title="Clôturer">
-                    <i class="ti ti-check me-1"></i>Terminer
+                     (click)="completeAssignment(a.id)" [title]="'fleet.asg.act_complete' | transloco">
+                    <i class="ti ti-check me-1"></i>{{ 'fleet.asg.act_complete' | transloco }}
                   </a></ng-container>
                   <ng-container *hasPermission="'fleet.assignment.manage'"><a *ngIf="a.status === 'planned' || a.status === 'in_progress'"
-                     class="btn btn-sm btn-outline-danger me-1" (click)="cancelAssignment(a.id)" title="Annuler">
-                    <i class="ti ti-x me-1"></i>Annuler
+                     class="btn btn-sm btn-outline-danger me-1" (click)="cancelAssignment(a.id)" [title]="'shared.actions.cancel' | transloco">
+                    <i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}
                   </a></ng-container>
-                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.assignment.manage'" (click)="delete(a.id)" title="Supprimer">
-                    <i class="ti ti-trash me-1"></i>Supprimer
+                  <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.assignment.manage'" (click)="delete(a.id)" [title]="'shared.actions.delete' | transloco">
+                    <i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}
                   </a>
                 </td>
               </tr>
               <tr *ngIf="filtered.length === 0">
-                <td colspan="8" class="text-center text-muted py-4">Aucune mission trouvée.</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ 'fleet.asg.empty' | transloco }}</td>
               </tr>
             </tbody>
           </table>
@@ -94,7 +94,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvelle mission</h5>
+        <h5 class="modal-title">{{ 'fleet.asg.new' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
@@ -102,49 +102,49 @@
           <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Véhicule *</label>
+              <label class="form-label">{{ 'fleet.common.vehicle' | transloco }} *</label>
               <select class="form-select" formControlName="vehicle_id">
-                <option value="">-- Sélectionner --</option>
+                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
                 <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Conducteur externe</label>
+              <label class="form-label">{{ 'fleet.asg.f_ext_driver' | transloco }}</label>
               <select class="form-select" formControlName="external_driver_id">
-                <option value="">-- Conducteur interne --</option>
+                <option value="">{{ 'fleet.asg.opt_internal' | transloco }}</option>
                 <option *ngFor="let d of extDrivers" [value]="d.id">{{ d.full_name }}</option>
               </select>
             </div>
             <div class="col-12">
-              <label class="form-label">Objet de la mission *</label>
+              <label class="form-label">{{ 'fleet.asg.f_purpose' | transloco }} *</label>
               <input type="text" class="form-control" formControlName="purpose">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Destination *</label>
+              <label class="form-label">{{ 'fleet.asg.col_destination' | transloco }} *</label>
               <input type="text" class="form-control" formControlName="destination">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Lieu de départ</label>
+              <label class="form-label">{{ 'fleet.asg.f_departure_location' | transloco }}</label>
               <input type="text" class="form-control" formControlName="departure_location">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Départ prévu *</label>
+              <label class="form-label">{{ 'fleet.asg.col_departure' | transloco }} *</label>
               <input type="datetime-local" class="form-control" formControlName="planned_departure">
             </div>
             <div class="col-md-6">
-              <label class="form-label">Retour prévu</label>
+              <label class="form-label">{{ 'fleet.asg.col_return' | transloco }}</label>
               <input type="datetime-local" class="form-control" formControlName="planned_return">
             </div>
             <div class="col-12">
-              <label class="form-label">Notes</label>
+              <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="notes"></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="saving">
-            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>Créer
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.create' | transloco }}
           </button>
         </div>
       </form>

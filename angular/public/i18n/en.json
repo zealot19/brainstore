@@ -1066,7 +1066,9 @@
       "date": "Date",
       "choose": "— Choose —",
       "none_f": "— None —",
-      "select": "— Select —"
+      "select": "— Select —",
+      "vehicle": "Vehicle",
+      "all": "All"
     },
     "parking": {
       "title": "Parking lots",
@@ -1169,6 +1171,41 @@
       "f_doors": "Doors",
       "f_hp": "Power (hp)",
       "f_payload": "Payload (kg)"
+    },
+    "doc": {
+      "title": "Vehicle documents",
+      "subtitle": "Regulatory document tracking",
+      "add": "Add a document",
+      "edit_title": "Edit a document",
+      "stat_docs": "Documents",
+      "stat_expiring": "Exp. < 30d",
+      "stat_expired": "Expired",
+      "col_type": "Type",
+      "col_number": "Number",
+      "col_issue": "Issue",
+      "col_expiry": "Expiry",
+      "badge_expired": "Expired",
+      "empty_none": "No documents.",
+      "f_issue": "Issue date"
+    },
+    "asg": {
+      "title": "Missions",
+      "subtitle": "Vehicle assignments and trips",
+      "new": "New mission",
+      "stat_planned": "Planned",
+      "stat_in_progress": "In progress",
+      "col_driver": "Driver",
+      "col_purpose": "Purpose",
+      "col_destination": "Destination",
+      "col_departure": "Planned departure",
+      "col_return": "Planned return",
+      "act_start": "Start",
+      "act_complete": "Complete",
+      "empty": "No missions found.",
+      "f_ext_driver": "External driver",
+      "opt_internal": "-- Internal driver --",
+      "f_purpose": "Mission purpose",
+      "f_departure_location": "Departure location"
     }
   }
 }

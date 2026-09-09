@@ -1066,7 +1066,9 @@
       "date": "Date",
       "choose": "— Choisir —",
       "none_f": "— Aucune —",
-      "select": "— Sélectionner —"
+      "select": "— Sélectionner —",
+      "vehicle": "Véhicule",
+      "all": "Tous"
     },
     "parking": {
       "title": "Parkings",
@@ -1169,6 +1171,41 @@
       "f_doors": "Portes",
       "f_hp": "Puissance (ch)",
       "f_payload": "Charge utile (kg)"
+    },
+    "doc": {
+      "title": "Documents véhicule",
+      "subtitle": "Suivi des documents réglementaires",
+      "add": "Ajouter un document",
+      "edit_title": "Modifier un document",
+      "stat_docs": "Documents",
+      "stat_expiring": "Exp. < 30j",
+      "stat_expired": "Expirés",
+      "col_type": "Type",
+      "col_number": "Numéro",
+      "col_issue": "Émission",
+      "col_expiry": "Échéance",
+      "badge_expired": "Expiré",
+      "empty_none": "Aucun document.",
+      "f_issue": "Date d'émission"
+    },
+    "asg": {
+      "title": "Missions",
+      "subtitle": "Affectations et déplacements de véhicules",
+      "new": "Nouvelle mission",
+      "stat_planned": "Planifiées",
+      "stat_in_progress": "En cours",
+      "col_driver": "Conducteur",
+      "col_purpose": "Objet",
+      "col_destination": "Destination",
+      "col_departure": "Départ prévu",
+      "col_return": "Retour prévu",
+      "act_start": "Démarrer",
+      "act_complete": "Terminer",
+      "empty": "Aucune mission trouvée.",
+      "f_ext_driver": "Conducteur externe",
+      "opt_internal": "-- Conducteur interne --",
+      "f_purpose": "Objet de la mission",
+      "f_departure_location": "Lieu de départ"
     }
   }
 }
