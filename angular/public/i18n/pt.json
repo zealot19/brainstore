@@ -1353,5 +1353,52 @@
       "f_note": "Nota",
       "submit_odometer": "Atualizar"
     }
+  },
+  "admin": {
+    "common": {
+      "search_ph": "Pesquisar…",
+      "refresh": "Atualizar",
+      "name": "Nome",
+      "code": "Código",
+      "type": "Tipo",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "status": "Estado",
+      "description": "Descrição"
+    },
+    "ag": {
+      "title": "Agências",
+      "subtitle": "Agências da sua instituição",
+      "new": "Nova agência",
+      "info": "Faça a gestão das agências da sua instituição. As caixas e os pontos de venda de bilhetes poderão ser associados a elas.",
+      "active": "Ativa",
+      "inactive": "Inativa",
+      "empty": "Sem agências.",
+      "edit_title": "Editar agência"
+    },
+    "role": {
+      "title": "Funções",
+      "subtitle": "Gerir as funções e as suas permissões",
+      "new": "Nova função",
+      "search_ph": "Nome…",
+      "col_permissions": "Permissões",
+      "perm_unit": "permissão(ões)",
+      "badge_system": "Sistema",
+      "badge_standard": "Padrão",
+      "act_manage_perms": "Gerir permissões",
+      "empty": "Nenhuma função encontrada.",
+      "modal_edit": "Editar função",
+      "f_name_ph": "Ex.: Caixa, Contabilista…",
+      "f_desc_ph": "Descrição opcional…"
+    },
+    "perm": {
+      "title": "Permissões",
+      "subtitle": "Definir as permissões autorizadas para esta função",
+      "saved": "Guardado",
+      "search_ph": "Pesquisar uma permissão por nome, recurso ou código…",
+      "selected_word": "permissão(ões) selecionada(s)",
+      "empty": "Nenhuma permissão encontrada.",
+      "col_resource": "Recurso"
+    }
   }
 }

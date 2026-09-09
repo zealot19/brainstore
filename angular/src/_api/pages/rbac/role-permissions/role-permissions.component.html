@@ -5,22 +5,22 @@
         <a href="javascript:void(0);" (click)="back()" class="text-muted me-2">
           <i class="ti ti-arrow-left fs-18"></i>
         </a>
-        Permissions
+        {{ 'admin.perm.title' | transloco }}
         @if (role) { <span class="text-muted fw-normal fs-16 ms-1">— {{ role.name }}</span> }
       </h4>
-      <h6>Définir les permissions autorisées pour ce rôle</h6>
+      <h6>{{ 'admin.perm.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      @if (saved) { <span class="badge bg-outline-success me-2"><i class="ti ti-check me-1"></i>Enregistré</span> }
+      @if (saved) { <span class="badge bg-outline-success me-2"><i class="ti ti-check me-1"></i>{{ 'admin.perm.saved' | transloco }}</span> }
       @if (errorMsg) { <span class="text-danger small me-2">{{ errorMsg }}</span> }
     </li>
   </ul>
   <div class="page-btn">
     <button class="btn btn-primary" (click)="save()" [disabled]="saving || loading">
       @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-      <i class="ti ti-device-floppy me-1"></i>Enregistrer
+      <i class="ti ti-device-floppy me-1"></i>{{ 'shared.actions.save' | transloco }}
     </button>
   </div>
 </div>
@@ -35,16 +35,16 @@
         <i class="ti ti-search position-absolute" style="left:10px;top:50%;transform:translateY(-50%);color:#999"></i>
         <input type="search" class="form-control ps-4"
                [(ngModel)]="search" (ngModelChange)="applySearch()"
-               placeholder="Rechercher une permission par nom, ressource ou code…" />
+               [placeholder]="'admin.perm.search_ph' | transloco" />
       </div>
       <span class="text-muted text-nowrap fs-13">
-        <strong class="text-primary">{{ totalSelected }}</strong> permission{{ totalSelected !== 1 ? 's' : '' }} sélectionnée{{ totalSelected !== 1 ? 's' : '' }}
+        <strong class="text-primary">{{ totalSelected }}</strong> {{ 'admin.perm.selected_word' | transloco }}
       </span>
     </div>
   </div>
 
   @if (visibleGroups.length === 0) {
-    <div class="card"><div class="card-body text-center text-muted py-5">Aucune permission trouvée.</div></div>
+    <div class="card"><div class="card-body text-center text-muted py-5">{{ 'admin.perm.empty' | transloco }}</div></div>
   } @else {
     <!-- Un bloc par module -->
     @for (group of visibleGroups; track group.moduleName) {
@@ -73,7 +73,7 @@
               <table class="table table-sm align-middle mb-0 perm-grid">
                 <thead class="thead-light">
                   <tr>
-                    <th style="min-width:180px">Ressource</th>
+                    <th style="min-width:180px">{{ 'admin.perm.col_resource' | transloco }}</th>
                     @for (col of group.columns; track col) {
                       <th class="text-center">
                         <span class="badge badge-sm" [ngClass]="actionClass(col)">{{ actionLabel(col) }}</span>
@@ -117,10 +117,10 @@
 
     <!-- Bouton bas de page -->
     <div class="d-flex justify-content-end mt-3 mb-4">
-      <button class="btn btn-light me-2" (click)="back()">Retour</button>
+      <button class="btn btn-light me-2" (click)="back()">{{ 'shared.actions.back' | transloco }}</button>
       <button class="btn btn-primary" (click)="save()" [disabled]="saving">
         @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-        <i class="ti ti-device-floppy me-1"></i>Enregistrer
+        <i class="ti ti-device-floppy me-1"></i>{{ 'shared.actions.save' | transloco }}
       </button>
     </div>
   }

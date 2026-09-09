@@ -1353,5 +1353,52 @@
       "f_note": "Nota",
       "submit_odometer": "Actualizar"
     }
+  },
+  "admin": {
+    "common": {
+      "search_ph": "Buscar…",
+      "refresh": "Actualizar",
+      "name": "Nombre",
+      "code": "Código",
+      "type": "Tipo",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "status": "Estado",
+      "description": "Descripción"
+    },
+    "ag": {
+      "title": "Agencias",
+      "subtitle": "Agencias de su institución",
+      "new": "Nueva agencia",
+      "info": "Gestione las agencias de su institución. Las cajas y los puntos de venta de billetes podrán vincularse a ellas.",
+      "active": "Activa",
+      "inactive": "Inactiva",
+      "empty": "Sin agencias.",
+      "edit_title": "Editar agencia"
+    },
+    "role": {
+      "title": "Roles",
+      "subtitle": "Gestionar los roles y sus permisos",
+      "new": "Nuevo rol",
+      "search_ph": "Nombre…",
+      "col_permissions": "Permisos",
+      "perm_unit": "permiso(s)",
+      "badge_system": "Sistema",
+      "badge_standard": "Estándar",
+      "act_manage_perms": "Gestionar permisos",
+      "empty": "No se encontraron roles.",
+      "modal_edit": "Editar rol",
+      "f_name_ph": "Ej.: Cajero, Contable…",
+      "f_desc_ph": "Descripción opcional…"
+    },
+    "perm": {
+      "title": "Permisos",
+      "subtitle": "Definir los permisos autorizados para este rol",
+      "saved": "Guardado",
+      "search_ph": "Buscar un permiso por nombre, recurso o código…",
+      "selected_word": "permiso(s) seleccionado(s)",
+      "empty": "No se encontraron permisos.",
+      "col_resource": "Recurso"
+    }
   }
 }

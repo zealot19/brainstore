@@ -1353,5 +1353,52 @@
       "f_note": "Note",
       "submit_odometer": "Update"
     }
+  },
+  "admin": {
+    "common": {
+      "search_ph": "Search…",
+      "refresh": "Refresh",
+      "name": "Name",
+      "code": "Code",
+      "type": "Type",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "description": "Description"
+    },
+    "ag": {
+      "title": "Agencies",
+      "subtitle": "Your institution's agencies",
+      "new": "New agency",
+      "info": "Manage your institution's agencies. Cash registers and ticket sales points can be attached to them.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No agencies.",
+      "edit_title": "Edit agency"
+    },
+    "role": {
+      "title": "Roles",
+      "subtitle": "Manage roles and their permissions",
+      "new": "New role",
+      "search_ph": "Name…",
+      "col_permissions": "Permissions",
+      "perm_unit": "permission(s)",
+      "badge_system": "System",
+      "badge_standard": "Standard",
+      "act_manage_perms": "Manage permissions",
+      "empty": "No roles found.",
+      "modal_edit": "Edit role",
+      "f_name_ph": "e.g. Cashier, Accountant…",
+      "f_desc_ph": "Optional description…"
+    },
+    "perm": {
+      "title": "Permissions",
+      "subtitle": "Define the allowed permissions for this role",
+      "saved": "Saved",
+      "search_ph": "Search a permission by name, resource or code…",
+      "selected_word": "permission(s) selected",
+      "empty": "No permissions found.",
+      "col_resource": "Resource"
+    }
   }
 }

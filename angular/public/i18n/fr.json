@@ -1353,5 +1353,52 @@
       "f_note": "Note",
       "submit_odometer": "Mettre à jour"
     }
+  },
+  "admin": {
+    "common": {
+      "search_ph": "Rechercher…",
+      "refresh": "Actualiser",
+      "name": "Nom",
+      "code": "Code",
+      "type": "Type",
+      "email": "Email",
+      "phone": "Téléphone",
+      "status": "Statut",
+      "description": "Description"
+    },
+    "ag": {
+      "title": "Agences",
+      "subtitle": "Agences de votre institution",
+      "new": "Nouvelle agence",
+      "info": "Gérez les agences de votre institution. Les caisses et les points de vente de billets pourront y être rattachés.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "Aucune agence.",
+      "edit_title": "Modifier l'agence"
+    },
+    "role": {
+      "title": "Rôles",
+      "subtitle": "Gérer les rôles et leurs permissions",
+      "new": "Nouveau rôle",
+      "search_ph": "Nom…",
+      "col_permissions": "Permissions",
+      "perm_unit": "permission(s)",
+      "badge_system": "Système",
+      "badge_standard": "Standard",
+      "act_manage_perms": "Gérer les permissions",
+      "empty": "Aucun rôle trouvé.",
+      "modal_edit": "Modifier rôle",
+      "f_name_ph": "Ex : Caissier, Comptable…",
+      "f_desc_ph": "Description optionnelle…"
+    },
+    "perm": {
+      "title": "Permissions",
+      "subtitle": "Définir les permissions autorisées pour ce rôle",
+      "saved": "Enregistré",
+      "search_ph": "Rechercher une permission par nom, ressource ou code…",
+      "selected_word": "permission(s) sélectionnée(s)",
+      "empty": "Aucune permission trouvée.",
+      "col_resource": "Ressource"
+    }
   }
 }
