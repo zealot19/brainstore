@@ -2,16 +2,16 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Véhicules</h4>
-      <h6>Gestion du parc automobile</h6>
+      <h4>{{ 'fleet.veh.title' | transloco }}</h4>
+      <h6>{{ 'fleet.veh.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
-    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'fleet.common.refresh' | transloco"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-vehicle-modal" *hasPermission="'fleet.vehicle.create'" (click)="openCreate()">
-      <i class="ti ti-circle-plus me-2"></i>Nouveau véhicule
+      <i class="ti ti-circle-plus me-2"></i>{{ 'fleet.veh.new' | transloco }}
     </a>
   </div>
 </div>
@@ -21,7 +21,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-purple border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Total</p><h4 class="text-white">{{ total }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'fleet.veh.stat_total' | transloco }}</p><h4 class="text-white">{{ total }}</h4></div>
         <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-car"></i></span>
       </div>
     </div>
@@ -29,7 +29,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-teal border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Disponibles</p><h4 class="text-white">{{ totalAvailable }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'fleet.dash.available' | transloco }}</p><h4 class="text-white">{{ totalAvailable }}</h4></div>
         <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-circle-check"></i></span>
       </div>
     </div>
@@ -37,7 +37,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-primary border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">En mission</p><h4 class="text-white">{{ totalOnMission }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'fleet.dash.on_mission' | transloco }}</p><h4 class="text-white">{{ totalOnMission }}</h4></div>
         <span class="avatar avatar-lg bg-primary-900"><i class="ti ti-road"></i></span>
       </div>
     </div>
@@ -45,8 +45,8 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-warning border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">En maintenance</p><h4 class="text-white">{{ totalMaintenance }}</h4></div>
-        <span class="avatar avatar-lg bg-warning-900"><i class="ti ti-tool me-1"></i>Réparation</span>
+        <div><p class="mb-1 text-white">{{ 'fleet.dash.in_maintenance' | transloco }}</p><h4 class="text-white">{{ totalMaintenance }}</h4></div>
+        <span class="avatar avatar-lg bg-warning-900"><i class="ti ti-tool me-1"></i>{{ 'fleet.dash.repair' | transloco }}</span>
       </div>
     </div>
   </div>
@@ -60,7 +60,7 @@
         <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
         <div class="dataTables_filter">
           <label>
-            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Immatriculation, marque, modèle…" />
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'fleet.veh.search_ph' | transloco" />
           </label>
         </div>
       </div>
@@ -69,10 +69,10 @@
       <!-- Filter status -->
       <div class="dropdown me-2">
         <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-          {{ filterStatus ? statusLabel(filterStatus) : 'Tous les statuts' }}
+          {{ filterStatus ? statusLabel(filterStatus) : ('fleet.common.all_statuses' | transloco) }}
         </a>
         <ul class="dropdown-menu dropdown-menu-end p-3">
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterStatus=''; onFilterChange()">Tous</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterStatus=''; onFilterChange()">{{ 'fleet.common.all' | transloco }}</a></li>
           @for (s of statuses; track s.value) {
             <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="filterStatus=s.value; onFilterChange()">{{ s.label }}</a></li>
           }
@@ -80,7 +80,7 @@
       </div>
       <!-- Filter catégorie -->
       <select [(ngModel)]="filterCategory" (ngModelChange)="onFilterChange()" class="form-select w-auto me-2">
-        <option value="">Toutes les catégories</option>
+        <option value="">{{ 'fleet.veh.filter_all_categories' | transloco }}</option>
         @for (c of categories; track c.id) { <option [value]="c.id">{{ c.name }}</option> }
       </select>
     </div>
@@ -93,15 +93,15 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Immatriculation</th>
-              <th>Marque / Modèle</th>
-              <th>Catégorie</th>
-              <th>Étiquettes</th>
-              <th>Statut</th>
-              <th>Km actuel</th>
-              <th>Conducteur</th>
-              <th>Actif</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'fleet.veh.col_plate' | transloco }}</th>
+              <th>{{ 'fleet.veh.col_brand_model' | transloco }}</th>
+              <th>{{ 'fleet.veh.col_category' | transloco }}</th>
+              <th>{{ 'fleet.veh.col_tags' | transloco }}</th>
+              <th>{{ 'fleet.common.status' | transloco }}</th>
+              <th>{{ 'fleet.veh.col_odometer' | transloco }}</th>
+              <th>{{ 'fleet.asg.col_driver' | transloco }}</th>
+              <th>{{ 'fleet.common.active' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -126,7 +126,7 @@
                 <td>{{ v.current_driver || '—' }}</td>
                 <td>
                   <span class="badge" [ngClass]="v.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
-                    {{ v.is_active ? 'Actif' : 'Inactif' }}
+                    {{ (v.is_active ? 'fleet.common.active' : 'fleet.common.inactive') | transloco }}
                   </span>
                 </td>
                 <td class="action-table-data">
@@ -135,27 +135,27 @@
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#odometer-modal"
-                       *hasPermission="'fleet.vehicle.update'" (click)="openOdometer(v)" title="Mettre à jour le kilométrage">
+                       *hasPermission="'fleet.vehicle.update'" (click)="openOdometer(v)" [title]="'fleet.veh.act_odometer' | transloco">
                       <i class="ti ti-gauge"></i>
                     </a>
                     <!-- Edit -->
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#edit-vehicle-modal"
-                       *hasPermission="'fleet.vehicle.update'" (click)="openEdit(v)" title="Modifier">
-                      <i class="ti ti-edit me-1"></i>Modifier
+                       *hasPermission="'fleet.vehicle.update'" (click)="openEdit(v)" [title]="'shared.actions.edit' | transloco">
+                      <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
                     </a>
                     <!-- Delete -->
                     <a href="javascript:void(0);"
                        class="p-2 d-flex align-items-center border rounded"
-                       *hasPermission="'fleet.vehicle.delete'" (click)="delete(v.id)" title="Supprimer">
-                      <i class="ti ti-trash text-danger me-1"></i>Supprimer
+                       *hasPermission="'fleet.vehicle.delete'" (click)="delete(v.id)" [title]="'shared.actions.delete' | transloco">
+                      <i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}
                     </a>
                   </div>
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="10" class="text-center py-4 text-muted">Aucun véhicule trouvé.</td></tr>
+              <tr><td colspan="10" class="text-center py-4 text-muted">{{ 'fleet.veh.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -170,7 +170,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouveau véhicule</h5>
+        <h5 class="modal-title">{{ 'fleet.veh.new' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
@@ -179,58 +179,58 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Modèle <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.veh.f_model' | transloco }} <span class="text-danger">*</span></label>
               <select formControlName="model_id" class="form-select">
-                <option value="">— Sélectionner —</option>
+                <option value="">{{ 'fleet.common.select' | transloco }}</option>
                 @for (m of allModels; track m.id) {
                   <option [value]="m.id">{{ m.brand_name }} {{ m.name }}</option>
                 }
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Immatriculation <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.veh.col_plate' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="license_plate" type="text" class="form-control" placeholder="AB-123-CD" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Numéro de châssis (VIN)</label>
+              <label class="form-label">{{ 'fleet.veh.f_vin' | transloco }}</label>
               <input formControlName="vin" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Couleur</label>
+              <label class="form-label">{{ 'fleet.veh.f_color' | transloco }}</label>
               <input formControlName="color" type="text" class="form-control" placeholder="Blanc, Noir…" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Année</label>
+              <label class="form-label">{{ 'fleet.veh.f_year' | transloco }}</label>
               <input formControlName="year" type="number" min="1900" max="2100" class="form-control" placeholder="2022" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Catégorie</label>
+              <label class="form-label">{{ 'fleet.veh.col_category' | transloco }}</label>
               <select formControlName="category_id" class="form-select">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (c of categories; track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
               </select>
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Parking</label>
+              <label class="form-label">{{ 'fleet.veh.f_parking' | transloco }}</label>
               <select formControlName="parking_id" class="form-select">
-                <option [ngValue]="null">— Aucun —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
                 @for (p of parkings; track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
               </select>
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Date d'immatriculation</label>
+              <label class="form-label">{{ 'fleet.veh.f_reg_date' | transloco }}</label>
               <input formControlName="registration_date" type="date" class="form-control" />
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Étiquettes</label>
+            <label class="form-label">{{ 'fleet.veh.col_tags' | transloco }}</label>
             <select formControlName="tag_ids" class="form-select" multiple size="3">
               @for (t of tags; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
             </select>
@@ -238,55 +238,55 @@
 
           <div class="row">
             <div class="col-md-3 mb-3">
-              <label class="form-label">Puissance fiscale</label>
+              <label class="form-label">{{ 'fleet.veh.f_fiscal_hp' | transloco }}</label>
               <input formControlName="fiscal_horsepower" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur catalogue</label>
+              <label class="form-label">{{ 'fleet.veh.f_catalog_value' | transloco }}</label>
               <input formControlName="catalog_value" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur d'achat</label>
+              <label class="form-label">{{ 'fleet.veh.f_purchase_value' | transloco }}</label>
               <input formControlName="purchase_value" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur résiduelle</label>
+              <label class="form-label">{{ 'fleet.veh.f_residual_value' | transloco }}</label>
               <input formControlName="residual_value" type="number" min="0" class="form-control" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Date d'acquisition</label>
+              <label class="form-label">{{ 'fleet.veh.f_acq_date' | transloco }}</label>
               <input formControlName="acquisition_date" type="date" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Coût d'acquisition</label>
+              <label class="form-label">{{ 'fleet.veh.f_acq_cost' | transloco }}</label>
               <input formControlName="acquisition_cost" type="number" min="0" class="form-control" placeholder="0" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Capacité réservoir (L)</label>
+              <label class="form-label">{{ 'fleet.veh.f_tank' | transloco }}</label>
               <input formControlName="tank_capacity_liters" type="number" min="0" class="form-control" placeholder="60" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Kilométrage initial</label>
+              <label class="form-label">{{ 'fleet.veh.f_initial_odometer' | transloco }}</label>
               <input formControlName="initial_odometer" type="number" min="0" class="form-control" placeholder="0" />
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Notes</label>
+            <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
             <textarea formControlName="notes" class="form-control" rows="2"></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Créer le véhicule
+            {{ 'fleet.veh.submit_create' | transloco }}
           </button>
         </div>
       </form>
@@ -299,7 +299,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modifier le véhicule</h5>
+        <h5 class="modal-title">{{ 'fleet.veh.modal_edit' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="editForm" (ngSubmit)="submitEdit()">
@@ -308,7 +308,7 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Immatriculation <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'fleet.veh.col_plate' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="license_plate" type="text" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
@@ -316,27 +316,27 @@
               <input formControlName="vin" type="text" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Couleur</label>
+              <label class="form-label">{{ 'fleet.veh.f_color' | transloco }}</label>
               <input formControlName="color" type="text" class="form-control" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Année</label>
+              <label class="form-label">{{ 'fleet.veh.f_year' | transloco }}</label>
               <input formControlName="year" type="number" min="1900" max="2100" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Catégorie</label>
+              <label class="form-label">{{ 'fleet.veh.col_category' | transloco }}</label>
               <select formControlName="category_id" class="form-select">
-                <option [ngValue]="null">— Aucune —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (c of categories; track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
               </select>
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Parking</label>
+              <label class="form-label">{{ 'fleet.veh.f_parking' | transloco }}</label>
               <select formControlName="parking_id" class="form-select">
-                <option [ngValue]="null">— Aucun —</option>
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
                 @for (p of parkings; track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
               </select>
             </div>
@@ -344,11 +344,11 @@
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Date d'immatriculation</label>
+              <label class="form-label">{{ 'fleet.veh.f_reg_date' | transloco }}</label>
               <input formControlName="registration_date" type="date" class="form-control" />
             </div>
             <div class="col-md-8 mb-3">
-              <label class="form-label">Étiquettes</label>
+              <label class="form-label">{{ 'fleet.veh.col_tags' | transloco }}</label>
               <select formControlName="tag_ids" class="form-select" multiple size="3">
                 @for (t of tags; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
               </select>
@@ -357,25 +357,25 @@
 
           <div class="row">
             <div class="col-md-3 mb-3">
-              <label class="form-label">Puissance fiscale</label>
+              <label class="form-label">{{ 'fleet.veh.f_fiscal_hp' | transloco }}</label>
               <input formControlName="fiscal_horsepower" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur catalogue</label>
+              <label class="form-label">{{ 'fleet.veh.f_catalog_value' | transloco }}</label>
               <input formControlName="catalog_value" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur d'achat</label>
+              <label class="form-label">{{ 'fleet.veh.f_purchase_value' | transloco }}</label>
               <input formControlName="purchase_value" type="number" min="0" class="form-control" />
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Valeur résiduelle</label>
+              <label class="form-label">{{ 'fleet.veh.f_residual_value' | transloco }}</label>
               <input formControlName="residual_value" type="number" min="0" class="form-control" />
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Notes</label>
+            <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
             <textarea formControlName="notes" class="form-control" rows="2"></textarea>
           </div>
 
@@ -384,14 +384,14 @@
               <input type="checkbox" id="vehicle-is-active" class="check" formControlName="is_active" />
               <label for="vehicle-is-active" class="checktoggle"></label>
             </div>
-            <label class="form-label mb-0">Actif</label>
+            <label class="form-label mb-0">{{ 'fleet.common.active' | transloco }}</label>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Enregistrer
+            {{ 'shared.actions.save' | transloco }}
           </button>
         </div>
       </form>
@@ -404,30 +404,30 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Mettre à jour le kilométrage</h5>
+        <h5 class="modal-title">{{ 'fleet.veh.act_odometer' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="odometerForm" (ngSubmit)="submitOdometer()">
         <div class="modal-body">
           @if (odometerMsg) { <div class="alert alert-danger py-2">{{ odometerMsg }}</div> }
           <div class="mb-3">
-            <label class="form-label">Kilométrage (km) <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'fleet.veh.f_odometer_km' | transloco }} <span class="text-danger">*</span></label>
             <input formControlName="value_km" type="number" min="0" step="0.1" class="form-control" placeholder="50000" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Date de relevé</label>
+            <label class="form-label">{{ 'fleet.veh.f_reading_date' | transloco }}</label>
             <input formControlName="date" type="date" class="form-control" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Note</label>
+            <label class="form-label">{{ 'fleet.veh.f_note' | transloco }}</label>
             <input formControlName="note" type="text" class="form-control" placeholder="Relevé mensuel…" />
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="odometerForm.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Mettre à jour
+            {{ 'fleet.veh.submit_odometer' | transloco }}
           </button>
         </div>
       </form>
