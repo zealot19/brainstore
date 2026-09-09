@@ -969,5 +969,82 @@
       "stop_arrival": "Chegada prevista",
       "no_stops": "Sem paragens."
     }
+  },
+  "fcfg": {
+    "common": {
+      "subtitle": "Dados de referência configuráveis",
+      "new_m": "Novo",
+      "new_type": "Novo tipo",
+      "search_ph": "Pesquisar…",
+      "selected_count": "selecionado(s)",
+      "delete_selection": "Eliminar seleção",
+      "scope_global": "Global",
+      "scope_specific": "Específico",
+      "perimeter": "Âmbito",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "status": "Estado",
+      "empty": "Sem entradas.",
+      "code": "Código",
+      "name": "Nome",
+      "label": "Rótulo",
+      "choose": "— Escolher —",
+      "category": "Categoria"
+    },
+    "ft": {
+      "title": "Tipos de combustível",
+      "info": "Fontes de energia dos seus modelos: Gasolina, Diesel, Elétrico, Híbrido, GPL. As entradas «Global» são fornecidas por defeito."
+    },
+    "tr": {
+      "title": "Transmissões",
+      "info": "Tipo de caixa de velocidades: Manual, Automática, Semiautomática."
+    },
+    "tt": {
+      "title": "Tipos de tração",
+      "info": "Sistema de transmissão: Tração dianteira, Propulsão, 4x4, AWD."
+    },
+    "pe": {
+      "title": "Períodos",
+      "info": "Frequências de faturação ou recorrência: Mensal, Trimestral, Anual."
+    },
+    "uc": {
+      "title": "Categorias de unidade",
+      "info": "Agrupa as unidades de medida: Potência, Distância, Emissão, Volume."
+    },
+    "vc": {
+      "title": "Categorias de veículo",
+      "info": "Agrupamento dos seus veículos: Comercial, Sedan, SUV, Autocarro, Minibus."
+    },
+    "as": {
+      "title": "Setores de atividade",
+      "info": "Setores de atividade da sua frota: Transporte urbano, Logística, Mineração, Agricultura.",
+      "new_title": "Novo setor"
+    },
+    "it": {
+      "title": "Tipos de intervenção",
+      "info": "Tipos de intervenção para manutenções e contratos: Mudança de óleo, Revisão, Reparação, Seguro, Leasing. A categoria indica se se aplicam a serviços, contratos ou ambos.",
+      "f_interval_km": "Intervalo (km)",
+      "f_interval_days": "Intervalo (dias)",
+      "interval_hint": "Usados para planear automaticamente a próxima manutenção preventiva."
+    },
+    "un": {
+      "title": "Unidades",
+      "info": "Unidades de medida associadas a uma categoria: cv, kW (Potência); km, mi (Distância); g/km (Emissão).",
+      "new_title": "Nova unidade"
+    },
+    "dt": {
+      "title": "Tipos de documento",
+      "info": "Tipos de documentos administrativos anexados aos veículos: Seguro, Documento único, Inspeção técnica, Selo. «Expiração exigida» ativa o acompanhamento dos prazos.",
+      "col_expiration": "Expiração",
+      "badge_required": "Exigida",
+      "f_requires_expiration": "Expiração exigida"
+    },
+    "tg": {
+      "title": "Etiquetas",
+      "info": "Etiquetas para agrupar e filtrar os seus veículos: Pool, Direção, Obra, Aluguer. Atribua-lhes uma cor.",
+      "new_title": "Nova etiqueta",
+      "col_tag": "Etiqueta",
+      "f_color": "Cor"
+    }
   }
 }

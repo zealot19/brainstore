@@ -969,5 +969,82 @@
       "stop_arrival": "Scheduled arrival",
       "no_stops": "No stops."
     }
+  },
+  "fcfg": {
+    "common": {
+      "subtitle": "Configurable reference data",
+      "new_m": "New",
+      "new_type": "New type",
+      "search_ph": "Search…",
+      "selected_count": "selected",
+      "delete_selection": "Delete selection",
+      "scope_global": "Global",
+      "scope_specific": "Specific",
+      "perimeter": "Scope",
+      "active": "Active",
+      "inactive": "Inactive",
+      "status": "Status",
+      "empty": "No entries.",
+      "code": "Code",
+      "name": "Name",
+      "label": "Label",
+      "choose": "— Choose —",
+      "category": "Category"
+    },
+    "ft": {
+      "title": "Fuel types",
+      "info": "Energy sources for your models: Petrol, Diesel, Electric, Hybrid, LPG. \"Global\" entries are provided by default."
+    },
+    "tr": {
+      "title": "Transmissions",
+      "info": "Gearbox type: Manual, Automatic, Semi-automatic."
+    },
+    "tt": {
+      "title": "Drivetrain types",
+      "info": "Drivetrain system: Front-wheel, Rear-wheel, 4x4, AWD."
+    },
+    "pe": {
+      "title": "Periods",
+      "info": "Billing or recurrence frequencies: Monthly, Quarterly, Yearly."
+    },
+    "uc": {
+      "title": "Unit categories",
+      "info": "Groups measurement units: Power, Distance, Emission, Volume."
+    },
+    "vc": {
+      "title": "Vehicle categories",
+      "info": "Grouping of your vehicles: Van, Sedan, SUV, Bus, Minibus."
+    },
+    "as": {
+      "title": "Activity sectors",
+      "info": "Activity sectors of your fleet: Urban transport, Logistics, Mining, Agriculture.",
+      "new_title": "New sector"
+    },
+    "it": {
+      "title": "Intervention types",
+      "info": "Intervention types for maintenance and contracts: Oil change, Service, Repair, Insurance, Leasing. The category indicates whether they apply to services, contracts, or both.",
+      "f_interval_km": "Interval (km)",
+      "f_interval_days": "Interval (days)",
+      "interval_hint": "Used to automatically schedule the next preventive maintenance."
+    },
+    "un": {
+      "title": "Units",
+      "info": "Measurement units linked to a category: hp, kW (Power); km, mi (Distance); g/km (Emission).",
+      "new_title": "New unit"
+    },
+    "dt": {
+      "title": "Document types",
+      "info": "Types of administrative documents attached to vehicles: Insurance, Registration, Technical inspection, Road tax. \"Expiration required\" enables due-date tracking.",
+      "col_expiration": "Expiration",
+      "badge_required": "Required",
+      "f_requires_expiration": "Expiration required"
+    },
+    "tg": {
+      "title": "Tags",
+      "info": "Tags to group and filter your vehicles: Pool, Management, Site, Rental. Assign them a color.",
+      "new_title": "New tag",
+      "col_tag": "Tag",
+      "f_color": "Color"
+    }
   }
 }

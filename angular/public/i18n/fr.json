@@ -969,5 +969,82 @@
       "stop_arrival": "Arrivée prévue",
       "no_stops": "Aucune escale."
     }
+  },
+  "fcfg": {
+    "common": {
+      "subtitle": "Référentiel configurable",
+      "new_m": "Nouveau",
+      "new_type": "Nouveau type",
+      "search_ph": "Rechercher…",
+      "selected_count": "sélectionné(s)",
+      "delete_selection": "Supprimer la sélection",
+      "scope_global": "Global",
+      "scope_specific": "Spécifique",
+      "perimeter": "Périmètre",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "status": "Statut",
+      "empty": "Aucune entrée.",
+      "code": "Code",
+      "name": "Nom",
+      "label": "Libellé",
+      "choose": "— Choisir —",
+      "category": "Catégorie"
+    },
+    "ft": {
+      "title": "Types de carburant",
+      "info": "Sources d'énergie de vos modèles : Essence, Diesel, Électrique, Hybride, GPL. Les entrées « Global » sont fournies par défaut."
+    },
+    "tr": {
+      "title": "Transmissions",
+      "info": "Type de boîte de vitesses : Manuelle, Automatique, Semi-automatique."
+    },
+    "tt": {
+      "title": "Types de traction",
+      "info": "Système de transmission : Traction avant, Propulsion, 4x4, AWD."
+    },
+    "pe": {
+      "title": "Périodes",
+      "info": "Fréquences de facturation ou de récurrence : Mensuel, Trimestriel, Annuel."
+    },
+    "uc": {
+      "title": "Catégories d'unité",
+      "info": "Regroupe les unités de mesure : Puissance, Distance, Émission, Volume."
+    },
+    "vc": {
+      "title": "Catégories de véhicule",
+      "info": "Regroupement de vos véhicules : Utilitaire, Berline, SUV, Bus, Minibus."
+    },
+    "as": {
+      "title": "Secteurs d'activité",
+      "info": "Secteurs d'activité de votre flotte : Transport urbain, Logistique, Mining, Agriculture.",
+      "new_title": "Nouveau secteur"
+    },
+    "it": {
+      "title": "Types d'intervention",
+      "info": "Types d'intervention pour les maintenances et contrats : Vidange, Révision, Réparation, Assurance, Leasing. La catégorie indique s'ils s'appliquent aux services, aux contrats, ou aux deux.",
+      "f_interval_km": "Intervalle (km)",
+      "f_interval_days": "Intervalle (jours)",
+      "interval_hint": "Utilisés pour planifier automatiquement le prochain entretien préventif."
+    },
+    "un": {
+      "title": "Unités",
+      "info": "Unités de mesure rattachées à une catégorie : ch, kW (Puissance) ; km, mi (Distance) ; g/km (Émission).",
+      "new_title": "Nouvelle unité"
+    },
+    "dt": {
+      "title": "Types de document",
+      "info": "Types de documents administratifs attachés aux véhicules : Assurance, Carte grise, Visite technique, Vignette. « Expiration requise » active le suivi des échéances.",
+      "col_expiration": "Expiration",
+      "badge_required": "Requise",
+      "f_requires_expiration": "Expiration requise"
+    },
+    "tg": {
+      "title": "Étiquettes",
+      "info": "Étiquettes pour regrouper et filtrer vos véhicules : Pool, Direction, Chantier, Location. Attribuez-leur une couleur.",
+      "new_title": "Nouvelle étiquette",
+      "col_tag": "Étiquette",
+      "f_color": "Couleur"
+    }
   }
 }
