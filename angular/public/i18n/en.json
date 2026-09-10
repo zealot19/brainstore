@@ -49,7 +49,10 @@
       "config": "Configuration",
       "audit": "Audit Log",
       "logout": "Log out",
-      "profile": "My Profile"
+      "profile": "My Profile",
+      "new_booking": "New booking",
+      "new_parcel": "New parcel",
+      "new_baggage": "New baggage"
     },
     "select": {
       "search_ph": "Search…",
