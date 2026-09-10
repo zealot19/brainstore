@@ -7,11 +7,12 @@ import { FiscalYear, AccountingPeriod } from '../../../models/accounting.models'
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-acc-fiscal-years',
   templateUrl: './fiscal-years.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class AccFiscalYearsComponent implements OnInit {
   private toast = inject(ToastService);

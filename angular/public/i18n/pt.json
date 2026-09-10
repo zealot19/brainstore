@@ -1534,5 +1534,59 @@
     "f_new_pwd_ph": "Mínimo 8 caracteres",
     "f_force_change": "Forçar a alteração no próximo início de sessão",
     "reset_submit": "Repor"
+  },
+  "acct": {
+    "common": {
+      "none_m": "— Nenhum —"
+    },
+    "accounts": {
+      "title": "Plano de contas",
+      "subtitle": "Contas OHADA da instituição",
+      "new": "Nova conta",
+      "info": "Plano de contas SYSCOHADA pré-preenchido na criação da instituição. Pode adicionar subcontas, editar os rótulos e depreciar as contas não utilizadas.",
+      "search_ph": "Pesquisar (código, rótulo)…",
+      "all_types": "Todos os tipos",
+      "col_label": "Rótulo",
+      "col_reconcile": "Conciliável",
+      "deprecated": "Depreciada",
+      "empty": "Sem contas.",
+      "act_reactivate": "Reativar",
+      "act_deprecate": "Depreciar",
+      "modal_edit": "Editar conta",
+      "f_parent": "Conta principal",
+      "f_note": "Nota"
+    },
+    "journals": {
+      "title": "Diários",
+      "subtitle": "Diários contabilísticos da instituição",
+      "new": "Novo diário",
+      "info": "Diários padrão (VTE, ACH, OD, PAIE, CAISSE, BANQUE) criados na abertura da instituição. Os diários de caixa/banco por agência serão geridos pela Tesouraria.",
+      "col_default_account": "Conta predefinida",
+      "empty": "Sem diários.",
+      "modal_edit": "Editar diário",
+      "f_default_account": "Conta predefinida",
+      "f_seq_prefix": "Prefixo de sequência"
+    },
+    "fy": {
+      "title": "Exercícios e períodos",
+      "subtitle": "Exercícios contabilísticos e períodos mensais",
+      "new": "Novo exercício",
+      "info": "O exercício atual e os seus 12 períodos mensais são criados na abertura da instituição. Selecione um exercício para gerir os seus períodos.",
+      "years": "Exercícios",
+      "col_start": "Início",
+      "col_end": "Fim",
+      "col_state": "Estado",
+      "state_open": "Aberto",
+      "state_closed": "Encerrado",
+      "empty": "Sem exercícios.",
+      "periods": "Períodos",
+      "new_period": "Novo período",
+      "select_prompt": "Selecione um exercício.",
+      "period_open": "Aberta",
+      "period_closed": "Encerrada",
+      "period_locked": "Bloqueada",
+      "act_close": "Encerrar",
+      "empty_periods": "Sem períodos."
+    }
   }
 }

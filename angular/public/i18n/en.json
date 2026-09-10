@@ -1534,5 +1534,59 @@
     "f_new_pwd_ph": "Minimum 8 characters",
     "f_force_change": "Force change on next login",
     "reset_submit": "Reset"
+  },
+  "acct": {
+    "common": {
+      "none_m": "— None —"
+    },
+    "accounts": {
+      "title": "Chart of accounts",
+      "subtitle": "OHADA accounts of the institution",
+      "new": "New account",
+      "info": "SYSCOHADA chart of accounts pre-filled when the institution is created. You can add sub-accounts, edit labels and deprecate unused accounts.",
+      "search_ph": "Search (code, label)…",
+      "all_types": "All types",
+      "col_label": "Label",
+      "col_reconcile": "Reconcilable",
+      "deprecated": "Deprecated",
+      "empty": "No accounts.",
+      "act_reactivate": "Reactivate",
+      "act_deprecate": "Deprecate",
+      "modal_edit": "Edit account",
+      "f_parent": "Parent account",
+      "f_note": "Note"
+    },
+    "journals": {
+      "title": "Journals",
+      "subtitle": "Accounting journals of the institution",
+      "new": "New journal",
+      "info": "Standard journals (VTE, ACH, OD, PAIE, CAISSE, BANQUE) created when the institution is opened. Per-agency cash/bank journals will be managed by Treasury.",
+      "col_default_account": "Default account",
+      "empty": "No journals.",
+      "modal_edit": "Edit journal",
+      "f_default_account": "Default account",
+      "f_seq_prefix": "Sequence prefix"
+    },
+    "fy": {
+      "title": "Fiscal years & periods",
+      "subtitle": "Accounting fiscal years and monthly periods",
+      "new": "New fiscal year",
+      "info": "The current fiscal year and its 12 monthly periods are created when the institution is opened. Select a fiscal year to manage its periods.",
+      "years": "Fiscal years",
+      "col_start": "Start",
+      "col_end": "End",
+      "col_state": "State",
+      "state_open": "Open",
+      "state_closed": "Closed",
+      "empty": "No fiscal years.",
+      "periods": "Periods",
+      "new_period": "New period",
+      "select_prompt": "Select a fiscal year.",
+      "period_open": "Open",
+      "period_closed": "Closed",
+      "period_locked": "Locked",
+      "act_close": "Close",
+      "empty_periods": "No periods."
+    }
   }
 }
