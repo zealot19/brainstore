@@ -32,4 +32,16 @@ RUN SECRET_KEY=build-only python manage.py collectstatic --noinput
 
 # Railway fournit $PORT. On applique les migrations au démarrage (sinon un nouveau
 # champ/table provoque des 500 « no such column ») puis on lance gunicorn.
-CMD sh -c 'python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000}'
+#
+# Concurrence + timeout : la création d'une institution amorce beaucoup de données
+# en une requête (agence siège, admin, rôles RBAC, plan comptable OHADA, mappings
+# Trésorerie). Le timeout gunicorn par défaut (30 s) tue alors le worker
+# (« WORKER TIMEOUT / SIGKILL ») → 500. On passe le timeout à 120 s et on utilise
+# des threads (gthread) pour la concurrence sans surcoût mémoire. Réglable via env
+# (WEB_CONCURRENCY, WEB_THREADS, WEB_TIMEOUT).
+CMD sh -c 'python manage.py migrate --noinput && gunicorn config.wsgi:application \
+    --bind 0.0.0.0:${PORT:-8000} \
+    --worker-class gthread \
+    --workers ${WEB_CONCURRENCY:-1} \
+    --threads ${WEB_THREADS:-4} \
+    --timeout ${WEB_TIMEOUT:-120}'
