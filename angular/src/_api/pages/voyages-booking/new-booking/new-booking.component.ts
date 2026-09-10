@@ -46,8 +46,18 @@ export class VbNewBookingComponent implements OnInit {
   }
 
   onPaymentMethodChange(): void {
-    const pm = this.paymentMethods.find(m => m.code === this.paymentMethod);
-    if (pm && !pm.requires_payment) this.amountReceived = 0;
+    if (!this.requiresPayment) this.amountReceived = 0;
+  }
+
+  /** Currently selected payment method object (undefined until one is chosen). */
+  get selectedPaymentMethod(): any {
+    return this.paymentMethods.find(m => m.code === this.paymentMethod);
+  }
+
+  /** A method requires payment unless it is explicitly flagged otherwise. */
+  get requiresPayment(): boolean {
+    const pm = this.selectedPaymentMethod;
+    return pm ? pm.requires_payment !== false : true;
   }
 
   get isRound(): boolean { return this.tripType === 'round_trip'; }
@@ -155,7 +165,7 @@ export class VbNewBookingComponent implements OnInit {
     if (this.needReturnSel && (!this.returnTripId || this.selReturn.length !== this.selOutbound.length)) return false;
     if (this.anyMissingFare) return false;
     if (this.passengers.some(p => !p.name || !p.phone)) return false;
-    if ((this.amountReceived ?? 0) < this.total) return false;
+    if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
     return true;
   }
 

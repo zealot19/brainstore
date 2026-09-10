@@ -130,8 +130,8 @@
         </select></div>
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
         <input class="form-control fw-bold" [value]="(total | number:'1.0-0') + ' XAF'" disabled /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.amount_received' | transloco }} <span class="text-danger">*</span></label>
-        <input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" placeholder="0" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.amount_received' | transloco }} @if (requiresPayment) { <span class="text-danger">*</span> }</label>
+        <input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" placeholder="0" [disabled]="!requiresPayment" /></div>
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.change' | transloco }}</label>
         <input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
     </div>
