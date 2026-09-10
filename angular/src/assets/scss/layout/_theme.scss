@@ -139,15 +139,15 @@
         }
         .header {
             margin: 0 auto;
-            max-width: calc(1320px - 252px);
+            max-width: calc(1320px - 272px);
             @include mixins.respond-above(custom991) {
-                left: 252px;
+                left: 272px;
             }
             @include mixins.respond-below(custom1399) {
-                max-width: calc(1170px - 252px);
+                max-width: calc(1170px - 272px);
             }
             @include mixins.respond-below(custom1199) {
-                max-width: calc(950px - 252px);
+                max-width: calc(950px - 272px);
             }
             @include mixins.respond-below(custom991) {
                 max-width: 100%;
@@ -173,15 +173,15 @@
             }
             &.expand-menu {
                 .header {
-                    max-width: calc(1320px - 252px);
+                    max-width: calc(1320px - 272px);
                     @include mixins.respond-above(custom991) {
-                        left: 252px;
+                        left: 272px;
                     }
                     @include mixins.respond-below(custom1399) {
-                        max-width: calc(1170px - 252px);
+                        max-width: calc(1170px - 272px);
                     }
                     @include mixins.respond-below(custom1199) {
-                        max-width: calc(950px - 252px);
+                        max-width: calc(950px - 272px);
                     }
                     @include mixins.respond-below(custom991) {
                         max-width: 100%;
@@ -9170,7 +9170,7 @@ body {
             border-left: 1px solid variables.$border-color;
         }
         .page-wrapper {
-            margin-right: 252px;
+            margin-right: 272px;
             margin-left: 0;
             @include mixins.respond-below(custom991) {
                 margin-right: 0;
@@ -11633,7 +11633,7 @@ body.layout-mode-rtl {
     .layout-mode-rtl {
         .header {
             left: 0;
-            right: 252px;
+            right: 272px;
         }
         .sidebar {
             top: 0;
@@ -11645,7 +11645,7 @@ body.layout-mode-rtl {
             }
             &.expand-menu {
                 .header {
-                    right: 252px;
+                    right: 272px;
                     left: 0;
                 }
             }

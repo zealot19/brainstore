@@ -12,7 +12,7 @@
     left: 0;
     @include mixins.transition(all 0.5s ease);
     border-right: 1px solid variables.$border-color;
-    width: 252px;
+    width: 272px;
     @include mixins.respond-below(custom991) {
         margin-left: -575px;
         @include mixins.transition(all 0.4s ease);
@@ -101,8 +101,9 @@
                         }
                     }
                     span{
-                        font-size: variables.$font-size-15;
+                        font-size: variables.$font-size-14;
                         font-weight: variables.$font-weight-medium;
+                        line-height: 1.25;
                         color: variables.$gray-600;
                     }
                     
@@ -179,8 +180,9 @@
                                 padding: 8px 12px;
                                 border-radius: 5px;
                                span {
-                                white-space: nowrap;
-                                font-size: variables.$font-size-base;
+                                white-space: normal;
+                                font-size: variables.$font-size-13;
+                                line-height: 1.25;
                                 color: variables.$title-color;
                                }
                                i {
@@ -677,7 +679,7 @@
             @include mixins.transition(all 0.2s ease);
         }
         .sidebar {
-            width: 252px;
+            width: 272px;
             .sidebar-menu{
                ul{
                    > li{
@@ -698,7 +700,7 @@
             }
         }
         .header-left{
-            width: 252px;
+            width: 272px;
         }
     }
     #toggle_btn {
@@ -859,7 +861,7 @@ body.mini-sidebar{
 }
 @include mixins.respond-above(custom992) {
     .header {
-        left: 252px;
+        left: 272px;
     }
     .sidebar {
         top: 0;
@@ -898,7 +900,7 @@ body.mini-sidebar{
                 }
             }
             .header {
-                left: 252px;
+                left: 272px;
             }
         }
     }
