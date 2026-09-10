@@ -1,0 +1,29 @@
+# Caddy — reverse proxy + HTTPS automatique.
+# Remplacez erp.mondomaine.com par VOTRE domaine (enregistrement DNS A → IP du VPS)
+# et l'e-mail par le vôtre (avis Let's Encrypt).
+{
+    email admin@mondomaine.com
+}
+
+erp.mondomaine.com {
+    encode zstd gzip
+
+    # Fichiers médias téléversés (servis depuis le volume partagé)
+    handle_path /media/* {
+        root * /srv/media
+        file_server
+    }
+
+    # Backend Django : API, admin, statiques Django (WhiteNoise)
+    @backend path /api/* /admin/* /static/*
+    handle @backend {
+        reverse_proxy web:8000
+    }
+
+    # Frontend Angular (application mono-page) — tout le reste
+    handle {
+        root * /srv/app
+        try_files {path} /index.html
+        file_server
+    }
+}
