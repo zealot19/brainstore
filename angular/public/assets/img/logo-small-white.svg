@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Brainstore Group">
+  <rect x="6" y="6" width="52" height="52" rx="15" fill="#FFFFFF"/>
+  <g stroke="#0A7CD6" stroke-width="2.6" stroke-linecap="round">
+    <line x1="32" y1="21" x2="21" y2="43"/>
+    <line x1="32" y1="21" x2="43" y2="43"/>
+    <line x1="21" y1="43" x2="43" y2="43"/>
+  </g>
+  <g fill="#0A7CD6">
+    <circle cx="32" cy="21" r="5"/>
+    <circle cx="21" cy="43" r="4.6"/>
+    <circle cx="43" cy="43" r="4.6"/>
+  </g>
+</svg>
