@@ -2,13 +2,13 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Sessions d'inventaire</h4>
-      <h6>Gestion des inventaires physiques SCIG</h6>
+      <h4>{{ 'scig.inv.title' | transloco }}</h4>
+      <h6>{{ 'scig.inv.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser">
+      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco">
         <i class="ti ti-refresh"></i>
       </a>
     </li>
@@ -18,7 +18,7 @@
       <a href="javascript:void(0);" class="btn btn-primary"
          data-bs-toggle="modal" data-bs-target="#inv-create-modal"
          (click)="openCreate()">
-        <i class="ti ti-circle-plus me-2"></i>Nouvel inventaire
+        <i class="ti ti-circle-plus me-2"></i>{{ 'scig.inv.new' | transloco }}
       </a>
     </div>
   }
@@ -29,7 +29,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-purple border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Total</p><h4 class="text-white">{{ sessions.length }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'scig.inv.stat_total' | transloco }}</p><h4 class="text-white">{{ sessions.length }}</h4></div>
         <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-clipboard-list"></i></span>
       </div>
     </div>
@@ -37,7 +37,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-teal border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">En cours</p><h4 class="text-white">{{ totalOpen }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'scig.inv.stat_open' | transloco }}</p><h4 class="text-white">{{ totalOpen }}</h4></div>
         <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-lock-open"></i></span>
       </div>
     </div>
@@ -45,7 +45,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-secondary border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Clôturés</p><h4 class="text-white">{{ totalClosed }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'scig.inv.stat_closed' | transloco }}</p><h4 class="text-white">{{ totalClosed }}</h4></div>
         <span class="avatar avatar-lg bg-secondary-900"><i class="ti ti-lock"></i></span>
       </div>
     </div>
@@ -61,7 +61,7 @@
         <div class="dataTables_filter">
           <label>
             <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search"
-                   class="form-control" placeholder="Nom ou dépôt…" />
+                   class="form-control" [placeholder]="'scig.inv.search_ph' | transloco" />
           </label>
         </div>
       </div>
@@ -71,15 +71,15 @@
         <a href="javascript:void(0);"
            class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
            data-bs-toggle="dropdown">
-          {{ filterStatus ? statusLabel(filterStatus) : 'Tous les statuts' }}
+          {{ filterStatus ? statusLabel(filterStatus) : ('scig.inv.filter_all_statuses' | transloco) }}
         </a>
         <ul class="dropdown-menu dropdown-menu-end p-3">
           <li><a href="javascript:void(0);" class="dropdown-item rounded-1"
-                 (click)="filterStatus=''; load()">Tous</a></li>
+                 (click)="filterStatus=''; load()">{{ 'scig.inv.filter_all' | transloco }}</a></li>
           <li><a href="javascript:void(0);" class="dropdown-item rounded-1"
-                 (click)="filterStatus='OPEN'; load()">Ouvert</a></li>
+                 (click)="filterStatus='OPEN'; load()">{{ 'scig.common.st_open' | transloco }}</a></li>
           <li><a href="javascript:void(0);" class="dropdown-item rounded-1"
-                 (click)="filterStatus='CLOSED'; load()">Clôturé</a></li>
+                 (click)="filterStatus='CLOSED'; load()">{{ 'scig.common.st_closed' | transloco }}</a></li>
         </ul>
       </div>
     </div>
@@ -93,14 +93,14 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Nom</th>
-              <th>Dépôt</th>
-              <th>Statut</th>
-              <th>Zones</th>
-              <th>Validées</th>
-              <th>Ouvert le</th>
-              <th>Clôturé le</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'admin.common.name' | transloco }}</th>
+              <th>{{ 'scig.inv.col_depot' | transloco }}</th>
+              <th>{{ 'admin.common.status' | transloco }}</th>
+              <th>{{ 'scig.inv.col_zones' | transloco }}</th>
+              <th>{{ 'scig.inv.col_validated' | transloco }}</th>
+              <th>{{ 'scig.inv.col_opened' | transloco }}</th>
+              <th>{{ 'scig.inv.col_closed' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -125,7 +125,7 @@
                 <td class="action-table-data">
                   <div class="edit-delete-action d-flex align-items-center">
                     <a [routerLink]="['/scig/inventaires', s.id]"
-                       class="me-2 p-2 d-flex align-items-center border rounded" title="Gérer les zones">
+                       class="me-2 p-2 d-flex align-items-center border rounded" [title]="'scig.inv.act_manage_zones' | transloco">
                       <i class="ti ti-layout-list"></i>
                     </a>
                   </div>
@@ -134,7 +134,7 @@
             } @empty {
               <tr>
                 <td colspan="8" class="text-center py-4 text-muted">
-                  Aucune session d'inventaire trouvée.
+                  {{ 'scig.inv.empty' | transloco }}
                 </td>
               </tr>
             }
@@ -151,7 +151,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvel inventaire</h5>
+        <h5 class="modal-title">{{ 'scig.inv.new' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="form" (ngSubmit)="submit()">
@@ -159,35 +159,35 @@
           @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
           <div class="mb-3">
-            <label class="form-label">Dépôt <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'scig.inv.f_depot' | transloco }} <span class="text-danger">*</span></label>
             <select formControlName="depot_id" class="form-select">
-              <option value="">— Sélectionner un dépôt —</option>
+              <option value="">{{ 'scig.inv.opt_select_depot' | transloco }}</option>
               @for (d of depots; track d.id) {
                 <option [value]="d.id">{{ d.name }}</option>
               }
             </select>
             @if (depots.length === 0) {
-              <div class="form-text text-warning">Aucun dépôt actif — synchronisez d'abord Sage.</div>
+              <div class="form-text text-warning">{{ 'scig.inv.no_depot_warn' | transloco }}</div>
             }
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Nom de la session <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'scig.inv.f_session_name' | transloco }} <span class="text-danger">*</span></label>
             <input formControlName="name" type="text" class="form-control"
                    placeholder="ex : INV-2025-11-NOV" />
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Notes</label>
+            <label class="form-label">{{ 'scig.inv.f_notes' | transloco }}</label>
             <textarea formControlName="notes" class="form-control" rows="2"
-                      placeholder="Observations optionnelles…"></textarea>
+                      [placeholder]="'scig.inv.notes_ph' | transloco"></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Créer
+            {{ 'shared.actions.create' | transloco }}
           </button>
         </div>
       </form>

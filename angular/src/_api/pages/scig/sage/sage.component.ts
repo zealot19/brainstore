@@ -7,6 +7,7 @@ import {
   SageConnection, SyncLog, SyncFullResult, SyncType, SyncStatus,
   ConnectionTestResult,
 } from '../../../models/sage.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 function isFullResult(r: SyncLog | SyncFullResult): r is SyncFullResult {
   return 'depots' in r && 'articles' in r && 'stock' in r;
@@ -15,7 +16,7 @@ function isFullResult(r: SyncLog | SyncFullResult): r is SyncFullResult {
 @Component({
   selector: 'app-sage',
   templateUrl: './sage.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
 })
 export class SageComponent implements OnInit {
   readonly perm = inject(PermissionService);

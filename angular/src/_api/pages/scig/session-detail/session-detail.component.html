@@ -2,20 +2,20 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>@if (session) { {{ session.name }} } @else { Session d'inventaire }</h4>
+      <h4>@if (session) { {{ session.name }} } @else { {{ 'scig.sd.default_title' | transloco }} }</h4>
       <h6>{{ session?.depot_name ?? '…' }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" title="Actualiser">
+      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco">
         <i class="ti ti-refresh"></i>
       </a>
     </li>
     <li>
       <div class="page-btn mt-0">
         <a [routerLink]="['/scig/inventaires']" class="btn btn-secondary w-100">
-          <i class="feather icon-arrow-left me-2"></i>Back to Sessions
+          <i class="feather icon-arrow-left me-2"></i>{{ 'scig.sd.back_to_sessions' | transloco }}
         </a>
       </div>
     </li>
@@ -25,7 +25,7 @@
       <a href="javascript:void(0);" class="btn btn-primary"
          data-bs-toggle="modal" data-bs-target="#zone-create-modal"
          (click)="openCreateZone()">
-        <i class="ti ti-circle-plus me-2"></i>Créer une zone
+        <i class="ti ti-circle-plus me-2"></i>{{ 'scig.sd.create_zone' | transloco }}
       </a>
     }
     @if (canSubmitToSage() && perm.has('scig.sage.submit')) {
@@ -33,12 +33,12 @@
               data-bs-toggle="modal" data-bs-target="#confirm-sage-modal"
               (click)="openSubmitSageConfirm()"
               [disabled]="submittingToSage">
-        <i class="ti ti-cloud-upload me-2"></i>Soumettre à Sage
+        <i class="ti ti-cloud-upload me-2"></i>{{ 'scig.sd.submit_sage' | transloco }}
       </button>
     }
     @if (session && perm.has('scig.report.view')) {
       <a [routerLink]="['/scig/inventaires', sessionId, 'rapport']" class="btn btn-outline-secondary">
-        <i class="ti ti-file-report me-2"></i>Rapport
+        <i class="ti ti-file-report me-2"></i>{{ 'scig.sd.report' | transloco }}
       </a>
     }
   </div>
@@ -62,40 +62,40 @@
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-3">
-          <small class="text-muted d-block">Dépôt</small>
+          <small class="text-muted d-block">{{ 'scig.sd.depot' | transloco }}</small>
           <span class="fw-medium">{{ session.depot_name }}</span>
         </div>
         <div class="col-md-2">
-          <small class="text-muted d-block">Statut</small>
+          <small class="text-muted d-block">{{ 'admin.common.status' | transloco }}</small>
           @if (isSessionClosed()) {
             <span class="badge bg-secondary">
-              <i class="ti ti-lock me-1"></i>Clôturée
+              <i class="ti ti-lock me-1"></i>{{ 'scig.sd.closed_badge' | transloco }}
             </span>
           } @else {
             <span class="badge bg-outline-success">
-              <i class="ti ti-lock-open me-1"></i>Ouverte
+              <i class="ti ti-lock-open me-1"></i>{{ 'scig.sd.open_badge' | transloco }}
             </span>
           }
         </div>
         <div class="col-md-2">
-          <small class="text-muted d-block">Ouvert le</small>
+          <small class="text-muted d-block">{{ 'scig.sd.opened_at' | transloco }}</small>
           <span>{{ session.opened_at | date:'dd/MM/yyyy' }}</span>
         </div>
         @if (isSessionClosed()) {
           <div class="col-md-2">
-            <small class="text-muted d-block">Clôturée le</small>
+            <small class="text-muted d-block">{{ 'scig.sd.closed_at' | transloco }}</small>
             <span class="text-success fw-medium">{{ session.closed_at | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="col-md-3">
-            <small class="text-muted d-block">Soumis à Sage le</small>
+            <small class="text-muted d-block">{{ 'scig.sd.submitted_sage_at' | transloco }}</small>
             <span class="text-success fw-medium">{{ session.submitted_to_sage_at | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
         } @else {
           <div class="col-md-3">
-            <small class="text-muted d-block">Progression zones</small>
+            <small class="text-muted d-block">{{ 'scig.sd.zones_progress' | transloco }}</small>
             <span class="fw-medium"
                   [ngClass]="session.all_zones_validated && session.zone_count > 0 ? 'text-success' : ''">
-              {{ session.validated_count }} / {{ session.zone_count }} validées
+              {{ session.validated_count }} / {{ session.zone_count }} {{ 'scig.sd.validated_suffix' | transloco }}
               @if (session.all_zones_validated && session.zone_count > 0) {
                 <i class="ti ti-circle-check text-success ms-1"></i>
               }
@@ -104,7 +104,7 @@
         }
         @if (session.notes) {
           <div class="col-md-2">
-            <small class="text-muted d-block">Notes</small>
+            <small class="text-muted d-block">{{ 'scig.sd.notes' | transloco }}</small>
             <span class="text-muted small">{{ session.notes }}</span>
           </div>
         }
@@ -122,7 +122,7 @@
         <div class="card-body py-3 text-center">
           <i class="ti ti-circle-dashed fs-2 text-secondary"></i>
           <div class="fw-bold fs-3 text-secondary my-1">{{ countByStatus['NOT_STARTED'] }}</div>
-          <div class="text-secondary small fw-medium">Non démarrées</div>
+          <div class="text-secondary small fw-medium">{{ 'scig.sd.kpi_not_started' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -132,7 +132,7 @@
         <div class="card-body py-3 text-center">
           <i class="ti ti-player-play fs-2 text-danger"></i>
           <div class="fw-bold fs-3 text-danger my-1">{{ countByStatus['IN_PROGRESS'] }}</div>
-          <div class="text-danger small fw-medium">En cours</div>
+          <div class="text-danger small fw-medium">{{ 'scig.sd.kpi_in_progress' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -142,7 +142,7 @@
         <div class="card-body py-3 text-center">
           <i class="ti ti-send fs-2 text-primary"></i>
           <div class="fw-bold fs-3 text-primary my-1">{{ countByStatus['SUBMITTED'] }}</div>
-          <div class="text-primary small fw-medium">À valider</div>
+          <div class="text-primary small fw-medium">{{ 'scig.sd.kpi_to_validate' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -152,7 +152,7 @@
         <div class="card-body py-3 text-center">
           <i class="ti ti-alert-triangle fs-2 text-warning"></i>
           <div class="fw-bold fs-3 text-warning my-1">{{ countByStatus['RECHECK'] }}</div>
-          <div class="text-warning small fw-medium">À revérifier</div>
+          <div class="text-warning small fw-medium">{{ 'scig.sd.kpi_to_recheck' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -162,7 +162,7 @@
         <div class="card-body py-3 text-center">
           <i class="ti ti-circle-check fs-2 text-success"></i>
           <div class="fw-bold fs-3 text-success my-1">{{ countByStatus['VALIDATED'] }}</div>
-          <div class="text-success small fw-medium">Validées</div>
+          <div class="text-success small fw-medium">{{ 'scig.sd.kpi_validated' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -173,8 +173,8 @@
 <!-- Table des zones -->
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between">
-    <h5 class="mb-0">Zones de l'inventaire</h5>
-    <span class="badge bg-outline-secondary">{{ zones.length }} zone(s)</span>
+    <h5 class="mb-0">{{ 'scig.sd.zones_title' | transloco }}</h5>
+    <span class="badge bg-outline-secondary">{{ zones.length }} {{ 'scig.sd.zone_count_suffix' | transloco }}</span>
   </div>
   <div class="card-body p-0">
     @if (loadingZones) {
@@ -184,13 +184,13 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Zone</th>
-              <th>Statut</th>
-              <th>Articles comptés</th>
-              <th>Lignes</th>
-              <th>Appareil actif</th>
-              <th>Validée le</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'scig.rapport.col_zone' | transloco }}</th>
+              <th>{{ 'admin.common.status' | transloco }}</th>
+              <th>{{ 'scig.sd.col_counted' | transloco }}</th>
+              <th>{{ 'scig.sd.col_lines' | transloco }}</th>
+              <th>{{ 'scig.sd.col_device' | transloco }}</th>
+              <th>{{ 'scig.sd.col_validated_at' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -229,7 +229,7 @@
                                 data-bs-toggle="modal" data-bs-target="#confirm-validate-modal"
                                 (click)="openValidateConfirm(z)"
                                 [disabled]="validatingId === z.id"
-                                title="Valider la zone">
+                                [title]="'scig.sd.act_validate_zone' | transloco">
                           @if (validatingId === z.id) {
                             <span class="spinner-border spinner-border-sm"></span>
                           } @else {
@@ -242,7 +242,7 @@
                         <button class="btn btn-sm btn-warning text-dark"
                                 data-bs-toggle="modal" data-bs-target="#recheck-modal"
                                 (click)="openRecheck(z)"
-                                title="Renvoyer en vérification">
+                                [title]="'scig.common.recheck_title' | transloco">
                           <i class="ti ti-rotate-clockwise"></i>
                         </button>
                       }
@@ -253,7 +253,7 @@
                               data-bs-toggle="modal" data-bs-target="#confirm-unlock-modal"
                               (click)="openUnlockConfirm(z)"
                               [disabled]="unlockingId === z.id"
-                              title="Déverrouiller la zone (appareil bloqué)">
+                              [title]="'scig.sd.act_unlock' | transloco">
                         @if (unlockingId === z.id) {
                           <span class="spinner-border spinner-border-sm"></span>
                         } @else {
@@ -263,7 +263,7 @@
                     }
                     <!-- Voir / Gérer -->
                     <a [routerLink]="['/scig/inventaires', sessionId, 'zones', z.id]"
-                       class="p-2 d-flex align-items-center border rounded" title="Détail zone">
+                       class="p-2 d-flex align-items-center border rounded" [title]="'scig.sd.act_detail_zone' | transloco">
                       <i class="ti ti-eye"></i>
                     </a>
                   </div>
@@ -273,12 +273,12 @@
               <tr>
                 <td colspan="7" class="text-center py-5">
                   <div class="text-muted mb-2"><i class="ti ti-map-pins fs-2"></i></div>
-                  <p class="text-muted mb-0">Aucune zone définie.</p>
+                  <p class="text-muted mb-0">{{ 'scig.sd.empty_zones' | transloco }}</p>
                   @if (isSessionOpen()) {
                     <a href="javascript:void(0);" class="btn btn-sm btn-primary mt-2"
                        data-bs-toggle="modal" data-bs-target="#zone-create-modal"
                        (click)="openCreateZone()">
-                      <i class="ti ti-plus me-1"></i>Créer la première zone
+                      <i class="ti ti-plus me-1"></i>{{ 'scig.sd.create_first_zone' | transloco }}
                     </a>
                   }
                 </td>
@@ -296,7 +296,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvelle zone</h5>
+        <h5 class="modal-title">{{ 'scig.sd.modal_new_zone' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="zoneForm" (ngSubmit)="submitZone()">
@@ -304,33 +304,33 @@
           @if (zoneErrorMsg) { <div class="alert alert-danger py-2">{{ zoneErrorMsg }}</div> }
 
           <div class="mb-3">
-            <label class="form-label">Nom de la zone <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'scig.sd.f_zone_name' | transloco }} <span class="text-danger">*</span></label>
             <input formControlName="name" type="text" class="form-control"
-                   placeholder="ex : Zone 1 – Femme" autofocus />
+                   [placeholder]="'scig.sd.zone_name_ph' | transloco" autofocus />
             <div class="form-text text-muted">
-              Le nom doit être unique dans cet inventaire.
+              {{ 'scig.sd.zone_name_hint' | transloco }}
             </div>
           </div>
 
           <!-- Légende des statuts -->
           <div class="alert alert-light py-2 mb-0">
-            <small class="d-block fw-medium mb-1">Cycle de vie d'une zone :</small>
+            <small class="d-block fw-medium mb-1">{{ 'scig.sd.lifecycle' | transloco }}</small>
             <div class="d-flex flex-wrap gap-2">
-              <span class="badge bg-outline-secondary">Non commencée</span>
+              <span class="badge bg-outline-secondary">{{ 'scig.common.st_not_started' | transloco }}</span>
               <i class="ti ti-arrow-right align-self-center text-muted"></i>
-              <span class="badge bg-outline-danger">En cours (Zebra)</span>
+              <span class="badge bg-outline-danger">{{ 'scig.sd.lc_in_progress' | transloco }}</span>
               <i class="ti ti-arrow-right align-self-center text-muted"></i>
-              <span class="badge bg-outline-primary">À valider</span>
+              <span class="badge bg-outline-primary">{{ 'scig.common.st_to_validate' | transloco }}</span>
               <i class="ti ti-arrow-right align-self-center text-muted"></i>
-              <span class="badge bg-outline-success">Validée</span>
+              <span class="badge bg-outline-success">{{ 'scig.common.st_validated' | transloco }}</span>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="zoneForm.invalid || savingZone">
             @if (savingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Créer
+            {{ 'shared.actions.create' | transloco }}
           </button>
         </div>
       </form>
@@ -344,25 +344,25 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="ti ti-circle-check text-success me-2"></i>Valider la zone
+          <i class="ti ti-circle-check text-success me-2"></i>{{ 'scig.sd.act_validate_zone' | transloco }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         @if (validateError) { <div class="alert alert-danger py-2 mb-3">{{ validateError }}</div> }
         <p class="mb-0">
-          Confirmer la validation de la zone
+          {{ 'scig.sd.validate_confirm' | transloco }}
           <strong>{{ validatePendingZone?.name }}</strong> ?
-          <br><small class="text-muted">Le statut passera à <span class="badge bg-outline-success">Validée</span> — action irréversible.</small>
+          <br><small class="text-muted">{{ 'scig.sd.validate_status_pre' | transloco }} <span class="badge bg-outline-success">{{ 'scig.common.st_validated' | transloco }}</span> {{ 'scig.sd.action_irreversible' | transloco }}</small>
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="button" class="btn btn-success"
                 (click)="confirmValidateZone()"
                 [disabled]="validatingId !== null">
           @if (validatingId !== null) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-check me-1"></i>Valider
+          <i class="ti ti-check me-1"></i>{{ 'scig.common.validate' | transloco }}
         </button>
       </div>
     </div>
@@ -382,23 +382,23 @@
             <i class="ti ti-cloud-upload fs-2"></i>
           </span>
         </div>
-        <h5 class="mb-2">Soumettre à Sage 100 ?</h5>
+        <h5 class="mb-2">{{ 'scig.sd.sage_modal_title' | transloco }}</h5>
         <p class="text-muted mb-0">
-          L'inventaire sera transmis à Sage 100 et la session sera
-          <strong>définitivement clôturée</strong>.<br>
-          Cette action est irréversible.
+          {{ 'scig.sd.sage_body_pre' | transloco }}
+          <strong>{{ 'scig.sd.definitely_closed' | transloco }}</strong>.<br>
+          {{ 'scig.common.irreversible' | transloco }}
         </p>
         @if (submitSageError) {
           <div class="alert alert-danger py-2 mt-3 text-start">{{ submitSageError }}</div>
         }
       </div>
       <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
-        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="button" class="btn btn-success px-4"
                 (click)="confirmSubmitToSage()"
                 [disabled]="submittingToSage">
           @if (submittingToSage) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-cloud-upload me-1"></i>Soumettre
+          <i class="ti ti-cloud-upload me-1"></i>{{ 'scig.common.submit' | transloco }}
         </button>
       </div>
     </div>
@@ -418,27 +418,27 @@
             <i class="ti ti-lock-open fs-2"></i>
           </span>
         </div>
-        <h5 class="mb-1">Déverrouiller la zone ?</h5>
+        <h5 class="mb-1">{{ 'scig.sd.unlock_modal_title' | transloco }}</h5>
         <p class="text-muted small mb-1">
-          Zone : <strong>{{ unlockPendingZone?.name }}</strong><br>
-          Appareil actif : <strong class="text-danger">{{ unlockPendingZone?.locked_by_username ?? '—' }}</strong>
+          {{ 'scig.sd.unlock_zone_label' | transloco }} <strong>{{ unlockPendingZone?.name }}</strong><br>
+          {{ 'scig.sd.unlock_device_label' | transloco }} <strong class="text-danger">{{ unlockPendingZone?.locked_by_username ?? '—' }}</strong>
         </p>
         <p class="text-muted mb-0">
-          La zone sera remise à <span class="badge bg-outline-secondary">Non commencée</span>
-          et pourra être réouverte depuis un autre appareil.<br>
-          <small>Les articles déjà comptés sont conservés.</small>
+          {{ 'scig.sd.unlock_body_pre' | transloco }} <span class="badge bg-outline-secondary">{{ 'scig.common.st_not_started' | transloco }}</span>
+          {{ 'scig.sd.unlock_body_post' | transloco }}<br>
+          <small>{{ 'scig.sd.unlock_kept' | transloco }}</small>
         </p>
         @if (unlockError) {
           <div class="alert alert-danger py-2 mt-3 text-start">{{ unlockError }}</div>
         }
       </div>
       <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
-        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="button" class="btn btn-danger px-4"
                 (click)="confirmUnlockZone()"
                 [disabled]="unlockingId !== null">
           @if (unlockingId !== null) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-lock-open me-1"></i>Déverrouiller
+          <i class="ti ti-lock-open me-1"></i>{{ 'scig.common.unlock' | transloco }}
         </button>
       </div>
     </div>
@@ -451,7 +451,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="ti ti-rotate-clockwise text-warning me-2"></i>Renvoyer en vérification
+          <i class="ti ti-rotate-clockwise text-warning me-2"></i>{{ 'scig.common.recheck_title' | transloco }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -459,20 +459,19 @@
         <div class="modal-body">
           @if (recheckError) { <div class="alert alert-danger py-2">{{ recheckError }}</div> }
           <p class="mb-3">
-            La zone <strong>{{ recheckTargetName }}</strong> sera renvoyée aux opérateurs
-            (statut → <span class="badge bg-warning text-dark">À revérifier</span>).
+            {{ 'scig.sd.recheck_body_pre' | transloco }} <strong>{{ recheckTargetName }}</strong> {{ 'scig.sd.recheck_body_mid' | transloco }} <span class="badge bg-warning text-dark">{{ 'scig.common.st_recheck' | transloco }}</span>).
           </p>
           <div class="mb-0">
-            <label class="form-label">Note / motif (optionnel)</label>
+            <label class="form-label">{{ 'scig.common.f_note' | transloco }}</label>
             <textarea formControlName="note" class="form-control" rows="3"
-                      placeholder="ex : Erreur sur la taille M rouge, recompter le rayon…"></textarea>
+                      [placeholder]="'scig.sd.note_ph' | transloco"></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-warning text-dark" [disabled]="savingRecheck">
             @if (savingRecheck) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Renvoyer
+            {{ 'scig.common.resend' | transloco }}
           </button>
         </div>
       </form>

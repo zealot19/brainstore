@@ -2,7 +2,7 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>@if (zone) { {{ zone.name }} } @else { Zone }</h4>
+      <h4>@if (zone) { {{ zone.name }} } @else { {{ 'scig.zd.default_title' | transloco }} }</h4>
       @if (zone) {
         <h6>
           <span class="badge me-2" [ngClass]="statusBadge(zone.status)">{{ statusLabel(zone.status) }}</span>
@@ -15,14 +15,14 @@
   </div>
   <ul class="table-top-head">
     <li>
-      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" title="Actualiser">
+      <a href="javascript:void(0);" (click)="refresh()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco">
         <i class="ti ti-refresh"></i>
       </a>
     </li>
     <li>
       <div class="page-btn mt-0">
         <a [routerLink]="['/scig/inventaires', sessionId]" class="btn btn-secondary w-100">
-          <i class="feather icon-arrow-left me-2"></i>Back to Zones
+          <i class="feather icon-arrow-left me-2"></i>{{ 'scig.zd.back_to_zones' | transloco }}
         </a>
       </div>
     </li>
@@ -34,13 +34,13 @@
       @if (zone.status === 'NOT_STARTED' && perm.has('scig.zone.open')) {
         <button class="btn btn-danger" (click)="openZone()" [disabled]="openingZone">
           @if (openingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-player-play me-1"></i>Ouvrir la zone
+          <i class="ti ti-player-play me-1"></i>{{ 'scig.zd.open_zone' | transloco }}
         </button>
       }
       @if (zone.status === 'RECHECK' && perm.has('scig.zone.open')) {
         <button class="btn btn-warning text-dark" (click)="openZone()" [disabled]="openingZone">
           @if (openingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-rotate-clockwise me-1"></i>Réouvrir pour correction
+          <i class="ti ti-rotate-clockwise me-1"></i>{{ 'scig.zd.reopen_correction' | transloco }}
         </button>
       }
       @if (isEditable() && perm.has('scig.zone.submit')) {
@@ -48,7 +48,7 @@
                 data-bs-toggle="modal" data-bs-target="#confirm-submit-zone-modal"
                 (click)="openSubmitZoneConfirm()"
                 [disabled]="submittingZone">
-          <i class="ti ti-send me-1"></i>Soumettre pour validation
+          <i class="ti ti-send me-1"></i>{{ 'scig.zd.submit_validation' | transloco }}
         </button>
       }
       @if (zone.status === 'SUBMITTED') {
@@ -57,14 +57,14 @@
                   data-bs-toggle="modal" data-bs-target="#confirm-validate-zone-modal"
                   (click)="openValidateZoneConfirm()"
                   [disabled]="validatingZone">
-            <i class="ti ti-check me-1"></i>Valider
+            <i class="ti ti-check me-1"></i>{{ 'scig.common.validate' | transloco }}
           </button>
         }
         @if (perm.has('scig.zone.recheck')) {
           <button class="btn btn-warning text-dark"
                   data-bs-toggle="modal" data-bs-target="#recheck-zone-modal"
                   (click)="openRecheckModal()">
-            <i class="ti ti-rotate-clockwise me-1"></i>Recheck
+            <i class="ti ti-rotate-clockwise me-1"></i>{{ 'scig.zd.recheck' | transloco }}
           </button>
         }
       }
@@ -81,7 +81,7 @@
 @if (zone?.status === 'RECHECK' && zone?.recheck_note) {
   <div class="alert alert-warning py-2 mb-3">
     <i class="ti ti-message-circle me-2"></i>
-    <strong>Note du gestionnaire :</strong> {{ zone?.recheck_note }}
+    <strong>{{ 'scig.zd.recheck_note_label' | transloco }}</strong> {{ zone?.recheck_note }}
   </div>
 }
 
@@ -89,17 +89,17 @@
 @if (zone?.validated_at) {
   <div class="alert alert-success py-2 mb-3 small">
     <i class="ti ti-circle-check me-2"></i>
-    <strong>Validée</strong>
-    @if (zone?.validated_by_username) { par <strong>{{ zone?.validated_by_username }}</strong> }
-    le {{ zone?.validated_at | date:'dd/MM/yy HH:mm' }}
+    <strong>{{ 'scig.zd.validated_word' | transloco }}</strong>
+    @if (zone?.validated_by_username) { {{ 'scig.zd.by' | transloco }} <strong>{{ zone?.validated_by_username }}</strong> }
+    {{ 'scig.zd.on_date' | transloco }} {{ zone?.validated_at | date:'dd/MM/yy HH:mm' }}
   </div>
 }
 @if (zone?.rechecked_at) {
   <div class="alert alert-secondary py-2 mb-3 small">
     <i class="ti ti-rotate-clockwise me-2"></i>
-    <strong>Recheck demandé</strong>
-    @if (zone?.rechecked_by_username) { par <strong>{{ zone?.rechecked_by_username }}</strong> }
-    le {{ zone?.rechecked_at | date:'dd/MM/yy HH:mm' }}
+    <strong>{{ 'scig.zd.recheck_requested' | transloco }}</strong>
+    @if (zone?.rechecked_by_username) { {{ 'scig.zd.by' | transloco }} <strong>{{ zone?.rechecked_by_username }}</strong> }
+    {{ 'scig.zd.on_date' | transloco }} {{ zone?.rechecked_at | date:'dd/MM/yy HH:mm' }}
   </div>
 }
 
@@ -116,7 +116,7 @@
     <div class="col-lg-6 mb-3 mb-lg-0">
       <div class="card h-100">
         <div class="card-header">
-          <h6 class="mb-0"><i class="ti ti-scan me-2 text-primary"></i>Scan code-barres</h6>
+          <h6 class="mb-0"><i class="ti ti-scan me-2 text-primary"></i>{{ 'scig.zd.scan_title' | transloco }}</h6>
         </div>
         <div class="card-body">
           <div class="input-group mb-2">
@@ -124,7 +124,7 @@
               #scanInput
               type="text"
               class="form-control form-control-lg"
-              placeholder="Scanner ou saisir le code-barres…"
+              [placeholder]="'scig.zd.scan_ph' | transloco"
               [(ngModel)]="barcodeInput"
               (keydown.enter)="onScanEnter()"
               [disabled]="scanning"
@@ -138,7 +138,7 @@
               [(ngModel)]="scanQty"
               min="1"
               step="1"
-              title="Quantité"
+              [title]="'scig.zd.qty' | transloco"
             />
             <button class="btn btn-outline-primary" (click)="onScanEnter()" [disabled]="!barcodeInput.trim() || scanning">
               @if (scanning) { <span class="spinner-border spinner-border-sm"></span> }
@@ -153,7 +153,7 @@
             <div class="alert alert-danger py-2 mb-0">{{ scanError }}</div>
           }
           <div class="form-text text-muted mt-1">
-            Appuyez sur <kbd>Entrée</kbd> après chaque scan. Compatible scanner USB.
+            {{ 'scig.zd.scan_hint_pre' | transloco }} <kbd>Entrée</kbd> {{ 'scig.zd.scan_hint_post' | transloco }}
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@
     <div class="col-lg-6">
       <div class="card h-100">
         <div class="card-header">
-          <h6 class="mb-0"><i class="ti ti-pencil me-2 text-warning"></i>Saisie manuelle</h6>
+          <h6 class="mb-0"><i class="ti ti-pencil me-2 text-warning"></i>{{ 'scig.zd.manual_title' | transloco }}</h6>
         </div>
         <div class="card-body">
           <form [formGroup]="manualForm" (ngSubmit)="submitManual()">
@@ -173,7 +173,7 @@
                 type="text"
                 class="form-control"
                 formControlName="variantSearch"
-                placeholder="Référence, désignation ou code-barres…"
+                [placeholder]="'scig.zd.manual_search_ph' | transloco"
                 autocomplete="off"
                 (input)="onVariantSearchChange(manualForm.value.variantSearch)"
               />
@@ -208,12 +208,12 @@
             }
 
             <div class="input-group mb-2">
-              <span class="input-group-text">Qté</span>
+              <span class="input-group-text">{{ 'scig.zd.qty' | transloco }}</span>
               <input type="number" class="form-control" formControlName="qty" min="0" step="1" />
               <button type="submit" class="btn btn-warning text-dark"
                       [disabled]="!selectedVariant || manualForm.invalid || savingManual">
                 @if (savingManual) { <span class="spinner-border spinner-border-sm me-1"></span> }
-                Valider
+                {{ 'scig.common.validate' | transloco }}
               </button>
             </div>
 
@@ -230,12 +230,12 @@
 <!-- Table des lignes d'inventaire -->
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <h5 class="mb-0">Articles comptés</h5>
+    <h5 class="mb-0">{{ 'scig.zd.articles_counted' | transloco }}</h5>
     @if (displayedLines.length > 0) {
       <div class="d-flex gap-3 text-muted small">
-        <span>Total lignes : <strong class="text-dark">{{ displayedLines.length }}</strong></span>
-        <span>Qté comptée : <strong class="text-dark">{{ totalCounted | number:'1.0-0' }}</strong></span>
-        <span>Écart global :
+        <span>{{ 'scig.zd.total_lines' | transloco }} <strong class="text-dark">{{ displayedLines.length }}</strong></span>
+        <span>{{ 'scig.zd.qty_counted' | transloco }} <strong class="text-dark">{{ totalCounted | number:'1.0-0' }}</strong></span>
+        <span>{{ 'scig.zd.global_variance' | transloco }}
           <strong [ngClass]="varianceClass(totalVariance)">
             {{ totalVariance > 0 ? '+' : '' }}{{ totalVariance | number:'1.0-0' }}
           </strong>
@@ -251,15 +251,15 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Désignation</th>
-              <th>Référence</th>
-              <th>Taille</th>
-              <th>Couleur</th>
-              <th class="text-end">Sage (théo.)</th>
-              <th class="text-end">Compté</th>
-              <th class="text-end">Écart</th>
-              <th>Saisie</th>
-              <th>Saisi par</th>
+              <th>{{ 'scig.common.col_designation' | transloco }}</th>
+              <th>{{ 'scig.common.col_reference' | transloco }}</th>
+              <th>{{ 'scig.common.col_size' | transloco }}</th>
+              <th>{{ 'scig.common.col_color' | transloco }}</th>
+              <th class="text-end">{{ 'scig.zd.col_sage_theo' | transloco }}</th>
+              <th class="text-end">{{ 'scig.common.col_counted' | transloco }}</th>
+              <th class="text-end">{{ 'scig.common.col_variance' | transloco }}</th>
+              <th>{{ 'scig.common.col_entry' | transloco }}</th>
+              <th>{{ 'scig.zd.col_entered_by' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -278,9 +278,9 @@
                 </td>
                 <td>
                   @if (l.is_manual) {
-                    <span class="badge bg-outline-warning text-dark" title="Saisie manuelle">Manuel</span>
+                    <span class="badge bg-outline-warning text-dark" [title]="'scig.zd.manual_title' | transloco">{{ 'scig.common.manual' | transloco }}</span>
                   } @else {
-                    <span class="badge bg-outline-secondary" title="Scan barcode">Scan</span>
+                    <span class="badge bg-outline-secondary" [title]="'scig.zd.scan_title' | transloco">{{ 'scig.common.scan' | transloco }}</span>
                   }
                 </td>
                 <td class="small text-muted">
@@ -301,12 +301,12 @@
                   @if (zone?.status === 'NOT_STARTED') {
                     <div>
                       <i class="ti ti-lock fs-2 d-block mb-2"></i>
-                      Ouvrez la zone pour charger les articles depuis Sage et commencer le comptage.
+                      {{ 'scig.zd.empty_not_started' | transloco }}
                     </div>
                   } @else {
                     <div>
                       <i class="ti ti-package fs-2 d-block mb-2"></i>
-                      Aucun article compté pour l'instant.
+                      {{ 'scig.zd.empty_counted' | transloco }}
                     </div>
                   }
                 </td>
@@ -332,22 +332,22 @@
             <i class="ti ti-send fs-2"></i>
           </span>
         </div>
-        <h5 class="mb-2">Soumettre pour validation ?</h5>
+        <h5 class="mb-2">{{ 'scig.zd.submit_zone_title' | transloco }}</h5>
         <p class="text-muted mb-0">
-          La zone sera transmise au gestionnaire pour vérification.<br>
-          <small>Le comptage ne sera plus modifiable après soumission.</small>
+          {{ 'scig.zd.submit_zone_body' | transloco }}<br>
+          <small>{{ 'scig.zd.submit_zone_note' | transloco }}</small>
         </p>
         @if (submitError) {
           <div class="alert alert-danger py-2 mt-3 text-start">{{ submitError }}</div>
         }
       </div>
       <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
-        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="button" class="btn btn-primary px-4"
                 (click)="confirmSubmitZone()"
                 [disabled]="submittingZone">
           @if (submittingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-send me-1"></i>Soumettre
+          <i class="ti ti-send me-1"></i>{{ 'scig.common.submit' | transloco }}
         </button>
       </div>
     </div>
@@ -367,22 +367,22 @@
             <i class="ti ti-circle-check fs-2"></i>
           </span>
         </div>
-        <h5 class="mb-2">Valider définitivement la zone ?</h5>
+        <h5 class="mb-2">{{ 'scig.zd.validate_zone_title' | transloco }}</h5>
         <p class="text-muted mb-0">
-          Le statut passera à <span class="badge bg-outline-success">Validée</span>.<br>
-          <small>Cette action est irréversible.</small>
+          {{ 'scig.zd.validate_zone_body_pre' | transloco }} <span class="badge bg-outline-success">{{ 'scig.common.st_validated' | transloco }}</span>.<br>
+          <small>{{ 'scig.common.irreversible' | transloco }}</small>
         </p>
         @if (validateError) {
           <div class="alert alert-danger py-2 mt-3 text-start">{{ validateError }}</div>
         }
       </div>
       <div class="modal-footer border-0 justify-content-center gap-2 pt-0">
-        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="button" class="btn btn-success px-4"
                 (click)="confirmValidateZone()"
                 [disabled]="validatingZone">
           @if (validatingZone) { <span class="spinner-border spinner-border-sm me-1"></span> }
-          <i class="ti ti-check me-1"></i>Valider
+          <i class="ti ti-check me-1"></i>{{ 'scig.common.validate' | transloco }}
         </button>
       </div>
     </div>
@@ -395,7 +395,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="ti ti-rotate-clockwise text-warning me-2"></i>Renvoyer en vérification
+          <i class="ti ti-rotate-clockwise text-warning me-2"></i>{{ 'scig.common.recheck_title' | transloco }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -403,20 +403,19 @@
         <div class="modal-body">
           @if (recheckError) { <div class="alert alert-danger py-2">{{ recheckError }}</div> }
           <p class="mb-3">
-            Cette zone sera renvoyée aux opérateurs Zebra
-            (statut → <span class="badge bg-warning text-dark">À revérifier</span>).
+            {{ 'scig.zd.recheck_zone_body' | transloco }} <span class="badge bg-warning text-dark">{{ 'scig.common.st_recheck' | transloco }}</span>).
           </p>
           <div class="mb-0">
-            <label class="form-label">Note / motif (optionnel)</label>
+            <label class="form-label">{{ 'scig.common.f_note' | transloco }}</label>
             <textarea formControlName="note" class="form-control" rows="3"
-                      placeholder="ex : Recompter le rayon chaussures…"></textarea>
+                      [placeholder]="'scig.zd.recheck_zone_note_ph' | transloco"></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-warning text-dark" [disabled]="savingRecheck">
             @if (savingRecheck) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Renvoyer
+            {{ 'scig.common.resend' | transloco }}
           </button>
         </div>
       </form>
