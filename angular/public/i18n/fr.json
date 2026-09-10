@@ -388,7 +388,11 @@
       "today_income": "Recettes du jour",
       "today_expense": "Dépenses du jour",
       "today_net": "Net du jour",
-      "open_sessions": "Sessions ouvertes"
+      "open_sessions": "Sessions ouvertes",
+      "composition": "Répartition des liquidités",
+      "cash_short": "Caisses",
+      "bank_short": "Banques",
+      "no_data": "Aucune donnée à afficher."
     },
     "register": {
       "title": "Caisses",

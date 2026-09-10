@@ -388,7 +388,11 @@
       "today_income": "Today's income",
       "today_expense": "Today's expenses",
       "today_net": "Today's net",
-      "open_sessions": "Open sessions"
+      "open_sessions": "Open sessions",
+      "composition": "Liquidity breakdown",
+      "cash_short": "Cash",
+      "bank_short": "Banks",
+      "no_data": "No data to show."
     },
     "register": {
       "title": "Cash registers",

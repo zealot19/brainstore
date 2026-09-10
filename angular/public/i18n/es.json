@@ -388,7 +388,11 @@
       "today_income": "Ingresos del día",
       "today_expense": "Gastos del día",
       "today_net": "Neto del día",
-      "open_sessions": "Sesiones abiertas"
+      "open_sessions": "Sesiones abiertas",
+      "composition": "Distribución de liquidez",
+      "cash_short": "Cajas",
+      "bank_short": "Bancos",
+      "no_data": "Sin datos que mostrar."
     },
     "register": {
       "title": "Cajas",
