@@ -3,7 +3,7 @@
 
 .page-wrapper {
     @include mixins.transition(all 0.5s ease);
-    @include mixins.margin-padding( 0 0 0 272px, 65px 0 0);
+    @include mixins.margin-padding( 0 0 0 346px, 65px 0 0);
     @include mixins.position(relative,null,null,null,0);
     @include mixins.transition(all 0.2s ease);
     @include mixins.respond-below(custom991) {

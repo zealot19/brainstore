@@ -12,7 +12,7 @@
     left: 0;
     @include mixins.transition(all 0.5s ease);
     border-right: 1px solid variables.$border-color;
-    width: 272px;
+    width: 346px;
     @include mixins.respond-below(custom991) {
         margin-left: -575px;
         @include mixins.transition(all 0.4s ease);
@@ -56,7 +56,7 @@
                     align-items: center;
                     -webkit-box-align: center;
                     -ms-flex-align: center;
-                    @include mixins.margin-padding(null, 10px 15px);
+                    @include mixins.margin-padding(null, 10px 34px 10px 15px);
                     position: relative;
                     color: variables.$secondary;
                     svg{
@@ -104,6 +104,7 @@
                         font-size: variables.$font-size-14;
                         font-weight: variables.$font-weight-medium;
                         line-height: 1.25;
+                        white-space: nowrap;
                         color: variables.$gray-600;
                     }
                     
@@ -180,7 +181,7 @@
                                 padding: 8px 12px;
                                 border-radius: 5px;
                                span {
-                                white-space: normal;
+                                white-space: nowrap;
                                 font-size: variables.$font-size-13;
                                 line-height: 1.25;
                                 color: variables.$title-color;
@@ -230,6 +231,7 @@
                         font-size: variables.$font-size-12;
                         color: variables.$secondary;
                         margin: 0 0 8px 0;
+                        white-space: nowrap;
                     }
                     &:first-child {
                         h6 {
@@ -679,7 +681,7 @@
             @include mixins.transition(all 0.2s ease);
         }
         .sidebar {
-            width: 272px;
+            width: 346px;
             .sidebar-menu{
                ul{
                    > li{
@@ -700,7 +702,7 @@
             }
         }
         .header-left{
-            width: 272px;
+            width: 346px;
         }
     }
     #toggle_btn {
@@ -861,7 +863,7 @@ body.mini-sidebar{
 }
 @include mixins.respond-above(custom992) {
     .header {
-        left: 272px;
+        left: 346px;
     }
     .sidebar {
         top: 0;
@@ -900,7 +902,7 @@ body.mini-sidebar{
                 }
             }
             .header {
-                left: 272px;
+                left: 346px;
             }
         }
     }
