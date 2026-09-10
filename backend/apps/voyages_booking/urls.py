@@ -3,6 +3,7 @@ from .config_api import views as v
 
 urlpatterns = [
     path("stats/", v.BookingStatsView.as_view()),
+    path("series/", v.BookingSeriesView.as_view()),
     path("passengers/", v.PassengerListView.as_view()),
     path("passengers/<uuid:pk>/", v.PassengerDetailView.as_view()),
     path("passengers/<uuid:pk>/loyalty/", v.PassengerLoyaltyView.as_view()),

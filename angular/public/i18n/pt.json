@@ -1954,7 +1954,16 @@
     "empty_bookings": "Sem reservas recentes.",
     "recent_movements": "Últimos movimentos",
     "col_label": "Rótulo",
-    "empty_movements": "Sem movimentos recentes."
+    "empty_movements": "Sem movimentos recentes.",
+    "hello": "Olá",
+    "chart_activity": "Atividade — últimos 14 dias",
+    "chart_cashflow": "Receitas e despesas — 14 dias",
+    "s_bookings": "Reservas",
+    "s_revenue": "Receita",
+    "s_income": "Receitas",
+    "s_expense": "Despesas",
+    "revenue_month": "Receita do mês",
+    "no_activity": "Ainda não há atividade para mostrar."
   },
   "auth": {
     "signin_title": "Iniciar sessão",

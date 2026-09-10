@@ -1954,7 +1954,16 @@
     "empty_bookings": "No recent bookings.",
     "recent_movements": "Latest movements",
     "col_label": "Label",
-    "empty_movements": "No recent movements."
+    "empty_movements": "No recent movements.",
+    "hello": "Hello",
+    "chart_activity": "Activity — last 14 days",
+    "chart_cashflow": "Income & expenses — 14 days",
+    "s_bookings": "Bookings",
+    "s_revenue": "Revenue",
+    "s_income": "Income",
+    "s_expense": "Expenses",
+    "revenue_month": "Month revenue",
+    "no_activity": "No activity to show yet."
   },
   "auth": {
     "signin_title": "Sign in",

@@ -21,4 +21,13 @@ export class DashboardService {
     return this.http.get(`${API_BASE}/treasury/transactions/`,
       { params: new HttpParams().set('page_size', String(limit)) });
   }
+
+  bookingSeries(days = 14): Observable<any> {
+    return this.http.get(`${API_BASE}/voyages/booking/series/`,
+      { params: new HttpParams().set('days', String(days)) });
+  }
+  treasurySeries(days = 14): Observable<any> {
+    return this.http.get(`${API_BASE}/treasury/series/`,
+      { params: new HttpParams().set('days', String(days)) });
+  }
 }
