@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../services/dashboard/dashboard.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { HasModuleDirective } from '../../../../app/shared/directives/has-module.directive';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-home-dashboard',
   standalone: true,
   templateUrl: './home-dashboard.component.html',
-  imports: [CommonModule, HasModuleDirective],
+  imports: [CommonModule, HasModuleDirective, TranslocoModule],
 })
 export class HomeDashboardComponent implements OnInit {
   private dash = inject(DashboardService);

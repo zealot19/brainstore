@@ -1,7 +1,7 @@
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
   <div>
-    <h1 class="mb-1">Tableau de bord</h1>
-    <p class="fw-medium mb-0">Aperçu de votre activité</p>
+    <h1 class="mb-1">{{ 'dash.title' | transloco }}</h1>
+    <p class="fw-medium mb-0">{{ 'dash.subtitle' | transloco }}</p>
   </div>
 </div>
 
@@ -12,13 +12,13 @@
       <div class="card-body d-flex align-items-center">
         <span class="sale-icon bg-white text-primary"><i class="ti ti-cash fs-24"></i></span>
         <div class="ms-2">
-          <p class="text-white mb-1">Trésorerie</p>
+          <p class="text-white mb-1">{{ 'dash.treasury' | transloco }}</p>
           <h4 class="text-white">{{ (treasury?.total_balance ?? 0) | number }}</h4>
           <p class="text-white mb-0 fs-13">
             <span class="me-2"><i class="ti ti-arrow-up-right"></i> {{ (treasury?.today_income ?? 0) | number }}</span>
             <span><i class="ti ti-arrow-down-right"></i> {{ (treasury?.today_expense ?? 0) | number }}</span>
           </p>
-          <p class="text-white mb-0 fs-13">{{ treasury?.open_sessions ?? 0 }} caisse(s) ouverte(s)</p>
+          <p class="text-white mb-0 fs-13">{{ treasury?.open_sessions ?? 0 }} {{ 'dash.open_sessions' | transloco }}</p>
         </div>
       </div>
     </div>
@@ -30,10 +30,10 @@
       <div class="card-body d-flex align-items-center">
         <span class="sale-icon bg-white text-secondary"><i class="ti ti-bus fs-24"></i></span>
         <div class="ms-2">
-          <p class="text-white mb-1">Voyages</p>
+          <p class="text-white mb-1">{{ 'dash.voyages' | transloco }}</p>
           <h4 class="text-white">{{ trips?.today_departures ?? 0 }}</h4>
-          <p class="text-white mb-0 fs-13">Départs aujourd'hui</p>
-          <p class="text-white mb-0 fs-13">À venir 7j : {{ trips?.upcoming_7d ?? 0 }} · En cours : {{ trips?.in_progress ?? 0 }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.departures_today' | transloco }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.upcoming_7d' | transloco }} {{ trips?.upcoming_7d ?? 0 }} · {{ 'dash.in_progress' | transloco }} {{ trips?.in_progress ?? 0 }}</p>
         </div>
       </div>
     </div>
@@ -45,10 +45,10 @@
       <div class="card-body d-flex align-items-center">
         <span class="sale-icon bg-white text-teal"><i class="ti ti-ticket fs-24"></i></span>
         <div class="ms-2">
-          <p class="text-white mb-1">Réservations</p>
+          <p class="text-white mb-1">{{ 'dash.bookings' | transloco }}</p>
           <h4 class="text-white">{{ bookings?.bookings_today ?? 0 }}</h4>
-          <p class="text-white mb-0 fs-13">Réservations du jour</p>
-          <p class="text-white mb-0 fs-13">Recette : {{ (bookings?.revenue_today ?? 0) | number }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.bookings_today' | transloco }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.revenue' | transloco }} {{ (bookings?.revenue_today ?? 0) | number }}</p>
         </div>
       </div>
     </div>
@@ -60,10 +60,10 @@
       <div class="card-body d-flex align-items-center">
         <span class="sale-icon bg-white text-info"><i class="ti ti-package fs-24"></i></span>
         <div class="ms-2">
-          <p class="text-white mb-1">Colis</p>
+          <p class="text-white mb-1">{{ 'dash.parcels' | transloco }}</p>
           <h4 class="text-white">{{ parcels?.to_collect ?? 0 }}</h4>
-          <p class="text-white mb-0 fs-13">À retirer</p>
-          <p class="text-white mb-0 fs-13">À charger : {{ parcels?.registered ?? 0 }} · En transit : {{ parcels?.in_transit ?? 0 }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.to_collect' | transloco }}</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.to_load' | transloco }} {{ parcels?.registered ?? 0 }} · {{ 'dash.in_transit' | transloco }} {{ parcels?.in_transit ?? 0 }}</p>
         </div>
       </div>
     </div>
@@ -75,9 +75,9 @@
       <div class="card-body d-flex align-items-center">
         <span class="sale-icon bg-white text-success"><i class="ti ti-car fs-24"></i></span>
         <div class="ms-2">
-          <p class="text-white mb-1">Flotte</p>
+          <p class="text-white mb-1">{{ 'dash.fleet' | transloco }}</p>
           <h4 class="text-white">{{ fleet?.available ?? fleet?.total ?? 0 }}</h4>
-          <p class="text-white mb-0 fs-13">Véhicules</p>
+          <p class="text-white mb-0 fs-13">{{ 'dash.vehicles' | transloco }}</p>
         </div>
       </div>
     </div>
@@ -89,16 +89,16 @@
   <div class="col-lg-6 col-12 d-flex" *hasModule="'voyage'">
     <div class="card flex-fill">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="card-title mb-0">Dernières réservations</h5>
+        <h5 class="card-title mb-0">{{ 'dash.recent_bookings' | transloco }}</h5>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover mb-0">
-            <thead class="table-light"><tr><th>Réf.</th><th>Montant</th><th>Date</th></tr></thead>
+            <thead class="table-light"><tr><th>{{ 'dash.col_ref' | transloco }}</th><th>{{ 'dash.col_amount' | transloco }}</th><th>{{ 'dash.col_date' | transloco }}</th></tr></thead>
             <tbody>
               @for (b of recentBookings; track b.id) {
                 <tr><td class="fw-medium">{{ b.reference }}</td><td>{{ (b.amount_paid ?? 0) | number }}</td><td>{{ b.created_at | date:'dd/MM HH:mm' }}</td></tr>
-              } @empty { <tr><td colspan="3" class="text-center text-muted py-3">Aucune réservation récente.</td></tr> }
+              } @empty { <tr><td colspan="3" class="text-center text-muted py-3">{{ 'dash.empty_bookings' | transloco }}</td></tr> }
             </tbody>
           </table>
         </div>
@@ -110,16 +110,16 @@
   <div class="col-lg-6 col-12 d-flex" *hasModule="'treasury'">
     <div class="card flex-fill">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="card-title mb-0">Derniers mouvements</h5>
+        <h5 class="card-title mb-0">{{ 'dash.recent_movements' | transloco }}</h5>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover mb-0">
-            <thead class="table-light"><tr><th>Libellé</th><th>Montant</th><th>Date</th></tr></thead>
+            <thead class="table-light"><tr><th>{{ 'dash.col_label' | transloco }}</th><th>{{ 'dash.col_amount' | transloco }}</th><th>{{ 'dash.col_date' | transloco }}</th></tr></thead>
             <tbody>
               @for (m of recentMovements; track m.id) {
                 <tr><td class="fw-medium">{{ m.description || m.category }}</td><td>{{ (m.amount ?? 0) | number }}</td><td>{{ m.transaction_date | date:'dd/MM' }}</td></tr>
-              } @empty { <tr><td colspan="3" class="text-center text-muted py-3">Aucun mouvement récent.</td></tr> }
+              } @empty { <tr><td colspan="3" class="text-center text-muted py-3">{{ 'dash.empty_movements' | transloco }}</td></tr> }
             </tbody>
           </table>
         </div>
