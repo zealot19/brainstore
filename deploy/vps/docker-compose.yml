@@ -1,0 +1,52 @@
+# Serveur central "tout-en-un" sur un seul VPS (backend + base + frontend + HTTPS).
+# Voir README-VPS.md (racine du dépôt) pour le pas-à-pas complet.
+#
+# Prérequis avant `docker compose up` :
+#   1) cp .env.example .env         puis renseigner .env
+#   2) éditer Caddyfile             (remplacer erp.mondomaine.com + email)
+#   3) construire le frontend :
+#      docker run --rm -v "$PWD/../../angular:/app" -w /app node:20-alpine \
+#        sh -c "npm ci && npx ng build --configuration production"
+#
+# Puis :  docker compose up -d --build
+#         docker compose exec web python manage.py createsuperuser
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:                      # Django + Gunicorn (le Dockerfile applique migrate au démarrage)
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/app/media    # fichiers téléversés (persistants)
+    depends_on:
+      - db
+
+  caddy:                    # reverse proxy + HTTPS automatique (Let's Encrypt)
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../../angular/dist/angular/browser:/srv/app:ro   # build Angular (configuration production)
+      - media:/srv/media:ro                              # médias servis directement
+      - caddy_data:/data                                 # certificats (persistants)
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:
+  caddy_config:
