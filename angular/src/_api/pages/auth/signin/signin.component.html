@@ -12,8 +12,8 @@
           </a>
 
           <div class="login-userheading">
-            <h3>Sign In</h3>
-            <h4>Access your dashboard using your email and password.</h4>
+            <h3>{{ 'auth.signin_title' | transloco }}</h3>
+            <h4>{{ 'auth.signin_subtitle' | transloco }}</h4>
           </div>
 
           <!-- Alerte erreur -->
@@ -23,7 +23,7 @@
 
           <!-- Email -->
           <div class="mb-3">
-            <label class="form-label">Email<span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'auth.email' | transloco }}<span class="text-danger">*</span></label>
             <div class="input-group">
               <input type="email" class="form-control border-end-0"
                      formControlName="email" placeholder="admin@example.com"
@@ -34,7 +34,7 @@
 
           <!-- Mot de passe -->
           <div class="mb-3">
-            <label class="form-label">Password<span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'auth.password' | transloco }}<span class="text-danger">*</span></label>
             <div class="pass-group">
               <input [type]="showPassword ? 'text' : 'password'"
                      class="pass-input form-control" formControlName="password"
@@ -52,12 +52,12 @@
                 <div class="custom-control custom-checkbox custom-class-check">
                   <label class="checkboxs ps-4 mb-0 pb-0 line-height-1">
                     <input type="checkbox" class="form-control">
-                    <span class="checkmarks"></span>Remember me
+                    <span class="checkmarks"></span>{{ 'auth.remember_me' | transloco }}
                   </label>
                 </div>
                 <div class="text-end">
                   <a class="text-orange fs-16 fw-medium" [routerLink]="routes.forgotPassword">
-                    Forgot Password?
+                    {{ 'auth.forgot_password' | transloco }}
                   </a>
                 </div>
               </div>
@@ -68,7 +68,7 @@
           <div class="form-login">
             <button type="submit" class="btn btn-login" [disabled]="loading">
               <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-              Sign In
+              {{ 'auth.signin_btn' | transloco }}
             </button>
           </div>
 
