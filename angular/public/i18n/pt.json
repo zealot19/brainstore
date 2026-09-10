@@ -50,6 +50,13 @@
       "audit": "Registo de auditoria",
       "logout": "Terminar sessão",
       "profile": "O meu perfil"
+    },
+    "select": {
+      "search_ph": "Pesquisar…",
+      "no_results": "Sem resultados"
+    },
+    "client": {
+      "name_ph": "Nome do cliente"
     }
   },
   "nav": {

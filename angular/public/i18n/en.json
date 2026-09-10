@@ -50,6 +50,13 @@
       "audit": "Audit Log",
       "logout": "Log out",
       "profile": "My Profile"
+    },
+    "select": {
+      "search_ph": "Search…",
+      "no_results": "No results"
+    },
+    "client": {
+      "name_ph": "Client name"
     }
   },
   "nav": {
