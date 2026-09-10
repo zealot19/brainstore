@@ -1,13 +1,13 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Manifeste voyage</h4><h6>Chargement des colis et suivi des bagages</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.manifest.title' | transloco }}</h4><h6>{{ 'cons.manifest.subtitle' | transloco }}</h6></div></div>
 </div>
-<app-info-banner text="Choisissez un voyage : chargez les colis en attente compatibles, marquez-les arrivés, et suivez les bagages des passagers du voyage."></app-info-banner>
+<app-info-banner [text]="'cons.manifest.info' | transloco"></app-info-banner>
 
 <div class="card"><div class="card-body">
   <div class="mb-3" style="max-width:520px">
-    <label class="form-label">Voyage</label>
+    <label class="form-label">{{ 'cons.common.f_trip' | transloco }}</label>
     <select class="form-select" [(ngModel)]="tripId" (ngModelChange)="onTripChange()">
-      <option value="">— Choisir un voyage —</option>
+      <option value="">{{ 'cons.manifest.opt_choose_trip' | transloco }}</option>
       @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number }} · {{ t.origin_name }} → {{ t.destination_name }} · {{ t.scheduled_departure | date:'short' }}</option> }
     </select>
   </div>
@@ -17,19 +17,19 @@
       <!-- Colis à charger -->
       <div class="col-lg-5 mb-3">
         <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between">
-          <h6 class="mb-0">Colis à charger</h6>
-          @if (pending.length) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" (click)="loadAll()"><i class="ti ti-arrows-right me-1"></i>Tout charger</button> }
+          <h6 class="mb-0">{{ 'cons.manifest.parcels_to_load' | transloco }}</h6>
+          @if (pending.length) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" (click)="loadAll()"><i class="ti ti-arrows-right me-1"></i>{{ 'cons.manifest.load_all' | transloco }}</button> }
         </div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table mb-0">
-            <thead class="thead-light"><tr><th>Réf.</th><th>Trajet</th><th class="no-sort"></th></tr></thead>
+            <thead class="thead-light"><tr><th>{{ 'cons.manifest.col_ref_short' | transloco }}</th><th>{{ 'cons.common.col_trip' | transloco }}</th><th class="no-sort"></th></tr></thead>
             <tbody>
               @for (p of pending; track p.id) {
                 <tr>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td><small>{{ p.origin_point_name }} → {{ p.destination_point_name }}</small></td>
-                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.parcel.manage'" (click)="load(p)" title="Charger"><i class="ti ti-arrow-right"></i></a></td>
+                  <td class="text-end"><a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.parcel.manage'" (click)="load(p)" [title]="'cons.manifest.load' | transloco"><i class="ti ti-arrow-right"></i></a></td>
                 </tr>
-              } @empty { <tr><td colspan="3" class="text-center py-3 text-muted">Aucun colis en attente.</td></tr> }
+              } @empty { <tr><td colspan="3" class="text-center py-3 text-muted">{{ 'cons.manifest.empty_pending' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>
@@ -37,24 +37,24 @@
 
       <!-- À bord -->
       <div class="col-lg-7 mb-3">
-        <div class="card mb-3"><div class="card-header"><h6 class="mb-0">Colis à bord</h6></div>
+        <div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'cons.manifest.parcels_onboard' | transloco }}</h6></div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table mb-0">
-            <thead class="thead-light"><tr><th>Réf.</th><th>Destinataire</th><th>Statut</th><th class="no-sort"></th></tr></thead>
+            <thead class="thead-light"><tr><th>{{ 'cons.manifest.col_ref_short' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.common.col_status' | transloco }}</th><th class="no-sort"></th></tr></thead>
             <tbody>
               @for (p of manifest?.parcels ?? []; track p.id) {
                 <tr>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td>{{ p.recipient_name }}</td>
                   <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
-                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unload(p)" title="Retirer du voyage"><i class="ti ti-arrow-left me-1"></i>Retirer</a> }</td>
+                  <td class="text-end">@if (p.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unload(p)" [title]="'cons.manifest.remove_title' | transloco"><i class="ti ti-arrow-left me-1"></i>{{ 'cons.manifest.remove' | transloco }}</a> }</td>
                 </tr>
-              } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">Aucun colis à bord.</td></tr> }
+              } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">{{ 'cons.manifest.empty_onboard' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>
-        <div class="card"><div class="card-header"><h6 class="mb-0">Bagages du voyage</h6></div>
+        <div class="card"><div class="card-header"><h6 class="mb-0">{{ 'cons.manifest.trip_baggage' | transloco }}</h6></div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table mb-0">
-            <thead class="thead-light"><tr><th>Étiquette</th><th>Passager</th><th>Poids</th><th>Statut</th><th class="no-sort"></th></tr></thead>
+            <thead class="thead-light"><tr><th>{{ 'cons.common.col_tag' | transloco }}</th><th>{{ 'cons.manifest.col_passenger' | transloco }}</th><th>{{ 'cons.manifest.col_weight' | transloco }}</th><th>{{ 'cons.common.col_status' | transloco }}</th><th class="no-sort"></th></tr></thead>
             <tbody>
               @for (b of manifest?.baggage ?? []; track b.id) {
                 <tr>
@@ -63,11 +63,11 @@
                   <td>{{ b.weight_kg || '—' }} kg</td>
                   <td><span class="badge {{ statusClass(b.status) }}">{{ b.status_display }}</span></td>
                   <td class="text-end">
-                    @if (b.status === 'checked_in') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" *hasPermission="'ticketing.luggage.manage'" (click)="loadBag(b)"><i class="ti ti-truck-loading me-1"></i>Charger</a> }
-                    @if (b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.luggage.manage'" (click)="deliver(b)"><i class="ti ti-package-export me-1"></i>Livrer</a> }
+                    @if (b.status === 'checked_in') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" *hasPermission="'ticketing.luggage.manage'" (click)="loadBag(b)"><i class="ti ti-truck-loading me-1"></i>{{ 'cons.manifest.load' | transloco }}</a> }
+                    @if (b.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.luggage.manage'" (click)="deliver(b)"><i class="ti ti-package-export me-1"></i>{{ 'cons.manifest.deliver' | transloco }}</a> }
                   </td>
                 </tr>
-              } @empty { <tr><td colspan="5" class="text-center py-3 text-muted">Aucun bagage.</td></tr> }
+              } @empty { <tr><td colspan="5" class="text-center py-3 text-muted">{{ 'cons.common.empty_baggage' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>
