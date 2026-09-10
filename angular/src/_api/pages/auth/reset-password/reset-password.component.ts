@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { PasswordService } from '../../../services/auth/password.service';
 import { routes } from '../../../../app/core/core.index';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.component.html',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslocoModule],
 })
 export class ResetPasswordComponent implements OnInit {
   readonly routes = routes;

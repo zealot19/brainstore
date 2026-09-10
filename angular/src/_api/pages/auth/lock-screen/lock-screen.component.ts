@@ -5,11 +5,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { AuthService } from '../../../services/auth/auth.service';
 import { TokenService } from '../../../services/auth/token.service';
 import { UserProfile } from '../../../models/auth.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-lock-screen',
   templateUrl: './lock-screen.component.html',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslocoModule],
 })
 export class LockScreenComponent implements OnInit {
 

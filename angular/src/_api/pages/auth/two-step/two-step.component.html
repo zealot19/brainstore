@@ -13,8 +13,8 @@
 
           <div>
             <div class="login-userheading">
-              <h3>2 Step Verification</h3>
-              <h4>Enter the 6-digit code from your authenticator app.</h4>
+              <h3>{{ 'auth.twostep_title' | transloco }}</h3>
+              <h4>{{ 'auth.twostep_subtitle' | transloco }}</h4>
             </div>
 
             <!-- Alerte erreur -->
@@ -32,12 +32,12 @@
               <button type="submit" class="btn btn-primary w-100"
                       [disabled]="loading || otpValue.length < 6">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                Verify
+                {{ 'auth.verify' | transloco }}
               </button>
             </div>
 
             <div class="signinform text-center">
-              <h4>Return to <a [routerLink]="routes.signIn" class="hover-a">login</a></h4>
+              <h4>{{ 'auth.return_to' | transloco }} <a [routerLink]="routes.signIn" class="hover-a">{{ 'auth.login_word' | transloco }}</a></h4>
             </div>
           </div>
 

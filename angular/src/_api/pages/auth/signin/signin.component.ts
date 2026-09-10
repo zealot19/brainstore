@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth/auth.service';
 import { routes } from '../../../../app/core/core.index';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslocoModule],
 })
 export class SigninComponent implements OnInit {
   readonly routes = routes;

@@ -7,7 +7,7 @@
         <div class="login-right-wrap">
 
           <div class="login-info">
-            <p class="account-subtitle">Welcome back!</p>
+            <p class="account-subtitle">{{ 'auth.welcome_back' | transloco }}</p>
 
             <!-- Avatar ou initiales -->
             <ng-container *ngIf="user?.avatar; else initials">
@@ -35,7 +35,7 @@
               <div class="pass-group">
                 <input [type]="showPassword ? 'text' : 'password'"
                        class="pass-input form-control" formControlName="password"
-                       placeholder="Enter your password">
+                       [placeholder]="'auth.password_ph' | transloco">
                 <span class="ti toggle-password text-gray-9"
                       [ngClass]="showPassword ? 'ti-eye' : 'ti-eye-off'"
                       (click)="showPassword = !showPassword"></span>
@@ -45,7 +45,7 @@
             <button class="btn btn-lg btn-block btn-primary w-100"
                     type="submit" [disabled]="loading">
               <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-              Log In
+              {{ 'auth.login_btn' | transloco }}
             </button>
           </form>
 

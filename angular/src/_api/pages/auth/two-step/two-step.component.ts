@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { InputOtpModule } from 'primeng/inputotp';
 import { AuthService } from '../../../services/auth/auth.service';
 import { routes } from '../../../../app/core/core.index';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-two-step',
   templateUrl: './two-step.component.html',
-  imports: [CommonModule, FormsModule, RouterLink, InputOtpModule],
+  imports: [CommonModule, FormsModule, RouterLink, InputOtpModule, TranslocoModule],
 })
 export class TwoStepComponent implements OnInit {
   readonly routes = routes;
