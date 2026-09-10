@@ -2,13 +2,13 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Dépôts Sage</h4>
-      <h6>Dépôts synchronisés depuis Sage 100</h6>
+      <h4>{{ 'scig.depots.title' | transloco }}</h4>
+      <h6>{{ 'scig.depots.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser">
+      <a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco">
         <i class="ti ti-refresh"></i>
       </a>
     </li>
@@ -20,7 +20,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-purple border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Total dépôts</p><h4 class="text-white">{{ total }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'scig.depots.stat_total' | transloco }}</p><h4 class="text-white">{{ total }}</h4></div>
         <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-building-warehouse"></i></span>
       </div>
     </div>
@@ -28,7 +28,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-teal border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Actifs</p><h4 class="text-white">{{ actifs }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'scig.depots.stat_active' | transloco }}</p><h4 class="text-white">{{ actifs }}</h4></div>
         <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-circle-check"></i></span>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
         <div class="dataTables_filter">
           <label>
-            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Nom ou numéro dépôt…" />
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'scig.depots.search_ph' | transloco" />
           </label>
         </div>
       </div>
@@ -57,10 +57,10 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Nom dépôt</th>
-              <th>N° Sage</th>
-              <th>Statut</th>
-              <th>Dernière sync.</th>
+              <th>{{ 'scig.depots.col_name' | transloco }}</th>
+              <th>{{ 'scig.depots.col_sage_no' | transloco }}</th>
+              <th>{{ 'admin.common.status' | transloco }}</th>
+              <th>{{ 'scig.depots.col_last_sync' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -70,7 +70,7 @@
                 <td><span class="badge bg-outline-secondary">{{ d.sage_depot_no }}</span></td>
                 <td>
                   <span class="badge" [ngClass]="d.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
-                    {{ d.is_active ? 'Actif' : 'Inactif' }}
+                    {{ (d.is_active ? 'admin.common.active' : 'admin.common.inactive') | transloco }}
                   </span>
                 </td>
                 <td>{{ d.last_synced_at ? (d.last_synced_at | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
@@ -78,7 +78,7 @@
             } @empty {
               <tr>
                 <td colspan="4" class="text-center py-4 text-muted">
-                  Aucun dépôt trouvé. Lancez une synchronisation depuis la configuration Sage.
+                  {{ 'scig.depots.empty' | transloco }}
                 </td>
               </tr>
             }

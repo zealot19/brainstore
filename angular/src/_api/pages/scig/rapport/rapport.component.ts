@@ -4,11 +4,12 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ScigService } from '../../../services/scig/scig.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { InventorySession, InventoryLine, ZoneGroup } from '../../../models/scig.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-scig-rapport',
   templateUrl: './rapport.component.html',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslocoModule],
 })
 export class RapportComponent implements OnInit {
 

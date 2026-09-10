@@ -6,11 +6,12 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ScigService } from '../../../services/scig/scig.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { InventoryZone, InventoryLine, ArticleVariantSummary, ZoneStatus } from '../../../models/scig.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-scig-zone-detail',
   templateUrl: './zone-detail.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslocoModule],
 })
 export class ZoneDetailComponent implements OnInit {
 

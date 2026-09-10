@@ -8,11 +8,12 @@ import { Depot, InventorySession } from '../../../models/scig.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-scig-inventaires',
   templateUrl: './inventaires.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslocoModule],
 })
 export class InventairesComponent implements OnInit {
   private toast = inject(ToastService);

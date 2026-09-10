@@ -5,11 +5,12 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ScigService } from '../../../services/scig/scig.service';
 import { PermissionService } from '../../../services/auth/permission.service';
 import { InventorySession, InventoryZone, ZoneStatus } from '../../../models/scig.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-scig-session-detail',
   templateUrl: './session-detail.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslocoModule],
 })
 export class SessionDetailComponent implements OnInit {
 

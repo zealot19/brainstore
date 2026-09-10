@@ -5,11 +5,12 @@ import { ScigService } from '../../../services/scig/scig.service';
 import { Depot } from '../../../models/scig.models';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-scig-depots',
   templateUrl: './depots.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule],
+  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, TranslocoModule],
 })
 export class DepotsComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
