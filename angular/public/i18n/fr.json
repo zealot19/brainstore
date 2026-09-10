@@ -1279,7 +1279,9 @@
       "col_planned_date": "Date prévue",
       "badge_overdue": "En retard",
       "no_alerts_1": "Aucune alerte active pour les",
-      "no_alerts_2": "prochains jours."
+      "no_alerts_2": "prochains jours.",
+      "by_status_title": "Flotte par statut",
+      "other": "Autre"
     },
     "svc": {
       "title": "Services / Interventions",
