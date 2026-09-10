@@ -9,11 +9,12 @@ import { TripOption } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vcg-manifest',
   templateUrl: './manifest.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);

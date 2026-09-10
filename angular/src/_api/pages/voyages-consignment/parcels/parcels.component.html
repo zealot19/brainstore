@@ -1,52 +1,52 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Colis</h4><h6>Enregistrement, suivi et retrait des colis</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.parcels.title' | transloco }}</h4><h6>{{ 'cons.parcels.subtitle' | transloco }}</h6></div></div>
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>Enregistrer un colis</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'cons.parcels.add' | transloco }}</a>
   </div>
 </div>
-<app-info-banner text="Enregistrez le colis (expéditeur, destinataire, contenu) et encaissez le montant au dépôt. Le colis part « Enregistré » ; il sera affecté à un voyage via le manifeste, puis retiré par le destinataire à l'arrivée."></app-info-banner>
+<app-info-banner [text]="'cons.parcels.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2 flex-wrap">
       <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
-        <option value="">Tous les statuts</option>
-        <option value="registered">Enregistré</option>
-        <option value="loaded">Chargé</option>
-        <option value="arrived">Arrivé</option>
-        <option value="picked_up">Retiré</option>
-        <option value="cancelled">Annulé</option>
+        <option value="">{{ 'cons.common.opt_all_statuses' | transloco }}</option>
+        <option value="registered">{{ 'cons.common.st_registered' | transloco }}</option>
+        <option value="loaded">{{ 'cons.common.st_loaded' | transloco }}</option>
+        <option value="arrived">{{ 'cons.common.st_arrived' | transloco }}</option>
+        <option value="picked_up">{{ 'cons.common.st_withdrawn' | transloco }}</option>
+        <option value="cancelled">{{ 'cons.common.st_cancelled' | transloco }}</option>
       </select>
       <select class="form-select w-auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
-        <option value="">Tous voyages</option>
+        <option value="">{{ 'cons.common.opt_all_trips' | transloco }}</option>
         @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
       </select>
       <select class="form-select w-auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
-        <option value="">Tous types</option>
+        <option value="">{{ 'cons.common.opt_all_types' | transloco }}</option>
         @for (c of types; track c.id) { <option [value]="c.id">{{ c.label }}</option> }
       </select>
       <select class="form-select w-auto" [(ngModel)]="originFilter" (ngModelChange)="reload()">
-        <option value="">Toute origine</option>
+        <option value="">{{ 'cons.parcels.opt_all_origins' | transloco }}</option>
         @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
       </select>
       <select class="form-select w-auto" [(ngModel)]="destFilter" (ngModelChange)="reload()">
-        <option value="">Toute destination</option>
+        <option value="">{{ 'cons.parcels.opt_all_dest' | transloco }}</option>
         @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
       </select>
       <select class="form-select w-auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
-        <option value="created">Date création</option>
-        <option value="departure">Date départ</option>
-        <option value="arrival">Date arrivée</option>
+        <option value="created">{{ 'cons.common.df_created' | transloco }}</option>
+        <option value="departure">{{ 'cons.common.df_departure' | transloco }}</option>
+        <option value="arrival">{{ 'cons.common.df_arrival' | transloco }}</option>
       </select>
       <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
       <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
-      <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
-      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>Effacer</button>
+      <input type="text" class="form-control w-auto" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'cons.common.clear' | transloco }}</button>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
-        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" (click)="bulkCancel()"><i class="ti ti-trash me-1"></i>Annuler la sélection</button>
+        <span class="text-muted small">{{ selected.size }} {{ 'cons.common.selected' | transloco }}</span>
+        <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" (click)="bulkCancel()"><i class="ti ti-trash me-1"></i>{{ 'cons.parcels.bulk_cancel' | transloco }}</button>
       </div>
     }
   </div>
@@ -56,7 +56,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>Référence</th><th>Trajet</th><th>Destinataire</th><th class="text-center">Pièces</th><th>Montant</th><th>Statut</th><th class="no-sort">Actions</th></tr></thead>
+          <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_trip' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th class="text-center">{{ 'cons.common.pieces' | transloco }}</th><th>{{ 'cons.common.col_amount' | transloco }}</th><th>{{ 'cons.common.col_status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (p of rows | paginate:pg.page:pg.size; track p.id) {
             <tr>
@@ -67,21 +67,21 @@
               <td class="text-center">
                 @if (p.status === 'arrived' || p.status === 'picked_up') {
                   {{ p.received_pieces }}/{{ p.quantity }}
-                  @if (p.missing_pieces) { <span class="badge bg-danger ms-1" title="Manquant">-{{ p.missing_pieces }}</span> }
-                  @if (p.damaged_pieces) { <span class="badge bg-warning ms-1" title="Avarié">⚡{{ p.damaged_pieces }}</span> }
+                  @if (p.missing_pieces) { <span class="badge bg-danger ms-1" [title]="'cons.common.missing' | transloco">-{{ p.missing_pieces }}</span> }
+                  @if (p.damaged_pieces) { <span class="badge bg-warning ms-1" [title]="'cons.common.damaged' | transloco">⚡{{ p.damaged_pieces }}</span> }
                 } @else { {{ p.quantity }} }
               </td>
               <td>{{ p.amount_due | number:'1.0-0' }} XAF</td>
               <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" title="Détail"><i class="ti ti-eye me-1"></i>Détail</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" title="Imprimer le reçu"><i class="ti ti-printer me-1"></i>Reçu</a>
-                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" title="Modifier"><i class="ti ti-edit me-1"></i>Modifier</a> }
-                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" title="Livrer"><i class="ti ti-package-export me-1"></i>Livrer</a> }
-                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" title="Annuler"><i class="ti ti-x me-1"></i>Annuler</a> }
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" [title]="'cons.parcels.act_detail' | transloco"><i class="ti ti-eye me-1"></i>{{ 'cons.parcels.act_detail' | transloco }}</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" [title]="'cons.parcels.act_receipt_title' | transloco"><i class="ti ti-printer me-1"></i>{{ 'cons.parcels.act_receipt' | transloco }}</a>
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a> }
+                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" [title]="'cons.parcels.act_deliver' | transloco"><i class="ti ti-package-export me-1"></i>{{ 'cons.parcels.act_deliver' | transloco }}</a> }
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'cons.parcels.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
@@ -91,90 +91,90 @@
 
 <!-- Enregistrement -->
 <div class="modal fade" id="parcel-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ isEdit ? 'Modifier le colis' : 'Enregistrer un colis' }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ (isEdit ? 'cons.parcels.modal_edit' : 'cons.parcels.add') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
-    <h6 class="text-muted">Trajet</h6>
+    <h6 class="text-muted">{{ 'cons.parcels.sec_route' | transloco }}</h6>
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">Point de départ <span class="text-danger">*</span></label>
-        <app-searchable-select formControlName="origin_point_id" [items]="points" labelKey="name" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
-      <div class="col-md-6 mb-3"><label class="form-label">Point d'arrivée <span class="text-danger">*</span></label>
-        <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_origin' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select formControlName="origin_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_dest' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>
-    <h6 class="text-muted">Expéditeur / Destinataire</h6>
+    <h6 class="text-muted">{{ 'cons.parcels.sec_parties' | transloco }}</h6>
     <div class="row">
-      <div class="col-md-3 mb-3"><label class="form-label">Expéditeur <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Tél. expéditeur <span class="text-danger">*</span></label><input formControlName="sender_phone" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Destinataire <span class="text-danger">*</span></label><input formControlName="recipient_name" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Tél. destinataire <span class="text-danger">*</span></label><input formControlName="recipient_phone" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_sender' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_sender_phone' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_phone" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient' | transloco }} <span class="text-danger">*</span></label><input formControlName="recipient_name" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient_phone' | transloco }} <span class="text-danger">*</span></label><input formControlName="recipient_phone" class="form-control" /></div>
     </div>
     <div class="row">
-      <div class="col-md-8 mb-3"><label class="form-label">Adresse destinataire</label><input formControlName="recipient_address" class="form-control" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">Pièce du destinataire</label><input formControlName="recipient_id_number" class="form-control" placeholder="No CNI/passeport (vérifié à la livraison)" /></div>
+      <div class="col-md-8 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient_address' | transloco }}</label><input formControlName="recipient_address" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient_id' | transloco }}</label><input formControlName="recipient_id_number" class="form-control" [placeholder]="'cons.parcels.recipient_id_ph' | transloco" /></div>
     </div>
-    <h6 class="text-muted">Contenu</h6>
+    <h6 class="text-muted">{{ 'cons.parcels.sec_content' | transloco }}</h6>
     <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">Type de colis <span class="text-danger">*</span></label>
-        <app-searchable-select formControlName="consignment_type_id" [items]="types" labelKey="label" valueKey="id" placeholder="— Choisir —"></app-searchable-select></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Poids (kg)</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
-      <div class="col-md-2 mb-3"><label class="form-label">Quantité</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Valeur déclarée</label><input formControlName="declared_value" type="number" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_type' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select formControlName="consignment_type_id" [items]="types" labelKey="label" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_weight' | transloco }}</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
+      <div class="col-md-2 mb-3"><label class="form-label">{{ 'cons.parcels.f_qty' | transloco }}</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_declared' | transloco }}</label><input formControlName="declared_value" type="number" class="form-control" /></div>
     </div>
-    <div class="mb-3"><label class="form-label">Description</label><input formControlName="description" class="form-control" /></div>
-    <h6 class="text-muted">Encaissement</h6>
+    <div class="mb-3"><label class="form-label">{{ 'cons.common.col_description' | transloco }}</label><input formControlName="description" class="form-control" /></div>
+    <h6 class="text-muted">{{ 'cons.common.sec_payment' | transloco }}</h6>
     <div class="row">
-      <div class="col-md-3 mb-3"><label class="form-label">Mode de paiement</label>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
         <select formControlName="payment_method" class="form-select">
-          <option value="" disabled selected>— Choisir —</option>
+          <option value="" disabled selected>{{ 'cons.common.opt_choose' | transloco }}</option>
           @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Montant <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Encaissé</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">Monnaie rendue</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.col_amount' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_received' | transloco }}</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_change' | transloco }}</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
     </div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ isEdit ? 'Enregistrer les modifications' : 'Enregistrer & encaisser' }}</button></div></form>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (isEdit ? 'cons.common.submit_edit' : 'cons.common.submit_new') | transloco }}</button></div></form>
 </div></div></div>
 
 <!-- Retrait -->
 <div class="modal fade" id="pickup-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Livraison au destinataire</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="pickupTarget = null"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'cons.parcels.pickup_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" (click)="pickupTarget = null"></button></div>
   <div class="modal-body">
     @if (pickupTarget) {
-      <p>Colis <strong>{{ pickupTarget.reference }}</strong> pour <strong>{{ pickupTarget.recipient_name }}</strong> ({{ pickupTarget.recipient_phone }}).</p>
+      <p>{{ 'cons.parcels.pickup_parcel' | transloco }} <strong>{{ pickupTarget.reference }}</strong> {{ 'cons.parcels.pickup_for' | transloco }} <strong>{{ pickupTarget.recipient_name }}</strong> ({{ pickupTarget.recipient_phone }}).</p>
       @if (pickupTarget.recipient_id_number) {
-        <div class="alert alert-info py-2"><i class="ti ti-id me-1"></i>Pièce enregistrée du destinataire : <strong>{{ pickupTarget.recipient_id_number }}</strong> — à vérifier.</div>
+        <div class="alert alert-info py-2"><i class="ti ti-id me-1"></i>{{ 'cons.parcels.pickup_id_registered' | transloco }} <strong>{{ pickupTarget.recipient_id_number }}</strong> {{ 'cons.parcels.pickup_id_verify' | transloco }}</div>
       }
     }
-    <div class="mb-2"><label class="form-label">Nom de la personne qui retire <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
-    <div class="mb-2"><label class="form-label">Pièce présentée</label><input class="form-control" [(ngModel)]="pickupId" placeholder="No CNI/passeport présenté" /></div>
+    <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_pickup_name' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
+    <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_pickup_id' | transloco }}</label><input class="form-control" [(ngModel)]="pickupId" [placeholder]="'cons.parcels.pickup_id_ph' | transloco" /></div>
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">Annuler</button><button type="button" class="btn btn-success" [disabled]="!pickupName" *hasPermission="'ticketing.parcel.manage'" (click)="doPickup()">Confirmer la livraison</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-success" [disabled]="!pickupName" *hasPermission="'ticketing.parcel.manage'" (click)="doPickup()">{{ 'cons.parcels.pickup_confirm' | transloco }}</button></div>
 </div></div></div>
 
 <!-- Détail / suivi -->
 <div class="modal fade" id="detail-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Colis {{ detail?.reference }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'cons.parcels.pickup_parcel' | transloco }} {{ detail?.reference }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (detail) {
       <div class="row mb-3">
-        <div class="col-md-6"><small class="text-muted d-block">Trajet</small><strong>{{ detail.origin_point_name }} → {{ detail.destination_point_name }}</strong></div>
-        <div class="col-md-6"><small class="text-muted d-block">Statut</small><span class="badge {{ statusClass(detail.status) }}">{{ detail.status_display }}</span></div>
-        <div class="col-md-6 mt-2"><small class="text-muted d-block">Expéditeur</small>{{ detail.sender_name }} · {{ detail.sender_phone }}</div>
-        <div class="col-md-6 mt-2"><small class="text-muted d-block">Destinataire</small>{{ detail.recipient_name }} · {{ detail.recipient_phone }}</div>
-        <div class="col-md-4 mt-2"><small class="text-muted d-block">Montant</small>{{ detail.amount_due | number:'1.0-0' }} XAF</div>
-        <div class="col-md-4 mt-2"><small class="text-muted d-block">Encaissé</small>{{ detail.amount_received | number:'1.0-0' }} XAF</div>
-        <div class="col-md-4 mt-2"><small class="text-muted d-block">Monnaie</small>{{ detail.change_due | number:'1.0-0' }} XAF</div>
+        <div class="col-md-6"><small class="text-muted d-block">{{ 'cons.common.col_trip' | transloco }}</small><strong>{{ detail.origin_point_name }} → {{ detail.destination_point_name }}</strong></div>
+        <div class="col-md-6"><small class="text-muted d-block">{{ 'cons.common.col_status' | transloco }}</small><span class="badge {{ statusClass(detail.status) }}">{{ detail.status_display }}</span></div>
+        <div class="col-md-6 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.f_sender' | transloco }}</small>{{ detail.sender_name }} · {{ detail.sender_phone }}</div>
+        <div class="col-md-6 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.f_recipient' | transloco }}</small>{{ detail.recipient_name }} · {{ detail.recipient_phone }}</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.common.col_amount' | transloco }}</small>{{ detail.amount_due | number:'1.0-0' }} XAF</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.common.f_received' | transloco }}</small>{{ detail.amount_received | number:'1.0-0' }} XAF</div>
+        <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_change' | transloco }}</small>{{ detail.change_due | number:'1.0-0' }} XAF</div>
         @if (detail.status === 'arrived' || detail.status === 'picked_up') {
-          <div class="col-md-4 mt-2"><small class="text-muted d-block">Pièces reçues</small>{{ detail.received_pieces }}/{{ detail.quantity }}</div>
-          <div class="col-md-4 mt-2"><small class="text-muted d-block">Manquant / Avarié</small>{{ detail.missing_pieces }} / {{ detail.damaged_pieces }}</div>
+          <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_received_pieces' | transloco }}</small>{{ detail.received_pieces }}/{{ detail.quantity }}</div>
+          <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_missing_damaged' | transloco }}</small>{{ detail.missing_pieces }} / {{ detail.damaged_pieces }}</div>
         }
-        @if (detail.picked_up_by) { <div class="col-md-6 mt-2"><small class="text-muted d-block">Livré à</small>{{ detail.picked_up_by }}@if (detail.picked_up_id_number) { <small class="text-muted"> · pièce {{ detail.picked_up_id_number }}</small> }</div> }
+        @if (detail.picked_up_by) { <div class="col-md-6 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_delivered_to' | transloco }}</small>{{ detail.picked_up_by }}@if (detail.picked_up_id_number) { <small class="text-muted"> · {{ 'cons.parcels.d_piece' | transloco }} {{ detail.picked_up_id_number }}</small> }</div> }
       </div>
-      <h6>Suivi</h6>
+      <h6>{{ 'cons.parcels.d_tracking' | transloco }}</h6>
       <ul class="list-group">
         @for (e of detail.events; track e.id) {
           <li class="list-group-item d-flex justify-content-between"><span><i class="ti ti-point-filled me-1"></i>{{ e.kind_display }}<small class="text-muted ms-2">{{ e.note }}</small></span><small class="text-muted">{{ e.created_at | date:'short' }}</small></li>
-        } @empty { <li class="list-group-item text-muted">Aucun événement.</li> }
+        } @empty { <li class="list-group-item text-muted">{{ 'cons.parcels.d_no_events' | transloco }}</li> }
       </ul>
     }
   </div>

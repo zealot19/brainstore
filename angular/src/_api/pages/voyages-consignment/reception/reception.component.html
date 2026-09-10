@@ -1,17 +1,17 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Réception colis</h4><h6>Vérifier et réceptionner les colis à leur arrivée</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.reception.title' | transloco }}</h4><h6>{{ 'cons.reception.subtitle' | transloco }}</h6></div></div>
 </div>
-<app-info-banner text="Les colis en transit (chargés) apparaissent ici. Saisissez les pièces reçues, manquantes ou avariées, puis réceptionnez. « Réceptionner Tout » réceptionne intégralement la sélection. Seuls les colis réceptionnés pourront être livrés."></app-info-banner>
+<app-info-banner [text]="'cons.reception.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2">
-      <input type="text" class="form-control w-auto" placeholder="Référence, expéditeur, destinataire…" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>Rechercher</button>
+      <input type="text" class="form-control w-auto" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">
-        <span class="text-muted small">{{ selected.size }} sélectionné(s)</span>
-        <button class="btn btn-sm btn-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>Réceptionner Tout</button>
+        <span class="text-muted small">{{ selected.size }} {{ 'cons.common.selected' | transloco }}</span>
+        <button class="btn btn-sm btn-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>{{ 'cons.reception.receive_all' | transloco }}</button>
       </div>
     }
   </div>
@@ -21,9 +21,9 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!rows.length" /></th>
-          <th>Référence</th><th>Destinataire</th><th>Description</th>
-          <th class="text-center">Pièces</th><th style="width:80px">Reçues</th><th style="width:80px">Manquant</th><th style="width:80px">Avarié</th>
-          <th class="no-sort">Action</th></tr></thead>
+          <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.common.col_description' | transloco }}</th>
+          <th class="text-center">{{ 'cons.common.pieces' | transloco }}</th><th style="width:80px">{{ 'cons.reception.col_received' | transloco }}</th><th style="width:80px">{{ 'cons.common.missing' | transloco }}</th><th style="width:80px">{{ 'cons.common.damaged' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (p of rows | paginate:pg.page:pg.size; track p.id) {
             <tr>
@@ -36,10 +36,10 @@
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].missing" /></td>
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].damaged" /></td>
               <td class="action-table-data">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveOne(p)" title="Réceptionner"><i class="ti ti-package-import me-1"></i>Réceptionner</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveOne(p)" [title]="'cons.reception.receive' | transloco"><i class="ti ti-package-import me-1"></i>{{ 'cons.reception.receive' | transloco }}</a>
               </td>
             </tr>
-          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">Aucun colis en transit à réceptionner.</td></tr> }
+          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">{{ 'cons.reception.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
