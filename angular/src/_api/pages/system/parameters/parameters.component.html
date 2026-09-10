@@ -2,13 +2,13 @@
   <div class="col-xl-12">
     <div class="card flex-fill mb-0">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h4 class="fs-18 fw-bold">Paramètres</h4>
+        <h4 class="fs-18 fw-bold">{{ 'sys.params.title' | transloco }}</h4>
         <div class="d-flex align-items-center gap-2">
-          @if (saved) { <span class="badge bg-outline-success"><i class="ti ti-check me-1"></i>Sauvegardé</span> }
+          @if (saved) { <span class="badge bg-outline-success"><i class="ti ti-check me-1"></i>{{ 'sys.params.saved' | transloco }}</span> }
           @if (errorMsg) { <span class="text-danger small">{{ errorMsg }}</span> }
           <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving || loading">
             @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            <i class="ti ti-device-floppy me-1"></i>Enregistrer
+            <i class="ti ti-device-floppy me-1"></i>{{ 'shared.actions.save' | transloco }}
           </button>
         </div>
       </div>
@@ -16,7 +16,7 @@
         @if (loading) {
           <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
         } @else if (parameters.length === 0) {
-          <p class="text-muted text-center py-4">Aucun paramètre configuré.</p>
+          <p class="text-muted text-center py-4">{{ 'sys.params.empty' | transloco }}</p>
         } @else {
           @for (p of parameters; track p.key) {
             <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 border-bottom mb-3 pb-3">

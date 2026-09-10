@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FeatureFlagService } from '../../../services/system/feature-flag.service';
 import { FeatureFlag } from '../../../models/system.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-feature-flags',
   templateUrl: './feature-flags.component.html',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
 })
 export class FeatureFlagsComponent implements OnInit {
 
