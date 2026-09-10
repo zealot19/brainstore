@@ -8,4 +8,7 @@ import { TreasuryStats } from '../../models/treasury.models';
 export class TreasuryStatsService {
   constructor(private http: HttpClient) {}
   get(): Observable<TreasuryStats> { return this.http.get<TreasuryStats>(TREASURY.stats); }
+  series(days = 14): Observable<any> {
+    return this.http.get(`${TREASURY.series}?days=${days}`);
+  }
 }

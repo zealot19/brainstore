@@ -412,6 +412,7 @@ const TRZ = `${API_BASE}/treasury`;
 
 export const TREASURY = {
   stats:     `${TRZ}/stats/`,
+  series:    `${TRZ}/series/`,
   movements: `${TRZ}/transactions/`,
   registers: `${TRZ}/registers/`,   register: (id: string) => `${TRZ}/registers/${id}/`,
   banks:     `${TRZ}/banks/`,       bank:     (id: string) => `${TRZ}/banks/${id}/`,
