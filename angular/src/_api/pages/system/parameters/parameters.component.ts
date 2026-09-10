@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParameterService } from '../../../services/system/parameter.service';
 import { Parameter } from '../../../models/system.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-parameters',
   templateUrl: './parameters.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
 })
 export class ParametersComponent implements OnInit {
 

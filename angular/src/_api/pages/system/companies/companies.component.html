@@ -2,16 +2,16 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Institutions</h4>
-      <h6>Gérer les institutions (tenants)</h6>
+      <h4>{{ 'sys.co.title' | transloco }}</h4>
+      <h6>{{ 'sys.co.subtitle' | transloco }}</h6>
     </div>
   </div>
   <ul class="table-top-head">
-    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" title="Actualiser"><i class="ti ti-refresh"></i></a></li>
+    <li><a href="javascript:void(0);" (click)="load()" data-bs-toggle="tooltip" [title]="'admin.common.refresh' | transloco"><i class="ti ti-refresh"></i></a></li>
   </ul>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-company">
-      <i class="ti ti-circle-plus me-2"></i>Nouvelle institution
+      <i class="ti ti-circle-plus me-2"></i>{{ 'sys.co.new' | transloco }}
     </a>
   </div>
 </div>
@@ -21,7 +21,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-purple border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Total</p><h4 class="text-white">{{ total }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'sys.co.stat_total' | transloco }}</p><h4 class="text-white">{{ total }}</h4></div>
         <span class="avatar avatar-lg bg-purple-900"><i class="ti ti-building"></i></span>
       </div>
     </div>
@@ -29,7 +29,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-teal border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Actives</p><h4 class="text-white">{{ totalActive }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'sys.co.stat_active' | transloco }}</p><h4 class="text-white">{{ totalActive }}</h4></div>
         <span class="avatar avatar-lg bg-teal-900"><i class="ti ti-building-check"></i></span>
       </div>
     </div>
@@ -37,7 +37,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-info border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Essai</p><h4 class="text-white">{{ totalTrial }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'sys.co.stat_trial' | transloco }}</p><h4 class="text-white">{{ totalTrial }}</h4></div>
         <span class="avatar avatar-lg bg-info-900"><i class="ti ti-building-star"></i></span>
       </div>
     </div>
@@ -45,7 +45,7 @@
   <div class="col-xl-3 col-md-6">
     <div class="card bg-secondary border-0">
       <div class="card-body d-flex align-items-center justify-content-between">
-        <div><p class="mb-1 text-white">Suspendues</p><h4 class="text-white">{{ totalSuspended }}</h4></div>
+        <div><p class="mb-1 text-white">{{ 'sys.co.stat_suspended' | transloco }}</p><h4 class="text-white">{{ totalSuspended }}</h4></div>
         <span class="avatar avatar-lg bg-secondary-900"><i class="ti ti-building-minus"></i></span>
       </div>
     </div>
@@ -60,7 +60,7 @@
         <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
         <div class="dataTables_filter">
           <label>
-            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" placeholder="Rechercher..." />
+            <input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'admin.common.search_ph' | transloco" />
           </label>
         </div>
       </div>
@@ -68,14 +68,14 @@
     <div class="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
       <div class="dropdown me-2">
         <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-          {{ statusFilter ? statusLabel(statusFilter) : 'Tous les statuts' }}
+          {{ statusFilter ? statusLabel(statusFilter) : ('sys.co.filter_all_statuses' | transloco) }}
         </a>
         <ul class="dropdown-menu dropdown-menu-end p-3">
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter=''; applyFilter()">Tous</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='active'; applyFilter()">Actives</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='trial'; applyFilter()">Essai</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='suspended'; applyFilter()">Suspendues</a></li>
-          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='cancelled'; applyFilter()">Résiliées</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter=''; applyFilter()">{{ 'sys.co.filter_all' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='active'; applyFilter()">{{ 'sys.co.st_active' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='trial'; applyFilter()">{{ 'sys.co.st_trial' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='suspended'; applyFilter()">{{ 'sys.co.st_suspended' | transloco }}</a></li>
+          <li><a href="javascript:void(0);" class="dropdown-item rounded-1" (click)="statusFilter='cancelled'; applyFilter()">{{ 'sys.co.st_cancelled' | transloco }}</a></li>
         </ul>
       </div>
     </div>
@@ -88,13 +88,13 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
-              <th>Institution</th>
-              <th>Code</th>
-              <th>Devise</th>
-              <th>Package</th>
-              <th>Actif</th>
-              <th>Créée le</th>
-              <th class="no-sort">Actions</th>
+              <th>{{ 'sys.co.col_institution' | transloco }}</th>
+              <th>{{ 'admin.common.code' | transloco }}</th>
+              <th>{{ 'sys.co.col_currency' | transloco }}</th>
+              <th>{{ 'sys.co.col_package' | transloco }}</th>
+              <th>{{ 'admin.common.active' | transloco }}</th>
+              <th>{{ 'sys.co.col_created' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -117,7 +117,7 @@
                 <td>{{ c.package_name ?? '—' }}</td>
                 <td>
                   <span class="badge" [ngClass]="c.is_active ? 'bg-outline-success' : 'bg-outline-danger'">
-                    {{ c.is_active ? 'Actif' : 'Inactif' }}
+                    {{ (c.is_active ? 'admin.common.active' : 'admin.common.inactive') | transloco }}
                   </span>
                 </td>
                 <td>{{ c.created_at | date:'dd/MM/yyyy' }}</td>
@@ -126,22 +126,22 @@
                     <a href="javascript:void(0);"
                        class="me-2 p-2 d-flex align-items-center border rounded"
                        data-bs-toggle="modal" data-bs-target="#edit-company"
-                       (click)="openEdit(c)" title="Modifier">
+                       (click)="openEdit(c)" [title]="'shared.actions.edit' | transloco">
                       <i class="ti ti-pencil"></i>
                     </a>
                     @if (c.status === 'suspended') {
-                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" title="Réactiver" (click)="activate(c.id)">
+                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" [title]="'sys.co.act_reactivate' | transloco" (click)="activate(c.id)">
                         <i class="ti ti-player-play text-success"></i>
                       </a>
                     }
                     @if (c.status === 'active' || c.status === 'trial') {
-                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" title="Suspendre"
+                      <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" [title]="'sys.co.act_suspend' | transloco"
                          data-bs-toggle="modal" data-bs-target="#suspend-company" (click)="openSuspend(c.id)">
                         <i class="ti ti-player-pause text-warning"></i>
                       </a>
                     }
                     @if (c.status !== 'cancelled') {
-                      <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded confirm-text" title="Résilier" (click)="cancel(c.id)">
+                      <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded confirm-text" [title]="'sys.co.act_cancel' | transloco" (click)="cancel(c.id)">
                         <i class="ti ti-trash text-danger"></i>
                       </a>
                     }
@@ -149,7 +149,7 @@
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="7" class="text-center py-4 text-muted">Aucune institution trouvée.</td></tr>
+              <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'sys.co.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -164,7 +164,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvelle institution</h5>
+        <h5 class="modal-title">{{ 'sys.co.new' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
@@ -178,43 +178,43 @@
               @else { <i class="ti ti-building fs-2 text-muted"></i> }
             </div>
             <label class="btn btn-sm btn-outline-secondary">
-              <i class="ti ti-upload me-1"></i>Logo
+              <i class="ti ti-upload me-1"></i>{{ 'sys.co.logo' | transloco }}
               <input type="file" accept="image/*" class="d-none" (change)="onCreateLogo($event)" />
             </label>
           </div>
 
           <div class="row">
             <div class="col-md-8 mb-3">
-              <label class="form-label">Raison sociale <span class="text-danger">*</span></label>
-              <input formControlName="name" type="text" class="form-control" placeholder="Ex: Transport Abidjan SA" />
+              <label class="form-label">{{ 'sys.co.f_name' | transloco }} <span class="text-danger">*</span></label>
+              <input formControlName="name" type="text" class="form-control" [placeholder]="'sys.co.name_ph' | transloco" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Code</label>
-              <input formControlName="code" type="text" class="form-control" placeholder="Ex: TAB" />
+              <label class="form-label">{{ 'admin.common.code' | transloco }}</label>
+              <input formControlName="code" type="text" class="form-control" [placeholder]="'sys.co.code_ph' | transloco" />
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Slogan</label>
-            <input formControlName="slogan" type="text" class="form-control" placeholder="Votre partenaire de mobilité…" />
+            <label class="form-label">{{ 'sys.co.f_slogan' | transloco }}</label>
+            <input formControlName="slogan" type="text" class="form-control" [placeholder]="'sys.co.slogan_ph' | transloco" />
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Devise <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'sys.co.f_currency' | transloco }} <span class="text-danger">*</span></label>
               <select formControlName="currency" class="form-select">
-                <option value="XOF">XOF — Franc CFA BCEAO</option>
-                <option value="XAF">XAF — Franc CFA BEAC</option>
-                <option value="EUR">EUR — Euro</option>
-                <option value="USD">USD — Dollar</option>
-                <option value="GHS">GHS — Cedi</option>
-                <option value="GNF">GNF — Franc guinéen</option>
-                <option value="NGN">NGN — Naira</option>
-                <option value="MAD">MAD — Dirham</option>
+                <option value="XOF">XOF — {{ 'sys.co.cur_xof' | transloco }}</option>
+                <option value="XAF">XAF — {{ 'sys.co.cur_xaf' | transloco }}</option>
+                <option value="EUR">EUR — {{ 'sys.co.cur_eur' | transloco }}</option>
+                <option value="USD">USD — {{ 'sys.co.cur_usd' | transloco }}</option>
+                <option value="GHS">GHS — {{ 'sys.co.cur_ghs' | transloco }}</option>
+                <option value="GNF">GNF — {{ 'sys.co.cur_gnf' | transloco }}</option>
+                <option value="NGN">NGN — {{ 'sys.co.cur_ngn' | transloco }}</option>
+                <option value="MAD">MAD — {{ 'sys.co.cur_mad' | transloco }}</option>
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Package</label>
+              <label class="form-label">{{ 'sys.co.f_package' | transloco }}</label>
               <select formControlName="package" class="form-select">
-                <option value="">— Aucun (trial) —</option>
+                <option value="">{{ 'sys.co.opt_none_trial' | transloco }}</option>
                 @for (p of packages; track p.id) {
                   <option [value]="p.id">{{ p.name }}</option>
                 }
@@ -223,63 +223,63 @@
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Forme juridique</label>
-              <input formControlName="legal_form" type="text" class="form-control" placeholder="SARL, SA…" />
+              <label class="form-label">{{ 'sys.co.f_legal_form' | transloco }}</label>
+              <input formControlName="legal_form" type="text" class="form-control" [placeholder]="'sys.co.legal_form_ph' | transloco" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">RCCM</label>
+              <label class="form-label">{{ 'sys.co.f_rccm' | transloco }}</label>
               <input formControlName="rccm" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° fiscal (NIU)</label>
+              <label class="form-label">{{ 'sys.co.f_tax_id' | transloco }}</label>
               <input formControlName="tax_id" type="text" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° CNPS</label>
+              <label class="form-label">{{ 'sys.co.f_cnps' | transloco }}</label>
               <input formControlName="cnps_number" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° TVA</label>
+              <label class="form-label">{{ 'sys.co.f_vat' | transloco }}</label>
               <input formControlName="vat_number" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Capital</label>
+              <label class="form-label">{{ 'sys.co.f_capital' | transloco }}</label>
               <input formControlName="capital" type="number" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Email</label>
+              <label class="form-label">{{ 'admin.common.email' | transloco }}</label>
               <input formControlName="email" type="email" class="form-control" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Téléphone</label>
+              <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
               <input formControlName="phone" type="text" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-8 mb-3">
-              <label class="form-label">Site web</label>
+              <label class="form-label">{{ 'sys.co.f_website' | transloco }}</label>
               <input formControlName="website" type="url" class="form-control" placeholder="https://…" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Boîte postale</label>
-              <input formControlName="postal_box" type="text" class="form-control" placeholder="BP 123" />
+              <label class="form-label">{{ 'sys.co.f_postal_box' | transloco }}</label>
+              <input formControlName="postal_box" type="text" class="form-control" [placeholder]="'sys.co.postal_box_ph' | transloco" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Adresse</label>
-              <input formControlName="address_line1" type="text" class="form-control" placeholder="Rue, avenue…" />
+              <label class="form-label">{{ 'sys.co.f_address' | transloco }}</label>
+              <input formControlName="address_line1" type="text" class="form-control" [placeholder]="'sys.co.address_ph' | transloco" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Ville</label>
+              <label class="form-label">{{ 'sys.co.f_city' | transloco }}</label>
               <input formControlName="address_city" type="text" class="form-control" />
             </div>
             <div class="col-md-2 mb-3">
-              <label class="form-label">Code postal</label>
+              <label class="form-label">{{ 'sys.co.f_postal_code' | transloco }}</label>
               <input formControlName="address_postal_code" type="text" class="form-control" />
             </div>
           </div>
@@ -288,35 +288,35 @@
               <input type="checkbox" id="create-is-active" class="check" formControlName="is_active" />
               <label for="create-is-active" class="checktoggle"></label>
             </div>
-            <label class="form-label mb-0">Actif</label>
+            <label class="form-label mb-0">{{ 'admin.common.active' | transloco }}</label>
           </div>
 
           <!-- Bootstrap : premier administrateur -->
           <hr class="my-3" />
-          <p class="fw-semibold mb-3"><i class="ti ti-user-check me-1 text-primary"></i>Premier administrateur <span class="text-muted fw-normal small">(optionnel)</span></p>
+          <p class="fw-semibold mb-3"><i class="ti ti-user-check me-1 text-primary"></i>{{ 'sys.co.first_admin' | transloco }} <span class="text-muted fw-normal small">{{ 'sys.co.first_admin_opt' | transloco }}</span></p>
           <div class="row">
             <div class="col-md-12 mb-3">
-              <label class="form-label">Email</label>
-              <input formControlName="admin_email" type="email" class="form-control" placeholder="admin@institution.com" />
-              <div class="form-text text-muted">Si renseigné, un agence Siège et cet admin seront créés automatiquement.</div>
+              <label class="form-label">{{ 'admin.common.email' | transloco }}</label>
+              <input formControlName="admin_email" type="email" class="form-control" [placeholder]="'sys.co.admin_email_ph' | transloco" />
+              <div class="form-text text-muted">{{ 'sys.co.admin_email_hint' | transloco }}</div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Prénom</label>
+              <label class="form-label">{{ 'sys.co.f_first_name' | transloco }}</label>
               <input formControlName="admin_first_name" type="text" class="form-control" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Nom</label>
+              <label class="form-label">{{ 'sys.co.f_last_name' | transloco }}</label>
               <input formControlName="admin_last_name" type="text" class="form-control" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || creating">
             @if (creating) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Créer
+            {{ 'shared.actions.create' | transloco }}
           </button>
         </div>
       </form>
@@ -329,7 +329,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modifier l'institution</h5>
+        <h5 class="modal-title">{{ 'sys.co.modal_edit_title' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="editForm" (ngSubmit)="submitEdit()">
@@ -343,43 +343,43 @@
               @else { <i class="ti ti-building fs-2 text-muted"></i> }
             </div>
             <label class="btn btn-sm btn-outline-secondary">
-              <i class="ti ti-upload me-1"></i>Changer le logo
+              <i class="ti ti-upload me-1"></i>{{ 'sys.co.change_logo' | transloco }}
               <input type="file" accept="image/*" class="d-none" (change)="onEditLogo($event)" />
             </label>
           </div>
 
           <div class="row">
             <div class="col-md-8 mb-3">
-              <label class="form-label">Raison sociale <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'sys.co.f_name' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="name" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Code</label>
+              <label class="form-label">{{ 'admin.common.code' | transloco }}</label>
               <input formControlName="code" type="text" class="form-control" />
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Slogan</label>
+            <label class="form-label">{{ 'sys.co.f_slogan' | transloco }}</label>
             <input formControlName="slogan" type="text" class="form-control" />
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Devise <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'sys.co.f_currency' | transloco }} <span class="text-danger">*</span></label>
               <select formControlName="currency" class="form-select">
-                <option value="XOF">XOF — Franc CFA BCEAO</option>
-                <option value="XAF">XAF — Franc CFA BEAC</option>
-                <option value="EUR">EUR — Euro</option>
-                <option value="USD">USD — Dollar</option>
-                <option value="GHS">GHS — Cedi</option>
-                <option value="GNF">GNF — Franc guinéen</option>
-                <option value="NGN">NGN — Naira</option>
-                <option value="MAD">MAD — Dirham</option>
+                <option value="XOF">XOF — {{ 'sys.co.cur_xof' | transloco }}</option>
+                <option value="XAF">XAF — {{ 'sys.co.cur_xaf' | transloco }}</option>
+                <option value="EUR">EUR — {{ 'sys.co.cur_eur' | transloco }}</option>
+                <option value="USD">USD — {{ 'sys.co.cur_usd' | transloco }}</option>
+                <option value="GHS">GHS — {{ 'sys.co.cur_ghs' | transloco }}</option>
+                <option value="GNF">GNF — {{ 'sys.co.cur_gnf' | transloco }}</option>
+                <option value="NGN">NGN — {{ 'sys.co.cur_ngn' | transloco }}</option>
+                <option value="MAD">MAD — {{ 'sys.co.cur_mad' | transloco }}</option>
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Package</label>
+              <label class="form-label">{{ 'sys.co.f_package' | transloco }}</label>
               <select formControlName="package" class="form-select">
-                <option value="">— Aucun —</option>
+                <option value="">{{ 'sys.co.opt_none_m' | transloco }}</option>
                 @for (p of packages; track p.id) {
                   <option [value]="p.id">{{ p.name }}</option>
                 }
@@ -388,72 +388,72 @@
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Forme juridique</label>
+              <label class="form-label">{{ 'sys.co.f_legal_form' | transloco }}</label>
               <input formControlName="legal_form" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">RCCM</label>
+              <label class="form-label">{{ 'sys.co.f_rccm' | transloco }}</label>
               <input formControlName="rccm" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° fiscal (NIU)</label>
+              <label class="form-label">{{ 'sys.co.f_tax_id' | transloco }}</label>
               <input formControlName="tax_id" type="text" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° CNPS</label>
+              <label class="form-label">{{ 'sys.co.f_cnps' | transloco }}</label>
               <input formControlName="cnps_number" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">N° TVA</label>
+              <label class="form-label">{{ 'sys.co.f_vat' | transloco }}</label>
               <input formControlName="vat_number" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Capital</label>
+              <label class="form-label">{{ 'sys.co.f_capital' | transloco }}</label>
               <input formControlName="capital" type="number" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Email</label>
+              <label class="form-label">{{ 'admin.common.email' | transloco }}</label>
               <input formControlName="email" type="email" class="form-control" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Téléphone</label>
+              <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
               <input formControlName="phone" type="text" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-8 mb-3">
-              <label class="form-label">Site web</label>
+              <label class="form-label">{{ 'sys.co.f_website' | transloco }}</label>
               <input formControlName="website" type="url" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Boîte postale</label>
+              <label class="form-label">{{ 'sys.co.f_postal_box' | transloco }}</label>
               <input formControlName="postal_box" type="text" class="form-control" />
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Adresse</label>
+              <label class="form-label">{{ 'sys.co.f_address' | transloco }}</label>
               <input formControlName="address_line1" type="text" class="form-control" />
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Ville</label>
+              <label class="form-label">{{ 'sys.co.f_city' | transloco }}</label>
               <input formControlName="address_city" type="text" class="form-control" />
             </div>
             <div class="col-md-2 mb-3">
-              <label class="form-label">Code postal</label>
+              <label class="form-label">{{ 'sys.co.f_postal_code' | transloco }}</label>
               <input formControlName="address_postal_code" type="text" class="form-control" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || editing">
             @if (editing) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Enregistrer
+            {{ 'shared.actions.save' | transloco }}
           </button>
         </div>
       </form>
@@ -466,21 +466,21 @@
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Suspendre l'institution</h5>
+        <h5 class="modal-title">{{ 'sys.co.suspend_title' | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="suspendForm" (ngSubmit)="submitSuspend()">
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Motif <span class="text-danger">*</span></label>
-            <textarea formControlName="reason" class="form-control" rows="3" placeholder="Raison de la suspension…"></textarea>
+            <label class="form-label">{{ 'sys.co.f_reason' | transloco }} <span class="text-danger">*</span></label>
+            <textarea formControlName="reason" class="form-control" rows="3" [placeholder]="'sys.co.reason_ph' | transloco"></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-warning" [disabled]="suspendForm.invalid || suspending">
             @if (suspending) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Suspendre
+            {{ 'sys.co.act_suspend' | transloco }}
           </button>
         </div>
       </form>
@@ -494,32 +494,32 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header bg-success-subtle">
-          <h5 class="modal-title text-success"><i class="ti ti-circle-check me-2"></i>Institution créée</h5>
+          <h5 class="modal-title text-success"><i class="ti ti-circle-check me-2"></i>{{ 'sys.co.setup_title' | transloco }}</h5>
         </div>
         <div class="modal-body">
-          <p class="mb-3">Le setup initial a été effectué. Transmettez ces informations à l'administrateur.</p>
+          <p class="mb-3">{{ 'sys.co.setup_intro' | transloco }}</p>
           <div class="mb-3">
-            <label class="form-label text-muted small">Agence Siège</label>
+            <label class="form-label text-muted small">{{ 'sys.co.setup_hq' | transloco }}</label>
             <div class="fw-semibold">{{ setupResult.hq_agency_name }}</div>
           </div>
           <div class="mb-3">
-            <label class="form-label text-muted small">Administrateur</label>
+            <label class="form-label text-muted small">{{ 'sys.co.setup_admin' | transloco }}</label>
             <div class="fw-semibold">{{ setupResult.admin_name }}</div>
             <div class="text-muted small">{{ setupResult.admin_email }}</div>
           </div>
           <div class="mb-1">
-            <label class="form-label text-muted small">Mot de passe temporaire</label>
+            <label class="form-label text-muted small">{{ 'sys.co.setup_temp_pwd' | transloco }}</label>
             <div class="input-group">
               <input type="text" class="form-control fw-bold text-danger" [value]="setupResult.temp_password" readonly />
               <button class="btn btn-outline-secondary" type="button" (click)="copyToClipboard(setupResult!.temp_password)">
                 <i class="ti ti-copy"></i>
               </button>
             </div>
-            <div class="form-text text-warning"><i class="ti ti-alert-triangle me-1"></i>Ce mot de passe ne sera plus affiché. Copiez-le maintenant.</div>
+            <div class="form-text text-warning"><i class="ti ti-alert-triangle me-1"></i>{{ 'sys.co.setup_pwd_warn' | transloco }}</div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" (click)="closeSetup()">J'ai noté, fermer</button>
+          <button type="button" class="btn btn-success" (click)="closeSetup()">{{ 'sys.co.setup_close' | transloco }}</button>
         </div>
       </div>
     </div>

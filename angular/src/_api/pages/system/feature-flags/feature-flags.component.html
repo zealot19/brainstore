@@ -2,13 +2,13 @@
   <div class="col-xl-12">
     <div class="card flex-fill mb-0">
       <div class="card-header">
-        <h4 class="fs-18 fw-bold">Modules disponibles</h4>
+        <h4 class="fs-18 fw-bold">{{ 'sys.flags.title' | transloco }}</h4>
       </div>
       <div class="card-body">
         @if (loading) {
           <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
         } @else if (flags.length === 0) {
-          <p class="text-muted text-center py-4">Aucun feature flag configuré.</p>
+          <p class="text-muted text-center py-4">{{ 'sys.flags.empty' | transloco }}</p>
         } @else {
           @for (flag of flags; track flag.id) {
             <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 border-bottom mb-3 pb-3">
