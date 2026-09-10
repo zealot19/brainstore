@@ -1534,5 +1534,59 @@
     "f_new_pwd_ph": "8 caractères minimum",
     "f_force_change": "Forcer le changement à la prochaine connexion",
     "reset_submit": "Réinitialiser"
+  },
+  "acct": {
+    "common": {
+      "none_m": "— Aucun —"
+    },
+    "accounts": {
+      "title": "Plan comptable",
+      "subtitle": "Comptes OHADA de l'institution",
+      "new": "Nouveau compte",
+      "info": "Plan comptable SYSCOHADA pré-rempli à la création de l'institution. Vous pouvez ajouter des sous-comptes, modifier les libellés et déprécier les comptes inutilisés.",
+      "search_ph": "Rechercher (code, libellé)…",
+      "all_types": "Tous les types",
+      "col_label": "Libellé",
+      "col_reconcile": "Lettrable",
+      "deprecated": "Déprécié",
+      "empty": "Aucun compte.",
+      "act_reactivate": "Réactiver",
+      "act_deprecate": "Déprécier",
+      "modal_edit": "Modifier le compte",
+      "f_parent": "Compte parent",
+      "f_note": "Note"
+    },
+    "journals": {
+      "title": "Journaux",
+      "subtitle": "Journaux comptables de l'institution",
+      "new": "Nouveau journal",
+      "info": "Journaux standard (VTE, ACH, OD, PAIE, CAISSE, BANQUE) créés à l'ouverture de l'institution. Les journaux de caisse/banque par agence seront gérés par la Trésorerie.",
+      "col_default_account": "Compte défaut",
+      "empty": "Aucun journal.",
+      "modal_edit": "Modifier le journal",
+      "f_default_account": "Compte par défaut",
+      "f_seq_prefix": "Préfixe de séquence"
+    },
+    "fy": {
+      "title": "Exercices & Périodes",
+      "subtitle": "Exercices comptables et périodes mensuelles",
+      "new": "Nouvel exercice",
+      "info": "L'exercice courant et ses 12 périodes mensuelles sont créés à l'ouverture de l'institution. Sélectionnez un exercice pour gérer ses périodes.",
+      "years": "Exercices",
+      "col_start": "Début",
+      "col_end": "Fin",
+      "col_state": "État",
+      "state_open": "Ouvert",
+      "state_closed": "Clôturé",
+      "empty": "Aucun exercice.",
+      "periods": "Périodes",
+      "new_period": "Nouvelle période",
+      "select_prompt": "Sélectionnez un exercice.",
+      "period_open": "Ouverte",
+      "period_closed": "Clôturée",
+      "period_locked": "Verrouillée",
+      "act_close": "Clôturer",
+      "empty_periods": "Aucune période."
+    }
   }
 }
