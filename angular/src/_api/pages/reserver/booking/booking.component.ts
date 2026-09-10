@@ -7,11 +7,12 @@ import { OnlineBookingService } from '../../../services/online/online-booking.se
 import { OnlineTrip, OnlineSeat, InitiateBookingBody } from '../../../models/online-booking.models';
 import { SeatPickerComponent } from '../seats/seat-picker.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-rsv-booking',
   standalone: true,
-  imports: [CommonModule, FormsModule, SeatPickerComponent],
+  imports: [CommonModule, FormsModule, SeatPickerComponent, TranslocoModule],
   templateUrl: './booking.component.html',
 })
 export class RsvBookingComponent implements OnInit {

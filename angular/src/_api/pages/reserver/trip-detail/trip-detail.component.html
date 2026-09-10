@@ -1,17 +1,17 @@
 @if (loading()) {
-  <p>Chargement…</p>
+  <p>{{ 'rsv.loading' | transloco }}</p>
 } @else if (error()) {
-  <p class="text-danger">Ce voyage n'est plus disponible. <a routerLink="/reserver">Nouvelle recherche</a>.</p>
+  <p class="text-danger">{{ 'rsv.trip_unavailable' | transloco }} <a routerLink="/reserver">{{ 'rsv.new_search' | transloco }}</a>.</p>
 } @else if (trip(); as t) {
   <h1 class="h4">{{ t.from_town }} → {{ t.to_town }}</h1>
   <div class="card p-3 my-3">
-    <div><strong>Départ :</strong> {{ t.scheduled_departure | date:'EEEE d MMM y, HH:mm' }}</div>
-    <div><strong>Arrivée prévue :</strong> {{ t.scheduled_arrival | date:'EEEE d MMM y, HH:mm' }}</div>
-    <div><strong>Point de départ :</strong> {{ t.origin.name }} ({{ t.from_town }})</div>
-    <div><strong>Point d'arrivée :</strong> {{ t.destination.name }} ({{ t.to_town }})</div>
-    <div><strong>Bus :</strong> {{ t.vehicle_category.name }}</div>
-    <div><strong>Places disponibles :</strong> {{ t.available_seats }}</div>
-    @if (t.fare_class) { <div><strong>Catégorie :</strong> {{ t.fare_class.name }}</div> }
+    <div><strong>{{ 'rsv.departure_label' | transloco }}</strong> {{ t.scheduled_departure | date:'EEEE d MMM y, HH:mm' }}</div>
+    <div><strong>{{ 'rsv.arrival_label' | transloco }}</strong> {{ t.scheduled_arrival | date:'EEEE d MMM y, HH:mm' }}</div>
+    <div><strong>{{ 'rsv.origin_point' | transloco }}</strong> {{ t.origin.name }} ({{ t.from_town }})</div>
+    <div><strong>{{ 'rsv.dest_point' | transloco }}</strong> {{ t.destination.name }} ({{ t.to_town }})</div>
+    <div><strong>{{ 'rsv.bus' | transloco }}</strong> {{ t.vehicle_category.name }}</div>
+    <div><strong>{{ 'rsv.seats_available' | transloco }}</strong> {{ t.available_seats }}</div>
+    @if (t.fare_class) { <div><strong>{{ 'rsv.category' | transloco }}</strong> {{ t.fare_class.name }}</div> }
   </div>
 
   @if (t.price) {
@@ -19,10 +19,10 @@
       <div class="h5 mb-0">{{ t.price }} {{ t.currency }}</div>
       <button class="btn btn-primary" (click)="reserve()"
               [disabled]="t.available_seats === 0">
-        {{ t.available_seats === 0 ? 'Complet' : 'Réserver' }}
+        {{ (t.available_seats === 0 ? 'rsv.full' : 'rsv.reserve') | transloco }}
       </button>
     </div>
   } @else {
-    <p class="text-danger">Tarif indisponible pour ce voyage — contactez l'agence.</p>
+    <p class="text-danger">{{ 'rsv.fare_unavailable' | transloco }}</p>
   }
 }

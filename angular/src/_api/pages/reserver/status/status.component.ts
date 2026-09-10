@@ -7,11 +7,12 @@ import QRCode from 'qrcode';
 import { OnlineBookingService } from '../../../services/online/online-booking.service';
 import { BookingRequestStatus } from '../../../models/online-booking.models';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-rsv-status',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslocoModule],
   templateUrl: './status.component.html',
   styleUrls: ['./status.component.scss'],
 })

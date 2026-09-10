@@ -1,5 +1,5 @@
 @if (loading()) {
-  <p>Chargement…</p>
+  <p>{{ 'rsv.loading' | transloco }}</p>
 } @else if (trip(); as t) {
   <h1 class="h5">{{ t.from_town }} → {{ t.to_town }}</h1>
   <div class="text-muted mb-3">
@@ -7,18 +7,18 @@
     @if (t.price) { · <strong>{{ t.price }} {{ t.currency }}</strong> }
   </div>
 
-  <h2 class="h6">Choisissez votre siège</h2>
+  <h2 class="h6">{{ 'rsv.choose_seat' | transloco }}</h2>
   <app-seat-picker [seats]="seats()" (seatChange)="onSeat($event)"></app-seat-picker>
-  <div class="my-2">Siège : <strong>{{ selectedSeatLabel() || '—' }}</strong></div>
+  <div class="my-2">{{ 'rsv.seat_label' | transloco }} <strong>{{ selectedSeatLabel() || '—' }}</strong></div>
 
-  <h2 class="h6 mt-3">Passager</h2>
+  <h2 class="h6 mt-3">{{ 'rsv.passenger' | transloco }}</h2>
   <div class="row g-2">
-    <div class="col-md-6"><input class="form-control" placeholder="Nom complet" [(ngModel)]="name"></div>
-    <div class="col-md-6"><input class="form-control" placeholder="Téléphone" [(ngModel)]="phone"></div>
-    <div class="col-md-6"><input class="form-control" placeholder="Email (facultatif)" [(ngModel)]="email"></div>
+    <div class="col-md-6"><input class="form-control" [placeholder]="'rsv.name_ph' | transloco" [(ngModel)]="name"></div>
+    <div class="col-md-6"><input class="form-control" [placeholder]="'rsv.phone_ph' | transloco" [(ngModel)]="phone"></div>
+    <div class="col-md-6"><input class="form-control" [placeholder]="'rsv.email_ph' | transloco" [(ngModel)]="email"></div>
   </div>
 
-  <h2 class="h6 mt-3">Paiement Mobile Money</h2>
+  <h2 class="h6 mt-3">{{ 'rsv.momo_title' | transloco }}</h2>
   <div class="row g-2">
     <div class="col-md-6">
       <select class="form-select" [(ngModel)]="method">
@@ -26,11 +26,11 @@
         <option value="orange_money">Orange Money</option>
       </select>
     </div>
-    <div class="col-md-6"><input class="form-control" placeholder="Numéro de paiement" [(ngModel)]="paymentPhone"></div>
+    <div class="col-md-6"><input class="form-control" [placeholder]="'rsv.payment_phone_ph' | transloco" [(ngModel)]="paymentPhone"></div>
   </div>
 
   <button class="btn btn-primary mt-3" (click)="submit()" [disabled]="submitting()">
-    {{ submitting() ? 'Traitement…' : 'Payer et réserver' }}
+    {{ (submitting() ? 'rsv.processing' : 'rsv.pay_btn') | transloco }}
   </button>
-  <p class="small text-muted mt-2">Vous recevrez une demande de confirmation sur votre téléphone Mobile Money.</p>
+  <p class="small text-muted mt-2">{{ 'rsv.momo_hint' | transloco }}</p>
 }

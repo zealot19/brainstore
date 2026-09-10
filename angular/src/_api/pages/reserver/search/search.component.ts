@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { OnlineBookingService } from '../../../services/online/online-booking.service';
 import { OnlineTown, OnlineTrip } from '../../../models/online-booking.models';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-rsv-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
