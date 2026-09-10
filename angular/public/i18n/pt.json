@@ -49,7 +49,10 @@
       "config": "Configuração",
       "audit": "Registo de auditoria",
       "logout": "Terminar sessão",
-      "profile": "O meu perfil"
+      "profile": "O meu perfil",
+      "new_booking": "Nova reserva",
+      "new_parcel": "Nova encomenda",
+      "new_baggage": "Nova bagagem"
     },
     "select": {
       "search_ph": "Pesquisar…",

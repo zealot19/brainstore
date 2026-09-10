@@ -22,19 +22,19 @@
       <!-- Raccourcis (le <span> évite la règle .user-menu.nav>li>a qui écrase le style .btn) -->
       <ng-container *hasModule="'voyage'">
         <li class="nav-item me-2" *hasPermission="'ticketing.booking.create'">
-          <span class="d-inline-flex"><a class="btn btn-primary" [routerLink]="routes.vbBookingNew">Nouvelle réservation</a></span>
+          <span class="d-inline-flex"><a class="btn btn-primary" [routerLink]="routes.vbBookingNew">{{ 'shared.nav.new_booking' | transloco }}</a></span>
         </li>
       </ng-container>
 
       <ng-container *hasModule="'colis'">
         <li class="nav-item me-2" *hasPermission="'ticketing.parcel.manage'">
-          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">Nouveau colis</a></span>
+          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_parcel' | transloco }}</a></span>
         </li>
       </ng-container>
 
       <ng-container *hasModule="'bagages'">
         <li class="nav-item me-3" *hasPermission="'ticketing.luggage.manage'">
-          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">Nouveau bagage</a></span>
+          <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_baggage' | transloco }}</a></span>
         </li>
       </ng-container>
 
