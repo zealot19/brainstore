@@ -134,10 +134,10 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
   .tk .f b{{font-size:11pt}}
   .tk .note{{margin-top:8px;border-top:1px solid #ddd;padding-top:4px;font-size:7pt;color:var(--muted)}}
   .tk .stub{{width:52mm;border-left:2px dashed var(--ink);padding:5mm 4mm;text-align:center;font-weight:700}}
-  .tk .stub .qr svg{{width:26mm;height:26mm}}
-  .tk .stub .num{{font-weight:800;font-size:12pt;margin:5px 0 7px}}
-  .tk .stub .sf{{text-align:left;font-size:11pt;line-height:1.35;margin-bottom:5px;font-weight:700}}
-  .tk .stub .price{{font-size:16pt;font-weight:800;margin-top:3px}}
+  .tk .stub .qr svg{{width:18mm;height:18mm}}
+  .tk .stub .num{{font-weight:800;font-size:9.5pt;margin:4px 0 5px}}
+  .tk .stub .sf{{text-align:left;font-size:8pt;line-height:1.25;margin-bottom:3px;font-weight:700}}
+  .tk .stub .price{{font-size:12pt;font-weight:800;margin-top:3px}}
 </style>
 <div class="tk">
   {band}
