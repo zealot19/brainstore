@@ -5,12 +5,13 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { PassengerService } from '../../../../services/voyages-booking/passenger.service';
 import { Passenger, PassengerSpec } from '../../../../models/voyages-booking.models';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-client-autocomplete',
   standalone: true,
   templateUrl: './client-autocomplete.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
 })
 export class ClientAutocompleteComponent {
   @Input({ required: true }) row!: PassengerSpec;

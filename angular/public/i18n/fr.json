@@ -50,6 +50,13 @@
       "audit": "Journal d'audit",
       "logout": "Déconnexion",
       "profile": "Mon profil"
+    },
+    "select": {
+      "search_ph": "Rechercher…",
+      "no_results": "Aucun résultat"
+    },
+    "client": {
+      "name_ph": "Nom du client"
     }
   },
   "nav": {

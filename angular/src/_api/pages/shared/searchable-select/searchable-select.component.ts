@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, Input, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 /**
  * Select recherchable réutilisable, compatible [(ngModel)] et formControlName.
@@ -12,7 +13,7 @@ import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/f
 @Component({
   selector: 'app-searchable-select',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './searchable-select.component.html',
   styleUrls: ['./searchable-select.component.scss'],
   providers: [{
