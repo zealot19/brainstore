@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
 
@@ -190,6 +192,31 @@ def get_treasury_stats(company_id):
         "today_net":          today_income - today_expense,
         "open_sessions":      open_sessions,
     }
+
+
+def get_treasury_series(company_id, days=14):
+    """Recettes vs dépenses par jour sur les `days` derniers jours (série continue)."""
+    days = max(1, min(int(days), 90))
+    today = timezone.now().date()
+    start = today - timedelta(days=days - 1)
+    rows = (Transaction.objects
+            .filter(company_id=company_id, is_deleted=False, transaction_date__gte=start)
+            .values("transaction_date")
+            .annotate(
+                income=Sum("amount", filter=Q(transaction_type=Transaction.Type.INCOME)),
+                expense=Sum("amount", filter=Q(transaction_type=Transaction.Type.EXPENSE)),
+            ))
+    by = {r["transaction_date"]: r for r in rows}
+    out = []
+    for i in range(days):
+        d = start + timedelta(days=i)
+        r = by.get(d)
+        out.append({
+            "date": d.isoformat(),
+            "income": float(r["income"]) if (r and r["income"]) else 0.0,
+            "expense": float(r["expense"]) if (r and r["expense"]) else 0.0,
+        })
+    return out
 
 
 def get_open_session_for_user(company_id, user):

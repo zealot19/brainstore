@@ -40,6 +40,19 @@ class TreasuryStatsView(APIView):
         return Response(TreasuryStatsSerializer(stats).data)
 
 
+class TreasurySeriesView(APIView):
+    """Série journalière recettes/dépenses pour les graphiques du tableau de bord."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.dashboard.view"}
+
+    def get(self, request):
+        try:
+            days = int(request.query_params.get("days", 14))
+        except (TypeError, ValueError):
+            days = 14
+        return Response(selectors.get_treasury_series(_company(request).id, days))
+
+
 # ── Cash registers ─────────────────────────────────────────────────────────────
 
 class CashRegisterListView(APIView):

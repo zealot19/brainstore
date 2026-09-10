@@ -1,7 +1,7 @@
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
   <div>
-    <h1 class="mb-1">{{ 'dash.title' | transloco }}</h1>
-    <p class="fw-medium mb-0">{{ 'dash.subtitle' | transloco }}</p>
+    <h1 class="mb-1">{{ 'dash.hello' | transloco }}@if (userName) {, {{ userName }}} 👋</h1>
+    <p class="fw-medium mb-0 text-muted">{{ 'dash.subtitle' | transloco }} · {{ today | date:'EEEE d MMMM y' }}</p>
   </div>
 </div>
 
@@ -79,6 +79,36 @@
           <h4 class="text-white">{{ fleet?.available ?? fleet?.total ?? 0 }}</h4>
           <p class="text-white mb-0 fs-13">{{ 'dash.vehicles' | transloco }}</p>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Graphiques (14 derniers jours) -->
+<div class="row">
+  <div class="col-xl-7 col-12 d-flex" *hasModule="'voyage'">
+    <div class="card flex-fill">
+      <div class="card-header"><h5 class="card-title mb-0">{{ 'dash.chart_activity' | transloco }}</h5></div>
+      <div class="card-body">
+        @if (bookingChart) {
+          <apx-chart [series]="bookingChart.series" [chart]="bookingChart.chart" [colors]="bookingChart.colors"
+                     [stroke]="bookingChart.stroke" [plotOptions]="bookingChart.plotOptions" [dataLabels]="bookingChart.dataLabels"
+                     [xaxis]="bookingChart.xaxis" [yaxis]="bookingChart.yaxis" [legend]="bookingChart.legend"
+                     [grid]="bookingChart.grid" [tooltip]="bookingChart.tooltip"></apx-chart>
+        } @else { <p class="text-muted text-center py-5 mb-0">{{ 'dash.no_activity' | transloco }}</p> }
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-5 col-12 d-flex" *hasModule="'treasury'">
+    <div class="card flex-fill">
+      <div class="card-header"><h5 class="card-title mb-0">{{ 'dash.chart_cashflow' | transloco }}</h5></div>
+      <div class="card-body">
+        @if (treasuryChart) {
+          <apx-chart [series]="treasuryChart.series" [chart]="treasuryChart.chart" [colors]="treasuryChart.colors"
+                     [stroke]="treasuryChart.stroke" [fill]="treasuryChart.fill" [dataLabels]="treasuryChart.dataLabels"
+                     [xaxis]="treasuryChart.xaxis" [yaxis]="treasuryChart.yaxis" [legend]="treasuryChart.legend"
+                     [grid]="treasuryChart.grid" [tooltip]="treasuryChart.tooltip"></apx-chart>
+        } @else { <p class="text-muted text-center py-5 mb-0">{{ 'dash.no_activity' | transloco }}</p> }
       </div>
     </div>
   </div>

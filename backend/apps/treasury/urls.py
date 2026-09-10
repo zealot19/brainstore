@@ -4,6 +4,7 @@ from apps.treasury import views
 urlpatterns = [
     # ── Stats ──────────────────────────────────────────────────────────────────
     path("stats/", views.TreasuryStatsView.as_view(), name="treasury-stats"),
+    path("series/", views.TreasurySeriesView.as_view(), name="treasury-series"),
 
     # ── Cash registers ─────────────────────────────────────────────────────────
     path("registers/",                    views.CashRegisterListView.as_view(),   name="register-list"),

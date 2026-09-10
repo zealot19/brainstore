@@ -471,3 +471,19 @@ class BookingStatsView(APIView):
         if not request.user.company_id:
             return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
         return success_response(get_booking_stats(request.user.company_id))
+
+
+class BookingSeriesView(APIView):
+    """Série journalière (réservations + recette) pour les graphiques du tableau de bord."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "ticketing.booking.view"}
+
+    def get(self, request):
+        from apps.voyages_booking.stats import get_booking_series
+        if not request.user.company_id:
+            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
+        try:
+            days = int(request.query_params.get("days", 14))
+        except (TypeError, ValueError):
+            days = 14
+        return success_response(get_booking_series(request.user.company_id, days))

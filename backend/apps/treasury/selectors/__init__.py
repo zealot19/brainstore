@@ -4,7 +4,7 @@ from .selectors import (
     get_active_session, list_sessions, get_session,
     list_transactions, get_transaction,
     list_transfers, get_transfer,
-    get_treasury_stats,
+    get_treasury_stats, get_treasury_series,
 )
 
 __all__ = [
@@ -13,5 +13,5 @@ __all__ = [
     "get_active_session", "list_sessions", "get_session",
     "list_transactions", "get_transaction",
     "list_transfers", "get_transfer",
-    "get_treasury_stats",
+    "get_treasury_stats", "get_treasury_series",
 ]

@@ -34,3 +34,12 @@ def test_booking_stats_endpoint():
     data = r.json()["data"]
     assert data["bookings_today"] == 1
     assert float(data["revenue_today"]) == 15000.0
+
+    # Série : 7 jours continus, la dernière entrée (aujourd'hui) porte la réservation.
+    rs = c.get("/api/v1/voyages/booking/series/?days=7")
+    assert rs.status_code == 200
+    series = rs.json()["data"]
+    assert len(series) == 7
+    assert series[-1]["bookings"] == 1
+    assert float(series[-1]["revenue"]) == 15000.0
+    assert series[0]["bookings"] == 0
