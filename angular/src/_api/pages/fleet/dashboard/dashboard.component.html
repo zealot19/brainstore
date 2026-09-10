@@ -90,6 +90,22 @@
         </div>
       </div>
     </div>
+
+    <!-- Répartition de la flotte par statut -->
+    @if (statusChart) {
+      <div class="row">
+        <div class="col-xl-5 col-md-7 col-12">
+          <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">{{ 'fleet.dash.by_status_title' | transloco }}</h5></div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+              <apx-chart [series]="statusChart.series" [chart]="statusChart.chart" [labels]="statusChart.labels"
+                         [colors]="statusChart.colors" [legend]="statusChart.legend" [dataLabels]="statusChart.dataLabels"
+                         [plotOptions]="statusChart.plotOptions" [stroke]="statusChart.stroke"></apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   }
 
   <!-- Alertes -->
