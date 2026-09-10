@@ -1,47 +1,47 @@
 @if (loading()) {
-  <p>Vérification du paiement…</p>
+  <p>{{ 'rsv.checking_payment' | transloco }}</p>
 } @else if (req(); as r) {
   @switch (r.status) {
     @case ('pending') {
       <div class="text-center py-4">
         <div class="spinner-border text-primary mb-3"></div>
-        <h1 class="h5">En attente de votre paiement</h1>
-        <p class="text-muted">Confirmez la demande sur votre téléphone ({{ r.payment_method_display }}).
-          Cette page se met à jour automatiquement.</p>
+        <h1 class="h5">{{ 'rsv.pending_title' | transloco }}</h1>
+        <p class="text-muted">{{ 'rsv.pending_confirm' | transloco }} ({{ r.payment_method_display }}).
+          {{ 'rsv.pending_auto' | transloco }}</p>
       </div>
     }
     @case ('paid') {
       <div class="text-center py-3">
-        <h1 class="h4 text-success">Réservation confirmée ✓</h1>
+        <h1 class="h4 text-success">{{ 'rsv.confirmed' | transloco }}</h1>
         <p>{{ r.trip_summary.from_town }} → {{ r.trip_summary.to_town }} ·
            {{ r.trip_summary.departure | date:'d MMM y, HH:mm' }}</p>
         @if (r.ticket) {
           <div class="ticket card p-3 d-inline-block">
-            <div><strong>Billet :</strong> {{ r.ticket.ticket_number }}</div>
-            <div><strong>Passager :</strong> {{ r.passenger_name }}</div>
-            @if (r.seat_number) { <div><strong>Siège :</strong> {{ r.seat_number }}</div> }
-            <div><strong>Montant :</strong> {{ r.amount }} XAF</div>
+            <div><strong>{{ 'rsv.ticket_label' | transloco }}</strong> {{ r.ticket.ticket_number }}</div>
+            <div><strong>{{ 'rsv.passenger_label' | transloco }}</strong> {{ r.passenger_name }}</div>
+            @if (r.seat_number) { <div><strong>{{ 'rsv.seat_label' | transloco }}</strong> {{ r.seat_number }}</div> }
+            <div><strong>{{ 'rsv.amount_label' | transloco }}</strong> {{ r.amount }} XAF</div>
             <canvas #qr class="mt-3"></canvas>
-            <div class="small text-muted">Présentez ce QR code à l'embarquement.</div>
+            <div class="small text-muted">{{ 'rsv.qr_hint' | transloco }}</div>
           </div>
         }
       </div>
     }
     @case ('failed') {
       <div class="text-center py-4">
-        <h1 class="h5 text-danger">Paiement échoué</h1>
-        <p class="text-muted">Le paiement n'a pas abouti. Vous pouvez réessayer.</p>
-        <a class="btn btn-primary" routerLink="/reserver">Nouvelle réservation</a>
+        <h1 class="h5 text-danger">{{ 'rsv.payment_failed' | transloco }}</h1>
+        <p class="text-muted">{{ 'rsv.payment_failed_msg' | transloco }}</p>
+        <a class="btn btn-primary" routerLink="/reserver">{{ 'rsv.new_booking' | transloco }}</a>
       </div>
     }
     @case ('expired') {
       <div class="text-center py-4">
-        <h1 class="h5 text-warning">Demande expirée</h1>
-        <p class="text-muted">Le délai de paiement est dépassé. Veuillez recommencer.</p>
-        <a class="btn btn-primary" routerLink="/reserver">Nouvelle réservation</a>
+        <h1 class="h5 text-warning">{{ 'rsv.expired_title' | transloco }}</h1>
+        <p class="text-muted">{{ 'rsv.expired_msg' | transloco }}</p>
+        <a class="btn btn-primary" routerLink="/reserver">{{ 'rsv.new_booking' | transloco }}</a>
       </div>
     }
   }
 } @else {
-  <p class="text-danger">Réservation introuvable. <a routerLink="/reserver">Nouvelle recherche</a>.</p>
+  <p class="text-danger">{{ 'rsv.not_found' | transloco }} <a routerLink="/reserver">{{ 'rsv.new_search' | transloco }}</a>.</p>
 }

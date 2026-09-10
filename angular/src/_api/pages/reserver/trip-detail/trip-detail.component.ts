@@ -4,11 +4,12 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { OnlineBookingService } from '../../../services/online/online-booking.service';
 import { OnlineTrip } from '../../../models/online-booking.models';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-rsv-trip-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslocoModule],
   templateUrl: './trip-detail.component.html',
 })
 export class RsvTripDetailComponent implements OnInit {
