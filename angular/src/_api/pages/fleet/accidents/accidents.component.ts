@@ -40,10 +40,12 @@ export class FleetAccidentsComponent implements OnInit {
     { value: 'total_loss', label: 'Perte totale', css: 'bg-dark'    },
   ];
 
+  // Statuts alignés sur le backend : reported → under_review → repair_in_progress → closed.
   statuses = [
-    { value: 'open',          label: 'Ouvert',        css: 'bg-danger'  },
-    { value: 'under_repair',  label: 'En réparation', css: 'bg-warning' },
-    { value: 'closed',        label: 'Clôturé',       css: 'bg-success' },
+    { value: 'reported',           label: 'Déclaré',           css: 'bg-danger'  },
+    { value: 'under_review',       label: "En cours d'examen", css: 'bg-info'    },
+    { value: 'repair_in_progress', label: 'En réparation',     css: 'bg-warning' },
+    { value: 'closed',             label: 'Clôturé',           css: 'bg-success' },
   ];
 
   constructor(
@@ -91,8 +93,9 @@ export class FleetAccidentsComponent implements OnInit {
   statusCss(s: string): string     { return this.statuses.find(x => x.value === s)?.css      ?? ''; }
   statusLabel(s: string): string   { return this.statuses.find(x => x.value === s)?.label    ?? s;  }
 
-  get totalOpen():        number { return this.accidents.filter(a => a.status === 'open').length; }
-  get totalUnderRepair(): number { return this.accidents.filter(a => a.status === 'under_repair').length; }
+  get totalReported():    number { return this.accidents.filter(a => a.status === 'reported').length; }
+  get totalUnderReview(): number { return this.accidents.filter(a => a.status === 'under_review').length; }
+  get totalUnderRepair(): number { return this.accidents.filter(a => a.status === 'repair_in_progress').length; }
 
   openCreate(): void {
     this.errorMsg = '';

@@ -16,8 +16,14 @@
     <div class="row mb-3 g-3 align-items-end">
       <div class="col-md-2">
         <div class="card p-3 text-center">
-          <h4 class="mb-0 text-danger">{{ totalOpen }}</h4>
-          <small class="text-muted">{{ 'fleet.acc.stat_open' | transloco }}</small>
+          <h4 class="mb-0 text-danger">{{ totalReported }}</h4>
+          <small class="text-muted">{{ 'fleet.acc.stat_reported' | transloco }}</small>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card p-3 text-center">
+          <h4 class="mb-0 text-info">{{ totalUnderReview }}</h4>
+          <small class="text-muted">{{ 'fleet.acc.stat_under_review' | transloco }}</small>
         </div>
       </div>
       <div class="col-md-2">
@@ -68,8 +74,12 @@
                 <td>{{ a.estimated_damage_cost ? (a.estimated_damage_cost | number:'1.0-0') : '—' }}</td>
                 <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
                 <td>
-                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'open'" class="btn btn-sm btn-outline-warning me-1"
-                     (click)="setStatus(a.id, 'under_repair')" [title]="'fleet.acc.act_repair_title' | transloco">
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'reported'" class="btn btn-sm btn-outline-info me-1"
+                     (click)="setStatus(a.id, 'under_review')" [title]="'fleet.acc.act_review_title' | transloco">
+                    <i class="ti ti-search me-1"></i>{{ 'fleet.acc.act_review' | transloco }}
+                  </a></ng-container>
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'under_review'" class="btn btn-sm btn-outline-warning me-1"
+                     (click)="setStatus(a.id, 'repair_in_progress')" [title]="'fleet.acc.act_repair_title' | transloco">
                     <i class="ti ti-tool me-1"></i>{{ 'fleet.acc.act_repair' | transloco }}
                   </a></ng-container>
                   <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-success me-1"
