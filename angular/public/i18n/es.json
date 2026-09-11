@@ -1252,7 +1252,11 @@
       "submit_declare": "Declarar",
       "f_actual_cost": "Coste real de reparación",
       "f_close_notes": "Notas de cierre",
-      "submit_close": "Cerrar"
+      "submit_close": "Cerrar",
+      "stat_reported": "Declarados",
+      "stat_under_review": "En revisión",
+      "act_review": "Examinar",
+      "act_review_title": "Poner en revisión"
     },
     "dash": {
       "title": "Panel — Flota",

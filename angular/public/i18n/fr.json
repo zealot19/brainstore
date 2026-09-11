@@ -1252,7 +1252,11 @@
       "submit_declare": "Déclarer",
       "f_actual_cost": "Coût réel de réparation",
       "f_close_notes": "Notes de clôture",
-      "submit_close": "Clôturer"
+      "submit_close": "Clôturer",
+      "stat_reported": "Déclarés",
+      "stat_under_review": "En examen",
+      "act_review": "Examiner",
+      "act_review_title": "Mettre en examen"
     },
     "dash": {
       "title": "Tableau de bord — Flotte",

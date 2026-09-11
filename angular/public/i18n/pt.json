@@ -1252,7 +1252,11 @@
       "submit_declare": "Declarar",
       "f_actual_cost": "Custo real de reparação",
       "f_close_notes": "Notas de encerramento",
-      "submit_close": "Encerrar"
+      "submit_close": "Encerrar",
+      "stat_reported": "Declarados",
+      "stat_under_review": "Em análise",
+      "act_review": "Analisar",
+      "act_review_title": "Colocar em análise"
     },
     "dash": {
       "title": "Painel — Frota",

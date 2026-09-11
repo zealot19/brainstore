@@ -1252,7 +1252,11 @@
       "submit_declare": "Report",
       "f_actual_cost": "Actual repair cost",
       "f_close_notes": "Closing notes",
-      "submit_close": "Close"
+      "submit_close": "Close",
+      "stat_reported": "Reported",
+      "stat_under_review": "Under review",
+      "act_review": "Review",
+      "act_review_title": "Move to review"
     },
     "dash": {
       "title": "Dashboard — Fleet",
