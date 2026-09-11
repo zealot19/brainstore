@@ -22,16 +22,15 @@ _DEFAULTS = {
 
 def seed_treasury_mapping(company, created_by=None) -> int:
     accounts = {a.code: a for a in Account.objects.filter(company=company, is_deleted=False)}
-    created = 0
-    for category, code in _DEFAULTS.items():
-        acc = accounts.get(code)
-        if not acc:
-            continue
-        if MovementAccountMapping.objects.filter(company=company, category=category).exists():
-            continue
-        MovementAccountMapping.objects.create(company=company, category=category, account=acc, created_by=created_by)
-        created += 1
-    return created
+    existing = set(MovementAccountMapping.objects.filter(company=company).values_list("category", flat=True))
+    to_create = [
+        MovementAccountMapping(company=company, category=category, account=accounts[code], created_by=created_by)
+        for category, code in _DEFAULTS.items()
+        if category not in existing and code in accounts
+    ]
+    if to_create:
+        MovementAccountMapping.objects.bulk_create(to_create)
+    return len(to_create)
 
 
 _PAYMENT_METHODS = [
