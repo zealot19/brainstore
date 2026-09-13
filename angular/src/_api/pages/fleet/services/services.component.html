@@ -149,30 +149,6 @@
               <label class="form-label">{{ 'fleet.common.currency' | transloco }}</label>
               <input type="text" class="form-control" formControlName="currency" maxlength="3">
             </div>
-            <div class="col-md-6">
-              <label class="form-label d-flex justify-content-between">
-                <span>{{ 'fleet.svc.f_supplier' | transloco }}</span>
-                <a href="javascript:void(0)" class="small" (click)="showNewSupplier = !showNewSupplier">
-                  {{ (showNewSupplier ? 'fleet.common.choose_existing' : 'fleet.common.new_supplier_toggle') | transloco }}
-                </a>
-              </label>
-              <select *ngIf="!showNewSupplier" class="form-select" formControlName="supplier_id">
-                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
-                <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}</option>
-              </select>
-              <div *ngIf="showNewSupplier" class="border rounded p-2">
-                <input type="text" class="form-control form-control-sm mb-1" [placeholder]="'fleet.common.ph_supplier_name' | transloco" [(ngModel)]="newSupplierName" [ngModelOptions]="{standalone:true}">
-                <input type="text" class="form-control form-control-sm mb-1" [placeholder]="'fleet.common.phone' | transloco" [(ngModel)]="newSupplierPhone" [ngModelOptions]="{standalone:true}">
-                <button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'fleet.supplier.manage'" (click)="createSupplierInline()" [disabled]="!newSupplierName.trim() || creatingSupplier">{{ 'fleet.common.create_select' | transloco }}</button>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.asg.col_driver' | transloco }}</label>
-              <select class="form-select" formControlName="driver_id">
-                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
-                <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.full_name }}</option>
-              </select>
-            </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.common.description' | transloco }}</label>
               <input type="text" class="form-control" formControlName="description" maxlength="500">

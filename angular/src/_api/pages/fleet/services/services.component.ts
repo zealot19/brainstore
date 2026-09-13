@@ -74,8 +74,6 @@ export class FleetServicesComponent implements OnInit {
       vehicle_id:           ['', Validators.required],
       intervention_type_id: ['', Validators.required],
       planned_date:         ['', Validators.required],
-      supplier_id:          [null],
-      driver_id:            [null],
       description:          [''],
       currency:            ['XAF'],
       notes:               [''],
@@ -147,8 +145,7 @@ export class FleetServicesComponent implements OnInit {
     const v = this.createForm.value;
     const payload = {
       vehicle_id: v.vehicle_id, intervention_type_id: v.intervention_type_id,
-      planned_date: v.planned_date, supplier_id: v.supplier_id || null,
-      driver_id: v.driver_id || null, description: v.description || '',
+      planned_date: v.planned_date, description: v.description || '',
       currency: v.currency || 'XAF', notes: v.notes || '',
     };
     const action = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
