@@ -19,18 +19,17 @@ RESET_TOKEN_TTL_HOURS = 1
 
 # ── Authentification ──────────────────────────────────────────────────────────
 
-def authenticate_user(*, email: str, password: str, ip: str = None, user_agent: str = "") -> User:
+def authenticate_user(*, identifier: str, password: str, ip: str = None, user_agent: str = "") -> User:
     """
     Vérifie les credentials, la politique de verrouillage et l'état du compte.
-    Enregistre chaque tentative dans LoginAttempt.
+    `identifier` = email OU nom d'utilisateur. Enregistre chaque tentative dans LoginAttempt.
     """
     user = None
     failure_reason = ""
 
-    try:
-        candidate = User.objects.get(email__iexact=email)
-    except User.DoesNotExist:
-        candidate = None
+    # Résolution par email puis par nom d'utilisateur (comme EmailOrUsernameBackend).
+    candidate = (User.objects.filter(email__iexact=identifier).first()
+                 or User.objects.filter(username__iexact=identifier).first())
 
     if candidate is None:
         failure_reason = "user_not_found"
@@ -39,7 +38,7 @@ def authenticate_user(*, email: str, password: str, ip: str = None, user_agent: 
     elif not candidate.is_active:
         failure_reason = "account_inactive"
     else:
-        user = authenticate(username=email, password=password)
+        user = authenticate(username=identifier, password=password)
         if user is None:
             failure_reason = "wrong_password"
             candidate.increment_failed_attempts(
@@ -47,7 +46,7 @@ def authenticate_user(*, email: str, password: str, ip: str = None, user_agent: 
                 lockout_minutes=LOCKOUT_MINUTES,
             )
 
-    _log_attempt(email=email, ip=ip, user_agent=user_agent,
+    _log_attempt(email=identifier, ip=ip, user_agent=user_agent,
                  success=(user is not None), reason=failure_reason, user=user)
 
     if user is None:
@@ -57,7 +56,7 @@ def authenticate_user(*, email: str, password: str, ip: str = None, user_agent: 
                 extra={"reason": failure_reason},
             )
         raise ApplicationError(
-            _("Email ou mot de passe incorrect."),
+            _("Identifiant ou mot de passe incorrect."),
             extra={"reason": failure_reason},
         )
 

@@ -9,8 +9,17 @@ User = get_user_model()
 # ── Input serializers ─────────────────────────────────────────────────────────
 
 class LoginInputSerializer(serializers.Serializer):
-    email    = serializers.EmailField(label=_("Email"))
-    password = serializers.CharField(label=_("Mot de passe"), write_only=True)
+    # Identifiant = email OU nom d'utilisateur. `email` conservé pour rétro-compatibilité.
+    identifier = serializers.CharField(label=_("Identifiant"), required=False, allow_blank=True)
+    email      = serializers.CharField(label=_("Email"), required=False, allow_blank=True)
+    password   = serializers.CharField(label=_("Mot de passe"), write_only=True)
+
+    def validate(self, attrs):
+        ident = (attrs.get("identifier") or attrs.get("email") or "").strip()
+        if not ident:
+            raise serializers.ValidationError({"identifier": _("Identifiant requis.")})
+        attrs["identifier"] = ident
+        return attrs
 
 
 class RefreshInputSerializer(serializers.Serializer):

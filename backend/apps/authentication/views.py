@@ -39,7 +39,7 @@ class LoginView(APIView):
         user_agent = request.META.get("HTTP_USER_AGENT", "")
 
         user = services.authenticate_user(
-            email=payload.validated_data["email"],
+            identifier=payload.validated_data["identifier"],
             password=payload.validated_data["password"],
             ip=ip,
             user_agent=user_agent,

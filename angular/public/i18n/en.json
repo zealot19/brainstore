@@ -2002,7 +2002,9 @@
     "login_btn": "Log in",
     "twostep_title": "2-step verification",
     "twostep_subtitle": "Enter the 6-digit code from your authenticator app.",
-    "verify": "Verify"
+    "verify": "Verify",
+    "identifier": "Username or email",
+    "identifier_ph": "username or email"
   },
   "rsv": {
     "brand": "Online booking",
