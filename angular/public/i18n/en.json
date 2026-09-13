@@ -168,7 +168,8 @@
     "sync_scig": "SCIG Sync",
     "depots": "Depots",
     "inventaires": "Inventories",
-    "configuration_sage": "Sage configuration"
+    "configuration_sage": "Sage configuration",
+    "garage": "Garage"
   },
   "booking": {
     "list": {
@@ -1288,16 +1289,16 @@
       "other": "Other"
     },
     "svc": {
-      "title": "Services / Interventions",
-      "subtitle": "Maintenance, repairs and their attachments",
-      "plan": "Schedule an intervention",
+      "title": "Garage",
+      "subtitle": "Interventions and diagnostics",
+      "plan": "Create an intervention",
       "info": "Record all interventions (services, repairs) and their attachments (invoices, photos). The intervention type determines preventive-maintenance recurrence.",
-      "stat_planned": "Planned",
+      "stat_planned": "Created",
       "stat_done": "Done",
-      "col_planned_date": "Planned date",
+      "col_planned_date": "Diagnostic date",
       "col_cost": "Cost",
       "empty": "No interventions found.",
-      "modal_edit": "Edit an intervention",
+      "modal_edit": "Edit intervention",
       "f_intervention_type": "Intervention type",
       "f_supplier": "Supplier / garage",
       "attachments": "Attachments",
@@ -1306,7 +1307,13 @@
       "modal_complete_title": "Close the intervention",
       "f_done_date": "End date",
       "submit_plan": "Schedule",
-      "submit_close": "Close"
+      "submit_close": "Close",
+      "col_entry_date": "Entry date",
+      "col_exit_date": "Exit date",
+      "filter_vehicle": "Vehicle",
+      "opt_all_vehicles": "All vehicles",
+      "filter_from": "From",
+      "filter_to": "To"
     },
     "ct": {
       "title": "Contracts",

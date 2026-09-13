@@ -168,7 +168,8 @@
     "sync_scig": "Sincr. SCIG",
     "depots": "Depósitos",
     "inventaires": "Inventarios",
-    "configuration_sage": "Configuración Sage"
+    "configuration_sage": "Configuración Sage",
+    "garage": "Taller"
   },
   "booking": {
     "list": {
@@ -1288,16 +1289,16 @@
       "other": "Otro"
     },
     "svc": {
-      "title": "Servicios / Intervenciones",
-      "subtitle": "Mantenimientos, reparaciones y sus adjuntos",
-      "plan": "Planificar una intervención",
+      "title": "Taller",
+      "subtitle": "Intervenciones y diagnósticos",
+      "plan": "Crear una intervención",
       "info": "Registre todas las intervenciones (mantenimientos, reparaciones) y sus adjuntos (facturas, fotos). El tipo de intervención determina la recurrencia del mantenimiento preventivo.",
-      "stat_planned": "Planificados",
+      "stat_planned": "Creadas",
       "stat_done": "Terminados",
-      "col_planned_date": "Fecha planificada",
+      "col_planned_date": "Fecha de diagnóstico",
       "col_cost": "Coste",
       "empty": "No se encontraron intervenciones.",
-      "modal_edit": "Editar una intervención",
+      "modal_edit": "Editar intervención",
       "f_intervention_type": "Tipo de intervención",
       "f_supplier": "Proveedor / taller",
       "attachments": "Adjuntos",
@@ -1306,7 +1307,13 @@
       "modal_complete_title": "Cerrar la intervención",
       "f_done_date": "Fecha de fin",
       "submit_plan": "Planificar",
-      "submit_close": "Cerrar"
+      "submit_close": "Cerrar",
+      "col_entry_date": "Fecha de entrada",
+      "col_exit_date": "Fecha de salida",
+      "filter_vehicle": "Vehículo",
+      "opt_all_vehicles": "Todos los vehículos",
+      "filter_from": "Desde",
+      "filter_to": "Hasta"
     },
     "ct": {
       "title": "Contratos",

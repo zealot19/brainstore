@@ -191,8 +191,7 @@ export class SidebarService {
           icon2: 'tool',
           base: 'fleet-maintenance',
           subMenus: [
-            { menuValue: 'Services',  route: routes.fleetServices,  base: 'services',  permission: 'fleet.maintenance.view' },
-            { menuValue: 'Contrats',  route: routes.fleetContracts, base: 'contracts', permission: 'fleet.contract.view' },
+            { menuValue: 'Garage',    route: routes.fleetServices,  base: 'services',  permission: 'fleet.maintenance.view' },
             { menuValue: 'Documents', route: routes.fleetDocuments, base: 'documents', permission: 'fleet.document.view' },
             { menuValue: 'Accidents', route: routes.fleetAccidents, base: 'accidents', permission: 'fleet.accident.view' },
           ],
