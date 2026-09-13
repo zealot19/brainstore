@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth/auth.service';
 import { routes } from '../../../../app/core/core.index';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 
 @Component({
   selector: 'app-signin',
@@ -26,6 +27,8 @@ export class SigninComponent implements OnInit {
     private authService: AuthService,
     private router:      Router,
     private route:       ActivatedRoute,
+    private toast:       ToastService,
+    private t:           TranslocoService,
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +50,7 @@ export class SigninComponent implements OnInit {
         if (res.requires_2fa) {
           this.router.navigate([routes.twoStepVerification]);
         } else {
+          this.toast.success(this.t.translate('auth.login_success'));
           this.router.navigateByUrl(this.returnUrl);
         }
       },

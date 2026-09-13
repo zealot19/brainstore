@@ -2004,7 +2004,8 @@
     "twostep_subtitle": "Enter the 6-digit code from your authenticator app.",
     "verify": "Verify",
     "identifier": "Username or email",
-    "identifier_ph": "username or email"
+    "identifier_ph": "username or email",
+    "login_success": "Logged in successfully. Welcome!"
   },
   "rsv": {
     "brand": "Online booking",
