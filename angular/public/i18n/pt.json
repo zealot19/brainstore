@@ -2002,7 +2002,9 @@
     "login_btn": "Iniciar sessão",
     "twostep_title": "Verificação em 2 passos",
     "twostep_subtitle": "Introduza o código de 6 dígitos da sua aplicação de autenticação.",
-    "verify": "Verificar"
+    "verify": "Verificar",
+    "identifier": "Utilizador ou e-mail",
+    "identifier_ph": "utilizador ou e-mail"
   },
   "rsv": {
     "brand": "Reserva online",

@@ -138,7 +138,7 @@ export class AuthService {
   unlockSession(password: string): Observable<LoginResponse> {
     const user = this.tokenService.getUser();
     if (!user?.email) throw new Error('Aucun profil en cache');
-    return this.login({ email: user.email, password });
+    return this.login({ identifier: user.email, password });
   }
 
   // ── Démarrage de l'application ───────────────────────────────────────────────

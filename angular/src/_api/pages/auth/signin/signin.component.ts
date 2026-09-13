@@ -30,8 +30,8 @@ export class SigninComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      email:    ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      identifier: ['', Validators.required],
+      password:   ['', Validators.required],
     });
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard/index';
   }
@@ -52,7 +52,7 @@ export class SigninComponent implements OnInit {
       },
       error: err => {
         this.loading  = false;
-        this.errorMsg = err?.error?.detail ?? 'Email ou mot de passe incorrect.';
+        this.errorMsg = err?.error?.detail ?? 'Identifiant ou mot de passe incorrect.';
       },
     });
   }

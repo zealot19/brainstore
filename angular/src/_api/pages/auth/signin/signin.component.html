@@ -23,12 +23,12 @@
 
           <!-- Email -->
           <div class="mb-3">
-            <label class="form-label">{{ 'auth.email' | transloco }}<span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'auth.identifier' | transloco }}<span class="text-danger">*</span></label>
             <div class="input-group">
-              <input type="email" class="form-control border-end-0"
-                     formControlName="email" placeholder="admin@example.com"
-                     [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
-              <span class="input-group-text border-start-0"><i class="ti ti-mail"></i></span>
+              <input type="text" class="form-control border-end-0" autocomplete="username"
+                     formControlName="identifier" [placeholder]="'auth.identifier_ph' | transloco"
+                     [class.is-invalid]="form.get('identifier')?.invalid && form.get('identifier')?.touched">
+              <span class="input-group-text border-start-0"><i class="ti ti-user"></i></span>
             </div>
           </div>
 

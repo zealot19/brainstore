@@ -1,7 +1,7 @@
 // ── Requêtes ─────────────────────────────────────────────────────────────────
 
 export interface LoginRequest {
-  email: string;
+  identifier: string;   // nom d'utilisateur OU email
   password: string;
 }
 
