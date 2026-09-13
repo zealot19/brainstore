@@ -168,7 +168,8 @@
     "sync_scig": "Sync SCIG",
     "depots": "Dépôts",
     "inventaires": "Inventaires",
-    "configuration_sage": "Configuration Sage"
+    "configuration_sage": "Configuration Sage",
+    "garage": "Garage"
   },
   "booking": {
     "list": {
@@ -1288,16 +1289,16 @@
       "other": "Autre"
     },
     "svc": {
-      "title": "Services / Interventions",
-      "subtitle": "Maintenances, réparations et leurs pièces jointes",
-      "plan": "Planifier une intervention",
+      "title": "Garage",
+      "subtitle": "Interventions et diagnostics",
+      "plan": "Créer une intervention",
       "info": "Enregistrez ici toutes les interventions (entretiens, réparations) et leurs pièces jointes (factures, photos). Le type d'intervention détermine la récurrence de l'entretien préventif.",
-      "stat_planned": "Planifiés",
+      "stat_planned": "Créées",
       "stat_done": "Terminés",
-      "col_planned_date": "Date planifiée",
+      "col_planned_date": "Date du diagnostic",
       "col_cost": "Coût",
       "empty": "Aucune intervention trouvée.",
-      "modal_edit": "Modifier une intervention",
+      "modal_edit": "Modifier l'intervention",
       "f_intervention_type": "Type d'intervention",
       "f_supplier": "Fournisseur / garage",
       "attachments": "Pièces jointes",
@@ -1306,7 +1307,13 @@
       "modal_complete_title": "Clôturer l'intervention",
       "f_done_date": "Date de fin",
       "submit_plan": "Planifier",
-      "submit_close": "Clôturer"
+      "submit_close": "Clôturer",
+      "col_entry_date": "Date d'entrée",
+      "col_exit_date": "Date de sortie",
+      "filter_vehicle": "Véhicule",
+      "opt_all_vehicles": "Tous les véhicules",
+      "filter_from": "Du",
+      "filter_to": "Au"
     },
     "ct": {
       "title": "Contrats",

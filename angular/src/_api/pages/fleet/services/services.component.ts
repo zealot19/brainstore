@@ -31,6 +31,9 @@ export class FleetServicesComponent implements OnInit {
   drivers:      ExternalDriver[]   = [];
   loading       = true;
   filterStatus  = '';
+  filterVehicle = '';
+  dateFrom      = '';
+  dateTo        = '';
 
   createForm!:  FormGroup;
   completeForm!: FormGroup;
@@ -51,7 +54,7 @@ export class FleetServicesComponent implements OnInit {
   creatingSupplier  = false;
 
   statuses = [
-    { value: 'planned',     label: 'Planifié',     css: 'bg-info'    },
+    { value: 'planned',     label: 'Créé',         css: 'bg-info'    },
     { value: 'in_progress', label: 'En cours',     css: 'bg-warning' },
     { value: 'done',        label: 'Terminé',      css: 'bg-success' },
     { value: 'cancelled',   label: 'Annulé',       css: 'bg-danger'  },
@@ -92,10 +95,22 @@ export class FleetServicesComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.svc.list({ status: this.filterStatus || undefined }).subscribe({
-      next: data => { this.services = data; this.filtered = data; this.loading = false; },
+    this.svc.list({}).subscribe({
+      next: data => { this.services = data; this.applyFilter(); this.loading = false; },
       error: ()  => { this.loading = false; },
     });
+  }
+
+  applyFilter(): void {
+    this.filtered = this.services.filter(o => {
+      if (this.filterStatus  && o.status  !== this.filterStatus)  return false;
+      if (this.filterVehicle && o.vehicle !== this.filterVehicle) return false;
+      const d = o.planned_date || '';
+      if (this.dateFrom && d < this.dateFrom) return false;
+      if (this.dateTo   && d > this.dateTo)   return false;
+      return true;
+    });
+    this.pg.page = 1;
   }
 
   statusCss(s: string): string { return this.statuses.find(st => st.value === s)?.css ?? ''; }
