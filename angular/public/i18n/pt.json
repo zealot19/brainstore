@@ -2004,7 +2004,8 @@
     "twostep_subtitle": "Introduza o código de 6 dígitos da sua aplicação de autenticação.",
     "verify": "Verificar",
     "identifier": "Utilizador ou e-mail",
-    "identifier_ph": "utilizador ou e-mail"
+    "identifier_ph": "utilizador ou e-mail",
+    "login_success": "Sessão iniciada com sucesso. Bem-vindo!"
   },
   "rsv": {
     "brand": "Reserva online",

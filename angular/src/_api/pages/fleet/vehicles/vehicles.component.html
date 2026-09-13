@@ -99,7 +99,6 @@
               <th>{{ 'fleet.veh.col_tags' | transloco }}</th>
               <th>{{ 'fleet.common.status' | transloco }}</th>
               <th>{{ 'fleet.veh.col_odometer' | transloco }}</th>
-              <th>{{ 'fleet.asg.col_driver' | transloco }}</th>
               <th>{{ 'fleet.common.active' | transloco }}</th>
               <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
             </tr>
@@ -123,7 +122,6 @@
                   <span class="badge" [ngClass]="statusCss(v.status)">{{ v.status_display }}</span>
                 </td>
                 <td>{{ v.current_odometer }} km</td>
-                <td>{{ v.current_driver || '—' }}</td>
                 <td>
                   <span class="badge" [ngClass]="v.is_active ? 'bg-outline-success' : 'bg-outline-secondary'">
                     {{ (v.is_active ? 'fleet.common.active' : 'fleet.common.inactive') | transloco }}
