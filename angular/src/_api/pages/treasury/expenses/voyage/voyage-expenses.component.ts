@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ExpenseService } from '../../../../services/treasury/expense.service';
 import { TripExpenseService } from '../../../../services/voyages/trip-expense.service';
 import { TripService } from '../../../../services/voyages/trip.service';
@@ -27,6 +28,7 @@ export class VoyageExpensesComponent implements OnInit {
   private tripSvc = inject(TripService);
   private typeSvc = inject(ExpenseTypeService);
   private sessionSvc = inject(SessionService);
+  private route = inject(ActivatedRoute);
 
   rows: any[] = []; sessions: any[] = []; loading = false; disburseSession = '';
   voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
@@ -39,6 +41,7 @@ export class VoyageExpensesComponent implements OnInit {
   saving = false; addError = '';
 
   ngOnInit(): void {
+    this.selectedVoyage = this.route.snapshot.queryParamMap.get('trip') || '';  // filtre voyage depuis l'action de liste
     this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
     this.typeSvc.list().subscribe((d: any) => this.expenseTypes = (d || []).filter((t: any) => t.is_active !== false));
     this.loadManualTrips();

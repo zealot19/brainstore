@@ -1,7 +1,7 @@
 import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { TripService } from '../../../services/voyages/trip.service';
 import { Booking } from '../../../models/voyages-booking.models';
@@ -24,8 +24,13 @@ export class VbBookingsComponent implements OnInit {
   typeFilter = ''; channelFilter = ''; tripFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
   trips: { id: string; number?: string; code?: string }[] = [];
 
-  constructor(private svc: BookingService, private tripSvc: TripService, private router: Router) {}
-  ngOnInit(): void { this.tripSvc.list().subscribe(d => this.trips = d as any); this.reload(); }
+  constructor(private svc: BookingService, private tripSvc: TripService, private router: Router,
+              private route: ActivatedRoute) {}
+  ngOnInit(): void {
+    this.tripSvc.list().subscribe(d => this.trips = d as any);
+    this.tripFilter = this.route.snapshot.queryParamMap.get('trip') || '';  // filtre voyage depuis l'action de liste
+    this.reload();
+  }
   reload(): void {
     this.loading = true;
     this.svc.list({

@@ -156,7 +156,7 @@ export class VoyagesListComponent implements OnInit {
   deleteTrip(t: Trip): void { if (confirm('Supprimer ce brouillon ?')) this.act(this.svc.delete(t.id), 'Supprimé.'); }
 
   // ── Navigation contextuelle ──
-  goExpenses(t: Trip): void { this.router.navigate(['/treasury/expenses-voyage']); }
+  goExpenses(t: Trip): void { this.router.navigate(['/treasury/expenses-voyage'], { queryParams: { trip: t.id } }); }
   goReservations(t: Trip): void { this.router.navigate(['/voyages-booking/bookings'], { queryParams: { trip: t.id } }); }
 
   private close(): void { document.getElementById('trip-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
