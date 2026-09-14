@@ -485,13 +485,20 @@ class TripTransbordSelectionView(APIView):
         return success_response(res)
 
 
+def _resolve_crew_agency(agency_id, company_id):
+    if not agency_id:
+        return None
+    from apps.system_config.models import Agency
+    return Agency.objects.filter(id=agency_id, company_id=company_id, is_deleted=False).first()
+
+
 class CrewMemberListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.manage"}
 
     def get(self, request):
         cid = request.user.company_id
-        qs = CrewMember.objects.filter(is_deleted=False, company_id=cid).select_related("member_type").order_by("last_name")
+        qs = CrewMember.objects.filter(is_deleted=False, company_id=cid).select_related("member_type", "agency").order_by("name", "last_name")
         return success_response(S.CrewMemberSerializer(qs, many=True).data)
 
     def post(self, request):
@@ -500,8 +507,9 @@ class CrewMemberListView(APIView):
         mt = CrewMemberType.objects.filter(id=d["member_type_id"], company_id=cid, is_deleted=False).first()
         if not mt:
             return error_response("Type introuvable.", status_code=404)
-        obj = CrewMember.objects.create(company_id=cid, first_name=d["first_name"], last_name=d["last_name"],
-                                        member_type=mt, phone=d["phone"], license_number=d["license_number"],
+        agency = _resolve_crew_agency(d.get("agency_id"), cid)
+        obj = CrewMember.objects.create(company_id=cid, name=d["name"], member_type=mt,
+                                        agency=agency, phone=d["phone"],
                                         is_active=d["is_active"], created_by=request.user)
         return created_response(S.CrewMemberSerializer(obj).data)
 
@@ -522,7 +530,7 @@ class CrewMemberDetailView(APIView):
         if not o:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         d = request.data
-        for f in ("first_name", "last_name", "phone", "license_number", "is_active"):
+        for f in ("name", "phone", "is_active"):
             if f in d:
                 setattr(o, f, d[f])
         if "member_type_id" in d:
@@ -530,6 +538,8 @@ class CrewMemberDetailView(APIView):
             if not mt:
                 return error_response("Type introuvable.", status_code=404)
             o.member_type = mt
+        if "agency_id" in d:
+            o.agency = _resolve_crew_agency(d["agency_id"], o.company_id)
         o.updated_by = request.user
         o.save()
         return success_response(S.CrewMemberSerializer(o).data)
@@ -541,6 +551,61 @@ class CrewMemberDetailView(APIView):
         o.is_deleted = True; o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message="Membre supprimé.")
+
+
+# ── Documents du personnel naviguant (pièces jointes génériques) ────────────────
+
+class CrewDocumentListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.manage"}
+
+    def _member(self, request, pk):
+        return CrewMember.objects.filter(is_deleted=False, company_id=request.user.company_id, id=pk).first()
+
+    def _ct(self):
+        from django.contrib.contenttypes.models import ContentType
+        return ContentType.objects.get_for_model(CrewMember)
+
+    def get(self, request, pk):
+        m = self._member(request, pk)
+        if not m:
+            return error_response("Personnel introuvable.", status_code=404)
+        from apps.core.models import Attachment
+        items = Attachment.objects.filter(content_type=self._ct(), object_id=m.id, is_deleted=False).order_by("created_at")
+        return success_response(S.CrewDocumentSerializer(items, many=True).data)
+
+    def post(self, request, pk):
+        m = self._member(request, pk)
+        if not m:
+            return error_response("Personnel introuvable.", status_code=404)
+        file = request.FILES.get("file")
+        if not file:
+            return error_response("Aucun fichier fourni.")
+        from apps.core.models import Attachment
+        att = Attachment.objects.create(
+            content_type=self._ct(), object_id=m.id,
+            name=request.data.get("name") or getattr(file, "name", "fichier"),
+            file=file, size=getattr(file, "size", 0) or 0,
+            mime_type=getattr(file, "content_type", "") or "",
+            description=request.data.get("description", ""), created_by=request.user,
+        )
+        return created_response(S.CrewDocumentSerializer(att).data)
+
+
+class CrewDocumentDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"DELETE": "voyage.crew.manage"}
+
+    def delete(self, request, pk, att_id):
+        from django.contrib.contenttypes.models import ContentType
+        from apps.core.models import Attachment
+        ct = ContentType.objects.get_for_model(CrewMember)
+        att = Attachment.objects.filter(id=att_id, content_type=ct, object_id=pk,
+                                        is_deleted=False).first()
+        if not att:
+            return error_response("Pièce jointe introuvable.", status_code=404)
+        att.soft_delete(user=request.user)
+        return no_content_response()
 
 
 # ── Dépenses de voyage ────────────────────────────────────────────────────────

@@ -378,6 +378,7 @@ export const routes={
   fleetAccidents:         '/fleet/accidents',
   fleetParking:           '/fleet/parking',
   fleetSuppliers:         '/fleet/suppliers',
+  fleetCrew:              '/fleet/crew',
   // ── Config Flotte ───────────────────────────────────────────────────────────
   fcVehicleCategories: '/fleet-config/vehicle-categories',
   fcFuelTypes:         '/fleet-config/fuel-types',

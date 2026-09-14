@@ -169,7 +169,10 @@
     "depots": "Depots",
     "inventaires": "Inventories",
     "configuration_sage": "Sage configuration",
-    "garage": "Garage"
+    "garage": "Garage",
+    "config_bus": "Config · Buses",
+    "personnel_naviguant": "Onboard crew",
+    "types_de_personnel": "Crew types"
   },
   "booking": {
     "list": {
@@ -666,7 +669,7 @@
     },
     "cmt": {
       "title": "Crew types",
-      "subtitle": "Driver, Attendant, Inspector…",
+      "subtitle": "Driver, attendant, controller…",
       "info": "Crew member types. Tick \"driver\" for types allowed to drive (rule: a trip requires at least one driver).",
       "col_driver": "Driver",
       "f_is_driver": "Is a driver"
@@ -1379,6 +1382,25 @@
       "f_reading_date": "Reading date",
       "f_note": "Note",
       "submit_odometer": "Update"
+    },
+    "crew": {
+      "title": "Onboard crew",
+      "subtitle": "Drivers, attendants and controllers",
+      "new": "Add",
+      "edit_title": "Edit",
+      "search_ph": "Search…",
+      "col_name": "Name",
+      "col_type": "Type",
+      "col_phone": "Phone",
+      "col_agency": "Agency",
+      "col_active": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No onboard crew.",
+      "choose": "Choose…",
+      "documents": "Documents",
+      "no_documents": "No document.",
+      "documents_after_save": "Save first to add documents."
     }
   },
   "admin": {

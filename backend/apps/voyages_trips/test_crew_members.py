@@ -17,7 +17,7 @@ def _ctx():
 def test_create_crew_member():
     company, admin = _ctx()
     mt = CrewMemberType.objects.get(company=company, code="DRIVER")
-    req = APIRequestFactory().post("/x", {"first_name": "Jean", "last_name": "Kamga",
+    req = APIRequestFactory().post("/x", {"name": "Jean Kamga",
                                           "member_type_id": str(mt.id), "phone": "690"}, format="json")
     force_authenticate(req, user=admin)
     r = CrewMemberListView.as_view()(req); r.render()
