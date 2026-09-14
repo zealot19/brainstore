@@ -13,11 +13,12 @@ import { PaginatePipe } from '../../../app/shared/table-paginator/paginate.pipe'
 import { TablePaginatorComponent, PageState } from '../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
 })
 export class UsersComponent implements OnInit, OnDestroy {
   private toast = inject(ToastService);

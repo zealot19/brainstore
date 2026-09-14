@@ -11,12 +11,13 @@ import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pi
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { routes } from '../../../../app/core/core.index';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-vb-reservations',
   standalone: true,
   templateUrl: './reservations.component.html',
-  imports: [CommonModule, FormsModule, RouterLink, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, TranslocoModule],
+  imports: [SearchableSelectDirective, CommonModule, FormsModule, RouterLink, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, TranslocoModule],
 })
 export class VbReservationsComponent implements OnInit {
   readonly routes = routes;

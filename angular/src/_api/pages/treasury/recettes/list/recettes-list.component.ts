@@ -10,6 +10,7 @@ import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate
 import { TablePaginatorComponent, PageState } from '../../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../../shared/searchable-select/searchable-select.directive';
 
 type Kind = 'voyage' | 'parcel' | 'baggage' | 'other';
 
@@ -22,7 +23,7 @@ const TITLES: Record<Kind, string> = {
   selector: 'app-recettes-list',
   standalone: true,
   templateUrl: './recettes-list.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, SearchableSelectComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, SearchableSelectComponent, TranslocoModule],
 })
 export class RecettesListComponent implements OnInit {
   private toast = inject(ToastService);

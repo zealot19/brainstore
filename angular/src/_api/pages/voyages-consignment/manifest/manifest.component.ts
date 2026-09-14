@@ -10,11 +10,12 @@ import { InfoBannerComponent } from '../../shared/info-banner/info-banner.compon
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-vcg-manifest',
   templateUrl: './manifest.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);

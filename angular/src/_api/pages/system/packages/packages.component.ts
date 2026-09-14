@@ -7,11 +7,12 @@ import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pi
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-packages',
   templateUrl: './packages.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, ReactiveFormsModule, TranslocoModule],
 })
 export class PackagesComponent implements OnInit {
   private toast = inject(ToastService);

@@ -5,6 +5,7 @@ import { AuditService, AuditLog, AuditFilters } from '../../../services/audit/au
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 const MODULES = [
   { value: 'SCIG',      label: 'Sync SCIG / Sage 100' },
@@ -38,7 +39,7 @@ const ACTIONS = [
 @Component({
   selector: 'app-audit-log',
   templateUrl: './audit.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, CommonModule, FormsModule, TranslocoModule],
 })
 export class AuditLogComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };

@@ -12,11 +12,12 @@ import { PaginationService, pageSelection, tablePageSize } from '../../../../../
 import { CustomPaginationComponent } from '../../../../../shared/custom-pagination/custom-pagination.component';
 import { MatSelectModule } from '@angular/material/select';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { SearchableSelectDirective } from '../../../../../../_api/pages/shared/searchable-select/searchable-select.directive';
 
 
 @Component({
   selector: 'app-orders',
-  imports: [CommonModule,FormsModule,MatSortModule,BsDatepickerModule,MatSelectModule,CustomPaginationComponent,RouterLink],
+  imports: [SearchableSelectDirective, CommonModule,FormsModule,MatSortModule,BsDatepickerModule,MatSelectModule,CustomPaginationComponent,RouterLink],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'
 })

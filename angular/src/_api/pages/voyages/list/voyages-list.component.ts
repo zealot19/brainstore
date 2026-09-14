@@ -18,11 +18,12 @@ import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-voyages-list',
   templateUrl: './voyages-list.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
 })
 export class VoyagesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };

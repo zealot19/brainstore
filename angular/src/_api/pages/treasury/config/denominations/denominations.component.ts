@@ -6,12 +6,13 @@ import { DenominationService } from '../../../../services/treasury/denomination.
 import { CurrencyDenomination } from '../../../../models/treasury.models';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../../app/shared/toast/toast.service';
+import { SearchableSelectDirective } from '../../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-trz-denominations',
   standalone: true,
   templateUrl: './denominations.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, TranslocoModule],
+  imports: [SearchableSelectDirective, CommonModule, FormsModule, ReactiveFormsModule, HasPermissionDirective, TranslocoModule],
 })
 export class TrzDenominationsComponent implements OnInit {
   private svc = inject(DenominationService);

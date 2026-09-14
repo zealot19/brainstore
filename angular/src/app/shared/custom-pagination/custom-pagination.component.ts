@@ -7,12 +7,13 @@ import {
 } from './pagination.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SearchableSelectDirective } from '../../../_api/pages/shared/searchable-select/searchable-select.directive';
 
 @Component({
     selector: 'app-custom-pagination',
     templateUrl: './custom-pagination.component.html',
     styleUrls: ['./custom-pagination.component.scss'],
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [SearchableSelectDirective, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class CustomPaginationComponent {
   public pageSize = 10;

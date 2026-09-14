@@ -13,11 +13,12 @@ import { ClientAutocompleteComponent } from '../shared/client-autocomplete/clien
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, ClientAutocompleteComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, ClientAutocompleteComponent, TranslocoModule],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';

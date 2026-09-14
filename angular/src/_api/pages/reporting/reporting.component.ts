@@ -8,11 +8,12 @@ import { Agency } from '../../models/system.models';
 import { CashRegister } from '../../models/treasury.models';
 import { InfoBannerComponent } from '../shared/info-banner/info-banner.component';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-reporting',
   templateUrl: './reporting.component.html',
-  imports: [CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class ReportingComponent implements OnInit {
   reports: ReportMeta[] = [];

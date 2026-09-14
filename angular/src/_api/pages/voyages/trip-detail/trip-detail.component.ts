@@ -9,12 +9,13 @@ import { CrewMember } from '../../../models/crew.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-voyages-trip-detail',
   templateUrl: './trip-detail.component.html',
   styleUrls: ['./trip-detail.component.scss'],
-  imports: [HasPermissionDirective, CommonModule, FormsModule, RouterModule, TranslocoModule],
+  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, RouterModule, TranslocoModule],
 })
 export class VoyagesTripDetailComponent implements OnInit {
   private toast = inject(ToastService);
