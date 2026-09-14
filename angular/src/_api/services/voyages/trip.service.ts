@@ -9,7 +9,8 @@ export class TripService {
   constructor(private http: HttpClient) {}
 
   list(params: { status?: string; route?: string; vehicle?: string;
-                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Trip[]> {
+                 date_field?: string; date_from?: string; date_to?: string;
+                 auto_expenses?: string } = {}): Observable<Trip[]> {
     let p = new HttpParams().set('page_size', '200');
     Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<Trip[]>(VOYAGES.trips, { params: p });

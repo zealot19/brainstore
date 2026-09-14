@@ -528,7 +528,11 @@
       "badge_planned": "Planned",
       "print_voucher": "Print expense voucher",
       "disburse": "Disburse",
-      "empty": "No trip expenses."
+      "empty": "No trip expenses.",
+      "add": "Add expense",
+      "f_type": "Expense type",
+      "f_amount": "Amount",
+      "no_manual": "No trip set to manual expenses. Untick automatic expenses when creating a trip."
     },
     "exp_gen": {
       "title": "General expenses",

@@ -528,7 +528,11 @@
       "badge_planned": "Prévue",
       "print_voucher": "Imprimer le bon de dépense",
       "disburse": "Décaisser",
-      "empty": "Aucune dépense voyage."
+      "empty": "Aucune dépense voyage.",
+      "add": "Ajouter une dépense",
+      "f_type": "Type de dépense",
+      "f_amount": "Montant",
+      "no_manual": "Aucun voyage en dépenses manuelles. Cochez « dépenses manuelles » à la création du voyage."
     },
     "exp_gen": {
       "title": "Dépenses générales",

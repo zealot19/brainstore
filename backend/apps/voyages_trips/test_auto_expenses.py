@@ -46,3 +46,18 @@ def test_manual_expenses_skips_bareme():
     trip = _mk(company, admin, route, fc, auto=False)
     assert trip.auto_expenses is False
     assert TripExpense.objects.filter(trip=trip).count() == 0
+
+
+@pytest.mark.django_db
+def test_trip_list_filters_by_auto_expenses():
+    from rest_framework.test import APIClient
+    company, admin, route, fc = _setup()
+    manual = _mk(company, admin, route, fc, auto=False)
+    _mk(company, admin, route, fc, auto=True)
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.get("/api/v1/voyages/trips/?auto_expenses=false")
+    assert r.status_code == 200, r.content
+    body = r.json()
+    data = body["data"] if isinstance(body, dict) and "data" in body else body
+    ids = [t["id"] for t in data]
+    assert str(manual.id) in ids and len(ids) == 1

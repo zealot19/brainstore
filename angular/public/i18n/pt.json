@@ -528,7 +528,11 @@
       "badge_planned": "Prevista",
       "print_voucher": "Imprimir o comprovativo de despesa",
       "disburse": "Desembolsar",
-      "empty": "Sem despesas de viagem."
+      "empty": "Sem despesas de viagem.",
+      "add": "Adicionar despesa",
+      "f_type": "Tipo de despesa",
+      "f_amount": "Montante",
+      "no_manual": "Nenhuma viagem com despesas manuais. Desmarque as despesas automáticas ao criar uma viagem."
     },
     "exp_gen": {
       "title": "Despesas gerais",

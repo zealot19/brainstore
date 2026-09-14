@@ -528,7 +528,11 @@
       "badge_planned": "Prevista",
       "print_voucher": "Imprimir el vale de gasto",
       "disburse": "Desembolsar",
-      "empty": "Sin gastos de viaje."
+      "empty": "Sin gastos de viaje.",
+      "add": "Añadir gasto",
+      "f_type": "Tipo de gasto",
+      "f_amount": "Importe",
+      "no_manual": "Ningún viaje con gastos manuales. Desmarque los gastos automáticos al crear un viaje."
     },
     "exp_gen": {
       "title": "Gastos generales",

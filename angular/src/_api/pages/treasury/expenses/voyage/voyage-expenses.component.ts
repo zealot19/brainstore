@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../../../services/treasury/expense.service';
 import { TripExpenseService } from '../../../../services/voyages/trip-expense.service';
+import { TripService } from '../../../../services/voyages/trip.service';
+import { ExpenseTypeService } from '../../../../services/voyages-config/expense-type.service';
 import { SessionService } from '../../../../services/treasury/session.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
@@ -22,16 +24,46 @@ export class VoyageExpensesComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   private svc = inject(ExpenseService);
   private tripExpSvc = inject(TripExpenseService);
+  private tripSvc = inject(TripService);
+  private typeSvc = inject(ExpenseTypeService);
   private sessionSvc = inject(SessionService);
 
   rows: any[] = []; sessions: any[] = []; loading = false; disburseSession = '';
   voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
   fStatus = ''; fFrom = ''; fTo = '';
 
+  // Ajout manuel : uniquement les voyages en dépenses manuelles.
+  manualTrips: { id: string; label: string }[] = [];
+  expenseTypes: any[] = [];
+  addForm = { trip_id: '', expense_type: '', amount: null as number | null, description: '' };
+  saving = false; addError = '';
+
   ngOnInit(): void {
     this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
+    this.typeSvc.list().subscribe((d: any) => this.expenseTypes = (d || []).filter((t: any) => t.is_active !== false));
+    this.loadManualTrips();
     this.reload();
   }
+
+  loadManualTrips(): void {
+    this.tripSvc.list({ auto_expenses: 'false' }).subscribe((d: any) => {
+      this.manualTrips = (d || [])
+        .filter((t: any) => t.status !== 'cancelled')
+        .map((t: any) => ({ id: t.id, label: `${t.number || t.code || '—'} · ${t.route_code || ''} · ${(t.scheduled_departure || '').slice(0, 10)}` }));
+    });
+  }
+
+  openAdd(): void { this.addError = ''; this.addForm = { trip_id: '', expense_type: '', amount: null, description: '' }; }
+  submitAdd(): void {
+    const f = this.addForm;
+    if (!f.trip_id || !f.expense_type || !f.amount || this.saving) return;
+    this.saving = true; this.addError = '';
+    this.tripExpSvc.create(f.trip_id, { expense_type: f.expense_type, amount: f.amount, description: f.description }).subscribe({
+      next: () => { this.saving = false; this.reload(); this.toast.success('Dépense ajoutée.'); this.close('voyage-exp-add-modal'); },
+      error: e => { this.saving = false; this.addError = e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué."; },
+    });
+  }
+  private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 
   reload(): void {
     this.loading = true;

@@ -1,5 +1,6 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.exp_voyage.title' | transloco }}</h4><h6>{{ 'treasury.exp_voyage.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#voyage-exp-add-modal" *hasPermission="'treasury.expense.manage'" (click)="openAdd()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.exp_voyage.add' | transloco }}</a></div>
 </div>
 
 <!-- Filtres / décaissement (en haut) -->
@@ -69,3 +70,26 @@
     </div>
   </div>
 </div>
+
+<!-- Ajouter une dépense (voyages manuels uniquement) -->
+<div class="modal fade" id="voyage-exp-add-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.exp_voyage.add' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (addError) { <div class="alert alert-danger py-2">{{ addError }}</div> }
+    <div class="mb-3">
+      <label class="form-label">{{ 'treasury.exp_voyage.f_voyage' | transloco }} <span class="text-danger">*</span></label>
+      <app-searchable-select [items]="manualTrips" labelKey="label" valueKey="id"
+        [placeholder]="'treasury.common.choose' | transloco" [(ngModel)]="addForm.trip_id"></app-searchable-select>
+      @if (!manualTrips.length) { <small class="text-muted">{{ 'treasury.exp_voyage.no_manual' | transloco }}</small> }
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.exp_voyage.f_type' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="addForm.expense_type">
+        <option value="">{{ 'treasury.common.choose' | transloco }}</option>
+        @for (t of expenseTypes; track t.id) { <option [value]="t.id">{{ t.name }}</option> }
+      </select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.exp_voyage.f_amount' | transloco }} <span class="text-danger">*</span></label><input type="number" min="1" class="form-control" [(ngModel)]="addForm.amount" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="addForm.description" /></div>
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving || !addForm.trip_id || !addForm.expense_type || !addForm.amount" (click)="submitAdd()">{{ 'shared.actions.create' | transloco }}</button></div>
+</div></div></div>
