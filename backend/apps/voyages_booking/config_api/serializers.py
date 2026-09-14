@@ -82,7 +82,7 @@ class BookingRead(serializers.ModelSerializer):
         fields = ["id", "reference", "status", "status_display", "trip_type", "trip_type_display",
                   "outbound_trip", "return_trip", "return_open", "buyer", "buyer_name",
                   "amount_due", "amount_paid", "amount_received", "change_due", "payment_method",
-                  "channel", "notes", "created_at", "updated_at", "tickets"]
+                  "channel", "notes", "hold_until", "created_at", "updated_at", "tickets"]
 
 
 class BookingItemSerializer(serializers.Serializer):
@@ -102,6 +102,21 @@ class BookingCreateSerializer(serializers.Serializer):
     payment_method = serializers.CharField(required=False, allow_blank=True, default="")
     amount_received = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
     return_open = serializers.BooleanField(required=False, default=False)
+
+
+class ReservationCreateSerializer(serializers.Serializer):
+    trip_type = serializers.ChoiceField(choices=Booking.TripType.choices, default=Booking.TripType.ONE_WAY)
+    outbound_trip_id = serializers.UUIDField()
+    return_trip_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    buyer = serializers.DictField()
+    items = BookingItemSerializer(many=True)
+    hold_until = serializers.DateTimeField()
+    return_open = serializers.BooleanField(required=False, default=False)
+
+
+class PayReservationSerializer(serializers.Serializer):
+    payment_method = serializers.CharField(required=False, allow_blank=True, default="")
+    amount_received = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
 
 
 class AssignReturnItemSerializer(serializers.Serializer):

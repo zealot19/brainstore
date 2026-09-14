@@ -70,16 +70,18 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Réservations',
+          menuValue: 'Billetterie',
           hasSubRoute: true,
           showSubRoute: false,
           icon2: 'ticket',
           base: 'voyages-booking',
           subMenus: [
-            { menuValue: 'Passagers',            route: routes.vbPassengers, base: 'passengers',   permission: 'ticketing.customer.view' },
-            { menuValue: 'Réservations',         route: routes.vbBookings,   base: 'bookings',     permission: 'ticketing.booking.view' },
-            { menuValue: 'Nouvelle réservation', route: routes.vbBookingNew, base: 'bookings/new', permission: 'ticketing.booking.create' },
-            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns, base: 'open-returns', permission: 'ticketing.booking.view' },
+            { menuValue: 'Passagers',            route: routes.vbPassengers,     base: 'passengers',       permission: 'ticketing.customer.view' },
+            { menuValue: 'Billets',              route: routes.vbBookings,       base: 'bookings',         permission: 'ticketing.booking.view' },
+            { menuValue: 'Nouveau billet',       route: routes.vbBookingNew,     base: 'bookings/new',     permission: 'ticketing.booking.create' },
+            { menuValue: 'Réservations',         route: routes.vbReservations,   base: 'reservations',     permission: 'ticketing.booking.view' },
+            { menuValue: 'Nouvelle réservation', route: routes.vbReservationNew, base: 'reservations/new', permission: 'ticketing.booking.create' },
+            { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns,    base: 'open-returns',     permission: 'ticketing.booking.view' },
           ],
         },
         {

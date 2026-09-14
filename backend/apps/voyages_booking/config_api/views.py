@@ -91,6 +91,9 @@ class TripSeatMapView(APIView):
         trip = _trip(request.user.company, trip_id)
         if not trip:
             return error_response("Voyage introuvable.", status_code=404)
+        # Libère les réservations expirées de ce voyage avant d'afficher le plan.
+        from apps.voyages_booking.services.reservation_services import release_expired_reservations
+        release_expired_reservations(company=request.user.company, trip=trip)
         return success_response(S.SeatCellSerializer(selectors.seat_map(trip), many=True).data)
 
 
@@ -141,6 +144,50 @@ class BookingListView(APIView):
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.BookingRead(booking).data)
+
+
+class ReservationCreateView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.create'}
+
+    def post(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        payload = S.ReservationCreateSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        outbound = _trip(company, d["outbound_trip_id"])
+        if not outbound:
+            return error_response("Voyage aller introuvable.", status_code=404)
+        return_trip = _trip(company, d["return_trip_id"]) if d.get("return_trip_id") else None
+        try:
+            booking = services.create_reservation(
+                company, trip_type=d["trip_type"], outbound_trip=outbound, return_trip=return_trip,
+                buyer_spec=d["buyer"], items=d["items"], hold_until=d["hold_until"],
+                return_open=d["return_open"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(S.BookingRead(booking).data)
+
+
+class BookingPayView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.create'}
+
+    def post(self, request, pk):
+        b = selectors.booking_detail(request.user.company, pk)
+        if not b:
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        payload = S.PayReservationSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        try:
+            b = services.pay_reservation(b, payment_method=d["payment_method"],
+                                         amount_received=d["amount_received"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.BookingRead(b).data)
 
 
 class OpenReturnsView(APIView):

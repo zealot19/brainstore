@@ -174,7 +174,10 @@
     "config_bus": "Config · Bus",
     "personnel_naviguant": "Personnel naviguant",
     "types_de_personnel": "Types de personnel",
-    "denominations": "Dénominations"
+    "denominations": "Dénominations",
+    "billetterie": "Billetterie",
+    "billets": "Billets",
+    "nouveau_billet": "Nouveau billet"
   },
   "booking": {
     "list": {
@@ -353,6 +356,25 @@
       "pax_count": "Nombre de passagers",
       "auto_hint": "Les sièges seront attribués automatiquement à l’enregistrement.",
       "seat_auto": "Auto"
+    },
+    "reserve": {
+      "title": "Nouvelle réservation",
+      "subtitle": "Tenir des sièges non payés jusqu’à une échéance",
+      "s5": "Échéance de la réservation",
+      "hold_until": "Réservé jusqu’à",
+      "hint": "Aucun paiement maintenant. Les sièges sont tenus jusqu’à l’échéance, puis libérés automatiquement.",
+      "submit": "Réserver",
+      "list_title": "Réservations",
+      "list_subtitle": "Billets réservés non payés",
+      "new": "Nouvelle réservation",
+      "search_ph": "Rechercher (référence, client)…",
+      "col_ref": "Référence",
+      "col_client": "Client",
+      "col_due": "Montant dû",
+      "col_deadline": "Échéance",
+      "expired": "Expirée",
+      "pay": "Encaisser",
+      "empty": "Aucune réservation."
     }
   },
   "treasury": {

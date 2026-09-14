@@ -1,0 +1,58 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'booking.reserve.list_title' | transloco }}</h4><h6>{{ 'booking.reserve.list_subtitle' | transloco }}</h6>
+  </div></div>
+  <div class="page-btn"><a [routerLink]="routes.vbReservationNew" class="btn btn-primary" *hasPermission="'ticketing.booking.create'"><i class="ti ti-circle-plus me-2"></i>{{ 'booking.reserve.new' | transloco }}</a></div>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (keyup.enter)="load()" type="search" class="form-control" [placeholder]="'booking.reserve.search_ph' | transloco" /></div></div></div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>{{ 'booking.reserve.col_ref' | transloco }}</th>
+          <th>{{ 'booking.reserve.col_client' | transloco }}</th>
+          <th>{{ 'booking.reserve.col_due' | transloco }}</th>
+          <th>{{ 'booking.reserve.col_deadline' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+        </tr></thead>
+        <tbody>
+          @for (b of rows | paginate:pg.page:pg.size; track b.id) {
+            <tr>
+              <td class="fw-medium">{{ b.reference }}</td>
+              <td>{{ b.buyer_name }}</td>
+              <td>{{ b.amount_due }} XAF</td>
+              <td>
+                {{ b.hold_until ? (b.hold_until | date:'dd/MM HH:mm') : '—' }}
+                @if (expired(b)) { <span class="badge bg-danger ms-1">{{ 'booking.reserve.expired' | transloco }}</span> }
+              </td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center gap-1">
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#res-pay-modal" *hasPermission="'ticketing.booking.create'" (click)="openPay(b)"><i class="ti ti-cash me-1"></i>{{ 'booking.reserve.pay' | transloco }}</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'ticketing.booking.cancel'" (click)="cancel(b)"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a>
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">{{ 'booking.reserve.empty' | transloco }}</td></tr> }
+        </tbody>
+      </table></div>
+      <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+    }
+  </div>
+</div>
+
+<div class="modal fade" id="res-pay-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'booking.reserve.pay' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">{{ 'booking.new.payment_method' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="payMethod" (ngModelChange)="onPayMethodChange()">
+        <option value="" disabled selected>{{ 'booking.new.choose' | transloco }}</option>
+        @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
+      </select></div>
+    <div class="mb-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label><input class="form-control fw-bold" [value]="payDue + ' XAF'" disabled /></div>
+    <div class="mb-3"><label class="form-label">{{ 'booking.new.amount_received' | transloco }} @if (requiresPayment) { <span class="text-danger">*</span> }</label>
+      <input type="number" min="0" class="form-control" [(ngModel)]="payAmount" [disabled]="!requiresPayment" /></div>
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving || !payMethod" (click)="submitPay()">{{ 'booking.reserve.pay' | transloco }}</button></div>
+</div></div></div>

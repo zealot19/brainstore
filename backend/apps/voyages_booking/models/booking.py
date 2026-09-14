@@ -5,6 +5,7 @@ from apps.core.models import BaseModel
 
 class Booking(BaseModel):
     class Status(models.TextChoices):
+        RESERVED  = "reserved",  _("Réservé (non payé)")
         CONFIRMED = "confirmed", _("Payé")
         BOARDED   = "boarded",   _("Embarqué")
         CANCELLED = "cancelled", _("Annulé")
@@ -39,6 +40,7 @@ class Booking(BaseModel):
     payment_method  = models.CharField(_("mode de paiement"), max_length=40, blank=True)
     channel         = models.CharField(_("canal"), max_length=10, choices=Channel.choices, default=Channel.COUNTER)
     return_open     = models.BooleanField(_("retour ouvert"), default=False)
+    hold_until      = models.DateTimeField(_("réservé jusqu'à"), null=True, blank=True)
     notes           = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
@@ -55,6 +57,7 @@ class Ticket(BaseModel):
         RETURN   = "return",   _("Retour")
 
     class Status(models.TextChoices):
+        RESERVED  = "reserved",  _("Réservé")
         SOLD      = "sold",      _("Vendu")
         BOARDED   = "boarded",   _("Embarqué")
         CANCELLED = "cancelled", _("Annulé")

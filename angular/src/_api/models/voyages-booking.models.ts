@@ -36,7 +36,7 @@ export interface Booking {
   outbound_trip: string; return_trip: string | null; return_open: boolean;
   buyer: string; buyer_name: string;
   amount_due: string; amount_paid: string; amount_received: string; change_due: string;
-  payment_method: string; channel: string; notes: string;
+  payment_method: string; channel: string; notes: string; hold_until: string | null;
   created_at: string; updated_at: string; tickets: Ticket[];
 }
 

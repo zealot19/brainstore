@@ -174,7 +174,10 @@
     "config_bus": "Config · Autobuses",
     "personnel_naviguant": "Personal de a bordo",
     "types_de_personnel": "Tipos de personal",
-    "denominations": "Denominaciones"
+    "denominations": "Denominaciones",
+    "billetterie": "Billetería",
+    "billets": "Billetes",
+    "nouveau_billet": "Nuevo billete"
   },
   "booking": {
     "list": {
@@ -353,6 +356,25 @@
       "pax_count": "Número de pasajeros",
       "auto_hint": "Los asientos se asignarán automáticamente al guardar.",
       "seat_auto": "Auto"
+    },
+    "reserve": {
+      "title": "Nueva reserva",
+      "subtitle": "Reservar asientos no pagados hasta una fecha límite",
+      "s5": "Fecha límite de la reserva",
+      "hold_until": "Reservado hasta",
+      "hint": "Sin pago ahora. Los asientos se retienen hasta la fecha límite y luego se liberan automáticamente.",
+      "submit": "Reservar",
+      "list_title": "Reservas",
+      "list_subtitle": "Billetes reservados no pagados",
+      "new": "Nueva reserva",
+      "search_ph": "Buscar (referencia, cliente)…",
+      "col_ref": "Referencia",
+      "col_client": "Cliente",
+      "col_due": "Importe adeudado",
+      "col_deadline": "Fecha límite",
+      "expired": "Vencida",
+      "pay": "Cobrar",
+      "empty": "Sin reservas."
     }
   },
   "treasury": {

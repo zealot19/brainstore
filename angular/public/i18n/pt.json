@@ -174,7 +174,10 @@
     "config_bus": "Config · Autocarros",
     "personnel_naviguant": "Pessoal de bordo",
     "types_de_personnel": "Tipos de pessoal",
-    "denominations": "Denominações"
+    "denominations": "Denominações",
+    "billetterie": "Bilheteria",
+    "billets": "Bilhetes",
+    "nouveau_billet": "Novo bilhete"
   },
   "booking": {
     "list": {
@@ -353,6 +356,25 @@
       "pax_count": "Número de passageiros",
       "auto_hint": "Os lugares serão atribuídos automaticamente ao guardar.",
       "seat_auto": "Auto"
+    },
+    "reserve": {
+      "title": "Nova reserva",
+      "subtitle": "Reservar lugares não pagos até um prazo",
+      "s5": "Prazo da reserva",
+      "hold_until": "Reservado até",
+      "hint": "Sem pagamento agora. Os lugares ficam reservados até o prazo e depois são liberados automaticamente.",
+      "submit": "Reservar",
+      "list_title": "Reservas",
+      "list_subtitle": "Bilhetes reservados não pagos",
+      "new": "Nova reserva",
+      "search_ph": "Pesquisar (referência, cliente)…",
+      "col_ref": "Referência",
+      "col_client": "Cliente",
+      "col_due": "Montante devido",
+      "col_deadline": "Prazo",
+      "expired": "Expirada",
+      "pay": "Receber",
+      "empty": "Sem reservas."
     }
   },
   "treasury": {

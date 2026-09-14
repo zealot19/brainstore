@@ -452,6 +452,8 @@ export const routes={
   vbPassengers:   '/voyages-booking/passengers',
   vbBookings:     '/voyages-booking/bookings',
   vbBookingNew:   '/voyages-booking/bookings/new',
+  vbReservations: '/voyages-booking/reservations',
+  vbReservationNew: '/voyages-booking/reservations/new',
   vbOpenReturns:  '/voyages-booking/open-returns',
 
   // ── Colis & Bagages ──────────────────────────────────────────────────────────

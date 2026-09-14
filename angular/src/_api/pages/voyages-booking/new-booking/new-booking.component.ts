@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
@@ -37,10 +37,20 @@ export class VbNewBookingComponent implements OnInit {
   returnOpen = false;
   saving = false; errorMsg = '';
 
+  // Mode réservation (billet non payé avec échéance)
+  isReservation = false; holdUntil = '';
+
   constructor(private svc: BookingService, private fcSvc: FareClassService,
               private tsSvc: TimeSlotService, private router: Router,
+              private route: ActivatedRoute,
               private pmSvc: PaymentMethodService) {}
   ngOnInit(): void {
+    this.isReservation = this.route.snapshot.data['mode'] === 'reservation';
+    if (this.isReservation) {
+      const d = new Date(Date.now() + 24 * 3600 * 1000);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      this.holdUntil = d.toISOString().slice(0, 16);  // datetime-local par défaut +24h
+    }
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
     this.tsSvc.list().subscribe(d => this.timeSlots = d);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
@@ -180,6 +190,7 @@ export class VbNewBookingComponent implements OnInit {
     }
     if (this.anyMissingFare) return false;
     if (this.passengers.some(p => !p.name || !p.phone)) return false;
+    if (this.isReservation) return !!this.holdUntil;   // pas de paiement pour une réservation
     if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
     return true;
   }
@@ -195,6 +206,18 @@ export class VbNewBookingComponent implements OnInit {
       return_seat_id: (this.needReturnSel && !this.returnAuto) ? (this.selReturn[i]?.id ?? null) : null,
     }));
     const buyer = items[this.buyerIndex].passenger;
+    if (this.isReservation) {
+      const resBody = {
+        trip_type: this.tripType, outbound_trip_id: this.outboundTripId,
+        return_trip_id: this.needReturnSel ? this.returnTripId : null,
+        buyer, items, hold_until: new Date(this.holdUntil).toISOString(),
+        return_open: this.isRound && this.returnOpen,
+      };
+      this.svc.reserve(resBody).subscribe({
+        next: () => this.router.navigate(['/voyages-booking/reservations']),
+        error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
+      return;
+    }
     const body: BookingCreate = {
       trip_type: this.tripType, outbound_trip_id: this.outboundTripId,
       return_trip_id: this.needReturnSel ? this.returnTripId : null,

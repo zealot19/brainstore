@@ -356,6 +356,8 @@ export const VOYAGES_BOOKING = {
   seatMap: (tripId: string) => `${VB}/trips/${tripId}/seat-map/`,
   destinations: (tripId: string) => `${VB}/trips/${tripId}/destinations/`,
   bookings: `${VB}/bookings/`,
+  reservations: `${VB}/reservations/`,
+  bookingPay: (id: string) => `${VB}/bookings/${id}/pay/`,
   openReturns: `${VB}/bookings/open-returns/`,
   booking: (id: string) => `${VB}/bookings/${id}/`,
   bookingPrint: (id: string) => `${VB}/bookings/${id}/print/`,
