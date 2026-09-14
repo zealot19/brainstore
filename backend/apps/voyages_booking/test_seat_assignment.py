@@ -42,6 +42,25 @@ def test_auto_mode_assigns_first_available_seat():
 
 
 @pytest.mark.django_db
+def test_auto_mode_via_api_accepts_null_seat():
+    """Regression: the request serializer must accept items without a seat id in AUTO."""
+    from rest_framework.test import APIClient
+    company, admin, trip = _setup()
+    trip.seat_assignment_mode = "auto"; trip.save(update_fields=["seat_assignment_mode"])
+    _open_caisse(company, admin)
+    c = APIClient(); c.force_authenticate(user=admin)
+    body = {
+        "trip_type": "one_way", "outbound_trip_id": str(trip.id),
+        "buyer": {"name": "Cli Ent", "phone": "690"},
+        "items": [{"passenger": {"name": "Cli Ent", "phone": "690"},
+                   "destination_point_id": None, "outbound_seat_id": None}],
+        "payment_method": "cash",
+    }
+    r = c.post("/api/v1/voyages/booking/bookings/", body, format="json")
+    assert r.status_code in (200, 201), r.content
+
+
+@pytest.mark.django_db
 def test_auto_mode_ignores_supplied_seat_and_reports_full():
     company, admin, trip = _setup()  # plan has 2 seats
     trip.seat_assignment_mode = "auto"; trip.save(update_fields=["seat_assignment_mode"])

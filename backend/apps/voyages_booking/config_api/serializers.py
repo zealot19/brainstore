@@ -88,7 +88,8 @@ class BookingRead(serializers.ModelSerializer):
 class BookingItemSerializer(serializers.Serializer):
     passenger = serializers.DictField()
     destination_point_id = serializers.UUIDField(required=False, allow_null=True, default=None)
-    outbound_seat_id = serializers.UUIDField()
+    # Optionnel : en attribution automatique, le siège est choisi côté serveur.
+    outbound_seat_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     return_seat_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
 
@@ -105,7 +106,8 @@ class BookingCreateSerializer(serializers.Serializer):
 
 class AssignReturnItemSerializer(serializers.Serializer):
     outbound_ticket_id = serializers.UUIDField()
-    return_seat_id = serializers.UUIDField()
+    # Optionnel : en attribution automatique, le siège retour est choisi côté serveur.
+    return_seat_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
 
 class AssignReturnSerializer(serializers.Serializer):
