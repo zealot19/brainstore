@@ -318,6 +318,8 @@ export const VOYAGES = {
   assignVehicle: (id: string) => `${VT}/${id}/assign-vehicle/`,
   crew: (id: string) => `${VT}/${id}/crew/`, crewItem: (id: string, cid: string) => `${VT}/${id}/crew/${cid}/`,
   crewMembers: `${VT}/crew-members/`, crewMember: (id: string) => `${VT}/crew-members/${id}/`,
+  crewDocs: (id: string) => `${VT}/crew-members/${id}/documents/`,
+  crewDoc: (id: string, attId: string) => `${VT}/crew-members/${id}/documents/${attId}/`,
   tripExpenses: (id: string) => `${VT}/${id}/expenses/`,
   tripExpense: (id: string, eid: string) => `${VT}/${id}/expenses/${eid}/`,
   tripExpenseDisburse: (id: string, eid: string) => `${VT}/${id}/expenses/${eid}/disburse/`,

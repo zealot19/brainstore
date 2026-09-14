@@ -139,17 +139,27 @@ class CrewMemberSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(read_only=True)
     member_type_name = serializers.CharField(source="member_type.name", read_only=True)
     is_driver = serializers.BooleanField(source="member_type.is_driver", read_only=True)
+    agency_name = serializers.CharField(source="agency.name", read_only=True)
 
     class Meta:
         model = CrewMember
-        fields = ["id", "first_name", "last_name", "full_name", "member_type", "member_type_name",
-                  "is_driver", "phone", "license_number", "is_active"]
+        fields = ["id", "name", "first_name", "last_name", "full_name", "member_type", "member_type_name",
+                  "is_driver", "agency", "agency_name", "phone", "license_number", "is_active"]
 
 
 class CrewMemberWriteSerializer(serializers.Serializer):
-    first_name     = serializers.CharField(max_length=150)
-    last_name      = serializers.CharField(max_length=150)
+    name           = serializers.CharField(max_length=200)
     member_type_id = serializers.UUIDField()
+    agency_id      = serializers.UUIDField(required=False, allow_null=True, default=None)
     phone          = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
-    license_number = serializers.CharField(max_length=50, required=False, allow_blank=True, default="")
     is_active      = serializers.BooleanField(required=False, default=True)
+
+
+class CrewDocumentSerializer(serializers.Serializer):
+    id          = serializers.UUIDField(read_only=True)
+    name        = serializers.CharField(read_only=True)
+    file        = serializers.FileField(read_only=True)
+    mime_type   = serializers.CharField(read_only=True)
+    size        = serializers.IntegerField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    created_at  = serializers.DateTimeField(read_only=True)

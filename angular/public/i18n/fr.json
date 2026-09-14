@@ -170,7 +170,10 @@
     "inventaires": "Inventaires",
     "configuration_sage": "Configuration Sage",
     "garage": "Garage",
-    "remboursements": "Remboursements"
+    "remboursements": "Remboursements",
+    "config_bus": "Config · Bus",
+    "personnel_naviguant": "Personnel naviguant",
+    "types_de_personnel": "Types de personnel"
   },
   "booking": {
     "list": {
@@ -687,8 +690,8 @@
       "add_stop": "+ Ajouter"
     },
     "cmt": {
-      "title": "Types d'équipage",
-      "subtitle": "Chauffeur, Convoyeur, Contrôleur…",
+      "title": "Types de personnel",
+      "subtitle": "Chauffeur, convoyeur, contrôleur…",
       "info": "Types de membre d'équipage. Cochez « conducteur » pour les types autorisés à conduire (règle : un voyage exige au moins un conducteur).",
       "col_driver": "Conducteur",
       "f_is_driver": "Est conducteur"
@@ -1401,6 +1404,25 @@
       "f_reading_date": "Date de relevé",
       "f_note": "Note",
       "submit_odometer": "Mettre à jour"
+    },
+    "crew": {
+      "title": "Personnel naviguant",
+      "subtitle": "Chauffeurs, convoyeurs et contrôleurs",
+      "new": "Ajouter",
+      "edit_title": "Modifier",
+      "search_ph": "Rechercher…",
+      "col_name": "Nom",
+      "col_type": "Type",
+      "col_phone": "Téléphone",
+      "col_agency": "Agence",
+      "col_active": "Statut",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "empty": "Aucun personnel naviguant.",
+      "choose": "Choisir…",
+      "documents": "Documents",
+      "no_documents": "Aucun document.",
+      "documents_after_save": "Enregistrez d'abord pour ajouter des documents."
     }
   },
   "admin": {

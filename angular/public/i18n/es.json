@@ -170,7 +170,10 @@
     "inventaires": "Inventarios",
     "configuration_sage": "Configuración Sage",
     "garage": "Taller",
-    "remboursements": "Reembolsos"
+    "remboursements": "Reembolsos",
+    "config_bus": "Config · Autobuses",
+    "personnel_naviguant": "Personal de a bordo",
+    "types_de_personnel": "Tipos de personal"
   },
   "booking": {
     "list": {
@@ -687,8 +690,8 @@
       "add_stop": "+ Añadir"
     },
     "cmt": {
-      "title": "Tipos de tripulación",
-      "subtitle": "Chófer, Acompañante, Controlador…",
+      "title": "Tipos de personal",
+      "subtitle": "Conductor, acompañante, controlador…",
       "info": "Tipos de miembro de tripulación. Marque «conductor» para los tipos autorizados a conducir (regla: un viaje exige al menos un conductor).",
       "col_driver": "Conductor",
       "f_is_driver": "Es conductor"
@@ -1401,6 +1404,25 @@
       "f_reading_date": "Fecha de lectura",
       "f_note": "Nota",
       "submit_odometer": "Actualizar"
+    },
+    "crew": {
+      "title": "Personal de a bordo",
+      "subtitle": "Conductores, acompañantes y controladores",
+      "new": "Añadir",
+      "edit_title": "Editar",
+      "search_ph": "Buscar…",
+      "col_name": "Nombre",
+      "col_type": "Tipo",
+      "col_phone": "Teléfono",
+      "col_agency": "Agencia",
+      "col_active": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "empty": "Sin personal de a bordo.",
+      "choose": "Elegir…",
+      "documents": "Documentos",
+      "no_documents": "Sin documentos.",
+      "documents_after_save": "Guarde primero para añadir documentos."
     }
   },
   "admin": {

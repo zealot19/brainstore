@@ -112,7 +112,7 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Config · Bus & Équipage',
+          menuValue: 'Config · Bus',
           hasSubRoute: true,
           showSubRoute: false,
           icon2: 'bus',
@@ -120,8 +120,6 @@ export class SidebarService {
           subMenus: [
             { menuValue: 'Plans de bus',        route: routes.vcSeatingPlans,       base: 'seating-plans',        permission: 'transport.config.view' },
             { menuValue: 'Affectations de plan',route: routes.vcVehicleAssignments, base: 'vehicle-assignments',  permission: 'transport.config.view' },
-            { menuValue: "Types d'équipage",    route: routes.vcCrewMemberTypes,    base: 'crew-member-types',    permission: 'transport.config.view' },
-            { menuValue: "Membres d'équipage",  route: routes.vcCrewMembers,        base: 'crew-members',         permission: 'voyage.crew.view' },
           ],
         },
         {
@@ -197,17 +195,14 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Exploitation',
-          hasSubRoute: true,
+          menuValue: 'Personnel naviguant',
+          hasSubRoute: false,
           showSubRoute: false,
           icon2: 'steering-wheel',
-          base: 'fleet-ops',
-          subMenus: [
-            { menuValue: 'Missions',         route: routes.fleetAssignments,     base: 'assignments',      permission: 'fleet.assignment.view' },
-            { menuValue: 'Carburant',        route: routes.fleetFuelLogs,        base: 'fuel-logs',        permission: 'fleet.fuel.view' },
-            { menuValue: 'Conducteurs ext.', route: routes.fleetExternalDrivers, base: 'external-drivers', permission: 'fleet.driver.view' },
-            { menuValue: 'Fournisseurs',     route: routes.fleetSuppliers,       base: 'suppliers',        permission: 'fleet.supplier.view' },
-          ],
+          route: routes.fleetCrew,
+          base: 'crew',
+          permission: 'voyage.crew.view',
+          subMenus: [],
         },
         {
           menuValue: 'Configuration',
@@ -216,6 +211,7 @@ export class SidebarService {
           icon2: 'settings-cog',
           base: 'fleet-config',
           subMenus: [
+            { menuValue: 'Types de personnel',  route: routes.vcCrewMemberTypes,   base: 'crew-member-types'  , permission: 'transport.config.view' },
             { menuValue: 'Catégories véhicule', route: routes.fcVehicleCategories, base: 'vehicle-categories' , permission: 'fleet.config.view' },
             { menuValue: 'Carburants',          route: routes.fcFuelTypes,         base: 'fuel-types'         , permission: 'fleet.config.view' },
             { menuValue: 'Transmissions',       route: routes.fcTransmissions,     base: 'transmissions'      , permission: 'fleet.config.view' },

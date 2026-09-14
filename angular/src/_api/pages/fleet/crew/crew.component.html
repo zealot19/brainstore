@@ -1,0 +1,74 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'fleet.crew.title' | transloco }}</h4><h6>{{ 'fleet.crew.subtitle' | transloco }}</h6>
+  </div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cm-modal" *hasPermission="'voyage.crew.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'fleet.crew.new' | transloco }}</a></div>
+</div>
+<div class="card table-list-card">
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'fleet.crew.search_ph' | transloco" /></div></div></div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>{{ 'fleet.crew.col_name' | transloco }}</th>
+          <th>{{ 'fleet.crew.col_type' | transloco }}</th>
+          <th>{{ 'fleet.crew.col_phone' | transloco }}</th>
+          <th>{{ 'fleet.crew.col_agency' | transloco }}</th>
+          <th>{{ 'fleet.crew.col_active' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+        </tr></thead>
+        <tbody>
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
+            <tr>
+              <td class="fw-medium">{{ r.full_name }}</td>
+              <td><span class="badge bg-info">{{ r.member_type_name }}</span></td>
+              <td>{{ r.phone || '—' }}</td>
+              <td>{{ r.agency_name || '—' }}</td>
+              <td>@if (r.is_active) { <span class="badge bg-success">{{ 'fleet.crew.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'fleet.crew.inactive' | transloco }}</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#cm-modal" *hasPermission="'voyage.crew.manage'" (click)="openEdit(r)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'voyage.crew.manage'" (click)="delete(r)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'fleet.crew.empty' | transloco }}</td></tr> }
+        </tbody>
+      </table></div>
+      <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
+    }
+  </div>
+</div>
+
+<div class="modal fade" id="cm-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'fleet.crew.edit_title' : 'fleet.crew.new') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">{{ 'fleet.crew.col_name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'fleet.crew.col_type' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="member_type_id" class="form-select"><option [ngValue]="null">{{ 'fleet.crew.choose' | transloco }}</option>@for (t of types; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }</select>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'fleet.crew.col_phone' | transloco }}</label><input formControlName="phone" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'fleet.crew.col_agency' | transloco }}</label>
+        <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'fleet.crew.choose' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
+      </div>
+    </div>
+    <div class="form-check form-switch mb-2"><input formControlName="is_active" type="checkbox" class="form-check-input" id="cm-active" /><label class="form-check-label" for="cm-active">{{ 'fleet.crew.active' | transloco }}</label></div>
+
+    @if (editId) {
+      <hr />
+      <label class="form-label">{{ 'fleet.crew.documents' | transloco }}</label>
+      <ul class="list-group mb-2">
+        @for (d of documents; track d.id) {
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <a [href]="d.file" target="_blank" rel="noopener"><i class="ti ti-file me-1"></i>{{ d.name }}</a>
+            <button type="button" class="btn btn-sm btn-outline-danger" *hasPermission="'voyage.crew.manage'" (click)="deleteDoc(d.id)"><i class="ti ti-trash"></i></button>
+          </li>
+        } @empty { <li class="list-group-item text-muted py-2">{{ 'fleet.crew.no_documents' | transloco }}</li> }
+      </ul>
+      <input type="file" class="form-control" (change)="onFileSelected($event)" [disabled]="uploading" *hasPermission="'voyage.crew.manage'" />
+    } @else {
+      <small class="text-muted d-block">{{ 'fleet.crew.documents_after_save' | transloco }}</small>
+    }
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
+</div></div></div>

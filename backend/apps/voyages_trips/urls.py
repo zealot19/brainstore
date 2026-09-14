@@ -5,6 +5,8 @@ urlpatterns = [
     path("stats/", v.TripStatsView.as_view()),
     path("crew-members/",           v.CrewMemberListView.as_view()),
     path("crew-members/<uuid:pk>/", v.CrewMemberDetailView.as_view()),
+    path("crew-members/<uuid:pk>/documents/",               v.CrewDocumentListView.as_view()),
+    path("crew-members/<uuid:pk>/documents/<uuid:att_id>/", v.CrewDocumentDetailView.as_view()),
     path("", v.TripListCreateView.as_view()),
     path("<uuid:trip_id>/", v.TripDetailView.as_view()),
     path("<uuid:trip_id>/eligible-vehicles/", v.TripEligibleVehiclesView.as_view()),

@@ -25,6 +25,7 @@ export const Pages_routes: Routes = [
                 { path: 'accidents',          loadComponent: () => import('../../../_api/pages/fleet/accidents/accidents.component').then(m => m.FleetAccidentsComponent) },
                 { path: 'parking',            loadComponent: () => import('../../../_api/pages/fleet/parking/parking.component').then(m => m.FleetParkingComponent) },
                 { path: 'suppliers',          loadComponent: () => import('../../../_api/pages/fleet/suppliers/suppliers.component').then(m => m.FleetSuppliersComponent) },
+                { path: 'crew',               loadComponent: () => import('../../../_api/pages/fleet/crew/crew.component').then(m => m.FleetCrewComponent) },
               ],
             },
             // ── MODULE : Config Flotte ────────────────────────────────────────────────
@@ -93,7 +94,6 @@ export const Pages_routes: Routes = [
               loadComponent: () => import('../../../_api/pages/voyages-config/voyages-config.component').then(m => m.VoyagesConfigComponent),
               children: [
                 { path: 'crew-member-types',   loadComponent: () => import('../../../_api/pages/voyages-config/crew-member-types/crew-member-types.component').then(m => m.VcCrewMemberTypesComponent) },
-                { path: 'crew-members',        loadComponent: () => import('../../../_api/pages/voyages-config/crew-members/crew-members.component').then(m => m.VcCrewMembersComponent) },
                 { path: 'expense-types',       loadComponent: () => import('../../../_api/pages/voyages-config/expense-types/expense-types.component').then(m => m.VcExpenseTypesComponent) },
                 { path: 'expense-schedules',   loadComponent: () => import('../../../_api/pages/voyages-config/expense-schedules/expense-schedules.component').then(m => m.VcExpenseSchedulesComponent) },
                 { path: 'towns',               loadComponent: () => import('../../../_api/pages/voyages-config/towns/towns.component').then(m => m.VcTownsComponent) },
