@@ -454,7 +454,9 @@
       "reopen": "Reabrir",
       "no_guichetier": "Nenhum operador disponível para esta caixa.",
       "sched_start": "Início previsto",
-      "sched_end": "Fim previsto"
+      "sched_end": "Fim previsto",
+      "report": "Relatório",
+      "closed_at": "Fechada em"
     },
     "movement": {
       "title": "Movimentos",
@@ -632,6 +634,30 @@
       "total": "Total (fundo inicial)",
       "counted_total": "Total contado",
       "use_billetage": "Contar por denominação"
+    },
+    "ecart": {
+      "hint": "Em caso de diferença, indique o motivo (obrigatório).",
+      "reason": "Motivo da diferença",
+      "no_reason": "— Nenhum (sem diferença) —",
+      "note": "Detalhe",
+      "r_rendu": "Erro no troco",
+      "r_encaissement": "Erro de recebimento",
+      "r_depense": "Despesa esquecida",
+      "r_comptage": "Erro de contagem",
+      "r_perte": "Perda / roubo",
+      "r_autre": "Outro"
+    },
+    "report": {
+      "print": "Imprimir",
+      "summary": "Resumo financeiro",
+      "income": "Total de receitas",
+      "expense": "Total de despesas",
+      "expected": "Saldo teórico",
+      "counted": "Montante contado",
+      "ecart": "Diferença",
+      "payments": "Repartição dos pagamentos",
+      "mode": "Meio de pagamento",
+      "billetage": "Contagem de fecho"
     }
   },
   "vcfg": {

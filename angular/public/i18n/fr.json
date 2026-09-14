@@ -454,7 +454,9 @@
       "reopen": "Réouvrir",
       "no_guichetier": "Aucun guichetier disponible pour cette caisse.",
       "sched_start": "Début prévu",
-      "sched_end": "Fin prévue"
+      "sched_end": "Fin prévue",
+      "report": "Rapport",
+      "closed_at": "Clôturée le"
     },
     "movement": {
       "title": "Mouvements",
@@ -632,6 +634,30 @@
       "total": "Total (fonds initial)",
       "counted_total": "Total compté",
       "use_billetage": "Compter par billetage"
+    },
+    "ecart": {
+      "hint": "En cas d’écart, indiquez le motif (obligatoire).",
+      "reason": "Motif d’écart",
+      "no_reason": "— Aucun (pas d’écart) —",
+      "note": "Précision",
+      "r_rendu": "Erreur de rendu de monnaie",
+      "r_encaissement": "Erreur d’encaissement",
+      "r_depense": "Dépense oubliée",
+      "r_comptage": "Erreur de comptage",
+      "r_perte": "Perte / vol",
+      "r_autre": "Autre"
+    },
+    "report": {
+      "print": "Imprimer",
+      "summary": "Résumé financier",
+      "income": "Total encaissements",
+      "expense": "Total décaissements",
+      "expected": "Solde théorique",
+      "counted": "Montant compté",
+      "ecart": "Écart",
+      "payments": "Ventilation des paiements",
+      "mode": "Moyen de paiement",
+      "billetage": "Billetage de fermeture"
     }
   },
   "vcfg": {

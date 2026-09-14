@@ -14,6 +14,14 @@ class CashSession(BaseModel):
         SUSPENDED = "suspended", _("Suspendue")
         CLOSED    = "closed",    _("Closed")
 
+    class EcartReason(models.TextChoices):
+        RENDU        = "rendu",        _("Erreur de rendu de monnaie")
+        ENCAISSEMENT = "encaissement", _("Erreur d'encaissement")
+        DEPENSE      = "depense",      _("Dépense oubliée")
+        COMPTAGE     = "comptage",     _("Erreur de comptage")
+        PERTE        = "perte",        _("Perte / vol")
+        AUTRE        = "autre",        _("Autre")
+
     company        = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                         on_delete=models.CASCADE, related_name="cash_sessions")
     cash_register  = models.ForeignKey("treasury.CashRegister", verbose_name=_("cash register"),
@@ -44,7 +52,20 @@ class CashSession(BaseModel):
     closed_at = models.DateTimeField(_("closed at"), null=True, blank=True)
     status    = models.CharField(_("status"), max_length=10, choices=Status.choices,
                                   default=Status.OPEN)
+    justification_reason = models.CharField(_("motif d'écart"), max_length=20,
+                                            choices=EcartReason.choices, blank=True)
+    justification_note   = models.CharField(_("précision sur l'écart"), max_length=255, blank=True)
     notes     = models.TextField(_("notes"), blank=True)
+
+    @property
+    def ecart_status(self):
+        if self.difference is None:
+            return None
+        if self.difference > 0:
+            return "surplus"
+        if self.difference < 0:
+            return "shortage"
+        return "balanced"
 
     class Meta(BaseModel.Meta):
         verbose_name = _("cash session")

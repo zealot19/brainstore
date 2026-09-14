@@ -249,6 +249,8 @@ class CloseSessionView(APIView):
                 session,
                 closing_balance=ser.validated_data.get("closing_balance"),
                 closing_count=ser.validated_data.get("closing_count") or [],
+                justification_reason=ser.validated_data.get("justification_reason", ""),
+                justification_note=ser.validated_data.get("justification_note", ""),
                 notes=ser.validated_data.get("notes", ""),
                 updated_by=request.user,
             )
@@ -378,6 +380,18 @@ class SessionCountsView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         counts = session.counts.filter(is_deleted=False).prefetch_related("items").order_by("created_at")
         return success_response(CashCountSerializer(counts, many=True).data)
+
+
+class SessionReportView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.view"}
+
+    def get(self, request, session_id):
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        from apps.treasury.services.session_report import build_session_report
+        return success_response(build_session_report(session))
 
 
 class CashSessionDetailView(APIView):

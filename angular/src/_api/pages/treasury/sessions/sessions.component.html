@@ -44,8 +44,8 @@
                 @if (s.status === 'suspended' && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="resume(s)"><i class="ti ti-player-play me-1"></i>{{ 'treasury.session.resume' | transloco }}</a> }
                 @if ((s.status === 'draft' || s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-extend-modal" (click)="openExtend(s)"><i class="ti ti-clock-plus me-1"></i>{{ 'treasury.session.extend' | transloco }}</a> }
                 @if ((s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
+                @if (s.status === 'closed') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-report-modal" (click)="openReport(s)"><i class="ti ti-file-text me-1"></i>{{ 'treasury.session.report' | transloco }}</a> }
                 @if (s.status === 'closed' && isAdmin) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="reopen(s)"><i class="ti ti-refresh me-1"></i>{{ 'treasury.session.reopen' | transloco }}</a> }
-                @if (s.status === 'closed' && !isAdmin) { <span class="text-muted small">{{ s.difference ?? '—' }}</span> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'treasury.session.empty' | transloco }}</td></tr> }
@@ -126,5 +126,68 @@
     } @else {
       <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="closeManual" /></div>
     }
+    <hr />
+    <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
+    <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }}</label>
+      <select class="form-select" [(ngModel)]="closeReason">
+        <option value="">{{ 'treasury.ecart.no_reason' | transloco }}</option>
+        @for (r of ecartReasons; track r) { <option [value]="r">{{ 'treasury.ecart.r_' + r | transloco }}</option> }
+      </select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="closeNote" /></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving" (click)="submitClose()">{{ 'treasury.session.close_btn' | transloco }}</button></div>
+</div></div></div>
+
+<!-- Rapport de session -->
+<div class="modal fade" id="trz-report-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ 'treasury.session.report' | transloco }}</h5>
+    <div class="ms-auto d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="!reportData" (click)="printReport()"><i class="ti ti-printer me-1"></i>{{ 'treasury.report.print' | transloco }}</button>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+  </div>
+  <div class="modal-body">
+    @if (!reportData) { <div class="text-center py-4"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div id="session-report-print">
+        <h4>{{ reportData.general.register_name }} @if (reportData.general.session_name) { — {{ reportData.general.session_name }} }</h4>
+        <table>
+          <tr><th>{{ 'treasury.session.col_guichetier' | transloco }}</th><td>{{ reportData.general.guichetier || '—' }}</td>
+              <th>{{ 'treasury.common.status' | transloco }}</th><td>{{ reportData.general.status_display }}</td></tr>
+          <tr><th>{{ 'treasury.session.col_opened_at' | transloco }}</th><td>{{ reportData.general.opened_at | date:'short' }}</td>
+              <th>{{ 'treasury.session.closed_at' | transloco }}</th><td>{{ reportData.general.closed_at ? (reportData.general.closed_at | date:'short') : '—' }}</td></tr>
+        </table>
+
+        <h4>{{ 'treasury.report.summary' | transloco }}</h4>
+        <table>
+          <tr><th>{{ 'treasury.common.opening_balance' | transloco }}</th><td class="text-end">{{ reportData.summary.opening_balance }}</td></tr>
+          <tr><th>{{ 'treasury.report.income' | transloco }}</th><td class="text-end">{{ reportData.summary.income_total }}</td></tr>
+          <tr><th>{{ 'treasury.report.expense' | transloco }}</th><td class="text-end">{{ reportData.summary.expense_total }}</td></tr>
+          <tr><th>{{ 'treasury.report.expected' | transloco }}</th><td class="text-end">{{ reportData.summary.expected_closing }}</td></tr>
+          <tr><th>{{ 'treasury.report.counted' | transloco }}</th><td class="text-end">{{ reportData.summary.closing_balance }}</td></tr>
+          <tr class="fw-bold"><th>{{ 'treasury.report.ecart' | transloco }}</th><td class="text-end" [ngClass]="ecartCss(reportData.summary.ecart_status)">{{ reportData.summary.difference }}</td></tr>
+        </table>
+        @if (reportData.justification?.reason_label) {
+          <p><strong>{{ 'treasury.ecart.reason' | transloco }} :</strong> {{ reportData.justification.reason_label }}@if (reportData.justification.note) { — {{ reportData.justification.note }} }</p>
+        }
+
+        <h4>{{ 'treasury.report.payments' | transloco }}</h4>
+        <table>
+          <thead><tr><th>{{ 'treasury.report.mode' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+          <tbody>@for (p of reportData.payments; track p.mode) { <tr><td>{{ p.mode_label }}</td><td class="text-end">{{ p.total }}</td></tr> }
+            @if (!reportData.payments.length) { <tr><td colspan="2" class="text-muted">—</td></tr> }
+          </tbody>
+        </table>
+
+        @if (reportData.billetage.length) {
+          <h4>{{ 'treasury.report.billetage' | transloco }}</h4>
+          <table>
+            <thead><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th>{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+            <tbody>@for (b of reportData.billetage; track $index) { <tr><td>{{ b.value }}</td><td>{{ b.quantity }}</td><td class="text-end">{{ b.subtotal }}</td></tr> }</tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
 </div></div></div>

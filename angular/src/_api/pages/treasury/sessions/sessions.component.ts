@@ -33,6 +33,11 @@ export class TrzSessionsComponent implements OnInit {
   // Billetage
   openBilletage = true;  openQty:  Record<string, number> = {}; openManual: number | null = null;
   closeBilletage = true; closeQty: Record<string, number> = {}; closeManual: number | null = null;
+  closeReason = ''; closeNote = '';
+  readonly ecartReasons = ['rendu', 'encaissement', 'depense', 'comptage', 'perte', 'autre'];
+
+  // Rapport de session
+  reportData: any = null;
 
   constructor(private svc: SessionService, private regSvc: RegisterService,
               private denSvc: DenominationService, private fb: FormBuilder,
@@ -97,10 +102,10 @@ export class TrzSessionsComponent implements OnInit {
   }
 
   // ── Clôturer ──
-  openClose(s: CashSession): void { this.closingId = s.id; this.errorMsg = ''; this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; }
+  openClose(s: CashSession): void { this.closingId = s.id; this.errorMsg = ''; this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = ''; }
   submitClose(): void {
     if (this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
-    const payload: Record<string, unknown> = {};
+    const payload: Record<string, unknown> = { justification_reason: this.closeReason, justification_note: this.closeNote };
     if (this.closeBilletage) payload['closing_count'] = this.toItems(this.closeQty);
     else payload['closing_balance'] = this.closeManual;
     this.svc.close(this.closingId, payload).subscribe({
@@ -123,8 +128,25 @@ export class TrzSessionsComponent implements OnInit {
   resume(s: CashSession): void { this.act(this.svc.resume(s.id)); }
   reopen(s: CashSession): void { if (confirm('Réouvrir cette session clôturée ?')) this.act(this.svc.reopen(s.id)); }
 
+  // ── Rapport ──
+  openReport(s: CashSession): void {
+    this.reportData = null;
+    this.svc.report(s.id).subscribe({ next: d => this.reportData = d, error: e => this.toast.error(e?.error?.detail ?? 'Rapport indisponible.') });
+  }
+  printReport(): void {
+    const el = document.getElementById('session-report-print');
+    if (!el) return;
+    const w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write('<html><head><title>Rapport de session</title><style>body{font-family:sans-serif;padding:24px;color:#222}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #ccc;padding:6px;text-align:left}h4{margin:12px 0 4px}</style></head><body>' + el.innerHTML + '</body></html>');
+    w.document.close(); w.focus(); w.print();
+  }
+
   statusCss(s: string): string {
     return { draft: 'bg-secondary', open: 'bg-success', suspended: 'bg-warning', closed: 'bg-dark' }[s] ?? 'bg-secondary';
+  }
+  ecartCss(s: string | null): string {
+    return { surplus: 'text-success', shortage: 'text-danger', balanced: 'text-muted' }[s ?? ''] ?? '';
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

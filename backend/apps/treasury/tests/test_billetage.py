@@ -55,7 +55,7 @@ def test_close_with_billetage_computes_ecart():
         {"denomination_id": str(_den(company, 2000).id), "quantity": 2},   # 4 000
         {"denomination_id": str(_den(company, 500).id),  "quantity": 1},   #   500
     ]
-    session = close_session(session, closing_count=items, updated_by=admin)
+    session = close_session(session, closing_count=items, justification_reason="comptage", updated_by=admin)
     assert session.closing_balance == Decimal("9500")
     assert session.expected_closing == Decimal("10000")
     assert session.difference == Decimal("-500")

@@ -454,7 +454,9 @@
       "reopen": "Reabrir",
       "no_guichetier": "Sin cajeros disponibles para esta caja.",
       "sched_start": "Inicio previsto",
-      "sched_end": "Fin prevista"
+      "sched_end": "Fin prevista",
+      "report": "Informe",
+      "closed_at": "Cerrada el"
     },
     "movement": {
       "title": "Movimientos",
@@ -632,6 +634,30 @@
       "total": "Total (fondo inicial)",
       "counted_total": "Total contado",
       "use_billetage": "Contar por denominación"
+    },
+    "ecart": {
+      "hint": "Si hay diferencia, indique el motivo (obligatorio).",
+      "reason": "Motivo de la diferencia",
+      "no_reason": "— Ninguno (sin diferencia) —",
+      "note": "Detalle",
+      "r_rendu": "Error al dar cambio",
+      "r_encaissement": "Error de cobro",
+      "r_depense": "Gasto olvidado",
+      "r_comptage": "Error de conteo",
+      "r_perte": "Pérdida / robo",
+      "r_autre": "Otro"
+    },
+    "report": {
+      "print": "Imprimir",
+      "summary": "Resumen financiero",
+      "income": "Total ingresos",
+      "expense": "Total gastos",
+      "expected": "Saldo teórico",
+      "counted": "Importe contado",
+      "ecart": "Diferencia",
+      "payments": "Desglose de pagos",
+      "mode": "Medio de pago",
+      "billetage": "Arqueo de cierre"
     }
   },
   "vcfg": {

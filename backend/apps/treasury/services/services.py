@@ -129,7 +129,8 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
 
 
 @transaction.atomic
-def close_session(session, *, closing_balance=None, notes="", closing_count=None, updated_by):
+def close_session(session, *, closing_balance=None, notes="", closing_count=None,
+                  justification_reason="", justification_note="", updated_by):
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
         raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
@@ -151,11 +152,18 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     expense = (session.transactions
                .filter(transaction_type=Transaction.Type.EXPENSE, is_deleted=False)
                .aggregate(t=Sum("amount"))["t"] or 0)
-    expected = session.opening_balance + income - expense
+    expected = (session.opening_balance or 0) + income - expense
+    difference = closing_balance - expected
+
+    # Un écart doit être justifié (motif obligatoire).
+    if difference != 0 and not justification_reason:
+        raise ApplicationError(_("Un écart de caisse a été constaté : un motif est obligatoire."))
 
     session.closing_balance  = closing_balance
     session.expected_closing = expected
-    session.difference       = closing_balance - expected
+    session.difference       = difference
+    session.justification_reason = justification_reason if difference != 0 else ""
+    session.justification_note   = justification_note if difference != 0 else ""
     session.closed_at        = timezone.now()
     session.closed_by        = updated_by
     session.status           = CashSession.Status.CLOSED

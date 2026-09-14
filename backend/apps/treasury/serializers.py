@@ -108,19 +108,25 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
     closed_by_name = serializers.SerializerMethodField()
     assigned_to_name = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    ecart_status = serializers.CharField(read_only=True)
+    justification_reason_display = serializers.SerializerMethodField()
 
     class Meta:
         model = CashSession
         fields = [
             "id", "name", "register_name", "status", "status_display",
             "opening_balance", "closing_balance",
-            "expected_closing", "difference",
+            "expected_closing", "difference", "ecart_status",
+            "justification_reason", "justification_reason_display", "justification_note",
             "assigned_to", "assigned_to_name",
             "scheduled_start", "scheduled_end",
             "opened_by", "opened_by_name", "closed_by_name",
             "opened_at", "closed_at",
             "notes", "created_at",
         ]
+
+    def get_justification_reason_display(self, obj):
+        return obj.get_justification_reason_display() if obj.justification_reason else None
 
     def get_opened_by_name(self, obj):
         return _uname(obj.opened_by)
@@ -176,6 +182,9 @@ class CloseSessionSerializer(serializers.Serializer):
     closing_balance = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                required=False, allow_null=True)
     closing_count   = CountItemInputSerializer(many=True, required=False, default=list)
+    justification_reason = serializers.ChoiceField(
+        choices=CashSession.EcartReason.choices, required=False, allow_blank=True, default="")
+    justification_note   = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     notes           = serializers.CharField(required=False, allow_blank=True, default="")
 
 
