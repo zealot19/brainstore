@@ -96,6 +96,14 @@
         <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_arrival' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
       </div>
     }
+    <div class="mb-3">
+      <label class="form-label">{{ 'trips.list.f_seat_mode' | transloco }}</label>
+      <select formControlName="seat_assignment_mode" class="form-select">
+        <option value="manual">{{ 'trips.list.seat_manual' | transloco }}</option>
+        <option value="auto">{{ 'trips.list.seat_auto' | transloco }}</option>
+      </select>
+      <small class="text-muted d-block mt-1">{{ 'trips.list.seat_mode_hint' | transloco }}</small>
+    </div>
     <div class="mb-3"><label class="form-label">{{ 'trips.list.f_notes' | transloco }}</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'trips.list.creating' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

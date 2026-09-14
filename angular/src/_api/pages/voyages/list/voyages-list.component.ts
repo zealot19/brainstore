@@ -46,7 +46,7 @@ export class VoyagesListComponent implements OnInit {
       route_id: [null, Validators.required], service_pattern_id: [null], fare_class_id: [null, Validators.required],
       service_date: [''],
       scheduled_departure: ['', Validators.required], scheduled_arrival: ['', Validators.required],
-      code: [''], notes: [''],
+      code: [''], notes: [''], seat_assignment_mode: ['manual'],
     });
     this.routeSvc.list().subscribe(d => this.routes = d);
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
@@ -99,17 +99,19 @@ export class VoyagesListComponent implements OnInit {
   openCreate(): void {
     this.errorMsg = '';
     this.form.reset({ route_id: null, service_pattern_id: null, fare_class_id: null, service_date: '',
-                      scheduled_departure: '', scheduled_arrival: '', code: '', notes: '' });
+                      scheduled_departure: '', scheduled_arrival: '', code: '', notes: '', seat_assignment_mode: 'manual' });
     this.onPatternChange();  // restaure les validateurs du mode manuel
   }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const f = this.form.value;
     const payload = f.service_pattern_id
-      ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes }
+      ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes,
+          seat_assignment_mode: f.seat_assignment_mode }
       : { route_id: f.route_id, fare_class_id: f.fare_class_id,
           scheduled_departure: f.scheduled_departure, scheduled_arrival: f.scheduled_arrival,
-          code: f.code, notes: f.notes, service_pattern_id: null };
+          code: f.code, notes: f.notes, service_pattern_id: null,
+          seat_assignment_mode: f.seat_assignment_mode };
     this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },

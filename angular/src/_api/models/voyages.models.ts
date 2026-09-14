@@ -72,6 +72,7 @@ export interface Trip {
   actual_arrival: string | null;
   status: TripStatus;
   status_display: string;
+  seat_assignment_mode: 'manual' | 'auto';
   is_delayed: boolean;
   delayed_until: string | null;
   delay_reason: string;

@@ -347,7 +347,11 @@
       "total_due": "Total due",
       "amount_received": "Amount received",
       "change": "Change due",
-      "submit": "Take payment & create booking"
+      "submit": "Take payment & create booking",
+      "s3_auto": "Passengers (automatic seats)",
+      "pax_count": "Number of passengers",
+      "auto_hint": "Seats will be assigned automatically on save.",
+      "seat_auto": "Auto"
     }
   },
   "treasury": {
@@ -911,7 +915,11 @@
       "f_departure": "Scheduled departure",
       "f_arrival": "Scheduled arrival",
       "f_notes": "Notes",
-      "creating": "Creating…"
+      "creating": "Creating…",
+      "f_seat_mode": "Seat assignment",
+      "seat_manual": "Manual (seat picked)",
+      "seat_auto": "Automatic (seat assigned)",
+      "seat_mode_hint": "In automatic mode, the system assigns the next available seat and the counter does not pick a seat."
     },
     "rm": {
       "board_all": "Board all",

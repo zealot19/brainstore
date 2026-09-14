@@ -79,6 +79,25 @@ def _lock_seat(trip, seat_id):
     return seat
 
 
+def _auto_pick_seat(trip):
+    """Attribution automatique : premier siège disponible (rangée, colonne, numéro)."""
+    seat = (TripSeat.objects.select_for_update()
+            .filter(is_deleted=False, trip=trip, status=TripSeat.Status.AVAILABLE)
+            .order_by("row", "column", "seat_number").first())
+    if not seat:
+        raise ApplicationError(_("Voyage complet : plus aucun siège disponible."))
+    return seat
+
+
+def _pick_seat(trip, seat_id):
+    """Manuel : siège choisi ; Auto : siège attribué par le système (aucun choix)."""
+    if trip.seat_assignment_mode == trip.SeatAssignment.AUTO:
+        return _auto_pick_seat(trip)
+    if not seat_id:
+        raise ApplicationError(_("Veuillez choisir un siège pour chaque passager."))
+    return _lock_seat(trip, seat_id)
+
+
 def _resolve_destination(trip, destination_point_id):
     """The chosen drop point must be a route point downstream of the origin."""
     pts = route_points(trip.route)          # [origin, escales..., destination]
@@ -141,7 +160,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
         dest = _resolve_destination(outbound_trip, item.get("destination_point_id"))
         fare = _price(company, outbound_trip, dest, trip_type)
 
-        out_seat = _lock_seat(outbound_trip, item["outbound_seat_id"])
+        out_seat = _pick_seat(outbound_trip, item.get("outbound_seat_id"))
         out_ticket = Ticket.objects.create(
             booking=booking, number=_ticket_number(outbound_trip.origin.agency), passenger=passenger, trip=outbound_trip,
             trip_seat=out_seat, origin_point=outbound_trip.origin, destination_point=dest,
@@ -154,9 +173,9 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
         total += fare.amount
 
         if is_round and not open_return:
-            if not item.get("return_seat_id"):
+            if return_trip.seat_assignment_mode != return_trip.SeatAssignment.AUTO and not item.get("return_seat_id"):
                 raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
-            ret_seat = _lock_seat(return_trip, item["return_seat_id"])
+            ret_seat = _pick_seat(return_trip, item.get("return_seat_id"))
             Ticket.objects.create(
                 booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=passenger, trip=return_trip,
                 trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
@@ -211,7 +230,7 @@ def assign_return(booking, return_trip, *, items, user):
             raise ApplicationError(_("Billet aller introuvable pour cette réservation."))
         if out_ticket.return_tickets.filter(is_deleted=False).exists():
             raise ApplicationError(_("Un billet retour existe déjà pour ce passager."))
-        ret_seat = _lock_seat(return_trip, item["return_seat_id"])
+        ret_seat = _pick_seat(return_trip, item.get("return_seat_id"))
         Ticket.objects.create(
             booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=out_ticket.passenger, trip=return_trip,
             trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,

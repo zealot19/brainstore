@@ -12,7 +12,7 @@ export interface SeatCell {
 export interface TripOption {
   id: string; number: string; route_code: string | null; origin_name: string | null;
   destination_name: string | null; fare_class: string; fare_class_name: string | null;
-  scheduled_departure: string;
+  scheduled_departure: string; seat_assignment_mode: 'manual' | 'auto';
 }
 
 export interface TripDestination {
@@ -50,7 +50,7 @@ export interface PassengerSpec {
 }
 export interface BookingItem {
   passenger: PassengerSpec; destination_point_id?: string | null;
-  outbound_seat_id: string; return_seat_id?: string | null;
+  outbound_seat_id: string | null; return_seat_id?: string | null;
 }
 export interface BookingCreate {
   trip_type: 'one_way' | 'round_trip'; outbound_trip_id: string; return_trip_id?: string | null;

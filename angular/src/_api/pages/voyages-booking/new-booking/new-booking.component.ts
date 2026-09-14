@@ -31,6 +31,7 @@ export class VbNewBookingComponent implements OnInit {
   destinations: TripDestination[] = [];
   selOutbound: SeatCell[] = []; selReturn: SeatCell[] = [];
   passengers: PaxRow[] = []; buyerIndex = 0;
+  paxCount = 1;  // utilisé en attribution automatique (pas de choix de siège)
   paymentMethod = ''; amountReceived: number | null = null;
   paymentMethods: any[] = [];
   returnOpen = false;
@@ -61,6 +62,13 @@ export class VbNewBookingComponent implements OnInit {
   }
 
   get isRound(): boolean { return this.tripType === 'round_trip'; }
+
+  /** Attribution automatique des sièges sur le voyage sélectionné ? */
+  get outboundAuto(): boolean { return this.outTrips.find(t => t.id === this.outboundTripId)?.seat_assignment_mode === 'auto'; }
+  get returnAuto(): boolean { return this.retTrips.find(t => t.id === this.returnTripId)?.seat_assignment_mode === 'auto'; }
+  /** Nombre effectif de passagers : compteur en mode auto, nb de sièges choisis en manuel. */
+  get paxN(): number { return this.outboundAuto ? (this.paxCount || 0) : this.selOutbound.length; }
+  onPaxCountChange(): void { if (this.paxCount < 1) this.paxCount = 1; this.syncPassengers(); }
 
   tripLabel = (t: any): string =>
     `${t.number} · ${t.origin_name} → ${t.destination_name} · ${new Date(t.scheduled_departure).toLocaleString('fr-FR')}`;
@@ -97,14 +105,18 @@ export class VbNewBookingComponent implements OnInit {
 
   onOutboundChange(): void {
     this.resetSelection();
+    this.paxCount = 1;
     if (this.outboundTripId) {
-      this.svc.seatMap(this.outboundTripId).subscribe(s => this.outboundSeats = s);
-      this.svc.destinations(this.outboundTripId).subscribe(d => this.destinations = d);
+      this.svc.destinations(this.outboundTripId).subscribe(d => {
+        this.destinations = d;
+        if (this.outboundAuto) this.syncPassengers();  // auto: pas de grille, on part d'un passager
+      });
+      if (!this.outboundAuto) this.svc.seatMap(this.outboundTripId).subscribe(s => this.outboundSeats = s);
     }
   }
   onReturnChange(): void {
     this.returnSeats = []; this.selReturn = [];
-    if (this.isRound && this.returnTripId) {
+    if (this.isRound && this.returnTripId && !this.returnAuto) {
       this.svc.seatMap(this.returnTripId).subscribe(s => this.returnSeats = s);
     }
   }
@@ -130,10 +142,10 @@ export class VbNewBookingComponent implements OnInit {
     return 'btn-outline-success';
   }
 
-  /** Keep one passenger row per selected outbound seat. */
+  /** One passenger row per selected seat (manual) or per paxCount (auto). */
   syncPassengers(): void {
     const rows: PaxRow[] = [];
-    for (let i = 0; i < this.selOutbound.length; i++) {
+    for (let i = 0; i < this.paxN; i++) {
       rows.push(this.passengers[i] ?? {
         name: '', phone: '', id_type: 'cni', id_number: '',
         destination_point_id: this.defaultDestId,
@@ -161,8 +173,11 @@ export class VbNewBookingComponent implements OnInit {
   }
 
   get canSubmit(): boolean {
-    if (this.saving || !this.outboundTripId || !this.selOutbound.length) return false;
-    if (this.needReturnSel && (!this.returnTripId || this.selReturn.length !== this.selOutbound.length)) return false;
+    if (this.saving || !this.outboundTripId || !this.paxN) return false;
+    if (this.needReturnSel) {
+      if (!this.returnTripId) return false;
+      if (!this.returnAuto && this.selReturn.length !== this.paxN) return false;
+    }
     if (this.anyMissingFare) return false;
     if (this.passengers.some(p => !p.name || !p.phone)) return false;
     if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
@@ -172,16 +187,13 @@ export class VbNewBookingComponent implements OnInit {
   submit(): void {
     if (!this.canSubmit) return;
     this.saving = true; this.errorMsg = '';
-    const items: BookingItem[] = this.selOutbound.map((seat, i) => {
-      const p = this.passengers[i];
-      return {
-        passenger: { id: p.id, name: p.name, phone: p.phone,
-                     id_type: p.id_type, id_number: p.id_number },
-        destination_point_id: p.destination_point_id || null,
-        outbound_seat_id: seat.id,
-        return_seat_id: this.needReturnSel ? this.selReturn[i]?.id ?? null : null,
-      };
-    });
+    const items: BookingItem[] = this.passengers.map((p, i) => ({
+      passenger: { id: p.id, name: p.name, phone: p.phone,
+                   id_type: p.id_type, id_number: p.id_number },
+      destination_point_id: p.destination_point_id || null,
+      outbound_seat_id: this.outboundAuto ? null : this.selOutbound[i].id,
+      return_seat_id: (this.needReturnSel && !this.returnAuto) ? (this.selReturn[i]?.id ?? null) : null,
+    }));
     const buyer = items[this.buyerIndex].passenger;
     const body: BookingCreate = {
       trip_type: this.tripType, outbound_trip_id: this.outboundTripId,

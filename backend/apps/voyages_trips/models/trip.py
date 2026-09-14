@@ -12,6 +12,10 @@ class Trip(BaseModel):
         SUSPENDED = "suspended", _("Suspendu")
         CANCELLED = "cancelled", _("Annulé")
 
+    class SeatAssignment(models.TextChoices):
+        MANUAL = "manual", _("Manuelle")
+        AUTO   = "auto",   _("Automatique")
+
     company             = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                              on_delete=models.CASCADE, related_name="voyages_trips")
     number              = models.CharField(_("numéro"), max_length=40, blank=True)
@@ -35,6 +39,8 @@ class Trip(BaseModel):
     destination         = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("destination"),
                                              on_delete=models.PROTECT, related_name="trips_to")
     status              = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.DRAFT)
+    seat_assignment_mode = models.CharField(_("attribution des sièges"), max_length=10,
+                                            choices=SeatAssignment.choices, default=SeatAssignment.MANUAL)
     is_delayed          = models.BooleanField(_("en retard"), default=False)
     delayed_until       = models.DateTimeField(_("reporté à"), null=True, blank=True)
     delay_reason        = models.TextField(_("motif du retard"), blank=True)

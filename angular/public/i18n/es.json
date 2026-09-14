@@ -347,7 +347,11 @@
       "total_due": "Total a pagar",
       "amount_received": "Importe cobrado",
       "change": "Cambio a devolver",
-      "submit": "Cobrar y crear la reserva"
+      "submit": "Cobrar y crear la reserva",
+      "s3_auto": "Pasajeros (asientos automáticos)",
+      "pax_count": "Número de pasajeros",
+      "auto_hint": "Los asientos se asignarán automáticamente al guardar.",
+      "seat_auto": "Auto"
     }
   },
   "treasury": {
@@ -911,7 +915,11 @@
       "f_departure": "Salida prevista",
       "f_arrival": "Llegada prevista",
       "f_notes": "Notas",
-      "creating": "Creando…"
+      "creating": "Creando…",
+      "f_seat_mode": "Asignación de asientos",
+      "seat_manual": "Manual (elección de asiento)",
+      "seat_auto": "Automática (asiento asignado)",
+      "seat_mode_hint": "En modo automático, el sistema asigna el siguiente asiento disponible y la taquilla no elige asiento."
     },
     "rm": {
       "board_all": "Embarcar todos",

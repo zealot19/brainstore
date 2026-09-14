@@ -69,7 +69,8 @@ class TripListSerializer(serializers.ModelSerializer):
         model = Trip
         fields = ["id", "number", "code", "route", "route_code", "vehicle", "vehicle_plate",
                   "fare_class_name", "scheduled_departure", "scheduled_arrival",
-                  "status", "status_display", "is_delayed", "seats_available", "seats_total"]
+                  "status", "status_display", "seat_assignment_mode",
+                  "is_delayed", "seats_available", "seats_total"]
 
     def get_seats_available(self, obj):
         return obj.seats.filter(is_deleted=False, status=TripSeat.Status.AVAILABLE).count()
@@ -107,6 +108,8 @@ class TripCreateSerializer(serializers.Serializer):
     destination_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     code = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
     notes = serializers.CharField(required=False, allow_blank=True, default="")
+    seat_assignment_mode = serializers.ChoiceField(
+        choices=Trip.SeatAssignment.choices, required=False, default=Trip.SeatAssignment.MANUAL)
 
     def validate(self, attrs):
         pattern_mode = bool(attrs.get("service_pattern_id") and attrs.get("service_date"))
@@ -124,6 +127,7 @@ class TripUpdateSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, allow_blank=True)
     scheduled_departure = serializers.DateTimeField(required=False)
     scheduled_arrival = serializers.DateTimeField(required=False)
+    seat_assignment_mode = serializers.ChoiceField(choices=Trip.SeatAssignment.choices, required=False)
 
 
 class MarkDelayedSerializer(serializers.Serializer):

@@ -43,6 +43,7 @@ class TripOptionSerializer(serializers.Serializer):
     fare_class = serializers.UUIDField(source="fare_class_id")
     fare_class_name = serializers.CharField(source="fare_class.name", default=None)
     scheduled_departure = serializers.DateTimeField()
+    seat_assignment_mode = serializers.CharField()
 
 
 class TripDestinationSerializer(serializers.Serializer):

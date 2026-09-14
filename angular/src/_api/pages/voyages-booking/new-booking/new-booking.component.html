@@ -86,6 +86,19 @@
     }
   }
 
+  <!-- Attribution automatique : pas de grille, on saisit le nombre de passagers -->
+  @if (outboundTripId && outboundAuto) {
+    <hr>
+    <h6 class="mb-2"><span class="badge bg-primary me-2">3</span>{{ 'booking.new.s3_auto' | transloco }}</h6>
+    <div class="row align-items-center mb-2">
+      <div class="col-md-4">
+        <label class="form-label">{{ 'booking.new.pax_count' | transloco }}</label>
+        <input type="number" min="1" class="form-control" [(ngModel)]="paxCount" (ngModelChange)="onPaxCountChange()" />
+      </div>
+      <div class="col-md-8"><small class="text-muted"><i class="ti ti-info-circle me-1"></i>{{ 'booking.new.auto_hint' | transloco }}</small></div>
+    </div>
+  }
+
   <!-- Passagers + point de descente -->
   @if (passengers.length) {
     <hr>
@@ -95,7 +108,7 @@
       <tbody>
         @for (p of passengers; track $index) {
           <tr>
-            <td><span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span>@if (needReturnSel && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
+            <td>@if (outboundAuto) { <span class="badge bg-secondary">{{ 'booking.new.seat_auto' | transloco }}</span> } @else { <span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span> }@if (needReturnSel && !returnAuto && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
             <td><app-client-autocomplete [row]="p"></app-client-autocomplete></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.phone" /></td>
             <td><input class="form-control form-control-sm" [(ngModel)]="p.id_number" /></td>
