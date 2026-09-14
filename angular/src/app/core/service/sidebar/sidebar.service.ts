@@ -391,30 +391,6 @@ export class SidebarService {
             { menuValue: 'Domain',        route: routes.superadminDomain,        base: 'domain' },
           ],
         },
-        {
-          menuValue: 'Sync SCIG',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'arrows-exchange',
-          base: 'scig',
-          subMenus: [
-            {
-              menuValue: 'Dépôts',
-              route: routes.scigDepots,
-              base: 'depots',
-            },
-            {
-              menuValue: 'Inventaires',
-              route: routes.scigInventaires,
-              base: 'inventaires',
-            },
-            {
-              menuValue: 'Configuration Sage',
-              route: routes.scigSage,
-              base: 'sage',
-            },
-          ],
-        },
       ],
     },
   ];
