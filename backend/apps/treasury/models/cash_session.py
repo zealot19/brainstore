@@ -9,21 +9,30 @@ class CashSession(BaseModel):
     """Daily opening/closing of a cash register."""
 
     class Status(models.TextChoices):
-        OPEN   = "open",   _("Open")
-        CLOSED = "closed", _("Closed")
+        DRAFT     = "draft",     _("Planifiée")
+        OPEN      = "open",      _("Open")
+        SUSPENDED = "suspended", _("Suspendue")
+        CLOSED    = "closed",    _("Closed")
 
     company        = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                         on_delete=models.CASCADE, related_name="cash_sessions")
     cash_register  = models.ForeignKey("treasury.CashRegister", verbose_name=_("cash register"),
                                         on_delete=models.PROTECT, related_name="sessions")
     name           = models.CharField(_("intitulé de la session"), max_length=150, blank=True)
+    assigned_to    = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("guichetier assigné"),
+                                        on_delete=models.PROTECT, null=True, blank=True,
+                                        related_name="assigned_sessions")
+    scheduled_start = models.DateTimeField(_("début prévu"), null=True, blank=True)
+    scheduled_end   = models.DateTimeField(_("fin prévue"), null=True, blank=True)
     opened_by      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("opened by"),
-                                        on_delete=models.PROTECT, related_name="opened_sessions")
+                                        on_delete=models.PROTECT, null=True, blank=True,
+                                        related_name="opened_sessions")
     closed_by      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("closed by"),
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="closed_sessions")
 
-    opening_balance  = models.DecimalField(_("opening balance"), max_digits=12, decimal_places=2)
+    opening_balance  = models.DecimalField(_("opening balance"), max_digits=12, decimal_places=2,
+                                            null=True, blank=True)
     closing_balance  = models.DecimalField(_("closing balance"), max_digits=12, decimal_places=2,
                                             null=True, blank=True)
     expected_closing = models.DecimalField(_("expected closing"), max_digits=12, decimal_places=2,

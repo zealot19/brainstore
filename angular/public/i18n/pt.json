@@ -442,7 +442,19 @@
       "f_counted": "Saldo contado",
       "col_name": "Sessão",
       "f_name": "Nome da sessão",
-      "f_name_hint": "ex.: Caixa da manhã"
+      "f_name_hint": "ex.: Caixa da manhã",
+      "schedule_btn": "Agendar uma sessão",
+      "col_guichetier": "Operador",
+      "col_window": "Janela prevista",
+      "st_draft": "Agendada",
+      "st_suspended": "Suspensa",
+      "suspend": "Suspender",
+      "resume": "Retomar",
+      "extend": "Prolongar",
+      "reopen": "Reabrir",
+      "no_guichetier": "Nenhum operador disponível para esta caixa.",
+      "sched_start": "Início previsto",
+      "sched_end": "Fim previsto"
     },
     "movement": {
       "title": "Movimentos",

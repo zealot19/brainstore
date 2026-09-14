@@ -59,20 +59,20 @@ def get_bank_account(account_id, company_id):
 # ── Cash sessions ──────────────────────────────────────────────────────────────
 
 def get_active_session(register_id, company_id):
-    try:
-        return (CashSession.objects
-                .select_related("cash_register", "opened_by")
-                .get(cash_register_id=register_id, company_id=company_id,
-                     status=CashSession.Status.OPEN, is_deleted=False))
-    except CashSession.DoesNotExist:
-        return None
+    # Une caisse est « occupée » tant qu'une session est ouverte OU suspendue.
+    return (CashSession.objects
+            .select_related("cash_register", "opened_by")
+            .filter(cash_register_id=register_id, company_id=company_id,
+                    status__in=[CashSession.Status.OPEN, CashSession.Status.SUSPENDED],
+                    is_deleted=False)
+            .first())
 
 
 def list_sessions(company_id, *, register_id=None, status=None,
                   date_from=None, date_to=None, agency_scope=None):
     qs = (CashSession.objects
           .filter(company_id=company_id, is_deleted=False)
-          .select_related("cash_register", "opened_by", "closed_by")
+          .select_related("cash_register", "opened_by", "closed_by", "assigned_to")
           .order_by("-opened_at"))
     qs = _apply_agency_scope(qs, agency_scope, "cash_register__agency_id")
     if register_id:
@@ -89,7 +89,7 @@ def list_sessions(company_id, *, register_id=None, status=None,
 def get_session(session_id, company_id):
     try:
         return (CashSession.objects
-                .select_related("cash_register", "opened_by", "closed_by")
+                .select_related("cash_register", "opened_by", "closed_by", "assigned_to")
                 .get(id=session_id, company_id=company_id, is_deleted=False))
     except CashSession.DoesNotExist:
         return None
@@ -225,3 +225,16 @@ def get_open_session_for_user(company_id, user):
             .filter(company_id=company_id, opened_by=user, status=CashSession.Status.OPEN, is_deleted=False)
             .order_by("-opened_at")
             .first())
+
+
+def list_guichetiers(company_id, agency_id=None):
+    """Utilisateurs assignables comme guichetiers : actifs, de l'agence donnée,
+    détenant la permission caisse (treasury.session.manage)."""
+    from django.contrib.auth import get_user_model
+    from django.db.models import Q
+    from apps.admin_rbac.selectors.user_role_selectors import has_permission
+    User = get_user_model()
+    qs = User.objects.filter(company_id=company_id, is_active=True)
+    if agency_id:
+        qs = qs.filter(Q(default_agency_id=agency_id) | Q(user_agencies__agency_id=agency_id)).distinct()
+    return [u for u in qs if has_permission(u, "treasury.session.manage", company_id)]

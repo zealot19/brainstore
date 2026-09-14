@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 import { TREASURY } from '../../config/api.config';
 import { CashSession } from '../../models/treasury.models';
 
+export interface Guichetier { id: string; full_name: string; }
+
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   constructor(private http: HttpClient) {}
@@ -16,4 +18,15 @@ export class SessionService {
   }
   open(data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionOpen, data); }
   close(id: string, data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionClose(id), data); }
+
+  schedule(data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSchedule, data); }
+  guichetiers(registerId: string): Observable<Guichetier[]> {
+    return this.http.get<any>(TREASURY.sessionGuichetiers, { params: new HttpParams().set('register_id', registerId) })
+      .pipe(map(r => r.data ?? r));
+  }
+  openScheduled(id: string, data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionOpenScheduled(id), data); }
+  suspend(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSuspend(id), {}); }
+  resume(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionResume(id), {}); }
+  extend(id: string, scheduled_end: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionExtend(id), { scheduled_end }); }
+  reopen(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionReopen(id), {}); }
 }

@@ -442,7 +442,19 @@
       "f_counted": "Saldo contado",
       "col_name": "Sesión",
       "f_name": "Nombre de la sesión",
-      "f_name_hint": "p. ej. Caja de la mañana"
+      "f_name_hint": "p. ej. Caja de la mañana",
+      "schedule_btn": "Programar una sesión",
+      "col_guichetier": "Cajero",
+      "col_window": "Franja prevista",
+      "st_draft": "Programada",
+      "st_suspended": "Suspendida",
+      "suspend": "Suspender",
+      "resume": "Reanudar",
+      "extend": "Prolongar",
+      "reopen": "Reabrir",
+      "no_guichetier": "Sin cajeros disponibles para esta caja.",
+      "sched_start": "Inicio previsto",
+      "sched_end": "Fin prevista"
     },
     "movement": {
       "title": "Movimientos",

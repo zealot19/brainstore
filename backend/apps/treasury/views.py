@@ -14,6 +14,7 @@ from apps.treasury.serializers import (
     CashRegisterReadSerializer, CashRegisterWriteSerializer, CashRegisterUpdateSerializer,
     BankAccountReadSerializer, BankAccountWriteSerializer, BankAccountUpdateSerializer,
     CashSessionReadSerializer, OpenSessionSerializer, CloseSessionSerializer,
+    ScheduleSessionSerializer, OpenScheduledSerializer, ExtendSessionSerializer, GuichetierSerializer,
     TransactionReadSerializer, TransactionWriteSerializer,
     TransferReadSerializer, TransferWriteSerializer,
     TreasuryStatsSerializer,
@@ -253,6 +254,117 @@ class CloseSessionView(APIView):
             )
         except ApplicationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+class GuichetierListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.manage"}
+
+    def get(self, request):
+        company = _company(request)
+        register_id = request.query_params.get("register_id")
+        agency_id = request.query_params.get("agency_id")
+        if register_id and not agency_id:
+            reg = selectors.get_cash_register(register_id, company.id)
+            agency_id = reg.agency_id if reg else None
+        users = selectors.list_guichetiers(company.id, agency_id=agency_id)
+        return success_response(GuichetierSerializer(users, many=True).data)
+
+
+class ScheduleSessionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+
+    def post(self, request):
+        from django.contrib.auth import get_user_model
+        company = _company(request)
+        ser = ScheduleSessionSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        reg = selectors.get_cash_register(d["cash_register_id"], company.id)
+        if not reg:
+            return error_response("Caisse introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        guichetier = get_user_model().objects.filter(
+            id=d["assigned_to_id"], company_id=company.id, is_active=True, is_deleted=False).first()
+        if not guichetier:
+            return error_response("Guichetier introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        try:
+            session = services.schedule_session(
+                company=company, cash_register=reg, assigned_to=guichetier,
+                scheduled_start=d.get("scheduled_start"), scheduled_end=d.get("scheduled_end"),
+                name=d.get("name", ""), created_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return Response(CashSessionReadSerializer(session).data, status=status.HTTP_201_CREATED)
+
+
+class OpenScheduledSessionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+
+    def post(self, request, session_id):
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        ser = OpenScheduledSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            session = services.open_scheduled_session(
+                session, opening_balance=ser.validated_data.get("opening_balance"),
+                opening_count=ser.validated_data.get("opening_count") or [], updated_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+class _SessionActionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+    action = None
+
+    def post(self, request, session_id):
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            fn = getattr(services, self.action)
+            fn(session, updated_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+class SuspendSessionView(_SessionActionView):
+    action = "suspend_session"
+
+
+class ResumeSessionView(_SessionActionView):
+    action = "resume_session"
+
+
+class ReopenSessionView(_SessionActionView):
+    action = "reopen_session"
+
+
+class ExtendSessionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+
+    def post(self, request, session_id):
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        ser = ExtendSessionSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            services.extend_session(session, scheduled_end=ser.validated_data["scheduled_end"],
+                                    updated_by=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
 
 

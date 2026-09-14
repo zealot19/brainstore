@@ -442,7 +442,19 @@
       "f_counted": "Counted balance",
       "col_name": "Session",
       "f_name": "Session name",
-      "f_name_hint": "e.g. Morning desk"
+      "f_name_hint": "e.g. Morning desk",
+      "schedule_btn": "Schedule a session",
+      "col_guichetier": "Teller",
+      "col_window": "Planned window",
+      "st_draft": "Scheduled",
+      "st_suspended": "Suspended",
+      "suspend": "Suspend",
+      "resume": "Resume",
+      "extend": "Extend",
+      "reopen": "Reopen",
+      "no_guichetier": "No teller available for this register.",
+      "sched_start": "Planned start",
+      "sched_end": "Planned end"
     },
     "movement": {
       "title": "Movements",

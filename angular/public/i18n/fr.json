@@ -442,7 +442,19 @@
       "f_counted": "Solde compté",
       "col_name": "Session",
       "f_name": "Intitulé de la session",
-      "f_name_hint": "Ex. : Caisse du matin"
+      "f_name_hint": "Ex. : Caisse du matin",
+      "schedule_btn": "Planifier une session",
+      "col_guichetier": "Guichetier",
+      "col_window": "Créneau prévu",
+      "st_draft": "Planifiée",
+      "st_suspended": "Suspendue",
+      "suspend": "Suspendre",
+      "resume": "Reprendre",
+      "extend": "Prolonger",
+      "reopen": "Réouvrir",
+      "no_guichetier": "Aucun guichetier disponible pour cette caisse.",
+      "sched_start": "Début prévu",
+      "sched_end": "Fin prévue"
     },
     "movement": {
       "title": "Mouvements",

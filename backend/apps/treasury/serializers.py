@@ -98,10 +98,15 @@ class BankAccountUpdateSerializer(serializers.Serializer):
 
 # ── Cash session ───────────────────────────────────────────────────────────────
 
+def _uname(u):
+    return (u.get_full_name() or u.username) if u else None
+
+
 class CashSessionReadSerializer(serializers.ModelSerializer):
     register_name = serializers.CharField(source="cash_register.name", read_only=True)
     opened_by_name = serializers.SerializerMethodField()
     closed_by_name = serializers.SerializerMethodField()
+    assigned_to_name = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
@@ -110,18 +115,41 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
             "id", "name", "register_name", "status", "status_display",
             "opening_balance", "closing_balance",
             "expected_closing", "difference",
+            "assigned_to", "assigned_to_name",
+            "scheduled_start", "scheduled_end",
             "opened_by", "opened_by_name", "closed_by_name",
             "opened_at", "closed_at",
             "notes", "created_at",
         ]
 
     def get_opened_by_name(self, obj):
-        return obj.opened_by.get_full_name() or obj.opened_by.username
+        return _uname(obj.opened_by)
 
     def get_closed_by_name(self, obj):
-        if obj.closed_by_id:
-            return obj.closed_by.get_full_name() or obj.closed_by.username
-        return None
+        return _uname(obj.closed_by)
+
+    def get_assigned_to_name(self, obj):
+        return _uname(obj.assigned_to)
+
+
+class ScheduleSessionSerializer(serializers.Serializer):
+    cash_register_id = serializers.UUIDField()
+    assigned_to_id   = serializers.UUIDField()
+    name             = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
+    scheduled_start  = serializers.DateTimeField(required=False, allow_null=True)
+    scheduled_end    = serializers.DateTimeField(required=False, allow_null=True)
+
+
+class ExtendSessionSerializer(serializers.Serializer):
+    scheduled_end = serializers.DateTimeField()
+
+
+class GuichetierSerializer(serializers.Serializer):
+    id         = serializers.UUIDField()
+    full_name  = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return _uname(obj)
 
 
 class CountItemInputSerializer(serializers.Serializer):
@@ -136,6 +164,12 @@ class OpenSessionSerializer(serializers.Serializer):
                                                  required=False, allow_null=True)
     opening_count    = CountItemInputSerializer(many=True, required=False, default=list)
     notes            = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class OpenScheduledSerializer(serializers.Serializer):
+    opening_balance = serializers.DecimalField(max_digits=12, decimal_places=2,
+                                               required=False, allow_null=True)
+    opening_count   = CountItemInputSerializer(many=True, required=False, default=list)
 
 
 class CloseSessionSerializer(serializers.Serializer):

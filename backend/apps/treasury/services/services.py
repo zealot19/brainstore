@@ -131,8 +131,8 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
 @transaction.atomic
 def close_session(session, *, closing_balance=None, notes="", closing_count=None, updated_by):
     from apps.treasury.services.billetage import compute_count_total, record_count
-    if session.status != CashSession.Status.OPEN:
-        raise ApplicationError(_("Cette session de caisse est déjà clôturée."))
+    if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
+        raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
     # Seul l'utilisateur qui a ouvert la caisse peut la clôturer (ou un administrateur).
     is_admin = getattr(updated_by, "is_superuser", False) or getattr(updated_by, "is_institution_admin", False)
     if not is_admin and session.opened_by_id != getattr(updated_by, "id", None):
@@ -174,6 +174,115 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
 
     from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
     TreasuryAccountingBridge.post_session_difference(session)
+    return session
+
+
+# ── Cycle de vie des sessions (planification, ouverture, suspension…) ────────────
+
+def _is_admin(user):
+    return getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False)
+
+
+@transaction.atomic
+def schedule_session(*, company, cash_register, assigned_to, scheduled_start=None,
+                     scheduled_end=None, name="", created_by):
+    """Planifie une session (DRAFT) pour un guichetier sur une caisse."""
+    from apps.treasury.scoping import register_agency_scope
+    scoped, agency_id = register_agency_scope(created_by)
+    if scoped and cash_register.agency_id and cash_register.agency_id != agency_id:
+        raise ApplicationError(_("Vous ne pouvez planifier que sur une caisse de votre agence."))
+    if scheduled_start and scheduled_end and scheduled_end <= scheduled_start:
+        raise ApplicationError(_("La fin prévue doit être postérieure au début prévu."))
+    return CashSession.objects.create(
+        company=company, cash_register=cash_register, name=name,
+        assigned_to=assigned_to, scheduled_start=scheduled_start, scheduled_end=scheduled_end,
+        status=CashSession.Status.DRAFT, created_by=created_by,
+    )
+
+
+@transaction.atomic
+def open_scheduled_session(session, *, opening_balance=None, opening_count=None, updated_by):
+    """Ouvre une session planifiée (DRAFT → OPEN) : seul le guichetier assigné (ou admin)."""
+    from apps.treasury.selectors import get_active_session
+    from apps.treasury.services.billetage import compute_count_total, record_count
+    if session.status != CashSession.Status.DRAFT:
+        raise ApplicationError(_("Seule une session planifiée peut être ouverte."))
+    if not _is_admin(updated_by) and session.assigned_to_id != getattr(updated_by, "id", None):
+        raise ApplicationError(_("Seul le guichetier assigné (ou un administrateur) peut ouvrir cette session."))
+    if get_active_session(session.cash_register_id, session.company_id):
+        raise ApplicationError(_("Une session est déjà active sur cette caisse."))
+    if opening_count:
+        balance, _r = compute_count_total(session.company, opening_count)
+    else:
+        balance = opening_balance if opening_balance is not None else session.cash_register.current_balance
+    session.opening_balance = balance
+    session.opened_by = updated_by
+    session.opened_at = timezone.now()
+    session.status = CashSession.Status.OPEN
+    session.updated_by = updated_by
+    session.save(update_fields=["opening_balance", "opened_by", "opened_at", "status",
+                                "updated_by", "updated_at"])
+    if opening_count:
+        record_count(session, kind="opening", items=opening_count, user=updated_by)
+    return session
+
+
+def _assert_session_actor(session, user):
+    if not _is_admin(user) and session.opened_by_id != getattr(user, "id", None):
+        raise ApplicationError(_("Seul l'agent de cette session (ou un administrateur) peut effectuer cette action."))
+
+
+@transaction.atomic
+def suspend_session(session, *, updated_by):
+    if session.status != CashSession.Status.OPEN:
+        raise ApplicationError(_("Seule une session ouverte peut être suspendue."))
+    _assert_session_actor(session, updated_by)
+    session.status = CashSession.Status.SUSPENDED
+    session.updated_by = updated_by
+    session.save(update_fields=["status", "updated_by", "updated_at"])
+    return session
+
+
+@transaction.atomic
+def resume_session(session, *, updated_by):
+    if session.status != CashSession.Status.SUSPENDED:
+        raise ApplicationError(_("Seule une session suspendue peut être reprise."))
+    _assert_session_actor(session, updated_by)
+    session.status = CashSession.Status.OPEN
+    session.updated_by = updated_by
+    session.save(update_fields=["status", "updated_by", "updated_at"])
+    return session
+
+
+@transaction.atomic
+def extend_session(session, *, scheduled_end, updated_by):
+    if session.status not in (CashSession.Status.DRAFT, CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
+        raise ApplicationError(_("Cette session ne peut plus être prolongée."))
+    _assert_session_actor(session, updated_by) if session.status != CashSession.Status.DRAFT else None
+    if session.scheduled_start and scheduled_end <= session.scheduled_start:
+        raise ApplicationError(_("La fin prévue doit être postérieure au début prévu."))
+    session.scheduled_end = scheduled_end
+    session.updated_by = updated_by
+    session.save(update_fields=["scheduled_end", "updated_by", "updated_at"])
+    return session
+
+
+@transaction.atomic
+def reopen_session(session, *, updated_by):
+    """Réouvre une session clôturée (administrateurs uniquement)."""
+    if not _is_admin(updated_by):
+        raise ApplicationError(_("Seul un administrateur peut réouvrir une session clôturée."))
+    if session.status != CashSession.Status.CLOSED:
+        raise ApplicationError(_("Seule une session clôturée peut être réouverte."))
+    session.status = CashSession.Status.OPEN
+    session.closed_at = None
+    session.closed_by = None
+    session.closing_balance = None
+    session.expected_closing = None
+    session.difference = None
+    session.updated_by = updated_by
+    session.save(update_fields=["status", "closed_at", "closed_by", "closing_balance",
+                                "expected_closing", "difference", "updated_by", "updated_at"])
     return session
 
 

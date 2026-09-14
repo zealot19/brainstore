@@ -17,8 +17,15 @@ urlpatterns = [
     # ── Cash sessions ──────────────────────────────────────────────────────────
     path("sessions/",                          views.CashSessionListView.as_view(), name="session-list"),
     path("sessions/open/",                     views.OpenSessionView.as_view(),     name="session-open"),
+    path("sessions/schedule/",                 views.ScheduleSessionView.as_view(), name="session-schedule"),
+    path("sessions/guichetiers/",              views.GuichetierListView.as_view(),  name="session-guichetiers"),
     path("sessions/<uuid:session_id>/",        views.CashSessionDetailView.as_view(), name="session-detail"),
+    path("sessions/<uuid:session_id>/open/",   views.OpenScheduledSessionView.as_view(), name="session-open-scheduled"),
     path("sessions/<uuid:session_id>/close/",  views.CloseSessionView.as_view(),    name="session-close"),
+    path("sessions/<uuid:session_id>/suspend/",views.SuspendSessionView.as_view(),  name="session-suspend"),
+    path("sessions/<uuid:session_id>/resume/", views.ResumeSessionView.as_view(),   name="session-resume"),
+    path("sessions/<uuid:session_id>/extend/", views.ExtendSessionView.as_view(),   name="session-extend"),
+    path("sessions/<uuid:session_id>/reopen/", views.ReopenSessionView.as_view(),   name="session-reopen"),
     path("sessions/<uuid:session_id>/counts/", views.SessionCountsView.as_view(),   name="session-counts"),
 
     # ── Coupures monétaires (billetage) ──────────────────────────────────────────

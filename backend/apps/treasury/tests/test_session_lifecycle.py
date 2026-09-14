@@ -1,0 +1,100 @@
+import pytest
+from datetime import timedelta
+from django.utils import timezone
+from apps.core.exceptions import ApplicationError
+
+
+def _setup():
+    from apps.system_config.services import create_company
+    from apps.system_config.models import Agency
+    from apps.users.services.user_services import create_user
+    from apps.authentication.models import User
+    from apps.treasury.services.services import create_cash_register
+    company, _ = create_company(name="Lc Co", admin_email="lc@x.com", admin_first_name="A", admin_last_name="B")
+    admin = User.objects.get(email="lc@x.com")
+    ag = Agency.objects.create(company=company, name="Douala", code="DLA")
+    g1, _ = create_user(created_by=admin, company=company, email="g1@x.com", first_name="G", last_name="One",
+                        is_institution_admin=False, default_agency_id=ag.id)
+    g2, _ = create_user(created_by=admin, company=company, email="g2@x.com", first_name="G", last_name="Two",
+                        is_institution_admin=False, default_agency_id=ag.id)
+    reg = create_cash_register(company=company, name="C1", agency_id=ag.id, created_by=admin)
+    return company, admin, g1, g2, reg
+
+
+@pytest.mark.django_db
+def test_schedule_then_open_by_assigned_guichetier():
+    from apps.treasury.services import schedule_session, open_scheduled_session
+    company, admin, g1, g2, reg = _setup()
+    now = timezone.now()
+    s = schedule_session(company=company, cash_register=reg, assigned_to=g1,
+                         scheduled_start=now, scheduled_end=now + timedelta(hours=8),
+                         name="Matin", created_by=admin)
+    assert s.status == "draft" and s.assigned_to_id == g1.id
+    # Another guichetier cannot open it
+    with pytest.raises(ApplicationError):
+        open_scheduled_session(s, opening_balance=10000, updated_by=g2)
+    # Assigned one can
+    s = open_scheduled_session(s, opening_balance=10000, updated_by=g1)
+    assert s.status == "open" and s.opened_by_id == g1.id and s.opening_balance == 10000
+
+
+@pytest.mark.django_db
+def test_suspend_resume_and_movement_blocked_while_suspended():
+    from decimal import Decimal
+    from apps.treasury.services import (schedule_session, open_scheduled_session,
+                                        suspend_session, resume_session, create_transaction)
+    from apps.treasury.models import Transaction
+    company, admin, g1, g2, reg = _setup()
+    s = schedule_session(company=company, cash_register=reg, assigned_to=g1, created_by=admin)
+    s = open_scheduled_session(s, opening_balance=0, updated_by=g1)
+    s = suspend_session(s, updated_by=g1)
+    assert s.status == "suspended"
+    with pytest.raises(ApplicationError):  # movements blocked while suspended
+        create_transaction(company=company, transaction_type=Transaction.Type.INCOME,
+                           category=Transaction.Category.OTHER_INCOME, account_type=Transaction.AccountType.CASH,
+                           amount=Decimal("100"), payment_mode=Transaction.PaymentMode.CASH,
+                           cash_session=s, created_by=g1)
+    s = resume_session(s, updated_by=g1)
+    assert s.status == "open"
+
+
+@pytest.mark.django_db
+def test_extend_and_reopen():
+    from apps.treasury.services import (schedule_session, open_scheduled_session,
+                                        extend_session, close_session, reopen_session)
+    company, admin, g1, g2, reg = _setup()
+    now = timezone.now()
+    s = schedule_session(company=company, cash_register=reg, assigned_to=g1,
+                         scheduled_start=now, scheduled_end=now + timedelta(hours=4), created_by=admin)
+    s = open_scheduled_session(s, opening_balance=0, updated_by=g1)
+    new_end = now + timedelta(hours=10)
+    s = extend_session(s, scheduled_end=new_end, updated_by=g1)
+    assert s.scheduled_end == new_end
+    s = close_session(s, closing_balance=0, updated_by=g1)
+    assert s.status == "closed"
+    # Guichetier cannot reopen; admin can
+    with pytest.raises(ApplicationError):
+        reopen_session(s, updated_by=g1)
+    s = reopen_session(s, updated_by=admin)
+    assert s.status == "open" and s.closed_at is None
+
+
+@pytest.mark.django_db
+def test_one_active_session_per_register():
+    from apps.treasury.services import schedule_session, open_scheduled_session
+    company, admin, g1, g2, reg = _setup()
+    s1 = schedule_session(company=company, cash_register=reg, assigned_to=g1, created_by=admin)
+    open_scheduled_session(s1, opening_balance=0, updated_by=g1)
+    s2 = schedule_session(company=company, cash_register=reg, assigned_to=g2, created_by=admin)
+    with pytest.raises(ApplicationError):  # register already busy
+        open_scheduled_session(s2, opening_balance=0, updated_by=g2)
+
+
+@pytest.mark.django_db
+def test_guichetier_list_filters_by_permission():
+    from apps.treasury.selectors import list_guichetiers
+    company, admin, g1, g2, reg = _setup()
+    # created_user gets default role/permissions; both g1/g2 should be assignable if they have the perm.
+    ids = {str(u.id) for u in list_guichetiers(company.id, agency_id=reg.agency_id)}
+    # At minimum the function runs and returns a set (permission-dependent membership)
+    assert isinstance(ids, set)

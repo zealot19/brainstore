@@ -29,10 +29,12 @@ export interface CashCount {
 
 export interface CashSession {
   id: string; name: string; register_name: string; status: string; status_display: string;
-  opening_balance: string; closing_balance: string | null;
+  opening_balance: string | null; closing_balance: string | null;
   expected_closing: string | null; difference: string | null;
-  opened_by_name: string | null; closed_by_name: string | null;
-  opened_at: string; closed_at: string | null; notes: string;
+  assigned_to: string | null; assigned_to_name: string | null;
+  scheduled_start: string | null; scheduled_end: string | null;
+  opened_by: string | null; opened_by_name: string | null; closed_by_name: string | null;
+  opened_at: string | null; closed_at: string | null; notes: string;
 }
 export interface Transaction {
   id: string; reference: string;
