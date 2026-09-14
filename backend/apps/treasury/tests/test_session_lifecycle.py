@@ -17,7 +17,9 @@ def _setup():
                         is_institution_admin=False, default_agency_id=ag.id)
     g2, _ = create_user(created_by=admin, company=company, email="g2@x.com", first_name="G", last_name="Two",
                         is_institution_admin=False, default_agency_id=ag.id)
-    reg = create_cash_register(company=company, name="C1", agency_id=ag.id, created_by=admin)
+    # g1 est gestionnaire de la caisse ; g2 ne l'est pas.
+    reg = create_cash_register(company=company, name="C1", agency_id=ag.id,
+                               manager_ids=[str(g1.id)], created_by=admin)
     return company, admin, g1, g2, reg
 
 
@@ -85,9 +87,9 @@ def test_one_active_session_per_register():
     company, admin, g1, g2, reg = _setup()
     s1 = schedule_session(company=company, cash_register=reg, assigned_to=g1, created_by=admin)
     open_scheduled_session(s1, opening_balance=0, updated_by=g1)
-    s2 = schedule_session(company=company, cash_register=reg, assigned_to=g2, created_by=admin)
-    with pytest.raises(ApplicationError):  # register already busy
-        open_scheduled_session(s2, opening_balance=0, updated_by=g2)
+    s2 = schedule_session(company=company, cash_register=reg, assigned_to=g1, created_by=admin)
+    with pytest.raises(ApplicationError):  # register already busy (g1 is a manager)
+        open_scheduled_session(s2, opening_balance=0, updated_by=g1)
 
 
 @pytest.mark.django_db

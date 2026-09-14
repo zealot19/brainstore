@@ -36,6 +36,11 @@ class Transfer(BaseModel):
                                           null=True, blank=True,
                                           related_name="incoming_transfers")
 
+    # Rattachement à la session de caisse source (traçabilité).
+    cash_session = models.ForeignKey("treasury.CashSession", verbose_name=_("session de caisse"),
+                                     on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name="transfers")
+
     amount        = models.DecimalField(_("amount"), max_digits=12, decimal_places=2)
     description   = models.CharField(_("description"), max_length=255, blank=True)
     transfer_date = models.DateField(_("date"), default=timezone.now)

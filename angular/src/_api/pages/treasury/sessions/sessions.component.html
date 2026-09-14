@@ -1,6 +1,6 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.session.title' | transloco }}</h4><h6>{{ 'treasury.session.subtitle' | transloco }}</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-schedule-modal" *hasPermission="'treasury.session.manage'" (click)="openSchedule()"><i class="ti ti-calendar-plus me-2"></i>{{ 'treasury.session.schedule_btn' | transloco }}</a></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-open-modal" *hasPermission="'treasury.session.manage'" (click)="openCreate()"><i class="ti ti-lock-open me-2"></i>{{ 'treasury.session.open_btn' | transloco }}</a></div>
 </div>
 <app-info-banner [text]="'treasury.session.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
@@ -39,7 +39,6 @@
               <td><span class="badge {{ statusCss(s.status) }}">{{ s.status_display }}</span></td>
               <td>{{ s.opening_balance ?? '—' }}</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center flex-wrap gap-1">
-                @if (canOpen(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-open-modal" (click)="openOpen(s)"><i class="ti ti-lock-open me-1"></i>{{ 'treasury.session.open_btn' | transloco }}</a> }
                 @if (s.status === 'open' && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="suspend(s)"><i class="ti ti-player-pause me-1"></i>{{ 'treasury.session.suspend' | transloco }}</a> }
                 @if (s.status === 'suspended' && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="resume(s)"><i class="ti ti-player-play me-1"></i>{{ 'treasury.session.resume' | transloco }}</a> }
                 @if ((s.status === 'draft' || s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-extend-modal" (click)="openExtend(s)"><i class="ti ti-clock-plus me-1"></i>{{ 'treasury.session.extend' | transloco }}</a> }
@@ -56,46 +55,19 @@
   </div>
 </div>
 
-<!-- Planifier -->
-<div class="modal fade" id="trz-schedule-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.schedule_btn' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-  <form [formGroup]="scheduleForm" (ngSubmit)="submitSchedule()"><div class="modal-body">
-    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
-    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
-      <select formControlName="cash_register_id" (ngModelChange)="onScheduleRegister()" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
-    </div>
-    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_guichetier' | transloco }} <span class="text-danger">*</span></label>
-      <select formControlName="assigned_to_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (g of guichetiers; track g.id) { <option [ngValue]="g.id">{{ g.full_name }}</option> }</select>
-      @if (scheduleForm.value.cash_register_id && !guichetiers.length) { <small class="text-muted">{{ 'treasury.session.no_guichetier' | transloco }}</small> }
-    </div>
-    <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.session.sched_start' | transloco }}</label><input formControlName="scheduled_start" type="datetime-local" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.session.sched_end' | transloco }}</label><input formControlName="scheduled_end" type="datetime-local" class="form-control" /></div>
-    </div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="scheduleForm.invalid || saving">{{ 'treasury.session.schedule_btn' | transloco }}</button></div></form>
-</div></div></div>
-
-<!-- Ouvrir (billetage) -->
+<!-- Ouvrir une session (montant simple ; le billetage est réservé à la clôture) -->
 <div class="modal fade" id="trz-open-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
   <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.open_btn' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
+  <form [formGroup]="openForm" (ngSubmit)="submitOpen()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
-    <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="open-bill" [(ngModel)]="openBilletage" /><label class="form-check-label" for="open-bill">{{ 'treasury.denom.use_billetage' | transloco }}</label></div>
-    @if (openBilletage) {
-      <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
-        <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
-        <tbody>@for (d of denoms; track d.id) {
-          <tr><td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
-          <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="openQty[d.id]" /></td>
-          <td class="text-end">{{ (+d.value) * (openQty[d.id] || 0) }}</td></tr>
-        }</tbody>
-        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.denom.total' | transloco }}</td><td class="text-end">{{ openTotal }}</td></tr></tfoot>
-      </table></div>
-    } @else {
-      <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="openManual" /></div>
-    }
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving" (click)="submitOpen()">{{ 'treasury.session.open_submit' | transloco }}</button></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label>
+      <input formControlName="opening_balance" type="number" class="form-control" />
+      <small class="text-muted d-block mt-1">{{ 'treasury.session.opening_hint' | transloco }}</small></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
 </div></div></div>
 
 <!-- Prolonger -->

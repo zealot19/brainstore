@@ -23,24 +23,35 @@ def _next_ref(model, company, prefix_key):
 @transaction.atomic
 def create_cash_register(*, company, name, terminal=None, responsible=None,
                           opening_balance=0, notes="", account_id=None, journal_id=None,
-                          agency_id=None, created_by):
-    return CashRegister.objects.create(
+                          agency_id=None, manager_ids=None, created_by):
+    reg = CashRegister.objects.create(
         company=company, name=name, terminal=terminal,
         responsible=responsible,
         current_balance=opening_balance,
         account_id=account_id, journal_id=journal_id, agency_id=agency_id,
         notes=notes, created_by=created_by,
     )
+    if manager_ids:
+        reg.managers.set(_company_users(company, manager_ids))
+    return reg
+
+
+def _company_users(company, ids):
+    from django.contrib.auth import get_user_model
+    return list(get_user_model().objects.filter(company=company, id__in=ids))
 
 
 @transaction.atomic
 def update_cash_register(register, *, updated_by, **fields):
     allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id", "agency_id"}
+    manager_ids = fields.pop("manager_ids", None)
     for k, v in fields.items():
         if k in allowed:
             setattr(register, k, v)
     register.updated_by = updated_by
     register.save()
+    if manager_ids is not None:
+        register.managers.set(_company_users(register.company, manager_ids))
     return register
 
 
@@ -87,45 +98,38 @@ def delete_bank_account(account, *, deleted_by):
 
 # ── Cash sessions ──────────────────────────────────────────────────────────────
 
+def is_cash_manager(user, cash_register):
+    """Un utilisateur peut gérer une caisse s'il en est gestionnaire (ou admin)."""
+    if _is_admin(user):
+        return True
+    return cash_register.managers.filter(id=getattr(user, "id", None)).exists()
+
+
 @transaction.atomic
-def open_session(*, company, cash_register, opening_balance=None, name="", notes="",
-                 opening_count=None, created_by):
+def open_session(*, company, cash_register, opening_balance=None, name="", notes="", created_by):
     from apps.treasury.selectors import get_active_session
     from apps.treasury.scoping import register_agency_scope
-    from apps.treasury.services.billetage import compute_count_total, record_count
-    # Restriction d'agence : un guichetier n'ouvre une session que sur une caisse de son agence.
+    # Restriction d'agence : on n'ouvre une session que sur une caisse de son agence.
     scoped, agency_id = register_agency_scope(created_by)
     if scoped:
-        if not agency_id:
-            raise ApplicationError(_("Aucune agence ne vous est attribuée : impossible d'ouvrir une caisse."))
-        if cash_register.agency_id != agency_id:
+        if agency_id and cash_register.agency_id and cash_register.agency_id != agency_id:
             raise ApplicationError(_("Vous ne pouvez ouvrir une session que sur une caisse de votre agence."))
-        # Chargé de caisse : si un responsable est désigné, lui seul peut ouvrir cette caisse.
-        if cash_register.responsible_id and cash_register.responsible_id != created_by.id:
-            raise ApplicationError(_("Seul le chargé de cette caisse peut y ouvrir une session."))
+        # Il faut être gestionnaire de la caisse (l'admin est exempté).
+        if not is_cash_manager(created_by, cash_register):
+            raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
     existing = get_active_session(cash_register.id, company.id)
     if existing:
         raise ApplicationError(
-            _("A session is already open for {register}.").format(
-                register=cash_register.name
-            )
-        )
-    # Fonds initial : billetage prioritaire, sinon montant saisi, sinon solde de la caisse.
-    if opening_count:
-        balance, _resolved = compute_count_total(company, opening_count)
-    elif opening_balance is not None:
-        balance = opening_balance
-    else:
-        balance = cash_register.current_balance
-    session = CashSession.objects.create(
+            _("Une session est déjà ouverte pour {register}.").format(register=cash_register.name))
+    # Fonds initial : montant saisi (souvent 0 ; approvisionné ensuite par transfert).
+    # Pas de billetage à l'ouverture — le billetage est une opération de fin de session.
+    balance = opening_balance if opening_balance is not None else 0
+    return CashSession.objects.create(
         company=company, cash_register=cash_register,
         opened_by=created_by, opening_balance=balance, name=name,
         status=CashSession.Status.OPEN,
         notes=notes, created_by=created_by,
     )
-    if opening_count:
-        record_count(session, kind="opening", items=opening_count, user=created_by)
-    return session
 
 
 @transaction.atomic
@@ -134,10 +138,9 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
         raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
-    # Seul l'utilisateur qui a ouvert la caisse peut la clôturer (ou un administrateur).
-    is_admin = getattr(updated_by, "is_superuser", False) or getattr(updated_by, "is_institution_admin", False)
-    if not is_admin and session.opened_by_id != getattr(updated_by, "id", None):
-        raise ApplicationError(_("Seul l'utilisateur qui a ouvert la caisse (ou un administrateur) peut la clôturer."))
+    # Un gestionnaire de la caisse (ou un admin) peut clôturer.
+    if not is_cash_manager(updated_by, session.cash_register):
+        raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
 
     # Montant compté : billetage prioritaire, sinon montant saisi.
     if closing_count:
@@ -209,29 +212,23 @@ def schedule_session(*, company, cash_register, assigned_to, scheduled_start=Non
 
 
 @transaction.atomic
-def open_scheduled_session(session, *, opening_balance=None, opening_count=None, updated_by):
-    """Ouvre une session planifiée (DRAFT → OPEN) : seul le guichetier assigné (ou admin)."""
+def open_scheduled_session(session, *, opening_balance=None, updated_by):
+    """Ouvre une session planifiée (DRAFT → OPEN). Réservé aux gestionnaires de la caisse
+    (ou admin). Pas de billetage à l'ouverture."""
     from apps.treasury.selectors import get_active_session
-    from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status != CashSession.Status.DRAFT:
         raise ApplicationError(_("Seule une session planifiée peut être ouverte."))
-    if not _is_admin(updated_by) and session.assigned_to_id != getattr(updated_by, "id", None):
-        raise ApplicationError(_("Seul le guichetier assigné (ou un administrateur) peut ouvrir cette session."))
+    if not is_cash_manager(updated_by, session.cash_register):
+        raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
     if get_active_session(session.cash_register_id, session.company_id):
         raise ApplicationError(_("Une session est déjà active sur cette caisse."))
-    if opening_count:
-        balance, _r = compute_count_total(session.company, opening_count)
-    else:
-        balance = opening_balance if opening_balance is not None else session.cash_register.current_balance
-    session.opening_balance = balance
+    session.opening_balance = opening_balance if opening_balance is not None else 0
     session.opened_by = updated_by
     session.opened_at = timezone.now()
     session.status = CashSession.Status.OPEN
     session.updated_by = updated_by
     session.save(update_fields=["opening_balance", "opened_by", "opened_at", "status",
                                 "updated_by", "updated_at"])
-    if opening_count:
-        record_count(session, kind="opening", items=opening_count, user=updated_by)
     return session
 
 
@@ -314,11 +311,11 @@ def create_transaction(
             raise ApplicationError(_("A cash session is required for cash transactions."))
         if cash_session.status != CashSession.Status.OPEN:
             raise ApplicationError(_("The cash session is closed."))
-        # Séparation des tâches : seul celui qui a ouvert la session peut y opérer (admins exemptés).
+        # Tout gestionnaire de la caisse (ou un admin) peut opérer sur sa session ouverte.
         from apps.treasury.scoping import register_agency_scope
         scoped, _agency = register_agency_scope(created_by)
-        if scoped and cash_session.opened_by_id != created_by.id:
-            raise ApplicationError(_("Seul l'agent ayant ouvert cette caisse peut y enregistrer des mouvements."))
+        if scoped and not is_cash_manager(created_by, cash_session.cash_register):
+            raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
     elif account_type == Transaction.AccountType.BANK:
         if not bank_account:
             raise ApplicationError(_("Un compte bancaire est requis pour un règlement par banque."))
@@ -444,9 +441,14 @@ def create_transfer(
         acc.current_balance += amount
         acc.save(update_fields=["current_balance"])
 
+    # Rattache le transfert à la session ouverte de la caisse source (traçabilité).
+    from_session = None
+    if from_cash_register:
+        from apps.treasury.selectors import get_active_session
+        from_session = get_active_session(from_cash_register.id, company.id)
     reference = _next_ref(Transfer, company, "TRF")
     transfer = Transfer.objects.create(
-        company=company, reference=reference,
+        company=company, reference=reference, cash_session=from_session,
         from_cash_register=from_cash_register, from_bank_account=from_bank_account,
         to_cash_register=to_cash_register, to_bank_account=to_bank_account,
         amount=amount, description=description,

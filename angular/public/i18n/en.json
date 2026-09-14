@@ -468,7 +468,10 @@
       "empty": "No registers.",
       "edit_title": "Edit register",
       "f_account": "Ledger account (571x)",
-      "f_journal": "Cash journal"
+      "f_journal": "Cash journal",
+      "managers": "Managers",
+      "add_manager": "Add a manager…",
+      "managers_hint": "Only managers (or an admin) can open/operate this register."
     },
     "session": {
       "title": "Cash sessions",
@@ -508,7 +511,8 @@
       "sched_start": "Planned start",
       "sched_end": "Planned end",
       "report": "Report",
-      "closed_at": "Closed at"
+      "closed_at": "Closed at",
+      "opening_hint": "Often 0: fund it later via a transfer. Cash counting is done at close."
     },
     "movement": {
       "title": "Movements",

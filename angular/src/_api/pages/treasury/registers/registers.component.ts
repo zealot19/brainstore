@@ -6,6 +6,8 @@ import { CashRegister } from '../../../models/treasury.models';
 import { AccountService } from '../../../services/accounting/account.service';
 import { JournalService } from '../../../services/accounting/journal.service';
 import { AgencyService } from '../../../services/system/agency.service';
+import { UserService } from '../../../services/users/user.service';
+import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { Account, Journal } from '../../../models/accounting.models';
 import { Agency } from '../../../models/system.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -19,17 +21,23 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-trz-registers',
   templateUrl: './registers.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, SearchableSelectComponent, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class TrzRegistersComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: CashRegister[] = []; filtered: CashRegister[] = []; loading = true; search = '';
   accounts: Account[] = []; journals: Journal[] = []; agencies: Agency[] = [];
+  users: { id: string; full_name: string }[] = [];
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
 
+  // Gestionnaires (searchable-select + suppression)
+  selectedManagers: { id: string; label: string }[] = [];
+  managerPick: string | null = null;
+
   constructor(private svc: RegisterService, private accSvc: AccountService,
-              private jrnSvc: JournalService, private agSvc: AgencyService, private fb: FormBuilder) {}
+              private jrnSvc: JournalService, private agSvc: AgencyService,
+              private userSvc: UserService, private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -39,8 +47,21 @@ export class TrzRegistersComponent implements OnInit {
     this.accSvc.list().subscribe({ next: d => this.accounts = d.filter(a => a.account_type === 'asset_cash') });
     this.jrnSvc.list().subscribe({ next: d => this.journals = d.filter(j => j.journal_type === 'cash') });
     this.agSvc.list().subscribe({ next: d => this.agencies = d });
+    this.userSvc.list({ is_active: true, page_size: 500 }).subscribe({ next: d => this.users = d as any });
     this.load();
   }
+
+  get availableManagerOptions(): { id: string; label: string }[] {
+    const taken = new Set(this.selectedManagers.map(m => m.id));
+    return this.users.filter(u => !taken.has(u.id)).map(u => ({ id: u.id, label: u.full_name }));
+  }
+  onManagerPick(id: string | null): void {
+    if (!id) return;
+    const u = this.users.find(x => x.id === id);
+    if (u && !this.selectedManagers.some(m => m.id === id)) this.selectedManagers.push({ id, label: u.full_name });
+    this.managerPick = null;
+  }
+  removeManager(id: string): void { this.selectedManagers = this.selectedManagers.filter(m => m.id !== id); }
   load(): void {
     this.loading = true;
     this.svc.list().subscribe({ next: d => { this.rows = d; this.applyFilter(); this.loading = false; }, error: () => this.loading = false });
@@ -49,15 +70,17 @@ export class TrzRegistersComponent implements OnInit {
     const q = this.search.toLowerCase();
     this.filtered = this.rows.filter(r => !q || r.name.toLowerCase().includes(q));
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ name: '', notes: '', is_active: true, account_id: null, journal_id: null, agency_id: null, opening_balance: 0 }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.selectedManagers = []; this.managerPick = null; this.form.reset({ name: '', notes: '', is_active: true, account_id: null, journal_id: null, agency_id: null, opening_balance: 0 }); }
   openEdit(r: CashRegister): void {
     this.editId = r.id; this.errorMsg = '';
+    this.selectedManagers = (r.managers || []).map((id, i) => ({ id, label: (r.manager_names || [])[i] || id }));
+    this.managerPick = null;
     this.form.reset({ name: r.name, notes: r.notes, is_active: r.is_active, account_id: r.account, journal_id: r.journal, agency_id: r.agency, opening_balance: 0 });
   }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = this.form.value;
-    const payload: Record<string, unknown> = { name: v.name, notes: v.notes, account_id: v.account_id, journal_id: v.journal_id, agency_id: v.agency_id };
+    const payload: Record<string, unknown> = { name: v.name, notes: v.notes, account_id: v.account_id, journal_id: v.journal_id, agency_id: v.agency_id, manager_ids: this.selectedManagers.map(m => m.id) };
     if (this.editId) { payload['is_active'] = v.is_active; } else { payload['opening_balance'] = v.opening_balance; }
     const a = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },

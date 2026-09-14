@@ -19,7 +19,9 @@ def _setup():
     other, _ = create_user(created_by=admin, company=company, email="other@x.com",
                            first_name="X", last_name="Y", is_institution_admin=False,
                            default_agency_id=ag.id)
-    reg = create_cash_register(company=company, name="C1", agency_id=ag.id, created_by=admin)
+    # opener est gestionnaire de la caisse ; other ne l'est pas.
+    reg = create_cash_register(company=company, name="C1", agency_id=ag.id,
+                               manager_ids=[str(opener.id)], created_by=admin)
     sess = open_session(company=company, cash_register=reg, opening_balance=0, created_by=opener)
     return company, admin, opener, other, sess
 

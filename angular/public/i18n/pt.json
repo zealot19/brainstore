@@ -468,7 +468,10 @@
       "empty": "Sem caixas.",
       "edit_title": "Editar caixa",
       "f_account": "Conta contabilística (571x)",
-      "f_journal": "Diário de caixa"
+      "f_journal": "Diário de caixa",
+      "managers": "Gestores",
+      "add_manager": "Adicionar um gestor…",
+      "managers_hint": "Apenas os gestores (ou um admin) podem abrir/operar esta caixa."
     },
     "session": {
       "title": "Sessões de caixa",
@@ -508,7 +511,8 @@
       "sched_start": "Início previsto",
       "sched_end": "Fim previsto",
       "report": "Relatório",
-      "closed_at": "Fechada em"
+      "closed_at": "Fechada em",
+      "opening_hint": "Muitas vezes 0: abasteça depois por transferência. A contagem é feita no fecho."
     },
     "movement": {
       "title": "Movimentos",

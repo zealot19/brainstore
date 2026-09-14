@@ -14,7 +14,8 @@ def _setup():
     ag = Agency.objects.create(company=company, name="Dla", code="DLA")
     g, _ = create_user(created_by=admin, company=company, email="g@x.com", first_name="G", last_name="U",
                        is_institution_admin=False, default_agency_id=ag.id)
-    reg = create_cash_register(company=company, name="C1", agency_id=ag.id, created_by=admin)
+    reg = create_cash_register(company=company, name="C1", agency_id=ag.id,
+                               manager_ids=[str(g.id)], created_by=admin)
     return company, admin, g, reg
 
 

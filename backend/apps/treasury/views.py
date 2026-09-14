@@ -91,7 +91,7 @@ class CashRegisterListView(APIView):
             company=company, name=d["name"], terminal=terminal, responsible=responsible,
             opening_balance=d.get("opening_balance", 0),
             account_id=d.get("account_id"), journal_id=d.get("journal_id"),
-            agency_id=d.get("agency_id"),
+            agency_id=d.get("agency_id"), manager_ids=d.get("manager_ids") or [],
             notes=d.get("notes", ""), created_by=request.user,
         )
         return Response(CashRegisterReadSerializer(reg).data, status=status.HTTP_201_CREATED)
@@ -224,7 +224,6 @@ class OpenSessionView(APIView):
                 company=company, cash_register=reg,
                 opening_balance=d.get("opening_balance"),
                 name=d.get("name", ""),
-                opening_count=d.get("opening_count") or [],
                 notes=d.get("notes", ""),
                 created_by=request.user,
             )
@@ -315,7 +314,7 @@ class OpenScheduledSessionView(APIView):
         try:
             session = services.open_scheduled_session(
                 session, opening_balance=ser.validated_data.get("opening_balance"),
-                opening_count=ser.validated_data.get("opening_count") or [], updated_by=request.user)
+                updated_by=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)

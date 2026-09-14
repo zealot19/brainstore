@@ -48,6 +48,22 @@
     </div>
     @if (!editId) { <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input formControlName="opening_balance" type="number" class="form-control" /></div> }
     @if (editId) { <div class="form-check form-switch mb-3"><input formControlName="is_active" type="checkbox" class="form-check-input" id="trz-reg-active" /><label class="form-check-label" for="trz-reg-active">{{ 'treasury.register.active' | transloco }}</label></div> }
+    <div class="mb-3"><label class="form-label">{{ 'treasury.register.managers' | transloco }}</label>
+      <app-searchable-select [items]="availableManagerOptions" labelKey="label" valueKey="id"
+        [placeholder]="'treasury.register.add_manager' | transloco" [(ngModel)]="managerPick" [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onManagerPick($event)"></app-searchable-select>
+      @if (selectedManagers.length) {
+        <ul class="list-group mt-2">
+          @for (m of selectedManagers; track m.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+              <span><i class="ti ti-user me-2"></i>{{ m.label }}</span>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeManager(m.id)"><i class="ti ti-trash"></i></button>
+            </li>
+          }
+        </ul>
+      }
+      <small class="text-muted d-block mt-1">{{ 'treasury.register.managers_hint' | transloco }}</small>
+    </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

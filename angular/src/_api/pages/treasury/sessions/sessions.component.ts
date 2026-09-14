@@ -1,7 +1,7 @@
 import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SessionService, Guichetier } from '../../../services/treasury/session.service';
+import { SessionService } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
 import { DenominationService } from '../../../services/treasury/denomination.service';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -25,14 +25,12 @@ export class TrzSessionsComponent implements OnInit {
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
   denoms: CurrencyDenomination[] = [];
-  guichetiers: Guichetier[] = [];
 
-  scheduleForm!: FormGroup; extendForm!: FormGroup;
+  extendForm!: FormGroup;
   saving = false; errorMsg = '';
-  openingId: string | null = null; closingId: string | null = null; extendId: string | null = null;
+  closingId: string | null = null; extendId: string | null = null;
 
-  // Billetage
-  openBilletage = true;  openQty:  Record<string, number> = {}; openManual: number | null = null;
+  // Billetage (clôture uniquement)
   closeBilletage = true; closeQty: Record<string, number> = {}; closeManual: number | null = null;
   closeReason = ''; closeNote = '';
   readonly ecartReasons = ['rendu', 'encaissement', 'depense', 'comptage', 'perte', 'autre'];
@@ -46,13 +44,13 @@ export class TrzSessionsComponent implements OnInit {
 
   private get me(): any { return this.auth.currentUser; }
   get isAdmin(): boolean { const u = this.me; return !!u && (!!u.is_superuser || !!u.is_institution_admin); }
-  canOpen(s: CashSession): boolean { return s.status === 'draft' && (this.isAdmin || s.assigned_to === this.me?.id); }
   canManage(s: CashSession): boolean { return this.isAdmin || s.opened_by === this.me?.id; }
 
+  openForm!: FormGroup;
+
   ngOnInit(): void {
-    this.scheduleForm = this.fb.group({
-      cash_register_id: [null, Validators.required], assigned_to_id: [null, Validators.required],
-      name: [''], scheduled_start: [''], scheduled_end: [''],
+    this.openForm = this.fb.group({
+      cash_register_id: [null, Validators.required], name: [''], opening_balance: [0],
     });
     this.extendForm = this.fb.group({ scheduled_end: ['', Validators.required] });
     this.regSvc.list().subscribe({ next: d => this.registers = d.filter(r => r.is_active) });
@@ -67,38 +65,17 @@ export class TrzSessionsComponent implements OnInit {
 
   // ── Billetage helpers ──
   private total(qty: Record<string, number>): number { return this.denoms.reduce((s, d) => s + (+d.value) * (qty[d.id] || 0), 0); }
-  get openTotal(): number { return this.total(this.openQty); }
   get closeTotal(): number { return this.total(this.closeQty); }
   private toItems(qty: Record<string, number>): { denomination_id: string; quantity: number }[] {
     return this.denoms.filter(d => (qty[d.id] || 0) > 0).map(d => ({ denomination_id: d.id, quantity: qty[d.id] }));
   }
 
-  // ── Planifier ──
-  openSchedule(): void {
-    this.errorMsg = ''; this.guichetiers = [];
-    this.scheduleForm.reset({ cash_register_id: null, assigned_to_id: null, name: '', scheduled_start: '', scheduled_end: '' });
-  }
-  onScheduleRegister(): void {
-    const rid = this.scheduleForm.value.cash_register_id;
-    this.scheduleForm.patchValue({ assigned_to_id: null }); this.guichetiers = [];
-    if (rid) this.svc.guichetiers(rid).subscribe({ next: d => this.guichetiers = d });
-  }
-  submitSchedule(): void {
-    if (this.scheduleForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
-    this.svc.schedule(this.scheduleForm.value).subscribe({
-      next: () => { this.saving = false; this.load(); this.toast.success('Session planifiée.'); this.close('trz-schedule-modal'); },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
-  }
-
-  // ── Ouvrir une session planifiée ──
-  openOpen(s: CashSession): void { this.openingId = s.id; this.errorMsg = ''; this.openBilletage = true; this.openQty = {}; this.openManual = null; }
+  // ── Ouvrir une session (directement, par un gestionnaire) ──
+  openCreate(): void { this.errorMsg = ''; this.openForm.reset({ cash_register_id: null, name: '', opening_balance: 0 }); }
   submitOpen(): void {
-    if (this.saving || !this.openingId) return; this.saving = true; this.errorMsg = '';
-    const payload: Record<string, unknown> = {};
-    if (this.openBilletage) payload['opening_count'] = this.toItems(this.openQty);
-    else payload['opening_balance'] = this.openManual;
-    this.svc.openScheduled(this.openingId, payload).subscribe({
-      next: () => { this.saving = false; this.load(); this.toast.success('Caisse ouverte.'); this.close('trz-open-modal'); },
+    if (this.openForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
+    this.svc.open(this.openForm.value).subscribe({
+      next: () => { this.saving = false; this.load(); this.toast.success('Session ouverte.'); this.close('trz-open-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
   }
 

@@ -13,16 +13,25 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
     journal_code = serializers.CharField(source="journal.code", read_only=True, default=None)
     journal_name = serializers.CharField(source="journal.name", read_only=True, default=None)
     agency_name  = serializers.CharField(source="agency.name", read_only=True, default=None)
+    managers = serializers.SerializerMethodField()
+    manager_names = serializers.SerializerMethodField()
 
     class Meta:
         model = CashRegister
         fields = [
             "id", "name", "terminal_name", "responsible_name",
+            "managers", "manager_names",
             "current_balance", "is_active", "notes",
             "account", "journal", "account_code", "journal_code", "journal_name",
             "agency", "agency_name",
             "created_at", "updated_at",
         ]
+
+    def get_managers(self, obj):
+        return [str(u.id) for u in obj.managers.all()]
+
+    def get_manager_names(self, obj):
+        return [(u.get_full_name() or u.username) for u in obj.managers.all()]
 
     def get_terminal_name(self, obj):
         if obj.terminal_id:
@@ -45,6 +54,7 @@ class CashRegisterWriteSerializer(serializers.Serializer):
     account_id       = serializers.UUIDField(required=False, allow_null=True)
     journal_id       = serializers.UUIDField(required=False, allow_null=True)
     agency_id        = serializers.UUIDField(required=False, allow_null=True)
+    manager_ids      = serializers.ListField(child=serializers.UUIDField(), required=False, default=list)
 
 
 class CashRegisterUpdateSerializer(serializers.Serializer):
@@ -56,6 +66,7 @@ class CashRegisterUpdateSerializer(serializers.Serializer):
     account_id     = serializers.UUIDField(required=False, allow_null=True)
     journal_id     = serializers.UUIDField(required=False, allow_null=True)
     agency_id      = serializers.UUIDField(required=False, allow_null=True)
+    manager_ids    = serializers.ListField(child=serializers.UUIDField(), required=False)
 
 
 # ── Bank account ───────────────────────────────────────────────────────────────
@@ -168,14 +179,12 @@ class OpenSessionSerializer(serializers.Serializer):
     name             = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     opening_balance  = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                  required=False, allow_null=True)
-    opening_count    = CountItemInputSerializer(many=True, required=False, default=list)
     notes            = serializers.CharField(required=False, allow_blank=True, default="")
 
 
 class OpenScheduledSerializer(serializers.Serializer):
     opening_balance = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                required=False, allow_null=True)
-    opening_count   = CountItemInputSerializer(many=True, required=False, default=list)
 
 
 class CloseSessionSerializer(serializers.Serializer):

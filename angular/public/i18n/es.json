@@ -468,7 +468,10 @@
       "empty": "Sin cajas.",
       "edit_title": "Editar caja",
       "f_account": "Cuenta contable (571x)",
-      "f_journal": "Diario de caja"
+      "f_journal": "Diario de caja",
+      "managers": "Gestores",
+      "add_manager": "Añadir un gestor…",
+      "managers_hint": "Solo los gestores (o un admin) pueden abrir/operar esta caja."
     },
     "session": {
       "title": "Sesiones de caja",
@@ -508,7 +511,8 @@
       "sched_start": "Inicio previsto",
       "sched_end": "Fin prevista",
       "report": "Informe",
-      "closed_at": "Cerrada el"
+      "closed_at": "Cerrada el",
+      "opening_hint": "A menudo 0: aprovisiónela luego con una transferencia. El arqueo se hace al cierre."
     },
     "movement": {
       "title": "Movimientos",

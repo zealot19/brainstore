@@ -468,7 +468,10 @@
       "empty": "Aucune caisse.",
       "edit_title": "Modifier la caisse",
       "f_account": "Compte comptable (571x)",
-      "f_journal": "Journal de caisse"
+      "f_journal": "Journal de caisse",
+      "managers": "Gestionnaires",
+      "add_manager": "Ajouter un gestionnaire…",
+      "managers_hint": "Seuls les gestionnaires (ou un admin) peuvent ouvrir/opérer cette caisse."
     },
     "session": {
       "title": "Sessions de caisse",
@@ -508,7 +511,8 @@
       "sched_start": "Début prévu",
       "sched_end": "Fin prévue",
       "report": "Rapport",
-      "closed_at": "Clôturée le"
+      "closed_at": "Clôturée le",
+      "opening_hint": "Souvent 0 : approvisionnez ensuite par un transfert. Le billetage se fait à la clôture."
     },
     "movement": {
       "title": "Mouvements",

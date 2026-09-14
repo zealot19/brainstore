@@ -27,23 +27,6 @@ def test_company_creation_seeds_xaf_denominations():
 
 
 @pytest.mark.django_db
-def test_open_with_billetage_sets_opening_balance_from_count():
-    from apps.treasury.services import create_cash_register, open_session
-    company, admin = _company()
-    reg = create_cash_register(company=company, name="C1", created_by=admin)
-    items = [
-        {"denomination_id": str(_den(company, 10000).id), "quantity": 5},   # 50 000
-        {"denomination_id": str(_den(company, 1000).id),  "quantity": 3},   #  3 000
-        {"denomination_id": str(_den(company, 500).id),   "quantity": 4},   #  2 000
-    ]
-    session = open_session(company=company, cash_register=reg, opening_count=items, created_by=admin)
-    assert session.opening_balance == Decimal("55000")
-    count = session.counts.get(kind="opening")
-    assert count.total_amount == Decimal("55000")
-    assert count.items.count() == 3
-
-
-@pytest.mark.django_db
 def test_close_with_billetage_computes_ecart():
     from apps.treasury.services import create_cash_register, open_session, close_session
     company, admin = _company()
@@ -82,18 +65,23 @@ def _company_other():
 
 
 @pytest.mark.django_db
-def test_api_open_close_with_billetage():
+def test_api_open_plain_then_close_with_billetage():
     from rest_framework.test import APIClient
     from apps.treasury.services import create_cash_register
     company, admin = _company()
     reg = create_cash_register(company=company, name="C1", created_by=admin)
     c = APIClient(); c.force_authenticate(user=admin)
-    body = {"cash_register_id": str(reg.id), "name": "Matin",
-            "opening_count": [{"denomination_id": str(_den(company, 10000).id), "quantity": 2}]}
-    r = c.post("/api/v1/treasury/sessions/open/", body, format="json")
+    # Ouverture sans billetage (montant simple) — le billetage est réservé à la clôture.
+    r = c.post("/api/v1/treasury/sessions/open/",
+               {"cash_register_id": str(reg.id), "name": "Matin", "opening_balance": "0"}, format="json")
     assert r.status_code in (200, 201), r.content
     sid = (r.json().get("data") or r.json())["id"]
+    # Clôture avec billetage.
+    r = c.post(f"/api/v1/treasury/sessions/{sid}/close/",
+               {"closing_count": [{"denomination_id": str(_den(company, 10000).id), "quantity": 2}],
+                "justification_reason": "comptage"},
+               format="json")
+    assert r.status_code in (200, 201), r.content
     r = c.get(f"/api/v1/treasury/sessions/{sid}/counts/")
-    assert r.status_code == 200
     data = r.json().get("data", r.json())
-    assert len(data) == 1 and Decimal(str(data[0]["total_amount"])) == Decimal("20000")
+    assert len(data) == 1 and data[0]["kind"] == "closing" and Decimal(str(data[0]["total_amount"])) == Decimal("20000")

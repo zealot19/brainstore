@@ -16,6 +16,9 @@ class CashRegister(BaseModel):
     responsible = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("responsible"),
                                      on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name="managed_registers")
+    # Gestionnaires autorisés (attribués par l'admin) : plusieurs par caisse.
+    managers = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("gestionnaires"),
+                                      related_name="managed_cash_registers", blank=True)
     current_balance = models.DecimalField(_("current balance"), max_digits=12, decimal_places=2,
                                            default=0)
     account = models.ForeignKey("accounting.Account", verbose_name=_("compte comptable"), null=True, blank=True,
