@@ -104,6 +104,11 @@
       </select>
       <small class="text-muted d-block mt-1">{{ 'trips.list.seat_mode_hint' | transloco }}</small>
     </div>
+    <div class="form-check form-switch mb-3">
+      <input formControlName="auto_expenses" type="checkbox" class="form-check-input" id="trip-auto-exp" />
+      <label class="form-check-label" for="trip-auto-exp">{{ 'trips.list.auto_expenses' | transloco }}</label>
+      <small class="text-muted d-block">{{ 'trips.list.auto_expenses_hint' | transloco }}</small>
+    </div>
     <div class="mb-3"><label class="form-label">{{ 'trips.list.f_notes' | transloco }}</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'trips.list.creating' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

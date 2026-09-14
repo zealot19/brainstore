@@ -72,7 +72,8 @@ class TripListCreateView(APIView):
                 trip = services.create_trip_from_pattern(
                     company=company, pattern=pattern, service_date=d["service_date"],
                     code=d["code"], notes=d["notes"],
-                    seat_assignment_mode=d["seat_assignment_mode"], user=request.user)
+                    seat_assignment_mode=d["seat_assignment_mode"],
+                    auto_expenses=d["auto_expenses"], user=request.user)
             except ApplicationError as e:
                 return error_response(str(e))
             return created_response(S.TripDetailSerializer(trip).data)
@@ -92,7 +93,8 @@ class TripListCreateView(APIView):
                 scheduled_departure=d["scheduled_departure"], scheduled_arrival=d["scheduled_arrival"],
                 service_pattern=service_pattern, origin=origin, destination=destination,
                 code=d["code"], notes=d["notes"],
-                seat_assignment_mode=d["seat_assignment_mode"], user=request.user,
+                seat_assignment_mode=d["seat_assignment_mode"],
+                auto_expenses=d["auto_expenses"], user=request.user,
             )
         except ApplicationError as e:
             return error_response(str(e))

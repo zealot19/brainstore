@@ -18,7 +18,7 @@ def _trip_number():
 @transaction.atomic
 def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_arrival,
                 service_pattern=None, origin=None, destination=None, code="", notes="",
-                seat_assignment_mode=Trip.SeatAssignment.MANUAL, user):
+                seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True, user):
     if scheduled_arrival <= scheduled_departure:
         raise ApplicationError(_("L'arrivée prévue doit être postérieure au départ."))
     trip = Trip.objects.create(
@@ -27,14 +27,15 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
         origin=origin or route.origin, destination=destination or route.destination,
         scheduled_departure=scheduled_departure, scheduled_arrival=scheduled_arrival,
         status=Trip.Status.DRAFT, seat_assignment_mode=seat_assignment_mode,
-        notes=notes, created_by=user,
+        auto_expenses=auto_expenses, notes=notes, created_by=user,
     )
     for rs in RouteStop.objects.filter(route=route, is_deleted=False).order_by("sequence"):
         sched = scheduled_departure + rs.offset_from_departure if rs.offset_from_departure else None
         TripStop.objects.create(trip=trip, service_point=rs.service_point, sequence=rs.sequence,
                                 scheduled_arrival=sched, created_by=user)
-    from apps.voyages_trips.services.expense_services import apply_expense_schedule
-    apply_expense_schedule(trip)
+    if auto_expenses:
+        from apps.voyages_trips.services.expense_services import apply_expense_schedule
+        apply_expense_schedule(trip)
     return trip
 
 
@@ -43,7 +44,7 @@ _WEEKDAY_FIELDS = ["monday", "tuesday", "wednesday", "thursday", "friday", "satu
 
 @transaction.atomic
 def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="",
-                             seat_assignment_mode=Trip.SeatAssignment.MANUAL, user):
+                             seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True, user):
     """Crée un voyage à partir d'une planification : trajet, catégorie, plan et
     horaires sont dérivés du modèle ; l'utilisateur ne choisit que la date."""
     from datetime import datetime, timedelta
@@ -66,7 +67,7 @@ def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="
         company=company, route=pattern.route, fare_class=pattern.fare_class,
         scheduled_departure=departure, scheduled_arrival=arrival,
         service_pattern=pattern, code=code, notes=notes,
-        seat_assignment_mode=seat_assignment_mode, user=user)
+        seat_assignment_mode=seat_assignment_mode, auto_expenses=auto_expenses, user=user)
     if pattern.default_seating_plan_id:
         trip.seating_plan = pattern.default_seating_plan
         trip.updated_by = user

@@ -981,7 +981,9 @@
       "f_seat_mode": "Asignación de asientos",
       "seat_manual": "Manual (elección de asiento)",
       "seat_auto": "Automática (asiento asignado)",
-      "seat_mode_hint": "En modo automático, el sistema asigna el siguiente asiento disponible y la taquilla no elige asiento."
+      "seat_mode_hint": "En modo automático, el sistema asigna el siguiente asiento disponible y la taquilla no elige asiento.",
+      "auto_expenses": "Gastos automáticos (baremo)",
+      "auto_expenses_hint": "Genera los gastos del viaje desde el baremo (ruta × clase). Desmarque para ingresarlos manualmente."
     },
     "rm": {
       "board_all": "Embarcar todos",

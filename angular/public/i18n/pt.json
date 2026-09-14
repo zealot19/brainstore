@@ -981,7 +981,9 @@
       "f_seat_mode": "Atribuição de lugares",
       "seat_manual": "Manual (escolha do lugar)",
       "seat_auto": "Automática (lugar atribuído)",
-      "seat_mode_hint": "No modo automático, o sistema atribui o próximo lugar disponível e o balcão não escolhe lugar."
+      "seat_mode_hint": "No modo automático, o sistema atribui o próximo lugar disponível e o balcão não escolhe lugar.",
+      "auto_expenses": "Despesas automáticas (tabela)",
+      "auto_expenses_hint": "Gera as despesas da viagem a partir da tabela (rota × classe). Desmarque para inseri-las manualmente."
     },
     "rm": {
       "board_all": "Embarcar todos",

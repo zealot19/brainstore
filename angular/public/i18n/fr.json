@@ -981,7 +981,9 @@
       "f_seat_mode": "Attribution des sièges",
       "seat_manual": "Manuelle (choix du siège)",
       "seat_auto": "Automatique (siège attribué)",
-      "seat_mode_hint": "En automatique, le système attribue le prochain siège disponible et le guichet ne choisit pas de siège."
+      "seat_mode_hint": "En automatique, le système attribue le prochain siège disponible et le guichet ne choisit pas de siège.",
+      "auto_expenses": "Dépenses automatiques (barème)",
+      "auto_expenses_hint": "Génère les dépenses du voyage depuis le barème (trajet × catégorie). Décochez pour les saisir manuellement."
     },
     "rm": {
       "board_all": "Tout embarquer",

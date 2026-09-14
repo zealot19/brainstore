@@ -88,7 +88,7 @@ class TripDetailSerializer(TripListSerializer):
 
     class Meta(TripListSerializer.Meta):
         fields = TripListSerializer.Meta.fields + [
-            "service_pattern", "seating_plan", "seating_plan_code",
+            "service_pattern", "seating_plan", "seating_plan_code", "auto_expenses",
             "origin", "origin_name", "destination", "destination_name",
             "actual_departure", "actual_arrival", "delayed_until", "delay_reason",
             "notes", "stops", "crew", "created_at", "updated_at",
@@ -110,6 +110,7 @@ class TripCreateSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, allow_blank=True, default="")
     seat_assignment_mode = serializers.ChoiceField(
         choices=Trip.SeatAssignment.choices, required=False, default=Trip.SeatAssignment.MANUAL)
+    auto_expenses = serializers.BooleanField(required=False, default=True)
 
     def validate(self, attrs):
         pattern_mode = bool(attrs.get("service_pattern_id") and attrs.get("service_date"))
@@ -128,6 +129,7 @@ class TripUpdateSerializer(serializers.Serializer):
     scheduled_departure = serializers.DateTimeField(required=False)
     scheduled_arrival = serializers.DateTimeField(required=False)
     seat_assignment_mode = serializers.ChoiceField(choices=Trip.SeatAssignment.choices, required=False)
+    auto_expenses = serializers.BooleanField(required=False)
 
 
 class MarkDelayedSerializer(serializers.Serializer):

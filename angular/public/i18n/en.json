@@ -981,7 +981,9 @@
       "f_seat_mode": "Seat assignment",
       "seat_manual": "Manual (seat picked)",
       "seat_auto": "Automatic (seat assigned)",
-      "seat_mode_hint": "In automatic mode, the system assigns the next available seat and the counter does not pick a seat."
+      "seat_mode_hint": "In automatic mode, the system assigns the next available seat and the counter does not pick a seat.",
+      "auto_expenses": "Automatic expenses (schedule)",
+      "auto_expenses_hint": "Generates trip expenses from the schedule (route × class). Uncheck to enter them manually."
     },
     "rm": {
       "board_all": "Board all",
