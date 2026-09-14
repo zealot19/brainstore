@@ -169,7 +169,8 @@
     "depots": "Depósitos",
     "inventaires": "Inventarios",
     "configuration_sage": "Configuración Sage",
-    "garage": "Taller"
+    "garage": "Taller",
+    "remboursements": "Reembolsos"
   },
   "booking": {
     "list": {
@@ -567,6 +568,27 @@
       "saved": "Tasa guardada.",
       "label": "Tasa de reembolso (%)",
       "hint": "0 % = sin reembolso. El reembolso sale de la caja abierta del agente."
+    },
+    "refunds": {
+      "title": "Reembolsos",
+      "subtitle": "Reembolsar un billete, paquete o equipaje por referencia",
+      "reference_label": "Referencia",
+      "reference_ph": "Referencia del billete, paquete o equipaje",
+      "hint": "El reembolso anula el elemento y desembolsa desde su caja abierta según la tasa configurada.",
+      "search": "Buscar",
+      "not_found": "Ningún billete, paquete o equipaje coincide con esta referencia.",
+      "kind_billet": "Billete",
+      "kind_colis": "Paquete",
+      "kind_bagage": "Equipaje",
+      "col_reference": "Referencia",
+      "col_client": "Cliente",
+      "col_amount_paid": "Importe pagado",
+      "col_rate": "Tasa de reembolso",
+      "col_refund_amount": "Importe a reembolsar",
+      "not_refundable": "Este elemento ya está anulado o entregado y no puede reembolsarse.",
+      "perform": "Realizar el reembolso",
+      "confirm": "¿Confirmar el reembolso? El elemento será anulado.",
+      "done": "Reembolso realizado."
     }
   },
   "vcfg": {

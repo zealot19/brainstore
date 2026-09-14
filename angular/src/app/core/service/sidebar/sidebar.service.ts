@@ -257,6 +257,7 @@ export class SidebarService {
             { menuValue: 'Caisses',    route: routes.trzRegisters, base: 'registers', permission: 'treasury.register.view' },
             { menuValue: 'Sessions',   route: routes.trzSessions,  base: 'sessions',  permission: 'treasury.session.view' },
             { menuValue: 'Mouvements', route: routes.trzMovements, base: 'movements', permission: 'treasury.transaction.view' },
+            { menuValue: 'Remboursements', route: routes.trzRefunds, base: 'refunds', permission: 'treasury.transaction.manage' },
           ],
         },
         {

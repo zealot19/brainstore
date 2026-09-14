@@ -51,4 +51,8 @@ urlpatterns = [
 
     # ── Config remboursement ─────────────────────────────────────────────────────
     path("refund-rate/", views.RefundRateView.as_view(), name="refund-rate"),
+
+    # ── Remboursement par référence (guichet caisse) ─────────────────────────────
+    path("refunds/lookup/", views.RefundLookupView.as_view(),      name="refund-lookup"),
+    path("refunds/",        views.RefundByReferenceView.as_view(), name="refund-perform"),
 ]

@@ -413,6 +413,7 @@ export const routes={
   trzRecettesAutre:     '/treasury/recettes-autre',
   trzPaymentMethods:    '/treasury/payment-methods',
   trzRefundRate:        '/treasury/refund-rate',
+  trzRefunds:           '/treasury/refunds',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

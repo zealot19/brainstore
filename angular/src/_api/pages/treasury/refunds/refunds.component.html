@@ -1,0 +1,50 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'treasury.refunds.title' | transloco }}</h4>
+    <h6>{{ 'treasury.refunds.subtitle' | transloco }}</h6>
+  </div></div>
+</div>
+
+<div class="card"><div class="card-body" style="max-width:640px;">
+  <label class="form-label">{{ 'treasury.refunds.reference_label' | transloco }}</label>
+  <div class="input-group">
+    <input type="text" class="form-control" [(ngModel)]="reference"
+           (keyup.enter)="search()"
+           [placeholder]="'treasury.refunds.reference_ph' | transloco" />
+    <button class="btn btn-primary" (click)="search()" [disabled]="searching || !reference.trim()">
+      {{ (searching ? 'treasury.common.saving' : 'treasury.refunds.search') | transloco }}
+    </button>
+  </div>
+  <small class="text-muted d-block mt-1">{{ 'treasury.refunds.hint' | transloco }}</small>
+
+  @if (notFound) {
+    <div class="alert alert-warning py-2 mt-3">{{ 'treasury.refunds.not_found' | transloco }}</div>
+  }
+
+  @if (match) {
+    <div class="border rounded p-3 mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-info">{{ kindLabel(match.kind) }}</span>
+        <span class="text-muted">{{ match.status }}</span>
+      </div>
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr><th>{{ 'treasury.refunds.col_reference' | transloco }}</th><td>{{ match.reference }}</td></tr>
+          <tr><th>{{ 'treasury.refunds.col_client' | transloco }}</th><td>{{ match.label || '—' }}</td></tr>
+          <tr><th>{{ 'treasury.refunds.col_amount_paid' | transloco }}</th><td>{{ match.amount_paid }}</td></tr>
+          <tr><th>{{ 'treasury.refunds.col_rate' | transloco }}</th><td>{{ match.refund_rate }} %</td></tr>
+          <tr class="fw-bold"><th>{{ 'treasury.refunds.col_refund_amount' | transloco }}</th><td>{{ match.refund_amount }}</td></tr>
+        </tbody>
+      </table>
+
+      @if (!match.refundable) {
+        <div class="alert alert-warning py-2 mt-2 mb-0">{{ 'treasury.refunds.not_refundable' | transloco }}</div>
+      } @else {
+        <button class="btn btn-danger mt-3" *hasPermission="'treasury.transaction.manage'"
+                (click)="perform()" [disabled]="refunding">
+          {{ (refunding ? 'treasury.common.saving' : 'treasury.refunds.perform') | transloco }}
+        </button>
+      }
+    </div>
+  }
+</div></div>

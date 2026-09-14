@@ -798,3 +798,43 @@ class RefundRateView(APIView):
         except ApplicationError as ex:
             return error_response(str(ex))
         return success_response({"rate": str(rate)})
+
+
+# ── Remboursement par référence (guichet caisse) ─────────────────────────────────
+
+def _serialize_refund_descriptor(d):
+    return {
+        **d,
+        "amount_paid": str(d["amount_paid"]),
+        "refund_rate": str(d["refund_rate"]),
+        "refund_amount": str(d["refund_amount"]),
+    }
+
+
+class RefundLookupView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.transaction.view"}
+
+    def get(self, request):
+        reference = request.query_params.get("reference", "")
+        desc = services.lookup_refundable(_company(request), reference)
+        if not desc:
+            return error_response("Aucun billet, colis ou bagage ne correspond à cette référence.",
+                                  status_code=status.HTTP_404_NOT_FOUND)
+        return success_response(_serialize_refund_descriptor(desc))
+
+
+class RefundByReferenceView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.transaction.manage"}
+
+    def post(self, request):
+        kind = request.data.get("kind")
+        obj_id = request.data.get("id")
+        if not kind or not obj_id:
+            return error_response("Référence à rembourser manquante.")
+        try:
+            services.refund_by_reference(_company(request), kind=kind, obj_id=obj_id, user=request.user)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return success_response({"detail": "Remboursement effectué."})

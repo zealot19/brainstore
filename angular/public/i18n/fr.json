@@ -169,7 +169,8 @@
     "depots": "Dépôts",
     "inventaires": "Inventaires",
     "configuration_sage": "Configuration Sage",
-    "garage": "Garage"
+    "garage": "Garage",
+    "remboursements": "Remboursements"
   },
   "booking": {
     "list": {
@@ -567,6 +568,27 @@
       "saved": "Taux enregistré.",
       "label": "Taux de remboursement (%)",
       "hint": "0 % = aucun remboursement. Le remboursement sort de la caisse ouverte de l'agent."
+    },
+    "refunds": {
+      "title": "Remboursements",
+      "subtitle": "Rembourser un billet, un colis ou un bagage par référence",
+      "reference_label": "Référence",
+      "reference_ph": "Référence du billet, colis ou bagage",
+      "hint": "Le remboursement annule l’élément et décaisse depuis votre caisse ouverte selon le taux configuré.",
+      "search": "Rechercher",
+      "not_found": "Aucun billet, colis ou bagage ne correspond à cette référence.",
+      "kind_billet": "Billet",
+      "kind_colis": "Colis",
+      "kind_bagage": "Bagage",
+      "col_reference": "Référence",
+      "col_client": "Client",
+      "col_amount_paid": "Montant payé",
+      "col_rate": "Taux de remboursement",
+      "col_refund_amount": "Montant à rembourser",
+      "not_refundable": "Cet élément est déjà annulé ou livré et ne peut pas être remboursé.",
+      "perform": "Effectuer le remboursement",
+      "confirm": "Confirmer le remboursement ? L’élément sera annulé.",
+      "done": "Remboursement effectué."
     }
   },
   "vcfg": {

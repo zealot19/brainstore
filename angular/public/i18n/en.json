@@ -169,7 +169,8 @@
     "depots": "Depots",
     "inventaires": "Inventories",
     "configuration_sage": "Sage configuration",
-    "garage": "Garage"
+    "garage": "Garage",
+    "remboursements": "Refunds"
   },
   "booking": {
     "list": {
@@ -567,6 +568,27 @@
       "saved": "Rate saved.",
       "label": "Refund rate (%)",
       "hint": "0% = no refund. The refund comes from the agent's open register."
+    },
+    "refunds": {
+      "title": "Refunds",
+      "subtitle": "Refund a ticket, parcel or baggage by reference",
+      "reference_label": "Reference",
+      "reference_ph": "Ticket, parcel or baggage reference",
+      "hint": "The refund cancels the item and disburses from your open cash session at the configured rate.",
+      "search": "Search",
+      "not_found": "No ticket, parcel or baggage matches this reference.",
+      "kind_billet": "Ticket",
+      "kind_colis": "Parcel",
+      "kind_bagage": "Baggage",
+      "col_reference": "Reference",
+      "col_client": "Customer",
+      "col_amount_paid": "Amount paid",
+      "col_rate": "Refund rate",
+      "col_refund_amount": "Amount to refund",
+      "not_refundable": "This item is already cancelled or delivered and cannot be refunded.",
+      "perform": "Perform refund",
+      "confirm": "Confirm the refund? The item will be cancelled.",
+      "done": "Refund completed."
     }
   },
   "vcfg": {

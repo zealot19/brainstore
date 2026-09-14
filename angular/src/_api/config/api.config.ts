@@ -436,6 +436,8 @@ export const TREASURY = {
   paymentMethods: `${TRZ}/payment-methods/`,
   paymentMethod:  (id: string) => `${TRZ}/payment-methods/${id}/`,
   refundRate: `${TRZ}/refund-rate/`,
+  refundLookup:  `${TRZ}/refunds/lookup/`,
+  refundPerform: `${TRZ}/refunds/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */
