@@ -96,6 +96,14 @@
         <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_arrival' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
       </div>
     }
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_plan' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="seating_plan_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>@for (p of seatingPlans; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }} ({{ p.total_seats }})</option> }</select>
+        <small class="text-muted d-block mt-1">{{ 'trips.list.f_plan_hint' | transloco }}</small></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_vehicle' | transloco }}</label>
+        <select formControlName="vehicle_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.vehicle_undefined' | transloco }}</option>@for (v of vehicles; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }}</option> }</select>
+        <small class="text-muted d-block mt-1">{{ 'trips.list.f_vehicle_hint' | transloco }}</small></div>
+    </div>
     <div class="mb-3">
       <label class="form-label">{{ 'trips.list.f_seat_mode' | transloco }}</label>
       <select formControlName="seat_assignment_mode" class="form-select">

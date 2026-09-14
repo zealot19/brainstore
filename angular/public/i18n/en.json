@@ -1039,7 +1039,12 @@
       "seat_auto": "Automatic (seat assigned)",
       "seat_mode_hint": "In automatic mode, the system assigns the next available seat and the counter does not pick a seat.",
       "auto_expenses": "Automatic expenses (schedule)",
-      "auto_expenses_hint": "Generates trip expenses from the schedule (route × class). Uncheck to enter them manually."
+      "auto_expenses_hint": "Generates trip expenses from the schedule (route × class). Uncheck to enter them manually.",
+      "f_plan": "Seating plan",
+      "f_plan_hint": "Sets the number of seats to sell. Required.",
+      "f_vehicle": "Vehicle",
+      "vehicle_undefined": "Not defined",
+      "f_vehicle_hint": "Optional: can be added later."
     },
     "rm": {
       "board_all": "Board all",

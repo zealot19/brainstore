@@ -1039,7 +1039,12 @@
       "seat_auto": "Automatique (siège attribué)",
       "seat_mode_hint": "En automatique, le système attribue le prochain siège disponible et le guichet ne choisit pas de siège.",
       "auto_expenses": "Dépenses automatiques (barème)",
-      "auto_expenses_hint": "Génère les dépenses du voyage depuis le barème (trajet × catégorie). Décochez pour les saisir manuellement."
+      "auto_expenses_hint": "Génère les dépenses du voyage depuis le barème (trajet × catégorie). Décochez pour les saisir manuellement.",
+      "f_plan": "Charte (plan de bus)",
+      "f_plan_hint": "Définit le nombre de places à vendre. Obligatoire.",
+      "f_vehicle": "Véhicule",
+      "vehicle_undefined": "Non défini",
+      "f_vehicle_hint": "Optionnel : peut être ajouté plus tard."
     },
     "rm": {
       "board_all": "Tout embarquer",

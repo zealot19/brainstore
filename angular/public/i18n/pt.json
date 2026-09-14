@@ -1039,7 +1039,12 @@
       "seat_auto": "Automática (lugar atribuído)",
       "seat_mode_hint": "No modo automático, o sistema atribui o próximo lugar disponível e o balcão não escolhe lugar.",
       "auto_expenses": "Despesas automáticas (tabela)",
-      "auto_expenses_hint": "Gera as despesas da viagem a partir da tabela (rota × classe). Desmarque para inseri-las manualmente."
+      "auto_expenses_hint": "Gera as despesas da viagem a partir da tabela (rota × classe). Desmarque para inseri-las manualmente.",
+      "f_plan": "Plano de lugares",
+      "f_plan_hint": "Define o número de lugares a vender. Obrigatório.",
+      "f_vehicle": "Veículo",
+      "vehicle_undefined": "Não definido",
+      "f_vehicle_hint": "Opcional: pode ser adicionado depois."
     },
     "rm": {
       "board_all": "Embarcar todos",

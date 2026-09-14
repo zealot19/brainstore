@@ -460,7 +460,8 @@ class BookingRenderTicketsView(APIView):
                 "travel_class": t.fare_class.name if t.fare_class_id else "",
                 "trip_type": t.get_direction_display(),
                 "trip_number": trip.number if trip else "",
-                "vehicle": trip.vehicle.license_plate if trip and trip.vehicle_id else "",
+                # Le véhicule n'est pas toujours connu à la vente : on affiche le code du voyage.
+                "vehicle": (trip.code or trip.number) if trip else "",
                 "agent": (b.created_by.get_full_name() or b.created_by.username) if b.created_by_id else "",
                 "ticket_price": f"{t.amount:.0f} XAF",
                 "registered_date": reg.strftime("%d/%m/%Y"),

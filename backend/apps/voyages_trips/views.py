@@ -89,6 +89,11 @@ class TripListCreateView(APIView):
         service_pattern = _cfg(ServicePattern, d.get("service_pattern_id"), company)
         origin = _cfg(ServicePoint, d.get("origin_id"), company)
         destination = _cfg(ServicePoint, d.get("destination_id"), company)
+        from apps.voyages_config.models import SeatingPlan
+        from apps.fleet.models import Vehicle
+        seating_plan = _cfg(SeatingPlan, d.get("seating_plan_id"), company) if d.get("seating_plan_id") else None
+        vehicle = (Vehicle.objects.filter(id=d["vehicle_id"], company=company, is_deleted=False).first()
+                   if d.get("vehicle_id") else None)
         try:
             trip = services.create_trip(
                 company=company, route=route, fare_class=fare_class,
@@ -96,7 +101,8 @@ class TripListCreateView(APIView):
                 service_pattern=service_pattern, origin=origin, destination=destination,
                 code=d["code"], notes=d["notes"],
                 seat_assignment_mode=d["seat_assignment_mode"],
-                auto_expenses=d["auto_expenses"], user=request.user,
+                auto_expenses=d["auto_expenses"], seating_plan=seating_plan, vehicle=vehicle,
+                user=request.user,
             )
         except ApplicationError as e:
             return error_response(str(e))

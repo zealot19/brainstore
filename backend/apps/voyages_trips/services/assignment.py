@@ -42,10 +42,16 @@ def assign_vehicle(trip, vehicle, *, user, alert_days=30):
                                window_end=trip.scheduled_arrival, exclude_trip=trip)
     if reasons:
         raise VehicleNotEligible(" ".join(reasons))
-    plan = active_seating_plan(vehicle, trip.scheduled_departure.date())
     trip.vehicle = vehicle
-    trip.seating_plan = plan
+    fields = ["vehicle", "updated_by", "updated_at"]
+    # Ne jamais réécraser des sièges déjà générés (des billets peuvent être vendus).
+    # On ne prend le plan du véhicule que si aucune charte n'est encore définie.
+    has_seats = trip.seats.filter(is_deleted=False).exists()
+    if not trip.seating_plan_id and not has_seats:
+        trip.seating_plan = active_seating_plan(vehicle, trip.scheduled_departure.date())
+        fields.insert(1, "seating_plan")
     trip.updated_by = user
-    trip.save(update_fields=["vehicle", "seating_plan", "updated_by", "updated_at"])
-    materialise_seats(trip)
+    trip.save(update_fields=fields)
+    if not has_seats and trip.seating_plan_id:
+        materialise_seats(trip)
     return document_warnings(vehicle, before_date=trip.scheduled_arrival.date(), alert_days=alert_days)

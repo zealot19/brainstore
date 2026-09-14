@@ -111,6 +111,8 @@ class TripCreateSerializer(serializers.Serializer):
     seat_assignment_mode = serializers.ChoiceField(
         choices=Trip.SeatAssignment.choices, required=False, default=Trip.SeatAssignment.MANUAL)
     auto_expenses = serializers.BooleanField(required=False, default=True)
+    seating_plan_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    vehicle_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
     def validate(self, attrs):
         pattern_mode = bool(attrs.get("service_pattern_id") and attrs.get("service_date"))
