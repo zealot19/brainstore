@@ -1062,7 +1062,11 @@
       "act_complete": "Finalizar",
       "act_cancel": "Anular viaje",
       "act_delay": "Marcar con retraso",
-      "act_clear_delay": "Quitar retraso"
+      "act_clear_delay": "Quitar retraso",
+      "f_max_res_auto": "Auto (plano)",
+      "f_max_res_hint": "Derivado del plano de asientos.",
+      "f_sellable": "Plazas en venta",
+      "f_crew_add": "Añadir personal…"
     },
     "rm": {
       "board_all": "Embarcar todos",

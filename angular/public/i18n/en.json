@@ -1062,7 +1062,11 @@
       "act_complete": "Complete",
       "act_cancel": "Cancel trip",
       "act_delay": "Mark delayed",
-      "act_clear_delay": "Clear delay"
+      "act_clear_delay": "Clear delay",
+      "f_max_res_auto": "Auto (plan)",
+      "f_max_res_hint": "Derived from the seating plan.",
+      "f_sellable": "Seats on sale",
+      "f_crew_add": "Add crew member…"
     },
     "rm": {
       "board_all": "Board all",

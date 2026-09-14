@@ -1062,7 +1062,11 @@
       "act_complete": "Terminer",
       "act_cancel": "Annuler le voyage",
       "act_delay": "Mettre en retard",
-      "act_clear_delay": "Lever le retard"
+      "act_clear_delay": "Lever le retard",
+      "f_max_res_auto": "Auto (charte)",
+      "f_max_res_hint": "Déduit du plan de bus.",
+      "f_sellable": "Places en vente",
+      "f_crew_add": "Ajouter un personnel…"
     },
     "rm": {
       "board_all": "Tout embarquer",

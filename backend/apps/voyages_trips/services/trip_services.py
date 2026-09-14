@@ -42,6 +42,9 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
         from apps.voyages_trips.services.assignment import materialise_seats
         materialise_seats(trip)
         _block_seats(trip, blocked_seats_count or 0, user)
+        # « Réservations autorisées » = capacité de la charte (non saisie par l'agent).
+        trip.max_reservations = trip.seats.filter(is_deleted=False).count()
+        trip.save(update_fields=["max_reservations", "updated_by", "updated_at"])
     _assign_crew(trip, crew_member_ids or [], company, user)
     if auto_expenses:
         from apps.voyages_trips.services.expense_services import apply_expense_schedule

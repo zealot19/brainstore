@@ -45,24 +45,10 @@ def test_blocked_seats_and_crew_at_creation():
 
 
 @pytest.mark.django_db
-def test_reservation_cap_enforced():
-    from apps.core.exceptions import ApplicationError
-    from apps.voyages_pricing.models import Fare
-    from apps.voyages_booking.services import create_reservation
-    company, admin, route, fc, plan, member = _setup()
-    trip = _mk(company, admin, route, fc, plan, max_reservations=1)
-    trip.status = "pending"; trip.save(update_fields=["status"])
-    Fare.objects.create(company=company, route=route, origin_point=trip.origin, destination_point=trip.destination,
-                        fare_class=fc, trip_type="one_way", amount=1000)
-    hold = timezone.now() + timedelta(hours=2)
-    seats = list(trip.seats.filter(status="available").order_by("column")[:2])
-
-    def _res(seat):
-        return create_reservation(company, trip_type="one_way", outbound_trip=trip, return_trip=None,
-                                  buyer_spec={"name": "C", "phone": "1"},
-                                  items=[{"passenger": {"name": "C", "phone": "1"},
-                                          "destination_point_id": None, "outbound_seat_id": str(seat.id)}],
-                                  hold_until=hold, user=admin)
-    _res(seats[0])  # 1st ok (cap = 1)
-    with pytest.raises(ApplicationError):
-        _res(seats[1])  # 2nd exceeds cap
+def test_max_reservations_derived_from_plan_and_sellable_minus_blocked():
+    company, admin, route, fc, plan, member = _setup()  # plan = 9 seats
+    trip = _mk(company, admin, route, fc, plan, blocked_seats_count=2, max_reservations=1)
+    # Autorisées = capacité de la charte (9), pas la valeur saisie par l'agent (1).
+    assert trip.max_reservations == 9
+    # Places en vente = autorisées - bloquées = 7 (sièges AVAILABLE).
+    assert trip.seats.filter(status="available").count() == trip.max_reservations - trip.blocked_seats_count == 7

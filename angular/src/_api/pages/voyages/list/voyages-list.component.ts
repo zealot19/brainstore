@@ -12,6 +12,7 @@ import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
+import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
@@ -21,7 +22,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 @Component({
   selector: 'app-voyages-list',
   templateUrl: './voyages-list.component.html',
-  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
 })
 export class VoyagesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
@@ -32,6 +33,10 @@ export class VoyagesListComponent implements OnInit {
   crewMembers: { id: string; full_name: string; member_type_name: string }[] = [];
   routes: Route[] = []; fareClasses: FareClass[] = []; patterns: ServicePattern[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
+
+  // Équipage sélectionné (chips avec suppression), comme sur le détail.
+  selectedCrew: { id: string; label: string }[] = [];
+  crewPick: string | null = null;
 
   statuses = [
     { value: 'draft',     label: 'Brouillon',  css: 'bg-secondary' },
@@ -63,6 +68,11 @@ export class VoyagesListComponent implements OnInit {
     this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.planSvc.list().subscribe(d => this.seatingPlans = d as any);
     this.crewSvc.list().subscribe(d => this.crewMembers = d as any);
+    // « Réservations autorisées » dérivé de la charte (lecture seule).
+    this.form.get('seating_plan_id')!.valueChanges.subscribe(id => {
+      const p = this.seatingPlans.find(x => x.id === id);
+      this.form.get('max_reservations')!.setValue(p ? p.total_seats : null);
+    });
     this.load();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau voyage" (sidebar) : ?new=1
     this.route.queryParams.subscribe(q => {
@@ -108,7 +118,7 @@ export class VoyagesListComponent implements OnInit {
   }
 
   openCreate(): void {
-    this.errorMsg = '';
+    this.errorMsg = ''; this.selectedCrew = []; this.crewPick = null;
     this.form.reset({ route_id: null, service_pattern_id: null, fare_class_id: null, service_date: '',
                       scheduled_departure: '', scheduled_arrival: '', code: '', notes: '', seat_assignment_mode: 'manual', auto_expenses: true,
                       seating_plan_id: null, vehicle_id: null,
@@ -122,18 +132,41 @@ export class VoyagesListComponent implements OnInit {
       ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes,
           seat_assignment_mode: f.seat_assignment_mode, auto_expenses: f.auto_expenses,
           seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id,
-          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: f.crew_member_ids || [] }
+          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: this.selectedCrew.map(c => c.id) }
       : { route_id: f.route_id, fare_class_id: f.fare_class_id,
           scheduled_departure: f.scheduled_departure, scheduled_arrival: f.scheduled_arrival,
           code: f.code, notes: f.notes, service_pattern_id: null,
           seat_assignment_mode: f.seat_assignment_mode, auto_expenses: f.auto_expenses,
           seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id,
-          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: f.crew_member_ids || [] };
+          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: this.selectedCrew.map(c => c.id) };
     this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
+  // ── Places en vente = autorisées − bloquées ──
+  get sellableSeats(): number {
+    const max = +this.form?.get('max_reservations')?.value || 0;
+    const blocked = +this.form?.get('blocked_seats_count')?.value || 0;
+    return Math.max(0, max - blocked);
+  }
+
+  // ── Équipage (searchable select + suppression) ──
+  get availableCrewOptions(): { id: string; label: string }[] {
+    const taken = new Set(this.selectedCrew.map(c => c.id));
+    return this.crewMembers.filter(m => !taken.has(m.id))
+      .map(m => ({ id: m.id, label: m.member_type_name ? `${m.full_name} (${m.member_type_name})` : m.full_name }));
+  }
+  onCrewPick(id: string | null): void {
+    if (!id) return;
+    const m = this.crewMembers.find(x => x.id === id);
+    if (m && !this.selectedCrew.some(c => c.id === id)) {
+      this.selectedCrew.push({ id, label: m.member_type_name ? `${m.full_name} (${m.member_type_name})` : m.full_name });
+    }
+    this.crewPick = null;
+  }
+  removeCrew(id: string): void { this.selectedCrew = this.selectedCrew.filter(c => c.id !== id); }
+
   open(t: Trip): void { this.router.navigate(['/voyages/trip', t.id]); }
   roadmap(t: Trip): void { this.router.navigate(['/voyages/roadmap', t.id]); }
 

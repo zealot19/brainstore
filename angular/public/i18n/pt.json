@@ -1062,7 +1062,11 @@
       "act_complete": "Concluir",
       "act_cancel": "Anular viagem",
       "act_delay": "Marcar atraso",
-      "act_clear_delay": "Remover atraso"
+      "act_clear_delay": "Remover atraso",
+      "f_max_res_auto": "Auto (plano)",
+      "f_max_res_hint": "Derivado do plano de lugares.",
+      "f_sellable": "Lugares à venda",
+      "f_crew_add": "Adicionar pessoal…"
     },
     "rm": {
       "board_all": "Embarcar todos",

@@ -150,15 +150,28 @@
     </div>
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_max_res' | transloco }}</label>
-        <input formControlName="max_reservations" type="number" min="0" class="form-control" [placeholder]="'trips.list.f_max_res_ph' | transloco" /></div>
+        <input formControlName="max_reservations" type="number" class="form-control" readonly [placeholder]="'trips.list.f_max_res_auto' | transloco" />
+        <small class="text-muted d-block mt-1">{{ 'trips.list.f_max_res_hint' | transloco }}</small></div>
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_blocked' | transloco }}</label>
         <input formControlName="blocked_seats_count" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_sellable' | transloco }}</label>
+        <input type="number" class="form-control fw-bold" [value]="sellableSeats" disabled /></div>
     </div>
     <div class="mb-3"><label class="form-label">{{ 'trips.list.f_crew' | transloco }}</label>
-      <select formControlName="crew_member_ids" class="form-select" multiple size="4">
-        @for (c of crewMembers; track c.id) { <option [ngValue]="c.id">{{ c.full_name }} @if (c.member_type_name) { ({{ c.member_type_name }}) } </option> }
-      </select>
-      <small class="text-muted d-block mt-1">{{ 'trips.list.f_crew_hint' | transloco }}</small></div>
+      <app-searchable-select [items]="availableCrewOptions" labelKey="label" valueKey="id"
+        [placeholder]="'trips.list.f_crew_add' | transloco" [(ngModel)]="crewPick" [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onCrewPick($event)"></app-searchable-select>
+      @if (selectedCrew.length) {
+        <ul class="list-group mt-2">
+          @for (c of selectedCrew; track c.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+              <span><i class="ti ti-user me-2"></i>{{ c.label }}</span>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeCrew(c.id)"><i class="ti ti-trash"></i></button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
     <div class="mb-3">
       <label class="form-label">{{ 'trips.list.f_seat_mode' | transloco }}</label>
       <select formControlName="seat_assignment_mode" class="form-select">
