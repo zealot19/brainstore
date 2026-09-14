@@ -13,6 +13,7 @@ import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -44,6 +45,7 @@ export class VoyagesListComponent implements OnInit {
   constructor(private svc: TripService, private routeSvc: RouteService, private fcSvc: FareClassService,
               private spSvc: ServicePatternService, private vehicleSvc: VehicleService,
               private planSvc: SeatingPlanService, private crewSvc: CrewMemberService,
+              private toast: ToastService,
               private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -134,5 +136,28 @@ export class VoyagesListComponent implements OnInit {
   }
   open(t: Trip): void { this.router.navigate(['/voyages/trip', t.id]); }
   roadmap(t: Trip): void { this.router.navigate(['/voyages/roadmap', t.id]); }
+
+  // ── Actions de statut (depuis la liste, sans passer par le détail) ──
+  private act(obs: any, msg = 'Fait.'): void {
+    obs.subscribe({ next: () => { this.load(); this.toast.success(msg); },
+                    error: (e: any) => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
+  }
+  submitTrip(t: Trip): void { this.act(this.svc.submit(t.id), 'Voyage soumis.'); }
+  departTrip(t: Trip): void { if (confirm('Démarrer ce voyage ?')) this.act(this.svc.depart(t.id), 'Voyage démarré.'); }
+  suspendTrip(t: Trip): void { this.act(this.svc.suspend(t.id), 'Voyage suspendu.'); }
+  resumeTrip(t: Trip): void { this.act(this.svc.resume(t.id), 'Voyage repris.'); }
+  completeTrip(t: Trip): void { if (confirm('Terminer ce voyage ?')) this.act(this.svc.complete(t.id), 'Voyage terminé.'); }
+  cancelTrip(t: Trip): void { if (confirm('Annuler ce voyage ?')) this.act(this.svc.cancel(t.id), 'Voyage annulé.'); }
+  markDelayed(t: Trip): void {
+    const reason = prompt('Motif du retard (optionnel) :') ?? '';
+    this.act(this.svc.markDelayed(t.id, { delay_reason: reason }), 'Marqué en retard.');
+  }
+  clearDelay(t: Trip): void { this.act(this.svc.clearDelay(t.id), 'Retard levé.'); }
+  deleteTrip(t: Trip): void { if (confirm('Supprimer ce brouillon ?')) this.act(this.svc.delete(t.id), 'Supprimé.'); }
+
+  // ── Navigation contextuelle ──
+  goExpenses(t: Trip): void { this.router.navigate(['/treasury/expenses-voyage']); }
+  goReservations(t: Trip): void { this.router.navigate(['/voyages-booking/bookings'], { queryParams: { trip: t.id } }); }
+
   private close(): void { document.getElementById('trip-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

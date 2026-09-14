@@ -40,25 +40,69 @@
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>{{ 'trips.list.col_number' | transloco }}</th><th>{{ 'trips.list.col_route' | transloco }}</th><th>{{ 'trips.list.col_vehicle' | transloco }}</th><th>{{ 'trips.list.col_departure' | transloco }}</th><th>{{ 'trips.list.col_seats' | transloco }}</th><th>{{ 'trips.list.f_all_status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+        <thead class="thead-light"><tr>
+          <th>{{ 'trips.list.col_number' | transloco }}</th>
+          <th>{{ 'trips.list.f_code' | transloco }}</th>
+          <th>{{ 'trips.list.col_route' | transloco }}</th>
+          <th>{{ 'trips.list.f_plan' | transloco }}</th>
+          <th>{{ 'trips.list.col_vehicle' | transloco }}</th>
+          <th>{{ 'trips.list.col_category' | transloco }}</th>
+          <th>{{ 'trips.list.col_departure' | transloco }}</th>
+          <th>{{ 'trips.list.col_arrival' | transloco }}</th>
+          <th>{{ 'trips.list.col_seats' | transloco }}</th>
+          <th>{{ 'trips.list.f_all_status' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+        </tr></thead>
         <tbody>
           @for (t of filtered | paginate:pg.page:pg.size; track t.id) {
             <tr>
               <td class="fw-medium">{{ t.number }}</td>
+              <td>{{ t.code || '—' }}</td>
               <td>{{ t.route_code || '—' }}</td>
-              <td>{{ t.vehicle_plate || '—' }}</td>
-              <td>{{ t.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ t.seating_plan_code || '—' }}</td>
+              <td>{{ t.vehicle_plate || ('trips.list.vehicle_undefined' | transloco) }}</td>
+              <td>{{ t.fare_class_name || '—' }}</td>
+              <td>{{ t.scheduled_departure | date:'dd/MM HH:mm' }}</td>
+              <td>{{ t.scheduled_arrival | date:'dd/MM HH:mm' }}</td>
               <td>{{ t.seats_available }}/{{ t.seats_total }}</td>
               <td>
                 <span class="badge" [class]="statusCss(t.status)">{{ statusLabel(t.status) }}</span>
                 @if (t.is_delayed) { <span class="badge bg-warning ms-1">{{ 'trips.list.delayed' | transloco }}</span> }
               </td>
-              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" (click)="open(t)" [title]="'trips.list.open' | transloco"><i class="ti ti-eye me-1"></i>{{ 'trips.list.open' | transloco }}</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" (click)="roadmap(t)" [title]="'trips.list.roadmap' | transloco"><i class="ti ti-clipboard-list me-1"></i>{{ 'trips.list.roadmap' | transloco }}</a>
-              </div></td>
+              <td class="action-table-data">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="javascript:void(0);" (click)="open(t)"><i class="ti ti-eye me-2"></i>{{ 'trips.list.detail' | transloco }}</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);" (click)="roadmap(t)"><i class="ti ti-clipboard-list me-2"></i>{{ 'trips.list.roadmap' | transloco }}</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);" (click)="goReservations(t)"><i class="ti ti-ticket me-2"></i>{{ 'trips.list.act_reservations' | transloco }}</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);" (click)="goExpenses(t)"><i class="ti ti-receipt me-2"></i>{{ 'trips.list.act_expenses' | transloco }}</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    @if (t.status === 'draft') {
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="submitTrip(t)"><i class="ti ti-send me-2"></i>{{ 'trips.list.act_submit' | transloco }}</a></li>
+                      <li><a class="dropdown-item text-danger" href="javascript:void(0);" *hasPermission="'voyage.trip.delete'" (click)="deleteTrip(t)"><i class="ti ti-trash me-2"></i>{{ 'shared.actions.delete' | transloco }}</a></li>
+                    }
+                    @if (t.status === 'pending') {
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="departTrip(t)"><i class="ti ti-player-play me-2"></i>{{ 'trips.list.act_depart' | transloco }}</a></li>
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="suspendTrip(t)"><i class="ti ti-player-pause me-2"></i>{{ 'trips.list.act_suspend' | transloco }}</a></li>
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="cancelTrip(t)"><i class="ti ti-ban me-2"></i>{{ 'trips.list.act_cancel' | transloco }}</a></li>
+                    }
+                    @if (t.status === 'suspended') {
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="resumeTrip(t)"><i class="ti ti-player-play me-2"></i>{{ 'trips.list.act_resume' | transloco }}</a></li>
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="cancelTrip(t)"><i class="ti ti-ban me-2"></i>{{ 'trips.list.act_cancel' | transloco }}</a></li>
+                    }
+                    @if (t.status === 'departed') {
+                      <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="completeTrip(t)"><i class="ti ti-flag-check me-2"></i>{{ 'trips.list.act_complete' | transloco }}</a></li>
+                    }
+                    @if (t.status === 'pending' || t.status === 'departed') {
+                      @if (!t.is_delayed) { <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="markDelayed(t)"><i class="ti ti-clock-exclamation me-2"></i>{{ 'trips.list.act_delay' | transloco }}</a></li> }
+                      @else { <li><a class="dropdown-item" href="javascript:void(0);" *hasPermission="'voyage.trip.update'" (click)="clearDelay(t)"><i class="ti ti-clock-check me-2"></i>{{ 'trips.list.act_clear_delay' | transloco }}</a></li> }
+                    }
+                  </ul>
+                </div>
+              </td>
             </tr>
-          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'trips.list.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="11" class="text-center py-4 text-muted">{{ 'trips.list.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>

@@ -1049,7 +1049,20 @@
       "f_max_res_ph": "Unlimited if empty",
       "f_blocked": "Blocked seats",
       "f_crew": "Onboard crew",
-      "f_crew_hint": "Hold Ctrl/Cmd to select several."
+      "f_crew_hint": "Hold Ctrl/Cmd to select several.",
+      "col_category": "Category",
+      "col_arrival": "Arrival",
+      "detail": "Detail",
+      "act_reservations": "Reservations",
+      "act_expenses": "Expenses",
+      "act_submit": "Submit",
+      "act_depart": "Start",
+      "act_suspend": "Suspend",
+      "act_resume": "Resume",
+      "act_complete": "Complete",
+      "act_cancel": "Cancel trip",
+      "act_delay": "Mark delayed",
+      "act_clear_delay": "Clear delay"
     },
     "rm": {
       "board_all": "Board all",

@@ -61,6 +61,7 @@ class TripListSerializer(serializers.ModelSerializer):
     route_code = serializers.CharField(source="route.code", read_only=True, default=None)
     vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True, default=None)
     fare_class_name = serializers.CharField(source="fare_class.name", read_only=True, default=None)
+    seating_plan_code = serializers.CharField(source="seating_plan.code", read_only=True, default=None)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     seats_available = serializers.SerializerMethodField()
     seats_total = serializers.SerializerMethodField()
@@ -68,7 +69,7 @@ class TripListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
         fields = ["id", "number", "code", "route", "route_code", "vehicle", "vehicle_plate",
-                  "fare_class_name", "scheduled_departure", "scheduled_arrival",
+                  "fare_class_name", "seating_plan_code", "scheduled_departure", "scheduled_arrival",
                   "status", "status_display", "seat_assignment_mode",
                   "is_delayed", "seats_available", "seats_total"]
 

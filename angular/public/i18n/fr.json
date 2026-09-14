@@ -1049,7 +1049,20 @@
       "f_max_res_ph": "Illimité si vide",
       "f_blocked": "Nb places bloquées",
       "f_crew": "Personnels naviguants",
-      "f_crew_hint": "Maintenez Ctrl/Cmd pour en choisir plusieurs."
+      "f_crew_hint": "Maintenez Ctrl/Cmd pour en choisir plusieurs.",
+      "col_category": "Catégorie",
+      "col_arrival": "Arrivée",
+      "detail": "Détail",
+      "act_reservations": "Réservations",
+      "act_expenses": "Dépenses",
+      "act_submit": "Soumettre",
+      "act_depart": "Démarrer",
+      "act_suspend": "Suspendre",
+      "act_resume": "Reprendre",
+      "act_complete": "Terminer",
+      "act_cancel": "Annuler le voyage",
+      "act_delay": "Mettre en retard",
+      "act_clear_delay": "Lever le retard"
     },
     "rm": {
       "board_all": "Tout embarquer",

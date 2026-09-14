@@ -1049,7 +1049,20 @@
       "f_max_res_ph": "Ilimitado si vacío",
       "f_blocked": "Asientos bloqueados",
       "f_crew": "Personal de a bordo",
-      "f_crew_hint": "Mantenga Ctrl/Cmd para elegir varios."
+      "f_crew_hint": "Mantenga Ctrl/Cmd para elegir varios.",
+      "col_category": "Categoría",
+      "col_arrival": "Llegada",
+      "detail": "Detalle",
+      "act_reservations": "Reservas",
+      "act_expenses": "Gastos",
+      "act_submit": "Enviar",
+      "act_depart": "Iniciar",
+      "act_suspend": "Suspender",
+      "act_resume": "Reanudar",
+      "act_complete": "Finalizar",
+      "act_cancel": "Anular viaje",
+      "act_delay": "Marcar con retraso",
+      "act_clear_delay": "Quitar retraso"
     },
     "rm": {
       "board_all": "Embarcar todos",
