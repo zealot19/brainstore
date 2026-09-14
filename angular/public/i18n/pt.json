@@ -1044,7 +1044,12 @@
       "f_plan_hint": "Define o número de lugares a vender. Obrigatório.",
       "f_vehicle": "Veículo",
       "vehicle_undefined": "Não definido",
-      "f_vehicle_hint": "Opcional: pode ser adicionado depois."
+      "f_vehicle_hint": "Opcional: pode ser adicionado depois.",
+      "f_max_res": "Reservas permitidas",
+      "f_max_res_ph": "Ilimitado se vazio",
+      "f_blocked": "Lugares bloqueados",
+      "f_crew": "Pessoal de bordo",
+      "f_crew_hint": "Segure Ctrl/Cmd para escolher vários."
     },
     "rm": {
       "board_all": "Embarcar todos",

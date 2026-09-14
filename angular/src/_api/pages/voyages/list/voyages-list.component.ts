@@ -7,6 +7,7 @@ import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
 import { ServicePatternService } from '../../../services/voyages-config/service-pattern.service';
 import { SeatingPlanService } from '../../../services/voyages-config/seating-plan.service';
+import { CrewMemberService } from '../../../services/voyages/crew-member.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern } from '../../../models/voyages-config.models';
@@ -27,6 +28,7 @@ export class VoyagesListComponent implements OnInit {
   filterRoute = ''; filterVehicle = ''; dateField = 'departure'; dateFrom = ''; dateTo = '';
   vehicles: { id: string; license_plate: string }[] = [];
   seatingPlans: { id: string; code: string; name: string; total_seats: number }[] = [];
+  crewMembers: { id: string; full_name: string; member_type_name: string }[] = [];
   routes: Route[] = []; fareClasses: FareClass[] = []; patterns: ServicePattern[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
 
@@ -41,7 +43,7 @@ export class VoyagesListComponent implements OnInit {
 
   constructor(private svc: TripService, private routeSvc: RouteService, private fcSvc: FareClassService,
               private spSvc: ServicePatternService, private vehicleSvc: VehicleService,
-              private planSvc: SeatingPlanService,
+              private planSvc: SeatingPlanService, private crewSvc: CrewMemberService,
               private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -51,12 +53,14 @@ export class VoyagesListComponent implements OnInit {
       scheduled_departure: ['', Validators.required], scheduled_arrival: ['', Validators.required],
       code: [''], notes: [''], seat_assignment_mode: ['manual'], auto_expenses: [true],
       seating_plan_id: [null, Validators.required], vehicle_id: [null],
+      max_reservations: [null], blocked_seats_count: [0], crew_member_ids: [[]],
     });
     this.routeSvc.list().subscribe(d => this.routes = d);
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
     this.spSvc.list().subscribe(d => this.patterns = d);
     this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.planSvc.list().subscribe(d => this.seatingPlans = d as any);
+    this.crewSvc.list().subscribe(d => this.crewMembers = d as any);
     this.load();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau voyage" (sidebar) : ?new=1
     this.route.queryParams.subscribe(q => {
@@ -105,7 +109,8 @@ export class VoyagesListComponent implements OnInit {
     this.errorMsg = '';
     this.form.reset({ route_id: null, service_pattern_id: null, fare_class_id: null, service_date: '',
                       scheduled_departure: '', scheduled_arrival: '', code: '', notes: '', seat_assignment_mode: 'manual', auto_expenses: true,
-                      seating_plan_id: null, vehicle_id: null });
+                      seating_plan_id: null, vehicle_id: null,
+                      max_reservations: null, blocked_seats_count: 0, crew_member_ids: [] });
     this.onPatternChange();  // restaure les validateurs du mode manuel
   }
   submit(): void {
@@ -114,12 +119,14 @@ export class VoyagesListComponent implements OnInit {
     const payload = f.service_pattern_id
       ? { service_pattern_id: f.service_pattern_id, service_date: f.service_date, code: f.code, notes: f.notes,
           seat_assignment_mode: f.seat_assignment_mode, auto_expenses: f.auto_expenses,
-          seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id }
+          seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id,
+          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: f.crew_member_ids || [] }
       : { route_id: f.route_id, fare_class_id: f.fare_class_id,
           scheduled_departure: f.scheduled_departure, scheduled_arrival: f.scheduled_arrival,
           code: f.code, notes: f.notes, service_pattern_id: null,
           seat_assignment_mode: f.seat_assignment_mode, auto_expenses: f.auto_expenses,
-          seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id };
+          seating_plan_id: f.seating_plan_id, vehicle_id: f.vehicle_id,
+          max_reservations: f.max_reservations, blocked_seats_count: f.blocked_seats_count || 0, crew_member_ids: f.crew_member_ids || [] };
     this.svc.create(payload).subscribe({
       next: t => { this.saving = false; this.close(); this.router.navigate(['/voyages/trip', t.id]); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },

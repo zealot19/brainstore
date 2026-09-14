@@ -75,7 +75,9 @@ class TripListCreateView(APIView):
                     company=company, pattern=pattern, service_date=d["service_date"],
                     code=d["code"], notes=d["notes"],
                     seat_assignment_mode=d["seat_assignment_mode"],
-                    auto_expenses=d["auto_expenses"], user=request.user)
+                    auto_expenses=d["auto_expenses"], max_reservations=d["max_reservations"],
+                    blocked_seats_count=d["blocked_seats_count"], crew_member_ids=d["crew_member_ids"],
+                    user=request.user)
             except ApplicationError as e:
                 return error_response(str(e))
             return created_response(S.TripDetailSerializer(trip).data)
@@ -102,7 +104,8 @@ class TripListCreateView(APIView):
                 code=d["code"], notes=d["notes"],
                 seat_assignment_mode=d["seat_assignment_mode"],
                 auto_expenses=d["auto_expenses"], seating_plan=seating_plan, vehicle=vehicle,
-                user=request.user,
+                max_reservations=d["max_reservations"], blocked_seats_count=d["blocked_seats_count"],
+                crew_member_ids=d["crew_member_ids"], user=request.user,
             )
         except ApplicationError as e:
             return error_response(str(e))

@@ -33,6 +33,13 @@ def create_reservation(company, *, trip_type, outbound_trip, return_trip, buyer_
     if is_round and not open_return:
         B._assert_bookable(return_trip)
 
+    # Plafond de réservations (non payées) autorisées sur le voyage aller.
+    if outbound_trip.max_reservations is not None:
+        held = TripSeat.objects.filter(trip=outbound_trip, is_deleted=False,
+                                       status=TripSeat.Status.HELD).count()
+        if held + len(items) > outbound_trip.max_reservations:
+            raise ApplicationError(_("Nombre de réservations autorisées atteint pour ce voyage."))
+
     buyer = B._resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
         company=company, agency=outbound_trip.origin.agency,

@@ -19,7 +19,8 @@ def _trip_number():
 def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_arrival,
                 service_pattern=None, origin=None, destination=None, code="", notes="",
                 seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True,
-                seating_plan=None, vehicle=None, user):
+                seating_plan=None, vehicle=None, max_reservations=None,
+                blocked_seats_count=0, crew_member_ids=None, user):
     if scheduled_arrival <= scheduled_departure:
         raise ApplicationError(_("L'arrivée prévue doit être postérieure au départ."))
     trip = Trip.objects.create(
@@ -29,6 +30,7 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
         scheduled_departure=scheduled_departure, scheduled_arrival=scheduled_arrival,
         status=Trip.Status.DRAFT, seat_assignment_mode=seat_assignment_mode,
         auto_expenses=auto_expenses, seating_plan=seating_plan, vehicle=vehicle,
+        max_reservations=max_reservations, blocked_seats_count=blocked_seats_count or 0,
         notes=notes, created_by=user,
     )
     for rs in RouteStop.objects.filter(route=route, is_deleted=False).order_by("sequence"):
@@ -39,10 +41,33 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
     if trip.seating_plan_id:
         from apps.voyages_trips.services.assignment import materialise_seats
         materialise_seats(trip)
+        _block_seats(trip, blocked_seats_count or 0, user)
+    _assign_crew(trip, crew_member_ids or [], company, user)
     if auto_expenses:
         from apps.voyages_trips.services.expense_services import apply_expense_schedule
         apply_expense_schedule(trip)
     return trip
+
+
+def _block_seats(trip, count, user):
+    """Bloque les `count` premiers sièges disponibles (non vendables)."""
+    if count <= 0:
+        return
+    from apps.voyages_trips.models import TripSeat
+    seats = list(TripSeat.objects.filter(trip=trip, is_deleted=False, status=TripSeat.Status.AVAILABLE)
+                 .order_by("row", "column", "seat_number")[:count])
+    for s in seats:
+        s.status = TripSeat.Status.BLOCKED
+        s.updated_by = user
+        s.save(update_fields=["status", "updated_by", "updated_at"])
+
+
+def _assign_crew(trip, crew_member_ids, company, user):
+    from apps.voyages_trips.models import CrewMember, TripCrew
+    for cid in crew_member_ids:
+        member = CrewMember.objects.filter(id=cid, company=company, is_deleted=False).first()
+        if member and not TripCrew.objects.filter(trip=trip, member=member, is_deleted=False).exists():
+            TripCrew.objects.create(trip=trip, member=member, created_by=user)
 
 
 _WEEKDAY_FIELDS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -50,7 +75,8 @@ _WEEKDAY_FIELDS = ["monday", "tuesday", "wednesday", "thursday", "friday", "satu
 
 @transaction.atomic
 def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="",
-                             seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True, user):
+                             seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True,
+                             max_reservations=None, blocked_seats_count=0, crew_member_ids=None, user):
     """Crée un voyage à partir d'une planification : trajet, catégorie, plan et
     horaires sont dérivés du modèle ; l'utilisateur ne choisit que la date."""
     from datetime import datetime, timedelta
@@ -75,7 +101,8 @@ def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="
         service_pattern=pattern, code=code, notes=notes,
         seat_assignment_mode=seat_assignment_mode, auto_expenses=auto_expenses,
         seating_plan=pattern.default_seating_plan if pattern.default_seating_plan_id else None,
-        user=user)
+        max_reservations=max_reservations, blocked_seats_count=blocked_seats_count,
+        crew_member_ids=crew_member_ids, user=user)
     return trip
 
 

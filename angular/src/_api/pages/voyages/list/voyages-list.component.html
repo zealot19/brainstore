@@ -104,6 +104,17 @@
         <select formControlName="vehicle_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.vehicle_undefined' | transloco }}</option>@for (v of vehicles; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }}</option> }</select>
         <small class="text-muted d-block mt-1">{{ 'trips.list.f_vehicle_hint' | transloco }}</small></div>
     </div>
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_max_res' | transloco }}</label>
+        <input formControlName="max_reservations" type="number" min="0" class="form-control" [placeholder]="'trips.list.f_max_res_ph' | transloco" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_blocked' | transloco }}</label>
+        <input formControlName="blocked_seats_count" type="number" min="0" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'trips.list.f_crew' | transloco }}</label>
+      <select formControlName="crew_member_ids" class="form-select" multiple size="4">
+        @for (c of crewMembers; track c.id) { <option [ngValue]="c.id">{{ c.full_name }} @if (c.member_type_name) { ({{ c.member_type_name }}) } </option> }
+      </select>
+      <small class="text-muted d-block mt-1">{{ 'trips.list.f_crew_hint' | transloco }}</small></div>
     <div class="mb-3">
       <label class="form-label">{{ 'trips.list.f_seat_mode' | transloco }}</label>
       <select formControlName="seat_assignment_mode" class="form-select">

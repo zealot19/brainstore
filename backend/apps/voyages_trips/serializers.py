@@ -89,6 +89,7 @@ class TripDetailSerializer(TripListSerializer):
     class Meta(TripListSerializer.Meta):
         fields = TripListSerializer.Meta.fields + [
             "service_pattern", "seating_plan", "seating_plan_code", "auto_expenses",
+            "max_reservations", "blocked_seats_count",
             "origin", "origin_name", "destination", "destination_name",
             "actual_departure", "actual_arrival", "delayed_until", "delay_reason",
             "notes", "stops", "crew", "created_at", "updated_at",
@@ -113,6 +114,9 @@ class TripCreateSerializer(serializers.Serializer):
     auto_expenses = serializers.BooleanField(required=False, default=True)
     seating_plan_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     vehicle_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    max_reservations = serializers.IntegerField(required=False, allow_null=True, default=None, min_value=0)
+    blocked_seats_count = serializers.IntegerField(required=False, default=0, min_value=0)
+    crew_member_ids = serializers.ListField(child=serializers.UUIDField(), required=False, default=list)
 
     def validate(self, attrs):
         pattern_mode = bool(attrs.get("service_pattern_id") and attrs.get("service_date"))

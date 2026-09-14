@@ -1044,7 +1044,12 @@
       "f_plan_hint": "Définit le nombre de places à vendre. Obligatoire.",
       "f_vehicle": "Véhicule",
       "vehicle_undefined": "Non défini",
-      "f_vehicle_hint": "Optionnel : peut être ajouté plus tard."
+      "f_vehicle_hint": "Optionnel : peut être ajouté plus tard.",
+      "f_max_res": "Nb réservations autorisées",
+      "f_max_res_ph": "Illimité si vide",
+      "f_blocked": "Nb places bloquées",
+      "f_crew": "Personnels naviguants",
+      "f_crew_hint": "Maintenez Ctrl/Cmd pour en choisir plusieurs."
     },
     "rm": {
       "board_all": "Tout embarquer",

@@ -42,6 +42,9 @@ class Trip(BaseModel):
     seat_assignment_mode = models.CharField(_("attribution des sièges"), max_length=10,
                                             choices=SeatAssignment.choices, default=SeatAssignment.MANUAL)
     auto_expenses       = models.BooleanField(_("dépenses automatiques (barème)"), default=True)
+    max_reservations    = models.PositiveIntegerField(_("réservations autorisées"), null=True, blank=True,
+                                                      help_text=_("Nb max de places réservables (non payées). Vide = illimité."))
+    blocked_seats_count = models.PositiveIntegerField(_("places bloquées"), default=0)
     is_delayed          = models.BooleanField(_("en retard"), default=False)
     delayed_until       = models.DateTimeField(_("reporté à"), null=True, blank=True)
     delay_reason        = models.TextField(_("motif du retard"), blank=True)

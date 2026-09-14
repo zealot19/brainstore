@@ -1044,7 +1044,12 @@
       "f_plan_hint": "Sets the number of seats to sell. Required.",
       "f_vehicle": "Vehicle",
       "vehicle_undefined": "Not defined",
-      "f_vehicle_hint": "Optional: can be added later."
+      "f_vehicle_hint": "Optional: can be added later.",
+      "f_max_res": "Reservations allowed",
+      "f_max_res_ph": "Unlimited if empty",
+      "f_blocked": "Blocked seats",
+      "f_crew": "Onboard crew",
+      "f_crew_hint": "Hold Ctrl/Cmd to select several."
     },
     "rm": {
       "board_all": "Board all",
