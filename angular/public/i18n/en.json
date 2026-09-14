@@ -177,7 +177,9 @@
     "denominations": "Denominations",
     "billetterie": "Ticketing",
     "billets": "Tickets",
-    "nouveau_billet": "New ticket"
+    "nouveau_billet": "New ticket",
+    "titres_de_transport": "Transport tickets",
+    "nouveau_titre": "New ticket"
   },
   "booking": {
     "list": {
@@ -375,6 +377,34 @@
       "expired": "Expired",
       "pay": "Collect payment",
       "empty": "No reservation."
+    },
+    "form": {
+      "trip": "Trip",
+      "trip_type": "Trip type",
+      "one_way": "One way",
+      "round_trip": "Round trip",
+      "route": "Route",
+      "all_routes": "All routes",
+      "fare_class": "Fare class",
+      "return_open": "Open return",
+      "day": "Trip day",
+      "time_slot": "Time slot",
+      "vehicle": "Vehicle / Code",
+      "no_trip": "No trip",
+      "seat": "Seat No.",
+      "destination": "Destination",
+      "fare": "Fare (XAF)",
+      "ret_day": "Return day",
+      "ret_slot": "Return slot",
+      "ret_vehicle": "Return vehicle",
+      "ret_seat": "Return seat",
+      "client": "Customer",
+      "name": "Customer name",
+      "phone": "Phone",
+      "id_type": "ID type",
+      "id_number": "ID number",
+      "payment": "Payment",
+      "seats_left": "Seats left"
     }
   },
   "treasury": {

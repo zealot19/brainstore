@@ -177,7 +177,9 @@
     "denominations": "Denominaciones",
     "billetterie": "Billetería",
     "billets": "Billetes",
-    "nouveau_billet": "Nuevo billete"
+    "nouveau_billet": "Nuevo billete",
+    "titres_de_transport": "Títulos de transporte",
+    "nouveau_titre": "Nuevo título"
   },
   "booking": {
     "list": {
@@ -375,6 +377,34 @@
       "expired": "Vencida",
       "pay": "Cobrar",
       "empty": "Sin reservas."
+    },
+    "form": {
+      "trip": "Viaje",
+      "trip_type": "Tipo de viaje",
+      "one_way": "Solo ida",
+      "round_trip": "Ida y vuelta",
+      "route": "Trayecto",
+      "all_routes": "Todos los trayectos",
+      "fare_class": "Categoría tarifaria",
+      "return_open": "Vuelta abierta",
+      "day": "Día del viaje",
+      "time_slot": "Franja horaria",
+      "vehicle": "Vehículo / Código",
+      "no_trip": "Ningún viaje",
+      "seat": "N.º de asiento",
+      "destination": "Destino",
+      "fare": "Tarifa (XAF)",
+      "ret_day": "Día de vuelta",
+      "ret_slot": "Franja de vuelta",
+      "ret_vehicle": "Vehículo de vuelta",
+      "ret_seat": "Asiento de vuelta",
+      "client": "Cliente",
+      "name": "Nombre del cliente",
+      "phone": "Teléfono",
+      "id_type": "Tipo de documento",
+      "id_number": "N.º de documento",
+      "payment": "Pago",
+      "seats_left": "Asientos disponibles"
     }
   },
   "treasury": {

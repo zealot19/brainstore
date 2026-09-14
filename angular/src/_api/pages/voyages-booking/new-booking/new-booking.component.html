@@ -1,168 +1,156 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>{{ (isReservation ? 'booking.reserve.title' : 'booking.actions.new') | transloco }}</h4><h6>{{ (isReservation ? 'booking.reserve.subtitle' : 'booking.new.subtitle') | transloco }}</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ (isReservation ? 'booking.reserve.title' : 'booking.actions.new') | transloco }}</h4>
+    <h6>{{ (isReservation ? 'booking.reserve.subtitle' : 'booking.new.subtitle') | transloco }}</h6>
+  </div></div>
 </div>
-<app-info-banner [text]="'booking.new.info' | transloco"></app-info-banner>
 
 <div class="card"><div class="card-body">
   @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
-  <!-- Critères -->
-  <h6 class="mb-3"><span class="badge bg-primary me-2">1</span>{{ 'booking.new.s1' | transloco }}</h6>
-  <div class="row">
-    <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.trip_type' | transloco }}</label>
-      <select class="form-select" [(ngModel)]="tripType" (ngModelChange)="onCriteriaChange()">
-        <option value="one_way">{{ 'booking.type.one_way' | transloco }}</option>
-        <option value="round_trip">{{ 'booking.type.round_trip' | transloco }}</option>
-      </select></div>
-    <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.fare_class' | transloco }} <span class="text-danger">*</span></label>
-      <app-searchable-select [items]="fareClasses" labelKey="name" valueKey="id" [placeholder]="'booking.new.choose' | transloco" [(ngModel)]="fareClassId" (ngModelChange)="onCriteriaChange()"></app-searchable-select></div>
-    <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.out_date' | transloco }} <span class="text-danger">*</span></label>
-      <input type="date" class="form-control" [(ngModel)]="outDate" (ngModelChange)="searchOutbound()" /></div>
-    <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.out_slot' | transloco }} <span class="text-danger">*</span></label>
-      <select class="form-select" [(ngModel)]="outSlotId" (ngModelChange)="searchOutbound()">
+  <!-- Voyage -->
+  <h6 class="text-muted mb-2">{{ 'booking.form.trip' | transloco }}</h6>
+  <div class="row g-3 mb-2">
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.trip_type' | transloco }}</label>
+      <select class="form-select" [(ngModel)]="tripType" (ngModelChange)="onTripTypeChange()">
+        <option value="one_way">{{ 'booking.form.one_way' | transloco }}</option>
+        <option value="round_trip">{{ 'booking.form.round_trip' | transloco }}</option>
+      </select>
+    </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.route' | transloco }}</label>
+      <select class="form-select" [(ngModel)]="routeCode" (ngModelChange)="onOutCriteria()">
+        <option value="">{{ 'booking.form.all_routes' | transloco }}</option>
+        @for (r of routes; track r.id) { <option [value]="r.code">{{ r.code }} — {{ r.origin_name }} → {{ r.destination_name }}</option> }
+      </select>
+    </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.fare_class' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="fareClassId" (ngModelChange)="onOutCriteria()">
         <option value="">{{ 'booking.new.choose' | transloco }}</option>
-        @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
-      </select></div>
+        @for (f of fareClasses; track f.id) { <option [value]="f.id">{{ f.name }}</option> }
+      </select>
+    </div>
     @if (isRound) {
-      <div class="col-12 mb-2">
-        <div class="form-check"><input type="checkbox" class="form-check-input" id="return-open" [(ngModel)]="returnOpen" (ngModelChange)="onReturnOpenChange()" />
-          <label class="form-check-label" for="return-open">{{ 'booking.new.return_open_check' | transloco }}</label></div>
-      </div>
-    }
-    @if (needReturnSel) {
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.ret_date' | transloco }} <span class="text-danger">*</span></label>
-        <input type="date" class="form-control" [(ngModel)]="retDate" (ngModelChange)="searchReturn()" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.ret_slot' | transloco }} <span class="text-danger">*</span></label>
-        <select class="form-select" [(ngModel)]="retSlotId" (ngModelChange)="searchReturn()">
-          <option value="">{{ 'booking.new.choose' | transloco }}</option>
-          @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label }} ({{ s.start_time }}–{{ s.end_time }})</option> }
-        </select></div>
+      <div class="col-md-3 d-flex align-items-end"><div class="form-check form-switch">
+        <input type="checkbox" class="form-check-input" id="ret-open" [(ngModel)]="returnOpen" (ngModelChange)="onTripTypeChange()" />
+        <label class="form-check-label" for="ret-open">{{ 'booking.form.return_open' | transloco }}</label>
+      </div></div>
     }
   </div>
 
-  <!-- Voyages disponibles -->
-  @if (outReady) {
-    <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">2</span>{{ 'booking.new.s2' | transloco }}</h6>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'booking.new.out_trip' | transloco }} <span class="text-danger">*</span></label>
-        <app-searchable-select [items]="outTrips" [labelFn]="tripLabel" valueKey="id" [placeholder]="'booking.new.choose' | transloco" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()"></app-searchable-select>
-        @if (!outTrips.length) { <small class="text-muted">{{ 'booking.new.no_out_trip' | transloco }}</small> }
-      </div>
-      @if (needReturnSel && retReady) {
-        <div class="col-md-6 mb-3"><label class="form-label">{{ 'booking.new.return_trip' | transloco }} <span class="text-danger">*</span></label>
-          <app-searchable-select [items]="retTrips" [labelFn]="tripLabel" valueKey="id" [placeholder]="'booking.new.choose' | transloco" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()"></app-searchable-select>
-          @if (!retTrips.length) { <small class="text-muted">{{ 'booking.new.no_return_trip' | transloco }}</small> }
-        </div>
+  <div class="row g-3 mb-2">
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.day' | transloco }} <span class="text-danger">*</span></label>
+      <input type="date" class="form-control" [(ngModel)]="outDate" (ngModelChange)="onOutCriteria()" /></div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.time_slot' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="outSlotId" (ngModelChange)="onOutCriteria()">
+        <option value="">{{ 'booking.new.choose' | transloco }}</option>
+        @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label || (s.start_time + ' - ' + s.end_time) }}</option> }
+      </select>
+    </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.vehicle' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="outboundTripId" (ngModelChange)="onOutboundChange()" [disabled]="!outTrips.length">
+        <option value="">{{ outTrips.length ? ('booking.new.choose' | transloco) : ('booking.form.no_trip' | transloco) }}</option>
+        @for (t of outTrips; track t.id) { <option [value]="t.id">{{ t.number }} @if (t.route_code) { · {{ t.route_code }} }</option> }
+      </select>
+    </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.seat' | transloco }} @if (!outboundAuto) { <span class="text-danger">*</span> }</label>
+      @if (outboundAuto) {
+        <input class="form-control" disabled [value]="'booking.new.seat_auto' | transloco" />
+      } @else {
+        <select class="form-select" [(ngModel)]="outSeatId" [disabled]="!outboundTripId">
+          <option value="">{{ 'booking.new.choose' | transloco }}</option>
+          @for (s of availOutSeats; track s.id) { <option [value]="s.id">{{ s.seat_number }}</option> }
+        </select>
       }
     </div>
-  }
+  </div>
 
-  <!-- Sièges -->
-  @if (outboundSeats.length) {
-    <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">3</span>{{ 'booking.new.s3_out' | transloco }}</h6>
-    <div class="mb-2">
-      @for (row of rows(outboundSeats); track row) {
-        <div class="d-flex gap-2 mb-2">
-          @for (s of seatsInRow(outboundSeats, row); track s.id) {
-            <button type="button" class="btn btn-sm {{ seatClass('out', s) }}" style="width:48px" *hasPermission="'ticketing.booking.create'" (click)="toggleSeat('out', s)">{{ s.seat_number }}</button>
-          }
-        </div>
-      }
+  <div class="row g-3 mb-2">
+    <div class="col-md-6"><label class="form-label">{{ 'booking.form.destination' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="destinationId" [disabled]="!destinations.length">
+        <option value="">{{ 'booking.new.choose' | transloco }}</option>
+        @for (d of destinations; track d.id) { <option [value]="d.id">{{ d.name }}</option> }
+      </select>
     </div>
-    @if (needReturnSel && returnSeats.length) {
-      <h6 class="mb-3 mt-3">{{ 'booking.new.s3_ret' | transloco }}</h6>
-      <div class="mb-2">
-        @for (row of rows(returnSeats); track row) {
-          <div class="d-flex gap-2 mb-2">
-            @for (s of seatsInRow(returnSeats, row); track s.id) {
-              <button type="button" class="btn btn-sm {{ seatClass('ret', s) }}" style="width:48px" *hasPermission="'ticketing.booking.create'" (click)="toggleSeat('ret', s)">{{ s.seat_number }}</button>
-            }
-          </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.fare' | transloco }}</label>
+      <input class="form-control fw-bold" disabled [value]="fare != null ? ((fare | number:'1.0-0') + ' XAF') : '—'" /></div>
+  </div>
+
+  <!-- Retour (aller-retour fermé) -->
+  @if (needReturnSel) {
+    <div class="row g-3 mb-2">
+      <div class="col-md-3"><label class="form-label">{{ 'booking.form.ret_day' | transloco }}</label>
+        <input type="date" class="form-control" [(ngModel)]="retDate" (ngModelChange)="onRetCriteria()" /></div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.form.ret_slot' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="retSlotId" (ngModelChange)="onRetCriteria()">
+          <option value="">{{ 'booking.new.choose' | transloco }}</option>
+          @for (s of timeSlots; track s.id) { <option [value]="s.id">{{ s.label || (s.start_time + ' - ' + s.end_time) }}</option> }
+        </select>
+      </div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.form.ret_vehicle' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="returnTripId" (ngModelChange)="onReturnChange()" [disabled]="!retTrips.length">
+          <option value="">{{ retTrips.length ? ('booking.new.choose' | transloco) : ('booking.form.no_trip' | transloco) }}</option>
+          @for (t of retTrips; track t.id) { <option [value]="t.id">{{ t.number }}</option> }
+        </select>
+      </div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.form.ret_seat' | transloco }}</label>
+        @if (returnAuto) { <input class="form-control" disabled [value]="'booking.new.seat_auto' | transloco" /> }
+        @else {
+          <select class="form-select" [(ngModel)]="retSeatId" [disabled]="!returnTripId">
+            <option value="">{{ 'booking.new.choose' | transloco }}</option>
+            @for (s of availRetSeats; track s.id) { <option [value]="s.id">{{ s.seat_number }}</option> }
+          </select>
         }
       </div>
-      <p class="text-muted small">{{ 'booking.new.out_label' | transloco }} : {{ selOutbound.length }} · {{ 'booking.new.ret_label' | transloco }} : {{ selReturn.length }} {{ 'booking.new.must_equal' | transloco }}</p>
-    }
-  }
-
-  <!-- Attribution automatique : pas de grille, on saisit le nombre de passagers -->
-  @if (outboundTripId && outboundAuto) {
-    <hr>
-    <h6 class="mb-2"><span class="badge bg-primary me-2">3</span>{{ 'booking.new.s3_auto' | transloco }}</h6>
-    <div class="row align-items-center mb-2">
-      <div class="col-md-4">
-        <label class="form-label">{{ 'booking.new.pax_count' | transloco }}</label>
-        <input type="number" min="1" class="form-control" [(ngModel)]="paxCount" (ngModelChange)="onPaxCountChange()" />
-      </div>
-      <div class="col-md-8"><small class="text-muted"><i class="ti ti-info-circle me-1"></i>{{ 'booking.new.auto_hint' | transloco }}</small></div>
     </div>
   }
 
-  <!-- Passagers + point de descente -->
-  @if (passengers.length) {
-    <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">4</span>{{ 'booking.new.s4' | transloco }}</h6>
-    <div class="table-responsive"><table class="table align-middle">
-      <thead><tr><th>{{ 'booking.new.col_seat' | transloco }}</th><th>{{ 'booking.new.col_name' | transloco }}</th><th>{{ 'booking.new.col_phone' | transloco }}</th><th>{{ 'booking.new.col_id_number' | transloco }}</th><th>{{ 'booking.new.col_dropoff' | transloco }}</th><th class="text-end">{{ 'booking.new.col_fare' | transloco }}</th><th class="text-center">{{ 'booking.new.col_buyer' | transloco }}</th></tr></thead>
-      <tbody>
-        @for (p of passengers; track $index) {
-          <tr>
-            <td>@if (outboundAuto) { <span class="badge bg-secondary">{{ 'booking.new.seat_auto' | transloco }}</span> } @else { <span class="badge bg-primary">{{ selOutbound[$index].seat_number }}</span> }@if (needReturnSel && !returnAuto && selReturn[$index]) { <span class="badge bg-info ms-1">{{ selReturn[$index].seat_number }}</span> }</td>
-            <td><app-client-autocomplete [row]="p"></app-client-autocomplete></td>
-            <td><input class="form-control form-control-sm" [(ngModel)]="p.phone" /></td>
-            <td><input class="form-control form-control-sm" [(ngModel)]="p.id_number" /></td>
-            <td>
-              <select class="form-select form-select-sm" [(ngModel)]="p.destination_point_id">
-                @for (d of destinations; track d.id) {
-                  <option [value]="d.id">{{ d.name }}@if (!d.is_station) { {{ 'booking.new.escale' | transloco }} }</option>
-                }
-              </select>
-            </td>
-            <td class="text-end">
-              @if (priceFor(p.destination_point_id) != null) { {{ priceFor(p.destination_point_id) | number:'1.0-0' }} XAF }
-              @else { <span class="text-danger small">{{ 'booking.new.fare_missing' | transloco }}</span> }
-            </td>
-            <td class="text-center"><input type="radio" name="buyer" [value]="$index" [(ngModel)]="buyerIndex" /></td>
-          </tr>
-        }
-      </tbody>
-    </table></div>
-    @if (anyMissingFare) { <div class="alert alert-warning py-2">{{ 'booking.new.missing_fare_warn' | transloco }}</div> }
-  }
+  <hr />
+  <!-- Client -->
+  <h6 class="text-muted mb-2">{{ 'booking.form.client' | transloco }}</h6>
+  <div class="row g-3 mb-2">
+    <div class="col-md-4"><label class="form-label">{{ 'booking.form.name' | transloco }} <span class="text-danger">*</span></label>
+      <app-client-autocomplete [row]="client"></app-client-autocomplete></div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.phone' | transloco }} <span class="text-danger">*</span></label>
+      <input class="form-control" [(ngModel)]="client.phone" /></div>
+    <div class="col-md-2"><label class="form-label">{{ 'booking.form.id_type' | transloco }}</label>
+      <select class="form-select" [(ngModel)]="client.id_type">
+        <option value="cni">CNI</option><option value="passport">Passeport</option><option value="permis">Permis</option><option value="other">Autre</option>
+      </select></div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.id_number' | transloco }}</label>
+      <input class="form-control" [(ngModel)]="client.id_number" /></div>
+  </div>
 
-  <!-- Encaissement -->
-  @if (passengers.length && !isReservation) {
-    <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">5</span>{{ 'booking.new.s5' | transloco }}</h6>
-    <div class="row">
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.payment_method' | transloco }}</label>
+  <hr />
+  <!-- Paiement / Réservation -->
+  @if (isReservation) {
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">{{ 'booking.reserve.hold_until' | transloco }} <span class="text-danger">*</span></label>
+        <input type="datetime-local" class="form-control" [(ngModel)]="holdUntil" /></div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
+        <input class="form-control fw-bold" disabled [value]="(total | number:'1.0-0') + ' XAF'" /></div>
+    </div>
+    <p class="text-muted small mt-1">{{ 'booking.reserve.hint' | transloco }}</p>
+  } @else {
+    <h6 class="text-muted mb-2">{{ 'booking.form.payment' | transloco }}</h6>
+    <div class="row g-3">
+      <div class="col-md-3"><label class="form-label">{{ 'booking.new.payment_method' | transloco }} <span class="text-danger">*</span></label>
         <select class="form-select" [(ngModel)]="paymentMethod" (ngModelChange)="onPaymentMethodChange()">
           <option value="" disabled selected>{{ 'booking.new.choose' | transloco }}</option>
           @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
-        <input class="form-control fw-bold" [value]="(total | number:'1.0-0') + ' XAF'" disabled /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.amount_received' | transloco }} @if (requiresPayment) { <span class="text-danger">*</span> }</label>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
+        <input class="form-control fw-bold" disabled [value]="(total | number:'1.0-0') + ' XAF'" /></div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.new.amount_received' | transloco }} @if (requiresPayment) { <span class="text-danger">*</span> }</label>
         <input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" placeholder="0" [disabled]="!requiresPayment" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'booking.new.change' | transloco }}</label>
-        <input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
+      <div class="col-md-3"><label class="form-label">{{ 'booking.new.change' | transloco }}</label>
+        <input class="form-control" disabled [value]="(change | number:'1.0-0') + ' XAF'" /></div>
     </div>
   }
 
-  @if (passengers.length && isReservation) {
-    <hr>
-    <h6 class="mb-3"><span class="badge bg-primary me-2">5</span>{{ 'booking.reserve.s5' | transloco }}</h6>
-    <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'booking.reserve.hold_until' | transloco }} <span class="text-danger">*</span></label>
-        <input type="datetime-local" class="form-control" [(ngModel)]="holdUntil" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
-        <input class="form-control fw-bold" [value]="(total | number:'1.0-0') + ' XAF'" disabled /></div>
-    </div>
-    <p class="text-muted small">{{ 'booking.reserve.hint' | transloco }}</p>
-  }
-
-  <div class="d-flex justify-content-end mt-2">
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <span class="text-muted small">
+      @if (outboundTripId && !outboundAuto) { {{ 'booking.form.seats_left' | transloco }} : <span class="badge bg-success">{{ availOutSeats.length }}</span> }
+    </span>
     <button class="btn btn-success" [disabled]="!canSubmit" *hasPermission="'ticketing.booking.create'" (click)="submit()">
       <i class="ti ti-cash-register me-1"></i>{{ (isReservation ? 'booking.reserve.submit' : 'booking.new.submit') | transloco }}
     </button>

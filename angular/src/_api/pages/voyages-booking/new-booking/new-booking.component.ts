@@ -5,192 +5,135 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
 import { FareClassService } from '../../../services/voyages-config/fare-class.service';
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
-import { FareClass, TimeSlot } from '../../../models/voyages-config.models';
-import { TripOption, TripDestination, SeatCell, BookingCreate, BookingItem, PassengerSpec } from '../../../models/voyages-booking.models';
+import { RouteService } from '../../../services/voyages-config/route.service';
+import { FareClass, TimeSlot, Route } from '../../../models/voyages-config.models';
+import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
-import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { TranslocoModule } from '@jsverse/transloco';
 
-interface PaxRow extends PassengerSpec { destination_point_id: string; }
-
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, SearchableSelectComponent, ClientAutocompleteComponent, TranslocoModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, ClientAutocompleteComponent, TranslocoModule],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
-  fareClasses: FareClass[] = []; timeSlots: TimeSlot[] = [];
-  fareClassId = ''; outSlotId = ''; retSlotId = ''; outDate = ''; retDate = '';
-  outTrips: TripOption[] = []; retTrips: TripOption[] = [];
-  outboundTripId = ''; returnTripId = '';
-  outboundSeats: SeatCell[] = []; returnSeats: SeatCell[] = [];
-  destinations: TripDestination[] = [];
-  selOutbound: SeatCell[] = []; selReturn: SeatCell[] = [];
-  passengers: PaxRow[] = []; buyerIndex = 0;
-  paxCount = 1;  // utilisé en attribution automatique (pas de choix de siège)
-  paymentMethod = ''; amountReceived: number | null = null;
+  fareClasses: FareClass[] = []; timeSlots: TimeSlot[] = []; routes: Route[] = [];
   paymentMethods: any[] = [];
+
+  // Aller
+  routeCode = ''; fareClassId = ''; outDate = ''; outSlotId = '';
+  outTrips: TripOption[] = []; outboundTripId = '';
+  destinations: TripDestination[] = []; destinationId = '';
+  outSeats: SeatCell[] = []; outSeatId = '';
+
+  // Retour
   returnOpen = false;
+  retDate = ''; retSlotId = ''; retTrips: TripOption[] = []; returnTripId = '';
+  retSeats: SeatCell[] = []; retSeatId = '';
+
+  // Client (un seul par formulaire)
+  client: PassengerSpec = { name: '', phone: '', id_type: 'cni', id_number: '' };
+
+  // Paiement / Réservation
+  paymentMethod = ''; amountReceived: number | null = null;
+  isReservation = false; holdUntil = '';
   saving = false; errorMsg = '';
 
-  // Mode réservation (billet non payé avec échéance)
-  isReservation = false; holdUntil = '';
-
   constructor(private svc: BookingService, private fcSvc: FareClassService,
-              private tsSvc: TimeSlotService, private router: Router,
-              private route: ActivatedRoute,
+              private tsSvc: TimeSlotService, private routeSvc: RouteService,
+              private router: Router, private route: ActivatedRoute,
               private pmSvc: PaymentMethodService) {}
+
   ngOnInit(): void {
     this.isReservation = this.route.snapshot.data['mode'] === 'reservation';
     if (this.isReservation) {
       const d = new Date(Date.now() + 24 * 3600 * 1000);
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-      this.holdUntil = d.toISOString().slice(0, 16);  // datetime-local par défaut +24h
+      this.holdUntil = d.toISOString().slice(0, 16);
     }
     this.fcSvc.list().subscribe(d => this.fareClasses = d);
     this.tsSvc.list().subscribe(d => this.timeSlots = d);
+    this.routeSvc.list().subscribe(d => this.routes = d);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
   }
 
-  onPaymentMethodChange(): void {
-    if (!this.requiresPayment) this.amountReceived = 0;
-  }
-
-  /** Currently selected payment method object (undefined until one is chosen). */
-  get selectedPaymentMethod(): any {
-    return this.paymentMethods.find(m => m.code === this.paymentMethod);
-  }
-
-  /** A method requires payment unless it is explicitly flagged otherwise. */
-  get requiresPayment(): boolean {
-    const pm = this.selectedPaymentMethod;
-    return pm ? pm.requires_payment !== false : true;
-  }
-
   get isRound(): boolean { return this.tripType === 'round_trip'; }
-
-  /** Attribution automatique des sièges sur le voyage sélectionné ? */
-  get outboundAuto(): boolean { return this.outTrips.find(t => t.id === this.outboundTripId)?.seat_assignment_mode === 'auto'; }
-  get returnAuto(): boolean { return this.retTrips.find(t => t.id === this.returnTripId)?.seat_assignment_mode === 'auto'; }
-  /** Nombre effectif de passagers : compteur en mode auto, nb de sièges choisis en manuel. */
-  get paxN(): number { return this.outboundAuto ? (this.paxCount || 0) : this.selOutbound.length; }
-  onPaxCountChange(): void { if (this.paxCount < 1) this.paxCount = 1; this.syncPassengers(); }
-
-  tripLabel = (t: any): string =>
-    `${t.number} · ${t.origin_name} → ${t.destination_name} · ${new Date(t.scheduled_departure).toLocaleString('fr-FR')}`;
-
-  /** Reload the outbound / return trip lists from the chosen class + plage horaire. */
-  get outReady(): boolean { return !!(this.fareClassId && this.outSlotId && this.outDate); }
-  get retReady(): boolean { return !!(this.fareClassId && this.retSlotId && this.retDate); }
-
-  searchOutbound(): void {
-    this.outboundTripId = ''; this.outTrips = []; this.resetSelection();
-    if (this.outReady) {
-      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.outSlotId, date: this.outDate })
-        .subscribe(t => this.outTrips = t);
-    }
-  }
-  searchReturn(): void {
-    this.returnTripId = ''; this.retTrips = []; this.returnSeats = []; this.selReturn = [];
-    if (this.retReady) {
-      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.retSlotId, date: this.retDate })
-        .subscribe(t => this.retTrips = t);
-    }
-  }
   get needReturnSel(): boolean { return this.isRound && !this.returnOpen; }
-  onCriteriaChange(): void { this.searchOutbound(); if (this.needReturnSel) this.searchReturn(); }
-  onReturnOpenChange(): void {
-    if (this.returnOpen) { this.retSlotId = ''; this.retDate = ''; this.returnTripId = ''; this.retTrips = []; this.returnSeats = []; this.selReturn = []; }
-    else if (this.isRound) { this.searchReturn(); }
-  }
 
-  resetSelection(): void {
-    this.outboundSeats = []; this.returnSeats = []; this.selOutbound = []; this.selReturn = [];
-    this.destinations = []; this.passengers = [];
+  // ── Trip resolution (all dropdowns visible; populate reactively) ──
+  private byRoute(trips: TripOption[]): TripOption[] {
+    return this.routeCode ? trips.filter(t => t.route_code === this.routeCode) : trips;
   }
+  onOutCriteria(): void {
+    this.outboundTripId = ''; this.outTrips = []; this.resetOutTrip();
+    if (this.fareClassId && this.outDate && this.outSlotId) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.outSlotId, date: this.outDate })
+        .subscribe(t => this.outTrips = this.byRoute(t));
+    }
+  }
+  onRetCriteria(): void {
+    this.returnTripId = ''; this.retTrips = []; this.retSeats = []; this.retSeatId = '';
+    if (this.needReturnSel && this.fareClassId && this.retDate && this.retSlotId) {
+      this.svc.bookableTrips({ fare_class: this.fareClassId, time_slot: this.retSlotId, date: this.retDate })
+        .subscribe(t => this.retTrips = this.byRoute(t));
+    }
+  }
+  onTripTypeChange(): void { if (!this.needReturnSel) { this.retTrips = []; this.returnTripId = ''; this.retSeats = []; this.retSeatId = ''; } else { this.onRetCriteria(); } }
+
+  private resetOutTrip(): void { this.destinations = []; this.destinationId = ''; this.outSeats = []; this.outSeatId = ''; }
+
+  get outboundTrip(): TripOption | undefined { return this.outTrips.find(t => t.id === this.outboundTripId); }
+  get returnTrip(): TripOption | undefined { return this.retTrips.find(t => t.id === this.returnTripId); }
+  get outboundAuto(): boolean { return this.outboundTrip?.seat_assignment_mode === 'auto'; }
+  get returnAuto(): boolean { return this.returnTrip?.seat_assignment_mode === 'auto'; }
+  get availOutSeats(): SeatCell[] { return this.outSeats.filter(s => s.status === 'available'); }
+  get availRetSeats(): SeatCell[] { return this.retSeats.filter(s => s.status === 'available'); }
 
   onOutboundChange(): void {
-    this.resetSelection();
-    this.paxCount = 1;
+    this.resetOutTrip();
     if (this.outboundTripId) {
       this.svc.destinations(this.outboundTripId).subscribe(d => {
         this.destinations = d;
-        if (this.outboundAuto) this.syncPassengers();  // auto: pas de grille, on part d'un passager
+        this.destinationId = d.length ? d[d.length - 1].id : '';  // défaut : terminus
       });
-      if (!this.outboundAuto) this.svc.seatMap(this.outboundTripId).subscribe(s => this.outboundSeats = s);
+      if (!this.outboundAuto) this.svc.seatMap(this.outboundTripId).subscribe(s => this.outSeats = s);
     }
   }
   onReturnChange(): void {
-    this.returnSeats = []; this.selReturn = [];
-    if (this.isRound && this.returnTripId && !this.returnAuto) {
-      this.svc.seatMap(this.returnTripId).subscribe(s => this.returnSeats = s);
-    }
+    this.retSeats = []; this.retSeatId = '';
+    if (this.returnTripId && !this.returnAuto) this.svc.seatMap(this.returnTripId).subscribe(s => this.retSeats = s);
   }
 
-  get defaultDestId(): string { return this.destinations.length ? this.destinations[this.destinations.length - 1].id : ''; }
+  seatLabel(s: SeatCell): string { return s.seat_number; }
 
-  rows(seats: SeatCell[]): number[] { return [...new Set(seats.map(s => s.row))].sort((a, b) => a - b); }
-  seatsInRow(seats: SeatCell[], row: number): SeatCell[] { return seats.filter(s => s.row === row).sort((a, b) => a.column - b.column); }
-
-  toggleSeat(list: 'out' | 'ret', seat: SeatCell): void {
-    if (seat.status !== 'available') return;
-    const arr = list === 'out' ? this.selOutbound : this.selReturn;
-    const i = arr.findIndex(s => s.id === seat.id);
-    if (i >= 0) arr.splice(i, 1); else arr.push(seat);
-    if (list === 'out') this.syncPassengers();
-  }
-  isSel(list: 'out' | 'ret', seat: SeatCell): boolean {
-    return (list === 'out' ? this.selOutbound : this.selReturn).some(s => s.id === seat.id);
-  }
-  seatClass(list: 'out' | 'ret', seat: SeatCell): string {
-    if (this.isSel(list, seat)) return 'btn-primary';
-    if (seat.status !== 'available') return 'btn-secondary disabled';
-    return 'btn-outline-success';
-  }
-
-  /** One passenger row per selected seat (manual) or per paxCount (auto). */
-  syncPassengers(): void {
-    const rows: PaxRow[] = [];
-    for (let i = 0; i < this.paxN; i++) {
-      rows.push(this.passengers[i] ?? {
-        name: '', phone: '', id_type: 'cni', id_number: '',
-        destination_point_id: this.defaultDestId,
-      });
-    }
-    this.passengers = rows;
-    if (this.buyerIndex >= rows.length) this.buyerIndex = 0;
-  }
-
+  // ── Fare / payment ──
   priceFor(destId: string): number | null {
     const d = this.destinations.find(x => x.id === destId);
     if (!d) return null;
     const amt = this.isRound ? d.round_trip_amount : d.one_way_amount;
     return amt != null ? +amt : null;
   }
-  get total(): number {
-    return this.passengers.reduce((sum, p) => sum + (this.priceFor(p.destination_point_id) ?? 0), 0);
-  }
-  get anyMissingFare(): boolean {
-    return this.passengers.some(p => this.priceFor(p.destination_point_id) == null);
-  }
-  get change(): number {
-    const r = this.amountReceived ?? 0;
-    return r - this.total > 0 ? r - this.total : 0;
-  }
+  get fare(): number | null { return this.priceFor(this.destinationId); }
+  get total(): number { return this.fare ?? 0; }
+  get selectedPaymentMethod(): any { return this.paymentMethods.find(m => m.code === this.paymentMethod); }
+  get requiresPayment(): boolean { const pm = this.selectedPaymentMethod; return pm ? pm.requires_payment !== false : true; }
+  onPaymentMethodChange(): void { if (!this.requiresPayment) this.amountReceived = 0; }
+  get change(): number { const r = this.amountReceived ?? 0; return r - this.total > 0 ? r - this.total : 0; }
 
   get canSubmit(): boolean {
-    if (this.saving || !this.outboundTripId || !this.paxN) return false;
+    if (this.saving || !this.outboundTripId || !this.destinationId) return false;
+    if (this.fare == null) return false;
+    if (!this.outboundAuto && !this.outSeatId) return false;
     if (this.needReturnSel) {
       if (!this.returnTripId) return false;
-      if (!this.returnAuto && this.selReturn.length !== this.paxN) return false;
+      if (!this.returnAuto && !this.retSeatId) return false;
     }
-    if (this.anyMissingFare) return false;
-    if (this.passengers.some(p => !p.name || !p.phone)) return false;
-    if (this.isReservation) return !!this.holdUntil;   // pas de paiement pour une réservation
+    if (!this.client.name || !this.client.phone) return false;
+    if (this.isReservation) return !!this.holdUntil;
     if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
     return true;
   }
@@ -198,34 +141,28 @@ export class VbNewBookingComponent implements OnInit {
   submit(): void {
     if (!this.canSubmit) return;
     this.saving = true; this.errorMsg = '';
-    const items: BookingItem[] = this.passengers.map((p, i) => ({
-      passenger: { id: p.id, name: p.name, phone: p.phone,
-                   id_type: p.id_type, id_number: p.id_number },
-      destination_point_id: p.destination_point_id || null,
-      outbound_seat_id: this.outboundAuto ? null : this.selOutbound[i].id,
-      return_seat_id: (this.needReturnSel && !this.returnAuto) ? (this.selReturn[i]?.id ?? null) : null,
-    }));
-    const buyer = items[this.buyerIndex].passenger;
-    if (this.isReservation) {
-      const resBody = {
-        trip_type: this.tripType, outbound_trip_id: this.outboundTripId,
-        return_trip_id: this.needReturnSel ? this.returnTripId : null,
-        buyer, items, hold_until: new Date(this.holdUntil).toISOString(),
-        return_open: this.isRound && this.returnOpen,
-      };
-      this.svc.reserve(resBody).subscribe({
-        next: () => this.router.navigate(['/voyages-booking/reservations']),
-        error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
-      return;
-    }
-    const body: BookingCreate = {
+    const item = {
+      passenger: { id: this.client.id, name: this.client.name, phone: this.client.phone,
+                   id_type: this.client.id_type, id_number: this.client.id_number },
+      destination_point_id: this.destinationId || null,
+      outbound_seat_id: this.outboundAuto ? null : this.outSeatId,
+      return_seat_id: (this.needReturnSel && !this.returnAuto) ? this.retSeatId : null,
+    };
+    const common = {
       trip_type: this.tripType, outbound_trip_id: this.outboundTripId,
       return_trip_id: this.needReturnSel ? this.returnTripId : null,
-      buyer, items, payment_method: this.paymentMethod, amount_received: this.amountReceived,
-      return_open: this.isRound && this.returnOpen,
+      buyer: item.passenger, items: [item], return_open: this.isRound && this.returnOpen,
     };
+    if (this.isReservation) {
+      this.svc.reserve({ ...common, hold_until: new Date(this.holdUntil).toISOString() }).subscribe({
+        next: () => this.router.navigate(['/voyages-booking/reservations']),
+        error: e => this.fail(e) });
+      return;
+    }
+    const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: this.amountReceived } as BookingCreate;
     this.svc.create(body).subscribe({
       next: b => this.router.navigate(['/voyages-booking/bookings', b.id]),
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
+      error: e => this.fail(e) });
   }
+  private fail(e: any): void { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; }
 }
