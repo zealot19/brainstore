@@ -1,6 +1,7 @@
 from decimal import Decimal
 from rest_framework import serializers
-from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
+from apps.treasury.models import (CashRegister, BankAccount, CashSession, Transaction, Transfer,
+                                  CurrencyDenomination, CashCount, CashCountItem)
 
 
 # ── Cash register ──────────────────────────────────────────────────────────────
@@ -123,17 +124,50 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
         return None
 
 
+class CountItemInputSerializer(serializers.Serializer):
+    denomination_id = serializers.UUIDField()
+    quantity        = serializers.IntegerField(min_value=0)
+
+
 class OpenSessionSerializer(serializers.Serializer):
     cash_register_id = serializers.UUIDField()
     name             = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     opening_balance  = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                  required=False, allow_null=True)
+    opening_count    = CountItemInputSerializer(many=True, required=False, default=list)
     notes            = serializers.CharField(required=False, allow_blank=True, default="")
 
 
 class CloseSessionSerializer(serializers.Serializer):
-    closing_balance = serializers.DecimalField(max_digits=12, decimal_places=2)
+    closing_balance = serializers.DecimalField(max_digits=12, decimal_places=2,
+                                               required=False, allow_null=True)
+    closing_count   = CountItemInputSerializer(many=True, required=False, default=list)
     notes           = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class DenominationSerializer(serializers.ModelSerializer):
+    currency_code = serializers.CharField(source="currency.code", read_only=True)
+    kind_display  = serializers.CharField(source="get_kind_display", read_only=True)
+
+    class Meta:
+        model = CurrencyDenomination
+        fields = ["id", "currency", "currency_code", "value", "kind", "kind_display",
+                  "is_active", "display_order"]
+
+
+class CashCountItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CashCountItem
+        fields = ["id", "denomination", "quantity", "unit_value", "subtotal"]
+
+
+class CashCountSerializer(serializers.ModelSerializer):
+    kind_display = serializers.CharField(source="get_kind_display", read_only=True)
+    items = CashCountItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CashCount
+        fields = ["id", "kind", "kind_display", "total_amount", "created_at", "items"]
 
 
 # ── Transaction ────────────────────────────────────────────────────────────────

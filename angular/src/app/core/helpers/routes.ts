@@ -415,6 +415,7 @@ export const routes={
   trzPaymentMethods:    '/treasury/payment-methods',
   trzRefundRate:        '/treasury/refund-rate',
   trzRefunds:           '/treasury/refunds',
+  trzDenominations:     '/treasury/denominations',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

@@ -18,6 +18,15 @@ export interface TreasuryStats {
 
 export interface Paginated<T> { count: number; results: T[]; }
 
+export interface CurrencyDenomination {
+  id: string; currency: string; currency_code: string; value: string;
+  kind: 'banknote' | 'coin'; kind_display: string; is_active: boolean; display_order: number;
+}
+export interface CashCountItem { id: string; denomination: string; quantity: number; unit_value: string; subtotal: string; }
+export interface CashCount {
+  id: string; kind: string; kind_display: string; total_amount: string; created_at: string; items: CashCountItem[];
+}
+
 export interface CashSession {
   id: string; name: string; register_name: string; status: string; status_display: string;
   opening_balance: string; closing_balance: string | null;

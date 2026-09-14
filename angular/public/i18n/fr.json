@@ -173,7 +173,8 @@
     "remboursements": "Remboursements",
     "config_bus": "Config · Bus",
     "personnel_naviguant": "Personnel naviguant",
-    "types_de_personnel": "Types de personnel"
+    "types_de_personnel": "Types de personnel",
+    "denominations": "Dénominations"
   },
   "booking": {
     "list": {
@@ -599,6 +600,26 @@
       "perform": "Effectuer le remboursement",
       "confirm": "Confirmer le remboursement ? L’élément sera annulé.",
       "done": "Remboursement effectué."
+    },
+    "denom": {
+      "title": "Dénominations (coupures)",
+      "subtitle": "Billets et pièces utilisés pour le billetage",
+      "new": "Ajouter une coupure",
+      "edit_title": "Modifier la coupure",
+      "col_value": "Valeur",
+      "col_kind": "Type",
+      "col_active": "Statut",
+      "col_order": "Ordre d'affichage",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "banknote": "Billet",
+      "coin": "Pièce",
+      "empty": "Aucune coupure configurée.",
+      "qty": "Quantité",
+      "subtotal": "Sous-total",
+      "total": "Total (fonds initial)",
+      "counted_total": "Total compté",
+      "use_billetage": "Compter par billetage"
     }
   },
   "vcfg": {

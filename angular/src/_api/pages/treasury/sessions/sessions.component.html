@@ -45,7 +45,25 @@
       <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
     </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
-    <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input formControlName="opening_balance" type="number" class="form-control" [placeholder]="'treasury.session.f_opening_hint' | transloco" /></div>
+
+    <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="open-bill" [(ngModel)]="openBilletage" [ngModelOptions]="{ standalone: true }" /><label class="form-check-label" for="open-bill">{{ 'treasury.denom.use_billetage' | transloco }}</label></div>
+    @if (openBilletage) {
+      <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+        <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+        <tbody>
+          @for (d of denoms; track d.id) {
+            <tr>
+              <td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
+              <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="openQty[d.id]" [ngModelOptions]="{ standalone: true }" /></td>
+              <td class="text-end">{{ (+d.value) * (openQty[d.id] || 0) }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.denom.total' | transloco }}</td><td class="text-end">{{ openTotal }}</td></tr></tfoot>
+      </table></div>
+    } @else {
+      <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input formControlName="opening_balance" type="number" class="form-control" [placeholder]="'treasury.session.f_opening_hint' | transloco" /></div>
+    }
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
 </div></div></div>
@@ -53,7 +71,24 @@
   <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.close_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="closeForm" (ngSubmit)="submitClose()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
-    <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }} <span class="text-danger">*</span></label><input formControlName="closing_balance" type="number" class="form-control" /></div>
+    <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="close-bill" [(ngModel)]="closeBilletage" [ngModelOptions]="{ standalone: true }" /><label class="form-check-label" for="close-bill">{{ 'treasury.denom.use_billetage' | transloco }}</label></div>
+    @if (closeBilletage) {
+      <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+        <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+        <tbody>
+          @for (d of denoms; track d.id) {
+            <tr>
+              <td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
+              <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeQty[d.id]" [ngModelOptions]="{ standalone: true }" /></td>
+              <td class="text-end">{{ (+d.value) * (closeQty[d.id] || 0) }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.denom.counted_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
+      </table></div>
+    } @else {
+      <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }} <span class="text-danger">*</span></label><input formControlName="closing_balance" type="number" class="form-control" /></div>
+    }
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="closeForm.invalid || saving">{{ 'treasury.session.close_btn' | transloco }}</button></div></form>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="saving">{{ 'treasury.session.close_btn' | transloco }}</button></div></form>
 </div></div></div>

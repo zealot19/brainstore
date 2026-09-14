@@ -302,6 +302,7 @@ export class SidebarService {
           subMenus: [
             { menuValue: 'Types de dépense', route: routes.vcExpenseTypes, base: 'expense-types', permission: 'transport.config.view' },
             { menuValue: 'Moyens de paiement', route: routes.trzPaymentMethods, base: 'payment-methods', permission: 'treasury.paymentmethod.view' },
+            { menuValue: 'Dénominations', route: routes.trzDenominations, base: 'denominations', permission: 'treasury.config.view' },
             { menuValue: 'Remboursement', route: routes.trzRefundRate, base: 'refund-rate', permission: 'treasury.config.view' },
           ],
         },

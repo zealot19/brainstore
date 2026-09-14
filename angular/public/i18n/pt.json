@@ -173,7 +173,8 @@
     "remboursements": "Reembolsos",
     "config_bus": "Config · Autocarros",
     "personnel_naviguant": "Pessoal de bordo",
-    "types_de_personnel": "Tipos de pessoal"
+    "types_de_personnel": "Tipos de pessoal",
+    "denominations": "Denominações"
   },
   "booking": {
     "list": {
@@ -599,6 +600,26 @@
       "perform": "Efetuar o reembolso",
       "confirm": "Confirmar o reembolso? O item será anulado.",
       "done": "Reembolso efetuado."
+    },
+    "denom": {
+      "title": "Denominações",
+      "subtitle": "Notas e moedas para a contagem",
+      "new": "Adicionar denominação",
+      "edit_title": "Editar denominação",
+      "col_value": "Valor",
+      "col_kind": "Tipo",
+      "col_active": "Estado",
+      "col_order": "Ordem de exibição",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "banknote": "Nota",
+      "coin": "Moeda",
+      "empty": "Nenhuma denominação configurada.",
+      "qty": "Quantidade",
+      "subtotal": "Subtotal",
+      "total": "Total (fundo inicial)",
+      "counted_total": "Total contado",
+      "use_billetage": "Contar por denominação"
     }
   },
   "vcfg": {

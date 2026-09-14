@@ -19,6 +19,11 @@ urlpatterns = [
     path("sessions/open/",                     views.OpenSessionView.as_view(),     name="session-open"),
     path("sessions/<uuid:session_id>/",        views.CashSessionDetailView.as_view(), name="session-detail"),
     path("sessions/<uuid:session_id>/close/",  views.CloseSessionView.as_view(),    name="session-close"),
+    path("sessions/<uuid:session_id>/counts/", views.SessionCountsView.as_view(),   name="session-counts"),
+
+    # ── Coupures monétaires (billetage) ──────────────────────────────────────────
+    path("denominations/",           views.DenominationListView.as_view(),   name="denomination-list"),
+    path("denominations/<uuid:pk>/", views.DenominationDetailView.as_view(), name="denomination-detail"),
 
     # ── Transactions ───────────────────────────────────────────────────────────
     path("transactions/",               views.TransactionListView.as_view(),   name="transaction-list"),

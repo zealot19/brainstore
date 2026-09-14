@@ -173,7 +173,8 @@
     "remboursements": "Reembolsos",
     "config_bus": "Config · Autobuses",
     "personnel_naviguant": "Personal de a bordo",
-    "types_de_personnel": "Tipos de personal"
+    "types_de_personnel": "Tipos de personal",
+    "denominations": "Denominaciones"
   },
   "booking": {
     "list": {
@@ -599,6 +600,26 @@
       "perform": "Realizar el reembolso",
       "confirm": "¿Confirmar el reembolso? El elemento será anulado.",
       "done": "Reembolso realizado."
+    },
+    "denom": {
+      "title": "Denominaciones",
+      "subtitle": "Billetes y monedas para el arqueo",
+      "new": "Añadir denominación",
+      "edit_title": "Editar denominación",
+      "col_value": "Valor",
+      "col_kind": "Tipo",
+      "col_active": "Estado",
+      "col_order": "Orden de visualización",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "banknote": "Billete",
+      "coin": "Moneda",
+      "empty": "Sin denominaciones configuradas.",
+      "qty": "Cantidad",
+      "subtotal": "Subtotal",
+      "total": "Total (fondo inicial)",
+      "counted_total": "Total contado",
+      "use_billetage": "Contar por denominación"
     }
   },
   "vcfg": {

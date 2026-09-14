@@ -440,6 +440,9 @@ export const TREASURY = {
   refundRate: `${TRZ}/refund-rate/`,
   refundLookup:  `${TRZ}/refunds/lookup/`,
   refundPerform: `${TRZ}/refunds/`,
+  denominations: `${TRZ}/denominations/`,
+  denomination:  (id: string) => `${TRZ}/denominations/${id}/`,
+  sessionCounts: (id: string) => `${TRZ}/sessions/${id}/counts/`,
 };
 
 /** URLs qui ne nécessitent pas de token JWT */

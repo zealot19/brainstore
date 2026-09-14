@@ -72,6 +72,7 @@ export const Pages_routes: Routes = [
                 { path: 'payment-methods', loadComponent: () => import('../../../_api/pages/treasury/config/payment-methods/payment-methods.component').then(m => m.PaymentMethodsComponent) },
                 { path: 'refund-rate', loadComponent: () => import('../../../_api/pages/treasury/config/refund-rate/refund-rate.component').then(m => m.RefundRateComponent) },
                 { path: 'refunds', loadComponent: () => import('../../../_api/pages/treasury/refunds/refunds.component').then(m => m.TreasuryRefundsComponent) },
+                { path: 'denominations', loadComponent: () => import('../../../_api/pages/treasury/config/denominations/denominations.component').then(m => m.TrzDenominationsComponent) },
                 { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
               ],
             },

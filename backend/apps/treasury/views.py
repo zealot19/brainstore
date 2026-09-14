@@ -18,6 +18,7 @@ from apps.treasury.serializers import (
     TransferReadSerializer, TransferWriteSerializer,
     TreasuryStatsSerializer,
     IncomeRowSerializer, OtherIncomeWriteSerializer,
+    DenominationSerializer, CashCountSerializer,
 )
 
 
@@ -222,6 +223,7 @@ class OpenSessionView(APIView):
                 company=company, cash_register=reg,
                 opening_balance=d.get("opening_balance"),
                 name=d.get("name", ""),
+                opening_count=d.get("opening_count") or [],
                 notes=d.get("notes", ""),
                 created_by=request.user,
             )
@@ -244,13 +246,26 @@ class CloseSessionView(APIView):
         try:
             session = services.close_session(
                 session,
-                closing_balance=ser.validated_data["closing_balance"],
+                closing_balance=ser.validated_data.get("closing_balance"),
+                closing_count=ser.validated_data.get("closing_count") or [],
                 notes=ser.validated_data.get("notes", ""),
                 updated_by=request.user,
             )
         except ApplicationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+class SessionCountsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.view"}
+
+    def get(self, request, session_id):
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        counts = session.counts.filter(is_deleted=False).prefetch_related("items").order_by("created_at")
+        return success_response(CashCountSerializer(counts, many=True).data)
 
 
 class CashSessionDetailView(APIView):
@@ -799,6 +814,67 @@ class RefundRateView(APIView):
         except ApplicationError as ex:
             return error_response(str(ex))
         return success_response({"rate": str(rate)})
+
+
+# ── Coupures monétaires (billetage config) ──────────────────────────────────────
+
+class DenominationListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.config.view", "POST": "treasury.config.manage"}
+
+    def get(self, request):
+        from apps.treasury.models import CurrencyDenomination
+        qs = CurrencyDenomination.objects.filter(company=_company(request), is_deleted=False)\
+            .select_related("currency").order_by("-value")
+        return success_response(DenominationSerializer(qs, many=True).data)
+
+    def post(self, request):
+        from apps.core.models import Currency
+        from apps.treasury.models import CurrencyDenomination
+        company = _company(request)
+        ser = DenominationSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        currency = d.get("currency") or Currency.objects.filter(code="XAF").first()
+        if not currency:
+            return error_response("Devise introuvable.")
+        obj, created = CurrencyDenomination.objects.get_or_create(
+            company=company, currency=currency, value=d["value"],
+            defaults={"kind": d.get("kind", "banknote"),
+                      "is_active": d.get("is_active", True),
+                      "display_order": d.get("display_order", 0),
+                      "created_by": request.user})
+        if not created:
+            return error_response("Cette coupure existe déjà.")
+        return created_response(DenominationSerializer(obj).data)
+
+
+class DenominationDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"PATCH": "treasury.config.manage", "DELETE": "treasury.config.manage"}
+
+    def _get(self, request, pk):
+        from apps.treasury.models import CurrencyDenomination
+        return CurrencyDenomination.objects.filter(id=pk, company=_company(request), is_deleted=False).first()
+
+    def patch(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Coupure introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        for f in ("value", "kind", "is_active", "display_order"):
+            if f in request.data:
+                setattr(obj, f, request.data[f])
+        obj.updated_by = request.user
+        obj.save()
+        return success_response(DenominationSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Coupure introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        obj.is_deleted = True; obj.updated_by = request.user
+        obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return no_content_response()
 
 
 # ── Remboursement par référence (guichet caisse) ─────────────────────────────────

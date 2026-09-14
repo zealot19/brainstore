@@ -52,3 +52,25 @@ def seed_payment_methods(company, created_by=None) -> int:
                       "is_system": True, "created_by": created_by})
         created += int(was_created)
     return created
+
+
+_XAF_DENOMINATIONS = [
+    # (value, kind)
+    (10000, "banknote"), (5000, "banknote"), (2000, "banknote"), (1000, "banknote"),
+    (500, "coin"), (100, "coin"), (50, "coin"), (25, "coin"), (10, "coin"), (5, "coin"), (1, "coin"),
+]
+
+
+def seed_denominations(company, created_by=None) -> int:
+    """Coupures XAF par défaut pour une nouvelle institution (éditable ensuite)."""
+    from apps.core.models import Currency
+    from apps.treasury.models import CurrencyDenomination
+    xaf, _ = Currency.objects.get_or_create(
+        code="XAF", defaults={"name": "Franc CFA (CEMAC)", "symbol": "FCFA", "decimal_places": 0})
+    created = 0
+    for order, (value, kind) in enumerate(_XAF_DENOMINATIONS):
+        _, was_created = CurrencyDenomination.objects.get_or_create(
+            company=company, currency=xaf, value=value,
+            defaults={"kind": kind, "display_order": order, "created_by": created_by})
+        created += int(was_created)
+    return created

@@ -88,9 +88,11 @@ def delete_bank_account(account, *, deleted_by):
 # ── Cash sessions ──────────────────────────────────────────────────────────────
 
 @transaction.atomic
-def open_session(*, company, cash_register, opening_balance=None, name="", notes="", created_by):
+def open_session(*, company, cash_register, opening_balance=None, name="", notes="",
+                 opening_count=None, created_by):
     from apps.treasury.selectors import get_active_session
     from apps.treasury.scoping import register_agency_scope
+    from apps.treasury.services.billetage import compute_count_total, record_count
     # Restriction d'agence : un guichetier n'ouvre une session que sur une caisse de son agence.
     scoped, agency_id = register_agency_scope(created_by)
     if scoped:
@@ -108,24 +110,39 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
                 register=cash_register.name
             )
         )
-    # Default opening balance = current register balance
-    balance = opening_balance if opening_balance is not None else cash_register.current_balance
-    return CashSession.objects.create(
+    # Fonds initial : billetage prioritaire, sinon montant saisi, sinon solde de la caisse.
+    if opening_count:
+        balance, _resolved = compute_count_total(company, opening_count)
+    elif opening_balance is not None:
+        balance = opening_balance
+    else:
+        balance = cash_register.current_balance
+    session = CashSession.objects.create(
         company=company, cash_register=cash_register,
         opened_by=created_by, opening_balance=balance, name=name,
         status=CashSession.Status.OPEN,
         notes=notes, created_by=created_by,
     )
+    if opening_count:
+        record_count(session, kind="opening", items=opening_count, user=created_by)
+    return session
 
 
 @transaction.atomic
-def close_session(session, *, closing_balance, notes="", updated_by):
+def close_session(session, *, closing_balance=None, notes="", closing_count=None, updated_by):
+    from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status != CashSession.Status.OPEN:
         raise ApplicationError(_("Cette session de caisse est déjà clôturée."))
     # Seul l'utilisateur qui a ouvert la caisse peut la clôturer (ou un administrateur).
     is_admin = getattr(updated_by, "is_superuser", False) or getattr(updated_by, "is_institution_admin", False)
     if not is_admin and session.opened_by_id != getattr(updated_by, "id", None):
         raise ApplicationError(_("Seul l'utilisateur qui a ouvert la caisse (ou un administrateur) peut la clôturer."))
+
+    # Montant compté : billetage prioritaire, sinon montant saisi.
+    if closing_count:
+        closing_balance, _resolved = compute_count_total(session.company, closing_count)
+    elif closing_balance is None:
+        raise ApplicationError(_("Indiquez le montant compté (billetage ou saisie directe)."))
 
     # Compute expected: opening + all income - all expense in this session
     income = (session.transactions
@@ -151,6 +168,9 @@ def close_session(session, *, closing_balance, notes="", updated_by):
     reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
     reg.current_balance = closing_balance
     reg.save(update_fields=["current_balance"])
+
+    if closing_count:
+        record_count(session, kind="closing", items=closing_count, user=updated_by)
 
     from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
     TreasuryAccountingBridge.post_session_difference(session)

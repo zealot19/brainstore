@@ -1,0 +1,48 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'treasury.denom.title' | transloco }}</h4><h6>{{ 'treasury.denom.subtitle' | transloco }}</h6>
+  </div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#den-modal" *hasPermission="'treasury.config.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.denom.new' | transloco }}</a></div>
+</div>
+<div class="card table-list-card"><div class="card-body p-0">
+  @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+  @else {
+    <div class="table-responsive"><table class="table datanew">
+      <thead class="thead-light"><tr>
+        <th>{{ 'treasury.denom.col_value' | transloco }}</th>
+        <th>{{ 'treasury.denom.col_kind' | transloco }}</th>
+        <th>{{ 'treasury.denom.col_active' | transloco }}</th>
+        <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+      </tr></thead>
+      <tbody>
+        @for (r of rows; track r.id) {
+          <tr>
+            <td class="fw-medium">{{ r.value }} <span class="text-muted">{{ r.currency_code }}</span></td>
+            <td><span class="badge" [class.bg-info]="r.kind === 'banknote'" [class.bg-secondary]="r.kind === 'coin'">{{ r.kind_display }}</span></td>
+            <td>@if (r.is_active) { <span class="badge bg-success">{{ 'treasury.denom.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'treasury.denom.inactive' | transloco }}</span> }</td>
+            <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+              <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#den-modal" *hasPermission="'treasury.config.manage'" (click)="openEdit(r)"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+              <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.config.manage'" (click)="delete(r)"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
+            </div></td>
+          </tr>
+        } @empty { <tr><td colspan="4" class="text-center py-4 text-muted">{{ 'treasury.denom.empty' | transloco }}</td></tr> }
+      </tbody>
+    </table></div>
+  }
+</div></div>
+
+<div class="modal fade" id="den-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'treasury.denom.edit_title' : 'treasury.denom.new') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">{{ 'treasury.denom.col_value' | transloco }} <span class="text-danger">*</span></label><input formControlName="value" type="number" min="1" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.denom.col_kind' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="kind" class="form-select">
+        <option value="banknote">{{ 'treasury.denom.banknote' | transloco }}</option>
+        <option value="coin">{{ 'treasury.denom.coin' | transloco }}</option>
+      </select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.denom.col_order' | transloco }}</label><input formControlName="display_order" type="number" class="form-control" /></div>
+    <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="den-active" /><label class="form-check-label" for="den-active">{{ 'treasury.denom.active' | transloco }}</label></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
+</div></div></div>

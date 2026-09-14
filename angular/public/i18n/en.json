@@ -173,7 +173,8 @@
     "remboursements": "Refunds",
     "config_bus": "Config · Buses",
     "personnel_naviguant": "Onboard crew",
-    "types_de_personnel": "Crew types"
+    "types_de_personnel": "Crew types",
+    "denominations": "Denominations"
   },
   "booking": {
     "list": {
@@ -599,6 +600,26 @@
       "perform": "Perform refund",
       "confirm": "Confirm the refund? The item will be cancelled.",
       "done": "Refund completed."
+    },
+    "denom": {
+      "title": "Denominations",
+      "subtitle": "Banknotes and coins used for cash counting",
+      "new": "Add denomination",
+      "edit_title": "Edit denomination",
+      "col_value": "Value",
+      "col_kind": "Type",
+      "col_active": "Status",
+      "col_order": "Display order",
+      "active": "Active",
+      "inactive": "Inactive",
+      "banknote": "Banknote",
+      "coin": "Coin",
+      "empty": "No denomination configured.",
+      "qty": "Quantity",
+      "subtotal": "Subtotal",
+      "total": "Total (opening float)",
+      "counted_total": "Counted total",
+      "use_billetage": "Count by denomination"
     }
   },
   "vcfg": {
