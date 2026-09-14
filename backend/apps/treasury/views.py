@@ -286,7 +286,7 @@ class ScheduleSessionView(APIView):
         if not reg:
             return error_response("Caisse introuvable.", status_code=status.HTTP_404_NOT_FOUND)
         guichetier = get_user_model().objects.filter(
-            id=d["assigned_to_id"], company_id=company.id, is_active=True, is_deleted=False).first()
+            id=d["assigned_to_id"], company_id=company.id, is_active=True).first()
         if not guichetier:
             return error_response("Guichetier introuvable.", status_code=status.HTTP_404_NOT_FOUND)
         try:

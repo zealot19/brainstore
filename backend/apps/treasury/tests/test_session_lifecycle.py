@@ -91,6 +91,18 @@ def test_one_active_session_per_register():
 
 
 @pytest.mark.django_db
+def test_schedule_via_api_returns_draft():
+    """Regression: the schedule view must not filter User by a non-existent is_deleted field."""
+    from rest_framework.test import APIClient
+    company, admin, g1, g2, reg = _setup()
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.post("/api/v1/treasury/sessions/schedule/",
+               {"cash_register_id": str(reg.id), "assigned_to_id": str(g1.id), "name": "Matin"}, format="json")
+    assert r.status_code in (200, 201), r.content
+    assert r.json()["status"] == "draft"
+
+
+@pytest.mark.django_db
 def test_guichetier_list_filters_by_permission():
     from apps.treasury.selectors import list_guichetiers
     company, admin, g1, g2, reg = _setup()
