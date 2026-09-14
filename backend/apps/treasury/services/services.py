@@ -88,7 +88,7 @@ def delete_bank_account(account, *, deleted_by):
 # ── Cash sessions ──────────────────────────────────────────────────────────────
 
 @transaction.atomic
-def open_session(*, company, cash_register, opening_balance=None, notes="", created_by):
+def open_session(*, company, cash_register, opening_balance=None, name="", notes="", created_by):
     from apps.treasury.selectors import get_active_session
     from apps.treasury.scoping import register_agency_scope
     # Restriction d'agence : un guichetier n'ouvre une session que sur une caisse de son agence.
@@ -98,6 +98,9 @@ def open_session(*, company, cash_register, opening_balance=None, notes="", crea
             raise ApplicationError(_("Aucune agence ne vous est attribuée : impossible d'ouvrir une caisse."))
         if cash_register.agency_id != agency_id:
             raise ApplicationError(_("Vous ne pouvez ouvrir une session que sur une caisse de votre agence."))
+        # Chargé de caisse : si un responsable est désigné, lui seul peut ouvrir cette caisse.
+        if cash_register.responsible_id and cash_register.responsible_id != created_by.id:
+            raise ApplicationError(_("Seul le chargé de cette caisse peut y ouvrir une session."))
     existing = get_active_session(cash_register.id, company.id)
     if existing:
         raise ApplicationError(
@@ -109,7 +112,7 @@ def open_session(*, company, cash_register, opening_balance=None, notes="", crea
     balance = opening_balance if opening_balance is not None else cash_register.current_balance
     return CashSession.objects.create(
         company=company, cash_register=cash_register,
-        opened_by=created_by, opening_balance=balance,
+        opened_by=created_by, opening_balance=balance, name=name,
         status=CashSession.Status.OPEN,
         notes=notes, created_by=created_by,
     )
@@ -174,6 +177,11 @@ def create_transaction(
             raise ApplicationError(_("A cash session is required for cash transactions."))
         if cash_session.status != CashSession.Status.OPEN:
             raise ApplicationError(_("The cash session is closed."))
+        # Séparation des tâches : seul celui qui a ouvert la session peut y opérer (admins exemptés).
+        from apps.treasury.scoping import register_agency_scope
+        scoped, _agency = register_agency_scope(created_by)
+        if scoped and cash_session.opened_by_id != created_by.id:
+            raise ApplicationError(_("Seul l'agent ayant ouvert cette caisse peut y enregistrer des mouvements."))
     elif account_type == Transaction.AccountType.BANK:
         if not bank_account:
             raise ApplicationError(_("Un compte bancaire est requis pour un règlement par banque."))

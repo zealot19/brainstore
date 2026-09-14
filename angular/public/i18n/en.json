@@ -438,7 +438,10 @@
       "f_opening_hint": "(default: register's current balance)",
       "open_submit": "Open",
       "close_title": "Close the session",
-      "f_counted": "Counted balance"
+      "f_counted": "Counted balance",
+      "col_name": "Session",
+      "f_name": "Session name",
+      "f_name_hint": "e.g. Morning desk"
     },
     "movement": {
       "title": "Movements",

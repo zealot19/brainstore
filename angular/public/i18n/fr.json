@@ -438,7 +438,10 @@
       "f_opening_hint": "(par défaut : solde actuel de la caisse)",
       "open_submit": "Ouvrir",
       "close_title": "Clôturer la session",
-      "f_counted": "Solde compté"
+      "f_counted": "Solde compté",
+      "col_name": "Session",
+      "f_name": "Intitulé de la session",
+      "f_name_hint": "Ex. : Caisse du matin"
     },
     "movement": {
       "title": "Mouvements",

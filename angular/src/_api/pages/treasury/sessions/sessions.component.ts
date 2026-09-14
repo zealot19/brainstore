@@ -35,7 +35,7 @@ export class TrzSessionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.openForm = this.fb.group({ cash_register_id: [null, Validators.required], opening_balance: [null], notes: [''] });
+    this.openForm = this.fb.group({ cash_register_id: [null, Validators.required], name: [''], opening_balance: [null], notes: [''] });
     this.closeForm = this.fb.group({ closing_balance: [null, Validators.required], notes: [''] });
     this.regSvc.list().subscribe({ next: d => this.registers = d.filter(r => r.is_active) });
     this.load();
@@ -45,7 +45,7 @@ export class TrzSessionsComponent implements OnInit {
     this.svc.list(this.statusFilter ? { status: this.statusFilter } : undefined)
       .subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
-  openCreate(): void { this.errorMsg = ''; this.openForm.reset({ cash_register_id: null, opening_balance: null, notes: '' }); }
+  openCreate(): void { this.errorMsg = ''; this.openForm.reset({ cash_register_id: null, name: '', opening_balance: null, notes: '' }); }
   submitOpen(): void {
     if (this.openForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     this.svc.open(this.openForm.value).subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.close('trz-open-modal'); },

@@ -106,7 +106,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = CashSession
         fields = [
-            "id", "register_name", "status", "status_display",
+            "id", "name", "register_name", "status", "status_display",
             "opening_balance", "closing_balance",
             "expected_closing", "difference",
             "opened_by", "opened_by_name", "closed_by_name",
@@ -125,6 +125,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
 
 class OpenSessionSerializer(serializers.Serializer):
     cash_register_id = serializers.UUIDField()
+    name             = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     opening_balance  = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                  required=False, allow_null=True)
     notes            = serializers.CharField(required=False, allow_blank=True, default="")

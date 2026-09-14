@@ -221,6 +221,7 @@ class OpenSessionView(APIView):
             session = services.open_session(
                 company=company, cash_register=reg,
                 opening_balance=d.get("opening_balance"),
+                name=d.get("name", ""),
                 notes=d.get("notes", ""),
                 created_by=request.user,
             )

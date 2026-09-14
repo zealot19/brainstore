@@ -19,7 +19,7 @@ export interface TreasuryStats {
 export interface Paginated<T> { count: number; results: T[]; }
 
 export interface CashSession {
-  id: string; register_name: string; status: string; status_display: string;
+  id: string; name: string; register_name: string; status: string; status_display: string;
   opening_balance: string; closing_balance: string | null;
   expected_closing: string | null; difference: string | null;
   opened_by_name: string | null; closed_by_name: string | null;

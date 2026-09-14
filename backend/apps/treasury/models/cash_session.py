@@ -16,6 +16,7 @@ class CashSession(BaseModel):
                                         on_delete=models.CASCADE, related_name="cash_sessions")
     cash_register  = models.ForeignKey("treasury.CashRegister", verbose_name=_("cash register"),
                                         on_delete=models.PROTECT, related_name="sessions")
+    name           = models.CharField(_("intitulé de la session"), max_length=150, blank=True)
     opened_by      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("opened by"),
                                         on_delete=models.PROTECT, related_name="opened_sessions")
     closed_by      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("closed by"),

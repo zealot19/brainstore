@@ -438,7 +438,10 @@
       "f_opening_hint": "(por defecto: saldo actual de la caja)",
       "open_submit": "Abrir",
       "close_title": "Cerrar la sesión",
-      "f_counted": "Saldo contado"
+      "f_counted": "Saldo contado",
+      "col_name": "Sesión",
+      "f_name": "Nombre de la sesión",
+      "f_name_hint": "p. ej. Caja de la mañana"
     },
     "movement": {
       "title": "Movimientos",

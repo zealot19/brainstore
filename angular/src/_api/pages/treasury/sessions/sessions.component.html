@@ -13,11 +13,12 @@
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>{{ 'treasury.session.col_register' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th>{{ 'treasury.session.col_opening' | transloco }}</th><th>{{ 'treasury.session.col_expected' | transloco }}</th><th>{{ 'treasury.session.col_diff' | transloco }}</th><th>{{ 'treasury.session.col_opened_by' | transloco }}</th><th>{{ 'treasury.session.col_opened_at' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'treasury.session.col_register' | transloco }}</th><th>{{ 'treasury.session.col_name' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th>{{ 'treasury.session.col_opening' | transloco }}</th><th>{{ 'treasury.session.col_expected' | transloco }}</th><th>{{ 'treasury.session.col_diff' | transloco }}</th><th>{{ 'treasury.session.col_opened_by' | transloco }}</th><th>{{ 'treasury.session.col_opened_at' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (s of rows | paginate:pg.page:pg.size; track s.id) {
             <tr>
               <td class="fw-medium">{{ s.register_name }}</td>
+              <td>{{ s.name || '—' }}</td>
               <td>@if (s.status === 'open') { <span class="badge bg-success">{{ 'treasury.session.open_badge' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'treasury.session.closed_badge' | transloco }}</span> }</td>
               <td>{{ s.opening_balance }}</td>
               <td>{{ s.expected_closing ?? '—' }}</td>
@@ -29,7 +30,7 @@
                 @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'treasury.session.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">{{ 'treasury.session.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
@@ -43,6 +44,7 @@
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
       <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
     </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label><input formControlName="opening_balance" type="number" class="form-control" [placeholder]="'treasury.session.f_opening_hint' | transloco" /></div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.notes' | transloco }}</label><textarea formControlName="notes" class="form-control" rows="2"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
