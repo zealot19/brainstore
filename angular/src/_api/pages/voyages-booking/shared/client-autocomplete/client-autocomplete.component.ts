@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -16,15 +16,24 @@ import { TranslocoModule } from '@jsverse/transloco';
 export class ClientAutocompleteComponent {
   @Input({ required: true }) row!: PassengerSpec;
   private passengerSvc = inject(PassengerService);
+  private host = inject(ElementRef<HTMLElement>);
   results: Passenger[] = [];
   open = false;
+  dropUp = false;   // ouvre le panneau vers le haut si peu de place en bas
   private q$ = new Subject<string>();
 
   constructor() {
     this.q$.pipe(
       debounceTime(250), distinctUntilChanged(),
       switchMap(q => this.passengerSvc.list(q)),
-    ).subscribe(r => { this.results = (r ?? []).slice(0, 8); this.open = this.results.length > 0; });
+    ).subscribe(r => {
+      this.results = (r ?? []).slice(0, 8);
+      this.open = this.results.length > 0;
+      if (this.open) {
+        const rect = this.host.nativeElement.querySelector('input')?.getBoundingClientRect();
+        this.dropUp = !!rect && (window.innerHeight - rect.bottom < 250);
+      }
+    });
   }
 
   onInput(value: string): void {

@@ -3368,3 +3368,9 @@ border:1px solid #1F2228;
   .ticket-slip .ts-amount { border-top: 1px solid #ddd; margin-top: 4px; padding-top: 4px; font-size: 11pt; }
   .ticket-slip .ts-foot { margin-top: 6px; font-size: 7.5pt; color: #777; text-align: center; }
 }
+
+/* ── Menus déroulants d'actions dans les tables ──────────────────────────────
+   Quand un menu (dropdown Bootstrap) est ouvert dans une table scrollable,
+   laisser le conteneur déborder pour ne pas avoir à faire défiler la table. */
+.table-responsive:has(.dropdown-menu.show) { overflow: visible !important; }
+.card:has(> .card-body > .table-responsive .dropdown-menu.show) { overflow: visible; }

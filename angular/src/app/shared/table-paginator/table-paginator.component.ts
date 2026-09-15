@@ -9,7 +9,7 @@ export interface PageState { page: number; size: number; }
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-2" *ngIf="total > 0">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 px-3 pt-2 pb-3" *ngIf="total > 0">
       <div class="d-flex align-items-center gap-2 small text-muted">
         <span>Afficher</span>
         <select class="form-select form-select-sm w-auto" [ngModel]="state.size" (ngModelChange)="setSize($event)">
