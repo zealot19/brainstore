@@ -140,11 +140,10 @@ class Command(BaseCommand):
                         company=company, plan=plan, seat_number=f"{row}{_COLS[col - 1]}",
                         row=row, column=col, seat_type=PlanSeat.SeatType.STANDARD, is_sellable=True)
 
-        # Assign the plan to both vehicles (valid from a month ago)
+        # Assign the plan to both vehicles
         for v in vehicles:
             VehicleSeatingAssignment.objects.get_or_create(
-                company=company, vehicle=v, seating_plan=plan,
-                defaults={"valid_from": date.today() - timedelta(days=30)})
+                company=company, vehicle=v, seating_plan=plan)
 
         # ── 4c. Commercial config ─────────────────────────────────────────────
         fc_std, _ = FareClass.objects.get_or_create(company=company, code="STD",

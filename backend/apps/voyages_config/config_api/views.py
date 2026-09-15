@@ -526,7 +526,7 @@ class VehicleSeatingAssignmentListView(APIView):
 
     def get(self, request):
         qs = (scoped_qs(VehicleSeatingAssignment, scope_company_id(request))
-              .select_related("vehicle", "seating_plan").order_by("-valid_from"))
+              .select_related("vehicle", "seating_plan").order_by("-created_at"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.VehicleSeatingAssignmentRead(page, many=True).data)

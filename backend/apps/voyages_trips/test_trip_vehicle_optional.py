@@ -69,7 +69,7 @@ def test_assign_vehicle_later_keeps_existing_seats():
     veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-733-LB",
                                  status=Vehicle.Status.AVAILABLE, is_active=True, created_by=admin)
     VehicleSeatingAssignment.objects.create(company=company, vehicle=veh, seating_plan=plan,
-                                            valid_from=trip.scheduled_departure.date(), is_active=True)
+                                            is_active=True)
     assign_vehicle(trip, veh, user=admin)
     trip.refresh_from_db()
     assert trip.vehicle_id == veh.id

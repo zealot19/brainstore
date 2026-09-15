@@ -28,7 +28,7 @@ export class VcVehicleAssignmentsComponent implements OnInit {
   constructor(private svc: VehicleSeatingAssignmentService, private planSvc: SeatingPlanService,
               private vehicleSvc: VehicleService, private fb: FormBuilder) {}
   ngOnInit(): void {
-    this.form = this.fb.group({ vehicle_id: [null, Validators.required], seating_plan_id: [null, Validators.required], valid_from: ['', Validators.required], valid_to: [null], is_active: [true] });
+    this.form = this.fb.group({ vehicle_id: [null, Validators.required], seating_plan_id: [null, Validators.required], is_active: [true] });
     this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.planSvc.list().subscribe(d => this.plans = d);
     this.load();
@@ -45,11 +45,11 @@ export class VcVehicleAssignmentsComponent implements OnInit {
     if (!confirm(`Supprimer ${this.selected.size} élément(s) ?`)) return;
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ vehicle_id: null, seating_plan_id: null, valid_from: '', valid_to: null, is_active: true }); }
-  openEdit(r: VehicleSeatingAssignment): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ vehicle_id: r.vehicle, seating_plan_id: r.seating_plan, valid_from: r.valid_from, valid_to: r.valid_to, is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ vehicle_id: null, seating_plan_id: null, is_active: true }); }
+  openEdit(r: VehicleSeatingAssignment): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ vehicle_id: r.vehicle, seating_plan_id: r.seating_plan, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
-    const v = { ...this.form.value, valid_to: this.form.value.valid_to || null };
+    const v = { ...this.form.value };
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }

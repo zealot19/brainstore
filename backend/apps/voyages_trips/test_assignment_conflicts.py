@@ -34,8 +34,7 @@ def test_vehicle_blocked_by_overlapping_fleet_mission():
     veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-1",
                                  status=Vehicle.Status.AVAILABLE, is_active=True)
     VehicleSeatingAssignment.objects.create(
-        company=company, vehicle=veh, seating_plan=trip.seating_plan,
-        valid_from=trip.scheduled_departure.date(), is_active=True)
+        company=company, vehicle=veh, seating_plan=trip.seating_plan, is_active=True)
     # Sans mission : éligible.
     assert blocking_reasons(veh, window_start=trip.scheduled_departure,
                             window_end=trip.scheduled_arrival) == []

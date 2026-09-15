@@ -48,12 +48,10 @@ class VehicleSeatingAssignment(_CompanyScoped):
                                 on_delete=models.PROTECT, related_name="seating_assignments")
     seating_plan = models.ForeignKey("voyages_config.SeatingPlan", verbose_name=_("plan de bus"),
                                      on_delete=models.PROTECT, related_name="vehicle_assignments")
-    valid_from = models.DateField(_("valide à partir du"))
-    valid_to = models.DateField(_("valide jusqu'au"), null=True, blank=True)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("affectation de plan")
-        ordering = ["-valid_from"]
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.vehicle} → {self.seating_plan.code}"

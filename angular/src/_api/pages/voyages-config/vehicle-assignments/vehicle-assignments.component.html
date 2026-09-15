@@ -19,15 +19,13 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>{{ 'vcfg.va.col_vehicle' | transloco }}</th><th>{{ 'vcfg.va.col_plan' | transloco }}</th><th>{{ 'vcfg.common.valid_from' | transloco }}</th><th>{{ 'vcfg.common.valid_to' | transloco }}</th><th>{{ 'vcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+          <th>{{ 'vcfg.va.col_vehicle' | transloco }}</th><th>{{ 'vcfg.va.col_plan' | transloco }}</th><th>{{ 'vcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td><input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /></td>
               <td class="fw-medium">{{ r.vehicle_plate || '—' }}</td>
               <td>{{ r.seating_plan_code || '—' }}</td>
-              <td>{{ r.valid_from | date:'dd/MM/yyyy' }}</td>
-              <td>{{ r.valid_to ? (r.valid_to | date:'dd/MM/yyyy') : '—' }}</td>
               <td>@if (r.is_active) { <span class="badge bg-success">{{ 'vcfg.common.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'vcfg.common.inactive' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#vc-modal" *hasPermission="'transport.config.manage'" (click)="openEdit(r)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
@@ -52,8 +50,6 @@
       <select formControlName="seating_plan_id" class="form-select"><option [ngValue]="null">{{ 'vcfg.common.choose' | transloco }}</option>@for (p of plans; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }</select>
     </div>
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.common.valid_from' | transloco }} <span class="text-danger">*</span></label><input formControlName="valid_from" type="date" class="form-control" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.common.valid_to' | transloco }}</label><input formControlName="valid_to" type="date" class="form-control" /></div>
     </div>
     <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="vc-active" /><label class="form-check-label" for="vc-active">{{ 'vcfg.common.active' | transloco }}</label></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>

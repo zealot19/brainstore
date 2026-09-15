@@ -325,15 +325,13 @@ class VehicleSeatingAssignmentRead(_ScopeMixin):
     class Meta:
         model = VehicleSeatingAssignment
         fields = ["id", "vehicle", "vehicle_plate", "seating_plan", "seating_plan_code",
-                  "valid_from", "valid_to", "company", "scope", "is_active",
+                  "company", "scope", "is_active",
                   "created_at", "updated_at"]
 
 
 class VehicleSeatingAssignmentWrite(serializers.Serializer):
     vehicle_id = serializers.UUIDField()
     seating_plan_id = serializers.UUIDField()
-    valid_from = serializers.DateField()
-    valid_to = serializers.DateField(required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)
 
 

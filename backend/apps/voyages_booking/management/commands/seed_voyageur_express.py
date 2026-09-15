@@ -157,8 +157,7 @@ class Command(BaseCommand):
         bus_a, bus_b = vehicles[0], vehicles[1]
         for v in (bus_a, bus_b):
             VehicleSeatingAssignment.objects.get_or_create(
-                company=company, vehicle=v, seating_plan=plan,
-                defaults={"valid_from": date.today() - timedelta(days=60)})
+                company=company, vehicle=v, seating_plan=plan)
 
         # ── 7. Time slots (plages horaires) + loyalty + settings ──────────────
         slot_am, _ = TimeSlot.objects.get_or_create(

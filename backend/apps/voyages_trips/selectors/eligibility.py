@@ -5,12 +5,14 @@ from apps.voyages_config.models import VehicleSeatingAssignment
 from apps.voyages_trips.models import Trip
 
 
-def active_seating_plan(vehicle, on_date):
-    """The seating plan assigned to a vehicle and valid on `on_date`, else None."""
+def active_seating_plan(vehicle, on_date=None):
+    """The vehicle's current seating plan = its latest active assignment, else None.
+    `on_date` is accepted for call-site compatibility but no longer used (plan
+    assignments are no longer date-bounded)."""
     a = (VehicleSeatingAssignment.objects
-         .filter(vehicle=vehicle, is_deleted=False, is_active=True, valid_from__lte=on_date)
-         .filter(Q(valid_to__isnull=True) | Q(valid_to__gte=on_date))
-         .order_by("-valid_from")
+         .filter(vehicle=vehicle, is_deleted=False, is_active=True)
+         .select_related("seating_plan")
+         .order_by("-created_at")
          .first())
     return a.seating_plan if a else None
 

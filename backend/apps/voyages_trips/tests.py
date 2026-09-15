@@ -286,7 +286,7 @@ def test_transbord_selection_new_bus_creates_full_voyage_with_expenses():
     veh = Vehicle.objects.create(company=c, model=model, license_plate="LT-9",
                                  status="available", is_active=True)
     VehicleSeatingAssignment.objects.create(company=c, vehicle=veh, seating_plan=g["plan_big"],
-                                            valid_from=src.scheduled_departure.date(), is_active=True)
+                                            is_active=True)
     et = ExpenseType.objects.create(company=c, code="CARB", name="Carburant", account_code="601")
     sch = ExpenseSchedule.objects.create(company=c, route=src.route, fare_class=src.fare_class)
     ExpenseScheduleLine.objects.create(schedule=sch, expense_type=et, amount=Decimal("15000"))
