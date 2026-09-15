@@ -145,6 +145,7 @@ export const Pages_routes: Routes = [
                 { path: 'parcels',   loadComponent: () => import('../../../_api/pages/voyages-consignment/parcels/parcels.component').then(m => m.VcgParcelsComponent) },
                 { path: 'reception', loadComponent: () => import('../../../_api/pages/voyages-consignment/reception/reception.component').then(m => m.VcgReceptionComponent) },
                 { path: 'manifest',  loadComponent: () => import('../../../_api/pages/voyages-consignment/manifest/manifest.component').then(m => m.VcgManifestComponent) },
+                { path: 'livraison', loadComponent: () => import('../../../_api/pages/voyages-consignment/livraison/livraison.component').then(m => m.VcgLivraisonComponent) },
                 { path: 'baggage',  loadComponent: () => import('../../../_api/pages/voyages-consignment/baggage/baggage.component').then(m => m.VcgBaggageComponent) },
               ],
             },

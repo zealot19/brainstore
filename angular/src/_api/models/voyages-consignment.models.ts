@@ -7,6 +7,8 @@ export interface Parcel {
   origin_point: string; origin_point_name: string | null;
   destination_point: string; destination_point_name: string | null;
   trip: string | null;
+  trip_number?: string | null; trip_route_code?: string | null;
+  trip_departure?: string | null; trip_vehicle_plate?: string | null;
   sender_name: string; sender_phone: string;
   recipient_name: string; recipient_phone: string; recipient_address: string; recipient_id_number: string;
   consignment_type: string; consignment_type_label: string | null; description: string;

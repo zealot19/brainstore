@@ -1996,7 +1996,32 @@
       "dispatch_selected": "Expédier la sélection",
       "print_manifest": "Manifeste",
       "empty_ready": "Aucun colis prêt",
-      "empty_onboard": "Aucun colis sur ce voyage"
+      "empty_onboard": "Aucun colis sur ce voyage",
+      "f_route": "Trajet",
+      "f_dest": "Destination",
+      "f_day": "Jour du voyage",
+      "f_time": "Plage horaire",
+      "f_vehicle": "Véhicule / Code",
+      "all": "Tous"
+    },
+    "livraison": {
+      "title": "Livraison",
+      "subtitle": "Remettre un colis à son destinataire",
+      "info": "Recherchez le colis par référence, vérifiez puis remettez-le.",
+      "f_ref": "Référence du colis",
+      "ph_ref": "ex. COL-00123",
+      "new_search": "Nouvelle recherche",
+      "not_found": "Aucun colis trouvé pour cette référence.",
+      "sender": "Expéditeur",
+      "contents": "Contenu",
+      "weight": "Poids",
+      "voyage": "Voyage",
+      "picked_by": "Retiré par",
+      "picked_id": "Pièce présentée",
+      "picked_id_ph": "N° CNI, passeport…",
+      "remit": "Remettre le colis",
+      "already_done": "Ce colis a déjà été retiré",
+      "not_ready": "Ce colis n'est pas encore disponible pour retrait."
     }
   },
   "fare": {

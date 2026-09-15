@@ -1996,7 +1996,32 @@
       "dispatch_selected": "Dispatch selected",
       "print_manifest": "Manifest",
       "empty_ready": "No ready parcels",
-      "empty_onboard": "No parcels on this voyage"
+      "empty_onboard": "No parcels on this voyage",
+      "f_route": "Route",
+      "f_dest": "Destination",
+      "f_day": "Voyage day",
+      "f_time": "Time slot",
+      "f_vehicle": "Vehicle / Code",
+      "all": "All"
+    },
+    "livraison": {
+      "title": "Delivery",
+      "subtitle": "Hand a parcel to its recipient",
+      "info": "Search the parcel by reference, verify, then hand it over.",
+      "f_ref": "Parcel reference",
+      "ph_ref": "e.g. COL-00123",
+      "new_search": "New search",
+      "not_found": "No parcel found for this reference.",
+      "sender": "Sender",
+      "contents": "Contents",
+      "weight": "Weight",
+      "voyage": "Voyage",
+      "picked_by": "Picked up by",
+      "picked_id": "ID presented",
+      "picked_id_ph": "ID no., passport…",
+      "remit": "Hand over parcel",
+      "already_done": "This parcel was already picked up",
+      "not_ready": "This parcel is not yet available for pickup."
     }
   },
   "fare": {

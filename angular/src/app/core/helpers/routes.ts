@@ -460,6 +460,7 @@ export const routes={
   vcgParcels:   '/voyages-consignment/parcels',
   vcgReception: '/voyages-consignment/reception',
   vcgManifest:  '/voyages-consignment/manifest',
+  vcgLivraison: '/voyages-consignment/livraison',
   vcgBaggage:   '/voyages-consignment/baggage',
 
   //error

@@ -3,13 +3,28 @@
 </div>
 <app-info-banner [text]="'cons.reception.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
-  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2">
-      <input type="text" class="form-control w-auto" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
-      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+  <div class="card-header">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label small mb-1">{{ 'cons.common.search_ref' | transloco }}</label>
+        <div class="input-group">
+          <input type="text" class="form-control" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+          <button class="btn btn-outline-secondary" (click)="reload()"><i class="ti ti-search"></i></button>
+        </div>
+      </div>
+      <div class="col-6 col-md"><label class="form-label small mb-1">{{ 'cons.expedition.f_route' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="fRoute"><option value="">{{ 'cons.expedition.all' | transloco }}</option>@for (r of routeOptions; track r) { <option [value]="r">{{ r }}</option> }</select></div>
+      <div class="col-6 col-md"><label class="form-label small mb-1">{{ 'cons.expedition.f_dest' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="fDest"><option value="">{{ 'cons.expedition.all' | transloco }}</option>@for (d of destOptions; track d) { <option [value]="d">{{ d }}</option> }</select></div>
+      <div class="col-6 col-md"><label class="form-label small mb-1">{{ 'cons.expedition.f_day' | transloco }}</label>
+        <input type="date" class="form-control" [(ngModel)]="fDay" /></div>
+      <div class="col-6 col-md"><label class="form-label small mb-1">{{ 'cons.expedition.f_time' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="fTime"><option value="">{{ 'cons.expedition.all' | transloco }}</option>@for (h of timeOptions; track h) { <option [value]="h">{{ h }}</option> }</select></div>
+      <div class="col-6 col-md"><label class="form-label small mb-1">{{ 'cons.expedition.f_vehicle' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="fVehicle"><option value="">{{ 'cons.expedition.all' | transloco }}</option>@for (v of vehicleOptions; track v) { <option [value]="v">{{ v }}</option> }</select></div>
     </div>
     @if (selected.size) {
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 mt-2">
         <span class="text-muted small">{{ selected.size }} {{ 'cons.common.selected' | transloco }}</span>
         <button class="btn btn-sm btn-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveSelectedFull()"><i class="ti ti-package-import me-1"></i>{{ 'cons.reception.receive_all' | transloco }}</button>
       </div>
@@ -18,19 +33,21 @@
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
-      <div class="table-responsive"><table class="table datanew">
+      <div class="table-responsive"><table class="table table-sm table-hover datanew small">
         <thead class="thead-light"><tr>
-          <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!rows.length" /></th>
+          <th style="width:30px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!filtered.length" /></th>
           <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.common.col_description' | transloco }}</th>
-          <th class="text-center">{{ 'cons.common.pieces' | transloco }}</th><th style="width:80px">{{ 'cons.reception.col_received' | transloco }}</th><th style="width:80px">{{ 'cons.common.missing' | transloco }}</th><th style="width:80px">{{ 'cons.common.damaged' | transloco }}</th>
+          <th>{{ 'cons.livraison.voyage' | transloco }}</th>
+          <th class="text-center">{{ 'cons.common.pieces' | transloco }}</th><th style="width:70px">{{ 'cons.reception.col_received' | transloco }}</th><th style="width:70px">{{ 'cons.common.missing' | transloco }}</th><th style="width:70px">{{ 'cons.common.damaged' | transloco }}</th>
           <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
-          @for (p of rows | paginate:pg.page:pg.size; track p.id) {
+          @for (p of filtered | paginate:pg.page:pg.size; track p.id) {
             <tr>
               <td><input type="checkbox" class="form-check-input" [checked]="isSelected(p.id)" (change)="toggle(p.id)" /></td>
               <td class="fw-medium">{{ p.reference }}</td>
               <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
               <td>{{ p.description || '—' }} <small class="text-muted">({{ p.consignment_type_label }})</small></td>
+              <td>@if (p.trip_number) { {{ p.trip_number }}<br><small class="text-muted">{{ p.trip_vehicle_plate }}</small> } @else { <span class="badge bg-secondary">{{ 'cons.expedition.mode_sans' | transloco }}</span> }</td>
               <td class="text-center">{{ state[p.id].received }}/{{ p.quantity }}</td>
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].received" /></td>
               <td><input type="number" min="0" [max]="p.quantity" class="form-control form-control-sm" [(ngModel)]="state[p.id].missing" /></td>
@@ -39,10 +56,10 @@
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.parcel.manage'" (click)="receiveOne(p)" [title]="'cons.reception.receive' | transloco"><i class="ti ti-package-import me-1"></i>{{ 'cons.reception.receive' | transloco }}</a>
               </td>
             </tr>
-          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">{{ 'cons.reception.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="10" class="text-center py-4 text-muted">{{ 'cons.reception.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
-        <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
     }
   </div>
 </div>

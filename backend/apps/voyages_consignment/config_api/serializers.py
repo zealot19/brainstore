@@ -15,13 +15,18 @@ class ParcelRead(serializers.ModelSerializer):
     origin_point_name = serializers.CharField(source="origin_point.name", read_only=True, default=None)
     destination_point_name = serializers.CharField(source="destination_point.name", read_only=True, default=None)
     consignment_type_label = serializers.CharField(source="consignment_type.label", read_only=True, default=None)
+    trip_number = serializers.CharField(source="trip.number", read_only=True, default=None)
+    trip_route_code = serializers.CharField(source="trip.route.code", read_only=True, default=None)
+    trip_departure = serializers.DateTimeField(source="trip.scheduled_departure", read_only=True, default=None)
+    trip_vehicle_plate = serializers.CharField(source="trip.vehicle.license_plate", read_only=True, default=None)
     events = ParcelEventRead(many=True, read_only=True)
 
     class Meta:
         model = Parcel
         fields = ["id", "reference", "status", "status_display",
                   "origin_point", "origin_point_name", "destination_point", "destination_point_name",
-                  "trip", "sender_name", "sender_phone", "recipient_name", "recipient_phone",
+                  "trip", "trip_number", "trip_route_code", "trip_departure", "trip_vehicle_plate",
+                  "sender_name", "sender_phone", "recipient_name", "recipient_phone",
                   "recipient_address", "recipient_id_number", "consignment_type", "consignment_type_label",
                   "description", "weight_kg", "quantity", "received_pieces", "missing_pieces",
                   "damaged_pieces", "declared_value", "amount_due", "amount_received",

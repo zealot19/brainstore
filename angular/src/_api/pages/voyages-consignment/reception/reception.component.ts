@@ -21,15 +21,33 @@ export class VcgReceptionComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; q = '';
+  fRoute = ''; fDest = ''; fDay = ''; fTime = ''; fVehicle = '';
   selected = new Set<string>();
   state: Record<string, RowState> = {};
 
   constructor(private svc: ParcelService) {}
   ngOnInit(): void { this.reload(); }
 
+  private day(p: Parcel): string { return (p.trip_departure || '').slice(0, 10); }
+  private time(p: Parcel): string { return (p.trip_departure || '').slice(11, 16); }
+  private uniq(v: (string | null | undefined)[]): string[] { return [...new Set(v.filter((x): x is string => !!x))].sort(); }
+  get routeOptions(): string[] { return this.uniq(this.rows.map(p => p.trip_route_code)); }
+  get destOptions(): string[] { return this.uniq(this.rows.map(p => p.destination_point_name)); }
+  get timeOptions(): string[] { return this.uniq(this.rows.map(p => this.time(p))); }
+  get vehicleOptions(): string[] { return this.uniq(this.rows.map(p => p.trip_vehicle_plate)); }
+  get filtered(): Parcel[] {
+    return this.rows.filter(p =>
+      (!this.fRoute || p.trip_route_code === this.fRoute) &&
+      (!this.fDest || p.destination_point_name === this.fDest) &&
+      (!this.fDay || this.day(p) === this.fDay) &&
+      (!this.fTime || this.time(p) === this.fTime) &&
+      (!this.fVehicle || p.trip_vehicle_plate === this.fVehicle));
+  }
+
   reload(): void {
     this.loading = true; this.selected.clear();
-    this.svc.list({ status: 'arrived', q: this.q }).subscribe({
+    // Colis à réceptionner : en transit (dont ceux expédiés sans voyage) ou déjà arrivés.
+    this.svc.list({ status: 'in_transit,arrived', q: this.q }).subscribe({
       next: d => {
         this.rows = d; this.loading = false;
         this.state = {};
@@ -39,8 +57,8 @@ export class VcgReceptionComponent implements OnInit {
 
   isSelected(id: string): boolean { return this.selected.has(id); }
   toggle(id: string): void { this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id); }
-  get allSelected(): boolean { return this.rows.length > 0 && this.rows.every(r => this.selected.has(r.id)); }
-  toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.rows.forEach(r => this.selected.add(r.id)); }
+  get allSelected(): boolean { return this.filtered.length > 0 && this.filtered.every(r => this.selected.has(r.id)); }
+  toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.filtered.forEach(r => this.selected.add(r.id)); }
 
   /** Réception d'une ligne avec les quantités saisies. */
   receiveOne(p: Parcel): void {

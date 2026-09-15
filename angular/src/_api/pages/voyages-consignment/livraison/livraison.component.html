@@ -1,0 +1,63 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.livraison.title' | transloco }}</h4><h6>{{ 'cons.livraison.subtitle' | transloco }}</h6></div></div>
+</div>
+<app-info-banner [text]="'cons.livraison.info' | transloco"></app-info-banner>
+
+<div class="card"><div class="card-body">
+  <div class="row g-2 align-items-end" style="max-width:640px">
+    <div class="col">
+      <label class="form-label">{{ 'cons.livraison.f_ref' | transloco }}</label>
+      <input class="form-control" [(ngModel)]="ref" (keyup.enter)="search()" [placeholder]="'cons.livraison.ph_ref' | transloco" />
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="search()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+      @if (parcel) { <button class="btn btn-outline-secondary ms-1" (click)="reset()">{{ 'cons.livraison.new_search' | transloco }}</button> }
+    </div>
+  </div>
+
+  @if (searched && !parcel) {
+    <div class="alert alert-warning mt-3">{{ 'cons.livraison.not_found' | transloco }}</div>
+  }
+
+  @if (parcel) {
+    <div class="card mt-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">{{ parcel.reference }}</h5>
+        <span class="badge {{ statusClass(parcel.status) }}">{{ parcel.status_display }}</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.common.col_recipient' | transloco }}</small>{{ parcel.recipient_name }}<br><small class="text-muted">{{ parcel.recipient_phone }}</small></div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.sender' | transloco }}</small>{{ parcel.sender_name }}<br><small class="text-muted">{{ parcel.sender_phone }}</small></div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.common.col_trip' | transloco }}</small>{{ parcel.origin_point_name }} → {{ parcel.destination_point_name }}</div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.contents' | transloco }}</small>{{ parcel.description || '—' }} · {{ parcel.quantity }} {{ 'cons.common.pieces' | transloco }}</div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.weight' | transloco }}</small>{{ parcel.weight_kg || '—' }} kg</div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.voyage' | transloco }}</small>{{ parcel.trip_number || '—' }}</div>
+        </div>
+
+        @if (parcel.status === 'available_for_pickup') {
+          <hr>
+          <div class="row g-3" style="max-width:640px">
+            <div class="col-md-6">
+              <label class="form-label">{{ 'cons.livraison.picked_by' | transloco }} <span class="text-danger">*</span></label>
+              <input class="form-control" [(ngModel)]="pickedBy" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'cons.livraison.picked_id' | transloco }}</label>
+              <input class="form-control" [(ngModel)]="pickedId" [placeholder]="'cons.livraison.picked_id_ph' | transloco" />
+            </div>
+            <div class="col-12">
+              <button class="btn btn-success" *hasPermission="'ticketing.parcel.manage'" [disabled]="saving" (click)="remit()">
+                <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-package-export me-1"></i>{{ 'cons.livraison.remit' | transloco }}
+              </button>
+            </div>
+          </div>
+        } @else if (parcel.status === 'picked_up') {
+          <div class="alert alert-success mt-3 mb-0">{{ 'cons.livraison.already_done' | transloco }} — {{ parcel.picked_up_by }} · {{ parcel.picked_up_at | date:'short' }}</div>
+        } @else {
+          <div class="alert alert-warning mt-3 mb-0">{{ 'cons.livraison.not_ready' | transloco }}</div>
+        }
+      </div>
+    </div>
+  }
+</div></div>

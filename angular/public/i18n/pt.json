@@ -1996,7 +1996,32 @@
       "dispatch_selected": "Expedir seleção",
       "print_manifest": "Manifesto",
       "empty_ready": "Sem encomendas prontas",
-      "empty_onboard": "Sem encomendas nesta viagem"
+      "empty_onboard": "Sem encomendas nesta viagem",
+      "f_route": "Trajeto",
+      "f_dest": "Destino",
+      "f_day": "Dia da viagem",
+      "f_time": "Faixa horária",
+      "f_vehicle": "Veículo / Código",
+      "all": "Todos"
+    },
+    "livraison": {
+      "title": "Entrega",
+      "subtitle": "Entregar uma encomenda ao destinatário",
+      "info": "Procure a encomenda por referência, verifique e entregue.",
+      "f_ref": "Referência da encomenda",
+      "ph_ref": "ex. COL-00123",
+      "new_search": "Nova pesquisa",
+      "not_found": "Nenhuma encomenda encontrada.",
+      "sender": "Remetente",
+      "contents": "Conteúdo",
+      "weight": "Peso",
+      "voyage": "Viagem",
+      "picked_by": "Retirado por",
+      "picked_id": "Documento apresentado",
+      "picked_id_ph": "N.º de documento…",
+      "remit": "Entregar a encomenda",
+      "already_done": "Esta encomenda já foi retirada",
+      "not_ready": "Esta encomenda ainda não está disponível para retirada."
     }
   },
   "fare": {
