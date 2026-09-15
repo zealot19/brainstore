@@ -13,6 +13,9 @@ class VoyagesSettings(_CompanyScoped):
     auto_print_default = models.BooleanField(_("impression auto par défaut"), default=False)
     sms_notification_default = models.BooleanField(_("SMS par défaut"), default=False)
     baggage_free_allowance_kg = models.PositiveSmallIntegerField(_("franchise bagage (kg)"), default=23)
+    parcel_trip_max_weight_kg = models.DecimalField(_("capacité colis max/voyage (kg)"),
+                                                    max_digits=8, decimal_places=2, null=True, blank=True)
+    parcel_trip_max_count = models.PositiveIntegerField(_("nombre max de colis/voyage"), null=True, blank=True)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("paramètres voyages")
