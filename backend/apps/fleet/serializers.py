@@ -560,36 +560,30 @@ class AssignmentCompleteSerializer(serializers.Serializer):
 
 class AccidentListSerializer(serializers.ModelSerializer):
     vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True)
-    driver_name = serializers.SerializerMethodField()
+    trip_label = serializers.CharField(read_only=True)
     severity_display = serializers.CharField(source="get_severity_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Accident
         fields = [
-            "id", "vehicle", "vehicle_plate", "driver_name",
+            "id", "vehicle", "vehicle_plate", "trip", "trip_label",
             "date", "location", "severity", "severity_display",
             "at_fault", "status", "status_display",
             "estimated_damage_cost", "created_at",
         ]
 
-    def get_driver_name(self, obj):
-        return obj.driver_name
-
 
 class AccidentDetailSerializer(serializers.ModelSerializer):
     vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True)
-    internal_driver_info = serializers.SerializerMethodField()
-    external_driver_info = ExternalDriverSerializer(source="external_driver", read_only=True)
+    trip_label = serializers.CharField(read_only=True)
     severity_display = serializers.CharField(source="get_severity_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Accident
         fields = [
-            "id", "vehicle", "vehicle_plate",
-            "internal_driver_info", "external_driver_info",
-            "assignment",
+            "id", "vehicle", "vehicle_plate", "trip", "trip_label",
             "date", "location", "description",
             "severity", "severity_display",
             "at_fault", "third_party_involved", "third_party_info",
@@ -598,12 +592,6 @@ class AccidentDetailSerializer(serializers.ModelSerializer):
             "status", "status_display",
             "notes", "created_at", "updated_at",
         ]
-
-    def get_internal_driver_info(self, obj):
-        if obj.internal_driver_id:
-            u = obj.internal_driver
-            return {"id": str(u.id), "name": f"{u.first_name} {u.last_name}".strip() or u.username}
-        return None
 
 
 class AccidentCreateSerializer(serializers.Serializer):
@@ -618,9 +606,7 @@ class AccidentCreateSerializer(serializers.Serializer):
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
-    assignment_id = serializers.UUIDField(required=False, allow_null=True, default=None)
-    internal_driver_id = serializers.UUIDField(required=False, allow_null=True, default=None)
-    external_driver_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    trip_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -635,9 +621,7 @@ class AccidentUpdateSerializer(serializers.Serializer):
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
-    internal_driver_id = serializers.UUIDField(required=False, allow_null=True)
-    external_driver_id = serializers.UUIDField(required=False, allow_null=True)
-    assignment_id = serializers.UUIDField(required=False, allow_null=True)
+    trip_id = serializers.UUIDField(required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
 
 

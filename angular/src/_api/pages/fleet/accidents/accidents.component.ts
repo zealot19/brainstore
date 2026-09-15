@@ -3,11 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AccidentService } from '../../../services/fleet/accident.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
-import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
-import { AssignmentService } from '../../../services/fleet/assignment.service';
-import { UserService } from '../../../services/users/user.service';
-import { AccidentListItem, VehicleListItem, ExternalDriver, AssignmentListItem } from '../../../models/fleet.models';
-import { AppUser } from '../../../models/user.models';
+import { TripService } from '../../../services/voyages/trip.service';
+import { AccidentListItem, VehicleListItem } from '../../../models/fleet.models';
+import { Trip } from '../../../models/voyages.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
@@ -24,12 +22,10 @@ export class FleetAccidentsComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
-  accidents:   AccidentListItem[]   = [];
-  filtered:    AccidentListItem[]   = [];
-  vehicles:    VehicleListItem[]    = [];
-  extDrivers:  ExternalDriver[]     = [];
-  intDrivers:  AppUser[]            = [];
-  missions:    AssignmentListItem[] = [];
+  accidents:   AccidentListItem[] = [];
+  filtered:    AccidentListItem[] = [];
+  vehicles:    VehicleListItem[]  = [];
+  trips:       Trip[]             = [];   // voyages partis / terminés
   loading      = true;
   filterStatus = '';
 
@@ -58,9 +54,7 @@ export class FleetAccidentsComponent implements OnInit {
   constructor(
     private svc: AccidentService,
     private vehicleSvc: VehicleService,
-    private driverSvc: ExternalDriverService,
-    private assignmentSvc: AssignmentService,
-    private userSvc: UserService,
+    private tripSvc: TripService,
     private fb: FormBuilder,
   ) {}
 
@@ -77,9 +71,7 @@ export class FleetAccidentsComponent implements OnInit {
       police_report_number:   [''],
       insurance_claim_number: [''],
       estimated_damage_cost:  [null],
-      internal_driver_id:     [''],
-      external_driver_id:     [''],
-      assignment_id:          [''],
+      trip_id:                [''],
       notes:                  [''],
     });
     this.closeForm = this.fb.group({
@@ -87,10 +79,22 @@ export class FleetAccidentsComponent implements OnInit {
       notes:              [''],
     });
     this.vehicleSvc.list().subscribe(vs => this.vehicles = vs);
-    this.driverSvc.list().subscribe(ds => this.extDrivers = ds);
-    this.assignmentSvc.list().subscribe(ms => this.missions = ms);
-    this.userSvc.list().subscribe(us => this.intDrivers = us);
+    // Voyages « partis » ou « terminés » — ceux qui ont réellement démarré.
+    this.tripSvc.list({ status: 'departed' }).subscribe(ts => this.trips = [...this.trips, ...ts]);
+    this.tripSvc.list({ status: 'completed' }).subscribe(ts => this.trips = [...this.trips, ...ts]);
     this.load();
+  }
+
+  /** Sélection d'un voyage : pré-remplit le véhicule si le voyage en a un. */
+  onTripChange(tripId: string): void {
+    const t = this.trips.find(x => x.id === tripId);
+    if (t?.vehicle) this.createForm.get('vehicle_id')?.setValue(t.vehicle);
+  }
+
+  tripLabel(t: Trip): string {
+    const ref = t.number || t.code || t.id.slice(0, 8);
+    const route = [t.origin_name, t.destination_name].filter(Boolean).join(' → ');
+    return route ? `${ref} — ${route}` : ref;
   }
 
   load(): void {
@@ -134,9 +138,7 @@ export class FleetAccidentsComponent implements OnInit {
           police_report_number:   d.police_report_number || '',
           insurance_claim_number: d.insurance_claim_number || '',
           estimated_damage_cost:  d.estimated_damage_cost,
-          internal_driver_id:     d.internal_driver_info?.id ?? '',
-          external_driver_id:     d.external_driver_info?.id ?? '',
-          assignment_id:          d.assignment ?? '',
+          trip_id:                d.trip ?? '',
           notes:                  d.notes || '',
         });
         this.createForm.get('vehicle_id')?.disable();   // le véhicule n'est pas modifiable
@@ -159,9 +161,7 @@ export class FleetAccidentsComponent implements OnInit {
       police_report_number: v.police_report_number || '',
       insurance_claim_number: v.insurance_claim_number || '',
       estimated_damage_cost: v.estimated_damage_cost ? Number(v.estimated_damage_cost) : null,
-      internal_driver_id: v.internal_driver_id || null,
-      external_driver_id: v.external_driver_id || null,
-      assignment_id: v.assignment_id || null,
+      trip_id: v.trip_id || null,
       notes: v.notes || '',
     };
     const req = this.editId

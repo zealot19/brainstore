@@ -6,7 +6,7 @@ def list_accidents(company_id, vehicle_id=None, status=None, severity=None,
                    date_from=None, date_to=None):
     qs = (Accident.objects
           .filter(vehicle__company_id=company_id, is_deleted=False)
-          .select_related("vehicle", "internal_driver", "external_driver", "assignment")
+          .select_related("vehicle", "trip")
           .order_by("-date"))
     if vehicle_id:
         qs = qs.filter(vehicle_id=vehicle_id)
@@ -24,7 +24,7 @@ def list_accidents(company_id, vehicle_id=None, status=None, severity=None,
 def get_accident(accident_id, company_id):
     try:
         return Accident.objects.select_related(
-            "vehicle", "internal_driver", "external_driver", "assignment"
+            "vehicle", "trip"
         ).get(id=accident_id, vehicle__company_id=company_id, is_deleted=False)
     except Accident.DoesNotExist:
         return None
@@ -34,9 +34,7 @@ def list_vehicle_accidents(vehicle_id, company_id, status=None):
     vehicle = get_vehicle(vehicle_id, company_id)
     if vehicle is None:
         return None
-    qs = vehicle.accidents.filter(is_deleted=False).select_related(
-        "internal_driver", "external_driver", "assignment"
-    )
+    qs = vehicle.accidents.filter(is_deleted=False).select_related("trip")
     if status:
         qs = qs.filter(status=status)
     return qs.order_by("-date")

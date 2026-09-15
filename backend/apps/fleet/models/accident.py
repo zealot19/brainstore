@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel
@@ -19,18 +18,12 @@ class Accident(BaseModel):
         REPAIR_IN_PROGRESS = "repair_in_progress", _("En réparation")
         CLOSED            = "closed",             _("Clôturé")
 
-    # ── Véhicule & Conducteur ──────────────────────────────────────────────────
-    vehicle         = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
-                                        on_delete=models.PROTECT, related_name="accidents")
-    internal_driver = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("conducteur interne"),
-                                        on_delete=models.SET_NULL, null=True, blank=True,
-                                        related_name="fleet_accidents")
-    external_driver = models.ForeignKey("fleet.ExternalDriver", verbose_name=_("conducteur externe"),
-                                        on_delete=models.SET_NULL, null=True, blank=True,
-                                        related_name="accidents")
-    assignment      = models.ForeignKey("fleet.Assignment", verbose_name=_("mission liée"),
-                                        on_delete=models.SET_NULL, null=True, blank=True,
-                                        related_name="accidents")
+    # ── Véhicule & Voyage ──────────────────────────────────────────────────────
+    vehicle = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
+                                on_delete=models.PROTECT, related_name="accidents")
+    trip    = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage lié"),
+                                on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name="accidents")
 
     # ── Informations accident ──────────────────────────────────────────────────
     date        = models.DateField(_("date"))
@@ -65,10 +58,8 @@ class Accident(BaseModel):
         return f"{self.vehicle.license_plate} — {self.date} ({self.get_severity_display()})"
 
     @property
-    def driver_name(self):
-        if self.internal_driver_id:
-            u = self.internal_driver
-            return f"{u.first_name} {u.last_name}".strip() or u.username
-        if self.external_driver_id:
-            return self.external_driver.full_name
-        return None
+    def trip_label(self):
+        t = self.trip
+        if not t:
+            return None
+        return t.number or t.code or str(t.id)[:8]

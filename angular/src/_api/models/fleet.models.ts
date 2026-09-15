@@ -337,7 +337,8 @@ export interface AccidentListItem {
   id:                    string;
   vehicle:               string;
   vehicle_plate:         string;
-  driver_name:           string;
+  trip:                  string | null;
+  trip_label:            string | null;
   date:                  string;
   location:              string;
   severity:              AccidentSeverity;
@@ -353,9 +354,8 @@ export interface AccidentDetail {
   id:                     string;
   vehicle:                string;
   vehicle_plate:          string;
-  internal_driver_info:   { id: string; name: string } | null;
-  external_driver_info:   ExternalDriver | null;
-  assignment:             string | null;
+  trip:                   string | null;
+  trip_label:             string | null;
   date:                   string;
   location:               string;
   description:            string;

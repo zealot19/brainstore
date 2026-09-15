@@ -86,4 +86,4 @@ class AssignmentAdmin(admin.ModelAdmin):
 class AccidentAdmin(admin.ModelAdmin):
     list_display = ["vehicle", "date", "severity", "at_fault", "status"]
     list_filter = ["severity", "status", "at_fault"]
-    raw_id_fields = ["vehicle", "internal_driver", "external_driver", "assignment"]
+    raw_id_fields = ["vehicle", "trip"]

@@ -15,9 +15,7 @@ def create_accident(
     police_report_number: str = "",
     insurance_claim_number: str = "",
     estimated_damage_cost=None,
-    assignment_id=None,
-    internal_driver_id=None,
-    external_driver_id=None,
+    trip_id=None,
     notes: str = "",
     created_by,
 ):
@@ -33,9 +31,7 @@ def create_accident(
         police_report_number=police_report_number,
         insurance_claim_number=insurance_claim_number,
         estimated_damage_cost=estimated_damage_cost,
-        assignment_id=assignment_id,
-        internal_driver_id=internal_driver_id,
-        external_driver_id=external_driver_id,
+        trip_id=trip_id,
         status=Accident.Status.REPORTED,
         notes=notes,
         created_by=created_by,
@@ -50,8 +46,7 @@ def update_accident(accident, *, updated_by, **fields):
         "date", "location", "description", "severity", "at_fault",
         "third_party_involved", "third_party_info",
         "police_report_number", "insurance_claim_number",
-        "estimated_damage_cost", "internal_driver_id",
-        "external_driver_id", "assignment_id", "notes",
+        "estimated_damage_cost", "trip_id", "notes",
     }
     for key, val in fields.items():
         if key in allowed:

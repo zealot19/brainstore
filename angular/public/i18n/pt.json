@@ -1442,12 +1442,12 @@
       "stat_under_review": "Em análise",
       "act_review": "Analisar",
       "act_review_title": "Colocar em análise",
-      "f_int_driver": "Condutor interno",
-      "f_assignment": "Missão vinculada",
-      "opt_no_assignment": "Sem missão",
       "f_insurance": "N.º de sinistro",
       "f_third_party_info": "Dados de terceiros",
-      "modal_edit_title": "Editar acidente"
+      "modal_edit_title": "Editar acidente",
+      "f_voyage": "Viagem vinculada",
+      "col_voyage": "Viagem",
+      "opt_no_voyage": "Sem viagem"
     },
     "dash": {
       "title": "Painel — Frota",

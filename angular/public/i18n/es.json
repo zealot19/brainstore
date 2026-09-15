@@ -1442,12 +1442,12 @@
       "stat_under_review": "En revisión",
       "act_review": "Examinar",
       "act_review_title": "Poner en revisión",
-      "f_int_driver": "Conductor interno",
-      "f_assignment": "Misión vinculada",
-      "opt_no_assignment": "Sin misión",
       "f_insurance": "N.º de siniestro",
       "f_third_party_info": "Datos del tercero",
-      "modal_edit_title": "Editar accidente"
+      "modal_edit_title": "Editar accidente",
+      "f_voyage": "Viaje vinculado",
+      "col_voyage": "Viaje",
+      "opt_no_voyage": "Sin viaje"
     },
     "dash": {
       "title": "Panel — Flota",

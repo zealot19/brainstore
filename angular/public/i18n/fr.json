@@ -1442,12 +1442,12 @@
       "stat_under_review": "En examen",
       "act_review": "Examiner",
       "act_review_title": "Mettre en examen",
-      "f_int_driver": "Conducteur interne",
-      "f_assignment": "Mission liée",
-      "opt_no_assignment": "Aucune mission",
       "f_insurance": "N° sinistre assurance",
       "f_third_party_info": "Informations tiers",
-      "modal_edit_title": "Modifier l'accident"
+      "modal_edit_title": "Modifier l'accident",
+      "f_voyage": "Voyage lié",
+      "col_voyage": "Voyage",
+      "opt_no_voyage": "Aucun voyage"
     },
     "dash": {
       "title": "Tableau de bord — Flotte",

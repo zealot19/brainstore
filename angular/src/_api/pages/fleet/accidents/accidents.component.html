@@ -51,7 +51,7 @@
                 <th>{{ 'fleet.common.vehicle' | transloco }}</th>
                 <th>{{ 'fleet.common.date' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_location' | transloco }}</th>
-                <th>{{ 'fleet.asg.col_driver' | transloco }}</th>
+                <th>{{ 'fleet.acc.col_voyage' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_severity' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_at_fault' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_est_cost' | transloco }}</th>
@@ -64,7 +64,7 @@
                 <td class="fw-semibold">{{ a.vehicle_plate }}</td>
                 <td>{{ a.date | date:'dd/MM/yyyy' }}</td>
                 <td>{{ a.location }}</td>
-                <td>{{ a.driver_name || '—' }}</td>
+                <td>{{ a.trip_label || '—' }}</td>
                 <td><span class="badge" [class]="severityCss(a.severity)">{{ severityLabel(a.severity) }}</span></td>
                 <td>
                   <span class="badge" [class]="a.at_fault ? 'bg-danger' : 'bg-secondary'">
@@ -125,24 +125,10 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.acc.f_int_driver' | transloco }}</label>
-              <select class="form-select" formControlName="internal_driver_id">
-                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
-                <option *ngFor="let u of intDrivers" [value]="u.id">{{ u.full_name || u.username }}</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.asg.f_ext_driver' | transloco }}</label>
-              <select class="form-select" formControlName="external_driver_id">
-                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
-                <option *ngFor="let d of extDrivers" [value]="d.id">{{ d.full_name }}</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.acc.f_assignment' | transloco }}</label>
-              <select class="form-select" formControlName="assignment_id">
-                <option value="">{{ 'fleet.acc.opt_no_assignment' | transloco }}</option>
-                <option *ngFor="let m of missions" [value]="m.id">{{ m.vehicle_plate }} — {{ m.destination }} ({{ m.planned_departure | date:'dd/MM/yyyy' }})</option>
+              <label class="form-label">{{ 'fleet.acc.f_voyage' | transloco }}</label>
+              <select class="form-select" formControlName="trip_id" (change)="onTripChange(createForm.get('trip_id')!.value)">
+                <option value="">{{ 'fleet.acc.opt_no_voyage' | transloco }}</option>
+                <option *ngFor="let t of trips" [value]="t.id">{{ tripLabel(t) }}</option>
               </select>
             </div>
             <div class="col-md-4">
