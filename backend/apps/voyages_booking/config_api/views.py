@@ -437,20 +437,23 @@ class TripRoadmapView(APIView):
 
 
 class TripRoadmapPdfView(APIView):
-    """PDF (WeasyPrint) de la feuille de route : ?doc=voyages (passagers+bagages) ou colis."""
+    """PDF (WeasyPrint) des bordereaux : ?doc=voyages|comptabilisation|colis|bagages."""
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request, trip_id):
         from django.http import HttpResponse
-        from apps.voyages_booking.roadmap_pdf import render_roadmap_pdf
+        from apps.voyages_booking.manifest_render import render_manifest_pdf
         trip = _roadmap_trip(request, trip_id)
         if not trip:
             return error_response("Voyage introuvable.", status_code=404)
-        doc = "colis" if request.query_params.get("doc") == "colis" else "voyages"
+        doc = request.query_params.get("doc") or "voyages"
+        if doc not in ("voyages", "comptabilisation", "colis", "bagages"):
+            doc = "voyages"
         data = build_roadmap_data(trip, request)
+        tpl = resolve_manifest_template(trip.company, request)
         try:
-            pdf = render_roadmap_pdf(data, doc)
+            pdf = render_manifest_pdf(data, doc, tpl)
         except (ImportError, OSError):
             return error_response(
                 "Génération PDF indisponible : le moteur WeasyPrint n'est pas configuré sur ce serveur "

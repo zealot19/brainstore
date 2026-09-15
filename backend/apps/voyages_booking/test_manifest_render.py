@@ -21,6 +21,17 @@ def test_render_manifest_pdf_each_doc(doc):
 
 
 @pytest.mark.django_db
+def test_pdf_endpoint_accepts_comptabilisation():
+    from rest_framework.test import APIClient
+    from apps.voyages_booking.tests_integration_treasury import _setup
+    company, admin, trip = _setup()
+    c = APIClient(); c.force_authenticate(user=admin)
+    r = c.get(f"/api/v1/voyages/booking/trips/{trip.id}/roadmap/pdf/?doc=comptabilisation")
+    # 200 (WeasyPrint présent) ou 503 (absent) — jamais 400/404.
+    assert r.status_code in (200, 503), r.content
+
+
+@pytest.mark.django_db
 def test_resolve_manifest_template_defaults():
     from django.test import RequestFactory
     from apps.voyages_booking.tests_integration_treasury import _setup
