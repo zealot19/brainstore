@@ -12,16 +12,13 @@ class Accident(BaseModel):
         SEVERE     = "severe",     _("Grave")
         TOTAL_LOSS = "total_loss", _("Perte totale")
 
-    class Status(models.TextChoices):
-        REPORTED          = "reported",           _("Déclaré")
-        UNDER_REVIEW      = "under_review",       _("En cours d'examen")
-        REPAIR_IN_PROGRESS = "repair_in_progress", _("En réparation")
-        CLOSED            = "closed",             _("Clôturé")
-
-    # ── Véhicule & Voyage ──────────────────────────────────────────────────────
-    vehicle = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
-                                on_delete=models.PROTECT, related_name="accidents")
+    # ── Voyage & Véhicule ──────────────────────────────────────────────────────
+    # Un accident est rattaché à un voyage ; le véhicule est celui du voyage
+    # (dérivé automatiquement, donc null si le voyage n'a pas de véhicule).
     trip    = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage lié"),
+                                on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name="accidents")
+    vehicle = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
                                 on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name="accidents")
 
@@ -45,8 +42,6 @@ class Accident(BaseModel):
     actual_repair_cost     = models.DecimalField(_("coût réel de réparation"), max_digits=14,
                                                   decimal_places=2, null=True, blank=True)
 
-    status = models.CharField(_("statut"), max_length=25, choices=Status.choices,
-                               default=Status.REPORTED)
     notes  = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
@@ -55,7 +50,8 @@ class Accident(BaseModel):
         ordering = ["-date"]
 
     def __str__(self):
-        return f"{self.vehicle.license_plate} — {self.date} ({self.get_severity_display()})"
+        plate = self.vehicle.license_plate if self.vehicle_id else (self.trip_label or "?")
+        return f"{plate} — {self.date} ({self.get_severity_display()})"
 
     @property
     def trip_label(self):

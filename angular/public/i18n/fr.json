@@ -1447,7 +1447,8 @@
       "modal_edit_title": "Modifier l'accident",
       "f_voyage": "Voyage lié",
       "col_voyage": "Voyage",
-      "opt_no_voyage": "Aucun voyage"
+      "opt_no_voyage": "Aucun voyage",
+      "no_vehicle": "Aucun véhicule sur ce voyage"
     },
     "dash": {
       "title": "Tableau de bord — Flotte",

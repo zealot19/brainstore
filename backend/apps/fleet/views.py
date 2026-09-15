@@ -27,12 +27,12 @@ from .serializers import (
     AssignmentStartSerializer, AssignmentCompleteSerializer,
     AccidentListSerializer, AccidentDetailSerializer,
     AccidentCreateSerializer, AccidentUpdateSerializer,
-    AccidentCloseSerializer, AccidentStatusSerializer,
     ParkingSerializer, ParkingWriteSerializer,
     SupplierSerializer, SupplierWriteSerializer,
 )
 from .models import (VehicleModel, Vehicle, Service,
                      Assignment, Accident, VehicleCategoryCfg)
+from apps.voyages_trips.models import Trip
 from apps.core.models import Attachment
 
 
@@ -1339,7 +1339,6 @@ class AccidentListView(APIView):
         accidents = selectors.list_accidents(
             company_id,
             vehicle_id=request.query_params.get("vehicle_id"),
-            status=request.query_params.get("status"),
             severity=request.query_params.get("severity"),
             date_from=request.query_params.get("date_from"),
             date_to=request.query_params.get("date_to"),
@@ -1355,12 +1354,12 @@ class AccidentListView(APIView):
         payload = AccidentCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
-        vehicle = selectors.get_vehicle(d["vehicle_id"], str(company.id))
-        if not vehicle:
-            return error_response(_("Véhicule introuvable."), status_code=404)
+        trip = Trip.objects.filter(company_id=company.id, is_deleted=False).filter(id=d["trip_id"]).first()
+        if not trip:
+            return error_response(_("Voyage introuvable."), status_code=404)
         try:
-            accident = services.create_accident(vehicle=vehicle, created_by=request.user, **{
-                k: v for k, v in d.items() if k != "vehicle_id"
+            accident = services.create_accident(trip=trip, created_by=request.user, **{
+                k: v for k, v in d.items() if k != "trip_id"
             })
         except ApplicationError as e:
             return error_response(str(e))
@@ -1387,8 +1386,14 @@ class AccidentDetailView(APIView):
             return error_response(_("Accident introuvable."), status_code=404)
         payload = AccidentUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        if d.get("trip_id"):
+            company_id = _scope_company_id(request)
+            trip = Trip.objects.filter(company_id=company_id, is_deleted=False).filter(id=d["trip_id"]).first()
+            if not trip:
+                return error_response(_("Voyage introuvable."), status_code=404)
         try:
-            accident = services.update_accident(accident, updated_by=request.user, **payload.validated_data)
+            accident = services.update_accident(accident, updated_by=request.user, **d)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(AccidentDetailSerializer(accident).data)
@@ -1401,50 +1406,6 @@ class AccidentDetailView(APIView):
         return no_content_response()
 
 
-class AccidentCloseView(APIView):
-    permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'POST': 'fleet.accident.manage'}
-
-    def post(self, request, accident_id):
-        company_id = _scope_company_id(request)
-        accident = selectors.get_accident(accident_id, company_id)
-        if not accident:
-            return error_response(_("Accident introuvable."), status_code=404)
-        payload = AccidentCloseSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        d = payload.validated_data
-        try:
-            accident = services.close_accident(
-                accident,
-                actual_repair_cost=d["actual_repair_cost"],
-                notes=d["notes"],
-                updated_by=request.user,
-            )
-        except ApplicationError as e:
-            return error_response(str(e))
-        return success_response(AccidentDetailSerializer(accident).data)
-
-
-class AccidentStatusView(APIView):
-    permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'POST': 'fleet.accident.manage', 'PATCH': 'fleet.accident.manage'}
-
-    def post(self, request, accident_id):
-        company_id = _scope_company_id(request)
-        accident = selectors.get_accident(accident_id, company_id)
-        if not accident:
-            return error_response(_("Accident introuvable."), status_code=404)
-        payload = AccidentStatusSerializer(data=request.data)
-        payload.is_valid(raise_exception=True)
-        try:
-            accident = services.update_accident_status(
-                accident, status=payload.validated_data["status"], updated_by=request.user
-            )
-        except ApplicationError as e:
-            return error_response(str(e))
-        return success_response(AccidentDetailSerializer(accident).data)
-
-
 class VehicleAccidentListView(APIView):
     """Liste des accidents d'un véhicule spécifique."""
     permission_classes = [IsAuthenticated, HasModulePermission]
@@ -1452,9 +1413,7 @@ class VehicleAccidentListView(APIView):
 
     def get(self, request, vehicle_id):
         company_id = _scope_company_id(request)
-        accidents = selectors.list_vehicle_accidents(
-            vehicle_id, company_id, status=request.query_params.get("status")
-        )
+        accidents = selectors.list_vehicle_accidents(vehicle_id, company_id)
         if accidents is None:
             return error_response(_("Véhicule introuvable."), status_code=404)
         paginator = StandardResultsSetPagination()

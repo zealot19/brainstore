@@ -331,7 +331,6 @@ export interface AssignmentListItem {
 // ── Accident ──────────────────────────────────────────────────────────────────
 
 export type AccidentSeverity = 'minor' | 'moderate' | 'severe' | 'total_loss';
-export type AccidentStatus   = 'reported' | 'under_review' | 'repair_in_progress' | 'closed';
 
 export interface AccidentListItem {
   id:                    string;
@@ -344,8 +343,6 @@ export interface AccidentListItem {
   severity:              AccidentSeverity;
   severity_display:      string;
   at_fault:              boolean;
-  status:                AccidentStatus;
-  status_display:        string;
   estimated_damage_cost: string | null;
   created_at:            string;
 }
@@ -368,8 +365,6 @@ export interface AccidentDetail {
   insurance_claim_number: string;
   estimated_damage_cost:  string | null;
   actual_repair_cost:     string | null;
-  status:                 AccidentStatus;
-  status_display:         string;
   notes:                  string;
   created_at:             string;
   updated_at:             string;

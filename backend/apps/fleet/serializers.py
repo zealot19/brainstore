@@ -559,26 +559,23 @@ class AssignmentCompleteSerializer(serializers.Serializer):
 # ══════════════════════════════════════════════════════════════════════════════
 
 class AccidentListSerializer(serializers.ModelSerializer):
-    vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True)
+    vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True, default=None)
     trip_label = serializers.CharField(read_only=True)
     severity_display = serializers.CharField(source="get_severity_display", read_only=True)
-    status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Accident
         fields = [
             "id", "vehicle", "vehicle_plate", "trip", "trip_label",
             "date", "location", "severity", "severity_display",
-            "at_fault", "status", "status_display",
-            "estimated_damage_cost", "created_at",
+            "at_fault", "estimated_damage_cost", "created_at",
         ]
 
 
 class AccidentDetailSerializer(serializers.ModelSerializer):
-    vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True)
+    vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True, default=None)
     trip_label = serializers.CharField(read_only=True)
     severity_display = serializers.CharField(source="get_severity_display", read_only=True)
-    status_display = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Accident
@@ -589,13 +586,12 @@ class AccidentDetailSerializer(serializers.ModelSerializer):
             "at_fault", "third_party_involved", "third_party_info",
             "police_report_number", "insurance_claim_number",
             "estimated_damage_cost", "actual_repair_cost",
-            "status", "status_display",
             "notes", "created_at", "updated_at",
         ]
 
 
 class AccidentCreateSerializer(serializers.Serializer):
-    vehicle_id = serializers.UUIDField()
+    trip_id = serializers.UUIDField()
     date = serializers.DateField()
     location = serializers.CharField(max_length=300)
     description = serializers.CharField()
@@ -606,11 +602,12 @@ class AccidentCreateSerializer(serializers.Serializer):
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
-    trip_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    actual_repair_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
 class AccidentUpdateSerializer(serializers.Serializer):
+    trip_id = serializers.UUIDField(required=False)
     date = serializers.DateField(required=False)
     location = serializers.CharField(max_length=300, required=False)
     description = serializers.CharField(required=False)
@@ -621,17 +618,8 @@ class AccidentUpdateSerializer(serializers.Serializer):
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
-    trip_id = serializers.UUIDField(required=False, allow_null=True)
+    actual_repair_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
-
-
-class AccidentCloseSerializer(serializers.Serializer):
-    actual_repair_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
-    notes = serializers.CharField(required=False, allow_blank=True, default=None)
-
-
-class AccidentStatusSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=Accident.Status.choices)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

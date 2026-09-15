@@ -100,8 +100,6 @@ urlpatterns = [
     # ── Accidents ─────────────────────────────────────────────────────────────
     path("accidents/",                          views.AccidentListView.as_view()),
     path("accidents/<uuid:accident_id>/",       views.AccidentDetailView.as_view()),
-    path("accidents/<uuid:accident_id>/close/", views.AccidentCloseView.as_view()),
-    path("accidents/<uuid:accident_id>/status/", views.AccidentStatusView.as_view()),
 
     # ── Tableau de bord flotte ────────────────────────────────────────────────
     path("alerts/", views.FleetAlertsView.as_view()),

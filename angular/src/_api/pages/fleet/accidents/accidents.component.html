@@ -12,35 +12,6 @@
       </div>
     </div>
 
-    <!-- Stats + filter -->
-    <div class="row mb-3 g-3 align-items-end">
-      <div class="col-md-2">
-        <div class="card p-3 text-center">
-          <h4 class="mb-0 text-danger">{{ totalReported }}</h4>
-          <small class="text-muted">{{ 'fleet.acc.stat_reported' | transloco }}</small>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <div class="card p-3 text-center">
-          <h4 class="mb-0 text-info">{{ totalUnderReview }}</h4>
-          <small class="text-muted">{{ 'fleet.acc.stat_under_review' | transloco }}</small>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <div class="card p-3 text-center">
-          <h4 class="mb-0 text-warning">{{ totalUnderRepair }}</h4>
-          <small class="text-muted">{{ 'fleet.acc.stat_repair' | transloco }}</small>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label fw-semibold">{{ 'fleet.common.status' | transloco }}</label>
-        <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="load()">
-          <option value="">{{ 'fleet.common.all' | transloco }}</option>
-          <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
-        </select>
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-body p-0">
         <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
@@ -48,23 +19,22 @@
           <table class="table table-hover mb-0">
             <thead class="thead-light">
               <tr>
+                <th>{{ 'fleet.acc.col_voyage' | transloco }}</th>
                 <th>{{ 'fleet.common.vehicle' | transloco }}</th>
                 <th>{{ 'fleet.common.date' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_location' | transloco }}</th>
-                <th>{{ 'fleet.acc.col_voyage' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_severity' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_at_fault' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_est_cost' | transloco }}</th>
-                <th>{{ 'fleet.common.status' | transloco }}</th>
                 <th>{{ 'shared.common.actions' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let a of filtered | paginate:pg.page:pg.size">
-                <td class="fw-semibold">{{ a.vehicle_plate }}</td>
+                <td class="fw-semibold">{{ a.trip_label || '—' }}</td>
+                <td>{{ a.vehicle_plate || '—' }}</td>
                 <td>{{ a.date | date:'dd/MM/yyyy' }}</td>
                 <td>{{ a.location }}</td>
-                <td>{{ a.trip_label || '—' }}</td>
                 <td><span class="badge" [class]="severityCss(a.severity)">{{ severityLabel(a.severity) }}</span></td>
                 <td>
                   <span class="badge" [class]="a.at_fault ? 'bg-danger' : 'bg-secondary'">
@@ -72,21 +42,8 @@
                   </span>
                 </td>
                 <td>{{ a.estimated_damage_cost ? (a.estimated_damage_cost | number:'1.0-0') : '—' }}</td>
-                <td><span class="badge" [class]="statusCss(a.status)">{{ statusLabel(a.status) }}</span></td>
                 <td>
-                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'reported'" class="btn btn-sm btn-outline-info me-1"
-                     (click)="setStatus(a.id, 'under_review')" [title]="'fleet.acc.act_review_title' | transloco">
-                    <i class="ti ti-search me-1"></i>{{ 'fleet.acc.act_review' | transloco }}
-                  </a></ng-container>
-                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status === 'under_review'" class="btn btn-sm btn-outline-warning me-1"
-                     (click)="setStatus(a.id, 'repair_in_progress')" [title]="'fleet.acc.act_repair_title' | transloco">
-                    <i class="ti ti-tool me-1"></i>{{ 'fleet.acc.act_repair' | transloco }}
-                  </a></ng-container>
-                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-success me-1"
-                     data-bs-toggle="modal" data-bs-target="#close-accident-modal" (click)="openClose(a.id)" [title]="'fleet.asg.act_complete' | transloco">
-                    <i class="ti ti-check me-1"></i>{{ 'fleet.asg.act_complete' | transloco }}
-                  </a></ng-container>
-                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-primary me-1"
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a class="btn btn-sm btn-outline-primary me-1"
                      data-bs-toggle="modal" data-bs-target="#create-accident-modal" (click)="openEdit(a)" [title]="'shared.actions.edit' | transloco">
                     <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
                   </a></ng-container>
@@ -96,7 +53,7 @@
                 </td>
               </tr>
               <tr *ngIf="filtered.length === 0">
-                <td colspan="9" class="text-center text-muted py-4">{{ 'fleet.acc.empty' | transloco }}</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ 'fleet.acc.empty' | transloco }}</td>
               </tr>
             </tbody>
           </table>
@@ -105,7 +62,7 @@
       </div>
     </div>
 
-<!-- Modal déclarer accident -->
+<!-- Modal déclarer / modifier accident -->
 <div class="modal fade" id="create-accident-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -117,19 +74,16 @@
         <div class="modal-body">
           <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
           <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.common.vehicle' | transloco }} *</label>
-              <select class="form-select" formControlName="vehicle_id">
+            <div class="col-md-8">
+              <label class="form-label">{{ 'fleet.acc.f_voyage' | transloco }} *</label>
+              <select class="form-select" formControlName="trip_id">
                 <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
-                <option *ngFor="let v of vehicles" [value]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.acc.f_voyage' | transloco }}</label>
-              <select class="form-select" formControlName="trip_id" (change)="onTripChange(createForm.get('trip_id')!.value)">
-                <option value="">{{ 'fleet.acc.opt_no_voyage' | transloco }}</option>
                 <option *ngFor="let t of trips" [value]="t.id">{{ tripLabel(t) }}</option>
               </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ 'fleet.common.vehicle' | transloco }}</label>
+              <input type="text" class="form-control" [value]="selectedTrip?.vehicle_plate || ('fleet.acc.no_vehicle' | transloco)" disabled>
             </div>
             <div class="col-md-4">
               <label class="form-label">{{ 'fleet.common.date' | transloco }} *</label>
@@ -175,6 +129,10 @@
               <label class="form-label">{{ 'fleet.acc.f_third_party_info' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="third_party_info"></textarea>
             </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ 'fleet.acc.f_actual_cost' | transloco }}</label>
+              <input type="number" class="form-control" formControlName="actual_repair_cost" min="0" step="0.01">
+            </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="notes"></textarea>
@@ -185,39 +143,6 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-danger" [disabled]="saving">
             <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ (editId ? 'shared.actions.save' : 'fleet.acc.submit_declare') | transloco }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal clôturer accident -->
-<div class="modal fade" id="close-accident-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ 'fleet.acc.modal_close_title' | transloco }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form [formGroup]="closeForm" (ngSubmit)="submitClose()">
-        <div class="modal-body">
-          <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label">{{ 'fleet.acc.f_actual_cost' | transloco }}</label>
-              <input type="number" class="form-control" formControlName="actual_repair_cost" min="0" step="0.01">
-            </div>
-            <div class="col-12">
-              <label class="form-label">{{ 'fleet.acc.f_close_notes' | transloco }}</label>
-              <textarea class="form-control" rows="3" formControlName="notes"></textarea>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
-          <button type="submit" class="btn btn-success" [disabled]="saving">
-            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'fleet.acc.submit_close' | transloco }}
           </button>
         </div>
       </form>

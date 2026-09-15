@@ -84,6 +84,6 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 @admin.register(Accident)
 class AccidentAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "date", "severity", "at_fault", "status"]
-    list_filter = ["severity", "status", "at_fault"]
+    list_display = ["vehicle", "trip", "date", "severity", "at_fault"]
+    list_filter = ["severity", "at_fault"]
     raw_id_fields = ["vehicle", "trip"]

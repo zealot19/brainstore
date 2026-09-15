@@ -31,12 +31,4 @@ export class AccidentService {
   delete(id: string): Observable<unknown> {
     return this.http.delete(FLEET.accident(id));
   }
-
-  close(id: string, data?: Record<string, unknown>): Observable<AccidentListItem> {
-    return this.http.post<AccidentListItem>(FLEET.accidentClose(id), data ?? {});
-  }
-
-  setStatus(id: string, status: string): Observable<AccidentListItem> {
-    return this.http.post<AccidentListItem>(FLEET.accidentStatus(id), { status });
-  }
 }

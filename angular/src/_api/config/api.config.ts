@@ -194,8 +194,6 @@ export const FLEET = {
   // Fournisseurs
   suppliers:      `${API_BASE}/fleet/suppliers/`,
   supplierItem:   (id: string) => `${API_BASE}/fleet/suppliers/${id}/`,
-  accidentClose:  (id: string) => `${API_BASE}/fleet/accidents/${id}/close/`,
-  accidentStatus: (id: string) => `${API_BASE}/fleet/accidents/${id}/status/`,
 
   // Tableau de bord
   alerts: `${API_BASE}/fleet/alerts/`,

@@ -22,8 +22,7 @@ from .assignment_services import (
     cancel_assignment, update_assignment, delete_assignment,
 )
 from .accident_services import (
-    create_accident, update_accident, update_accident_status,
-    close_accident, delete_accident,
+    create_accident, update_accident, delete_accident,
 )
 
 __all__ = [
@@ -42,6 +41,5 @@ __all__ = [
     "add_recurring_cost", "update_recurring_cost", "delete_recurring_cost",
     "create_assignment", "start_assignment", "complete_assignment",
     "cancel_assignment", "update_assignment", "delete_assignment",
-    "create_accident", "update_accident", "update_accident_status",
-    "close_accident", "delete_accident",
+    "create_accident", "update_accident", "delete_accident",
 ]

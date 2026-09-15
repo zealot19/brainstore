@@ -1447,7 +1447,8 @@
       "modal_edit_title": "Editar accidente",
       "f_voyage": "Viaje vinculado",
       "col_voyage": "Viaje",
-      "opt_no_voyage": "Sin viaje"
+      "opt_no_voyage": "Sin viaje",
+      "no_vehicle": "Sin vehículo en este viaje"
     },
     "dash": {
       "title": "Panel — Flota",

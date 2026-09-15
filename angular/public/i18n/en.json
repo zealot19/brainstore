@@ -1447,7 +1447,8 @@
       "modal_edit_title": "Edit accident",
       "f_voyage": "Linked voyage",
       "col_voyage": "Voyage",
-      "opt_no_voyage": "No voyage"
+      "opt_no_voyage": "No voyage",
+      "no_vehicle": "No vehicle on this voyage"
     },
     "dash": {
       "title": "Dashboard — Fleet",

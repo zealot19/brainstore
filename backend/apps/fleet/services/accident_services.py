@@ -1,13 +1,15 @@
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
 
-from apps.core.exceptions import ApplicationError
 from apps.fleet.models import Accident
+
+
+def _vehicle_of(trip):
+    return trip.vehicle if (trip and trip.vehicle_id) else None
 
 
 @transaction.atomic
 def create_accident(
-    *, vehicle, date, location: str, description: str,
+    *, trip, date, location: str, description: str,
     severity: str = Accident.Severity.MINOR,
     at_fault: bool = False,
     third_party_involved: bool = False,
@@ -15,12 +17,13 @@ def create_accident(
     police_report_number: str = "",
     insurance_claim_number: str = "",
     estimated_damage_cost=None,
-    trip_id=None,
+    actual_repair_cost=None,
     notes: str = "",
     created_by,
 ):
     return Accident.objects.create(
-        vehicle=vehicle,
+        trip=trip,
+        vehicle=_vehicle_of(trip),
         date=date,
         location=location,
         description=description,
@@ -31,8 +34,7 @@ def create_accident(
         police_report_number=police_report_number,
         insurance_claim_number=insurance_claim_number,
         estimated_damage_cost=estimated_damage_cost,
-        trip_id=trip_id,
-        status=Accident.Status.REPORTED,
+        actual_repair_cost=actual_repair_cost,
         notes=notes,
         created_by=created_by,
     )
@@ -40,51 +42,17 @@ def create_accident(
 
 @transaction.atomic
 def update_accident(accident, *, updated_by, **fields):
-    if accident.status == Accident.Status.CLOSED:
-        raise ApplicationError(_("Un accident clôturé ne peut pas être modifié."))
     allowed = {
-        "date", "location", "description", "severity", "at_fault",
+        "trip_id", "date", "location", "description", "severity", "at_fault",
         "third_party_involved", "third_party_info",
         "police_report_number", "insurance_claim_number",
-        "estimated_damage_cost", "trip_id", "notes",
+        "estimated_damage_cost", "actual_repair_cost", "notes",
     }
     for key, val in fields.items():
         if key in allowed:
             setattr(accident, key, val)
-    accident.updated_by = updated_by
-    accident.save()
-    return accident
-
-
-@transaction.atomic
-def update_accident_status(accident, *, status: str, updated_by):
-    valid_transitions = {
-        Accident.Status.REPORTED: [Accident.Status.UNDER_REVIEW],
-        Accident.Status.UNDER_REVIEW: [Accident.Status.REPAIR_IN_PROGRESS, Accident.Status.CLOSED],
-        Accident.Status.REPAIR_IN_PROGRESS: [Accident.Status.CLOSED],
-    }
-    allowed = valid_transitions.get(accident.status, [])
-    if status not in allowed:
-        raise ApplicationError(
-            _("Transition de statut invalide : {from_s} → {to_s}.").format(
-                from_s=accident.get_status_display(), to_s=status
-            )
-        )
-    accident.status = status
-    accident.updated_by = updated_by
-    accident.save(update_fields=["status", "updated_by", "updated_at"])
-    return accident
-
-
-@transaction.atomic
-def close_accident(accident, *, actual_repair_cost=None, notes: str = None, updated_by):
-    if accident.status == Accident.Status.CLOSED:
-        raise ApplicationError(_("Cet accident est déjà clôturé."))
-    accident.status = Accident.Status.CLOSED
-    if actual_repair_cost is not None:
-        accident.actual_repair_cost = actual_repair_cost
-    if notes is not None:
-        accident.notes = notes
+    if "trip_id" in fields:
+        accident.vehicle = _vehicle_of(accident.trip)   # véhicule dérivé du voyage
     accident.updated_by = updated_by
     accident.save()
     return accident
