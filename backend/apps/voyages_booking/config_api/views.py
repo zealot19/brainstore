@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework.views import APIView
 from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
@@ -315,23 +316,41 @@ def build_roadmap_data(trip, request):
     seats_total = seats.count()
     seats_sold = seats.filter(status__in=["sold"]).count()
 
+    manifest = trip_manifest(trip)
+    # Nombre de bagages par billet (colonne « Bagages » du bordereau de route).
+    bag_count_by_ticket = {}
+    for b in manifest["baggage"]:
+        if b.ticket_id:
+            bag_count_by_ticket[str(b.ticket_id)] = bag_count_by_ticket.get(str(b.ticket_id), 0) + (b.quantity or 1)
+
     passengers = []
+    acc_passengers = []
     boarded_count = 0
     for t in selectors.trip_passengers(trip):
         is_boarded = t.status == "boarded"
         if is_boarded:
             boarded_count += 1
+        tid = str(t.id)
+        phone = t.passenger.phone if t.passenger_id else ""
+        id_number = t.passenger.id_number if t.passenger_id else ""
+        dest = t.destination_point.name if t.destination_point_id else ""
+        name = t.passenger.full_name if t.passenger_id else ""
+        agent = (t.created_by.get_full_name() or t.created_by.username) if t.created_by_id else ""
         passengers.append({
-            "ticket_id": str(t.id), "number": t.number,
-            "passenger_name": t.passenger.full_name if t.passenger_id else "",
+            "ticket_id": tid, "number": t.number,
+            "passenger_name": name, "phone": phone, "id_number": id_number,
             "seat_number": t.trip_seat.seat_number if t.trip_seat_id else "",
-            "destination_point_name": t.destination_point.name if t.destination_point_id else "",
+            "destination_point_name": dest,
             "direction_display": t.get_direction_display(),
+            "baggage_count": bag_count_by_ticket.get(tid, 0),
             "status": t.status, "boarded": is_boarded,
             "boarded_at": t.boarded_at,
         })
+        acc_passengers.append({
+            "name": name, "phone": phone, "destination": dest,
+            "amount": t.amount or Decimal("0"), "agent": agent,
+        })
 
-    manifest = trip_manifest(trip)
     baggage = [{
         "tag_number": b.tag_number, "owner_name": b.owner_name,
         "ticket_id": str(b.ticket_id) if b.ticket_id else None,
@@ -348,6 +367,19 @@ def build_roadmap_data(trip, request):
              "driver_name": c.member.full_name if c.member_id else ""}
             for c in trip.crew.filter(is_deleted=False).select_related("member__member_type")]
 
+    # Comptabilisation : dépenses du voyage + recettes billets.
+    from apps.voyages_trips.models import TripExpense
+    exp = (TripExpense.objects.filter(trip=trip, is_deleted=False).exclude(status="cancelled")
+           .select_related("expense_type"))
+    expenses = [{"type_label": (e.expense_type.name if e.expense_type_id else "—"), "amount": e.amount} for e in exp]
+    expenses_total = sum((e["amount"] for e in expenses), Decimal("0"))
+    recettes = sum((p["amount"] for p in acc_passengers), Decimal("0"))
+    accounting = {
+        "passengers": acc_passengers, "expenses": expenses,
+        "expenses_total": expenses_total, "recettes": recettes,
+        "net": recettes - expenses_total,
+    }
+
     return {
         "company": _company_header(trip.company, request),
         "trip": {
@@ -361,6 +393,7 @@ def build_roadmap_data(trip, request):
             "boarded_count": boarded_count,
         },
         "passengers": passengers, "baggage": baggage, "parcels": parcels,
+        "accounting": accounting,
     }
 
 
