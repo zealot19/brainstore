@@ -155,7 +155,7 @@ export class SidebarService {
           menuValue: 'Dépenses',
           hasSubRoute: true,
           showSubRoute: false,
-          icon2: 'receipt',
+          icon2: 'coin',
           base: 'treasury-expenses',
           subMenus: [
             { menuValue: 'Dépense voyage',   route: routes.trzExpensesVoyage,    base: 'expenses-voyage',    permission: 'treasury.expense.view' },
@@ -166,7 +166,7 @@ export class SidebarService {
           menuValue: 'Recettes',
           hasSubRoute: true,
           showSubRoute: false,
-          icon2: 'receipt',
+          icon2: 'coin',
           base: 'treasury-income',
           subMenus: [
             { menuValue: 'Recette voyage',  route: routes.trzRecettesVoyage,    base: 'recettes-voyage',    permission: 'treasury.income.view' },

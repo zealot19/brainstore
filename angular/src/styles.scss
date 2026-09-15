@@ -1416,7 +1416,7 @@ app-dashboard .feather.icon-chevron-down {
 // }
 
 mat-select.mat-mdc-select.select {
-  font-family: "Nunito", sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .tabs .owl-theme .owl-nav div {
@@ -3374,3 +3374,15 @@ border:1px solid #1F2228;
    laisser le conteneur déborder pour ne pas avoir à faire défiler la table. */
 .table-responsive:has(.dropdown-menu.show) { overflow: visible !important; }
 .card:has(> .card-body > .table-responsive .dropdown-menu.show) { overflow: visible; }
+
+/* ── Police globale (Inter) ──────────────────────────────────────────────────
+   Aligne la variable Bootstrap et le body sur la police primaire de l'app. */
+:root { --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+body { font-family: var(--bs-body-font-family); }
+
+/* ── Selects « recherchables » (SearchableSelectDirective) ────────────────────
+   La directive recopie les classes du <select> sur un contrôle superposé mais
+   pas ses styles inline ; sans largeur, il s'effondre dans une barre de filtres
+   flex et n'affiche plus le texte. On garantit une largeur minimale lisible. */
+.ss-wrap { min-width: 170px; }
+.ss-wrap > .form-select { width: 100%; }
