@@ -8,6 +8,9 @@ _PREFIX_MODULE = [
     ("voyages/consignment/parcels", "colis"),
     ("voyages/consignment/baggage", "bagages"),
     ("voyages/consignment", "colis"),
+    # Config des colis : accessible aux sociétés « colis seul » (sans le module Voyages).
+    ("voyages/config/consignment-natures", "colis"),
+    ("voyages/config/consignment-types", "colis"),
     ("voyages/config", "voyage"),
     ("voyages/trips", "voyage"),
     ("voyages/pricing", "voyage"),
