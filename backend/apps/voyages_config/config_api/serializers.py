@@ -442,3 +442,27 @@ class TicketTemplateSerializer(serializers.ModelSerializer):
 
     def get_background_logo_url(self, obj):
         return self._url(obj.background_logo)
+
+
+from apps.voyages_config.models import ManifestTemplate
+
+
+class ManifestTemplateSerializer(serializers.ModelSerializer):
+    logo_url = serializers.SerializerMethodField()
+    sign_labels_voyage = serializers.ListField(child=serializers.CharField(allow_blank=True), required=False)
+    sign_labels_colis = serializers.ListField(child=serializers.CharField(allow_blank=True), required=False)
+
+    class Meta:
+        model = ManifestTemplate
+        fields = ["brand_name", "slogan", "head_office", "phones", "agencies_line",
+                  "logo", "logo_url", "sign_labels_voyage", "sign_labels_colis"]
+        extra_kwargs = {"logo": {"required": False}}
+
+    def get_logo_url(self, obj):
+        req = self.context.get("request")
+        if not obj.logo:
+            return None
+        try:
+            return req.build_absolute_uri(obj.logo.url) if req else obj.logo.url
+        except Exception:
+            return None

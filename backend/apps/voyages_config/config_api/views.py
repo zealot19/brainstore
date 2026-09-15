@@ -745,6 +745,39 @@ class TicketTemplateView(APIView):
         return success_response(payload.data)
 
 
+def _get_or_create_manifest_template(company):
+    from apps.voyages_config.models import ManifestTemplate, DEFAULT_SIGN_VOYAGE, DEFAULT_SIGN_COLIS
+    obj, created = ManifestTemplate.objects.get_or_create(
+        company=company,
+        defaults={"sign_labels_voyage": list(DEFAULT_SIGN_VOYAGE),
+                  "sign_labels_colis": list(DEFAULT_SIGN_COLIS)})
+    return obj
+
+
+class ManifestTemplateView(APIView):
+    """Config manifestes (en-tête / pied des bordereaux), singleton par institution."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj = _get_or_create_manifest_template(company)
+        return success_response(S.ManifestTemplateSerializer(obj, context={"request": request}).data)
+
+    def put(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        obj = _get_or_create_manifest_template(company)
+        payload = S.ManifestTemplateSerializer(obj, data=request.data, partial=True, context={"request": request})
+        payload.is_valid(raise_exception=True)
+        payload.save(updated_by=request.user)
+        return success_response(payload.data)
+
+
 class TicketTemplateResetView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
