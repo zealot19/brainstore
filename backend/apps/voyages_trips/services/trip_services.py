@@ -143,6 +143,9 @@ def depart_trip(trip, *, user, lead_hours=24):
         v.status = Vehicle.Status.ON_MISSION
         v.updated_by = user
         v.save(update_fields=["status", "updated_by", "updated_at"])
+    # Cascade : les colis prêts/chargés de ce voyage passent en transit.
+    from apps.voyages_consignment.services import parcel_services as _p
+    _p.dispatch_parcels_for_trip(trip, user=user)
     return trip
 
 
@@ -166,6 +169,9 @@ def complete_trip(trip, *, user):
         v.status = Vehicle.Status.AVAILABLE
         v.updated_by = user
         v.save(update_fields=["status", "current_odometer", "updated_by", "updated_at"])
+    # Cascade : les colis en transit de ce voyage passent arrivés.
+    from apps.voyages_consignment.services import parcel_services as _p
+    _p.arrive_parcels_for_trip(trip, user=user)
     return trip
 
 
