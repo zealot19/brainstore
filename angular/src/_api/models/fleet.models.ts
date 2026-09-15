@@ -348,3 +348,29 @@ export interface AccidentListItem {
   estimated_damage_cost: string | null;
   created_at:            string;
 }
+
+export interface AccidentDetail {
+  id:                     string;
+  vehicle:                string;
+  vehicle_plate:          string;
+  internal_driver_info:   { id: string; name: string } | null;
+  external_driver_info:   ExternalDriver | null;
+  assignment:             string | null;
+  date:                   string;
+  location:               string;
+  description:            string;
+  severity:               AccidentSeverity;
+  severity_display:       string;
+  at_fault:               boolean;
+  third_party_involved:   boolean;
+  third_party_info:       string;
+  police_report_number:   string;
+  insurance_claim_number: string;
+  estimated_damage_cost:  string | null;
+  actual_repair_cost:     string | null;
+  status:                 AccidentStatus;
+  status_display:         string;
+  notes:                  string;
+  created_at:             string;
+  updated_at:             string;
+}

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FLEET } from '../../config/api.config';
-import { AccidentListItem } from '../../models/fleet.models';
+import { AccidentListItem, AccidentDetail } from '../../models/fleet.models';
 
 @Injectable({ providedIn: 'root' })
 export class AccidentService {
@@ -14,6 +14,10 @@ export class AccidentService {
     if (opts?.status)     params['status']     = opts.status;
     if (opts?.severity)   params['severity']   = opts.severity;
     return this.http.get<AccidentListItem[]>(FLEET.accidents, { params });
+  }
+
+  get(id: string): Observable<AccidentDetail> {
+    return this.http.get<AccidentDetail>(FLEET.accident(id));
   }
 
   create(data: Record<string, unknown>): Observable<AccidentListItem> {

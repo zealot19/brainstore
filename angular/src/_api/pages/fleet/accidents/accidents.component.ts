@@ -4,7 +4,10 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { AccidentService } from '../../../services/fleet/accident.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { ExternalDriverService } from '../../../services/fleet/external-driver.service';
-import { AccidentListItem, VehicleListItem, ExternalDriver } from '../../../models/fleet.models';
+import { AssignmentService } from '../../../services/fleet/assignment.service';
+import { UserService } from '../../../services/users/user.service';
+import { AccidentListItem, VehicleListItem, ExternalDriver, AssignmentListItem } from '../../../models/fleet.models';
+import { AppUser } from '../../../models/user.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
@@ -21,10 +24,12 @@ export class FleetAccidentsComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
 
-  accidents:   AccidentListItem[] = [];
-  filtered:    AccidentListItem[] = [];
-  vehicles:    VehicleListItem[]  = [];
-  extDrivers:  ExternalDriver[]   = [];
+  accidents:   AccidentListItem[]   = [];
+  filtered:    AccidentListItem[]   = [];
+  vehicles:    VehicleListItem[]    = [];
+  extDrivers:  ExternalDriver[]     = [];
+  intDrivers:  AppUser[]            = [];
+  missions:    AssignmentListItem[] = [];
   loading      = true;
   filterStatus = '';
 
@@ -33,6 +38,7 @@ export class FleetAccidentsComponent implements OnInit {
   saving       = false;
   errorMsg     = '';
   selectedId   = '';
+  editId:      string | null = null;   // null = mode création
 
   severities = [
     { value: 'minor',      label: 'Mineur',       css: 'bg-info'    },
@@ -53,6 +59,8 @@ export class FleetAccidentsComponent implements OnInit {
     private svc: AccidentService,
     private vehicleSvc: VehicleService,
     private driverSvc: ExternalDriverService,
+    private assignmentSvc: AssignmentService,
+    private userSvc: UserService,
     private fb: FormBuilder,
   ) {}
 
@@ -69,7 +77,9 @@ export class FleetAccidentsComponent implements OnInit {
       police_report_number:   [''],
       insurance_claim_number: [''],
       estimated_damage_cost:  [null],
+      internal_driver_id:     [''],
       external_driver_id:     [''],
+      assignment_id:          [''],
       notes:                  [''],
     });
     this.closeForm = this.fb.group({
@@ -78,6 +88,8 @@ export class FleetAccidentsComponent implements OnInit {
     });
     this.vehicleSvc.list().subscribe(vs => this.vehicles = vs);
     this.driverSvc.list().subscribe(ds => this.extDrivers = ds);
+    this.assignmentSvc.list().subscribe(ms => this.missions = ms);
+    this.userSvc.list().subscribe(us => this.intDrivers = us);
     this.load();
   }
 
@@ -99,17 +111,47 @@ export class FleetAccidentsComponent implements OnInit {
   get totalUnderRepair(): number { return this.accidents.filter(a => a.status === 'repair_in_progress').length; }
 
   openCreate(): void {
+    this.editId   = null;
     this.errorMsg = '';
     this.createForm.reset({ severity: 'minor', at_fault: false, third_party_involved: false });
+    this.createForm.get('vehicle_id')?.enable();
+  }
+
+  openEdit(a: AccidentListItem): void {
+    this.editId   = a.id;
+    this.errorMsg = '';
+    this.svc.get(a.id).subscribe({
+      next: d => {
+        this.createForm.reset({
+          vehicle_id:             d.vehicle,
+          date:                   d.date,
+          location:               d.location,
+          description:            d.description,
+          severity:               d.severity,
+          at_fault:               d.at_fault,
+          third_party_involved:   d.third_party_involved,
+          third_party_info:       d.third_party_info || '',
+          police_report_number:   d.police_report_number || '',
+          insurance_claim_number: d.insurance_claim_number || '',
+          estimated_damage_cost:  d.estimated_damage_cost,
+          internal_driver_id:     d.internal_driver_info?.id ?? '',
+          external_driver_id:     d.external_driver_info?.id ?? '',
+          assignment_id:          d.assignment ?? '',
+          notes:                  d.notes || '',
+        });
+        this.createForm.get('vehicle_id')?.disable();   // le véhicule n'est pas modifiable
+      },
+      error: err => { this.errorMsg = err?.error?.detail ?? "Chargement impossible. Réessayez ou contactez un administrateur."; },
+    });
   }
 
   submitCreate(): void {
     if (this.createForm.invalid || this.saving) return;
     this.saving   = true;
     this.errorMsg = '';
-    const v = this.createForm.value;
+    const v = this.createForm.getRawValue();
     const payload: Record<string, unknown> = {
-      vehicle_id: v.vehicle_id, date: v.date,
+      date: v.date,
       location: v.location, description: v.description,
       severity: v.severity, at_fault: v.at_fault,
       third_party_involved: v.third_party_involved,
@@ -117,11 +159,19 @@ export class FleetAccidentsComponent implements OnInit {
       police_report_number: v.police_report_number || '',
       insurance_claim_number: v.insurance_claim_number || '',
       estimated_damage_cost: v.estimated_damage_cost ? Number(v.estimated_damage_cost) : null,
+      internal_driver_id: v.internal_driver_id || null,
       external_driver_id: v.external_driver_id || null,
+      assignment_id: v.assignment_id || null,
       notes: v.notes || '',
     };
-    this.svc.create(payload).subscribe({
-      next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.openCreate(); },
+    const req = this.editId
+      ? this.svc.update(this.editId, payload)
+      : this.svc.create({ ...payload, vehicle_id: v.vehicle_id });
+    req.subscribe({
+      next: () => {
+        this.saving = false; this.load(); this.toast.success('Enregistré.');
+        if (this.editId) this.closeModal('create-accident-modal'); else this.openCreate();
+      },
       error: err => { this.saving = false; this.errorMsg = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }

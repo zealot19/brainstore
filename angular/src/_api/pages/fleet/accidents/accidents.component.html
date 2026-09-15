@@ -86,6 +86,10 @@
                      data-bs-toggle="modal" data-bs-target="#close-accident-modal" (click)="openClose(a.id)" [title]="'fleet.asg.act_complete' | transloco">
                     <i class="ti ti-check me-1"></i>{{ 'fleet.asg.act_complete' | transloco }}
                   </a></ng-container>
+                  <ng-container *hasPermission="'fleet.accident.manage'"><a *ngIf="a.status !== 'closed'" class="btn btn-sm btn-outline-primary me-1"
+                     data-bs-toggle="modal" data-bs-target="#create-accident-modal" (click)="openEdit(a)" [title]="'shared.actions.edit' | transloco">
+                    <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
+                  </a></ng-container>
                   <a class="btn btn-sm btn-outline-danger me-1" *hasPermission="'fleet.accident.manage'" (click)="delete(a.id)" [title]="'shared.actions.delete' | transloco">
                     <i class="ti ti-trash me-1"></i>{{ 'shared.actions.delete' | transloco }}
                   </a>
@@ -106,7 +110,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ 'fleet.acc.declare' | transloco }}</h5>
+        <h5 class="modal-title">{{ (editId ? 'fleet.acc.modal_edit_title' : 'fleet.acc.declare') | transloco }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
@@ -121,10 +125,24 @@
               </select>
             </div>
             <div class="col-md-6">
+              <label class="form-label">{{ 'fleet.acc.f_int_driver' | transloco }}</label>
+              <select class="form-select" formControlName="internal_driver_id">
+                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
+                <option *ngFor="let u of intDrivers" [value]="u.id">{{ u.full_name || u.username }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
               <label class="form-label">{{ 'fleet.asg.f_ext_driver' | transloco }}</label>
               <select class="form-select" formControlName="external_driver_id">
-                <option value="">{{ 'fleet.asg.opt_internal' | transloco }}</option>
+                <option value="">{{ 'fleet.fl.opt_select' | transloco }}</option>
                 <option *ngFor="let d of extDrivers" [value]="d.id">{{ d.full_name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'fleet.acc.f_assignment' | transloco }}</label>
+              <select class="form-select" formControlName="assignment_id">
+                <option value="">{{ 'fleet.acc.opt_no_assignment' | transloco }}</option>
+                <option *ngFor="let m of missions" [value]="m.id">{{ m.vehicle_plate }} — {{ m.destination }} ({{ m.planned_departure | date:'dd/MM/yyyy' }})</option>
               </select>
             </div>
             <div class="col-md-4">
@@ -159,9 +177,17 @@
                 <label class="form-check-label" for="third_party">{{ 'fleet.acc.f_third_party' | transloco }}</label>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label class="form-label">{{ 'fleet.acc.f_police' | transloco }}</label>
               <input type="text" class="form-control" formControlName="police_report_number">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ 'fleet.acc.f_insurance' | transloco }}</label>
+              <input type="text" class="form-control" formControlName="insurance_claim_number">
+            </div>
+            <div class="col-12" *ngIf="createForm.get('third_party_involved')?.value">
+              <label class="form-label">{{ 'fleet.acc.f_third_party_info' | transloco }}</label>
+              <textarea class="form-control" rows="2" formControlName="third_party_info"></textarea>
             </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
@@ -172,7 +198,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-danger" [disabled]="saving">
-            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'fleet.acc.submit_declare' | transloco }}
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ (editId ? 'shared.actions.save' : 'fleet.acc.submit_declare') | transloco }}
           </button>
         </div>
       </form>

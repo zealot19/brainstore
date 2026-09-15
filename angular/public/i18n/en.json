@@ -1441,7 +1441,13 @@
       "stat_reported": "Reported",
       "stat_under_review": "Under review",
       "act_review": "Review",
-      "act_review_title": "Move to review"
+      "act_review_title": "Move to review",
+      "f_int_driver": "Internal driver",
+      "f_assignment": "Linked mission",
+      "opt_no_assignment": "No mission",
+      "f_insurance": "Insurance claim no.",
+      "f_third_party_info": "Third-party details",
+      "modal_edit_title": "Edit accident"
     },
     "dash": {
       "title": "Dashboard — Fleet",
