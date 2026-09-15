@@ -5,11 +5,14 @@ from apps.core.models import BaseModel
 
 class Parcel(BaseModel):
     class Status(models.TextChoices):
-        REGISTERED = "registered", _("Enregistré")
-        LOADED     = "loaded",     _("Chargé")
-        ARRIVED    = "arrived",    _("Réceptionné")
-        PICKED_UP  = "picked_up",  _("Livré")
-        CANCELLED  = "cancelled",  _("Annulé")
+        REGISTERED           = "registered",           _("Enregistré")
+        READY_FOR_TRAVEL     = "ready_for_travel",     _("Prêt à expédier")
+        LOADED               = "loaded",               _("Chargé")
+        IN_TRANSIT           = "in_transit",           _("En transit")
+        ARRIVED              = "arrived",               _("Arrivé")
+        AVAILABLE_FOR_PICKUP = "available_for_pickup", _("Disponible pour retrait")
+        PICKED_UP            = "picked_up",            _("Retiré")
+        CANCELLED            = "cancelled",            _("Annulé")
 
     company           = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                            on_delete=models.CASCADE, related_name="voyages_parcels")
@@ -17,7 +20,7 @@ class Parcel(BaseModel):
                                            on_delete=models.SET_NULL, null=True, blank=True,
                                            related_name="voyages_parcels")
     reference         = models.CharField(_("référence"), max_length=40, blank=True)
-    status            = models.CharField(_("statut"), max_length=12, choices=Status.choices, default=Status.REGISTERED)
+    status            = models.CharField(_("statut"), max_length=20, choices=Status.choices, default=Status.REGISTERED)
     origin_point      = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("point de départ"),
                                            on_delete=models.PROTECT, related_name="parcels_from")
     destination_point = models.ForeignKey("voyages_config.ServicePoint", verbose_name=_("point d'arrivée"),
@@ -45,8 +48,10 @@ class Parcel(BaseModel):
     payment_method    = models.CharField(_("mode de paiement"), max_length=40, blank=True)
     paid_at           = models.DateTimeField(_("payé le"), null=True, blank=True)
     loaded_at         = models.DateTimeField(_("chargé le"), null=True, blank=True)
-    arrived_at        = models.DateTimeField(_("réceptionné le"), null=True, blank=True)
-    picked_up_at       = models.DateTimeField(_("livré le"), null=True, blank=True)
+    dispatched_at     = models.DateTimeField(_("expédié le"), null=True, blank=True)
+    arrived_at        = models.DateTimeField(_("arrivé le"), null=True, blank=True)
+    available_at      = models.DateTimeField(_("disponible le"), null=True, blank=True)
+    picked_up_at       = models.DateTimeField(_("retiré le"), null=True, blank=True)
     picked_up_by       = models.CharField(_("livré à"), max_length=150, blank=True)
     picked_up_id_number = models.CharField(_("pièce présentée"), max_length=100, blank=True)
     notes              = models.TextField(_("notes"), blank=True)
@@ -63,14 +68,19 @@ class Parcel(BaseModel):
 class ParcelEvent(BaseModel):
     class Kind(models.TextChoices):
         REGISTERED = "registered", _("Enregistré")
+        READY      = "ready",      _("Prêt à expédier")
         LOADED     = "loaded",     _("Chargé")
-        ARRIVED    = "arrived",    _("Réceptionné")
-        PICKED_UP  = "picked_up",  _("Livré")
+        DISPATCHED = "dispatched", _("Expédié")
+        ARRIVED    = "arrived",    _("Arrivé")
+        RECEIVED   = "received",   _("Réceptionné")
+        PICKED_UP  = "picked_up",  _("Retiré")
         CANCELLED  = "cancelled",  _("Annulé")
 
     parcel = models.ForeignKey("voyages_consignment.Parcel", verbose_name=_("colis"),
                                on_delete=models.CASCADE, related_name="events")
     kind   = models.CharField(_("type"), max_length=12, choices=Kind.choices)
+    from_status = models.CharField(_("ancien statut"), max_length=20, blank=True)
+    to_status   = models.CharField(_("nouveau statut"), max_length=20, blank=True)
     trip   = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage"),
                                on_delete=models.SET_NULL, null=True, blank=True, related_name="parcel_events")
     note   = models.CharField(_("note"), max_length=255, blank=True)
