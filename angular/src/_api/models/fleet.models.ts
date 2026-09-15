@@ -330,7 +330,7 @@ export interface AssignmentListItem {
 
 // ── Accident ──────────────────────────────────────────────────────────────────
 
-export type AccidentSeverity = 'minor' | 'moderate' | 'major' | 'total_loss';
+export type AccidentSeverity = 'minor' | 'moderate' | 'severe' | 'total_loss';
 export type AccidentStatus   = 'reported' | 'under_review' | 'repair_in_progress' | 'closed';
 
 export interface AccidentListItem {

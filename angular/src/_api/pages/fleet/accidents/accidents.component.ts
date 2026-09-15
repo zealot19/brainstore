@@ -37,7 +37,7 @@ export class FleetAccidentsComponent implements OnInit {
   severities = [
     { value: 'minor',      label: 'Mineur',       css: 'bg-info'    },
     { value: 'moderate',   label: 'Modéré',       css: 'bg-warning' },
-    { value: 'major',      label: 'Majeur',       css: 'bg-danger'  },
+    { value: 'severe',     label: 'Grave',        css: 'bg-danger'  },
     { value: 'total_loss', label: 'Perte totale', css: 'bg-dark'    },
   ];
 
