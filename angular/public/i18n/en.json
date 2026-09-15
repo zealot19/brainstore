@@ -50,7 +50,7 @@
       "audit": "Audit Log",
       "logout": "Log out",
       "profile": "My Profile",
-      "new_booking": "New booking",
+      "new_booking": "Sell a ticket",
       "new_parcel": "New parcel",
       "new_baggage": "New baggage"
     },
@@ -179,11 +179,14 @@
     "billets": "Tickets",
     "nouveau_billet": "New ticket",
     "titres_de_transport": "Transport tickets",
-    "nouveau_titre": "New ticket"
+    "nouveau_titre": "New ticket",
+    "tout_afficher": "Show all",
+    "vendre_un_billet": "Sell a ticket",
+    "retrait": "Pickup"
   },
   "booking": {
     "list": {
-      "title": "Bookings",
+      "title": "Sold tickets",
       "subtitle": "Manage bookings and tickets",
       "info": "A booking groups one or more tickets (one per passenger and seat). Payment will be linked to the treasury module later.",
       "empty": "No bookings."
@@ -2005,7 +2008,7 @@
       "all": "All"
     },
     "livraison": {
-      "title": "Delivery",
+      "title": "Pickup",
       "subtitle": "Hand a parcel to its recipient",
       "info": "Search the parcel by reference, verify, then hand it over.",
       "f_ref": "Parcel reference",
@@ -2022,6 +2025,20 @@
       "remit": "Hand over parcel",
       "already_done": "This parcel was already picked up",
       "not_ready": "This parcel is not yet available for pickup."
+    },
+    "retrait": {
+      "bag_title": "Pickup",
+      "bag_subtitle": "Hand a baggage to its owner",
+      "bag_info": "Search the baggage by tag number, verify, then hand it over.",
+      "f_tag": "Tag number",
+      "ph_tag": "e.g. BAG-00003",
+      "not_found": "No baggage found for this number.",
+      "owner": "Owner",
+      "already_done": "This baggage was already handed over",
+      "cancelled": "This baggage was cancelled.",
+      "comment": "Comment",
+      "comment_ph": "Optional",
+      "remit": "Hand over baggage"
     }
   },
   "fare": {

@@ -50,7 +50,7 @@
       "audit": "Registo de auditoria",
       "logout": "Terminar sessão",
       "profile": "O meu perfil",
-      "new_booking": "Nova reserva",
+      "new_booking": "Vender um bilhete",
       "new_parcel": "Nova encomenda",
       "new_baggage": "Nova bagagem"
     },
@@ -179,11 +179,14 @@
     "billets": "Bilhetes",
     "nouveau_billet": "Novo bilhete",
     "titres_de_transport": "Títulos de transporte",
-    "nouveau_titre": "Novo título"
+    "nouveau_titre": "Novo título",
+    "tout_afficher": "Ver tudo",
+    "vendre_un_billet": "Vender um bilhete",
+    "retrait": "Retirada"
   },
   "booking": {
     "list": {
-      "title": "Reservas",
+      "title": "Bilhetes vendidos",
       "subtitle": "Gestão de reservas e bilhetes",
       "info": "Uma reserva agrupa um ou mais bilhetes (um por passageiro e lugar). O pagamento será associado ao módulo de tesouraria mais tarde.",
       "empty": "Sem reservas."
@@ -2005,7 +2008,7 @@
       "all": "Todos"
     },
     "livraison": {
-      "title": "Entrega",
+      "title": "Retirada",
       "subtitle": "Entregar uma encomenda ao destinatário",
       "info": "Procure a encomenda por referência, verifique e entregue.",
       "f_ref": "Referência da encomenda",
@@ -2022,6 +2025,20 @@
       "remit": "Entregar a encomenda",
       "already_done": "Esta encomenda já foi retirada",
       "not_ready": "Esta encomenda ainda não está disponível para retirada."
+    },
+    "retrait": {
+      "bag_title": "Retirada",
+      "bag_subtitle": "Entregar uma bagagem ao proprietário",
+      "bag_info": "Procure a bagagem pelo número da etiqueta, verifique e entregue.",
+      "f_tag": "Número da etiqueta",
+      "ph_tag": "ex. BAG-00003",
+      "not_found": "Nenhuma bagagem encontrada.",
+      "owner": "Proprietário",
+      "already_done": "Esta bagagem já foi entregue",
+      "cancelled": "Esta bagagem foi cancelada.",
+      "comment": "Comentário",
+      "comment_ph": "Opcional",
+      "remit": "Entregar a bagagem"
     }
   },
   "fare": {

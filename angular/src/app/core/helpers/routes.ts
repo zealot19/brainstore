@@ -462,6 +462,7 @@ export const routes={
   vcgManifest:  '/voyages-consignment/manifest',
   vcgLivraison: '/voyages-consignment/livraison',
   vcgBaggage:   '/voyages-consignment/baggage',
+  vcgBaggageRetrait: '/voyages-consignment/baggage-retrait',
 
   //error
   error404: '/error/error-404',

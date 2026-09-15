@@ -9,29 +9,29 @@
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2 flex-wrap">
-      <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
         <option value="">{{ 'cons.common.opt_all_statuses' | transloco }}</option>
         <option value="checked_in">{{ 'cons.common.st_registered' | transloco }}</option>
         <option value="loaded">{{ 'cons.common.st_loaded' | transloco }}</option>
         <option value="delivered">{{ 'cons.common.st_withdrawn' | transloco }}</option>
         <option value="cancelled">{{ 'cons.common.st_cancelled' | transloco }}</option>
       </select>
-      <select class="form-select w-auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
         <option value="">{{ 'cons.common.opt_all_trips' | transloco }}</option>
         @for (t of filterTrips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
       </select>
-      <select class="form-select w-auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
         <option value="">{{ 'cons.common.opt_all_types' | transloco }}</option>
         @for (c of types; track c.id) { <option [value]="c.id">{{ c.label }}</option> }
       </select>
-      <select class="form-select w-auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
         <option value="created">{{ 'cons.common.df_created' | transloco }}</option>
         <option value="departure">{{ 'cons.common.df_departure' | transloco }}</option>
         <option value="arrival">{{ 'cons.common.df_arrival' | transloco }}</option>
       </select>
-      <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
-      <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
-      <input type="text" class="form-control w-auto" [placeholder]="'cons.baggage.search_ph' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
+      <input type="text" class="form-control" style="min-width:240px;flex:1 1 240px" [placeholder]="'cons.baggage.search_ph' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
       <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'cons.common.clear' | transloco }}</button>
     </div>

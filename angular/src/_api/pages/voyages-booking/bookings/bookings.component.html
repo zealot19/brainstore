@@ -7,36 +7,36 @@
 <app-info-banner [text]="'booking.list.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2">
-      <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
         <option value="">{{ 'booking.filter.all_statuses' | transloco }}</option>
         <option value="confirmed">{{ 'booking.status.paid' | transloco }}</option>
         <option value="boarded">{{ 'booking.status.boarded' | transloco }}</option>
         <option value="cancelled">{{ 'booking.status.cancelled' | transloco }}</option>
         <option value="no_show">{{ 'booking.status.no_show' | transloco }}</option>
       </select>
-      <select class="form-select w-auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="typeFilter" (ngModelChange)="reload()">
         <option value="">{{ 'booking.filter.all_types' | transloco }}</option>
         <option value="one_way">{{ 'booking.type.one_way' | transloco }}</option>
         <option value="round_trip">{{ 'booking.type.round_trip' | transloco }}</option>
       </select>
-      <select class="form-select w-auto" [(ngModel)]="channelFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="channelFilter" (ngModelChange)="reload()">
         <option value="">{{ 'booking.filter.all_channels' | transloco }}</option>
         <option value="counter">{{ 'booking.channel.counter' | transloco }}</option>
         <option value="online">{{ 'booking.channel.online' | transloco }}</option>
       </select>
-      <select class="form-select w-auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="tripFilter" (ngModelChange)="reload()">
         <option value="">{{ 'booking.filter.all_trips' | transloco }}</option>
         @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
       </select>
-      <select class="form-select w-auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="dateField" (ngModelChange)="reload()">
         <option value="created">{{ 'booking.filter.date_created' | transloco }}</option>
         <option value="departure">{{ 'booking.filter.date_departure' | transloco }}</option>
         <option value="arrival">{{ 'booking.filter.date_arrival' | transloco }}</option>
       </select>
-      <input type="date" class="form-control w-auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
-      <input type="date" class="form-control w-auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
-      <input type="text" class="form-control w-auto" [placeholder]="'booking.filter.search_placeholder' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
+      <input type="text" class="form-control" style="min-width:240px;flex:1 1 240px" [placeholder]="'booking.filter.search_placeholder' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
       <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'booking.filter.clear' | transloco }}</button>
     </div>

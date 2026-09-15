@@ -50,7 +50,7 @@
       "audit": "Journal d'audit",
       "logout": "Déconnexion",
       "profile": "Mon profil",
-      "new_booking": "Nouvelle réservation",
+      "new_booking": "Vendre un billet",
       "new_parcel": "Nouveau colis",
       "new_baggage": "Nouveau bagage"
     },
@@ -179,11 +179,14 @@
     "billets": "Billets",
     "nouveau_billet": "Nouveau billet",
     "titres_de_transport": "Titres de transport",
-    "nouveau_titre": "Nouveau titre"
+    "nouveau_titre": "Nouveau titre",
+    "tout_afficher": "Tout afficher",
+    "vendre_un_billet": "Vendre un billet",
+    "retrait": "Retrait"
   },
   "booking": {
     "list": {
-      "title": "Réservations",
+      "title": "Billets vendus",
       "subtitle": "Gestion des réservations et billets",
       "info": "Une réservation regroupe un ou plusieurs billets (un par passager et par siège). Le paiement sera relié au module trésorerie ultérieurement.",
       "empty": "Aucune réservation."
@@ -2005,7 +2008,7 @@
       "all": "Tous"
     },
     "livraison": {
-      "title": "Livraison",
+      "title": "Retrait",
       "subtitle": "Remettre un colis à son destinataire",
       "info": "Recherchez le colis par référence, vérifiez puis remettez-le.",
       "f_ref": "Référence du colis",
@@ -2022,6 +2025,20 @@
       "remit": "Remettre le colis",
       "already_done": "Ce colis a déjà été retiré",
       "not_ready": "Ce colis n'est pas encore disponible pour retrait."
+    },
+    "retrait": {
+      "bag_title": "Retrait",
+      "bag_subtitle": "Remettre un bagage à son propriétaire",
+      "bag_info": "Recherchez le bagage par numéro d'étiquette, vérifiez puis remettez-le.",
+      "f_tag": "Numéro d'étiquette",
+      "ph_tag": "ex. BAG-00003",
+      "not_found": "Aucun bagage trouvé pour ce numéro.",
+      "owner": "Propriétaire",
+      "already_done": "Ce bagage a déjà été remis",
+      "cancelled": "Ce bagage a été annulé.",
+      "comment": "Commentaire",
+      "comment_ph": "Optionnel",
+      "remit": "Remettre le bagage"
     }
   },
   "fare": {

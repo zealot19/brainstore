@@ -50,7 +50,7 @@
       "audit": "Registro de auditoría",
       "logout": "Cerrar sesión",
       "profile": "Mi perfil",
-      "new_booking": "Nueva reserva",
+      "new_booking": "Vender un billete",
       "new_parcel": "Nuevo paquete",
       "new_baggage": "Nuevo equipaje"
     },
@@ -179,11 +179,14 @@
     "billets": "Billetes",
     "nouveau_billet": "Nuevo billete",
     "titres_de_transport": "Títulos de transporte",
-    "nouveau_titre": "Nuevo título"
+    "nouveau_titre": "Nuevo título",
+    "tout_afficher": "Ver todo",
+    "vendre_un_billet": "Vender un billete",
+    "retrait": "Retiro"
   },
   "booking": {
     "list": {
-      "title": "Reservas",
+      "title": "Billetes vendidos",
       "subtitle": "Gestión de reservas y billetes",
       "info": "Una reserva agrupa uno o varios billetes (uno por pasajero y asiento). El pago se vinculará al módulo de tesorería más adelante.",
       "empty": "Sin reservas."
@@ -2005,7 +2008,7 @@
       "all": "Todos"
     },
     "livraison": {
-      "title": "Entrega",
+      "title": "Retiro",
       "subtitle": "Entregar un paquete a su destinatario",
       "info": "Busque el paquete por referencia, verifique y entréguelo.",
       "f_ref": "Referencia del paquete",
@@ -2022,6 +2025,20 @@
       "remit": "Entregar el paquete",
       "already_done": "Este paquete ya fue retirado",
       "not_ready": "Este paquete aún no está disponible para retiro."
+    },
+    "retrait": {
+      "bag_title": "Retiro",
+      "bag_subtitle": "Entregar un equipaje a su propietario",
+      "bag_info": "Busque el equipaje por número de etiqueta, verifique y entréguelo.",
+      "f_tag": "Número de etiqueta",
+      "ph_tag": "ej. BAG-00003",
+      "not_found": "No se encontró equipaje.",
+      "owner": "Propietario",
+      "already_done": "Este equipaje ya fue entregado",
+      "cancelled": "Este equipaje fue cancelado.",
+      "comment": "Comentario",
+      "comment_ph": "Opcional",
+      "remit": "Entregar el equipaje"
     }
   },
   "fare": {

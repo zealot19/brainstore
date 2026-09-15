@@ -1,0 +1,56 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.retrait.bag_title' | transloco }}</h4><h6>{{ 'cons.retrait.bag_subtitle' | transloco }}</h6></div></div>
+</div>
+<app-info-banner [text]="'cons.retrait.bag_info' | transloco"></app-info-banner>
+
+<div class="card"><div class="card-body">
+  <div class="row g-2 align-items-end" style="max-width:640px">
+    <div class="col">
+      <label class="form-label">{{ 'cons.retrait.f_tag' | transloco }}</label>
+      <input class="form-control" [(ngModel)]="ref" (keyup.enter)="search()" [placeholder]="'cons.retrait.ph_tag' | transloco" />
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="search()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+      @if (bag) { <button class="btn btn-outline-secondary ms-1" (click)="reset()">{{ 'cons.livraison.new_search' | transloco }}</button> }
+    </div>
+  </div>
+
+  @if (searched && !bag) {
+    <div class="alert alert-warning mt-3">{{ 'cons.retrait.not_found' | transloco }}</div>
+  }
+
+  @if (bag) {
+    <div class="card mt-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">{{ bag.tag_number }}</h5>
+        <span class="badge {{ statusClass(bag.status) }}">{{ bag.status_display }}</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.retrait.owner' | transloco }}</small>{{ bag.owner_name || bag.passenger_name || bag.sender_name }}<br><small class="text-muted">{{ bag.sender_phone }}</small></div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.contents' | transloco }}</small>{{ bag.description || '—' }} · {{ bag.quantity }} {{ 'cons.common.pieces' | transloco }}</div>
+          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.weight' | transloco }}</small>{{ bag.weight_kg || '—' }} kg</div>
+        </div>
+
+        @if (bag.status === 'delivered') {
+          <div class="alert alert-success mt-3 mb-0">{{ 'cons.retrait.already_done' | transloco }} — {{ bag.delivered_at | date:'short' }}</div>
+        } @else if (bag.status === 'cancelled') {
+          <div class="alert alert-warning mt-3 mb-0">{{ 'cons.retrait.cancelled' | transloco }}</div>
+        } @else {
+          <hr>
+          <div class="row g-3" style="max-width:640px">
+            <div class="col-12">
+              <label class="form-label">{{ 'cons.retrait.comment' | transloco }}</label>
+              <input class="form-control" [(ngModel)]="comment" [placeholder]="'cons.retrait.comment_ph' | transloco" />
+            </div>
+            <div class="col-12">
+              <button class="btn btn-success" *hasPermission="'ticketing.luggage.manage'" [disabled]="saving" (click)="remit()">
+                <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-package-export me-1"></i>{{ 'cons.retrait.remit' | transloco }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div></div>
