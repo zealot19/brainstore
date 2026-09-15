@@ -927,18 +927,26 @@ class RefundRateView(APIView):
     permission_map = {"GET": "treasury.config.view", "PUT": "treasury.config.manage"}
 
     def get(self, request):
-        from apps.treasury.services.refund_config import get_refund_rate
-        return success_response({"rate": str(get_refund_rate(_company(request)))})
+        from apps.treasury.services.refund_config import get_refund_rates
+        rates = get_refund_rates(_company(request))
+        return success_response({k: str(v) for k, v in rates.items()})
 
     def put(self, request):
-        from apps.treasury.services.refund_config import set_refund_rate
+        from apps.treasury.services.refund_config import set_refund_rate, set_refund_rates, get_refund_rates
         ser = RefundRateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        company = _company(request)
         try:
-            rate = set_refund_rate(_company(request), ser.validated_data["rate"], user=request.user)
+            per_kind = {k: d[k] for k in ("ticket", "colis", "bagage") if k in d}
+            if per_kind:
+                set_refund_rates(company, per_kind, user=request.user)
+            elif d.get("rate") is not None:
+                set_refund_rate(company, d["rate"], user=request.user)  # rétro-compat
         except ApplicationError as ex:
             return error_response(str(ex))
-        return success_response({"rate": str(rate)})
+        rates = get_refund_rates(company)
+        return success_response({k: str(v) for k, v in rates.items()})
 
 
 # ── Coupures monétaires (billetage config) ──────────────────────────────────────

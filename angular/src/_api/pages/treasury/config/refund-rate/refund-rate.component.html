@@ -4,9 +4,19 @@
 <div class="card"><div class="card-body" style="max-width:420px;">
   @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
   @if (saved) { <div class="alert alert-success py-2">{{ 'treasury.refund.saved' | transloco }}</div> }
-  <label class="form-label">{{ 'treasury.refund.label' | transloco }}</label>
+  <label class="form-label">{{ 'treasury.refund.label_ticket' | transloco }}</label>
   <div class="input-group">
-    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rate" />
+    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.ticket" />
+    <span class="input-group-text">%</span>
+  </div>
+  <label class="form-label mt-3">{{ 'treasury.refund.label_colis' | transloco }}</label>
+  <div class="input-group">
+    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.colis" />
+    <span class="input-group-text">%</span>
+  </div>
+  <label class="form-label mt-3">{{ 'treasury.refund.label_bagage' | transloco }}</label>
+  <div class="input-group">
+    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.bagage" />
     <span class="input-group-text">%</span>
   </div>
   <small class="text-muted d-block mt-1">{{ 'treasury.refund.hint' | transloco }}</small>

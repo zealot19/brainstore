@@ -655,7 +655,10 @@
       "subtitle": "Taxa aplicada ao montante pago numa anulação",
       "saved": "Taxa guardada.",
       "label": "Taxa de reembolso (%)",
-      "hint": "0 % = sem reembolso. O reembolso sai da caixa aberta do agente."
+      "hint": "0 % = sem reembolso. O reembolso sai da caixa aberta do agente.",
+      "label_ticket": "Taxa de reembolso — Bilhetes (%)",
+      "label_colis": "Taxa de reembolso — Encomendas (%)",
+      "label_bagage": "Taxa de reembolso — Bagagens (%)"
     },
     "refunds": {
       "title": "Reembolsos",

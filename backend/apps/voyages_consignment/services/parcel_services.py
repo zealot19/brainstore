@@ -241,7 +241,7 @@ def cancel_parcel(parcel, *, user):
            to_status=Parcel.Status.CANCELLED, user=user)
     from apps.treasury.services.refund import refund_on_cancel
     refund_on_cancel(parcel.company, amount_paid=parcel.amount_received, user=user,
-                     description=f"Remboursement colis {parcel.reference}")
+                     description=f"Remboursement colis {parcel.reference}", kind="colis")
     return parcel
 
 

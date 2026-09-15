@@ -655,7 +655,10 @@
       "subtitle": "Tasa aplicada al importe pagado en una cancelación",
       "saved": "Tasa guardada.",
       "label": "Tasa de reembolso (%)",
-      "hint": "0 % = sin reembolso. El reembolso sale de la caja abierta del agente."
+      "hint": "0 % = sin reembolso. El reembolso sale de la caja abierta del agente.",
+      "label_ticket": "Tasa de reembolso — Billetes (%)",
+      "label_colis": "Tasa de reembolso — Paquetes (%)",
+      "label_bagage": "Tasa de reembolso — Equipaje (%)"
     },
     "refunds": {
       "title": "Reembolsos",

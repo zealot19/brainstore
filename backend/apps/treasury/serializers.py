@@ -473,5 +473,12 @@ class PaymentMethodWriteSerializer(serializers.Serializer):
 
 
 class RefundRateSerializer(serializers.Serializer):
+    # Taux distincts par type ; `rate` conservé pour rétro-compatibilité.
+    ticket = serializers.DecimalField(max_digits=5, decimal_places=2,
+                                      min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    colis = serializers.DecimalField(max_digits=5, decimal_places=2,
+                                     min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    bagage = serializers.DecimalField(max_digits=5, decimal_places=2,
+                                      min_value=Decimal("0"), max_value=Decimal("100"), required=False)
     rate = serializers.DecimalField(max_digits=5, decimal_places=2,
-                                    min_value=Decimal("0"), max_value=Decimal("100"))
+                                    min_value=Decimal("0"), max_value=Decimal("100"), required=False)

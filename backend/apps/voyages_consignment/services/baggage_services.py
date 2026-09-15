@@ -119,5 +119,5 @@ def cancel_baggage(baggage, *, user, _skip_refund=False):
     if not _skip_refund:
         from apps.treasury.services.refund import refund_on_cancel
         refund_on_cancel(baggage.company, amount_paid=baggage.amount_received, user=user,
-                         description=f"Remboursement bagage {baggage.tag_number or baggage.id}")
+                         description=f"Remboursement bagage {baggage.tag_number or baggage.id}", kind="bagage")
     return baggage

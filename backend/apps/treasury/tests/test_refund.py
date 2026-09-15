@@ -20,6 +20,33 @@ def test_refund_rate_get_set():
 
 
 @pytest.mark.django_db
+def test_refund_rates_distinct_per_type():
+    from apps.treasury.services.refund_config import get_refund_rate, get_refund_rates, set_refund_rates
+    company, admin = _company(name="RfKind", email="rfk@x.com")
+    set_refund_rates(company, {"ticket": 10, "colis": 20, "bagage": 30}, user=admin)
+    assert get_refund_rate(company, "ticket") == Decimal("10")
+    assert get_refund_rate(company, "colis") == Decimal("20")
+    assert get_refund_rate(company, "bagage") == Decimal("30")
+    assert get_refund_rates(company) == {"ticket": Decimal("10"), "colis": Decimal("20"), "bagage": Decimal("30")}
+
+
+@pytest.mark.django_db
+def test_refund_rate_legacy_fallback():
+    """Un ancien taux unique s'applique aux trois types tant que les taux
+    spécifiques ne sont pas définis."""
+    from apps.treasury.services.refund_config import get_refund_rate, _set_one
+    from apps.system_config.models import Parameter
+    company, admin = _company(name="RfLegacy", email="rfl@x.com")
+    Parameter.objects.update_or_create(
+        key="treasury.refund_rate", company=company,
+        defaults={"value": "40", "data_type": "decimal", "scope": "company"})
+    assert get_refund_rate(company, "colis") == Decimal("40")  # fallback
+    _set_one(company, "colis", 15)
+    assert get_refund_rate(company, "colis") == Decimal("15")   # spécifique prioritaire
+    assert get_refund_rate(company, "bagage") == Decimal("40")  # toujours fallback
+
+
+@pytest.mark.django_db
 def test_refund_rate_rejects_out_of_range():
     from apps.treasury.services.refund_config import set_refund_rate
     company, admin = _company(name="RfBad", email="rfb@x.com")
@@ -101,12 +128,20 @@ def test_refund_rate_api():
     r = c.get("/api/v1/treasury/refund-rate/")
     assert r.status_code == 200
     body = r.json(); d = body["data"] if "data" in body else body
-    assert Decimal(str(d["rate"])) == Decimal("0")
-    r = c.put("/api/v1/treasury/refund-rate/", {"rate": 25}, format="json")
+    assert Decimal(str(d["ticket"])) == Decimal("0")
+    # Taux distincts par type
+    r = c.put("/api/v1/treasury/refund-rate/", {"ticket": 25, "colis": 10, "bagage": 5}, format="json")
     assert r.status_code == 200, r.content
     r = c.get("/api/v1/treasury/refund-rate/")
     d = r.json().get("data", r.json())
-    assert Decimal(str(d["rate"])) == Decimal("25")
+    assert Decimal(str(d["ticket"])) == Decimal("25")
+    assert Decimal(str(d["colis"])) == Decimal("10")
+    assert Decimal(str(d["bagage"])) == Decimal("5")
+    # Rétro-compat : un `rate` unique s'applique aux trois
+    r = c.put("/api/v1/treasury/refund-rate/", {"rate": 40}, format="json")
+    assert r.status_code == 200, r.content
+    d = r.json().get("data", r.json())
+    assert Decimal(str(d["ticket"])) == Decimal("40") and Decimal(str(d["bagage"])) == Decimal("40")
 
 
 @pytest.mark.django_db

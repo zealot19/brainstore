@@ -655,7 +655,10 @@
       "subtitle": "Rate applied to the amount paid on cancellation",
       "saved": "Rate saved.",
       "label": "Refund rate (%)",
-      "hint": "0% = no refund. The refund comes from the agent's open register."
+      "hint": "0% = no refund. The refund comes from the agent's open register.",
+      "label_ticket": "Refund rate — Tickets (%)",
+      "label_colis": "Refund rate — Parcels (%)",
+      "label_bagage": "Refund rate — Baggage (%)"
     },
     "refunds": {
       "title": "Refunds",

@@ -14,7 +14,7 @@ from .trip_expense_sales import record_trip_expense
 from .general_expense_sales import record_general_expense
 from .expense_shared import resolve_disbursement_session
 from .other_income import record_other_income
-from .refund_config import get_refund_rate, set_refund_rate
+from .refund_config import get_refund_rate, set_refund_rate, get_refund_rates, set_refund_rates
 from .refund import refund_on_cancel
 from .refund_by_reference import lookup_refundable, refund_by_reference
 
@@ -33,6 +33,6 @@ __all__ = [
     "record_trip_expense",
     "record_general_expense", "resolve_disbursement_session",
     "record_other_income",
-    "get_refund_rate", "set_refund_rate", "refund_on_cancel",
+    "get_refund_rate", "set_refund_rate", "get_refund_rates", "set_refund_rates", "refund_on_cancel",
     "lookup_refundable", "refund_by_reference",
 ]
