@@ -158,7 +158,6 @@ export class SidebarService {
           icon2: 'receipt',
           base: 'treasury-expenses',
           subMenus: [
-            { menuValue: 'Tableau de bord',  route: routes.trzExpensesDashboard, base: 'expenses-dashboard', permission: 'treasury.expense.view' },
             { menuValue: 'Dépense voyage',   route: routes.trzExpensesVoyage,    base: 'expenses-voyage',    permission: 'treasury.expense.view' },
             { menuValue: 'Dépense générale', route: routes.trzExpensesGeneral,   base: 'expenses-general',   permission: 'treasury.expense.view' },
           ],
@@ -170,7 +169,6 @@ export class SidebarService {
           icon2: 'coin',
           base: 'treasury-income',
           subMenus: [
-            { menuValue: 'Tableau de bord', route: routes.trzRecettesDashboard, base: 'recettes-dashboard', permission: 'treasury.income.view' },
             { menuValue: 'Recette voyage',  route: routes.trzRecettesVoyage,    base: 'recettes-voyage',    permission: 'treasury.income.view' },
             { menuValue: 'Recette colis',   route: routes.trzRecettesColis,     base: 'recettes-colis',     permission: 'treasury.income.view' },
             { menuValue: 'Recette bagage',  route: routes.trzRecettesBagage,    base: 'recettes-bagage',    permission: 'treasury.income.view' },
