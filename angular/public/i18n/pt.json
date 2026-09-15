@@ -1861,7 +1861,10 @@
       "st_loaded": "Carregado",
       "st_arrived": "Chegado",
       "st_withdrawn": "Levantado",
-      "st_cancelled": "Anulado"
+      "st_cancelled": "Anulado",
+      "st_ready": "Pronto para expedir",
+      "st_in_transit": "Em trânsito",
+      "st_available": "Disponível para retirada"
     },
     "reception": {
       "title": "Receção de encomendas",
@@ -1978,6 +1981,22 @@
       "d_piece": "documento",
       "d_tracking": "Acompanhamento",
       "d_no_events": "Nenhum evento."
+    },
+    "expedition": {
+      "title": "Expedição",
+      "subtitle": "Atribuir encomendas a uma viagem e expedir",
+      "info": "Escolha uma viagem e atribua encomendas, ou expeça sem viagem.",
+      "mode_voyage": "Com viagem",
+      "mode_sans": "Sem viagem",
+      "filter_dest": "Filtrar por destino",
+      "ready_pool": "Encomendas prontas",
+      "onboard": "Encomendas da viagem",
+      "assign": "Atribuir",
+      "dispatch": "Expedir",
+      "dispatch_selected": "Expedir seleção",
+      "print_manifest": "Manifesto",
+      "empty_ready": "Sem encomendas prontas",
+      "empty_onboard": "Sem encomendas nesta viagem"
     }
   },
   "fare": {

@@ -148,6 +148,7 @@ class ParcelArrivedView(APIView):
 
 
 class ParcelUnloadView(APIView):
+    """Retire un colis de son voyage (retour au pool « prêt »)."""
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
@@ -156,10 +157,63 @@ class ParcelUnloadView(APIView):
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
-            p = services.unload_parcel(p, user=request.user)
+            p = services.unassign_from_trip(p, user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.ParcelRead(p).data)
+
+
+class _ParcelActionView(APIView):
+    """Base : applique un service de transition (sans corps) à un colis."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
+    service_fn = None
+
+    def post(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk)
+        if not p:
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        try:
+            p = type(self).service_fn(p, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelRead(p).data)
+
+
+class ParcelLoadView(_ParcelActionView):
+    service_fn = staticmethod(services.load_parcel)
+
+
+class ParcelDispatchView(_ParcelActionView):
+    service_fn = staticmethod(services.dispatch_parcel)
+
+
+class ParcelArriveView(_ParcelActionView):
+    service_fn = staticmethod(services.mark_arrived)
+
+
+class ParcelUnassignView(_ParcelActionView):
+    service_fn = staticmethod(services.unassign_from_trip)
+
+
+class ParcelExpeditionView(APIView):
+    """Listes de l'écran Expédition : colis prêts (pool) + colis du voyage + totaux."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
+
+    def get(self, request):
+        company = request.user.company
+        trip_id = request.query_params.get("trip")
+        destination = request.query_params.get("destination")
+        ready = selectors.ready_parcels(company, destination_point=destination)
+        assigned = selectors.trip_parcels(company, trip_id) if trip_id else Parcel.objects.none()
+        assigned = list(assigned)
+        weight = sum(float(p.weight_kg or 0) for p in assigned)
+        return success_response({
+            "ready": S.ParcelRead(ready, many=True).data,
+            "assigned": S.ParcelRead(assigned, many=True).data,
+            "totals": {"count": len(assigned), "weight": weight},
+        })
 
 
 class ParcelPickupView(APIView):
@@ -335,8 +389,10 @@ class ParcelBulkView(APIView):
         if not ids:
             return error_response("Aucun colis sélectionné.")
         qs = Parcel.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
-        fn = {"receive": services.mark_arrived, "cancel": services.cancel_parcel,
-              "unload": services.unload_parcel}.get(action)
+        fn = {"dispatch": services.dispatch_parcel, "arrive": services.mark_arrived,
+              "receive": services.receive_parcel, "load": services.load_parcel,
+              "unassign": services.unassign_from_trip,
+              "cancel": services.cancel_parcel}.get(action)
         if not fn:
             return error_response("Action inconnue.")
         done, errors = _bulk_apply(list(qs), fn, request.user)

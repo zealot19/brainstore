@@ -39,12 +39,31 @@ def parcel_detail(company, pk):
 
 
 def pending_for_trip(company, route_id=None):
-    """Colis enregistrés sans voyage — candidats au chargement."""
+    """Colis prêts sans voyage — candidats au chargement/expédition."""
     qs = (Parcel.objects.filter(is_deleted=False, company=company,
-                                status=Parcel.Status.REGISTERED, trip__isnull=True)
+                                status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("created_at"))
     return qs
+
+
+def ready_parcels(company, destination_point=None):
+    """Colis prêts, sans voyage — pool « à expédier » de l'Expédition."""
+    qs = (Parcel.objects.filter(is_deleted=False, company=company,
+                                status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
+          .select_related("origin_point", "destination_point", "consignment_type")
+          .order_by("-created_at"))
+    if destination_point:
+        qs = qs.filter(destination_point_id=destination_point)
+    return qs
+
+
+def trip_parcels(company, trip_id):
+    """Colis (non annulés) affectés à un voyage."""
+    return (Parcel.objects.filter(is_deleted=False, company=company, trip_id=trip_id)
+            .exclude(status=Parcel.Status.CANCELLED)
+            .select_related("origin_point", "destination_point", "consignment_type")
+            .order_by("-created_at"))
 
 
 def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None,
@@ -83,4 +102,5 @@ def trip_manifest(trip):
     return {"parcels": parcels, "baggage": baggage}
 
 
-__all__ = ["list_parcels", "parcel_detail", "pending_for_trip", "list_baggage", "trip_manifest"]
+__all__ = ["list_parcels", "parcel_detail", "pending_for_trip", "ready_parcels",
+           "trip_parcels", "list_baggage", "trip_manifest"]

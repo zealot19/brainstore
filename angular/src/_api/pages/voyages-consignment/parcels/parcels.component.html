@@ -10,9 +10,11 @@
     <div class="d-flex align-items-center gap-2 flex-wrap">
       <select class="form-select w-auto" [(ngModel)]="statusFilter" (ngModelChange)="reload()">
         <option value="">{{ 'cons.common.opt_all_statuses' | transloco }}</option>
-        <option value="registered">{{ 'cons.common.st_registered' | transloco }}</option>
+        <option value="ready_for_travel">{{ 'cons.common.st_ready' | transloco }}</option>
         <option value="loaded">{{ 'cons.common.st_loaded' | transloco }}</option>
+        <option value="in_transit">{{ 'cons.common.st_in_transit' | transloco }}</option>
         <option value="arrived">{{ 'cons.common.st_arrived' | transloco }}</option>
+        <option value="available_for_pickup">{{ 'cons.common.st_available' | transloco }}</option>
         <option value="picked_up">{{ 'cons.common.st_withdrawn' | transloco }}</option>
         <option value="cancelled">{{ 'cons.common.st_cancelled' | transloco }}</option>
       </select>
@@ -65,7 +67,7 @@
               <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
               <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
               <td class="text-center">
-                @if (p.status === 'arrived' || p.status === 'picked_up') {
+                @if (p.status === 'available_for_pickup' || p.status === 'picked_up') {
                   {{ p.received_pieces }}/{{ p.quantity }}
                   @if (p.missing_pieces) { <span class="badge bg-danger ms-1" [title]="'cons.common.missing' | transloco">-{{ p.missing_pieces }}</span> }
                   @if (p.damaged_pieces) { <span class="badge bg-warning ms-1" [title]="'cons.common.damaged' | transloco">⚡{{ p.damaged_pieces }}</span> }
@@ -77,8 +79,8 @@
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#detail-modal" (click)="showDetail(p)" [title]="'cons.parcels.act_detail' | transloco"><i class="ti ti-eye me-1"></i>{{ 'cons.parcels.act_detail' | transloco }}</a>
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" [title]="'cons.parcels.act_receipt_title' | transloco"><i class="ti ti-printer me-1"></i>{{ 'cons.parcels.act_receipt' | transloco }}</a>
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a> }
-                @if (p.status === 'arrived') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" [title]="'cons.parcels.act_deliver' | transloco"><i class="ti ti-package-export me-1"></i>{{ 'cons.parcels.act_deliver' | transloco }}</a> }
-                @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a> }
+                @if (p.status === 'available_for_pickup') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" [title]="'cons.parcels.act_deliver' | transloco"><i class="ti ti-package-export me-1"></i>{{ 'cons.parcels.act_deliver' | transloco }}</a> }
+                @if (p.status === 'registered' || p.status === 'ready_for_travel') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'cons.parcels.empty' | transloco }}</td></tr> }
@@ -164,7 +166,7 @@
         <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.common.col_amount' | transloco }}</small>{{ detail.amount_due | number:'1.0-0' }} XAF</div>
         <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.common.f_received' | transloco }}</small>{{ detail.amount_received | number:'1.0-0' }} XAF</div>
         <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_change' | transloco }}</small>{{ detail.change_due | number:'1.0-0' }} XAF</div>
-        @if (detail.status === 'arrived' || detail.status === 'picked_up') {
+        @if (detail.status === 'available_for_pickup' || detail.status === 'picked_up') {
           <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_received_pieces' | transloco }}</small>{{ detail.received_pieces }}/{{ detail.quantity }}</div>
           <div class="col-md-4 mt-2"><small class="text-muted d-block">{{ 'cons.parcels.d_missing_damaged' | transloco }}</small>{{ detail.missing_pieces }} / {{ detail.damaged_pieces }}</div>
         }

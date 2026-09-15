@@ -90,7 +90,8 @@ export class VcgParcelsComponent implements OnInit {
       error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   statusClass(s: string): string {
-    return { registered: 'bg-warning', loaded: 'bg-info', arrived: 'bg-primary',
+    return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
+             in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
              picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   get change(): number {

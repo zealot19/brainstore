@@ -29,7 +29,7 @@ export class VcgReceptionComponent implements OnInit {
 
   reload(): void {
     this.loading = true; this.selected.clear();
-    this.svc.list({ status: 'loaded', q: this.q }).subscribe({
+    this.svc.list({ status: 'arrived', q: this.q }).subscribe({
       next: d => {
         this.rows = d; this.loading = false;
         this.state = {};

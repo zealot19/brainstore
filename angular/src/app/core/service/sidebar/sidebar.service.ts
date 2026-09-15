@@ -352,7 +352,7 @@ export class SidebarService {
             { menuValue: 'Colis',            route: routes.vcgParcels,   base: 'parcels',   permission: 'ticketing.parcel.view' },
             { menuValue: 'Nouveau colis',    route: routes.vcgParcels,   queryParams: { new: 1 }, base: 'parcels', permission: 'ticketing.parcel.manage' },
             { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception', permission: 'ticketing.parcel.view' },
-            { menuValue: 'Manifeste voyage', route: routes.vcgManifest,  base: 'manifest',  permission: 'ticketing.parcel.view' },
+            { menuValue: 'Expédition',       route: routes.vcgManifest,  base: 'manifest',  permission: 'ticketing.parcel.view' },
           ],
         },
       ],

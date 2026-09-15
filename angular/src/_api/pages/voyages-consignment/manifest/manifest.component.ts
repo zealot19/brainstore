@@ -1,10 +1,9 @@
-import { Component, OnInit, inject} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
-import { BaggageService } from '../../../services/voyages-consignment/baggage.service';
 import { BookingService } from '../../../services/voyages-booking/booking.service';
-import { Parcel, Baggage, Manifest } from '../../../models/voyages-consignment.models';
+import { Parcel } from '../../../models/voyages-consignment.models';
 import { TripOption } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -20,34 +19,56 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
   trips: TripOption[] = []; tripId = '';
-  pending: Parcel[] = []; manifest: Manifest | null = null;
+  mode: 'voyage' | 'sans' = 'voyage';
+  destFilter = '';
+  ready: Parcel[] = []; assigned: Parcel[] = [];
+  totals = { count: 0, weight: 0 };
+  selected = new Set<string>();
 
-  constructor(private parcels: ParcelService, private bags: BaggageService, private booking: BookingService) {}
-  ngOnInit(): void { this.booking.bookableTrips().subscribe(t => this.trips = t); }
+  constructor(private parcels: ParcelService, private booking: BookingService) {}
+  ngOnInit(): void { this.booking.bookableTrips().subscribe(t => this.trips = t); this.refresh(); }
 
-  onTripChange(): void {
-    this.manifest = null; this.pending = [];
-    if (!this.tripId) return;
-    this.parcels.pending().subscribe(d => this.pending = d);
-    this.parcels.manifest(this.tripId).subscribe(d => this.manifest = d);
+  refresh(): void {
+    this.selected.clear();
+    this.parcels.expedition({ trip: this.mode === 'voyage' ? this.tripId : undefined }).subscribe(d => {
+      this.ready = d.ready ?? []; this.assigned = d.assigned ?? [];
+      this.totals = d.totals ?? { count: 0, weight: 0 };
+    });
   }
+  setMode(m: 'voyage' | 'sans'): void { this.mode = m; this.refresh(); }
+  onTripChange(): void { this.refresh(); }
+
+  get readyFiltered(): Parcel[] {
+    const q = this.destFilter.toLowerCase();
+    return q ? this.ready.filter(p => (p.destination_point_name || '').toLowerCase().includes(q)) : this.ready;
+  }
+  isSelected(id: string): boolean { return this.selected.has(id); }
+  toggle(id: string): void { this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id); }
+
   statusClass(s: string): string {
-    return { registered: 'bg-warning', loaded: 'bg-info', arrived: 'bg-primary', picked_up: 'bg-success',
-             checked_in: 'bg-warning', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
+    return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
+             in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
+             picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
-  load(p: Parcel): void {
-    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+
+  private err = (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.");
+
+  assign(p: Parcel): void {
+    if (!this.tripId) { this.toast.error('Sélectionnez un voyage.'); return; }
+    this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.refresh(), error: this.err });
   }
-  loadAll(): void {
-    if (!this.pending.length) return;
-    let remaining = this.pending.length;
-    this.pending.forEach(p => this.parcels.assignTrip(p.id, this.tripId).subscribe({
-      next: () => { if (--remaining === 0) this.onTripChange(); },
-      error: e => { this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); if (--remaining === 0) this.onTripChange(); } }));
+  unassign(p: Parcel): void { this.parcels.unassign(p.id).subscribe({ next: () => this.refresh(), error: this.err }); }
+
+  /** Voyage : expédie tous les colis affectés au voyage (→ en transit). */
+  dispatchTrip(): void {
+    const ids = this.assigned.filter(p => p.status === 'ready_for_travel' || p.status === 'loaded').map(p => p.id);
+    if (!ids.length) { this.toast.error('Aucun colis à expédier.'); return; }
+    this.parcels.bulk(ids, 'dispatch').subscribe({ next: () => { this.toast.success('Colis expédiés.'); this.refresh(); }, error: this.err });
   }
-  unload(p: Parcel): void {
-    this.parcels.unload(p.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+  /** Sans voyage : expédie les colis sélectionnés dans le pool. */
+  dispatchSelected(): void {
+    if (!this.selected.size) { this.toast.error('Aucun colis sélectionné.'); return; }
+    this.parcels.bulk([...this.selected], 'dispatch').subscribe({ next: () => { this.toast.success('Colis expédiés.'); this.refresh(); }, error: this.err });
   }
-  deliver(b: Baggage): void { this.bags.deliver(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") }); }
-  loadBag(b: Baggage): void { this.bags.load(b.id).subscribe({ next: () => this.onTripChange(), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") }); }
+  printManifest(): void { if (this.tripId) window.open(`/api/v1/voyages/consignment/trips/${this.tripId}/manifest/`, '_blank'); }
 }

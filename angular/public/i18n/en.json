@@ -1861,7 +1861,10 @@
       "st_loaded": "Loaded",
       "st_arrived": "Arrived",
       "st_withdrawn": "Withdrawn",
-      "st_cancelled": "Cancelled"
+      "st_cancelled": "Cancelled",
+      "st_ready": "Ready to travel",
+      "st_in_transit": "In transit",
+      "st_available": "Available for pickup"
     },
     "reception": {
       "title": "Parcel reception",
@@ -1978,6 +1981,22 @@
       "d_piece": "ID",
       "d_tracking": "Tracking",
       "d_no_events": "No events."
+    },
+    "expedition": {
+      "title": "Dispatch",
+      "subtitle": "Assign parcels to a voyage and dispatch",
+      "info": "Pick a voyage then assign parcels, or dispatch without a voyage.",
+      "mode_voyage": "With voyage",
+      "mode_sans": "Without voyage",
+      "filter_dest": "Filter by destination",
+      "ready_pool": "Ready parcels",
+      "onboard": "Voyage parcels",
+      "assign": "Assign",
+      "dispatch": "Dispatch",
+      "dispatch_selected": "Dispatch selected",
+      "print_manifest": "Manifest",
+      "empty_ready": "No ready parcels",
+      "empty_onboard": "No parcels on this voyage"
     }
   },
   "fare": {

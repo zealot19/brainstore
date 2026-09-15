@@ -1861,7 +1861,10 @@
       "st_loaded": "Cargado",
       "st_arrived": "Llegado",
       "st_withdrawn": "Retirado",
-      "st_cancelled": "Anulado"
+      "st_cancelled": "Anulado",
+      "st_ready": "Listo para expedir",
+      "st_in_transit": "En tránsito",
+      "st_available": "Disponible para retiro"
     },
     "reception": {
       "title": "Recepción de paquetes",
@@ -1978,6 +1981,22 @@
       "d_piece": "documento",
       "d_tracking": "Seguimiento",
       "d_no_events": "Sin eventos."
+    },
+    "expedition": {
+      "title": "Expedición",
+      "subtitle": "Asignar paquetes a un viaje y expedir",
+      "info": "Elija un viaje y asigne paquetes, o expida sin viaje.",
+      "mode_voyage": "Con viaje",
+      "mode_sans": "Sin viaje",
+      "filter_dest": "Filtrar por destino",
+      "ready_pool": "Paquetes listos",
+      "onboard": "Paquetes del viaje",
+      "assign": "Asignar",
+      "dispatch": "Expedir",
+      "dispatch_selected": "Expedir selección",
+      "print_manifest": "Manifiesto",
+      "empty_ready": "Sin paquetes listos",
+      "empty_onboard": "Sin paquetes en este viaje"
     }
   },
   "fare": {
