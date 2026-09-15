@@ -397,6 +397,29 @@ def build_roadmap_data(trip, request):
     }
 
 
+def resolve_manifest_template(company, request):
+    """En-tête/pied des bordereaux depuis ManifestTemplate, avec repli sur la société."""
+    from apps.voyages_config.models import ManifestTemplate, DEFAULT_SIGN_VOYAGE, DEFAULT_SIGN_COLIS
+    tpl = ManifestTemplate.objects.filter(company=company).first()
+    ch = _company_header(company, request)
+    logo_url = ch.get("logo_url")
+    if tpl and tpl.logo:
+        try:
+            logo_url = request.build_absolute_uri(tpl.logo.url)
+        except Exception:
+            pass
+    return {
+        "brand_name": (tpl.brand_name if tpl and tpl.brand_name else ch.get("name")),
+        "slogan": (tpl.slogan if tpl and tpl.slogan else ch.get("slogan")),
+        "head_office": (tpl.head_office if tpl else "") or "",
+        "phones": (tpl.phones if tpl and tpl.phones else ch.get("phone")) or "",
+        "agencies_line": (tpl.agencies_line if tpl else "") or "",
+        "logo_url": logo_url,
+        "sign_labels_voyage": (tpl.sign_labels_voyage if tpl and tpl.sign_labels_voyage else list(DEFAULT_SIGN_VOYAGE)),
+        "sign_labels_colis": (tpl.sign_labels_colis if tpl and tpl.sign_labels_colis else list(DEFAULT_SIGN_COLIS)),
+    }
+
+
 def _roadmap_trip(request, trip_id):
     return (VoyageTrip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id)
             .select_related("route", "origin", "destination", "vehicle").first())
