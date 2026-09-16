@@ -18,7 +18,7 @@ class Trip(BaseModel):
 
     company             = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                              on_delete=models.CASCADE, related_name="voyages_trips")
-    number              = models.CharField(_("numéro"), max_length=40, blank=True)
+    number              = models.CharField(_("numéro"), max_length=60, blank=True)
     code                = models.CharField(_("code"), max_length=40, blank=True)
     route               = models.ForeignKey("voyages_config.Route", verbose_name=_("trajet"),
                                              on_delete=models.PROTECT, related_name="trips")

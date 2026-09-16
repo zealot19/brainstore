@@ -9,10 +9,22 @@ from apps.voyages_config.models import RouteStop
 from apps.voyages_trips.models import Trip, TripStop
 
 
-def _trip_number():
+def _point_code(point):
+    """Code d'un point (gare/agence) pour la référence voyage : code du point de
+    service, à défaut code de son agence, sinon 'XX'."""
+    if not point:
+        return "XX"
+    return (getattr(point, "code", "") or (point.agency.code if getattr(point, "agency_id", None) else "") or "XX")
+
+
+def _trip_number(company, origin, destination, departure_dt):
+    """Référence voyage : DEP-ARR-AAAAMMJJ-NNN (bordereau journalier par institution)."""
+    day = timezone.localtime(departure_dt).strftime("%Y%m%d")
+    seq_code = f"VOY-{company.id}-{day}"
     Sequence.objects.get_or_create(
-        code="VOY", defaults={"name": "Voyages", "prefix": "VOY", "padding": 5, "reset_yearly": True})
-    return next_number("VOY")
+        code=seq_code, defaults={"name": f"Voyages {day}", "prefix": "", "padding": 3, "reset_yearly": False})
+    n = next_number(seq_code)  # préfixe/année vides -> juste le numéro « 001 »
+    return f"{_point_code(origin)}-{_point_code(destination)}-{day}-{n}"
 
 
 @transaction.atomic
@@ -23,10 +35,12 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
                 blocked_seats_count=0, crew_member_ids=None, user):
     if scheduled_arrival <= scheduled_departure:
         raise ApplicationError(_("L'arrivée prévue doit être postérieure au départ."))
+    o = origin or route.origin
+    d = destination or route.destination
     trip = Trip.objects.create(
-        company=company, number=_trip_number(), code=code,
+        company=company, number=_trip_number(company, o, d, scheduled_departure), code=code,
         route=route, service_pattern=service_pattern, fare_class=fare_class,
-        origin=origin or route.origin, destination=destination or route.destination,
+        origin=o, destination=d,
         scheduled_departure=scheduled_departure, scheduled_arrival=scheduled_arrival,
         status=Trip.Status.DRAFT, seat_assignment_mode=seat_assignment_mode,
         auto_expenses=auto_expenses, seating_plan=seating_plan, vehicle=vehicle,
