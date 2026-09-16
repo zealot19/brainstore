@@ -6,6 +6,7 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { Roadmap } from '../../../models/voyages-roadmap.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printBlob } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
@@ -51,7 +52,7 @@ export class VbRoadmapComponent implements OnInit {
   /** Bordereau PDF (en-tête/pied configurables via « Config manifestes »). */
   openPdf(doc: 'voyages' | 'comptabilisation' | 'colis' | 'bagages'): void {
     this.svc.pdf(this.tripId, doc).subscribe({
-      next: blob => window.open(URL.createObjectURL(blob), '_blank'),
+      next: blob => printBlob(blob),
       error: () => this.toast.error("Génération PDF indisponible sur ce serveur."),
     });
   }

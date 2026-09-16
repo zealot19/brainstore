@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { TripService } from '../../../services/voyages/trip.service';
 import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
+import { printBlob } from '../../../../app/shared/print/print.util';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { Trip } from '../../../models/voyages.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -111,7 +112,7 @@ export class VcgManifestComponent implements OnInit {
   printManifest(): void {
     if (!this.tripId) return;
     this.roadmap.pdf(this.tripId, 'colis').subscribe({
-      next: blob => window.open(URL.createObjectURL(blob), '_blank'),
+      next: blob => printBlob(blob),
       error: () => this.toast.error("Génération PDF indisponible sur ce serveur."),
     });
   }

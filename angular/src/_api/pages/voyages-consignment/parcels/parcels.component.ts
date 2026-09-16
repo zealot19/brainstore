@@ -15,6 +15,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
@@ -137,13 +138,7 @@ export class VcgParcelsComponent implements OnInit {
 
   printReceipt(id: string): void {
     this.svc.receipt(id).subscribe({
-      next: r => {
-        const w = window.open('', '_blank');
-        if (!w) { return; }
-        w.document.write(r.html);
-        w.document.close();
-        setTimeout(() => w.print(), 300);
-      },
+      next: r => printHtml(r.html),
       error: () => {},
     });
   }

@@ -5,6 +5,7 @@ import { BookingService } from '../../../services/voyages-booking/booking.servic
 import { Booking } from '../../../models/voyages-booking.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
@@ -29,14 +30,7 @@ export class VbBookingDetailComponent implements OnInit {
   printTickets(): void {
     if (!this.booking) return;
     this.svc.renderTickets(this.booking.id).subscribe({
-      next: r => {
-        const w = window.open('', '_blank');
-        if (!w) { this.toast.error('Autorisez les fenêtres pop-up pour imprimer.'); return; }
-        w.document.write(r.html);
-        w.document.close();
-        w.focus();
-        setTimeout(() => { w.print(); }, 300);
-      },
+      next: r => printHtml(r.html),
       error: e => this.toast.error(e?.error?.detail ?? 'Impression impossible.'),
     });
   }

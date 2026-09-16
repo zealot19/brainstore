@@ -16,6 +16,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
@@ -167,13 +168,7 @@ export class VcgBaggageComponent implements OnInit {
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 
-  private openAndPrint(html: string): void {
-    const w = window.open('', '_blank');
-    if (!w) { return; }
-    w.document.write(html);
-    w.document.close();
-    setTimeout(() => w.print(), 300);
-  }
+  private openAndPrint(html: string): void { printHtml(html); }
   printTicket(id: string): void { this.svc.ticket(id).subscribe({ next: r => this.openAndPrint(r.html), error: () => {} }); }
   printLabel(id: string): void { this.svc.label(id).subscribe({ next: r => this.openAndPrint(r.html), error: () => {} }); }
 }
