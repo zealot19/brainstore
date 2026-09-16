@@ -220,9 +220,14 @@ def get_treasury_series(company_id, days=14):
 
 
 def get_open_session_for_user(company_id, user):
+    """Session de caisse ouverte de l'utilisateur : celle qu'il a ouverte
+    (gestionnaire) ou celle qui lui est assignée (guichetier). C'est cette
+    session qui autorise ses encaissements (ventes billets, colis, bagages…)."""
+    from django.db.models import Q
     from apps.treasury.models import CashSession
     return (CashSession.objects
-            .filter(company_id=company_id, opened_by=user, status=CashSession.Status.OPEN, is_deleted=False)
+            .filter(Q(opened_by=user) | Q(assigned_to=user),
+                    company_id=company_id, status=CashSession.Status.OPEN, is_deleted=False)
             .order_by("-opened_at")
             .first())
 

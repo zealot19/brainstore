@@ -729,6 +729,9 @@
       "payments": "Payment breakdown",
       "mode": "Payment method",
       "billetage": "Closing cash count"
+    },
+    "timer": {
+      "do_billetage": "Do the cash count"
     }
   },
   "vcfg": {

@@ -16,6 +16,7 @@ urlpatterns = [
 
     # ── Cash sessions ──────────────────────────────────────────────────────────
     path("sessions/",                          views.CashSessionListView.as_view(), name="session-list"),
+    path("sessions/my-active/",                views.MyActiveSessionView.as_view(), name="session-my-active"),
     path("sessions/open/",                     views.OpenSessionView.as_view(),     name="session-open"),
     path("sessions/schedule/",                 views.ScheduleSessionView.as_view(), name="session-schedule"),
     path("sessions/guichetiers/",              views.GuichetierListView.as_view(),  name="session-guichetiers"),

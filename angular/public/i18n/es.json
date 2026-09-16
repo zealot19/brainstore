@@ -729,6 +729,9 @@
       "payments": "Desglose de pagos",
       "mode": "Medio de pago",
       "billetage": "Arqueo de cierre"
+    },
+    "timer": {
+      "do_billetage": "Hacer el arqueo"
     }
   },
   "vcfg": {

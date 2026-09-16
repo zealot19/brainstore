@@ -38,6 +38,11 @@
         </li>
       </ng-container>
 
+      <!-- Minuteur de session de caisse (billetage de fin depuis tout écran) -->
+      <li class="nav-item me-3 d-inline-flex align-items-center" *hasPermission="'treasury.session.manage'">
+        <app-cash-session-timer />
+      </li>
+
       <!-- Langue (i18n Transloco) -->
       <li class="nav-item me-2 d-inline-flex align-items-center">
         <app-language-switcher />

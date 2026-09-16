@@ -427,6 +427,7 @@ export const TREASURY = {
   banks:     `${TRZ}/banks/`,       bank:     (id: string) => `${TRZ}/banks/${id}/`,
   sessions:     `${TRZ}/sessions/`,       session:      (id: string) => `${TRZ}/sessions/${id}/`,
   sessionOpen:  `${TRZ}/sessions/open/`,  sessionClose: (id: string) => `${TRZ}/sessions/${id}/close/`,
+  sessionMyActive:    `${TRZ}/sessions/my-active/`,
   sessionSchedule:    `${TRZ}/sessions/schedule/`,
   sessionGuichetiers: `${TRZ}/sessions/guichetiers/`,
   sessionOpenScheduled: (id: string) => `${TRZ}/sessions/${id}/open/`,

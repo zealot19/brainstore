@@ -17,6 +17,7 @@ export class SessionService {
     return this.http.get<any>(TREASURY.sessions, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   open(data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionOpen, data); }
+  myActive(): Observable<CashSession | null> { return this.http.get<any>(TREASURY.sessionMyActive).pipe(map(r => (r?.data ?? r) || null)); }
   close(id: string, data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionClose(id), data); }
 
   schedule(data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSchedule, data); }

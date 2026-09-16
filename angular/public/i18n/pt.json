@@ -729,6 +729,9 @@
       "payments": "Repartição dos pagamentos",
       "mode": "Meio de pagamento",
       "billetage": "Contagem de fecho"
+    },
+    "timer": {
+      "do_billetage": "Fazer a contagem"
     }
   },
   "vcfg": {

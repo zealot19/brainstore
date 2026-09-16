@@ -1,0 +1,46 @@
+@if (session) {
+  @if (showBilletage) {
+    <button type="button" class="btn btn-sm btn-warning d-inline-flex align-items-center"
+            data-bs-toggle="modal" data-bs-target="#cst-billetage-modal" (click)="openClose()"
+            [title]="session.register_name">
+      <i class="ti ti-cash-register me-1"></i>{{ 'treasury.timer.do_billetage' | transloco }}
+    </button>
+  } @else {
+    <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
+      <i class="ti ti-clock-play me-1"></i>
+      <span class="cst-time">{{ countdown }}</span>
+    </span>
+  }
+}
+
+<!-- Billetage de clôture (accessible depuis n'importe quel écran) -->
+<div class="modal fade" id="cst-billetage-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.close_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (session) { <p class="text-muted small mb-2">{{ session.register_name }}@if (session.name) { — {{ session.name }} }</p> }
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="cst-close-bill" [(ngModel)]="closeBilletage" /><label class="form-check-label" for="cst-close-bill">{{ 'treasury.denom.use_billetage' | transloco }}</label></div>
+    @if (closeBilletage) {
+      <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+        <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+        <tbody>@for (d of denoms; track d.id) {
+          <tr><td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
+          <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeQty[d.id]" /></td>
+          <td class="text-end">{{ (+d.value) * (closeQty[d.id] || 0) }}</td></tr>
+        }</tbody>
+        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.denom.counted_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
+      </table></div>
+    } @else {
+      <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="closeManual" /></div>
+    }
+    <hr />
+    <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
+    <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }}</label>
+      <select class="form-select" [(ngModel)]="closeReason">
+        <option value="">{{ 'treasury.ecart.no_reason' | transloco }}</option>
+        @for (r of ecartReasons; track r) { <option [value]="r">{{ 'treasury.ecart.r_' + r | transloco }}</option> }
+      </select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="closeNote" /></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving" (click)="submitClose()">{{ 'treasury.session.close_btn' | transloco }}</button></div>
+</div></div></div>

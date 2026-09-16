@@ -207,6 +207,20 @@ class CashSessionListView(APIView):
         return paginator.get_paginated_response(CashSessionReadSerializer(page, many=True).data)
 
 
+class MyActiveSessionView(APIView):
+    """Session de caisse ouverte de l'utilisateur courant (ouverte par lui ou
+    qui lui est assignée), ou null. Alimente le minuteur global + le billetage
+    de fin depuis n'importe quel écran."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.manage"}
+
+    def get(self, request):
+        session = selectors.get_open_session_for_user(_company(request).id, request.user)
+        if not session:
+            return Response({"data": None})
+        return Response({"data": CashSessionReadSerializer(session).data})
+
+
 class OpenSessionView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"POST": "treasury.session.manage"}

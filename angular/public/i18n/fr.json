@@ -729,6 +729,9 @@
       "payments": "Ventilation des paiements",
       "mode": "Moyen de paiement",
       "billetage": "Billetage de fermeture"
+    },
+    "timer": {
+      "do_billetage": "Faire le billetage"
     }
   },
   "vcfg": {
