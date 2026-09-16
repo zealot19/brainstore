@@ -3,8 +3,10 @@
     <button class="btn btn-light" (click)="back()"><i class="ti ti-arrow-left me-1"></i>{{ 'shared.actions.back' | transloco }}</button>
     <div class="d-flex gap-2">
       @if (canBoard) { <button class="btn btn-outline-success" *hasPermission="'voyage.trip.board'" (click)="boardAll()"><i class="ti ti-users-check me-1"></i>{{ 'trips.rm.board_all' | transloco }}</button> }
-      <button class="btn btn-outline-primary" (click)="printDoc('voyages')"><i class="ti ti-printer me-1"></i>{{ 'trips.rm.doc_voyages' | transloco }}</button>
-      <button class="btn btn-outline-primary" (click)="printDoc('colis')"><i class="ti ti-printer me-1"></i>{{ 'trips.rm.doc_colis' | transloco }}</button>
+      <button class="btn btn-outline-primary" (click)="openPdf('voyages')"><i class="ti ti-file-text me-1"></i>{{ 'trips.rm.pdf_passengers' | transloco }}</button>
+      <button class="btn btn-outline-primary" (click)="openPdf('comptabilisation')"><i class="ti ti-file-text me-1"></i>{{ 'trips.rm.pdf_accounting' | transloco }}</button>
+      <button class="btn btn-outline-primary" (click)="openPdf('colis')"><i class="ti ti-file-text me-1"></i>{{ 'trips.rm.pdf_colis' | transloco }}</button>
+      <button class="btn btn-outline-primary" (click)="openPdf('bagages')"><i class="ti ti-file-text me-1"></i>{{ 'trips.rm.pdf_baggage' | transloco }}</button>
     </div>
   </div>
 </div>

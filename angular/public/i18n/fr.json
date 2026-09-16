@@ -1005,6 +1005,21 @@
       "adv_hint": "(pour experts — remplace le gabarit par votre HTML ; tokens",
       "f_html_recto": "HTML recto",
       "f_html_verso": "HTML verso"
+    },
+    "manifest": {
+      "title": "Config manifestes",
+      "subtitle": "En-tête et pied des bordereaux",
+      "header": "En-tête",
+      "footer": "Pied (signatures)",
+      "brand_name": "Nom affiché",
+      "slogan": "Slogan",
+      "head_office": "Direction / siège social",
+      "phones": "Téléphones",
+      "agencies_line": "Agences",
+      "logo": "Logo",
+      "sign_voyage": "Signatures — Voyage",
+      "sign_colis": "Signatures — Colis / Bagages",
+      "add": "Ajouter"
     }
   },
   "trips": {
@@ -1112,7 +1127,11 @@
       "pc_pieces": "Pièces",
       "empty_pc": "Aucun colis chargé.",
       "unavailable": "Feuille de route indisponible.",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "pdf_passengers": "Manifest passagers",
+      "pdf_accounting": "Comptabilisation",
+      "pdf_colis": "Bordereau colis",
+      "pdf_baggage": "Bordereau bagages"
     },
     "detail": {
       "submit": "Soumettre",

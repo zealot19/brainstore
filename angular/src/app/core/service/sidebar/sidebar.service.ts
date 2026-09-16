@@ -281,6 +281,7 @@ export class SidebarService {
             { menuValue: "Barème dépenses",      route: routes.vcExpenseSchedules,   base: 'expense-schedules',   permission: 'transport.config.view' },
             { menuValue: 'Fidélité',             route: routes.vcLoyalty,            base: 'loyalty-rules',       permission: 'transport.config.view' },
             { menuValue: 'Config billets',       route: routes.vcTicketTemplate,     base: 'ticket-template',     permission: 'transport.config.view' },
+            { menuValue: 'Config manifestes',    route: routes.vcManifestTemplate,   base: 'manifest-template',   permission: 'transport.config.view' },
             { menuValue: 'Paramètres Voyages',   route: routes.vcSettings,           base: 'settings',            permission: 'transport.config.view' },
           ],
         },

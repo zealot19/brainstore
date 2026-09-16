@@ -302,6 +302,7 @@ export const VOYAGES_CONFIG = {
   vehicleSeatingAssignment:  (id: string) => `${VC}/vehicle-seating-assignments/${id}/`,
   servicePatterns:    `${VC}/service-patterns/`,   servicePattern:  (id: string) => `${VC}/service-patterns/${id}/`,
   settings:           `${VC}/settings/`,
+  manifestTemplate:      `${VC}/manifest-template/`,
   ticketTemplate:        `${VC}/ticket-template/`,
   ticketTemplateReset:   `${VC}/ticket-template/reset/`,
   ticketTemplatePreview: `${VC}/ticket-template/preview/`,

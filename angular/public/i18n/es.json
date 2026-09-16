@@ -1005,6 +1005,21 @@
       "adv_hint": "(para expertos — reemplaza la plantilla con su HTML; tokens",
       "f_html_recto": "HTML anverso",
       "f_html_verso": "HTML reverso"
+    },
+    "manifest": {
+      "title": "Config. manifiestos",
+      "subtitle": "Encabezado y pie de los manifiestos",
+      "header": "Encabezado",
+      "footer": "Pie (firmas)",
+      "brand_name": "Nombre mostrado",
+      "slogan": "Eslogan",
+      "head_office": "Dirección / sede",
+      "phones": "Teléfonos",
+      "agencies_line": "Agencias",
+      "logo": "Logo",
+      "sign_voyage": "Firmas — Viaje",
+      "sign_colis": "Firmas — Paquetes / Equipaje",
+      "add": "Añadir"
     }
   },
   "trips": {
@@ -1112,7 +1127,11 @@
       "pc_pieces": "Piezas",
       "empty_pc": "Sin paquetes cargados.",
       "unavailable": "Hoja de ruta no disponible.",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "pdf_passengers": "Manifiesto de pasajeros",
+      "pdf_accounting": "Contabilización",
+      "pdf_colis": "Manifiesto de paquetes",
+      "pdf_baggage": "Manifiesto de equipaje"
     },
     "detail": {
       "submit": "Enviar",

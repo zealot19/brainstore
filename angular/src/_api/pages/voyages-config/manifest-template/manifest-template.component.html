@@ -1,0 +1,58 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'vcfg.manifest.title' | transloco }}</h4><h6>{{ 'vcfg.manifest.subtitle' | transloco }}</h6></div></div>
+</div>
+
+<div class="row">
+  <!-- En-tête -->
+  <div class="col-lg-7">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">{{ 'vcfg.manifest.header' | transloco }}</h6>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">{{ 'vcfg.manifest.brand_name' | transloco }}</label>
+          <input class="form-control" [(ngModel)]="tpl.brand_name" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'vcfg.manifest.slogan' | transloco }}</label>
+          <input class="form-control" [(ngModel)]="tpl.slogan" /></div>
+        <div class="col-12"><label class="form-label">{{ 'vcfg.manifest.head_office' | transloco }}</label>
+          <input class="form-control" [(ngModel)]="tpl.head_office" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'vcfg.manifest.phones' | transloco }}</label>
+          <input class="form-control" [(ngModel)]="tpl.phones" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'vcfg.manifest.agencies_line' | transloco }}</label>
+          <input class="form-control" [(ngModel)]="tpl.agencies_line" /></div>
+        <div class="col-md-6">
+          <label class="form-label">{{ 'vcfg.manifest.logo' | transloco }}</label>
+          <input type="file" class="form-control" accept="image/*" (change)="onLogo($event)" />
+          @if (tpl.logo_url && !logoFile) { <img [src]="tpl.logo_url" alt="logo" style="height:48px;margin-top:8px" /> }
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Pied : signatures -->
+  <div class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">{{ 'vcfg.manifest.footer' | transloco }}</h6>
+
+      <label class="form-label">{{ 'vcfg.manifest.sign_voyage' | transloco }}</label>
+      @for (s of tpl.sign_labels_voyage; track trackByIndex($index)) {
+        <div class="input-group mb-2">
+          <input class="form-control" [(ngModel)]="tpl.sign_labels_voyage[$index]" />
+          <button class="btn btn-outline-danger" type="button" (click)="removeVoyage($index)"><i class="ti ti-x"></i></button>
+        </div>
+      }
+      <button class="btn btn-sm btn-outline-secondary mb-3" type="button" (click)="addVoyage()"><i class="ti ti-plus me-1"></i>{{ 'vcfg.manifest.add' | transloco }}</button>
+
+      <label class="form-label">{{ 'vcfg.manifest.sign_colis' | transloco }}</label>
+      @for (s of tpl.sign_labels_colis; track trackByIndex($index)) {
+        <div class="input-group mb-2">
+          <input class="form-control" [(ngModel)]="tpl.sign_labels_colis[$index]" />
+          <button class="btn btn-outline-danger" type="button" (click)="removeColis($index)"><i class="ti ti-x"></i></button>
+        </div>
+      }
+      <button class="btn btn-sm btn-outline-secondary" type="button" (click)="addColis()"><i class="ti ti-plus me-1"></i>{{ 'vcfg.manifest.add' | transloco }}</button>
+    </div></div>
+  </div>
+</div>
+
+<button class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()" [disabled]="saving">
+  <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
+</button>

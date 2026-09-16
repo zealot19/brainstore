@@ -48,5 +48,12 @@ export class VbRoadmapComponent implements OnInit {
     window.addEventListener('afterprint', cleanup);
     setTimeout(() => window.print(), 50);
   }
+  /** Bordereau PDF (en-tête/pied configurables via « Config manifestes »). */
+  openPdf(doc: 'voyages' | 'comptabilisation' | 'colis' | 'bagages'): void {
+    this.svc.pdf(this.tripId, doc).subscribe({
+      next: blob => window.open(URL.createObjectURL(blob), '_blank'),
+      error: () => this.toast.error("Génération PDF indisponible sur ce serveur."),
+    });
+  }
   back(): void { this.router.navigate(['/voyages/list']); }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { TripService } from '../../../services/voyages/trip.service';
+import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { Trip } from '../../../models/voyages.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -25,7 +26,7 @@ export class VcgManifestComponent implements OnInit {
   totals = { count: 0, weight: 0 };
   selReady = new Set<string>();
 
-  constructor(private parcels: ParcelService, private tripSvc: TripService) {}
+  constructor(private parcels: ParcelService, private tripSvc: TripService, private roadmap: RoadmapService) {}
   ngOnInit(): void {
     this.tripSvc.list({ status: 'pending' }).subscribe(t => this.allTrips = t ?? []);
     this.refresh();
@@ -107,5 +108,11 @@ export class VcgManifestComponent implements OnInit {
     if (!this.selReady.size) { this.toast.error('Aucun colis sélectionné.'); return; }
     this.parcels.bulk([...this.selReady], 'dispatch').subscribe({ next: () => { this.toast.success('Colis expédiés.'); this.refresh(); }, error: this.err });
   }
-  printManifest(): void { if (this.tripId) window.open(`/api/v1/voyages/consignment/trips/${this.tripId}/manifest/`, '_blank'); }
+  printManifest(): void {
+    if (!this.tripId) return;
+    this.roadmap.pdf(this.tripId, 'colis').subscribe({
+      next: blob => window.open(URL.createObjectURL(blob), '_blank'),
+      error: () => this.toast.error("Génération PDF indisponible sur ce serveur."),
+    });
+  }
 }

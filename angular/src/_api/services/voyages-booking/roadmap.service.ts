@@ -15,7 +15,7 @@ export class RoadmapService {
     return this.http.post<any>(VOYAGES_BOOKING.tripBoardAll(tripId), {}).pipe(map(r => r.data ?? r));
   }
   /** PDF WeasyPrint du bordereau (doc = 'voyages' | 'colis'). */
-  pdf(tripId: string, doc: 'voyages' | 'colis'): Observable<Blob> {
+  pdf(tripId: string, doc: 'voyages' | 'comptabilisation' | 'colis' | 'bagages'): Observable<Blob> {
     const params = new HttpParams().set('doc', doc);
     return this.http.get(VOYAGES_BOOKING.tripRoadmapPdf(tripId), { params, responseType: 'blob' });
   }

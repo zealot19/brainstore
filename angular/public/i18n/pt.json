@@ -1005,6 +1005,21 @@
       "adv_hint": "(para especialistas — substitui o modelo pelo seu HTML; tokens",
       "f_html_recto": "HTML frente",
       "f_html_verso": "HTML verso"
+    },
+    "manifest": {
+      "title": "Config. manifestos",
+      "subtitle": "Cabeçalho e rodapé dos manifestos",
+      "header": "Cabeçalho",
+      "footer": "Rodapé (assinaturas)",
+      "brand_name": "Nome exibido",
+      "slogan": "Slogan",
+      "head_office": "Direção / sede",
+      "phones": "Telefones",
+      "agencies_line": "Agências",
+      "logo": "Logo",
+      "sign_voyage": "Assinaturas — Viagem",
+      "sign_colis": "Assinaturas — Encomendas / Bagagens",
+      "add": "Adicionar"
     }
   },
   "trips": {
@@ -1112,7 +1127,11 @@
       "pc_pieces": "Peças",
       "empty_pc": "Sem encomendas carregadas.",
       "unavailable": "Folha de rota indisponível.",
-      "retry": "Tentar novamente"
+      "retry": "Tentar novamente",
+      "pdf_passengers": "Manifesto de passageiros",
+      "pdf_accounting": "Contabilização",
+      "pdf_colis": "Manifesto de encomendas",
+      "pdf_baggage": "Manifesto de bagagens"
     },
     "detail": {
       "submit": "Submeter",

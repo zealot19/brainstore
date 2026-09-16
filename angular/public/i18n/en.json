@@ -1005,6 +1005,21 @@
       "adv_hint": "(for experts — replaces the template with your HTML; tokens",
       "f_html_recto": "Front HTML",
       "f_html_verso": "Back HTML"
+    },
+    "manifest": {
+      "title": "Manifest settings",
+      "subtitle": "Bordereau header and footer",
+      "header": "Header",
+      "footer": "Footer (signatures)",
+      "brand_name": "Display name",
+      "slogan": "Slogan",
+      "head_office": "Head office",
+      "phones": "Phones",
+      "agencies_line": "Agencies",
+      "logo": "Logo",
+      "sign_voyage": "Signatures — Voyage",
+      "sign_colis": "Signatures — Parcels / Baggage",
+      "add": "Add"
     }
   },
   "trips": {
@@ -1112,7 +1127,11 @@
       "pc_pieces": "Pieces",
       "empty_pc": "No parcels loaded.",
       "unavailable": "Roadmap unavailable.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "pdf_passengers": "Passenger manifest",
+      "pdf_accounting": "Accounting",
+      "pdf_colis": "Parcel manifest",
+      "pdf_baggage": "Baggage manifest"
     },
     "detail": {
       "submit": "Submit",
