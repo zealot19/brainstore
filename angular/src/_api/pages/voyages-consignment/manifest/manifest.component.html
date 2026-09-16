@@ -10,21 +10,21 @@
     <button class="btn" [class.btn-primary]="mode==='sans'" [class.btn-outline-primary]="mode!=='sans'" (click)="setMode('sans')">{{ 'cons.expedition.mode_sans' | transloco }}</button>
   </div>
 
-  <!-- Bandeau de filtres du voyage -->
+  <!-- Bandeau de filtres du voyage (options issues de la config). -->
   @if (mode === 'voyage') {
     <div class="row g-2 mb-3">
       <div class="col-6 col-md">
         <label class="form-label small mb-1">{{ 'cons.expedition.f_route' | transloco }}</label>
         <select class="form-select" [(ngModel)]="fRoute" (ngModelChange)="onFiltersChange()">
           <option value="">{{ 'cons.expedition.all' | transloco }}</option>
-          @for (r of routeOptions; track r) { <option [value]="r">{{ r }}</option> }
+          @for (r of routes; track r.id) { <option [value]="r.id">{{ r.code }}{{ r.label ? ' — ' + r.label : '' }}</option> }
         </select>
       </div>
       <div class="col-6 col-md">
         <label class="form-label small mb-1">{{ 'cons.expedition.f_dest' | transloco }}</label>
         <select class="form-select" [(ngModel)]="fDest" (ngModelChange)="onFiltersChange()">
           <option value="">{{ 'cons.expedition.all' | transloco }}</option>
-          @for (d of destOptions; track d) { <option [value]="d">{{ d }}</option> }
+          @for (d of destinations; track d.id) { <option [value]="d.id">{{ d.name }}</option> }
         </select>
       </div>
       <div class="col-6 col-md">
@@ -35,19 +35,12 @@
         <label class="form-label small mb-1">{{ 'cons.expedition.f_time' | transloco }}</label>
         <select class="form-select" [(ngModel)]="fTime" (ngModelChange)="onFiltersChange()">
           <option value="">{{ 'cons.expedition.all' | transloco }}</option>
-          @for (h of timeOptions; track h) { <option [value]="h">{{ h }}</option> }
+          @for (ts of timeslots; track ts.id) { <option [value]="ts.start_time">{{ ts.label || ts.start_time }}</option> }
         </select>
       </div>
-      <div class="col-6 col-md">
+      <div class="col-12 col-md">
         <label class="form-label small mb-1">{{ 'cons.expedition.f_vehicle' | transloco }}</label>
-        <select class="form-select" [(ngModel)]="fVehicle" (ngModelChange)="onFiltersChange()">
-          <option value="">{{ 'cons.expedition.all' | transloco }}</option>
-          @for (v of vehicleOptions; track v) { <option [value]="v">{{ v }}</option> }
-        </select>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label small mb-1">{{ 'cons.common.f_trip' | transloco }}</label>
-        <select class="form-select" [(ngModel)]="tripId" (ngModelChange)="onTripChange()">
+        <select class="form-select" [(ngModel)]="tripId" (ngModelChange)="refresh()">
           <option value="">{{ 'cons.manifest.opt_choose_trip' | transloco }}</option>
           @for (t of filteredTrips; track t.id) { <option [value]="t.id">{{ tripLabel(t) }}</option> }
         </select>

@@ -4,9 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { TripService } from '../../../services/voyages/trip.service';
 import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
+import { RouteService } from '../../../services/voyages-config/route.service';
+import { ServicePointService } from '../../../services/voyages-config/service-point.service';
+import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { printBlob } from '../../../../app/shared/print/print.util';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { Trip } from '../../../models/voyages.models';
+import { Route, ServicePoint, TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
@@ -19,60 +23,63 @@ import { TranslocoModule } from '@jsverse/transloco';
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
-  allTrips: Trip[] = []; tripId = '';
+  allTrips: Trip[] = [];
+  routes: Route[] = []; destinations: ServicePoint[] = []; timeslots: TimeSlot[] = [];
   mode: 'voyage' | 'sans' = 'voyage';
-  // Filtres du bandeau (comme l'écran d'expédition historique)
-  fRoute = ''; fDest = ''; fDay = ''; fTime = ''; fVehicle = '';
+  // Filtres : options issues de la config (trajets, destinations, plages) ;
+  // « Véhicule / Code » identifie directement le voyage (pas de champ Voyage séparé).
+  fRoute = ''; fDest = ''; fDay = ''; fTime = ''; tripId = '';
   ready: Parcel[] = []; assigned: Parcel[] = [];
   totals = { count: 0, weight: 0 };
   selReady = new Set<string>();
 
-  constructor(private parcels: ParcelService, private tripSvc: TripService, private roadmap: RoadmapService) {}
+  constructor(private parcels: ParcelService, private tripSvc: TripService,
+              private roadmap: RoadmapService, private routeSvc: RouteService,
+              private spSvc: ServicePointService, private tsSvc: TimeSlotService) {}
+
   ngOnInit(): void {
     this.tripSvc.list({ status: 'pending' }).subscribe(t => this.allTrips = t ?? []);
+    this.routeSvc.list().subscribe(r => this.routes = r ?? []);
+    this.spSvc.list().subscribe(s => this.destinations = (s ?? []).filter(x => x.station_kind === 'AGENCY'));
+    this.tsSvc.list().subscribe(t => this.timeslots = t ?? []);
     this.refresh();
   }
 
-  // ── Options de filtre (valeurs distinctes des voyages chargeables) ───────────
   private dtDay(t: Trip): string { return (t.scheduled_departure || '').slice(0, 10); }
   private dtTime(t: Trip): string { return (t.scheduled_departure || '').slice(11, 16); }
-  private uniq(v: (string | null | undefined)[]): string[] {
-    return [...new Set(v.filter((x): x is string => !!x))].sort();
-  }
-  get routeOptions(): string[] { return this.uniq(this.allTrips.map(t => t.route_code)); }
-  get destOptions(): string[] { return this.uniq(this.allTrips.map(t => t.destination_name)); }
-  get timeOptions(): string[] { return this.uniq(this.allTrips.map(t => this.dtTime(t))); }
-  get vehicleOptions(): string[] { return this.uniq(this.allTrips.map(t => t.vehicle_plate || t.code)); }
 
+  /** Voyages chargeables correspondant aux filtres (leur liste = le sélecteur Véhicule/Code). */
   get filteredTrips(): Trip[] {
     return this.allTrips.filter(t =>
-      (!this.fRoute || t.route_code === this.fRoute) &&
-      (!this.fDest || t.destination_name === this.fDest) &&
+      (!this.fRoute || t.route === this.fRoute) &&
+      (!this.fDest || t.destination === this.fDest) &&
       (!this.fDay || this.dtDay(t) === this.fDay) &&
-      (!this.fTime || this.dtTime(t) === this.fTime) &&
-      (!this.fVehicle || (t.vehicle_plate || t.code) === this.fVehicle));
+      (!this.fTime || this.dtTime(t) === this.fTime.slice(0, 5)));
   }
   tripLabel(t: Trip): string {
-    return `${t.number || t.code} · ${t.origin_name} → ${t.destination_name} · ${(t.scheduled_departure || '').slice(0, 16).replace('T', ' ')}` +
-           (t.vehicle_plate ? ` · ${t.vehicle_plate}` : '');
+    const ref = t.vehicle_plate || t.code || t.number;
+    return `${ref} · ${(t.scheduled_departure || '').slice(0, 16).replace('T', ' ')}`;
   }
+  get selectedTrip(): Trip | undefined { return this.allTrips.find(t => t.id === this.tripId); }
+
   onFiltersChange(): void {
-    // Si le voyage sélectionné n'est plus dans la liste filtrée, le désélectionner.
-    if (this.tripId && !this.filteredTrips.some(t => t.id === this.tripId)) { this.tripId = ''; }
-    // Auto-sélection quand un seul voyage correspond.
+    // Le véhicule sélectionné doit rester cohérent avec les filtres.
+    if (this.tripId && !this.filteredTrips.some(t => t.id === this.tripId)) this.tripId = '';
     if (!this.tripId && this.filteredTrips.length === 1) this.tripId = this.filteredTrips[0].id;
     this.refresh();
   }
+  setMode(m: 'voyage' | 'sans'): void { this.mode = m; this.tripId = ''; this.refresh(); }
 
   refresh(): void {
     this.selReady.clear();
-    this.parcels.expedition({ trip: this.mode === 'voyage' ? this.tripId : undefined }).subscribe(d => {
+    const st = this.selectedTrip;
+    // Pool « à expédier » restreint à la destination du voyage sélectionné (ou au filtre destination).
+    const destination = st?.destination || this.fDest || undefined;
+    this.parcels.expedition({ trip: this.mode === 'voyage' ? this.tripId : undefined, destination }).subscribe(d => {
       this.ready = d.ready ?? []; this.assigned = d.assigned ?? [];
       this.totals = d.totals ?? { count: 0, weight: 0 };
     });
   }
-  setMode(m: 'voyage' | 'sans'): void { this.mode = m; this.tripId = ''; this.refresh(); }
-  onTripChange(): void { this.refresh(); }
 
   isSel(id: string): boolean { return this.selReady.has(id); }
   toggle(id: string): void { this.selReady.has(id) ? this.selReady.delete(id) : this.selReady.add(id); }
@@ -87,11 +94,11 @@ export class VcgManifestComponent implements OnInit {
   private err = (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.");
 
   assign(p: Parcel): void {
-    if (!this.tripId) { this.toast.error('Sélectionnez un voyage.'); return; }
+    if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
     this.parcels.assignTrip(p.id, this.tripId).subscribe({ next: () => this.refresh(), error: this.err });
   }
   assignSelected(): void {
-    if (!this.tripId) { this.toast.error('Sélectionnez un voyage.'); return; }
+    if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
     if (!this.selReady.size) { this.toast.error('Aucun colis sélectionné.'); return; }
     const ids = [...this.selReady]; let left = ids.length;
     ids.forEach(id => this.parcels.assignTrip(id, this.tripId).subscribe({
