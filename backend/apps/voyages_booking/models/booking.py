@@ -61,6 +61,7 @@ class Ticket(BaseModel):
         SOLD      = "sold",      _("Vendu")
         BOARDED   = "boarded",   _("Embarqué")
         CANCELLED = "cancelled", _("Annulé")
+        NO_SHOW   = "no_show",   _("Non présenté")
 
     booking    = models.ForeignKey("voyages_booking.Booking", verbose_name=_("réservation"),
                                     on_delete=models.CASCADE, related_name="tickets")

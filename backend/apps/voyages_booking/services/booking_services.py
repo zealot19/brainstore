@@ -251,6 +251,8 @@ def assign_return(booking, return_trip, *, items, user):
 def cancel_booking(booking, *, user):
     if booking.status == Booking.Status.CANCELLED:
         return booking
+    if booking.status == Booking.Status.BOARDED:
+        raise ApplicationError(_("Une réservation embarquée ne peut pas être annulée."))
     for t in booking.tickets.filter(is_deleted=False):
         seat = t.trip_seat
         seat.status = TripSeat.Status.AVAILABLE
@@ -285,6 +287,8 @@ def cancel_booking(booking, *, user):
 
 @transaction.atomic
 def board_ticket(ticket, *, user):
+    if ticket.booking.status in (Booking.Status.CANCELLED, Booking.Status.NO_SHOW):
+        raise ApplicationError(_("Cette réservation est annulée ou non présentée : embarquement impossible."))
     if ticket.status != Ticket.Status.SOLD:
         raise ApplicationError(_("Seul un billet vendu peut être embarqué."))
     if ticket.trip.status not in ("pending", "departed"):
@@ -319,4 +323,9 @@ def mark_no_show(booking, *, user):
     booking.status = Booking.Status.NO_SHOW
     booking.updated_by = user
     booking.save(update_fields=["status", "updated_by", "updated_at"])
+    # Propager aux billets pour que l'embarquement les refuse et que les listes reflètent l'absence.
+    for t in booking.tickets.filter(is_deleted=False, status=Ticket.Status.SOLD):
+        t.status = Ticket.Status.NO_SHOW
+        t.updated_by = user
+        t.save(update_fields=["status", "updated_by", "updated_at"])
     return booking
