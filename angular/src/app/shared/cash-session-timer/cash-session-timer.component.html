@@ -5,10 +5,14 @@
             [title]="session.register_name">
       <i class="ti ti-cash-register me-1"></i>{{ 'treasury.timer.do_billetage' | transloco }}
     </button>
-  } @else {
+  } @else if (showCountdown) {
     <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
       <i class="ti ti-clock-play me-1"></i>
       <span class="cst-time">{{ countdown }}</span>
+    </span>
+  } @else {
+    <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
+      <i class="ti ti-cash-register me-1"></i>{{ session.status_display }}
     </span>
   }
 }

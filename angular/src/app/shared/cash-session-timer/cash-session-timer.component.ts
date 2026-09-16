@@ -54,8 +54,11 @@ export class CashSessionTimerComponent implements OnInit, OnDestroy {
     return e ? new Date(e).getTime() : null;
   }
   get remainingMs(): number { const e = this.endMs; return e != null ? e - this.now : 0; }
-  /** Bouton billetage : pas de fin prévue, ou temps écoulé. */
-  get showBilletage(): boolean { return !!this.session && (this.endMs == null || this.remainingMs <= 0); }
+  /** Le billetage n'apparaît que lorsque la session planifiée est terminée
+   * (fin prévue dépassée). Une session sans fin prévue n'affiche pas le bouton. */
+  get showBilletage(): boolean { return !!this.session && this.endMs != null && this.remainingMs <= 0; }
+  /** Décompte tant que la fin prévue n'est pas atteinte. */
+  get showCountdown(): boolean { return !!this.session && this.endMs != null && this.remainingMs > 0; }
   get countdown(): string {
     let s = Math.max(0, Math.floor(this.remainingMs / 1000));
     const h = Math.floor(s / 3600); s -= h * 3600;
