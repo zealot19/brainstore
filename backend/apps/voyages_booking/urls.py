@@ -17,6 +17,7 @@ urlpatterns = [
     path("bookings/<uuid:pk>/", v.BookingDetailView.as_view()),
     path("bookings/<uuid:pk>/print/", v.BookingPrintView.as_view()),
     path("bookings/<uuid:pk>/render-tickets/", v.BookingRenderTicketsView.as_view()),
+    path("bookings/<uuid:pk>/duplicata/", v.BookingDuplicataView.as_view()),
     path("bookings/<uuid:pk>/assign-return/", v.BookingAssignReturnView.as_view()),
     path("bookings/<uuid:pk>/cancel/", v.BookingCancelView.as_view()),
     path("bookings/<uuid:pk>/no-show/", v.BookingNoShowView.as_view()),

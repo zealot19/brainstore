@@ -10,6 +10,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
@@ -52,6 +53,12 @@ export class VbBookingsComponent implements OnInit {
   }
   newBooking(): void { this.router.navigate(['/voyages-booking/bookings/new']); }
   open(b: Booking): void { this.router.navigate(['/voyages-booking/bookings', b.id]); }
+  printDuplicata(b: Booking): void {
+    this.svc.renderDuplicata(b.id).subscribe({
+      next: r => printHtml(r.html),
+      error: e => this.toast.error(e?.error?.detail ?? 'Impression impossible.'),
+    });
+  }
   cancel(b: Booking): void {
     if (!confirm('Annuler cette réservation ?')) return;
     this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Réservation annulée.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });

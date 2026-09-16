@@ -361,6 +361,7 @@ export const VOYAGES_BOOKING = {
   booking: (id: string) => `${VB}/bookings/${id}/`,
   bookingPrint: (id: string) => `${VB}/bookings/${id}/print/`,
   bookingRenderTickets: (id: string) => `${VB}/bookings/${id}/render-tickets/`,
+  bookingDuplicata: (id: string) => `${VB}/bookings/${id}/duplicata/`,
   bookingAssignReturn: (id: string) => `${VB}/bookings/${id}/assign-return/`,
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,

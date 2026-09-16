@@ -194,7 +194,8 @@
     "actions": {
       "new": "Venda de bilhetes",
       "detail": "Detalhe",
-      "noshow": "No-show"
+      "noshow": "No-show",
+      "duplicata": "Duplicata"
     },
     "filter": {
       "all_statuses": "Todos os estados",

@@ -194,7 +194,8 @@
     "actions": {
       "new": "Venta de billetes",
       "detail": "Detalle",
-      "noshow": "No-show"
+      "noshow": "No-show",
+      "duplicata": "Duplicado"
     },
     "filter": {
       "all_statuses": "Todos los estados",

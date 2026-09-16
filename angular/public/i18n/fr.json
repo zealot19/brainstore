@@ -194,7 +194,8 @@
     "actions": {
       "new": "Vente de billets",
       "detail": "Détail",
-      "noshow": "No-show"
+      "noshow": "No-show",
+      "duplicata": "Duplicata"
     },
     "filter": {
       "all_statuses": "Tous les statuts",

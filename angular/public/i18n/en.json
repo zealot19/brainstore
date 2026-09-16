@@ -194,7 +194,8 @@
     "actions": {
       "new": "Ticket sale",
       "detail": "Details",
-      "noshow": "No-show"
+      "noshow": "No-show",
+      "duplicata": "Duplicate"
     },
     "filter": {
       "all_statuses": "All statuses",
