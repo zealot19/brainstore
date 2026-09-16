@@ -516,7 +516,11 @@
       "sched_end": "Fin prevista",
       "report": "Informe",
       "closed_at": "Cerrada el",
-      "opening_hint": "A menudo 0: aprovisiónela luego con una transferencia. El arqueo se hace al cierre."
+      "opening_hint": "A menudo 0: aprovisiónela luego con una transferencia. El arqueo se hace al cierre.",
+      "schedule_title": "Programar una sesión",
+      "schedule_submit": "Programar",
+      "open_scheduled_btn": "Abrir",
+      "open_scheduled_title": "Abrir la sesión programada"
     },
     "movement": {
       "title": "Movimientos",

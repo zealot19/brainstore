@@ -1,6 +1,9 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.session.title' | transloco }}</h4><h6>{{ 'treasury.session.subtitle' | transloco }}</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-open-modal" *hasPermission="'treasury.session.manage'" (click)="openCreate()"><i class="ti ti-lock-open me-2"></i>{{ 'treasury.session.open_btn' | transloco }}</a></div>
+  <div class="page-btn d-flex gap-2">
+    <a href="javascript:void(0);" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#trz-schedule-modal" *hasPermission="'treasury.session.manage'" (click)="openSchedule()"><i class="ti ti-calendar-plus me-2"></i>{{ 'treasury.session.schedule_btn' | transloco }}</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-open-modal" *hasPermission="'treasury.session.manage'" (click)="openCreate()"><i class="ti ti-lock-open me-2"></i>{{ 'treasury.session.open_btn' | transloco }}</a>
+  </div>
 </div>
 <app-info-banner [text]="'treasury.session.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
@@ -39,10 +42,11 @@
               <td><span class="badge {{ statusCss(s.status) }}">{{ s.status_display }}</span></td>
               <td>{{ s.opening_balance ?? '—' }}</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center flex-wrap gap-1">
+                @if (s.status === 'draft' && canOpenDraft(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-open-scheduled-modal" *hasPermission="'treasury.session.manage'" (click)="openOpenScheduled(s)"><i class="ti ti-lock-open me-1"></i>{{ 'treasury.session.open_scheduled_btn' | transloco }}</a> }
                 @if (s.status === 'open' && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="suspend(s)"><i class="ti ti-player-pause me-1"></i>{{ 'treasury.session.suspend' | transloco }}</a> }
                 @if (s.status === 'suspended' && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="resume(s)"><i class="ti ti-player-play me-1"></i>{{ 'treasury.session.resume' | transloco }}</a> }
                 @if ((s.status === 'draft' || s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-extend-modal" (click)="openExtend(s)"><i class="ti ti-clock-plus me-1"></i>{{ 'treasury.session.extend' | transloco }}</a> }
-                @if ((s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
+                @if ((s.status === 'open' || s.status === 'suspended') && canClose(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
                 @if (s.status === 'closed') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-report-modal" (click)="openReport(s)"><i class="ti ti-file-text me-1"></i>{{ 'treasury.session.report' | transloco }}</a> }
                 @if (s.status === 'closed' && isAdmin) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="reopen(s)"><i class="ti ti-refresh me-1"></i>{{ 'treasury.session.reopen' | transloco }}</a> }
               </div></td>
@@ -68,6 +72,37 @@
       <input formControlName="opening_balance" type="number" class="form-control" />
       <small class="text-muted d-block mt-1">{{ 'treasury.session.opening_hint' | transloco }}</small></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
+</div></div></div>
+
+<!-- Planifier une session (assignée à un guichetier ; ouverte plus tard par un gestionnaire) -->
+<div class="modal fade" id="trz-schedule-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.schedule_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="scheduleForm" (ngSubmit)="submitSchedule()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="cash_register_id" class="form-select" (ngModelChange)="onScheduleRegisterChange()"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_guichetier' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="assigned_to_id" class="form-select" [attr.disabled]="!scheduleForm.value.cash_register_id ? true : null"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (g of guichetiers; track g.id) { <option [ngValue]="g.id">{{ g.full_name }}</option> }</select>
+      @if (scheduleForm.value.cash_register_id && !guichetiers.length) { <small class="text-muted d-block mt-1">{{ 'treasury.session.no_guichetier' | transloco }}</small> }
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.session.sched_start' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_start" type="datetime-local" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.session.sched_end' | transloco }}</label><input formControlName="scheduled_end" type="datetime-local" class="form-control" /></div>
+    </div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="scheduleForm.invalid || saving">{{ 'treasury.session.schedule_submit' | transloco }}</button></div></form>
+</div></div></div>
+
+<!-- Ouvrir une session planifiée -->
+<div class="modal fade" id="trz-open-scheduled-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.open_scheduled_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label>
+      <input type="number" class="form-control" [(ngModel)]="openScheduledBalance" />
+      <small class="text-muted d-block mt-1">{{ 'treasury.session.opening_hint' | transloco }}</small></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving" (click)="submitOpenScheduled()">{{ 'treasury.session.open_submit' | transloco }}</button></div>
 </div></div></div>
 
 <!-- Prolonger -->

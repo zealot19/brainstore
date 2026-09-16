@@ -138,9 +138,11 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
         raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
-    # Un gestionnaire de la caisse (ou un admin) peut clôturer.
-    if not is_cash_manager(updated_by, session.cash_register):
-        raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
+    # Un gestionnaire de la caisse, l'agent assigné (guichetier) ou un admin peut
+    # clôturer : le guichetier fait le billetage de fin sur la session qui lui est assignée.
+    if not (is_cash_manager(updated_by, session.cash_register)
+            or session.assigned_to_id == getattr(updated_by, "id", None)):
+        raise ApplicationError(_("Seul le gestionnaire ou l'agent assigné peut clôturer cette session."))
 
     # Montant compté : billetage prioritaire, sinon montant saisi.
     if closing_count:

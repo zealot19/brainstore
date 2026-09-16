@@ -1,7 +1,7 @@
 import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SessionService } from '../../../services/treasury/session.service';
+import { SessionService, Guichetier } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
 import { DenominationService } from '../../../services/treasury/denomination.service';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -25,10 +25,12 @@ export class TrzSessionsComponent implements OnInit {
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
   denoms: CurrencyDenomination[] = [];
+  guichetiers: Guichetier[] = [];
 
   extendForm!: FormGroup;
   saving = false; errorMsg = '';
   closingId: string | null = null; extendId: string | null = null;
+  openScheduledId: string | null = null; openScheduledBalance: number | null = 0;
 
   // Billetage (clôture uniquement)
   closeBilletage = true; closeQty: Record<string, number> = {}; closeManual: number | null = null;
@@ -45,12 +47,21 @@ export class TrzSessionsComponent implements OnInit {
   private get me(): any { return this.auth.currentUser; }
   get isAdmin(): boolean { const u = this.me; return !!u && (!!u.is_superuser || !!u.is_institution_admin); }
   canManage(s: CashSession): boolean { return this.isAdmin || s.opened_by === this.me?.id; }
+  // Le guichetier assigné n'ouvre pas la session : un gestionnaire le fait.
+  canOpenDraft(s: CashSession): boolean { return this.isAdmin || s.assigned_to !== this.me?.id; }
+  // La clôture (billetage de fin) est aussi permise au guichetier assigné.
+  canClose(s: CashSession): boolean { return this.canManage(s) || s.assigned_to === this.me?.id; }
 
   openForm!: FormGroup;
+  scheduleForm!: FormGroup;
 
   ngOnInit(): void {
     this.openForm = this.fb.group({
       cash_register_id: [null, Validators.required], name: [''], opening_balance: [0],
+    });
+    this.scheduleForm = this.fb.group({
+      cash_register_id: [null, Validators.required], assigned_to_id: [null, Validators.required],
+      name: [''], scheduled_start: ['', Validators.required], scheduled_end: [''],
     });
     this.extendForm = this.fb.group({ scheduled_end: ['', Validators.required] });
     this.regSvc.list().subscribe({ next: d => this.registers = d.filter(r => r.is_active) });
@@ -76,6 +87,32 @@ export class TrzSessionsComponent implements OnInit {
     if (this.openForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     this.svc.open(this.openForm.value).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Session ouverte.'); this.close('trz-open-modal'); },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
+  }
+
+  // ── Planifier une session (par un gestionnaire, assignée à un guichetier) ──
+  openSchedule(): void {
+    this.errorMsg = ''; this.guichetiers = [];
+    this.scheduleForm.reset({ cash_register_id: null, assigned_to_id: null, name: '', scheduled_start: '', scheduled_end: '' });
+  }
+  onScheduleRegisterChange(): void {
+    const rid = this.scheduleForm.value.cash_register_id;
+    this.scheduleForm.patchValue({ assigned_to_id: null }); this.guichetiers = [];
+    if (rid) this.svc.guichetiers(rid).subscribe({ next: g => this.guichetiers = g });
+  }
+  submitSchedule(): void {
+    if (this.scheduleForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
+    this.svc.schedule(this.scheduleForm.value).subscribe({
+      next: () => { this.saving = false; this.load(); this.toast.success('Session planifiée.'); this.close('trz-schedule-modal'); },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
+  }
+
+  // ── Ouvrir une session planifiée (par un gestionnaire) ──
+  openOpenScheduled(s: CashSession): void { this.openScheduledId = s.id; this.errorMsg = ''; this.openScheduledBalance = s.opening_balance != null ? +s.opening_balance : 0; }
+  submitOpenScheduled(): void {
+    if (this.saving || !this.openScheduledId) return; this.saving = true; this.errorMsg = '';
+    this.svc.openScheduled(this.openScheduledId, { opening_balance: this.openScheduledBalance }).subscribe({
+      next: () => { this.saving = false; this.load(); this.toast.success('Session ouverte.'); this.close('trz-open-scheduled-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
   }
 

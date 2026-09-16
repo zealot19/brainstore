@@ -516,7 +516,11 @@
       "sched_end": "Fim previsto",
       "report": "Relatório",
       "closed_at": "Fechada em",
-      "opening_hint": "Muitas vezes 0: abasteça depois por transferência. A contagem é feita no fecho."
+      "opening_hint": "Muitas vezes 0: abasteça depois por transferência. A contagem é feita no fecho.",
+      "schedule_title": "Agendar uma sessão",
+      "schedule_submit": "Agendar",
+      "open_scheduled_btn": "Abrir",
+      "open_scheduled_title": "Abrir a sessão agendada"
     },
     "movement": {
       "title": "Movimentos",

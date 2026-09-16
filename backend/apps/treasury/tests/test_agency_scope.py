@@ -51,8 +51,11 @@ def test_open_session_blocked_on_other_agency():
 
 @pytest.mark.django_db
 def test_open_session_allowed_on_own_agency():
+    # Depuis le ré-alignement du spec (c9bd76db), l'ouverture exige d'être
+    # gestionnaire de la caisse (et non un simple guichetier de l'agence).
     from apps.treasury.services.services import open_session
     company, admin, guichet, ag_a, ag_b, reg_a, reg_b = _setup()
+    reg_a.managers.add(guichet)
     s = open_session(company=company, cash_register=reg_a, created_by=guichet)
     assert s.status == "open"
 

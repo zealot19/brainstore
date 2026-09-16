@@ -516,7 +516,11 @@
       "sched_end": "Fin prévue",
       "report": "Rapport",
       "closed_at": "Clôturée le",
-      "opening_hint": "Souvent 0 : approvisionnez ensuite par un transfert. Le billetage se fait à la clôture."
+      "opening_hint": "Souvent 0 : approvisionnez ensuite par un transfert. Le billetage se fait à la clôture.",
+      "schedule_title": "Planifier une session",
+      "schedule_submit": "Planifier",
+      "open_scheduled_btn": "Ouvrir",
+      "open_scheduled_title": "Ouvrir la session planifiée"
     },
     "movement": {
       "title": "Mouvements",

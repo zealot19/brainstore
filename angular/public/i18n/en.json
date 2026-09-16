@@ -516,7 +516,11 @@
       "sched_end": "Planned end",
       "report": "Report",
       "closed_at": "Closed at",
-      "opening_hint": "Often 0: fund it later via a transfer. Cash counting is done at close."
+      "opening_hint": "Often 0: fund it later via a transfer. Cash counting is done at close.",
+      "schedule_title": "Schedule a session",
+      "schedule_submit": "Schedule",
+      "open_scheduled_btn": "Open",
+      "open_scheduled_title": "Open the scheduled session"
     },
     "movement": {
       "title": "Movements",
