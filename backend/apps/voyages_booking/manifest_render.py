@@ -43,6 +43,21 @@ def _trip_line(t: dict) -> str:
             f'Véhicule {_e(t.get("vehicle_plate")) or "—"}</div>')
 
 
+def _printed_line(tpl: dict) -> str:
+    """Ligne « Agence : … — Imprimé le … par … » (traçabilité de l'impression)."""
+    ag = tpl.get("printed_agency")
+    at = tpl.get("printed_at")
+    by = tpl.get("printed_by")
+    if not (ag or at):
+        return ""
+    parts = []
+    if ag:
+        parts.append(f'Agence : {_e(ag)}')
+    if at:
+        parts.append(f'Imprimé le {_e(at)}' + (f' par {_e(by)}' if by else ''))
+    return f'<div class="printed">{" — ".join(parts)}</div>'
+
+
 def manifest_footer_html(labels) -> str:
     labels = labels or []
     if not labels:
@@ -138,7 +153,7 @@ _BUILDERS = {
 def render_manifest_pdf(data: dict, doc: str, tpl: dict) -> bytes:
     from weasyprint import HTML
     builder = _BUILDERS.get(doc, build_passenger_manifest)
-    body = manifest_header_html(tpl) + builder(data, tpl)
+    body = manifest_header_html(tpl) + _printed_line(tpl) + builder(data, tpl)
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
     html = f"""<html><head><meta charset="utf-8"><style>
       @page {{ size: A4 portrait; margin: 12mm 10mm; }}
@@ -151,7 +166,8 @@ def render_manifest_pdf(data: dict, doc: str, tpl: dict) -> bytes:
       .co-ids {{ color:#333; font-size:9px; }}
       h1 {{ font-size:14px; margin:12px 0 2px; text-transform:uppercase; text-decoration:underline; }}
       h2 {{ font-size:11px; margin:12px 0 4px; }}
-      .trip {{ margin-bottom:8px; font-size:9px; }}
+      .trip {{ margin-bottom:4px; font-size:9px; }}
+      .printed {{ margin-bottom:8px; font-size:9px; color:#333; font-style:italic; }}
       table {{ width:100%; border-collapse:collapse; margin-bottom:6px; }}
       th, td {{ border:1px solid #999; padding:3px 5px; font-size:9px; }}
       th {{ background:#eee; text-align:left; }}
