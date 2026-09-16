@@ -210,9 +210,9 @@ class CashSessionListView(APIView):
 class MyActiveSessionView(APIView):
     """Session de caisse ouverte de l'utilisateur courant (ouverte par lui ou
     qui lui est assignée), ou null. Alimente le minuteur global + le billetage
-    de fin depuis n'importe quel écran."""
+    de fin depuis n'importe quel écran. Auto-limitée à l'appelant : pas de
+    permission caisse requise (le guichetier assigné n'a pas session.manage)."""
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.session.manage"}
 
     def get(self, request):
         session = selectors.get_open_session_for_user(_company(request).id, request.user)
@@ -247,8 +247,10 @@ class OpenSessionView(APIView):
 
 
 class CloseSessionView(APIView):
+    # Pas de permission_map figée : la clôture est autorisée au gestionnaire, à
+    # l'admin OU au guichetier assigné (billetage de fin). close_session applique
+    # cette règle ; le guichetier assigné n'a pas treasury.session.manage.
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"POST": "treasury.session.manage"}
 
     def post(self, request, session_id):
         company = _company(request)

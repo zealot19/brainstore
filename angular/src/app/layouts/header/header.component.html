@@ -39,7 +39,7 @@
       </ng-container>
 
       <!-- Minuteur de session de caisse (billetage de fin depuis tout écran) -->
-      <li class="nav-item me-3 d-inline-flex align-items-center" *hasPermission="'treasury.session.manage'">
+      <li class="nav-item me-3 d-inline-flex align-items-center" *hasPermission="['treasury.session.operate','treasury.session.manage','ticketing.booking.create','ticketing.parcel.manage','ticketing.luggage.manage']">
         <app-cash-session-timer />
       </li>
 

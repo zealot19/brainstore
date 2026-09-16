@@ -232,9 +232,18 @@ def get_open_session_for_user(company_id, user):
             .first())
 
 
+# Permissions qui font d'un utilisateur un « guichetier » (personnel de guichet).
+GUICHET_PERMS = (
+    "treasury.session.operate",
+    "ticketing.booking.create", "ticketing.parcel.manage", "ticketing.luggage.manage",
+)
+
+
 def list_guichetiers(company_id, agency_id=None):
-    """Utilisateurs assignables comme guichetiers : actifs, de l'agence donnée,
-    détenant la permission caisse (treasury.session.manage)."""
+    """Guichetiers assignables à une session : utilisateurs actifs de l'agence
+    qui font du guichet (permission caisse.operate OU vente billets/colis/bagages),
+    qui ne sont PAS gestionnaires de sessions (treasury.session.manage) et qui
+    n'ont pas déjà une session ouverte."""
     from django.contrib.auth import get_user_model
     from django.db.models import Q
     from apps.admin_rbac.selectors.user_role_selectors import has_permission
@@ -242,4 +251,9 @@ def list_guichetiers(company_id, agency_id=None):
     qs = User.objects.filter(company_id=company_id, is_active=True)
     if agency_id:
         qs = qs.filter(Q(default_agency_id=agency_id) | Q(user_agencies__agency_id=agency_id)).distinct()
-    return [u for u in qs if has_permission(u, "treasury.session.manage", company_id)]
+    return [
+        u for u in qs
+        if any(has_permission(u, p, company_id) for p in GUICHET_PERMS)
+        and not has_permission(u, "treasury.session.manage", company_id)
+        and get_open_session_for_user(company_id, u) is None
+    ]
