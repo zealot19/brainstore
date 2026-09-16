@@ -3,6 +3,14 @@ from django.utils import timezone
 from apps.core.models.sequence import Sequence
 
 
+def _point_code(point):
+    """Code d'un point (gare/agence) pour une référence : code du point de
+    service, à défaut code de son agence, sinon 'XX'."""
+    if not point:
+        return "XX"
+    return (getattr(point, "code", "") or (point.agency.code if getattr(point, "agency_id", None) else "") or "XX")
+
+
 @transaction.atomic
 def next_number(code: str, *, agency=None) -> str:
     """
@@ -36,3 +44,15 @@ def next_number(code: str, *, agency=None) -> str:
         seq.suffix,
     ] if p]
     return "/".join(parts)
+
+
+def daily_route_ref(scope, company_id, origin, destination, when=None):
+    """Référence style voyage : DEP-ARR-AAAAMMJJ-NNN (séquence journalière par
+    institution). Partagée par les billets et les colis pour un format homogène."""
+    when = when or timezone.now()
+    day = timezone.localtime(when).strftime("%Y%m%d")
+    seq_code = f"{scope}-{company_id}-{day}"
+    Sequence.objects.get_or_create(
+        code=seq_code, defaults={"name": f"{scope} {day}", "prefix": "", "padding": 3, "reset_yearly": False})
+    n = next_number(seq_code)  # préfixe/année vides -> juste le numéro « 001 »
+    return f"{_point_code(origin)}-{_point_code(destination)}-{day}-{n}"

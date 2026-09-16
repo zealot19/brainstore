@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.core.models import Sequence
-from apps.core.services.sequence_service import next_number
+from apps.core.services.sequence_service import next_number, daily_route_ref
 from apps.voyages_booking.models import Booking, Ticket, Passenger
 from apps.voyages_booking.services.passenger_services import get_or_create_passenger
 from apps.voyages_booking.services import loyalty_services
@@ -22,10 +22,9 @@ def _booking_reference(agency=None):
     return next_number("BOOK", agency=agency)
 
 
-def _ticket_number(agency=None):
-    Sequence.objects.get_or_create(
-        code="TKT", defaults={"name": "Billets", "prefix": "TKT", "padding": 5, "reset_yearly": True})
-    return next_number("TKT", agency=agency)
+def _ticket_number(trip, origin, destination):
+    """Numéro de billet, même style que la référence voyage : DEP-ARR-AAAAMMJJ-NNN."""
+    return daily_route_ref("TKT", trip.company_id, origin, destination, trip.scheduled_departure)
 
 
 def _assert_bookable(trip):
@@ -162,7 +161,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
 
         out_seat = _pick_seat(outbound_trip, item.get("outbound_seat_id"))
         out_ticket = Ticket.objects.create(
-            booking=booking, number=_ticket_number(outbound_trip.origin.agency), passenger=passenger, trip=outbound_trip,
+            booking=booking, number=_ticket_number(outbound_trip, outbound_trip.origin, dest), passenger=passenger, trip=outbound_trip,
             trip_seat=out_seat, origin_point=outbound_trip.origin, destination_point=dest,
             direction=Ticket.Direction.OUTBOUND, fare=fare, fare_class=outbound_trip.fare_class,
             amount=fare.amount, status=Ticket.Status.SOLD, created_by=user)
@@ -177,7 +176,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
                 raise ApplicationError(_("Un siège retour est requis pour chaque passager."))
             ret_seat = _pick_seat(return_trip, item.get("return_seat_id"))
             Ticket.objects.create(
-                booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=passenger, trip=return_trip,
+                booking=booking, number=_ticket_number(return_trip, return_trip.origin, return_trip.destination), passenger=passenger, trip=return_trip,
                 trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
                 direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
                 fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)
@@ -232,7 +231,7 @@ def assign_return(booking, return_trip, *, items, user):
             raise ApplicationError(_("Un billet retour existe déjà pour ce passager."))
         ret_seat = _pick_seat(return_trip, item.get("return_seat_id"))
         Ticket.objects.create(
-            booking=booking, number=_ticket_number(return_trip.origin.agency), passenger=out_ticket.passenger, trip=return_trip,
+            booking=booking, number=_ticket_number(return_trip, return_trip.origin, return_trip.destination), passenger=out_ticket.passenger, trip=return_trip,
             trip_seat=ret_seat, origin_point=return_trip.origin, destination_point=return_trip.destination,
             direction=Ticket.Direction.RETURN, return_of=out_ticket, fare=None,
             fare_class=return_trip.fare_class, amount=0, status=Ticket.Status.SOLD, created_by=user)

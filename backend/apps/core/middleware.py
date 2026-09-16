@@ -24,18 +24,42 @@ class TenantMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        from django.utils import timezone as djtz
+
         tenant_token = _current_tenant.set(None)
         user_token   = _current_user.set(None)
+        tz_activated = False
 
         try:
             tenant = self._resolve_tenant(request)
             _current_tenant.set(tenant)
+            if tenant and tenant.get("user_id"):
+                tz_activated = self._activate_user_tz(tenant["user_id"])
             response = self.get_response(request)
         finally:
+            if tz_activated:
+                djtz.deactivate()
             _current_tenant.reset(tenant_token)
             _current_user.reset(user_token)
 
         return response
+
+    def _activate_user_tz(self, user_id):
+        """Active le fuseau horaire de l'utilisateur pour la requête, afin que les
+        heures rendues côté serveur (bordereaux, reçus, rapports) soient à son
+        heure locale et non au fuseau serveur par défaut."""
+        from zoneinfo import ZoneInfo
+        from django.utils import timezone as djtz
+        from django.contrib.auth import get_user_model
+        tzname = (get_user_model().objects.filter(id=user_id)
+                  .values_list("timezone", flat=True).first())
+        if not tzname:
+            return False
+        try:
+            djtz.activate(ZoneInfo(tzname))
+            return True
+        except Exception:
+            return False
 
     def _resolve_tenant(self, request):
         """Résout le tenant depuis les claims du JWT (Authorization: Bearer …).

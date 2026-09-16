@@ -4,17 +4,16 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.core.models import Sequence
-from apps.core.services.sequence_service import next_number
+from apps.core.services.sequence_service import next_number, daily_route_ref
 from apps.voyages_consignment.models import Parcel, ParcelEvent
 
 _PRE_DEPARTURE = ["draft", "pending"]
 _ASSIGNABLE = (Parcel.Status.REGISTERED, Parcel.Status.READY_FOR_TRAVEL, Parcel.Status.LOADED)
 
 
-def _parcel_reference():
-    Sequence.objects.get_or_create(
-        code="COL", defaults={"name": "Colis", "prefix": "COL", "padding": 5, "reset_yearly": True})
-    return next_number("COL")
+def _parcel_reference(company_id, origin, destination):
+    """Référence colis, même style que la référence voyage : DEP-ARR-AAAAMMJJ-NNN."""
+    return daily_route_ref("COL", company_id, origin, destination)
 
 
 def _event(parcel, kind, *, from_status="", to_status="", trip=None, user=None, note=""):
@@ -43,7 +42,7 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
     parcel = Parcel.objects.create(
         company=company, agency=origin_point.agency,
-        reference=_parcel_reference(), status=Parcel.Status.READY_FOR_TRAVEL,
+        reference=_parcel_reference(company.id, origin_point, destination_point), status=Parcel.Status.READY_FOR_TRAVEL,
         origin_point=origin_point, destination_point=destination_point, consignment_type=consignment_type,
         sender_name=sender_name, sender_phone=sender_phone, recipient_name=recipient_name,
         recipient_phone=recipient_phone, recipient_address=recipient_address,

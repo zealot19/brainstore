@@ -72,13 +72,12 @@ def build_passenger_manifest(data: dict, tpl: dict) -> str:
     body = (
         f'<h1>Bordereau de route</h1>{_trip_line(data["trip"])}'
         '<table><thead><tr><th>S/N</th><th>Nom du passager</th><th>Téléphone</th>'
-        '<th>N° CNI</th><th>Destination</th><th>Siège</th><th>Bagages</th><th>Résultat</th></tr></thead><tbody>'
+        '<th>N° CNI</th><th>Destination</th><th>Siège</th><th>Bagages</th></tr></thead><tbody>'
         + _rows(list(enumerate(ps, 1)),
                 lambda ip: [str(ip[0]), _e(ip[1].get("passenger_name")), _e(ip[1].get("phone")),
                             _e(ip[1].get("id_number")), _e(ip[1].get("destination_point_name")),
-                            _e(ip[1].get("seat_number")), _e(ip[1].get("baggage_count") or 0),
-                            "Oui" if ip[1].get("boarded") else "Non"],
-                8, "Aucun passager.")
+                            _e(ip[1].get("seat_number")), _e(ip[1].get("baggage_count") or 0)],
+                7, "Aucun passager.")
         + '</tbody></table>'
     )
     return body + manifest_footer_html(tpl.get("sign_labels_voyage"))
