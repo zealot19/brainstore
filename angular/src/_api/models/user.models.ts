@@ -44,6 +44,7 @@ export interface UserStats {
 
 export interface UserCreateForm {
   email:                string;
+  username:             string;
   first_name:           string;
   last_name:            string;
   phone?:               string;
@@ -57,6 +58,7 @@ export interface UserCreateForm {
 }
 
 export interface UserUpdateForm {
+  username?:            string;
   first_name?:          string;
   last_name?:           string;
   phone?:               string;

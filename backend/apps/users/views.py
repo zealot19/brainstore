@@ -112,6 +112,7 @@ class UserListView(APIView):
                 created_by=request.user,
                 company=company,
                 email=d["email"],
+                username=d["username"],
                 first_name=d["first_name"],
                 last_name=d["last_name"],
                 phone=d.get("phone", ""),
@@ -163,6 +164,7 @@ class UserDetailView(APIView):
             user = services.update_user(
                 user,
                 updated_by=request.user,
+                username=d.get("username"),
                 first_name=d.get("first_name"),
                 last_name=d.get("last_name"),
                 phone=d.get("phone"),

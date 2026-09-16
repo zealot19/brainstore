@@ -1803,7 +1803,9 @@
     "f_new_pwd": "Nueva contraseña",
     "f_new_pwd_ph": "Mínimo 8 caracteres",
     "f_force_change": "Forzar el cambio en el próximo inicio de sesión",
-    "reset_submit": "Restablecer"
+    "reset_submit": "Restablecer",
+    "f_username": "Nombre de usuario",
+    "col_username": "Nombre de usuario"
   },
   "acct": {
     "common": {

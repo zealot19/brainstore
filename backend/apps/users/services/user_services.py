@@ -51,6 +51,7 @@ def create_user(
     language_code: str = "fr",
     user_timezone: str = "Africa/Abidjan",
     temp_password: str = None,
+    username: str = None,
 ):
     """
     Crée un utilisateur dans une institution.
@@ -62,7 +63,14 @@ def create_user(
 
     _check_user_limit(company)
 
-    username = _generate_username(email)
+    # Username choisi par l'admin (formulaire) ; sinon dérivé de l'email
+    # (utilisé au démarrage d'institution où aucun username n'est saisi).
+    if username:
+        username = username.strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise ApplicationError(_("Ce nom d'utilisateur est déjà pris."))
+    else:
+        username = _generate_username(email)
 
     if not temp_password:
         temp_password = secrets.token_urlsafe(12)
@@ -116,8 +124,16 @@ def update_user(
     language_code=None,
     user_timezone=None,
     default_agency_id=None,
+    username=None,
 ):
     """Met à jour le profil d'un utilisateur (seuls les champs fournis sont modifiés)."""
+    if username is not None:
+        username = username.strip()
+        if not username:
+            raise ApplicationError(_("Le nom d'utilisateur est requis."))
+        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+            raise ApplicationError(_("Ce nom d'utilisateur est déjà pris."))
+        user.username = username
     if first_name is not None:
         user.first_name = first_name
     if last_name is not None:

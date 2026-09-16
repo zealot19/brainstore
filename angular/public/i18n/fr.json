@@ -1803,7 +1803,9 @@
     "f_new_pwd": "Nouveau mot de passe",
     "f_new_pwd_ph": "8 caractères minimum",
     "f_force_change": "Forcer le changement à la prochaine connexion",
-    "reset_submit": "Réinitialiser"
+    "reset_submit": "Réinitialiser",
+    "f_username": "Nom d'utilisateur",
+    "col_username": "Nom d'utilisateur"
   },
   "acct": {
     "common": {

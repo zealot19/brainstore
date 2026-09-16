@@ -71,6 +71,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.createForm = this.fb.group({
       first_name:           ['', Validators.required],
       last_name:            ['', Validators.required],
+      username:             ['', Validators.required],
       email:                ['', [Validators.required, Validators.email]],
       phone:                [''],
       company_id:           [null],
@@ -84,6 +85,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.editForm = this.fb.group({
       first_name:           ['', Validators.required],
       last_name:            ['', Validators.required],
+      username:             ['', Validators.required],
       phone:                [''],
       default_agency_id:    [null],
       profile_id:           [null],
@@ -162,7 +164,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.createError    = '';
     this.createAgencies = this.agencies.slice();
     this.createForm.reset({
-      first_name: '', last_name: '', email: '', phone: '',
+      first_name: '', last_name: '', username: '', email: '', phone: '',
       company_id:           this.filterCompanyId || null,
       default_agency_id:    null,
       profile_id:           null,
@@ -180,6 +182,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     const payload: UserCreateForm = {
       email:                v.email,
+      username:             v.username,
       first_name:           v.first_name,
       last_name:            v.last_name,
       phone:                v.phone || '',
@@ -221,6 +224,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.editForm.patchValue({
       first_name:           u.first_name,
       last_name:            u.last_name,
+      username:             u.username ?? '',
       phone:                u.phone ?? '',
       default_agency_id:    u.default_agency_id ?? null,
       profile_id:           u.current_profile?.id ?? null,
@@ -236,6 +240,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     const v = this.editForm.value;
 
     const payload: UserUpdateForm = {
+      username:             v.username,
       first_name:           v.first_name,
       last_name:            v.last_name,
       phone:                v.phone || '',

@@ -65,6 +65,7 @@ class UserDetailSerializer(UserListSerializer):
 
 class UserCreateSerializer(serializers.Serializer):
     email                = serializers.EmailField()
+    username             = serializers.CharField(max_length=150)
     first_name           = serializers.CharField(max_length=150)
     last_name            = serializers.CharField(max_length=150)
     phone                = serializers.CharField(max_length=30,  required=False, default="", allow_blank=True)
@@ -83,6 +84,7 @@ class UserCreateSerializer(serializers.Serializer):
 
 
 class UserUpdateSerializer(serializers.Serializer):
+    username             = serializers.CharField(max_length=150, required=False)
     first_name           = serializers.CharField(max_length=150, required=False)
     last_name            = serializers.CharField(max_length=150, required=False)
     phone                = serializers.CharField(max_length=30,  required=False, allow_blank=True)

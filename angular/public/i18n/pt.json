@@ -1803,7 +1803,9 @@
     "f_new_pwd": "Nova senha",
     "f_new_pwd_ph": "Mínimo 8 caracteres",
     "f_force_change": "Forçar a alteração no próximo início de sessão",
-    "reset_submit": "Repor"
+    "reset_submit": "Repor",
+    "f_username": "Nome de utilizador",
+    "col_username": "Nome de utilizador"
   },
   "acct": {
     "common": {

@@ -1803,7 +1803,9 @@
     "f_new_pwd": "New password",
     "f_new_pwd_ph": "Minimum 8 characters",
     "f_force_change": "Force change on next login",
-    "reset_submit": "Reset"
+    "reset_submit": "Reset",
+    "f_username": "Username",
+    "col_username": "Username"
   },
   "acct": {
     "common": {

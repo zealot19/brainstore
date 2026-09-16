@@ -97,6 +97,7 @@
           <thead class="thead-light">
             <tr>
               <th>{{ 'admin.common.name' | transloco }}</th>
+              <th>{{ 'users.col_username' | transloco }}</th>
               <th>{{ 'users.col_email_phone' | transloco }}</th>
               <th>{{ 'users.col_agency' | transloco }}</th>
               <th>{{ 'users.col_profile' | transloco }}</th>
@@ -118,6 +119,7 @@
                     </div>
                   </div>
                 </td>
+                <td><span class="text-muted">{{ u.username || '—' }}</span></td>
                 <td>
                   <div>{{ u.email }}</div>
                   @if (u.phone) { <small class="text-muted">{{ u.phone }}</small> }
@@ -195,7 +197,7 @@
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'users.empty' | transloco }}</td></tr>
+              <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'users.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -261,6 +263,13 @@
                 <label class="form-label">{{ 'admin.common.email' | transloco }} <span class="text-danger">*</span></label>
                 <input formControlName="email" type="email" class="form-control" />
               </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ 'users.f_username' | transloco }} <span class="text-danger">*</span></label>
+                <input formControlName="username" type="text" class="form-control" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-6 mb-3">
                 <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
                 <input formControlName="phone" type="text" class="form-control" placeholder="+225 07 00 00 00 00" />
@@ -361,9 +370,16 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'users.f_username' | transloco }} <span class="text-danger">*</span></label>
+              <input formControlName="username" type="text" class="form-control" autocomplete="off" />
+            </div>
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
               <input formControlName="phone" type="text" class="form-control" />
             </div>
+          </div>
+
+          <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'users.f_agency' | transloco }}</label>
               <select formControlName="default_agency_id" class="form-select">
