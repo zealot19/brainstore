@@ -222,12 +222,19 @@ def get_treasury_series(company_id, days=14):
 def get_open_session_for_user(company_id, user):
     """Session de caisse ouverte de l'utilisateur : celle qu'il a ouverte
     (gestionnaire) ou celle qui lui est assignée (guichetier). C'est cette
-    session qui autorise ses encaissements (ventes billets, colis, bagages…)."""
+    session qui autorise ses encaissements (ventes billets, colis, bagages…).
+
+    La plage horaire est respectée : une fois la fin prévue (scheduled_end)
+    dépassée, la session ne donne plus accès à la caisse — plus aucune vente
+    n'est possible, même si le gestionnaire ne l'a pas encore clôturée."""
     from django.db.models import Q
+    from django.utils import timezone
     from apps.treasury.models import CashSession
+    now = timezone.now()
     return (CashSession.objects
             .filter(Q(opened_by=user) | Q(assigned_to=user),
                     company_id=company_id, status=CashSession.Status.OPEN, is_deleted=False)
+            .filter(Q(scheduled_end__isnull=True) | Q(scheduled_end__gte=now))
             .order_by("-opened_at")
             .first())
 
