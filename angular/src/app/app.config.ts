@@ -17,6 +17,7 @@ import { jwtInterceptor }      from '../_api/interceptors/jwt.interceptor';
 import { errorInterceptor }    from '../_api/interceptors/error.interceptor';
 import { apiUnwrapInterceptor } from '../_api/interceptors/api-unwrap.interceptor';
 import { acceptLanguageInterceptor } from '../_api/interceptors/accept-language.interceptor';
+import { timezoneInterceptor } from '../_api/interceptors/timezone.interceptor';
 import { AuthService }          from '../_api/services/auth/auth.service';
 import { TranslocoHttpLoader } from './core/i18n/transloco-loader';
 import { TRANSLOCO_APP_CONFIG } from './core/i18n/transloco.config';
@@ -30,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(BsDatepickerModule),
     provideAnimations(),
     provideHttpClient(withInterceptors([
-      jwtInterceptor, errorInterceptor, apiUnwrapInterceptor, acceptLanguageInterceptor,
+      jwtInterceptor, errorInterceptor, apiUnwrapInterceptor, acceptLanguageInterceptor, timezoneInterceptor,
     ])),
     provideTransloco({
       config: TRANSLOCO_APP_CONFIG,
