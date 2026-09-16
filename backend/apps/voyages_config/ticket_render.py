@@ -39,12 +39,8 @@ def get_or_create_template(company):
 
 
 def company_tokens(company, request=None):
-    logo = ""
-    if getattr(company, "logo", None):
-        try:
-            logo = request.build_absolute_uri(company.logo.url) if request else company.logo.url
-        except Exception:
-            logo = ""
+    from apps.core.media_uri import file_to_data_uri
+    logo = file_to_data_uri(company.logo) if getattr(company, "logo", None) else ""
     address = str(company.address) if getattr(company, "address_id", None) else ""
     return {
         "company_name": company.name or "", "company_slogan": company.slogan or "",
@@ -68,12 +64,9 @@ def qr_svg(tokens):
 
 
 def _abs(request, filefield):
-    if not filefield:
-        return ""
-    try:
-        return request.build_absolute_uri(filefield.url) if request else filefield.url
-    except Exception:
-        return ""
+    # Image embarquée en data URI : le rendu serveur ne peut pas récupérer une URL média.
+    from apps.core.media_uri import file_to_data_uri
+    return file_to_data_uri(filefield)
 
 
 def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
@@ -228,14 +221,22 @@ def sample_tokens():
     }
 
 
-def render_document(inner_html_list, *, tpl=None):
+def render_document(inner_html_list, *, tpl=None, duplicata=False):
     w = (tpl.ticket_width_mm if tpl else None) or 203
     h = (tpl.ticket_height_mm if tpl else None) or 82.55
-    body = "".join(f'<div class="tk-page">{h_}</div>' for h_ in inner_html_list)
+    wm = '<div class="dup-wm">DUPLICATA</div>' if duplicata else ''
+    body = "".join(f'<div class="tk-page">{wm}{h_}</div>' for h_ in inner_html_list)
+    dup_css = (
+        '.tk-page{position:relative}'
+        '.dup-wm{position:absolute;top:50%;left:50%;'
+        'transform:translate(-50%,-50%) rotate(-28deg);font-size:46px;font-weight:bold;'
+        'color:rgba(200,0,0,.22);letter-spacing:6px;pointer-events:none;z-index:99}'
+    ) if duplicata else ''
     return (
         '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Billets</title>'
         f'<style>@page{{size:{w}mm {h}mm landscape;margin:0}}'
         'body{margin:0;font-family:Arial,Helvetica,sans-serif}'
-        '.tk-page{page-break-after:always}</style>'
+        '.tk-page{page-break-after:always}'
+        f'{dup_css}</style>'
         f'</head><body>{body}</body></html>'
     )

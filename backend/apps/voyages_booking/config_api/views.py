@@ -400,14 +400,17 @@ def build_roadmap_data(trip, request):
 def resolve_manifest_template(company, request):
     """En-tête/pied des bordereaux depuis ManifestTemplate, avec repli sur la société."""
     from apps.voyages_config.models import ManifestTemplate, DEFAULT_SIGN_VOYAGE, DEFAULT_SIGN_COLIS
+    from apps.core.media_uri import file_to_data_uri
+    from django.utils import timezone
+    user = getattr(request, "user", None)
     tpl = ManifestTemplate.objects.filter(company=company).first()
     ch = _company_header(company, request)
-    logo_url = ch.get("logo_url")
+    # Logo embarqué en data URI (le rendu serveur ne peut pas récupérer une URL média).
+    logo_url = ""
     if tpl and tpl.logo:
-        try:
-            logo_url = request.build_absolute_uri(tpl.logo.url)
-        except Exception:
-            pass
+        logo_url = file_to_data_uri(tpl.logo)
+    if not logo_url and getattr(company, "logo", None):
+        logo_url = file_to_data_uri(company.logo)
     return {
         "brand_name": (tpl.brand_name if tpl and tpl.brand_name else ch.get("name")),
         "slogan": (tpl.slogan if tpl and tpl.slogan else ch.get("slogan")),
@@ -417,6 +420,10 @@ def resolve_manifest_template(company, request):
         "logo_url": logo_url,
         "sign_labels_voyage": (tpl.sign_labels_voyage if tpl and tpl.sign_labels_voyage else list(DEFAULT_SIGN_VOYAGE)),
         "sign_labels_colis": (tpl.sign_labels_colis if tpl and tpl.sign_labels_colis else list(DEFAULT_SIGN_COLIS)),
+        # Contexte d'impression (agence + horodatage + agent).
+        "printed_agency": (user.default_agency.name if user and user.default_agency_id else ""),
+        "printed_by": ((user.get_full_name() or user.username) if user else ""),
+        "printed_at": timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M"),
     }
 
 
@@ -480,55 +487,73 @@ class TripBoardAllView(APIView):
         return success_response({"done": done})
 
 
+def render_booking_tickets_html(request, b, *, duplicata=False):
+    """HTML des billets d'une réservation (Config billets). `duplicata` ajoute un
+    filigrane DUPLICATA sur chaque billet réimprimé."""
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.voyages_config import ticket_render
+    from apps.voyages_config.models import VoyagesSettings
+    company = request.user.company
+    tpl = ticket_render.get_or_create_template(company)
+    base = ticket_render.company_tokens(company, request)
+    settings = (VoyagesSettings.objects.filter(is_deleted=False, company=company).first()
+                or VoyagesSettings.objects.filter(is_deleted=False, company__isnull=True).first())
+    expiry_days = settings.ticket_expiry_days if settings else 7
+    now = timezone.now()
+    reg = timezone.localtime(b.created_at)
+    exp = reg + timedelta(days=expiry_days)
+    pages = []
+    for t in b.tickets.filter(is_deleted=False).exclude(status="cancelled").order_by("direction"):
+        trip = t.trip if t.trip_id else None
+        dep = timezone.localtime(trip.scheduled_departure) if trip else None
+        tokens = dict(base)
+        tokens.update({
+            "ticket_number": t.number, "booking_reference": b.reference,
+            "passenger_name": t.passenger.full_name if t.passenger_id else "",
+            "seat": t.trip_seat.seat_number if t.trip_seat_id else "",
+            "departure": trip.origin.name if trip and trip.origin_id else "",
+            "destination": t.destination_point.name if t.destination_point_id else (
+                trip.destination.name if trip and trip.destination_id else ""),
+            "travel_date": dep.strftime("%d/%m/%Y") if dep else "",
+            "travel_time": dep.strftime("%HH%M") if dep else "",
+            "travel_class": t.fare_class.name if t.fare_class_id else "",
+            "trip_type": t.get_direction_display(),
+            "trip_number": trip.number if trip else "",
+            # Le véhicule n'est pas toujours connu à la vente : on affiche le code du voyage.
+            "vehicle": (trip.code or trip.number) if trip else "",
+            "agent": (b.created_by.get_full_name() or b.created_by.username) if b.created_by_id else "",
+            "ticket_price": f"{t.amount:.0f} XAF",
+            "registered_date": reg.strftime("%d/%m/%Y"),
+            "printed_date": now.strftime("%d/%m/%Y"),
+            "expiration_date": exp.strftime("%d/%m/%Y"),
+        })
+        pages.extend(ticket_render.build_ticket_pages(tpl, tokens, request=request))
+    return ticket_render.render_document(pages, tpl=tpl, duplicata=duplicata)
+
+
 class BookingRenderTicketsView(APIView):
     """HTML des billets d'une réservation, rendu depuis le modèle « Config billets »."""
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.ticket.view'}
 
     def get(self, request, pk):
-        from datetime import timedelta
-        from django.utils import timezone
-        from apps.voyages_config import ticket_render
-        from apps.voyages_config.models import VoyagesSettings
         b = selectors.booking_detail(request.user.company, pk)
         if not b:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
-        company = request.user.company
-        tpl = ticket_render.get_or_create_template(company)
-        base = ticket_render.company_tokens(company, request)
-        settings = (VoyagesSettings.objects.filter(is_deleted=False, company=company).first()
-                    or VoyagesSettings.objects.filter(is_deleted=False, company__isnull=True).first())
-        expiry_days = settings.ticket_expiry_days if settings else 7
-        now = timezone.now()
-        reg = timezone.localtime(b.created_at)
-        exp = reg + timedelta(days=expiry_days)
-        pages = []
-        for t in b.tickets.filter(is_deleted=False).exclude(status="cancelled").order_by("direction"):
-            trip = t.trip if t.trip_id else None
-            dep = timezone.localtime(trip.scheduled_departure) if trip else None
-            tokens = dict(base)
-            tokens.update({
-                "ticket_number": t.number, "booking_reference": b.reference,
-                "passenger_name": t.passenger.full_name if t.passenger_id else "",
-                "seat": t.trip_seat.seat_number if t.trip_seat_id else "",
-                "departure": trip.origin.name if trip and trip.origin_id else "",
-                "destination": t.destination_point.name if t.destination_point_id else (
-                    trip.destination.name if trip and trip.destination_id else ""),
-                "travel_date": dep.strftime("%d/%m/%Y") if dep else "",
-                "travel_time": dep.strftime("%HH%M") if dep else "",
-                "travel_class": t.fare_class.name if t.fare_class_id else "",
-                "trip_type": t.get_direction_display(),
-                "trip_number": trip.number if trip else "",
-                # Le véhicule n'est pas toujours connu à la vente : on affiche le code du voyage.
-                "vehicle": (trip.code or trip.number) if trip else "",
-                "agent": (b.created_by.get_full_name() or b.created_by.username) if b.created_by_id else "",
-                "ticket_price": f"{t.amount:.0f} XAF",
-                "registered_date": reg.strftime("%d/%m/%Y"),
-                "printed_date": now.strftime("%d/%m/%Y"),
-                "expiration_date": exp.strftime("%d/%m/%Y"),
-            })
-            pages.extend(ticket_render.build_ticket_pages(tpl, tokens, request=request))
-        return success_response({"html": ticket_render.render_document(pages, tpl=tpl)})
+        return success_response({"html": render_booking_tickets_html(request, b)})
+
+
+class BookingDuplicataView(APIView):
+    """Réimpression des billets marqués DUPLICATA (privilège dédié)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.ticket.duplicata'}
+
+    def get(self, request, pk):
+        b = selectors.booking_detail(request.user.company, pk)
+        if not b:
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response({"html": render_booking_tickets_html(request, b, duplicata=True)})
 
 
 class BookingPrintView(APIView):
