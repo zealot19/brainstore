@@ -3386,3 +3386,12 @@ body { font-family: var(--bs-body-font-family); }
    flex et n'affiche plus le texte. On garantit une largeur minimale lisible. */
 .ss-wrap { min-width: 170px; }
 .ss-wrap > .form-select { width: 100%; }
+/* L'option survolée/sélectionnée héritait du thème (texte blanc sur bleu clair =
+   illisible). On force un texte foncé sur fond bleu clair pour la lisibilité. */
+.ss-wrap .dropdown-menu .dropdown-item:hover,
+.ss-wrap .dropdown-menu .dropdown-item:focus,
+.ss-wrap .dropdown-menu .dropdown-item.active,
+.ss-wrap .dropdown-menu .dropdown-item:active {
+  background-color: #eef2ff;
+  color: #1f2937;
+}

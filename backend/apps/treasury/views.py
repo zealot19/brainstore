@@ -208,14 +208,22 @@ class CashSessionListView(APIView):
 
 
 class MyActiveSessionView(APIView):
-    """Session de caisse ouverte de l'utilisateur courant (ouverte par lui ou
-    qui lui est assignée), ou null. Alimente le minuteur global + le billetage
-    de fin depuis n'importe quel écran. Auto-limitée à l'appelant : pas de
-    permission caisse requise (le guichetier assigné n'a pas session.manage)."""
+    """Session de caisse ouverte ASSIGNÉE à l'utilisateur courant, ou null.
+    Alimente le minuteur de la barre de navigation : il n'apparaît que chez le
+    guichetier à qui la session a été assignée — ni l'admin, ni le gestionnaire
+    qui l'a ouverte. Auto-limitée à l'appelant ; pas de permission caisse requise."""
     permission_classes = [IsAuthenticated, HasModulePermission]
 
     def get(self, request):
-        session = selectors.get_open_session_for_user(_company(request).id, request.user)
+        from django.db.models import Q
+        from django.utils import timezone
+        from apps.treasury.models import CashSession
+        now = timezone.now()
+        session = (CashSession.objects
+                   .filter(assigned_to=request.user, company_id=_company(request).id,
+                           status=CashSession.Status.OPEN, is_deleted=False)
+                   .filter(Q(scheduled_end__isnull=True) | Q(scheduled_end__gte=now))
+                   .order_by("-opened_at").first())
         if not session:
             return Response({"data": None})
         return Response({"data": CashSessionReadSerializer(session).data})

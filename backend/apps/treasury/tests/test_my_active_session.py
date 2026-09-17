@@ -51,24 +51,27 @@ def test_expired_scheduled_end_blocks_access_even_if_open():
 
 
 @pytest.mark.django_db
-def test_my_active_endpoint_returns_own_open_session():
+def test_my_active_endpoint_only_for_assigned_user():
+    """Le minuteur (my-active) n'apparaît que chez le guichetier assigné —
+    ni l'admin ni le gestionnaire qui a ouvert la session."""
     from rest_framework.test import APIClient
-    from apps.treasury.services import create_cash_register, open_session, close_session
+    from apps.authentication.models import User
+    from apps.treasury.services import (create_cash_register, schedule_session,
+                                        open_scheduled_session, close_session)
     company, admin = _company()
+    gui = User.objects.create(email="g@x.com", username="g", company=company, is_active=True)
     reg = create_cash_register(company=company, name="C1", created_by=admin)
-    c = APIClient(); c.force_authenticate(user=admin)
+    s = schedule_session(company=company, cash_register=reg, assigned_to=gui, created_by=admin)
+    open_scheduled_session(s, updated_by=admin)  # ouverte PAR l'admin, ASSIGNÉE à gui
 
-    # Aucune session ouverte → data null.
-    r = c.get("/api/v1/treasury/sessions/my-active/")
-    assert r.status_code == 200, r.content
-    assert r.json()["data"] is None
+    # L'admin (ouvreur) ne voit pas le minuteur.
+    ca = APIClient(); ca.force_authenticate(user=admin)
+    assert ca.get("/api/v1/treasury/sessions/my-active/").json()["data"] is None
 
-    # Session ouverte → renvoyée.
-    s = open_session(company=company, cash_register=reg, opening_balance=Decimal("0"), created_by=admin)
-    r = c.get("/api/v1/treasury/sessions/my-active/")
-    assert r.json()["data"]["id"] == str(s.id)
+    # Le guichetier assigné le voit.
+    cg = APIClient(); cg.force_authenticate(user=gui)
+    assert cg.get("/api/v1/treasury/sessions/my-active/").json()["data"]["id"] == str(s.id)
 
-    # Clôturée → data null de nouveau.
+    # Clôturée → plus rien.
     close_session(s, closing_balance=Decimal("0"), updated_by=admin)
-    r = c.get("/api/v1/treasury/sessions/my-active/")
-    assert r.json()["data"] is None
+    assert cg.get("/api/v1/treasury/sessions/my-active/").json()["data"] is None
