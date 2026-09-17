@@ -33,9 +33,8 @@ class TenantMiddleware:
         try:
             tenant = self._resolve_tenant(request)
             _current_tenant.set(tenant)
-            user_id = tenant.get("user_id") if tenant else None
-            if user_id or request.META.get("HTTP_X_TIMEZONE"):
-                tz_activated = self._activate_user_tz(user_id, request.META.get("HTTP_X_TIMEZONE"))
+            if tenant and tenant.get("user_id"):
+                tz_activated = self._activate_user_tz(tenant["user_id"])
             response = self.get_response(request)
         finally:
             if tz_activated:
@@ -45,18 +44,15 @@ class TenantMiddleware:
 
         return response
 
-    def _activate_user_tz(self, user_id, header_tz=None):
-        """Active le fuseau horaire de la requête pour que les heures rendues côté
-        serveur (bordereaux, reçus, rapports) soient à l'heure locale du poste.
-        Priorité au fuseau de l'OS/navigateur (en-tête X-Timezone) ; à défaut, le
-        fuseau enregistré de l'utilisateur."""
+    def _activate_user_tz(self, user_id):
+        """Active le fuseau horaire de l'utilisateur pour la requête, afin que les
+        heures rendues côté serveur (bordereaux, reçus, rapports) soient à son
+        heure locale et non au fuseau serveur par défaut."""
         from zoneinfo import ZoneInfo
         from django.utils import timezone as djtz
         from django.contrib.auth import get_user_model
-        tzname = header_tz or None
-        if not tzname and user_id:
-            tzname = (get_user_model().objects.filter(id=user_id)
-                      .values_list("timezone", flat=True).first())
+        tzname = (get_user_model().objects.filter(id=user_id)
+                  .values_list("timezone", flat=True).first())
         if not tzname:
             return False
         try:
