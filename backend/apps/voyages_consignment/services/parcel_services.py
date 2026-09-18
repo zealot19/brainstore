@@ -227,6 +227,33 @@ def pickup_parcel(parcel, *, picked_up_by, picked_up_id_number="", user):
 
 
 @transaction.atomic
+def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment_method="", user):
+    """Livraison à domicile : clôt le colis et encaisse les frais de livraison (recettes)."""
+    if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
+        raise ApplicationError(_("Seul un colis disponible peut être livré à domicile."))
+    amount = Decimal(str(delivery_amount or 0))
+    if amount <= 0:
+        raise ApplicationError(_("Indiquez le montant de la livraison."))
+    parcel.status = Parcel.Status.PICKED_UP
+    parcel.picked_up_by = parcel.recipient_name
+    parcel.picked_up_at = timezone.now()
+    parcel.delivery_amount = amount
+    parcel.delivery_address = delivery_address or ""
+    parcel.delivery_payment_method = payment_method or ""
+    parcel.delivered_home_at = timezone.now()
+    parcel.delivered_home_by = user
+    parcel.updated_by = user
+    parcel.save()
+    _event(parcel, ParcelEvent.Kind.PICKED_UP, from_status=Parcel.Status.AVAILABLE_FOR_PICKUP,
+           to_status=Parcel.Status.PICKED_UP, user=user,
+           note=f"Livré à domicile · {delivery_address}".strip(" ·"))
+    from apps.treasury.services import record_parcel_delivery
+    record_parcel_delivery(parcel.company, parcel=parcel, amount=amount,
+                           payment_method=payment_method, user=user)
+    return parcel
+
+
+@transaction.atomic
 def cancel_parcel(parcel, *, user):
     if parcel.status == Parcel.Status.CANCELLED:
         return parcel

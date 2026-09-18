@@ -1,5 +1,9 @@
 import pytest
+from decimal import Decimal
+from apps.core.exceptions import ApplicationError
+from apps.treasury.models import Transaction
 from apps.voyages_consignment.models import Parcel
+from apps.voyages_consignment.services import parcel_services as S
 
 
 @pytest.mark.django_db
@@ -7,3 +11,67 @@ def test_parcel_has_delivery_fields():
     fields = {f.name for f in Parcel._meta.get_fields()}
     assert {"delivery_amount", "delivery_address", "delivery_payment_method",
             "delivered_home_at", "delivered_home_by"} <= fields
+
+
+class _Ctx:
+    pass
+
+
+@pytest.fixture
+def colis_ctx(db):
+    from apps.system_config.services import create_company
+    from apps.authentication.models import User
+    from apps.voyages_config.models import Town, ServicePoint, ConsignmentNature, ConsignmentType
+    from apps.treasury.services.services import create_cash_register, open_session
+    c = _Ctx()
+    c.company, _ = create_company(name="DelivFlow", admin_email="delivflow@x.com",
+                                  admin_first_name="A", admin_last_name="B")
+    c.user = User.objects.get(email="delivflow@x.com")
+    town = Town.objects.create(company=c.company, name="Douala")
+    c.origin = ServicePoint.objects.create(company=c.company, town=town, code="O", name="Agence O",
+                                           is_station=True, station_kind="AGENCY")
+    c.dest = ServicePoint.objects.create(company=c.company, town=town, code="D", name="Agence D",
+                                         is_station=True, station_kind="AGENCY")
+    nature = ConsignmentNature.objects.create(company=c.company, code="STD", name="Standard")
+    c.ctype = ConsignmentType.objects.create(company=c.company, code="CT", label="Type", nature=nature)
+    reg = create_cash_register(company=c.company, name="C1", created_by=c.user)
+    open_session(company=c.company, cash_register=reg, created_by=c.user)
+
+    def register():
+        return S.register_parcel(
+            company=c.company, origin_point=c.origin, destination_point=c.dest,
+            consignment_type=c.ctype, sender_name="Exp", sender_phone="600",
+            recipient_name="Dest", recipient_phone="601", amount_due=0, user=c.user)
+
+    c.register = register
+    return c
+
+
+def _to_available(ctx):
+    p = ctx.register()
+    S.dispatch_parcel(p, user=ctx.user)
+    S.mark_arrived(p, user=ctx.user)
+    S.receive_parcel(p, received_pieces=p.quantity, user=ctx.user)
+    assert p.status == Parcel.Status.AVAILABLE_FOR_PICKUP
+    return p
+
+
+def test_deliver_home_marks_picked_up_and_stores_fields(colis_ctx):
+    p = _to_available(colis_ctx)
+    p = S.deliver_parcel_home(p, delivery_amount=Decimal("2000"),
+                              delivery_address="Bonapriso, Douala",
+                              payment_method="cash", user=colis_ctx.user)
+    assert p.status == Parcel.Status.PICKED_UP
+    assert p.delivery_amount == Decimal("2000")
+    assert p.delivery_address == "Bonapriso, Douala"
+    assert p.delivered_home_at is not None
+    assert p.delivered_home_by_id == colis_ctx.user.id
+    assert Transaction.objects.filter(
+        company=colis_ctx.company, category=Transaction.Category.PARCEL_DELIVERY,
+        amount=Decimal("2000"), is_deleted=False).exists()
+
+
+def test_deliver_home_rejected_when_not_available(colis_ctx):
+    p = colis_ctx.register()  # status ready_for_travel, not available
+    with pytest.raises(ApplicationError):
+        S.deliver_parcel_home(p, delivery_amount=Decimal("2000"), user=colis_ctx.user)
