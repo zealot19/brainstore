@@ -20,7 +20,7 @@
     <div class="col-md-3"><label class="form-label">{{ 'booking.form.route' | transloco }} <span class="text-danger">*</span></label>
       <select class="form-select" [(ngModel)]="routeCode" (ngModelChange)="onRouteChange()">
         <option value="" disabled selected>{{ 'booking.new.choose' | transloco }}</option>
-        @for (r of routes; track r.id) { <option [value]="r.code">{{ r.origin_name }} → {{ r.destination_name }}</option> }
+        @for (r of routes; track r.id) { <option [value]="r.code">{{ r.code }}</option> }
       </select>
     </div>
     <div class="col-md-3"><label class="form-label">{{ 'booking.form.destination' | transloco }} <span class="text-danger">*</span></label>
