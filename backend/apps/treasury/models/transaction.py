@@ -17,6 +17,7 @@ class Transaction(BaseModel):
         TICKET_SALES    = "ticket_sales",    _("Ticket Sales")
         PARCEL_SHIPPING = "parcel_shipping", _("Parcel Shipping")
         BAGGAGE         = "baggage",         _("Bagages")
+        PARCEL_DELIVERY = "parcel_delivery", _("Livraison colis")
         CHARTER         = "charter",         _("Charter")
         OTHER_INCOME    = "other_income",    _("Other Income")
         # Expense
