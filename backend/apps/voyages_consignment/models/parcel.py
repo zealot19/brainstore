@@ -54,6 +54,13 @@ class Parcel(BaseModel):
     picked_up_at       = models.DateTimeField(_("retiré le"), null=True, blank=True)
     picked_up_by       = models.CharField(_("livré à"), max_length=150, blank=True)
     picked_up_id_number = models.CharField(_("pièce présentée"), max_length=100, blank=True)
+    delivery_amount         = models.DecimalField(_("montant livraison"), max_digits=12, decimal_places=2, default=0)
+    delivery_address        = models.CharField(_("adresse de livraison"), max_length=255, blank=True)
+    delivery_payment_method = models.CharField(_("mode de paiement livraison"), max_length=40, blank=True)
+    delivered_home_at       = models.DateTimeField(_("livré à domicile le"), null=True, blank=True)
+    delivered_home_by       = models.ForeignKey(
+        "authentication.User", verbose_name=_("livré par"), on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="+")
     notes              = models.TextField(_("notes"), blank=True)
 
     class Meta(BaseModel.Meta):
