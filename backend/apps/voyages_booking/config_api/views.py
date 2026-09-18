@@ -109,6 +109,21 @@ class TripDestinationsView(APIView):
         return success_response(S.TripDestinationSerializer(selectors.trip_destinations(trip), many=True).data)
 
 
+class RouteDestinationsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
+
+    def get(self, request, route_id):
+        from django.db.models import Q
+        from apps.voyages_config.models import Route
+        company = request.user.company
+        route = (Route.objects.filter(is_deleted=False, id=route_id)
+                 .filter(Q(company=company) | Q(company__isnull=True)).first())
+        if not route:
+            return error_response("Trajet introuvable.", status_code=404)
+        return success_response(S.RouteDestinationSerializer(selectors.route_destinations(route), many=True).data)
+
+
 class BookingListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.booking.view', 'POST': 'ticketing.booking.create'}

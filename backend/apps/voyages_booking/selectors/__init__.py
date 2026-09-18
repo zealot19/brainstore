@@ -52,6 +52,16 @@ def seat_map(trip):
             .order_by("row", "column"))
 
 
+def route_destinations(route):
+    """Selectable drop points of a route (every route point after the origin), no fare.
+
+    The point ids are the service-point ids — identical to trip_destinations ids —
+    so a destination chosen from the route still resolves and prices on the trip."""
+    from apps.voyages_pricing.selectors.fare_selectors import route_points
+    return [{"id": p.id, "name": p.name, "code": p.code, "is_station": p.is_station}
+            for p in route_points(route)[1:]]
+
+
 def trip_destinations(trip):
     """Selectable drop points for a trip (every route point after the origin),
     each with the resolved one-way and round-trip fare for the trip's class."""
@@ -125,6 +135,6 @@ def trip_passengers(trip):
             .order_by("trip_seat__row", "trip_seat__column"))
 
 
-__all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations",
+__all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations", "route_destinations",
            "list_bookings", "booking_detail", "loyalty_view", "trip_passengers",
            "open_return_bookings"]
