@@ -75,3 +75,31 @@ def test_deliver_home_rejected_when_not_available(colis_ctx):
     p = colis_ctx.register()  # status ready_for_travel, not available
     with pytest.raises(ApplicationError):
         S.deliver_parcel_home(p, delivery_amount=Decimal("2000"), user=colis_ctx.user)
+
+
+def test_list_parcels_delivered_home_and_payment_filters(colis_ctx):
+    from apps.voyages_consignment.selectors import list_parcels
+    p1 = _to_available(colis_ctx)
+    p2 = _to_available(colis_ctx)
+    S.deliver_parcel_home(p1, delivery_amount=Decimal("2000"), delivery_address="Akwa",
+                          payment_method="cash", user=colis_ctx.user)
+
+    delivered = [p.id for p in list_parcels(colis_ctx.company, delivered_home=True)]
+    assert delivered == [p1.id]
+
+    awaiting = [p.id for p in list_parcels(colis_ctx.company, status="available_for_pickup")]
+    assert p2.id in awaiting and p1.id not in awaiting
+
+    by_cash = [p.id for p in list_parcels(colis_ctx.company, delivered_home=True, delivery_payment_method="cash")]
+    assert by_cash == [p1.id]
+    assert list(list_parcels(colis_ctx.company, delivered_home=True, delivery_payment_method="mobile_money")) == []
+
+
+def test_list_parcels_delivered_date_field(colis_ctx):
+    from apps.voyages_consignment.selectors import list_parcels
+    p1 = _to_available(colis_ctx)
+    S.deliver_parcel_home(p1, delivery_amount=Decimal("2000"), payment_method="cash", user=colis_ctx.user)
+    today = p1.delivered_home_at.date().isoformat()
+    got = [p.id for p in list_parcels(colis_ctx.company, delivered_home=True,
+                                      date_field="delivered", date_from=today, date_to=today)]
+    assert got == [p1.id]

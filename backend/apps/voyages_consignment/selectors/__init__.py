@@ -3,12 +3,13 @@ from apps.voyages_consignment.models import Parcel, Baggage
 from apps.core.filters import resolve_date_field, apply_date_range
 
 _CONS_DATE_FIELDS = {"created": "created_at", "departure": "trip__scheduled_departure",
-                     "arrival": "trip__scheduled_arrival"}
+                     "arrival": "trip__scheduled_arrival", "delivered": "delivered_home_at"}
 
 
 def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
                  origin_point=None, destination_point=None,
-                 date_field=None, date_from=None, date_to=None):
+                 date_field=None, date_from=None, date_to=None,
+                 delivered_home=None, delivery_payment_method=None):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
           .select_related("origin_point", "destination_point", "trip", "trip__route",
                           "trip__vehicle", "consignment_type")
@@ -16,6 +17,10 @@ def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=No
     if status:
         statuses = [s for s in str(status).split(",") if s]
         qs = qs.filter(status__in=statuses) if len(statuses) > 1 else qs.filter(status=statuses[0])
+    if delivered_home:
+        qs = qs.filter(delivered_home_at__isnull=False)
+    if delivery_payment_method:
+        qs = qs.filter(delivery_payment_method=delivery_payment_method)
     if trip_id:
         qs = qs.filter(trip_id=trip_id)
     if consignment_type:

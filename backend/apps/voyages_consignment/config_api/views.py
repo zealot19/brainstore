@@ -33,7 +33,9 @@ class ParcelListView(APIView):
             destination_point=request.query_params.get("destination_point"),
             date_field=request.query_params.get("date_field"),
             date_from=request.query_params.get("date_from"),
-            date_to=request.query_params.get("date_to"))
+            date_to=request.query_params.get("date_to"),
+            delivered_home=request.query_params.get("delivered_home"),
+            delivery_payment_method=request.query_params.get("delivery_payment_method"))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.ParcelRead(page, many=True).data)
