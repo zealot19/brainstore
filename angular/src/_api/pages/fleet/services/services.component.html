@@ -84,7 +84,7 @@
             <td>{{ o.planned_date | date:'dd/MM/yyyy' }}</td>
             <td>{{ o.start_date ? (o.start_date | date:'dd/MM/yyyy') : '—' }}</td>
             <td>{{ o.done_date ? (o.done_date | date:'dd/MM/yyyy') : '—' }}</td>
-            <td>{{ o.cost ? (o.cost | number:'1.0-0') + ' ' + o.currency : '—' }}</td>
+            <td>{{ o.cost ? (o.cost | number:'1.0-0') : '—' }}</td>
             <td>
               <a class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#service-modal" *hasPermission="'fleet.maintenance.manage'" (click)="openEdit(o)" [title]="'shared.actions.edit' | transloco">
                 <i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}
@@ -145,10 +145,6 @@
               <label class="form-label">{{ 'fleet.svc.col_planned_date' | transloco }} *</label>
               <input type="date" class="form-control" formControlName="planned_date">
             </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.common.currency' | transloco }}</label>
-              <input type="text" class="form-control" formControlName="currency" maxlength="3">
-            </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.common.description' | transloco }}</label>
               <input type="text" class="form-control" formControlName="description" maxlength="500">
@@ -199,10 +195,6 @@
             <div class="col-md-6">
               <label class="form-label">{{ 'fleet.svc.f_done_date' | transloco }}</label>
               <input type="date" class="form-control" formControlName="done_date">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'fleet.fl.f_odometer' | transloco }}</label>
-              <input type="number" class="form-control" formControlName="odometer_km" min="0">
             </div>
             <div class="col-md-6">
               <label class="form-label">{{ 'fleet.svc.col_cost' | transloco }}</label>

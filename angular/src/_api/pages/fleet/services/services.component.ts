@@ -76,13 +76,11 @@ export class FleetServicesComponent implements OnInit {
       intervention_type_id: ['', Validators.required],
       planned_date:         ['', Validators.required],
       description:          [''],
-      currency:            ['XAF'],
       notes:               [''],
     });
     this.completeForm = this.fb.group({
       done_date:    [new Date().toISOString().slice(0, 10)],
       cost:         [null],
-      odometer_km:  [null],
       notes:        [''],
     });
     this.vehicleSvc.list().subscribe(vs => this.vehicles = vs);
@@ -122,7 +120,7 @@ export class FleetServicesComponent implements OnInit {
   openCreate(): void {
     this.editId = null;
     this.errorMsg = '';
-    this.createForm.reset({ currency: 'XAF' });
+    this.createForm.reset({});
     this.attachments = [];
     this.attachFor = null;
   }
@@ -133,7 +131,7 @@ export class FleetServicesComponent implements OnInit {
     this.createForm.patchValue({
       vehicle_id: o.vehicle, intervention_type_id: o.intervention_type,
       planned_date: o.planned_date, supplier_id: o.supplier, driver_id: o.driver,
-      description: o.description, currency: o.currency, notes: o.notes,
+      description: o.description, notes: o.notes,
     });
     this.attachFor = o.id;
     this.loadAttachments(o.id);
@@ -147,7 +145,7 @@ export class FleetServicesComponent implements OnInit {
     const payload = {
       vehicle_id: v.vehicle_id, intervention_type_id: v.intervention_type_id,
       planned_date: v.planned_date, description: v.description || '',
-      currency: v.currency || 'XAF', notes: v.notes || '',
+      notes: v.notes || '',
     };
     const action = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     action.subscribe({
@@ -175,7 +173,6 @@ export class FleetServicesComponent implements OnInit {
     this.svc.complete(this.selectedId, {
       done_date:   v.done_date   || null,
       cost:        v.cost        ? Number(v.cost) : null,
-      odometer_km: v.odometer_km ? Number(v.odometer_km) : null,
       notes:       v.notes       || null,
     }).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('complete-service-modal'); },
