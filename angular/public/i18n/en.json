@@ -182,7 +182,10 @@
     "nouveau_titre": "New ticket",
     "tout_afficher": "Show all",
     "vendre_un_billet": "Sell a ticket",
-    "retrait": "Pickup"
+    "retrait": "Pickup",
+    "livraison_colis": "Parcel delivery",
+    "recette_livraison": "Delivery income",
+    "expedition": "Dispatch"
   },
   "booking": {
     "list": {
@@ -2058,7 +2061,12 @@
       "col_delivered_at": "Delivered on",
       "opt_all_payments": "All payments",
       "empty_awaiting": "No parcels to deliver.",
-      "empty_delivered": "No deliveries."
+      "empty_delivered": "No deliveries.",
+      "sender": "Sender",
+      "contents": "Contents",
+      "weight": "Weight",
+      "voyage": "Voyage",
+      "new_search": "New search"
     },
     "retrait": {
       "bag_title": "Pickup",

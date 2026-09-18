@@ -182,7 +182,10 @@
     "nouveau_titre": "Nuevo título",
     "tout_afficher": "Ver todo",
     "vendre_un_billet": "Vender un billete",
-    "retrait": "Retiro"
+    "retrait": "Retiro",
+    "livraison_colis": "Entrega de paquetes",
+    "recette_livraison": "Ingreso por entrega",
+    "expedition": "Expedición"
   },
   "booking": {
     "list": {
@@ -2058,7 +2061,12 @@
       "col_delivered_at": "Entregado el",
       "opt_all_payments": "Todos los pagos",
       "empty_awaiting": "Ningún paquete por entregar.",
-      "empty_delivered": "Ninguna entrega."
+      "empty_delivered": "Ninguna entrega.",
+      "sender": "Remitente",
+      "contents": "Contenido",
+      "weight": "Peso",
+      "voyage": "Viaje",
+      "new_search": "Nueva búsqueda"
     },
     "retrait": {
       "bag_title": "Retiro",
