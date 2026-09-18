@@ -57,6 +57,27 @@ def test_no_voyage_flow_via_api(api_ctx):
 
 
 @pytest.mark.django_db
+def test_deliver_home_endpoint(api_ctx):
+    from apps.treasury.services.services import create_cash_register, open_session
+    from apps.authentication.models import User
+    c = api_ctx["client"]
+    admin = User.objects.get(email="api@x.com")
+    reg = create_cash_register(company=admin.company, name="C1", created_by=admin)
+    open_session(company=admin.company, cash_register=reg, created_by=admin)
+    pid = _register(api_ctx).json()["data"]["id"]
+    c.post(f"/api/v1/voyages/consignment/parcels/{pid}/dispatch/", {}, format="json")
+    c.post(f"/api/v1/voyages/consignment/parcels/{pid}/arrive/", {}, format="json")
+    c.post(f"/api/v1/voyages/consignment/parcels/{pid}/arrived/",
+           {"received_pieces": 1, "missing_pieces": 0, "damaged_pieces": 0}, format="json")
+    r = c.post(f"/api/v1/voyages/consignment/parcels/{pid}/deliver-home/",
+               {"delivery_amount": "2000", "delivery_address": "Akwa", "payment_method": "cash"},
+               format="json")
+    assert r.status_code == 200, r.content
+    assert r.json()["data"]["status"] == "picked_up"
+    assert str(r.json()["data"]["delivery_amount"]) in ("2000.00", "2000")
+
+
+@pytest.mark.django_db
 def test_expedition_lists_endpoint(api_ctx):
     c = api_ctx["client"]
     _register(api_ctx)

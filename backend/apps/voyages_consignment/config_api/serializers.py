@@ -32,6 +32,7 @@ class ParcelRead(serializers.ModelSerializer):
                   "damaged_pieces", "declared_value", "amount_due", "amount_received",
                   "change_due", "payment_method", "paid_at", "loaded_at", "arrived_at",
                   "picked_up_at", "picked_up_by", "picked_up_id_number", "notes",
+                  "delivery_amount", "delivery_address", "delivery_payment_method", "delivered_home_at",
                   "created_at", "updated_at", "events"]
 
 
@@ -57,6 +58,12 @@ class ParcelWrite(serializers.Serializer):
 class ParcelPickupSerializer(serializers.Serializer):
     picked_up_by = serializers.CharField(max_length=150)
     picked_up_id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+
+
+class ParcelDeliverSerializer(serializers.Serializer):
+    delivery_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    delivery_address = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
+    payment_method = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
 
 
 class ParcelReceiveSerializer(serializers.Serializer):

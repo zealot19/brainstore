@@ -16,6 +16,7 @@ urlpatterns = [
     path("parcels/<uuid:pk>/arrive/", v.ParcelArriveView.as_view()),
     path("parcels/<uuid:pk>/arrived/", v.ParcelArrivedView.as_view()),
     path("parcels/<uuid:pk>/pickup/", v.ParcelPickupView.as_view()),
+    path("parcels/<uuid:pk>/deliver-home/", v.ParcelDeliverHomeView.as_view()),
     path("parcels/<uuid:pk>/cancel/", v.ParcelCancelView.as_view()),
     path("parcels/<uuid:pk>/receipt/", v.ParcelReceiptView.as_view()),
     path("baggage/", v.BaggageListView.as_view()),

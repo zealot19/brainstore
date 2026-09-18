@@ -235,6 +235,26 @@ class ParcelPickupView(APIView):
         return success_response(S.ParcelRead(p).data)
 
 
+class ParcelDeliverHomeView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
+
+    def post(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk)
+        if not p:
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        payload = S.ParcelDeliverSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        try:
+            p = services.deliver_parcel_home(
+                p, delivery_amount=payload.validated_data["delivery_amount"],
+                delivery_address=payload.validated_data["delivery_address"],
+                payment_method=payload.validated_data["payment_method"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelRead(p).data)
+
+
 class ParcelCancelView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'POST': 'ticketing.parcel.manage'}
