@@ -3,68 +3,102 @@
 </div>
 <app-info-banner [text]="'cons.livraison.info' | transloco"></app-info-banner>
 
-<div class="card"><div class="card-body">
-  <div class="row g-2 align-items-end" style="max-width:640px">
-    <div class="col">
-      <label class="form-label">{{ 'cons.livraison.f_ref' | transloco }}</label>
-      <input class="form-control" [(ngModel)]="ref" (keyup.enter)="search()" [placeholder]="'cons.livraison.ph_ref' | transloco" />
+@if (target) {
+  <div class="card border-success mb-3"><div class="card-body">
+    <h5 class="mb-3">{{ 'cons.livraison.deliver' | transloco }} — <span class="fw-bold">{{ target.reference }}</span>
+      <small class="text-muted ms-2">{{ target.recipient_name }} · {{ target.recipient_phone }}</small></h5>
+    <div class="row g-3" style="max-width:720px">
+      <div class="col-12">
+        <label class="form-label">{{ 'cons.livraison.f_address' | transloco }}</label>
+        <input class="form-control" [(ngModel)]="address" [placeholder]="'cons.livraison.ph_address' | transloco" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'cons.livraison.f_amount' | transloco }} <span class="text-danger">*</span></label>
+        <input type="number" min="0" class="form-control" [(ngModel)]="amount" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
+        <select class="form-select" [(ngModel)]="paymentMethod">
+          <option value="" disabled selected>{{ 'cons.common.opt_choose' | transloco }}</option>
+          @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
+        </select>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-success me-2" *hasPermission="'ticketing.parcel.manage'" [disabled]="saving || !amount" (click)="deliver()">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-truck-delivery me-1"></i>{{ 'cons.livraison.deliver' | transloco }}
+        </button>
+        <button class="btn btn-light" (click)="cancelDeliver()">{{ 'shared.actions.cancel' | transloco }}</button>
+      </div>
     </div>
-    <div class="col-auto">
-      <button class="btn btn-primary" (click)="search()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
-      @if (parcel) { <button class="btn btn-outline-secondary ms-1" (click)="reset()">{{ 'cons.livraison.new_search' | transloco }}</button> }
+  </div></div>
+}
+
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <ul class="nav nav-pills gap-1">
+      <li class="nav-item"><a href="javascript:void(0);" class="nav-link" [class.active]="tab === 'awaiting'" (click)="setTab('awaiting')">{{ 'cons.livraison.tab_awaiting' | transloco }}</a></li>
+      <li class="nav-item"><a href="javascript:void(0);" class="nav-link" [class.active]="tab === 'delivered'" (click)="setTab('delivered')">{{ 'cons.livraison.tab_delivered' | transloco }}</a></li>
+    </ul>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="originFilter" (ngModelChange)="reload()">
+        <option value="">{{ 'cons.parcels.opt_all_origins' | transloco }}</option>
+        @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
+      </select>
+      <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="destFilter" (ngModelChange)="reload()">
+        <option value="">{{ 'cons.parcels.opt_all_dest' | transloco }}</option>
+        @for (pt of points; track pt.id) { <option [value]="pt.id">{{ pt.name }}</option> }
+      </select>
+      @if (tab === 'delivered') {
+        <select class="form-select" style="min-width:150px;width:auto" [(ngModel)]="payFilter" (ngModelChange)="reload()">
+          <option value="">{{ 'cons.livraison.opt_all_payments' | transloco }}</option>
+          @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
+        </select>
+      }
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateFrom" (ngModelChange)="reload()" />
+      <input type="date" class="form-control" style="min-width:150px;width:auto" [(ngModel)]="dateTo" (ngModelChange)="reload()" />
+      <input type="text" class="form-control" style="min-width:220px;flex:1 1 220px" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
+      <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
+      <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'cons.common.clear' | transloco }}</button>
     </div>
   </div>
-
-  @if (searched && !parcel) {
-    <div class="alert alert-warning mt-3">{{ 'cons.livraison.not_found' | transloco }}</div>
-  }
-
-  @if (parcel) {
-    <div class="card mt-3">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="mb-0">{{ parcel.reference }}</h5>
-        <span class="badge {{ statusClass(parcel.status) }}">{{ parcel.status_display }}</span>
-      </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.common.col_recipient' | transloco }}</small>{{ parcel.recipient_name }}<br><small class="text-muted">{{ parcel.recipient_phone }}</small></div>
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.sender' | transloco }}</small>{{ parcel.sender_name }}<br><small class="text-muted">{{ parcel.sender_phone }}</small></div>
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.common.col_trip' | transloco }}</small>{{ parcel.origin_point_name }} → {{ parcel.destination_point_name }}</div>
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.contents' | transloco }}</small>{{ parcel.description || '—' }} · {{ parcel.quantity }} {{ 'cons.common.pieces' | transloco }}</div>
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.weight' | transloco }}</small>{{ parcel.weight_kg || '—' }} kg</div>
-          <div class="col-md-4"><small class="text-muted d-block">{{ 'cons.livraison.voyage' | transloco }}</small>{{ parcel.trip_number || '—' }}</div>
-        </div>
-
-        @if (parcel.status === 'available_for_pickup') {
-          <hr>
-          <div class="row g-3" style="max-width:640px">
-            <div class="col-12">
-              <label class="form-label">{{ 'cons.livraison.f_address' | transloco }}</label>
-              <input class="form-control" [(ngModel)]="address" [placeholder]="'cons.livraison.ph_address' | transloco" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'cons.livraison.f_amount' | transloco }} <span class="text-danger">*</span></label>
-              <input type="number" min="0" class="form-control" [(ngModel)]="amount" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
-              <select class="form-select" [(ngModel)]="paymentMethod">
-                <option value="" disabled selected>{{ 'cons.common.opt_choose' | transloco }}</option>
-                @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
-              </select>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-success" *hasPermission="'ticketing.parcel.manage'" [disabled]="saving || !amount" (click)="deliver()">
-                <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-truck-delivery me-1"></i>{{ 'cons.livraison.deliver' | transloco }}
-              </button>
-            </div>
-          </div>
-        } @else if (parcel.status === 'picked_up') {
-          <div class="alert alert-success mt-3 mb-0">{{ 'cons.livraison.already_done' | transloco }}</div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        @if (tab === 'awaiting') {
+          <thead class="thead-light"><tr>
+            <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_trip' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.livraison.col_arrived' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+          </tr></thead>
+          <tbody>
+            @for (p of rows | paginate:pg.page:pg.size; track p.id) {
+              <tr>
+                <td class="fw-medium">{{ p.reference }}</td>
+                <td>{{ p.origin_point_name }} → {{ p.destination_point_name }}</td>
+                <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
+                <td>{{ (p.arrived_at | date:'short') || '—' }}</td>
+                <td class="action-table-data"><a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.parcel.manage'" (click)="livrer(p)"><i class="ti ti-truck-delivery me-1"></i>{{ 'cons.livraison.deliver' | transloco }}</a></td>
+              </tr>
+            } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">{{ 'cons.livraison.empty_awaiting' | transloco }}</td></tr> }
+          </tbody>
         } @else {
-          <div class="alert alert-warning mt-3 mb-0">{{ 'cons.livraison.not_ready' | transloco }}</div>
+          <thead class="thead-light"><tr>
+            <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.livraison.f_address' | transloco }}</th><th>{{ 'cons.common.col_amount' | transloco }}</th><th>{{ 'cons.common.f_payment_method' | transloco }}</th><th>{{ 'cons.livraison.col_delivered_at' | transloco }}</th>
+          </tr></thead>
+          <tbody>
+            @for (p of rows | paginate:pg.page:pg.size; track p.id) {
+              <tr>
+                <td class="fw-medium">{{ p.reference }}</td>
+                <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
+                <td>{{ p.delivery_address || '—' }}</td>
+                <td>{{ p.delivery_amount | number:'1.0-0' }} XAF</td>
+                <td>{{ paymentLabel(p.delivery_payment_method) }}</td>
+                <td>{{ p.delivered_home_at | date:'short' }}</td>
+              </tr>
+            } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'cons.livraison.empty_delivered' | transloco }}</td></tr> }
+          </tbody>
         }
-      </div>
-    </div>
-  }
-</div></div>
+      </table></div>
+      <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
+    }
+  </div>
+</div>

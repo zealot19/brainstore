@@ -3,62 +3,84 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
+import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
+import { ServicePoint } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
+import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
+
+type Tab = 'awaiting' | 'delivered';
 
 @Component({
   selector: 'app-vcg-livraison',
   templateUrl: './livraison.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [PaginatePipe, TablePaginatorComponent, HasPermissionDirective,
+            CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class VcgLivraisonComponent implements OnInit {
   private toast = inject(ToastService);
-  ref = '';
-  parcel: Parcel | null = null;
-  searched = false;
-  saving = false;
-  address = '';
-  amount: number | null = null;
-  paymentMethod = '';
-  paymentMethods: any[] = [];
+  tab: Tab = 'awaiting';
+  pg: PageState = { page: 1, size: 25 };
+  rows: Parcel[] = []; loading = false;
+  q = ''; originFilter = ''; destFilter = ''; payFilter = ''; dateFrom = ''; dateTo = '';
+  points: ServicePoint[] = []; paymentMethods: any[] = [];
 
-  constructor(private svc: ParcelService, private pmSvc: PaymentMethodService) {}
+  // Deliver form
+  target: Parcel | null = null; address = ''; amount: number | null = null; paymentMethod = ''; saving = false;
 
-  ngOnInit(): void { this.pmSvc.list(true).subscribe(d => this.paymentMethods = d); }
+  constructor(private svc: ParcelService, private pmSvc: PaymentMethodService,
+              private spSvc: ServicePointService) {}
 
-  statusClass(s: string): string {
-    return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
-             in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
-             picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
+  ngOnInit(): void {
+    this.spSvc.list().subscribe(d => this.points = d);
+    this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
+    this.reload();
   }
 
-  search(): void {
-    const q = this.ref.trim();
-    if (!q) return;
-    this.searched = true; this.parcel = null;
-    this.svc.list({ q }).subscribe({
-      next: rows => {
-        this.parcel = rows.find(p => p.reference.toLowerCase() === q.toLowerCase()) ?? rows[0] ?? null;
-        if (this.parcel) { this.address = this.parcel.recipient_address || ''; this.amount = null; this.paymentMethod = ''; }
-      },
-      error: e => this.toast.error(e?.error?.detail ?? 'La recherche a échoué.'),
+  setTab(t: Tab): void { if (this.tab === t) return; this.tab = t; this.target = null; this.pg.page = 1; this.reload(); }
+
+  reload(): void {
+    this.loading = true;
+    const base = {
+      q: this.q || undefined, origin_point: this.originFilter || undefined,
+      destination_point: this.destFilter || undefined,
+      date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+    };
+    const params = this.tab === 'delivered'
+      ? { ...base, delivered_home: '1', date_field: 'delivered', delivery_payment_method: this.payFilter || undefined }
+      : { ...base, status: 'available_for_pickup', date_field: 'arrival' };
+    this.svc.list(params).subscribe({
+      next: d => { this.rows = d; this.pg.page = 1; this.loading = false; },
+      error: () => this.loading = false,
     });
   }
 
+  clearFilters(): void {
+    this.q = this.originFilter = this.destFilter = this.payFilter = this.dateFrom = this.dateTo = '';
+    this.reload();
+  }
+
+  paymentLabel(code: string | undefined): string {
+    if (!code) return '—';
+    return this.paymentMethods.find(m => m.code === code)?.name ?? code;
+  }
+
+  livrer(p: Parcel): void { this.target = p; this.address = p.recipient_address || ''; this.amount = null; this.paymentMethod = ''; }
+  cancelDeliver(): void { this.target = null; }
+
   deliver(): void {
-    if (!this.parcel || this.saving) return;
+    if (!this.target || this.saving) return;
     if (!this.amount || this.amount <= 0) { this.toast.error('Indiquez le montant de la livraison.'); return; }
     this.saving = true;
-    this.svc.deliverHome(this.parcel.id, {
+    this.svc.deliverHome(this.target.id, {
       delivery_amount: this.amount, delivery_address: this.address.trim(), payment_method: this.paymentMethod,
     }).subscribe({
-      next: p => { this.saving = false; this.parcel = p; this.toast.success('Colis livré. Recette enregistrée.'); },
+      next: () => { this.saving = false; this.target = null; this.toast.success('Colis livré. Recette enregistrée.'); this.reload(); },
       error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); },
     });
   }
-
-  reset(): void { this.ref = ''; this.parcel = null; this.searched = false; this.address = ''; this.amount = null; this.paymentMethod = ''; }
 }
