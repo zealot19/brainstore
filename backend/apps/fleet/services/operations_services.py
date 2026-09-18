@@ -41,6 +41,23 @@ def start_service(service, *, start_date=None, updated_by):
     return service
 
 
+def record_intervention_expense(*, company, agency, label, amount, expense_date, user):
+    """Enregistre le coût d'une intervention comme dépense générale « à décaisser ».
+
+    Réutilise (ou crée) un type de dépense dédié « Entretien véhicule » par institution.
+    La dépense est laissée à décaisser (UNPAID) : la trésorerie la décaisse via le flux habituel.
+    """
+    from apps.treasury.models import GeneralExpense
+    from apps.voyages_config.models import ExpenseType
+    etype, _created = ExpenseType.objects.get_or_create(
+        company=company, code="ENTRETIEN",
+        defaults={"name": "Entretien véhicule", "account_code": "624"})
+    return GeneralExpense.objects.create(
+        company=company, agency=agency, expense_type=etype, label=label,
+        amount=amount, expense_date=expense_date,
+        status=GeneralExpense.Status.UNPAID, created_by=user)
+
+
 @transaction.atomic
 def complete_service(service, *, done_date=None, cost=None, odometer_km=None,
                      notes=None, updated_by):
@@ -74,6 +91,12 @@ def complete_service(service, *, done_date=None, cost=None, odometer_km=None,
     vehicle.status = Vehicle.Status.AVAILABLE
     vehicle.updated_by = updated_by
     vehicle.save(update_fields=["status", "current_odometer", "updated_by", "updated_at"])
+    # Le coût de l'intervention devient une dépense générale à décaisser.
+    if service.cost and service.cost > 0:
+        record_intervention_expense(
+            company=vehicle.company, agency=vehicle.agency,
+            label=f"Entretien {itype.name} — {vehicle.license_plate}",
+            amount=service.cost, expense_date=today, user=updated_by)
     return service
 
 
