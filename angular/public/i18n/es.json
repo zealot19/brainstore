@@ -2016,7 +2016,10 @@
       "d_delivered_to": "Entregado a",
       "d_piece": "documento",
       "d_tracking": "Seguimiento",
-      "d_no_events": "Sin eventos."
+      "d_no_events": "Sin eventos.",
+      "f_by_mandataire": "Retirado por un apoderado",
+      "f_mandataire_name": "Nombre del apoderado",
+      "f_mandataire_id": "DNI del apoderado"
     },
     "expedition": {
       "title": "Expedición",

@@ -34,7 +34,7 @@ export class VcgParcelsComponent implements OnInit {
   points: ServicePoint[] = []; types: ConsignmentType[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
-  pickupTarget: Parcel | null = null; pickupName = ''; pickupId = '';
+  pickupTarget: Parcel | null = null; pickupName = ''; pickupId = ''; pickupByMandataire = false;
   editId: string | null = null;
   selected = new Set<string>();
 
@@ -123,10 +123,13 @@ export class VcgParcelsComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
-  askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupName = ''; this.pickupId = ''; }
+  askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupByMandataire = false; this.pickupName = ''; this.pickupId = ''; }
   doPickup(): void {
-    if (!this.pickupTarget || !this.pickupName) return;
-    this.svc.pickup(this.pickupTarget.id, this.pickupName, this.pickupId).subscribe({
+    if (!this.pickupTarget) return;
+    const by = this.pickupByMandataire ? this.pickupName.trim() : this.pickupTarget.recipient_name;
+    const idnum = this.pickupByMandataire ? this.pickupId.trim() : '';
+    if (this.pickupByMandataire && (!by || !idnum)) return;
+    this.svc.pickup(this.pickupTarget.id, by, idnum).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
       error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }

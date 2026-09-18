@@ -2016,7 +2016,10 @@
       "d_delivered_to": "Livré à",
       "d_piece": "pièce",
       "d_tracking": "Suivi",
-      "d_no_events": "Aucun événement."
+      "d_no_events": "Aucun événement.",
+      "f_by_mandataire": "Retiré par un mandataire",
+      "f_mandataire_name": "Nom du mandataire",
+      "f_mandataire_id": "CNI du mandataire"
     },
     "expedition": {
       "title": "Expédition",

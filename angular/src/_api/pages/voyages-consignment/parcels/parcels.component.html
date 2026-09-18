@@ -147,10 +147,16 @@
         <div class="alert alert-info py-2"><i class="ti ti-id me-1"></i>{{ 'cons.parcels.pickup_id_registered' | transloco }} <strong>{{ pickupTarget.recipient_id_number }}</strong> {{ 'cons.parcels.pickup_id_verify' | transloco }}</div>
       }
     }
-    <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_pickup_name' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
-    <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_pickup_id' | transloco }}</label><input class="form-control" [(ngModel)]="pickupId" [placeholder]="'cons.parcels.pickup_id_ph' | transloco" /></div>
+    <div class="form-check form-switch mb-2">
+      <input class="form-check-input" type="checkbox" id="mandataire-toggle" [(ngModel)]="pickupByMandataire" />
+      <label class="form-check-label" for="mandataire-toggle">{{ 'cons.parcels.f_by_mandataire' | transloco }}</label>
+    </div>
+    @if (pickupByMandataire) {
+      <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_mandataire_name' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupName" /></div>
+      <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_mandataire_id' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pickupId" [placeholder]="'cons.parcels.pickup_id_ph' | transloco" /></div>
+    }
   </div>
-  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-success" [disabled]="!pickupName" *hasPermission="'ticketing.parcel.manage'" (click)="doPickup()">{{ 'cons.parcels.pickup_confirm' | transloco }}</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="pickupTarget = null">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-success" [disabled]="pickupByMandataire && (!pickupName || !pickupId)" *hasPermission="'ticketing.parcel.manage'" (click)="doPickup()">{{ 'cons.parcels.pickup_confirm' | transloco }}</button></div>
 </div></div></div>
 
 <!-- Détail / suivi -->

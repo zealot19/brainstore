@@ -2016,7 +2016,10 @@
       "d_delivered_to": "Delivered to",
       "d_piece": "ID",
       "d_tracking": "Tracking",
-      "d_no_events": "No events."
+      "d_no_events": "No events.",
+      "f_by_mandataire": "Collected by a proxy",
+      "f_mandataire_name": "Proxy name",
+      "f_mandataire_id": "Proxy ID (CNI)"
     },
     "expedition": {
       "title": "Dispatch",
