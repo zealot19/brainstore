@@ -17,10 +17,16 @@
         <option value="round_trip">{{ 'booking.form.round_trip' | transloco }}</option>
       </select>
     </div>
-    <div class="col-md-3"><label class="form-label">{{ 'booking.form.route' | transloco }}</label>
-      <select class="form-select" [(ngModel)]="routeCode" (ngModelChange)="onOutCriteria()">
-        <option value="">{{ 'booking.form.all_routes' | transloco }}</option>
-        @for (r of routes; track r.id) { <option [value]="r.code">{{ r.code }} — {{ r.origin_name }} → {{ r.destination_name }}</option> }
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.route' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="routeCode" (ngModelChange)="onRouteChange()">
+        <option value="" disabled selected>{{ 'booking.new.choose' | transloco }}</option>
+        @for (r of routes; track r.id) { <option [value]="r.code">{{ r.origin_name }} → {{ r.destination_name }}</option> }
+      </select>
+    </div>
+    <div class="col-md-3"><label class="form-label">{{ 'booking.form.destination' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="destinationId" [disabled]="!routeDests.length">
+        <option value="" disabled selected>{{ 'booking.new.choose' | transloco }}</option>
+        @for (d of routeDests; track d.id) { <option [value]="d.id">{{ d.name }}</option> }
       </select>
     </div>
     <div class="col-md-3"><label class="form-label">{{ 'booking.form.fare_class' | transloco }} <span class="text-danger">*</span></label>
@@ -65,12 +71,6 @@
   </div>
 
   <div class="row g-3 mb-2">
-    <div class="col-md-6"><label class="form-label">{{ 'booking.form.destination' | transloco }} <span class="text-danger">*</span></label>
-      <select class="form-select" [(ngModel)]="destinationId" [disabled]="!destinations.length">
-        <option value="">{{ 'booking.new.choose' | transloco }}</option>
-        @for (d of destinations; track d.id) { <option [value]="d.id">{{ d.name }}</option> }
-      </select>
-    </div>
     <div class="col-md-3"><label class="form-label">{{ 'booking.form.fare' | transloco }}</label>
       <input class="form-control fw-bold" disabled [value]="fare != null ? ((fare | number:'1.0-0') + ' XAF') : '—'" /></div>
   </div>

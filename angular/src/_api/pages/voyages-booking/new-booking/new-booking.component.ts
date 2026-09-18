@@ -28,7 +28,8 @@ export class VbNewBookingComponent implements OnInit {
   // Aller
   routeCode = ''; fareClassId = ''; outDate = ''; outSlotId = '';
   outTrips: TripOption[] = []; outboundTripId = '';
-  destinations: TripDestination[] = []; destinationId = '';
+  routeDests: { id: string; name: string; code: string; is_station: boolean }[] = [];
+  tripDests: TripDestination[] = []; destinationId = '';
   outSeats: SeatCell[] = []; outSeatId = '';
 
   // Retour
@@ -69,6 +70,13 @@ export class VbNewBookingComponent implements OnInit {
   private byRoute(trips: TripOption[]): TripOption[] {
     return this.routeCode ? trips.filter(t => t.route_code === this.routeCode) : trips;
   }
+  // Trajet choisi en premier : charge ses points d'arrêt (destination) puis les voyages.
+  onRouteChange(): void {
+    this.routeDests = []; this.destinationId = '';
+    const r = this.routes.find(x => x.code === this.routeCode);
+    if (r) this.svc.routeDestinations(r.id).subscribe(d => this.routeDests = d);
+    this.onOutCriteria();
+  }
   onOutCriteria(): void {
     this.outboundTripId = ''; this.outTrips = []; this.resetOutTrip();
     if (this.fareClassId && this.outDate && this.outSlotId) {
@@ -85,7 +93,8 @@ export class VbNewBookingComponent implements OnInit {
   }
   onTripTypeChange(): void { if (!this.needReturnSel) { this.retTrips = []; this.returnTripId = ''; this.retSeats = []; this.retSeatId = ''; } else { this.onRetCriteria(); } }
 
-  private resetOutTrip(): void { this.destinations = []; this.destinationId = ''; this.outSeats = []; this.outSeatId = ''; }
+  // Le trajet/destination sont choisis avant le voyage : on ne réinitialise que la tarification + sièges.
+  private resetOutTrip(): void { this.tripDests = []; this.outSeats = []; this.outSeatId = ''; }
 
   get outboundTrip(): TripOption | undefined { return this.outTrips.find(t => t.id === this.outboundTripId); }
   get returnTrip(): TripOption | undefined { return this.retTrips.find(t => t.id === this.returnTripId); }
@@ -97,10 +106,8 @@ export class VbNewBookingComponent implements OnInit {
   onOutboundChange(): void {
     this.resetOutTrip();
     if (this.outboundTripId) {
-      this.svc.destinations(this.outboundTripId).subscribe(d => {
-        this.destinations = d;
-        this.destinationId = d.length ? d[d.length - 1].id : '';  // défaut : terminus
-      });
+      // La destination est déjà choisie (depuis le trajet) ; on charge la tarification du voyage.
+      this.svc.destinations(this.outboundTripId).subscribe(d => this.tripDests = d);
       if (!this.outboundAuto) this.svc.seatMap(this.outboundTripId).subscribe(s => this.outSeats = s);
     }
   }
@@ -113,7 +120,7 @@ export class VbNewBookingComponent implements OnInit {
 
   // ── Fare / payment ──
   priceFor(destId: string): number | null {
-    const d = this.destinations.find(x => x.id === destId);
+    const d = this.tripDests.find(x => x.id === destId);
     if (!d) return null;
     const amt = this.isRound ? d.round_trip_amount : d.one_way_amount;
     return amt != null ? +amt : null;
