@@ -18,6 +18,7 @@ export interface Parcel {
   amount_due: string; amount_received: string; change_due: string; payment_method: string;
   paid_at: string | null; loaded_at: string | null; arrived_at: string | null;
   picked_up_at: string | null; picked_up_by: string; picked_up_id_number: string; notes: string;
+  delivery_amount?: number; delivery_address?: string; delivery_payment_method?: string; delivered_home_at?: string | null;
   created_at: string; updated_at: string; events: ParcelEvent[];
 }
 

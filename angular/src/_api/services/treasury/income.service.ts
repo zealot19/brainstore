@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TREASURY } from '../../config/api.config';
 
-type IncomeKind = 'voyage' | 'parcel' | 'baggage' | 'other';
+type IncomeKind = 'voyage' | 'parcel' | 'baggage' | 'delivery' | 'other';
 
 @Injectable({ providedIn: 'root' })
 export class IncomeService {
@@ -12,7 +12,8 @@ export class IncomeService {
 
   private urlFor(kind: IncomeKind): string {
     return { voyage: TREASURY.incVoyage, parcel: TREASURY.incParcel,
-             baggage: TREASURY.incBaggage, other: TREASURY.incOther }[kind];
+             baggage: TREASURY.incBaggage, delivery: TREASURY.incDelivery,
+             other: TREASURY.incOther }[kind];
   }
 
   list(kind: IncomeKind,
