@@ -58,6 +58,21 @@ def record_parcel_payment(company, *, parcel, amount, payment_method, user):
     )
 
 
+def record_parcel_delivery(company, *, parcel, amount, payment_method, user):
+    """Mouvement de trésorerie pour une livraison à domicile (catégorie parcel_delivery).
+
+    Pas de lien voyages_parcel (link_obj=None) : l'expédition occupe déjà ce lien.
+    La double-facturation est empêchée par le statut du colis côté service.
+    """
+    ref = getattr(parcel, "reference", "") or ""
+    return _record_consignment_payment(
+        company, amount=amount, payment_method=payment_method, user=user,
+        category=Transaction.Category.PARCEL_DELIVERY,
+        description=f"Livraison {ref}".strip(),
+        link_field="voyages_parcel", link_obj=None,
+    )
+
+
 def record_baggage_payment(company, *, baggage, amount, payment_method, user):
     """Mouvement de trésorerie pour l'enregistrement d'un bagage (catégorie baggage)."""
     ref = getattr(baggage, "tag_number", "") or ""
