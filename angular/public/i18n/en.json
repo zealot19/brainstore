@@ -622,6 +622,7 @@
       "voyage_total": "Trip income",
       "parcel_total": "Parcel income",
       "baggage_total": "Luggage income",
+      "delivery_total": "Home delivery",
       "other_total": "Other income",
       "total": "Total"
     },

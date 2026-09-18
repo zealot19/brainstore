@@ -410,6 +410,7 @@ export const routes={
   trzRecettesDashboard: '/treasury/recettes-dashboard',
   trzRecettesVoyage:    '/treasury/recettes-voyage',
   trzRecettesColis:     '/treasury/recettes-colis',
+  trzRecettesLivraison: '/treasury/recettes-livraison',
   trzRecettesBagage:    '/treasury/recettes-bagage',
   trzRecettesAutre:     '/treasury/recettes-autre',
   trzPaymentMethods:    '/treasury/payment-methods',

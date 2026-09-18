@@ -622,6 +622,7 @@
       "voyage_total": "Recette voyage",
       "parcel_total": "Recette colis",
       "baggage_total": "Recette bagage",
+      "delivery_total": "Livraison colis",
       "other_total": "Autre recette",
       "total": "Total"
     },

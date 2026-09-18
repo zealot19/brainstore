@@ -67,6 +67,7 @@ export const Pages_routes: Routes = [
                 { path: 'recettes-dashboard', loadComponent: () => import('../../../_api/pages/treasury/recettes/dashboard/recettes-dashboard.component').then(m => m.RecettesDashboardComponent) },
                 { path: 'recettes-voyage', data: { kind: 'voyage' },  loadComponent: () => import('../../../_api/pages/treasury/recettes/list/recettes-list.component').then(m => m.RecettesListComponent) },
                 { path: 'recettes-colis',  data: { kind: 'parcel' },  loadComponent: () => import('../../../_api/pages/treasury/recettes/list/recettes-list.component').then(m => m.RecettesListComponent) },
+                { path: 'recettes-livraison', data: { kind: 'delivery' }, loadComponent: () => import('../../../_api/pages/treasury/recettes/list/recettes-list.component').then(m => m.RecettesListComponent) },
                 { path: 'recettes-bagage', data: { kind: 'baggage' }, loadComponent: () => import('../../../_api/pages/treasury/recettes/list/recettes-list.component').then(m => m.RecettesListComponent) },
                 { path: 'recettes-autre',  data: { kind: 'other' },   loadComponent: () => import('../../../_api/pages/treasury/recettes/list/recettes-list.component').then(m => m.RecettesListComponent) },
                 { path: 'payment-methods', loadComponent: () => import('../../../_api/pages/treasury/config/payment-methods/payment-methods.component').then(m => m.PaymentMethodsComponent) },

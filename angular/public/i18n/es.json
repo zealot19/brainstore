@@ -622,6 +622,7 @@
       "voyage_total": "Ingreso de viaje",
       "parcel_total": "Ingreso de paquetes",
       "baggage_total": "Ingreso de equipaje",
+      "delivery_total": "Entrega a domicilio",
       "other_total": "Otro ingreso",
       "total": "Total"
     },

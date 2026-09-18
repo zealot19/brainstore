@@ -622,6 +622,7 @@
       "voyage_total": "Receita de viagem",
       "parcel_total": "Receita de encomendas",
       "baggage_total": "Receita de bagagem",
+      "delivery_total": "Entrega ao domicílio",
       "other_total": "Outra receita",
       "total": "Total"
     },

@@ -12,11 +12,11 @@ import { ToastService } from '../../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../../shared/searchable-select/searchable-select.directive';
 
-type Kind = 'voyage' | 'parcel' | 'baggage' | 'other';
+type Kind = 'voyage' | 'parcel' | 'baggage' | 'delivery' | 'other';
 
 const TITLES: Record<Kind, string> = {
   voyage: 'Recette voyage', parcel: 'Recette colis',
-  baggage: 'Recette bagage', other: 'Autre recette',
+  baggage: 'Recette bagage', delivery: 'Recette livraison', other: 'Autre recette',
 };
 
 @Component({

@@ -171,6 +171,7 @@ export class SidebarService {
           subMenus: [
             { menuValue: 'Recette voyage',  route: routes.trzRecettesVoyage,    base: 'recettes-voyage',    permission: 'treasury.income.view' },
             { menuValue: 'Recette colis',   route: routes.trzRecettesColis,     base: 'recettes-colis',     permission: 'treasury.income.view' },
+            { menuValue: 'Recette livraison', route: routes.trzRecettesLivraison, base: 'recettes-livraison', permission: 'treasury.income.view' },
             { menuValue: 'Recette bagage',  route: routes.trzRecettesBagage,    base: 'recettes-bagage',    permission: 'treasury.income.view' },
             { menuValue: 'Autre recette',   route: routes.trzRecettesAutre,     base: 'recettes-autre',     permission: 'treasury.income.view' },
           ],
@@ -354,7 +355,7 @@ export class SidebarService {
             { menuValue: 'Nouveau colis',    route: routes.vcgParcels,   queryParams: { new: 1 }, base: 'parcels', permission: 'ticketing.parcel.manage' },
             { menuValue: 'Expédition',       route: routes.vcgManifest,  base: 'manifest',  permission: 'ticketing.parcel.view' },
             { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception', permission: 'ticketing.parcel.view' },
-            { menuValue: 'Retrait',          route: routes.vcgLivraison, base: 'livraison', permission: 'ticketing.parcel.view' },
+            { menuValue: 'Livraison colis',  route: routes.vcgLivraison, base: 'livraison', permission: 'ticketing.parcel.manage' },
           ],
         },
       ],
