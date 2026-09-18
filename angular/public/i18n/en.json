@@ -2019,7 +2019,8 @@
       "d_no_events": "No events.",
       "f_by_mandataire": "Collected by a proxy",
       "f_mandataire_name": "Proxy name",
-      "f_mandataire_id": "Proxy ID (CNI)"
+      "f_mandataire_id": "Proxy ID (CNI)",
+      "f_contenance": "Contents"
     },
     "expedition": {
       "title": "Dispatch",

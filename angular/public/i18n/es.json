@@ -2019,7 +2019,8 @@
       "d_no_events": "Sin eventos.",
       "f_by_mandataire": "Retirado por un apoderado",
       "f_mandataire_name": "Nombre del apoderado",
-      "f_mandataire_id": "DNI del apoderado"
+      "f_mandataire_id": "DNI del apoderado",
+      "f_contenance": "Contenido"
     },
     "expedition": {
       "title": "Expedición",

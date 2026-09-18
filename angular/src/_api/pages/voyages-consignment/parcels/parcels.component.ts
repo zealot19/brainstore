@@ -31,7 +31,7 @@ export class VcgParcelsComponent implements OnInit {
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
   dateField = 'created'; dateFrom = ''; dateTo = '';
   trips: { id: string; number?: string; code?: string }[] = [];
-  points: ServicePoint[] = []; types: ConsignmentType[] = [];
+  points: ServicePoint[] = []; types: ConsignmentType[] = []; typeOptions: any[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
   pickupTarget: Parcel | null = null; pickupName = ''; pickupId = ''; pickupByMandataire = false;
@@ -50,12 +50,15 @@ export class VcgParcelsComponent implements OnInit {
       consignment_type_id: [null, Validators.required],
       sender_name: [null, Validators.required], sender_phone: [null, Validators.required],
       recipient_name: [null, Validators.required], recipient_phone: [null, Validators.required],
-      recipient_address: [''], recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
+      recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
       amount_received: [null], payment_method: [''],
     });
     this.spSvc.list().subscribe(d => this.points = d);
-    this.ctSvc.list().subscribe(d => this.types = d);
+    this.ctSvc.list().subscribe(d => {
+      this.types = d;
+      this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
+    });
     this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
@@ -106,7 +109,7 @@ export class VcgParcelsComponent implements OnInit {
     this.form.reset({
       origin_point_id: p.origin_point, destination_point_id: p.destination_point, consignment_type_id: p.consignment_type,
       sender_name: p.sender_name, sender_phone: p.sender_phone, recipient_name: p.recipient_name,
-      recipient_phone: p.recipient_phone, recipient_address: p.recipient_address, recipient_id_number: p.recipient_id_number,
+      recipient_phone: p.recipient_phone, recipient_id_number: p.recipient_id_number,
       description: p.description, weight_kg: p.weight_kg, quantity: p.quantity, declared_value: p.declared_value,
       amount_due: p.amount_due, amount_received: p.amount_received, payment_method: p.payment_method,
     });
