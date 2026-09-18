@@ -34,3 +34,15 @@ def test_delivery_cash_without_session_raises():
     with pytest.raises(ApplicationError):
         record_parcel_delivery(company, parcel=None, amount=Decimal("1500"),
                                payment_method="cash", user=admin)
+
+
+@pytest.mark.django_db
+def test_delivery_total_in_dashboard():
+    from apps.treasury.selectors.incomes import income_dashboard
+    company, admin = _company(name="DelivDash", email="dd@x.com")
+    reg = create_cash_register(company=company, name="C1", created_by=admin)
+    open_session(company=company, cash_register=reg, created_by=admin)
+    record_parcel_delivery(company, parcel=None, amount=Decimal("1500"),
+                           payment_method="cash", user=admin)
+    d = income_dashboard(company.id)
+    assert Decimal(str(d["delivery_total"])) == Decimal("1500")

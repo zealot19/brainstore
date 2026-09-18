@@ -804,6 +804,10 @@ class IncomeBaggageListView(_IncomeListBase):
     category = Transaction.Category.BAGGAGE
 
 
+class IncomeDeliveryListView(_IncomeListBase):
+    category = Transaction.Category.PARCEL_DELIVERY
+
+
 class IncomeOtherListView(_IncomeListBase):
     category = Transaction.Category.OTHER_INCOME
     permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.manage"}

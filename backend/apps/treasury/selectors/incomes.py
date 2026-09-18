@@ -56,6 +56,7 @@ def income_dashboard(company_id, *, agency_scope=None):
         "voyage_total":  _cat(Transaction.Category.TICKET_SALES),
         "parcel_total":  _cat(Transaction.Category.PARCEL_SHIPPING),
         "baggage_total": _cat(Transaction.Category.BAGGAGE),
+        "delivery_total": _cat(Transaction.Category.PARCEL_DELIVERY),
         "other_total":   _cat(Transaction.Category.OTHER_INCOME),
         "total": _sum(base),
         "count": base.count(),
