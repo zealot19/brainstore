@@ -2040,9 +2040,9 @@
       "all": "Tous"
     },
     "livraison": {
-      "title": "Retrait",
-      "subtitle": "Remettre un colis à son destinataire",
-      "info": "Recherchez le colis par référence, vérifiez puis remettez-le.",
+      "title": "Livraison à domicile",
+      "subtitle": "Livrer un colis au domicile du client (service payant)",
+      "info": "Recherchez le colis par référence, saisissez l'adresse et le montant, puis validez la livraison.",
       "f_ref": "Référence du colis",
       "ph_ref": "ex. COL-00123",
       "new_search": "Nouvelle recherche",
@@ -2051,12 +2051,12 @@
       "contents": "Contenu",
       "weight": "Poids",
       "voyage": "Voyage",
-      "picked_by": "Retiré par",
-      "picked_id": "Pièce présentée",
-      "picked_id_ph": "N° CNI, passeport…",
-      "remit": "Remettre le colis",
-      "already_done": "Ce colis a déjà été retiré",
-      "not_ready": "Ce colis n'est pas encore disponible pour retrait."
+      "f_address": "Adresse de livraison",
+      "ph_address": "Quartier, ville…",
+      "f_amount": "Montant de la livraison",
+      "deliver": "Livrer",
+      "already_done": "Ce colis a déjà été remis.",
+      "not_ready": "Ce colis n'est pas encore disponible."
     },
     "retrait": {
       "bag_title": "Retrait",

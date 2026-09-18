@@ -2040,9 +2040,9 @@
       "all": "All"
     },
     "livraison": {
-      "title": "Pickup",
-      "subtitle": "Hand a parcel to its recipient",
-      "info": "Search the parcel by reference, verify, then hand it over.",
+      "title": "Home delivery",
+      "subtitle": "Deliver a parcel to the client's home (paid service)",
+      "info": "Search the parcel by reference, enter the address and amount, then confirm delivery.",
       "f_ref": "Parcel reference",
       "ph_ref": "e.g. COL-00123",
       "new_search": "New search",
@@ -2051,12 +2051,12 @@
       "contents": "Contents",
       "weight": "Weight",
       "voyage": "Voyage",
-      "picked_by": "Picked up by",
-      "picked_id": "ID presented",
-      "picked_id_ph": "ID no., passport…",
-      "remit": "Hand over parcel",
-      "already_done": "This parcel was already picked up",
-      "not_ready": "This parcel is not yet available for pickup."
+      "f_address": "Delivery address",
+      "ph_address": "Neighbourhood, city…",
+      "f_amount": "Delivery amount",
+      "deliver": "Deliver",
+      "already_done": "This parcel has already been handed over.",
+      "not_ready": "This parcel is not yet available."
     },
     "retrait": {
       "bag_title": "Pickup",

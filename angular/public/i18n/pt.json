@@ -2040,9 +2040,9 @@
       "all": "Todos"
     },
     "livraison": {
-      "title": "Retirada",
-      "subtitle": "Entregar uma encomenda ao destinatário",
-      "info": "Procure a encomenda por referência, verifique e entregue.",
+      "title": "Entrega ao domicílio",
+      "subtitle": "Entregar uma encomenda no domicílio do cliente (serviço pago)",
+      "info": "Procure a encomenda por referência, informe o endereço e o valor e confirme a entrega.",
       "f_ref": "Referência da encomenda",
       "ph_ref": "ex. COL-00123",
       "new_search": "Nova pesquisa",
@@ -2051,12 +2051,12 @@
       "contents": "Conteúdo",
       "weight": "Peso",
       "voyage": "Viagem",
-      "picked_by": "Retirado por",
-      "picked_id": "Documento apresentado",
-      "picked_id_ph": "N.º de documento…",
-      "remit": "Entregar a encomenda",
-      "already_done": "Esta encomenda já foi retirada",
-      "not_ready": "Esta encomenda ainda não está disponível para retirada."
+      "f_address": "Endereço de entrega",
+      "ph_address": "Bairro, cidade…",
+      "f_amount": "Valor da entrega",
+      "deliver": "Entregar",
+      "already_done": "Esta encomenda já foi entregue.",
+      "not_ready": "Esta encomenda ainda não está disponível."
     },
     "retrait": {
       "bag_title": "Retirada",

@@ -2040,9 +2040,9 @@
       "all": "Todos"
     },
     "livraison": {
-      "title": "Retiro",
-      "subtitle": "Entregar un paquete a su destinatario",
-      "info": "Busque el paquete por referencia, verifique y entréguelo.",
+      "title": "Entrega a domicilio",
+      "subtitle": "Entregar un paquete en el domicilio del cliente (servicio de pago)",
+      "info": "Busque el paquete por referencia, indique la dirección y el importe, y confirme la entrega.",
       "f_ref": "Referencia del paquete",
       "ph_ref": "ej. COL-00123",
       "new_search": "Nueva búsqueda",
@@ -2051,12 +2051,12 @@
       "contents": "Contenido",
       "weight": "Peso",
       "voyage": "Viaje",
-      "picked_by": "Retirado por",
-      "picked_id": "Documento presentado",
-      "picked_id_ph": "N.º de documento…",
-      "remit": "Entregar el paquete",
-      "already_done": "Este paquete ya fue retirado",
-      "not_ready": "Este paquete aún no está disponible para retiro."
+      "f_address": "Dirección de entrega",
+      "ph_address": "Barrio, ciudad…",
+      "f_amount": "Importe de la entrega",
+      "deliver": "Entregar",
+      "already_done": "Este paquete ya fue entregado.",
+      "not_ready": "Este paquete aún no está disponible."
     },
     "retrait": {
       "bag_title": "Retiro",

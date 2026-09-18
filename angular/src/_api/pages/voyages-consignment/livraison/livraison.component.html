@@ -38,22 +38,29 @@
         @if (parcel.status === 'available_for_pickup') {
           <hr>
           <div class="row g-3" style="max-width:640px">
-            <div class="col-md-6">
-              <label class="form-label">{{ 'cons.livraison.picked_by' | transloco }} <span class="text-danger">*</span></label>
-              <input class="form-control" [(ngModel)]="pickedBy" />
+            <div class="col-12">
+              <label class="form-label">{{ 'cons.livraison.f_address' | transloco }}</label>
+              <input class="form-control" [(ngModel)]="address" [placeholder]="'cons.livraison.ph_address' | transloco" />
             </div>
             <div class="col-md-6">
-              <label class="form-label">{{ 'cons.livraison.picked_id' | transloco }}</label>
-              <input class="form-control" [(ngModel)]="pickedId" [placeholder]="'cons.livraison.picked_id_ph' | transloco" />
+              <label class="form-label">{{ 'cons.livraison.f_amount' | transloco }} <span class="text-danger">*</span></label>
+              <input type="number" min="0" class="form-control" [(ngModel)]="amount" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
+              <select class="form-select" [(ngModel)]="paymentMethod">
+                <option value="" disabled selected>{{ 'cons.common.opt_choose' | transloco }}</option>
+                @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
+              </select>
             </div>
             <div class="col-12">
-              <button class="btn btn-success" *hasPermission="'ticketing.parcel.manage'" [disabled]="saving" (click)="remit()">
-                <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-package-export me-1"></i>{{ 'cons.livraison.remit' | transloco }}
+              <button class="btn btn-success" *hasPermission="'ticketing.parcel.manage'" [disabled]="saving || !amount" (click)="deliver()">
+                <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span><i class="ti ti-truck-delivery me-1"></i>{{ 'cons.livraison.deliver' | transloco }}
               </button>
             </div>
           </div>
         } @else if (parcel.status === 'picked_up') {
-          <div class="alert alert-success mt-3 mb-0">{{ 'cons.livraison.already_done' | transloco }} — {{ parcel.picked_up_by }} · {{ parcel.picked_up_at | date:'short' }}</div>
+          <div class="alert alert-success mt-3 mb-0">{{ 'cons.livraison.already_done' | transloco }}</div>
         } @else {
           <div class="alert alert-warning mt-3 mb-0">{{ 'cons.livraison.not_ready' | transloco }}</div>
         }
