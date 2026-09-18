@@ -34,13 +34,9 @@ class Accident(BaseModel):
     third_party_involved = models.BooleanField(_("tiers impliqué"), default=False)
     third_party_info     = models.TextField(_("informations tiers"), blank=True)
 
-    # ── Administratif & financier ──────────────────────────────────────────────
+    # ── Administratif ──────────────────────────────────────────────────────────
     police_report_number   = models.CharField(_("numéro PV de police"), max_length=100, blank=True)
     insurance_claim_number = models.CharField(_("numéro sinistre assurance"), max_length=100, blank=True)
-    estimated_damage_cost  = models.DecimalField(_("coût estimé des dégâts"), max_digits=14,
-                                                  decimal_places=2, null=True, blank=True)
-    actual_repair_cost     = models.DecimalField(_("coût réel de réparation"), max_digits=14,
-                                                  decimal_places=2, null=True, blank=True)
 
     notes  = models.TextField(_("notes"), blank=True)
 

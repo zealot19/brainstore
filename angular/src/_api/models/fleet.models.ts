@@ -343,7 +343,6 @@ export interface AccidentListItem {
   severity:              AccidentSeverity;
   severity_display:      string;
   at_fault:              boolean;
-  estimated_damage_cost: string | null;
   created_at:            string;
 }
 
@@ -363,8 +362,6 @@ export interface AccidentDetail {
   third_party_info:       string;
   police_report_number:   string;
   insurance_claim_number: string;
-  estimated_damage_cost:  string | null;
-  actual_repair_cost:     string | null;
   notes:                  string;
   created_at:             string;
   updated_at:             string;

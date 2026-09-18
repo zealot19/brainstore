@@ -56,8 +56,6 @@ export class FleetAccidentsComponent implements OnInit {
       third_party_info:       [''],
       police_report_number:   [''],
       insurance_claim_number: [''],
-      estimated_damage_cost:  [null],
-      actual_repair_cost:     [null],
       notes:                  [''],
     });
     // Voyages « partis » ou « terminés » — ceux qui ont réellement démarré.
@@ -111,8 +109,6 @@ export class FleetAccidentsComponent implements OnInit {
           third_party_info:       d.third_party_info || '',
           police_report_number:   d.police_report_number || '',
           insurance_claim_number: d.insurance_claim_number || '',
-          estimated_damage_cost:  d.estimated_damage_cost,
-          actual_repair_cost:     d.actual_repair_cost,
           notes:                  d.notes || '',
         });
         // Le voyage lié peut ne plus figurer dans la liste partis/terminés : le charger.
@@ -138,8 +134,6 @@ export class FleetAccidentsComponent implements OnInit {
       third_party_info: v.third_party_info || '',
       police_report_number: v.police_report_number || '',
       insurance_claim_number: v.insurance_claim_number || '',
-      estimated_damage_cost: v.estimated_damage_cost ? Number(v.estimated_damage_cost) : null,
-      actual_repair_cost: v.actual_repair_cost ? Number(v.actual_repair_cost) : null,
       notes: v.notes || '',
     };
     const req = this.editId

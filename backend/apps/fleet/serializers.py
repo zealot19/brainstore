@@ -568,7 +568,7 @@ class AccidentListSerializer(serializers.ModelSerializer):
         fields = [
             "id", "vehicle", "vehicle_plate", "trip", "trip_label",
             "date", "location", "severity", "severity_display",
-            "at_fault", "estimated_damage_cost", "created_at",
+            "at_fault", "created_at",
         ]
 
 
@@ -585,7 +585,6 @@ class AccidentDetailSerializer(serializers.ModelSerializer):
             "severity", "severity_display",
             "at_fault", "third_party_involved", "third_party_info",
             "police_report_number", "insurance_claim_number",
-            "estimated_damage_cost", "actual_repair_cost",
             "notes", "created_at", "updated_at",
         ]
 
@@ -601,8 +600,6 @@ class AccidentCreateSerializer(serializers.Serializer):
     third_party_info = serializers.CharField(required=False, allow_blank=True, default="")
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
-    estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
-    actual_repair_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True, default=None)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
@@ -617,8 +614,6 @@ class AccidentUpdateSerializer(serializers.Serializer):
     third_party_info = serializers.CharField(required=False, allow_blank=True)
     police_report_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     insurance_claim_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    estimated_damage_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
-    actual_repair_cost = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
 
 

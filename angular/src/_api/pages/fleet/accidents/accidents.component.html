@@ -25,7 +25,6 @@
                 <th>{{ 'fleet.acc.col_location' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_severity' | transloco }}</th>
                 <th>{{ 'fleet.acc.col_at_fault' | transloco }}</th>
-                <th>{{ 'fleet.acc.col_est_cost' | transloco }}</th>
                 <th>{{ 'shared.common.actions' | transloco }}</th>
               </tr>
             </thead>
@@ -41,7 +40,6 @@
                     {{ (a.at_fault ? 'fleet.common.yes' : 'fleet.common.no') | transloco }}
                   </span>
                 </td>
-                <td>{{ a.estimated_damage_cost ? (a.estimated_damage_cost | number:'1.0-0') : '—' }}</td>
                 <td>
                   <ng-container *hasPermission="'fleet.accident.manage'"><a class="btn btn-sm btn-outline-primary me-1"
                      data-bs-toggle="modal" data-bs-target="#create-accident-modal" (click)="openEdit(a)" [title]="'shared.actions.edit' | transloco">
@@ -95,10 +93,6 @@
                 <option *ngFor="let s of severities" [value]="s.value">{{ s.label }}</option>
               </select>
             </div>
-            <div class="col-md-4">
-              <label class="form-label">{{ 'fleet.acc.col_est_cost' | transloco }}</label>
-              <input type="number" class="form-control" formControlName="estimated_damage_cost" min="0" step="0.01">
-            </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.acc.col_location' | transloco }} *</label>
               <input type="text" class="form-control" formControlName="location">
@@ -128,10 +122,6 @@
             <div class="col-12" *ngIf="createForm.get('third_party_involved')?.value">
               <label class="form-label">{{ 'fleet.acc.f_third_party_info' | transloco }}</label>
               <textarea class="form-control" rows="2" formControlName="third_party_info"></textarea>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">{{ 'fleet.acc.f_actual_cost' | transloco }}</label>
-              <input type="number" class="form-control" formControlName="actual_repair_cost" min="0" step="0.01">
             </div>
             <div class="col-12">
               <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
