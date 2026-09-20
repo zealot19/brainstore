@@ -201,6 +201,7 @@ def create_vehicle(
     category=None, parking_id=None, tag_ids=None,
     registration_date=None, fiscal_horsepower=None, catalog_value=None,
     purchase_value=None, residual_value=None,
+    owner_partner_id=None, partner_share_percent=0,
     initial_odometer=0, created_by,
 ):
     if (Vehicle.objects
@@ -229,6 +230,8 @@ def create_vehicle(
         catalog_value=catalog_value,
         purchase_value=purchase_value,
         residual_value=residual_value,
+        owner_partner_id=owner_partner_id,
+        partner_share_percent=(partner_share_percent or 0) if owner_partner_id else 0,
         status=Vehicle.Status.AVAILABLE,
         current_odometer=initial_odometer,
         created_by=created_by,
@@ -259,6 +262,7 @@ def update_vehicle(vehicle, *, updated_by, **fields):
         "tank_capacity_liters", "notes", "is_active",
         "category_id", "parking_id", "registration_date",
         "fiscal_horsepower", "catalog_value", "purchase_value", "residual_value",
+        "owner_partner_id", "partner_share_percent",
     }
     tag_ids = fields.pop("tag_ids", None)
     if "license_plate" in fields:
@@ -271,6 +275,9 @@ def update_vehicle(vehicle, *, updated_by, **fields):
     for key, val in fields.items():
         if key in allowed:
             setattr(vehicle, key, val)
+    # Sans partenaire propriétaire, la part partenaire n'a pas de sens : on la remet à 0.
+    if not vehicle.owner_partner_id:
+        vehicle.partner_share_percent = 0
     vehicle.updated_by = updated_by
     vehicle.save()
     if tag_ids is not None:

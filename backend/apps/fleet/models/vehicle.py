@@ -62,6 +62,13 @@ class Vehicle(BaseModel):
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="assigned_vehicles")
 
+    # ── Propriété (agence ou partenaire) ────────────────────────────────────────
+    owner_partner = models.ForeignKey("partners.Partner", verbose_name=_("propriétaire (partenaire)"),
+                                      on_delete=models.SET_NULL, null=True, blank=True,
+                                      related_name="vehicles")
+    partner_share_percent = models.DecimalField(_("part partenaire (%)"), max_digits=5, decimal_places=2,
+                                                default=0)
+
     # ── Carburant ──────────────────────────────────────────────────────────────
     tank_capacity_liters = models.DecimalField(_("capacité réservoir (L)"), max_digits=6,
                                                decimal_places=1, null=True, blank=True)

@@ -332,6 +332,11 @@ class VehicleListView(APIView):
         parking_id = d.get("parking_id")
         if parking_id and not selectors.get_parking(parking_id, company_id):
             return error_response(_("Parking introuvable."), status_code=404)
+        owner_partner_id = d.get("owner_partner_id")
+        if owner_partner_id:
+            from apps.partners.models import Partner
+            if not Partner.objects.filter(company=company, id=owner_partner_id, is_deleted=False).exists():
+                return error_response(_("Partenaire introuvable."), status_code=404)
         try:
             vehicle = services.create_vehicle(
                 company=company, model=model,
@@ -349,6 +354,8 @@ class VehicleListView(APIView):
                 catalog_value=d.get("catalog_value"),
                 purchase_value=d.get("purchase_value"),
                 residual_value=d.get("residual_value"),
+                owner_partner_id=owner_partner_id,
+                partner_share_percent=d.get("partner_share_percent") or 0,
                 initial_odometer=d["initial_odometer"],
                 notes=d["notes"],
                 created_by=request.user,
@@ -384,6 +391,10 @@ class VehicleDetailView(APIView):
             return error_response(_("Catégorie introuvable."), status_code=404)
         if d.get("parking_id") and not selectors.get_parking(d["parking_id"], company_id):
             return error_response(_("Parking introuvable."), status_code=404)
+        if d.get("owner_partner_id"):
+            from apps.partners.models import Partner
+            if not Partner.objects.filter(company_id=company_id, id=d["owner_partner_id"], is_deleted=False).exists():
+                return error_response(_("Partenaire introuvable."), status_code=404)
         try:
             vehicle = services.update_vehicle(vehicle, updated_by=request.user, **d)
         except ApplicationError as e:

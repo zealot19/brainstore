@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 from apps.core.models import Attachment
 from apps.fleet.models import (
@@ -176,6 +177,7 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
     external_driver_detail = ExternalDriverSerializer(source="external_driver", read_only=True)
     category_name = serializers.CharField(source="category.name", read_only=True, default=None)
     parking_name = serializers.CharField(source="parking.name", read_only=True, default=None)
+    owner_partner_name = serializers.CharField(source="owner_partner.name", read_only=True, default=None)
     tags = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
@@ -191,6 +193,7 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             "status", "status_display",
             "current_odometer", "tank_capacity_liters", "is_active",
             "internal_driver_name", "external_driver_detail",
+            "owner_partner", "owner_partner_name", "partner_share_percent",
             "notes", "created_at", "updated_at",
         ]
 
@@ -226,6 +229,8 @@ class VehicleCreateSerializer(serializers.Serializer):
     catalog_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True, default=None)
     purchase_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True, default=None)
     residual_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True, default=None)
+    owner_partner_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    partner_share_percent = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False, default=0)
 
 
 class VehicleUpdateSerializer(serializers.Serializer):
@@ -250,6 +255,8 @@ class VehicleUpdateSerializer(serializers.Serializer):
     catalog_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True)
     purchase_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True)
     residual_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True)
+    owner_partner_id = serializers.UUIDField(required=False, allow_null=True)
+    partner_share_percent = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False)
 
 
 class OdometerUpdateSerializer(serializers.Serializer):
