@@ -75,6 +75,16 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Partenaires',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'users-group',
+          route: routes.trzPartners,
+          base: 'partners',
+          permission: 'treasury.partner.view',
+          subMenus: [],
+        },
+        {
           // Plateforme (super admin) — fusion de Config Système + Admin RBAC + Super Admin
           menuValue: 'Super Admin',
           hasSubRoute: true,
@@ -125,16 +135,6 @@ export class SidebarService {
           route: routes.trzDashboard,
           base: 'treasury-dashboard',
           permission: 'treasury.dashboard.view',
-          subMenus: [],
-        },
-        {
-          menuValue: 'Partenaires',
-          hasSubRoute: false,
-          showSubRoute: false,
-          icon2: 'users-group',
-          route: routes.trzPartners,
-          base: 'partners',
-          permission: 'treasury.partner.view',
           subMenus: [],
         },
         {
