@@ -43,7 +43,8 @@ export class VoyageExpensesComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedVoyage = this.route.snapshot.queryParamMap.get('trip') || '';  // filtre voyage depuis l'action de liste
-    this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
+    // Les dépenses voyage se décaissent depuis une caisse principale uniquement.
+    this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = (d || []).filter((s: any) => s.register_kind === 'principale'));
     this.typeSvc.list().subscribe((d: any) => this.expenseTypes = (d || []).filter((t: any) => t.is_active !== false));
     this.loadManualTrips();
     this.reload();

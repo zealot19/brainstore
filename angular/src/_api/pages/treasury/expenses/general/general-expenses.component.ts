@@ -46,7 +46,8 @@ export class GeneralExpensesComponent implements OnInit {
 
   ngOnInit(): void {
     this.typeSvc.list().subscribe((d: any) => this.types = d);
-    this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
+    // Les dépenses se décaissent depuis une caisse principale uniquement.
+    this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = (d || []).filter((s: any) => s.register_kind === 'principale'));
     this.reload();
   }
 
