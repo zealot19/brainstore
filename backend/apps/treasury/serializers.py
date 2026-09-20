@@ -118,6 +118,7 @@ def _uname(u):
 
 class CashSessionReadSerializer(serializers.ModelSerializer):
     register_name = serializers.CharField(source="cash_register.name", read_only=True)
+    register_kind = serializers.CharField(source="cash_register.kind", read_only=True, default=None)
     opened_by_name = serializers.SerializerMethodField()
     closed_by_name = serializers.SerializerMethodField()
     assigned_to_name = serializers.SerializerMethodField()
@@ -128,7 +129,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = CashSession
         fields = [
-            "id", "name", "register_name", "status", "status_display",
+            "id", "name", "cash_register", "register_name", "register_kind", "status", "status_display",
             "opening_balance", "closing_balance",
             "expected_closing", "difference", "ecart_status",
             "justification_reason", "justification_reason_display", "justification_note",
