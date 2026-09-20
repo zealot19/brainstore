@@ -741,7 +741,11 @@
       "ecart": "Diferença",
       "payments": "Repartição dos pagamentos",
       "mode": "Meio de pagamento",
-      "billetage": "Contagem de fecho"
+      "billetage": "Contagem de fecho",
+      "tickets": "Bilhetes",
+      "parcels": "Encomendas",
+      "baggage": "Bagagens",
+      "ref": "Ref."
     },
     "timer": {
       "do_billetage": "Fazer a contagem"
@@ -760,6 +764,11 @@
       "col_tax": "N.º de contribuinte",
       "f_postal": "Número postal",
       "f_address": "Endereço"
+    },
+    "rec_voyage": {
+      "add": "Adicionar receita de viagem",
+      "f_title": "Título",
+      "f_vehicle": "Veículo"
     }
   },
   "vcfg": {

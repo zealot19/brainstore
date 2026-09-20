@@ -741,7 +741,11 @@
       "ecart": "Discrepancy",
       "payments": "Payment breakdown",
       "mode": "Payment method",
-      "billetage": "Closing cash count"
+      "billetage": "Closing cash count",
+      "tickets": "Tickets",
+      "parcels": "Parcels",
+      "baggage": "Baggage",
+      "ref": "Ref."
     },
     "timer": {
       "do_billetage": "Do the cash count"
@@ -760,6 +764,11 @@
       "col_tax": "Tax number",
       "f_postal": "Postal number",
       "f_address": "Address"
+    },
+    "rec_voyage": {
+      "add": "Add trip income",
+      "f_title": "Title",
+      "f_vehicle": "Vehicle"
     }
   },
   "vcfg": {

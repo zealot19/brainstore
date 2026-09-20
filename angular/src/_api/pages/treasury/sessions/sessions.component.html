@@ -203,6 +203,20 @@
             <tbody>@for (b of reportData.billetage; track $index) { <tr><td>{{ b.value }}</td><td>{{ b.quantity }}</td><td class="text-end">{{ b.subtotal }}</td></tr> }</tbody>
           </table>
         }
+
+        @for (grp of [
+          { title: ('treasury.report.tickets' | transloco), rows: reportData.tickets },
+          { title: ('treasury.report.parcels' | transloco), rows: reportData.parcels },
+          { title: ('treasury.report.baggage' | transloco), rows: reportData.baggage }
+        ]; track grp.title) {
+          @if (grp.rows?.length) {
+            <h4>{{ grp.title }}</h4>
+            <table>
+              <thead><tr><th>{{ 'treasury.report.ref' | transloco }}</th><th>{{ 'treasury.common.label' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+              <tbody>@for (r of grp.rows; track $index) { <tr><td>{{ r.ref || '—' }}</td><td>{{ r.label || '—' }}</td><td class="text-end">{{ r.amount }}</td></tr> }</tbody>
+            </table>
+          }
+        }
       </div>
     }
   </div>

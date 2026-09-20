@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { IncomeService } from '../../../../services/treasury/income.service';
 import { SessionService } from '../../../../services/treasury/session.service';
+import { VehicleService } from '../../../../services/fleet/vehicle.service';
 import { HasPermissionDirective } from '../../../../../app/shared/directives/has-permission.directive';
 import { SearchableSelectComponent } from '../../../shared/searchable-select/searchable-select.component';
 import { PaginatePipe } from '../../../../../app/shared/table-paginator/paginate.pipe';
@@ -30,12 +31,13 @@ export class RecettesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   private income = inject(IncomeService);
   private sessionSvc = inject(SessionService);
+  private vehicleSvc = inject(VehicleService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
 
   kind: Kind = 'voyage';
   title = '';
-  rows: any[] = []; sessions: any[] = [];
+  rows: any[] = []; sessions: any[] = []; vehicles: any[] = [];
   voyageOptions: { id: string; number: string }[] = []; selectedVoyage = '';
   loading = false; saving = false; errorMsg = '';
   fFrom = ''; fTo = ''; fMode = '';
@@ -47,12 +49,24 @@ export class RecettesListComponent implements OnInit {
     cash_session_id: [null as string | null],
   });
 
+  voyageForm = this.fb.group({
+    amount: [null as number | null, [Validators.required, Validators.min(1)]],
+    payment_mode: ['cash', Validators.required],
+    title: ['', Validators.required],
+    vehicle_id: [null as string | null],
+    date: [null as string | null],
+    notes: [''],
+    cash_session_id: [null as string | null],
+  });
+
   get isOther(): boolean { return this.kind === 'other'; }
+  get isVoyage(): boolean { return this.kind === 'voyage'; }
 
   ngOnInit(): void {
     this.kind = (this.route.snapshot.data['kind'] as Kind) || 'voyage';
     this.title = TITLES[this.kind];
-    if (this.isOther) this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
+    if (this.isOther || this.isVoyage) this.sessionSvc.list({ status: 'open' }).subscribe((d: any) => this.sessions = d);
+    if (this.isVoyage) this.vehicleSvc.list().subscribe((d: any) => this.vehicles = d);
     this.reload();
   }
 
@@ -90,6 +104,17 @@ export class RecettesListComponent implements OnInit {
     this.income.createOther(this.form.value).subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.openCreate(); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
+    });
+  }
+
+  openCreateVoyage(): void { this.errorMsg = ''; this.voyageForm.reset({ payment_mode: 'cash' }); }
+
+  saveVoyage(): void {
+    if (this.voyageForm.invalid || this.saving) return;
+    this.saving = true;
+    this.income.createVoyage(this.voyageForm.value).subscribe({
+      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.openCreateVoyage(); },
+      error: e => { this.saving = false; this.errorMsg = e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
 

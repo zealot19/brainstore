@@ -4,6 +4,10 @@
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recette-modal"
        *hasPermission="'treasury.income.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.rec_list.add' | transloco }}</a>
   </div>
+  <div class="page-btn" *ngIf="isVoyage">
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recette-voyage-modal"
+       *hasPermission="'treasury.income.manage'" (click)="openCreateVoyage()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.rec_voyage.add' | transloco }}</a>
+  </div>
 </div>
 
 <div class="card mb-3"><div class="card-body">
@@ -103,6 +107,52 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
         <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'treasury.common.saving' : 'shared.actions.save') | transloco }}</button>
+      </div>
+    </form>
+  </div></div>
+</div>
+
+<!-- Modale Nouvelle recette voyage -->
+<div class="modal fade" id="recette-voyage-modal" tabindex="-1" *ngIf="isVoyage">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ 'treasury.rec_voyage.add' | transloco }}</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <form [formGroup]="voyageForm" (ngSubmit)="saveVoyage()">
+      <div class="modal-body">
+        @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
+        <div class="mb-2"><label class="form-label small">{{ 'treasury.session.col_register' | transloco }}</label>
+          <select class="form-select" formControlName="cash_session_id">
+            <option [ngValue]="null">{{ 'treasury.common.my_open_session' | transloco }}</option>
+            @for (s of sessions; track s.id) { <option [ngValue]="s.id">{{ s.register_name }}</option> }
+          </select></div>
+        <div class="mb-2"><label class="form-label small">{{ 'treasury.rec_voyage.f_title' | transloco }}</label>
+          <input type="text" class="form-control" formControlName="title" /></div>
+        <div class="mb-2"><label class="form-label small">{{ 'treasury.rec_voyage.f_vehicle' | transloco }}</label>
+          <select class="form-select" formControlName="vehicle_id">
+            <option [ngValue]="null">{{ 'cons.common.opt_choose' | transloco }}</option>
+            @for (v of vehicles; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }}</option> }
+          </select></div>
+        <div class="row">
+          <div class="col-6 mb-2"><label class="form-label small">{{ 'treasury.common.date' | transloco }}</label>
+            <input type="date" class="form-control" formControlName="date" /></div>
+          <div class="col-6 mb-2"><label class="form-label small">{{ 'treasury.common.amount' | transloco }}</label>
+            <input type="number" class="form-control" formControlName="amount" min="1" /></div>
+        </div>
+        <div class="mb-2"><label class="form-label small">{{ 'treasury.common.payment_method' | transloco }}</label>
+          <select class="form-select" formControlName="payment_mode">
+            <option value="cash">{{ 'treasury.common.mode_cash' | transloco }}</option>
+            <option value="mobile_money">{{ 'treasury.common.mode_momo' | transloco }}</option>
+            <option value="transfer">{{ 'treasury.common.mode_transfer' | transloco }}</option>
+            <option value="check">{{ 'treasury.common.mode_check' | transloco }}</option>
+          </select></div>
+        <div class="mb-2"><label class="form-label small">{{ 'treasury.common.notes' | transloco }}</label>
+          <input type="text" class="form-control" formControlName="notes" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="voyageForm.invalid || saving">{{ (saving ? 'treasury.common.saving' : 'shared.actions.save') | transloco }}</button>
       </div>
     </form>
   </div></div>

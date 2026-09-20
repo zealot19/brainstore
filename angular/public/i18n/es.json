@@ -741,7 +741,11 @@
       "ecart": "Diferencia",
       "payments": "Desglose de pagos",
       "mode": "Medio de pago",
-      "billetage": "Arqueo de cierre"
+      "billetage": "Arqueo de cierre",
+      "tickets": "Billetes",
+      "parcels": "Paquetes",
+      "baggage": "Equipaje",
+      "ref": "Ref."
     },
     "timer": {
       "do_billetage": "Hacer el arqueo"
@@ -760,6 +764,11 @@
       "col_tax": "N° de contribuyente",
       "f_postal": "Número postal",
       "f_address": "Dirección"
+    },
+    "rec_voyage": {
+      "add": "Añadir ingreso de viaje",
+      "f_title": "Título",
+      "f_vehicle": "Vehículo"
     }
   },
   "vcfg": {

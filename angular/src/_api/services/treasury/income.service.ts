@@ -31,6 +31,10 @@ export class IncomeService {
     return this.http.post<any>(TREASURY.incOther, body).pipe(map(r => r.data ?? r));
   }
 
+  createVoyage(body: any): Observable<any> {
+    return this.http.post<any>(TREASURY.incVoyage, body).pipe(map(r => r.data ?? r));
+  }
+
   receipt(id: string): Observable<Blob> {
     return this.http.get(TREASURY.incReceipt(id), { responseType: 'blob' });
   }

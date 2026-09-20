@@ -741,7 +741,11 @@
       "ecart": "Écart",
       "payments": "Ventilation des paiements",
       "mode": "Moyen de paiement",
-      "billetage": "Billetage de fermeture"
+      "billetage": "Billetage de fermeture",
+      "tickets": "Billets",
+      "parcels": "Colis",
+      "baggage": "Bagages",
+      "ref": "Réf."
     },
     "timer": {
       "do_billetage": "Faire le billetage"
@@ -760,6 +764,11 @@
       "col_tax": "N° contribuable",
       "f_postal": "Numéro postal",
       "f_address": "Adresse"
+    },
+    "rec_voyage": {
+      "add": "Ajouter une recette voyage",
+      "f_title": "Intitulé",
+      "f_vehicle": "Véhicule"
     }
   },
   "vcfg": {
