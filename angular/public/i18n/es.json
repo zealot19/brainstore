@@ -1620,7 +1620,10 @@
       "f_odometer_km": "Kilometraje (km)",
       "f_reading_date": "Fecha de lectura",
       "f_note": "Nota",
-      "submit_odometer": "Actualizar"
+      "submit_odometer": "Actualizar",
+      "f_owner_partner": "Propietario (socio)",
+      "owner_agency": "Agencia",
+      "f_partner_share": "Parte del socio (%)"
     },
     "crew": {
       "title": "Personal de a bordo",

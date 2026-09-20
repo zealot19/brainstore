@@ -128,6 +128,9 @@ export interface VehicleDetail {
   is_active:              boolean;
   internal_driver_name:   { id: string; name: string } | null;
   external_driver_detail: ExternalDriver | null;
+  owner_partner:          string | null;
+  owner_partner_name:     string | null;
+  partner_share_percent:  string | null;
   notes:                  string;
   created_at:             string;
   updated_at:             string;

@@ -254,6 +254,20 @@
           </div>
 
           <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_owner_partner' | transloco }}</label>
+              <select formControlName="owner_partner_id" class="form-select">
+                <option [ngValue]="null">{{ 'fleet.veh.owner_agency' | transloco }}</option>
+                @for (p of partners; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_partner_share' | transloco }}</label>
+              <input formControlName="partner_share_percent" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+          </div>
+
+          <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_acq_date' | transloco }}</label>
               <input formControlName="acquisition_date" type="date" class="form-control" />
@@ -369,6 +383,20 @@
             <div class="col-md-3 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_residual_value' | transloco }}</label>
               <input formControlName="residual_value" type="number" min="0" class="form-control" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_owner_partner' | transloco }}</label>
+              <select formControlName="owner_partner_id" class="form-select">
+                <option [ngValue]="null">{{ 'fleet.veh.owner_agency' | transloco }}</option>
+                @for (p of partners; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_partner_share' | transloco }}</label>
+              <input formControlName="partner_share_percent" type="number" min="0" max="100" step="0.01" class="form-control" />
             </div>
           </div>
 

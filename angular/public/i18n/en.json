@@ -1620,7 +1620,10 @@
       "f_odometer_km": "Odometer (km)",
       "f_reading_date": "Reading date",
       "f_note": "Note",
-      "submit_odometer": "Update"
+      "submit_odometer": "Update",
+      "f_owner_partner": "Owner (partner)",
+      "owner_agency": "Agency",
+      "f_partner_share": "Partner share (%)"
     },
     "crew": {
       "title": "Onboard crew",

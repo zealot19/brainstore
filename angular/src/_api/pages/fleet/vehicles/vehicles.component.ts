@@ -8,6 +8,8 @@ import { VehicleBrandService } from '../../../services/fleet/vehicle-brand.servi
 import { ParkingService } from '../../../services/fleet/parking.service';
 import { VehicleCategoryCfgService } from '../../../services/fleet-config/vehicle-category-cfg.service';
 import { TagService } from '../../../services/fleet-config/tag.service';
+import { PartnerService } from '../../../services/partners/partner.service';
+import { Partner } from '../../../models/partners.models';
 import { VehicleListItem, FleetVehicleModel, VehicleBrand, VehicleStatus, Parking } from '../../../models/fleet.models';
 import { VehicleCategoryCfg, Tag } from '../../../models/fleet-config.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -54,6 +56,7 @@ export class FleetVehiclesComponent implements OnInit {
   categories: VehicleCategoryCfg[] = [];
   tags:       Tag[] = [];
   parkings:   Parking[] = [];
+  partners:   Partner[] = [];
 
   constructor(
     private vehicleService: VehicleService,
@@ -62,6 +65,7 @@ export class FleetVehiclesComponent implements OnInit {
     private parkingService: ParkingService,
     private categoryService: VehicleCategoryCfgService,
     private tagService: TagService,
+    private partnerService: PartnerService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
   ) {}
@@ -84,6 +88,8 @@ export class FleetVehiclesComponent implements OnInit {
       purchase_value:    [null],
       residual_value:    [null],
       tank_capacity_liters: [null],
+      owner_partner_id: [null],
+      partner_share_percent: [0],
       initial_odometer: [0],
       notes:         [''],
     });
@@ -100,6 +106,8 @@ export class FleetVehiclesComponent implements OnInit {
       catalog_value:     [null],
       purchase_value:    [null],
       residual_value:    [null],
+      owner_partner_id: [null],
+      partner_share_percent: [0],
       notes:         [''],
       is_active:     [true],
     });
@@ -111,6 +119,7 @@ export class FleetVehiclesComponent implements OnInit {
 
     this.brandService.list().subscribe(bs => this.brands = bs);
     this.modelService.list().subscribe(ms => this.allModels = ms);
+    this.partnerService.list(true).subscribe(d => this.partners = d);
     this.categoryService.list().subscribe(d => this.categories = d);
     this.tagService.list().subscribe(d => this.tags = d);
     this.parkingService.list().subscribe(d => this.parkings = d);
@@ -184,6 +193,8 @@ export class FleetVehiclesComponent implements OnInit {
       purchase_value:    v.purchase_value    ? Number(v.purchase_value)    : null,
       residual_value:    v.residual_value    ? Number(v.residual_value)    : null,
       tank_capacity_liters: v.tank_capacity_liters ? Number(v.tank_capacity_liters) : null,
+      owner_partner_id: v.owner_partner_id || null,
+      partner_share_percent: v.owner_partner_id ? Number(v.partner_share_percent || 0) : 0,
       initial_odometer: Number(v.initial_odometer ?? 0),
       notes:         v.notes || '',
     };
@@ -211,6 +222,8 @@ export class FleetVehiclesComponent implements OnInit {
         catalog_value:     d.catalog_value,
         purchase_value:    d.purchase_value,
         residual_value:    d.residual_value,
+        owner_partner_id: d.owner_partner,
+        partner_share_percent: d.partner_share_percent,
         notes:         d.notes,
         is_active:     d.is_active,
       });
@@ -235,6 +248,8 @@ export class FleetVehiclesComponent implements OnInit {
       catalog_value:     v.catalog_value     ? Number(v.catalog_value)     : null,
       purchase_value:    v.purchase_value    ? Number(v.purchase_value)    : null,
       residual_value:    v.residual_value    ? Number(v.residual_value)    : null,
+      owner_partner_id: v.owner_partner_id || null,
+      partner_share_percent: v.owner_partner_id ? Number(v.partner_share_percent || 0) : 0,
       notes:         v.notes || '',
       is_active:     v.is_active,
     };

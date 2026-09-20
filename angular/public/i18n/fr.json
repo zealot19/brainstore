@@ -1620,7 +1620,10 @@
       "f_odometer_km": "Kilométrage (km)",
       "f_reading_date": "Date de relevé",
       "f_note": "Note",
-      "submit_odometer": "Mettre à jour"
+      "submit_odometer": "Mettre à jour",
+      "f_owner_partner": "Propriétaire (partenaire)",
+      "owner_agency": "Agence",
+      "f_partner_share": "Part partenaire (%)"
     },
     "crew": {
       "title": "Personnel naviguant",
