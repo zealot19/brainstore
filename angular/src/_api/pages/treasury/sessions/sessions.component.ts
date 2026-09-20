@@ -30,6 +30,7 @@ export class TrzSessionsComponent implements OnInit {
   extendForm!: FormGroup;
   saving = false; errorMsg = '';
   closingId: string | null = null; extendId: string | null = null;
+  closingSession: CashSession | null = null; closeDestId: string | null = null;
   openScheduledId: string | null = null; openScheduledBalance: number | null = 0;
 
   // Billetage (clôture uniquement)
@@ -50,7 +51,8 @@ export class TrzSessionsComponent implements OnInit {
   // Le guichetier assigné n'ouvre pas la session : un gestionnaire le fait.
   canOpenDraft(s: CashSession): boolean { return this.isAdmin || s.assigned_to !== this.me?.id; }
   // La clôture (billetage de fin) est aussi permise au guichetier assigné.
-  canClose(s: CashSession): boolean { return this.canManage(s) || s.assigned_to === this.me?.id; }
+  // La clôture appartient au chef d'agence (gestionnaire) ; le guichetier ne clôture plus.
+  canClose(s: CashSession): boolean { return this.canManage(s); }
 
   openForm!: FormGroup;
   scheduleForm!: FormGroup;
@@ -117,12 +119,15 @@ export class TrzSessionsComponent implements OnInit {
   }
 
   // ── Clôturer ──
-  openClose(s: CashSession): void { this.closingId = s.id; this.errorMsg = ''; this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = ''; }
+  openClose(s: CashSession): void { this.closingId = s.id; this.closingSession = s; this.closeDestId = null; this.errorMsg = ''; this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = ''; }
+  get closingIsGuichet(): boolean { return this.closingSession?.register_kind === 'guichet'; }
+  get destinationRegisters(): CashRegister[] { return this.registers.filter(r => r.id !== this.closingSession?.cash_register); }
   submitClose(): void {
     if (this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
     const payload: Record<string, unknown> = { justification_reason: this.closeReason, justification_note: this.closeNote };
     if (this.closeBilletage) payload['closing_count'] = this.toItems(this.closeQty);
     else payload['closing_balance'] = this.closeManual;
+    if (this.closingIsGuichet) payload['destination_cash_register_id'] = this.closeDestId;
     this.svc.close(this.closingId, payload).subscribe({
       next: () => { this.saving = false; this.load(); this.toast.success('Session clôturée.'); this.close('trz-close-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });

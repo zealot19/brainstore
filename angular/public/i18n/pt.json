@@ -479,7 +479,12 @@
       "f_journal": "Diário de caixa",
       "managers": "Gestores",
       "add_manager": "Adicionar um gestor…",
-      "managers_hint": "Apenas os gestores (ou um admin) podem abrir/operar esta caixa."
+      "managers_hint": "Apenas os gestores (ou um admin) podem abrir/operar esta caixa.",
+      "col_kind": "Tipo",
+      "f_kind": "Tipo de caixa",
+      "opt_kind": "Escolher…",
+      "kind_principale": "Caixa principal",
+      "kind_guichet": "Guichê"
     },
     "session": {
       "title": "Sessões de caixa",
@@ -524,7 +529,10 @@
       "schedule_title": "Agendar uma sessão",
       "schedule_submit": "Agendar",
       "open_scheduled_btn": "Abrir",
-      "open_scheduled_title": "Abrir a sessão agendada"
+      "open_scheduled_title": "Abrir a sessão agendada",
+      "f_close_destination": "Caixa de destino",
+      "opt_destination": "Escolha uma caixa…",
+      "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0."
     },
     "movement": {
       "title": "Movimentos",

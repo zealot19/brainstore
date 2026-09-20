@@ -9,11 +9,12 @@
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>{{ 'treasury.common.name' | transloco }}</th><th>{{ 'treasury.register.col_agency' | transloco }}</th><th>{{ 'treasury.register.col_terminal' | transloco }}</th><th>{{ 'treasury.common.balance' | transloco }}</th><th>{{ 'treasury.common.account' | transloco }}</th><th>{{ 'treasury.common.journal' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'treasury.common.name' | transloco }}</th><th>{{ 'treasury.register.col_kind' | transloco }}</th><th>{{ 'treasury.register.col_agency' | transloco }}</th><th>{{ 'treasury.register.col_terminal' | transloco }}</th><th>{{ 'treasury.common.balance' | transloco }}</th><th>{{ 'treasury.common.account' | transloco }}</th><th>{{ 'treasury.common.journal' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td class="fw-medium">{{ r.name }}</td>
+              <td>@if (r.kind_display) { <span class="badge bg-outline-info">{{ r.kind_display }}</span> } @else { <span class="text-muted">—</span> }</td>
               <td>{{ r.agency_name || '—' }}</td>
               <td>{{ r.terminal_name || '—' }}</td>
               <td>{{ r.current_balance }}</td>
@@ -37,6 +38,13 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.register.f_kind' | transloco }} <span class="text-danger">*</span></label>
+      <select formControlName="kind" class="form-select">
+        <option [ngValue]="null" disabled>{{ 'treasury.register.opt_kind' | transloco }}</option>
+        <option value="principale">{{ 'treasury.register.kind_principale' | transloco }}</option>
+        <option value="guichet">{{ 'treasury.register.kind_guichet' | transloco }}</option>
+      </select>
+    </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.register.col_agency' | transloco }}</label>
       <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.none_f' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
     </div>

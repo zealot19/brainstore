@@ -479,7 +479,12 @@
       "f_journal": "Cash journal",
       "managers": "Managers",
       "add_manager": "Add a manager…",
-      "managers_hint": "Only managers (or an admin) can open/operate this register."
+      "managers_hint": "Only managers (or an admin) can open/operate this register.",
+      "col_kind": "Type",
+      "f_kind": "Cash register type",
+      "opt_kind": "Choose…",
+      "kind_principale": "Main cash register",
+      "kind_guichet": "Counter"
     },
     "session": {
       "title": "Cash sessions",
@@ -524,7 +529,10 @@
       "schedule_title": "Schedule a session",
       "schedule_submit": "Schedule",
       "open_scheduled_btn": "Open",
-      "open_scheduled_title": "Open the scheduled session"
+      "open_scheduled_title": "Open the scheduled session",
+      "f_close_destination": "Destination cash register",
+      "opt_destination": "Choose a cash register…",
+      "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0."
     },
     "movement": {
       "title": "Movements",

@@ -133,6 +133,15 @@
     } @else {
       <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="closeManual" /></div>
     }
+    @if (closingIsGuichet) {
+      <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_close_destination' | transloco }} <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="closeDestId">
+          <option [ngValue]="null" disabled>{{ 'treasury.session.opt_destination' | transloco }}</option>
+          @for (r of destinationRegisters; track r.id) { <option [ngValue]="r.id">{{ r.name }}@if (r.kind_display) { — {{ r.kind_display }} }</option> }
+        </select>
+        <small class="text-muted">{{ 'treasury.session.close_destination_hint' | transloco }}</small>
+      </div>
+    }
     <hr />
     <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
     <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }}</label>
@@ -142,7 +151,7 @@
       </select>
     </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="closeNote" /></div>
-  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving" (click)="submitClose()">{{ 'treasury.session.close_btn' | transloco }}</button></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving || (closingIsGuichet && !closeDestId)" (click)="submitClose()">{{ 'treasury.session.close_btn' | transloco }}</button></div>
 </div></div></div>
 
 <!-- Rapport de session -->

@@ -479,7 +479,12 @@
       "f_journal": "Diario de caja",
       "managers": "Gestores",
       "add_manager": "Añadir un gestor…",
-      "managers_hint": "Solo los gestores (o un admin) pueden abrir/operar esta caja."
+      "managers_hint": "Solo los gestores (o un admin) pueden abrir/operar esta caja.",
+      "col_kind": "Tipo",
+      "f_kind": "Tipo de caja",
+      "opt_kind": "Elegir…",
+      "kind_principale": "Caja principal",
+      "kind_guichet": "Ventanilla"
     },
     "session": {
       "title": "Sesiones de caja",
@@ -524,7 +529,10 @@
       "schedule_title": "Programar una sesión",
       "schedule_submit": "Programar",
       "open_scheduled_btn": "Abrir",
-      "open_scheduled_title": "Abrir la sesión programada"
+      "open_scheduled_title": "Abrir la sesión programada",
+      "f_close_destination": "Caja de destino",
+      "opt_destination": "Elija una caja…",
+      "close_destination_hint": "El efectivo contado se transferirá allí; la ventanilla queda a 0."
     },
     "movement": {
       "title": "Movimientos",

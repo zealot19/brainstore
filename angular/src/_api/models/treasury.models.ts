@@ -1,5 +1,6 @@
 export interface CashRegister {
-  id: string; name: string; terminal_name: string | null; responsible_name: string | null;
+  id: string; name: string; kind: string | null; kind_display: string | null;
+  terminal_name: string | null; responsible_name: string | null;
   managers: string[]; manager_names: string[];
   current_balance: string; is_active: boolean; notes: string;
   account: string | null; journal: string | null;
@@ -29,7 +30,8 @@ export interface CashCount {
 }
 
 export interface CashSession {
-  id: string; name: string; register_name: string; status: string; status_display: string;
+  id: string; name: string; cash_register: string | null; register_name: string; register_kind: string | null;
+  status: string; status_display: string;
   opening_balance: string | null; closing_balance: string | null;
   expected_closing: string | null; difference: string | null;
   assigned_to: string | null; assigned_to_name: string | null;

@@ -479,7 +479,12 @@
       "f_journal": "Journal de caisse",
       "managers": "Gestionnaires",
       "add_manager": "Ajouter un gestionnaire…",
-      "managers_hint": "Seuls les gestionnaires (ou un admin) peuvent ouvrir/opérer cette caisse."
+      "managers_hint": "Seuls les gestionnaires (ou un admin) peuvent ouvrir/opérer cette caisse.",
+      "col_kind": "Type",
+      "f_kind": "Type de caisse",
+      "opt_kind": "Choisir…",
+      "kind_principale": "Caisse principale",
+      "kind_guichet": "Guichet"
     },
     "session": {
       "title": "Sessions de caisse",
@@ -524,7 +529,10 @@
       "schedule_title": "Planifier une session",
       "schedule_submit": "Planifier",
       "open_scheduled_btn": "Ouvrir",
-      "open_scheduled_title": "Ouvrir la session planifiée"
+      "open_scheduled_title": "Ouvrir la session planifiée",
+      "f_close_destination": "Caisse de destination",
+      "opt_destination": "Choisir une caisse…",
+      "close_destination_hint": "L'espèce comptée y sera transférée ; le guichet finira à 0 FCFA."
     },
     "movement": {
       "title": "Mouvements",
