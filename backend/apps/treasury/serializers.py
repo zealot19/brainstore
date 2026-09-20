@@ -15,11 +15,12 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
     agency_name  = serializers.CharField(source="agency.name", read_only=True, default=None)
     managers = serializers.SerializerMethodField()
     manager_names = serializers.SerializerMethodField()
+    kind_display = serializers.CharField(source="get_kind_display", read_only=True, default=None)
 
     class Meta:
         model = CashRegister
         fields = [
-            "id", "name", "terminal_name", "responsible_name",
+            "id", "name", "kind", "kind_display", "terminal_name", "responsible_name",
             "managers", "manager_names",
             "current_balance", "is_active", "notes",
             "account", "journal", "account_code", "journal_code", "journal_name",
@@ -46,6 +47,7 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
 
 class CashRegisterWriteSerializer(serializers.Serializer):
     name             = serializers.CharField(max_length=150)
+    kind             = serializers.ChoiceField(choices=CashRegister.Kind.choices)
     terminal_id      = serializers.UUIDField(required=False, allow_null=True)
     responsible_id   = serializers.UUIDField(required=False, allow_null=True)
     opening_balance  = serializers.DecimalField(max_digits=12, decimal_places=2,
@@ -59,6 +61,7 @@ class CashRegisterWriteSerializer(serializers.Serializer):
 
 class CashRegisterUpdateSerializer(serializers.Serializer):
     name           = serializers.CharField(max_length=150, required=False)
+    kind           = serializers.ChoiceField(choices=CashRegister.Kind.choices, required=False)
     terminal_id    = serializers.UUIDField(required=False, allow_null=True)
     responsible_id = serializers.UUIDField(required=False, allow_null=True)
     is_active      = serializers.BooleanField(required=False)
@@ -195,6 +198,7 @@ class CloseSessionSerializer(serializers.Serializer):
         choices=CashSession.EcartReason.choices, required=False, allow_blank=True, default="")
     justification_note   = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     notes           = serializers.CharField(required=False, allow_blank=True, default="")
+    destination_cash_register_id = serializers.UUIDField(required=False, allow_null=True, default=None)
 
 
 class DenominationSerializer(serializers.ModelSerializer):

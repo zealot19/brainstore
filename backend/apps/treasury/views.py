@@ -88,7 +88,7 @@ class CashRegisterListView(APIView):
             except Exception:
                 return Response({"detail": "Utilisateur introuvable."}, status=status.HTTP_404_NOT_FOUND)
         reg = services.create_cash_register(
-            company=company, name=d["name"], terminal=terminal, responsible=responsible,
+            company=company, name=d["name"], kind=d["kind"], terminal=terminal, responsible=responsible,
             opening_balance=d.get("opening_balance", 0),
             account_id=d.get("account_id"), journal_id=d.get("journal_id"),
             agency_id=d.get("agency_id"), manager_ids=d.get("manager_ids") or [],
@@ -255,10 +255,11 @@ class OpenSessionView(APIView):
 
 
 class CloseSessionView(APIView):
-    # Pas de permission_map figée : la clôture est autorisée au gestionnaire, à
-    # l'admin OU au guichetier assigné (billetage de fin). close_session applique
-    # cette règle ; le guichetier assigné n'a pas treasury.session.manage.
+    # La clôture appartient au chef d'agence (gestionnaire de la caisse) : elle exige
+    # treasury.session.manage, comme l'ouverture/suspension. Le guichetier (opérateur)
+    # ne peut plus clôturer.
     permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
 
     def post(self, request, session_id):
         company = _company(request)
@@ -275,6 +276,7 @@ class CloseSessionView(APIView):
                 justification_reason=ser.validated_data.get("justification_reason", ""),
                 justification_note=ser.validated_data.get("justification_note", ""),
                 notes=ser.validated_data.get("notes", ""),
+                destination_cash_register_id=ser.validated_data.get("destination_cash_register_id"),
                 updated_by=request.user,
             )
         except ApplicationError as e:

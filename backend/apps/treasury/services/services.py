@@ -21,11 +21,11 @@ def _next_ref(model, company, prefix_key):
 # ── Cash registers ─────────────────────────────────────────────────────────────
 
 @transaction.atomic
-def create_cash_register(*, company, name, terminal=None, responsible=None,
+def create_cash_register(*, company, name, kind=None, terminal=None, responsible=None,
                           opening_balance=0, notes="", account_id=None, journal_id=None,
                           agency_id=None, manager_ids=None, created_by):
     reg = CashRegister.objects.create(
-        company=company, name=name, terminal=terminal,
+        company=company, name=name, kind=kind, terminal=terminal,
         responsible=responsible,
         current_balance=opening_balance,
         account_id=account_id, journal_id=journal_id, agency_id=agency_id,
@@ -43,7 +43,7 @@ def _company_users(company, ids):
 
 @transaction.atomic
 def update_cash_register(register, *, updated_by, **fields):
-    allowed = {"name", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id", "agency_id"}
+    allowed = {"name", "kind", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id", "agency_id"}
     manager_ids = fields.pop("manager_ids", None)
     for k, v in fields.items():
         if k in allowed:
@@ -134,15 +134,15 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
 
 @transaction.atomic
 def close_session(session, *, closing_balance=None, notes="", closing_count=None,
-                  justification_reason="", justification_note="", updated_by):
+                  justification_reason="", justification_note="",
+                  destination_cash_register_id=None, updated_by):
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
         raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
-    # Un gestionnaire de la caisse, l'agent assigné (guichetier) ou un admin peut
-    # clôturer : le guichetier fait le billetage de fin sur la session qui lui est assignée.
-    if not (is_cash_manager(updated_by, session.cash_register)
-            or session.assigned_to_id == getattr(updated_by, "id", None)):
-        raise ApplicationError(_("Seul le gestionnaire ou l'agent assigné peut clôturer cette session."))
+    # La clôture appartient au chef d'agence (gestionnaire de la caisse). Le guichetier
+    # (opérateur) ne clôture plus : il ne fait qu'opérer/vendre.
+    if not is_cash_manager(updated_by, session.cash_register):
+        raise ApplicationError(_("Seul le chef d'agence (gestionnaire de la caisse) peut clôturer cette session."))
 
     # Montant compté : billetage prioritaire, sinon montant saisi.
     if closing_count:
@@ -181,6 +181,18 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
     reg.current_balance = closing_balance
     reg.save(update_fields=["current_balance"])
+
+    # Clôture d'un guichet : l'espèce comptée est transférée vers une caisse de
+    # destination choisie par le chef d'agence ; le guichet finit à 0F.
+    if reg.kind == CashRegister.Kind.GUICHET and closing_balance > 0:
+        dest = (CashRegister.objects
+                .filter(company=session.company, id=destination_cash_register_id, is_deleted=False)
+                .exclude(id=session.cash_register_id).first())
+        if not dest:
+            raise ApplicationError(_("Choisissez une caisse de destination valide pour la clôture du guichet."))
+        create_transfer(company=session.company, amount=closing_balance,
+                        from_cash_register=reg, to_cash_register=dest,
+                        description=f"Clôture guichet — session {session.id}", created_by=updated_by)
 
     if closing_count:
         record_count(session, kind="closing", items=closing_count, user=updated_by)
