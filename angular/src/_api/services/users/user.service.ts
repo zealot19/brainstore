@@ -32,6 +32,14 @@ export class UserService {
     return this.http.patch<AppUser>(USERS.detail(id), data);
   }
 
+  getAgencies(id: string): Observable<{ agency_id: string; agency_name: string; agency_code: string; is_default: boolean }[]> {
+    return this.http.get<{ agency_id: string; agency_name: string; agency_code: string; is_default: boolean }[]>(USERS.agencies(id));
+  }
+
+  setAgencies(id: string, body: { agency_ids: string[]; default_agency_id?: string | null }): Observable<unknown> {
+    return this.http.patch(USERS.agencies(id), body);
+  }
+
   activate(id: string): Observable<unknown> {
     return this.http.post(USERS.activate(id), {});
   }

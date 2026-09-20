@@ -75,6 +75,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       email:                ['', [Validators.required, Validators.email]],
       phone:                [''],
       default_agency_id:    [null],
+      agency_ids:           [[] as string[]],
       profile_id:           [null],
       is_institution_admin: [false],
       is_agency_admin:      [false],
@@ -87,6 +88,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       username:             ['', Validators.required],
       phone:                [''],
       default_agency_id:    [null],
+      agency_ids:           [[] as string[]],
       profile_id:           [null],
       is_institution_admin: [false],
       is_agency_admin:      [false],
@@ -137,9 +139,26 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.createError   = '';
     this.createForm.reset({
       first_name: '', last_name: '', username: '', email: '', phone: '',
-      default_agency_id: null, profile_id: null,
+      default_agency_id: null, agency_ids: [], profile_id: null,
       is_institution_admin: false, is_agency_admin: false, temp_password: '',
     });
+  }
+
+  // Multi-agences : gestion d'une liste d'ids dans un contrôle de formulaire.
+  isAgencySelected(form: FormGroup, id: string): boolean {
+    return ((form.get('agency_ids')?.value as string[]) || []).includes(id);
+  }
+  toggleAgency(form: FormGroup, id: string): void {
+    const ctrl = form.get('agency_ids');
+    const cur = ((ctrl?.value as string[]) || []).slice();
+    const i = cur.indexOf(id);
+    if (i >= 0) cur.splice(i, 1); else cur.push(id);
+    ctrl?.setValue(cur);
+  }
+  private withDefault(ids: string[], defaultId: string | null): string[] {
+    const list = (ids || []).slice();
+    if (defaultId && !list.includes(defaultId)) list.push(defaultId);
+    return list;
   }
 
   submitCreate(): void {
@@ -156,6 +175,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       phone:                v.phone || '',
       company_id:           this.companyId,
       default_agency_id:    v.default_agency_id || null,
+      agency_ids:           this.withDefault(v.agency_ids, v.default_agency_id || null),
       is_institution_admin: v.is_institution_admin,
       is_agency_admin:      v.is_agency_admin,
       temp_password:        v.temp_password || null,
@@ -191,9 +211,14 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       username:             u.username ?? '',
       phone:                u.phone ?? '',
       default_agency_id:    u.default_agency_id ?? null,
+      agency_ids:           [],
       profile_id:           u.current_profile?.id ?? null,
       is_institution_admin: u.is_institution_admin,
       is_agency_admin:      u.is_agency_admin,
+    });
+    this.userService.getAgencies(u.id).subscribe({
+      next: rows => this.editForm.get('agency_ids')?.setValue(rows.map(r => r.agency_id)),
+      error: () => {},
     });
   }
 
@@ -217,14 +242,20 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       next: () => {
         const u = this.editUser!;
         const afterEdit = () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.closeModal('admin-user-edit-modal'); };
-        if (v.profile_id && this.companyId) {
-          this.profileService.assignToUser(u.id, v.profile_id, this.companyId).subscribe({
-            next:  () => afterEdit(),
-            error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); this.toast.success('Enregistré.'); },
-          });
-        } else {
-          afterEdit();
-        }
+        const doProfile = () => {
+          if (v.profile_id && this.companyId) {
+            this.profileService.assignToUser(u.id, v.profile_id, this.companyId).subscribe({
+              next:  () => afterEdit(),
+              error: err => { this.profileError = err?.error?.detail ?? 'Modifications enregistrées mais profil non assigné.'; this.saving = false; this.load(); this.toast.success('Enregistré.'); },
+            });
+          } else {
+            afterEdit();
+          }
+        };
+        this.userService.setAgencies(u.id, {
+          agency_ids: this.withDefault(v.agency_ids, v.default_agency_id || null),
+          default_agency_id: v.default_agency_id || null,
+        }).subscribe({ next: () => doProfile(), error: () => doProfile() });
       },
       error: err => { this.saving = false; this.editError = err?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });

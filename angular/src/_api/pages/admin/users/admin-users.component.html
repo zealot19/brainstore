@@ -286,6 +286,17 @@
                   }
                 </select>
               </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">{{ 'users.f_agencies' | transloco }} <small class="text-muted">{{ 'users.f_agencies_hint' | transloco }}</small></label>
+                <div class="d-flex flex-wrap gap-3 border rounded p-2">
+                  @for (a of agencies; track a.id) {
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" [id]="'cr-ag-' + a.id" [checked]="isAgencySelected(createForm, a.id)" (change)="toggleAgency(createForm, a.id)" />
+                      <label class="form-check-label" [for]="'cr-ag-' + a.id">{{ a.name }}</label>
+                    </div>
+                  } @empty { <span class="text-muted small">{{ 'users.no_agency' | transloco }}</span> }
+                </div>
+              </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">{{ 'users.f_profile' | transloco }} <small class="text-muted">{{ 'users.f_profile_hint2' | transloco }}</small></label>
                 <select formControlName="profile_id" class="form-select">
@@ -388,6 +399,18 @@
                   <option [value]="a.id">{{ a.name }}</option>
                 }
               </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">{{ 'users.f_agencies' | transloco }} <small class="text-muted">{{ 'users.f_agencies_hint' | transloco }}</small></label>
+            <div class="d-flex flex-wrap gap-3 border rounded p-2">
+              @for (a of agencies; track a.id) {
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" [id]="'ed-ag-' + a.id" [checked]="isAgencySelected(editForm, a.id)" (change)="toggleAgency(editForm, a.id)" />
+                  <label class="form-check-label" [for]="'ed-ag-' + a.id">{{ a.name }}</label>
+                </div>
+              } @empty { <span class="text-muted small">{{ 'users.no_agency' | transloco }}</span> }
             </div>
           </div>
 

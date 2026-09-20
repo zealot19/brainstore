@@ -1826,7 +1826,10 @@
     "f_force_change": "Forzar el cambio en el próximo inicio de sesión",
     "reset_submit": "Restablecer",
     "f_username": "Nombre de usuario",
-    "col_username": "Nombre de usuario"
+    "col_username": "Nombre de usuario",
+    "f_agencies": "Agencias autorizadas",
+    "f_agencies_hint": "(marque una o varias)",
+    "no_agency": "Sin agencia"
   },
   "acct": {
     "common": {
