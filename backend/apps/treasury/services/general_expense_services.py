@@ -37,7 +37,8 @@ def disburse_general_expense(expense, *, user, cash_session=None):
     from apps.treasury.services.general_expense_sales import record_general_expense
     if expense.status == GeneralExpense.Status.PAID:
         return expense
-    session = resolve_disbursement_session(expense.company_id, user, cash_session)
+    session = resolve_disbursement_session(expense.company_id, user, cash_session,
+                                           require_principale=True, amount=expense.amount)
     record_general_expense(expense.company, expense=expense, cash_session=session, user=user)
     expense.status = GeneralExpense.Status.PAID
     expense.cash_session = session

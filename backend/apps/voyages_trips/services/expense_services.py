@@ -28,7 +28,9 @@ def disburse_trip_expense(trip_expense, *, user, cash_session=None):
     if trip_expense.status == TripExpense.Status.PAID:
         return trip_expense
     # Caisse choisie explicitement ou session ouverte de l'utilisateur (helper partagé, DRY).
-    session = resolve_disbursement_session(trip_expense.trip.company_id, user, cash_session)
+    # Dépense = décaissement depuis une caisse principale, solde suffisant requis.
+    session = resolve_disbursement_session(trip_expense.trip.company_id, user, cash_session,
+                                           require_principale=True, amount=trip_expense.amount)
     record_trip_expense(trip_expense.trip.company, trip_expense=trip_expense, cash_session=session, user=user)
     trip_expense.status = TripExpense.Status.PAID
     trip_expense.cash_session = session
