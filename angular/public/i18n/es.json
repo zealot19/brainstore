@@ -185,7 +185,8 @@
     "retrait": "Retiro",
     "livraison_colis": "Entrega de paquetes",
     "recette_livraison": "Ingreso por entrega",
-    "expedition": "Expedición"
+    "expedition": "Expedición",
+    "partenaires": "Socios"
   },
   "booking": {
     "list": {
@@ -736,6 +737,21 @@
     },
     "timer": {
       "do_billetage": "Hacer el arqueo"
+    },
+    "partners": {
+      "title": "Socios",
+      "subtitle": "Propietarios de vehículos y beneficiarios",
+      "info": "Gestione los socios (propietarios de vehículos).",
+      "add": "Añadir socio",
+      "edit_title": "Editar socio",
+      "empty": "Sin socios.",
+      "col_code": "Código",
+      "col_name": "Nombre",
+      "col_phone": "Teléfono",
+      "col_email": "Email",
+      "col_tax": "N° de contribuyente",
+      "f_postal": "Número postal",
+      "f_address": "Dirección"
     }
   },
   "vcfg": {

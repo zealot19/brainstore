@@ -128,6 +128,16 @@ export class SidebarService {
           subMenus: [],
         },
         {
+          menuValue: 'Partenaires',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'users-group',
+          route: routes.trzPartners,
+          base: 'partners',
+          permission: 'treasury.partner.view',
+          subMenus: [],
+        },
+        {
           menuValue: 'Caisse',
           hasSubRoute: true,
           showSubRoute: false,

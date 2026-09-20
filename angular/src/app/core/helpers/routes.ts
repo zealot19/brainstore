@@ -400,6 +400,7 @@ export const routes={
   // ── Trésorerie ──────────────────────────────────────────────────────────────
   trzDashboard: '/treasury/dashboard',
   trzRegisters: '/treasury/registers',
+  trzPartners:  '/treasury/partners',
   trzBanks:     '/treasury/banks',
   trzSessions:  '/treasury/sessions',
   trzMovements: '/treasury/movements',

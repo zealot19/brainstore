@@ -1,0 +1,58 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.partners.title' | transloco }}</h4><h6>{{ 'treasury.partners.subtitle' | transloco }}</h6></div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trz-partner-modal" *hasPermission="'treasury.partner.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.partners.add' | transloco }}</a></div>
+</div>
+<app-info-banner [text]="'treasury.partners.info' | transloco"></app-info-banner>
+<div class="card table-list-card">
+  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (ngModelChange)="applyFilter()" type="search" class="form-control" [placeholder]="'treasury.common.search_ph' | transloco" /></div></div></div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>{{ 'treasury.partners.col_code' | transloco }}</th><th>{{ 'treasury.partners.col_name' | transloco }}</th>
+          <th>{{ 'treasury.partners.col_phone' | transloco }}</th><th>{{ 'treasury.partners.col_email' | transloco }}</th>
+          <th>{{ 'treasury.partners.col_tax' | transloco }}</th><th>{{ 'treasury.common.status' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+        </tr></thead>
+        <tbody>
+          @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
+            <tr>
+              <td class="fw-medium">{{ r.code }}</td>
+              <td>{{ r.name }}</td>
+              <td>{{ r.phone || '—' }}</td>
+              <td>{{ r.email || '—' }}</td>
+              <td>{{ r.tax_number || '—' }}</td>
+              <td>@if (r.is_active) { <span class="badge bg-success">{{ 'treasury.bank.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'treasury.bank.inactive' | transloco }}</span> }</td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+                <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-partner-modal" *hasPermission="'treasury.partner.manage'" (click)="openEdit(r)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+                <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.partner.manage'" (click)="delete(r)" [title]="'shared.actions.delete' | transloco"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'treasury.partners.empty' | transloco }}</td></tr> }
+        </tbody>
+      </table></div>
+        <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
+    }
+  </div>
+</div>
+<div class="modal fade" id="trz-partner-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'treasury.partners.edit_title' : 'treasury.partners.add') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'treasury.partners.col_code' | transloco }} <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" /></div>
+      <div class="col-md-8 mb-3"><label class="form-label">{{ 'treasury.partners.col_name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.partners.col_phone' | transloco }}</label><input formControlName="phone" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.partners.col_email' | transloco }}</label><input formControlName="email" type="email" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.partners.f_postal' | transloco }}</label><input formControlName="postal_number" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.partners.col_tax' | transloco }}</label><input formControlName="tax_number" type="text" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.partners.f_address' | transloco }}</label><input formControlName="address" type="text" class="form-control" /></div>
+    @if (editId) { <div class="form-check form-switch mb-3"><input formControlName="is_active" type="checkbox" class="form-check-input" id="trz-partner-active" /><label class="form-check-label" for="trz-partner-active">{{ 'treasury.bank.active' | transloco }}</label></div> }
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
+</div></div></div>

@@ -58,6 +58,7 @@ export const Pages_routes: Routes = [
                 { path: 'dashboard', loadComponent: () => import('../../../_api/pages/treasury/dashboard/dashboard.component').then(m => m.TrzDashboardComponent) },
                 { path: 'registers', loadComponent: () => import('../../../_api/pages/treasury/registers/registers.component').then(m => m.TrzRegistersComponent) },
                 { path: 'banks',     loadComponent: () => import('../../../_api/pages/treasury/banks/banks.component').then(m => m.TrzBanksComponent) },
+                { path: 'partners',  loadComponent: () => import('../../../_api/pages/treasury/partners/partners.component').then(m => m.TrzPartnersComponent) },
                 { path: 'sessions',  loadComponent: () => import('../../../_api/pages/treasury/sessions/sessions.component').then(m => m.TrzSessionsComponent) },
                 { path: 'movements', loadComponent: () => import('../../../_api/pages/treasury/movements/movements.component').then(m => m.TrzMovementsComponent) },
                 { path: 'transfers', loadComponent: () => import('../../../_api/pages/treasury/transfers/transfers.component').then(m => m.TrzTransfersComponent) },

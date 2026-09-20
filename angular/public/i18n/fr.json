@@ -185,7 +185,8 @@
     "retrait": "Retrait",
     "livraison_colis": "Livraison colis",
     "recette_livraison": "Recette livraison",
-    "expedition": "Expédition"
+    "expedition": "Expédition",
+    "partenaires": "Partenaires"
   },
   "booking": {
     "list": {
@@ -736,6 +737,21 @@
     },
     "timer": {
       "do_billetage": "Faire le billetage"
+    },
+    "partners": {
+      "title": "Partenaires",
+      "subtitle": "Propriétaires de véhicules et bénéficiaires",
+      "info": "Gérez les partenaires (propriétaires de véhicules).",
+      "add": "Ajouter un partenaire",
+      "edit_title": "Modifier le partenaire",
+      "empty": "Aucun partenaire.",
+      "col_code": "Code",
+      "col_name": "Nom",
+      "col_phone": "Téléphone",
+      "col_email": "Email",
+      "col_tax": "N° contribuable",
+      "f_postal": "Numéro postal",
+      "f_address": "Adresse"
     }
   },
   "vcfg": {

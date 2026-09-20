@@ -185,7 +185,8 @@
     "retrait": "Pickup",
     "livraison_colis": "Parcel delivery",
     "recette_livraison": "Delivery income",
-    "expedition": "Dispatch"
+    "expedition": "Dispatch",
+    "partenaires": "Partners"
   },
   "booking": {
     "list": {
@@ -736,6 +737,21 @@
     },
     "timer": {
       "do_billetage": "Do the cash count"
+    },
+    "partners": {
+      "title": "Partners",
+      "subtitle": "Vehicle owners and beneficiaries",
+      "info": "Manage partners (vehicle owners).",
+      "add": "Add partner",
+      "edit_title": "Edit partner",
+      "empty": "No partners.",
+      "col_code": "Code",
+      "col_name": "Name",
+      "col_phone": "Phone",
+      "col_email": "Email",
+      "col_tax": "Tax number",
+      "f_postal": "Postal number",
+      "f_address": "Address"
     }
   },
   "vcfg": {

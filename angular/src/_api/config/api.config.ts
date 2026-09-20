@@ -464,6 +464,11 @@ export const TREASURY = {
   sessionCounts: (id: string) => `${TRZ}/sessions/${id}/counts/`,
 };
 
+export const PARTNERS = {
+  list:    `${API_BASE}/partners/`,
+  partner: (id: string) => `${API_BASE}/partners/${id}/`,
+};
+
 /** URLs qui ne nécessitent pas de token JWT */
 export const PUBLIC_URLS: string[] = [
   AUTH.login,

@@ -185,7 +185,8 @@
     "retrait": "Retirada",
     "livraison_colis": "Entrega de encomendas",
     "recette_livraison": "Receita de entrega",
-    "expedition": "Expedição"
+    "expedition": "Expedição",
+    "partenaires": "Parceiros"
   },
   "booking": {
     "list": {
@@ -736,6 +737,21 @@
     },
     "timer": {
       "do_billetage": "Fazer a contagem"
+    },
+    "partners": {
+      "title": "Parceiros",
+      "subtitle": "Proprietários de veículos e beneficiários",
+      "info": "Faça a gestão dos parceiros (proprietários de veículos).",
+      "add": "Adicionar parceiro",
+      "edit_title": "Editar parceiro",
+      "empty": "Nenhum parceiro.",
+      "col_code": "Código",
+      "col_name": "Nome",
+      "col_phone": "Telefone",
+      "col_email": "Email",
+      "col_tax": "N.º de contribuinte",
+      "f_postal": "Número postal",
+      "f_address": "Endereço"
     }
   },
   "vcfg": {
