@@ -29,9 +29,11 @@ D1 ajoute trois choses :
   caisses **exigent** un type à la création.
 - **Destination de clôture :** **n'importe quelle caisse** de l'institution (principale ou
   autre guichet), différente du guichet clôturé.
-- **Autorité de clôture :** **seul le chef d'agence / gestionnaire de la caisse** clôture.
-  On retire la possibilité pour le guichetier assigné de clôturer sa propre session
-  (changement de comportement vs l'existant).
+- **Autorité de clôture :** le **chef d'agence = détenteur de `treasury.session.manage`**
+  (les gestionnaires assignés de la caisse) fait tout le cycle de vie, y compris la clôture.
+  Le **guichetier / opérateur** (`treasury.session.operate`) ne fait qu'**opérer** (vendre) :
+  on retire sa possibilité de clôturer sa propre session (changement vs l'existant, où la
+  clôture-billetage lui était permise).
 
 ## Backend
 
@@ -52,8 +54,11 @@ Migration additive (nullable ; pas de valeur par défaut sur l'existant).
 - `create_cash_register(...)` gagne `kind=None` ; la vue POST exige `kind` (400 sinon).
   `update_cash_register` : ajouter `"kind"` à `allowed`.
 
-### `close_session` (services.py)
-1. **Autorisation :** remplacer
+### Autorité de clôture (vue + service)
+- **`CloseSessionView`** : ajouter `permission_map = {"POST": "treasury.session.manage"}`
+  (aligné sur Open/Suspend/Extend). Aujourd'hui la vue n'a pas de `permission_map` figée,
+  ce qui laisse passer le guichetier ; on ferme cette porte.
+- **`close_session`** — remplacer
    ```python
    if not (is_cash_manager(updated_by, session.cash_register)
            or session.assigned_to_id == getattr(updated_by, "id", None)):
@@ -61,10 +66,11 @@ Migration additive (nullable ; pas de valeur par défaut sur l'existant).
    par
    ```python
    if not is_cash_manager(updated_by, session.cash_register):
-       raise ApplicationError(_("Seul le gestionnaire (chef d'agence) peut clôturer cette session."))
+       raise ApplicationError(_("Seul le chef d'agence (gestionnaire de la caisse) peut clôturer cette session."))
    ```
-2. **Nouveau paramètre :** `destination_cash_register_id=None`.
-3. **Clôture-vers-caisse** (après la logique existante qui pose
+### `close_session` — clôture-vers-caisse (services.py)
+1. **Nouveau paramètre :** `destination_cash_register_id=None`.
+2. **Clôture-vers-caisse** (après la logique existante qui pose
    `reg.current_balance = closing_balance`, `status = CLOSED`, et sauvegarde) :
    ```python
    if session.cash_register.kind == CashRegister.Kind.GUICHET and closing_balance > 0:
