@@ -18,7 +18,7 @@ from apps.treasury.serializers import (
     TransactionReadSerializer, TransactionWriteSerializer,
     TransferReadSerializer, TransferWriteSerializer,
     TreasuryStatsSerializer,
-    IncomeRowSerializer, OtherIncomeWriteSerializer,
+    IncomeRowSerializer, OtherIncomeWriteSerializer, VoyageIncomeWriteSerializer,
     DenominationSerializer, CashCountSerializer,
 )
 
@@ -796,6 +796,31 @@ class _IncomeListBase(APIView):
 
 class IncomeVoyageListView(_IncomeListBase):
     category = Transaction.Category.TICKET_SALES
+    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.manage"}
+
+    def post(self, request):
+        ser = VoyageIncomeWriteSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        company = _company(request)
+        session = None
+        if d.get("cash_session_id"):
+            session = CashSession.objects.filter(
+                company=company, id=d["cash_session_id"],
+                status=CashSession.Status.OPEN, is_deleted=False).first()
+        vehicle = None
+        if d.get("vehicle_id"):
+            from apps.fleet.models import Vehicle
+            vehicle = Vehicle.objects.filter(company=company, id=d["vehicle_id"], is_deleted=False).first()
+        desc = d["title"] + (f" — {d['notes']}" if d.get("notes") else "")
+        try:
+            txn = services.record_voyage_income(
+                company, amount=d["amount"], payment_mode=d["payment_mode"],
+                description=desc, vehicle=vehicle, transaction_date=d.get("date"),
+                user=request.user, cash_session=session)
+        except ApplicationError as ex:
+            return error_response(str(ex))
+        return created_response(IncomeRowSerializer(txn).data)
 
 
 class IncomeParcelListView(_IncomeListBase):

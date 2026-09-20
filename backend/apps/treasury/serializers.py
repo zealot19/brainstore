@@ -454,6 +454,16 @@ class OtherIncomeWriteSerializer(serializers.Serializer):
     cash_session_id = serializers.UUIDField(required=False, allow_null=True)
 
 
+class VoyageIncomeWriteSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal("0.01"))
+    payment_mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices)
+    title = serializers.CharField(max_length=255)
+    vehicle_id = serializers.UUIDField(required=False, allow_null=True)
+    date = serializers.DateField(required=False, allow_null=True)
+    notes = serializers.CharField(required=False, allow_blank=True, default="")
+    cash_session_id = serializers.UUIDField(required=False, allow_null=True)
+
+
 # ── Moyens de paiement ──────────────────────────────────────────────────────
 
 from apps.treasury.models import PaymentMethod  # noqa: E402

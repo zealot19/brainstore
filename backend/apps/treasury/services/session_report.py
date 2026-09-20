@@ -34,8 +34,24 @@ def build_session_report(session):
             billetage.append({"value": it.unit_value, "quantity": it.quantity, "subtotal": it.subtotal,
                               "kind": it.denomination.kind if it.denomination_id else ""})
 
+    # Bordereau : billets / colis / bagages encaissés par la session.
+    tickets, parcels, baggage = [], [], []
+    for t in income.select_related("voyage_booking", "voyages_parcel", "voyages_baggage"):
+        if t.category == Transaction.Category.TICKET_SALES:
+            ref = t.voyage_booking.reference if t.voyage_booking_id else ""
+            tickets.append({"ref": ref, "label": t.description or "", "amount": t.amount})
+        elif t.category == Transaction.Category.PARCEL_SHIPPING:
+            ref = t.voyages_parcel.reference if t.voyages_parcel_id else ""
+            parcels.append({"ref": ref, "label": t.description or "", "amount": t.amount})
+        elif t.category == Transaction.Category.BAGGAGE:
+            ref = t.voyages_baggage.tag_number if t.voyages_baggage_id else ""
+            baggage.append({"ref": ref, "label": t.description or "", "amount": t.amount})
+
     reg = session.cash_register
     return {
+        "tickets": tickets,
+        "parcels": parcels,
+        "baggage": baggage,
         "general": {
             "register_name": reg.name,
             "agency_name": reg.agency.name if reg.agency_id else None,

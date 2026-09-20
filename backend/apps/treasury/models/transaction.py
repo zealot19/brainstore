@@ -88,6 +88,8 @@ class Transaction(BaseModel):
     voyage_expense  = models.ForeignKey("voyages_trips.TripExpense", verbose_name=_("dépense voyage"),
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="treasury_transactions")
+    vehicle = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
+                                on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     general_expense = models.ForeignKey("treasury.GeneralExpense", verbose_name=_("dépense générale"),
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="transactions")
