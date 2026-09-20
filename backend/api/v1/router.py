@@ -55,6 +55,7 @@ urlpatterns = [
 
     # ── Trésorerie ──────────────────────────────────────────────────────────────
     path("treasury/",   include("apps.treasury.urls")),
+    path("partners/",   include("apps.partners.urls")),
 
     # ── Réservation en ligne (public) ───────────────────────────────────────────
     path("online/",     include("apps.online_booking.urls")),

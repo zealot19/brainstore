@@ -101,6 +101,8 @@ LOCAL_APPS = [
     "apps.accounting",
     # ── Trésorerie ──
     "apps.treasury",
+    # ── Partenaires (propriétaires de véhicules) ──
+    "apps.partners",
     # ── Réservation en ligne ──
     "apps.online_booking",
     # ── Bot WhatsApp (canal de réservation) ──
