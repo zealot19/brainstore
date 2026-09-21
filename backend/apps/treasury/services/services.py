@@ -110,13 +110,14 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
     from apps.treasury.selectors import get_active_session
     from apps.treasury.scoping import register_agency_scope
     # Restriction d'agence : on n'ouvre une session que sur une caisse de son agence.
+    # La gestion des caisses appartient au détenteur du droit RBAC (chef d'agence),
+    # borné à son agence. Le « gestionnaire » de la caisse est le guichetier (ventes) :
+    # il n'est pas requis d'en être un pour ouvrir.
     scoped, agency_id = register_agency_scope(created_by)
-    if scoped:
-        if agency_id and cash_register.agency_id and cash_register.agency_id != agency_id:
-            raise ApplicationError(_("Vous ne pouvez ouvrir une session que sur une caisse de votre agence."))
-        # Il faut être gestionnaire de la caisse (l'admin est exempté).
-        if not is_cash_manager(created_by, cash_register):
-            raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
+    # agency_id peut être None (utilisateur sans agence) : il est alors bloqué sur toute
+    # caisse rattachée à une agence (None != agency_id).
+    if scoped and cash_register.agency_id and cash_register.agency_id != agency_id:
+        raise ApplicationError(_("Vous ne pouvez ouvrir une session que sur une caisse de votre agence."))
     existing = get_active_session(cash_register.id, company.id)
     if existing:
         raise ApplicationError(
@@ -139,10 +140,13 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
         raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
-    # La clôture appartient au chef d'agence (gestionnaire de la caisse). Le guichetier
-    # (opérateur) ne clôture plus : il ne fait qu'opérer/vendre.
-    if not is_cash_manager(updated_by, session.cash_register):
-        raise ApplicationError(_("Seul le chef d'agence (gestionnaire de la caisse) peut clôturer cette session."))
+    # La clôture appartient au chef d'agence (droit RBAC treasury.session.manage, imposé au
+    # niveau de la vue), borné à son agence. Le guichetier (gestionnaire de la caisse) ne
+    # clôture pas : il ne fait qu'opérer/vendre.
+    from apps.treasury.scoping import register_agency_scope
+    scoped, agency_id = register_agency_scope(updated_by)
+    if scoped and session.cash_register.agency_id and session.cash_register.agency_id != agency_id:
+        raise ApplicationError(_("Vous ne pouvez clôturer qu'une caisse de votre agence."))
 
     # Montant compté : billetage prioritaire, sinon montant saisi.
     if closing_count:
@@ -209,15 +213,21 @@ def _is_admin(user):
 
 
 @transaction.atomic
-def schedule_session(*, company, cash_register, assigned_to, scheduled_start=None,
+def schedule_session(*, company, cash_register, assigned_to=None, scheduled_start=None,
                      scheduled_end=None, name="", created_by):
-    """Planifie une session (DRAFT) pour un guichetier sur une caisse."""
+    """Planifie une session (DRAFT) sur une caisse.
+
+    Le guichetier n'est plus choisi : c'est le gestionnaire de la caisse (son
+    `responsible`, sinon son unique `manager`). Le champ reste `assigned_to` pour la
+    traçabilité (« ma session active »)."""
     from apps.treasury.scoping import register_agency_scope
     scoped, agency_id = register_agency_scope(created_by)
     if scoped and cash_register.agency_id and cash_register.agency_id != agency_id:
         raise ApplicationError(_("Vous ne pouvez planifier que sur une caisse de votre agence."))
     if scheduled_start and scheduled_end and scheduled_end <= scheduled_start:
         raise ApplicationError(_("La fin prévue doit être postérieure au début prévu."))
+    if assigned_to is None:
+        assigned_to = cash_register.responsible or cash_register.managers.first()
     return CashSession.objects.create(
         company=company, cash_register=cash_register, name=name,
         assigned_to=assigned_to, scheduled_start=scheduled_start, scheduled_end=scheduled_end,
@@ -232,8 +242,10 @@ def open_scheduled_session(session, *, opening_balance=None, updated_by):
     from apps.treasury.selectors import get_active_session
     if session.status != CashSession.Status.DRAFT:
         raise ApplicationError(_("Seule une session planifiée peut être ouverte."))
-    if not is_cash_manager(updated_by, session.cash_register):
-        raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
+    from apps.treasury.scoping import register_agency_scope
+    scoped, agency_id = register_agency_scope(updated_by)
+    if scoped and session.cash_register.agency_id and session.cash_register.agency_id != agency_id:
+        raise ApplicationError(_("Vous ne pouvez gérer qu'une caisse de votre agence."))
     if get_active_session(session.cash_register_id, session.company_id):
         raise ApplicationError(_("Une session est déjà active sur cette caisse."))
     session.opening_balance = opening_balance if opening_balance is not None else 0

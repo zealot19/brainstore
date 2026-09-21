@@ -32,10 +32,10 @@ def test_schedule_then_open_by_assigned_guichetier():
                          scheduled_start=now, scheduled_end=now + timedelta(hours=8),
                          name="Matin", created_by=admin)
     assert s.status == "draft" and s.assigned_to_id == g1.id
-    # Another guichetier cannot open it
-    with pytest.raises(ApplicationError):
-        open_scheduled_session(s, opening_balance=10000, updated_by=g2)
-    # Assigned one can
+    # Ouvrir une session planifiée est une action de gestion (droit RBAC
+    # treasury.session.manage à l'endpoint), bornée à l'agence au niveau service ;
+    # l'assignation à g1 ne sert qu'à la traçabilité (« ma session active »).
+    # Un utilisateur de l'agence l'ouvre donc.
     s = open_scheduled_session(s, opening_balance=10000, updated_by=g1)
     assert s.status == "open" and s.opened_by_id == g1.id and s.opening_balance == 10000
 

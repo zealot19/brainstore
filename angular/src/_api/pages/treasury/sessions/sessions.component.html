@@ -65,7 +65,7 @@
   <form [formGroup]="openForm" (ngSubmit)="submitOpen()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
-      <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
+      <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ registerLabel(r) }}</option> }</select>
     </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label>
@@ -74,17 +74,13 @@
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
 </div></div></div>
 
-<!-- Planifier une session (assignée à un guichetier ; ouverte plus tard par un gestionnaire) -->
+<!-- Planifier une session (assignée au gestionnaire/guichetier de la caisse ; ouverte plus tard) -->
 <div class="modal fade" id="trz-schedule-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
   <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.schedule_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="scheduleForm" (ngSubmit)="submitSchedule()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_register' | transloco }} <span class="text-danger">*</span></label>
-      <select formControlName="cash_register_id" class="form-select" (ngModelChange)="onScheduleRegisterChange()"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }</select>
-    </div>
-    <div class="mb-3"><label class="form-label">{{ 'treasury.session.col_guichetier' | transloco }} <span class="text-danger">*</span></label>
-      <select formControlName="assigned_to_id" class="form-select" [attr.disabled]="!scheduleForm.value.cash_register_id ? true : null"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (g of guichetiers; track g.id) { <option [ngValue]="g.id">{{ g.full_name }}</option> }</select>
-      @if (scheduleForm.value.cash_register_id && !guichetiers.length) { <small class="text-muted d-block mt-1">{{ 'treasury.session.no_guichetier' | transloco }}</small> }
+      <select formControlName="cash_register_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.choose' | transloco }}</option>@for (r of registers; track r.id) { <option [ngValue]="r.id">{{ registerLabel(r) }}</option> }</select>
     </div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
     <div class="row">

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SessionService, Guichetier } from '../../../services/treasury/session.service';
+import { SessionService } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
 import { DenominationService } from '../../../services/treasury/denomination.service';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -25,7 +25,6 @@ export class TrzSessionsComponent implements OnInit {
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
   denoms: CurrencyDenomination[] = [];
-  guichetiers: Guichetier[] = [];
 
   extendForm!: FormGroup;
   saving = false; errorMsg = '';
@@ -62,7 +61,7 @@ export class TrzSessionsComponent implements OnInit {
       cash_register_id: [null, Validators.required], name: [''], opening_balance: [0],
     });
     this.scheduleForm = this.fb.group({
-      cash_register_id: [null, Validators.required], assigned_to_id: [null, Validators.required],
+      cash_register_id: [null, Validators.required],
       name: [''], scheduled_start: ['', Validators.required], scheduled_end: [''],
     });
     this.extendForm = this.fb.group({ scheduled_end: ['', Validators.required] });
@@ -92,15 +91,18 @@ export class TrzSessionsComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
   }
 
-  // ── Planifier une session (par un gestionnaire, assignée à un guichetier) ──
+  // ── Planifier une session (par un gestionnaire) ──
+  // Le guichetier n'est plus choisi ici : la session est assignée au gestionnaire
+  // (guichetier) de la caisse côté serveur.
   openSchedule(): void {
-    this.errorMsg = ''; this.guichetiers = [];
-    this.scheduleForm.reset({ cash_register_id: null, assigned_to_id: null, name: '', scheduled_start: '', scheduled_end: '' });
+    this.errorMsg = '';
+    this.scheduleForm.reset({ cash_register_id: null, name: '', scheduled_start: '', scheduled_end: '' });
   }
-  onScheduleRegisterChange(): void {
-    const rid = this.scheduleForm.value.cash_register_id;
-    this.scheduleForm.patchValue({ assigned_to_id: null }); this.guichetiers = [];
-    if (rid) this.svc.guichetiers(rid).subscribe({ next: g => this.guichetiers = g });
+  // Libellé caisse « Nom caisse — nom gestionnaire » (le gestionnaire est le guichetier).
+  registerLabel(r: CashRegister): string {
+    const g = (r.manager_names && r.manager_names.length) ? r.manager_names.join(', ')
+            : (r.responsible_name || '');
+    return g ? `${r.name} — ${g}` : r.name;
   }
   submitSchedule(): void {
     if (this.scheduleForm.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
