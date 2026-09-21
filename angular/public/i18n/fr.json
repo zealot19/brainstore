@@ -1713,7 +1713,13 @@
       "search_ph": "Rechercher une permission par nom, ressource ou code…",
       "selected_word": "permission(s) sélectionnée(s)",
       "empty": "Aucune permission trouvée.",
-      "col_resource": "Ressource"
+      "col_resource": "Ressource",
+      "legend": "Légende",
+      "enabled": "activées",
+      "available": "disponibles",
+      "modules": "modules",
+      "system": "Système",
+      "toggle_all": "Tout activer / désactiver"
     },
     "audit": {
       "title": "Journal d'audit",

@@ -1713,7 +1713,13 @@
       "search_ph": "Buscar un permiso por nombre, recurso o código…",
       "selected_word": "permiso(s) seleccionado(s)",
       "empty": "No se encontraron permisos.",
-      "col_resource": "Recurso"
+      "col_resource": "Recurso",
+      "legend": "Leyenda",
+      "enabled": "activados",
+      "available": "disponibles",
+      "modules": "módulos",
+      "system": "Sistema",
+      "toggle_all": "Activar / desactivar todo"
     },
     "audit": {
       "title": "Registro de auditoría",

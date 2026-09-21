@@ -1,0 +1,150 @@
+// Permissions d'un rôle — grille moderne « matrice polie ».
+// Couleurs neutres via variables Bootstrap (compatibles thème clair/sombre) ;
+// couleurs d'action fixes (accents lisibles dans les deux thèmes).
+
+:host {
+  --pm-border: var(--bs-border-color, #eceef3);
+  --pm-surface: var(--bs-card-bg, #fff);
+  --pm-subtle: var(--bs-tertiary-bg, #f7f8fb);
+  --pm-text: var(--bs-body-color, #1f2733);
+  --pm-muted: var(--bs-secondary-color, #6b7480);
+  --pm-hover: rgba(125, 140, 165, .07);
+
+  --act-view: #3b82f6;
+  --act-create: #16a34a;
+  --act-update: #f59e0b;
+  --act-delete: #ef4444;
+  --act-manage: #7c3aed;
+  --act-neutral: #64748b;
+}
+
+// ── Carte identité du rôle ────────────────────────────────────────────────────
+.perm-role-card { border: 1px solid var(--pm-border); border-radius: 12px; }
+.perm-role-avatar {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 26px; color: #fff;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+}
+.perm-stats { gap: 0; }
+.perm-stat {
+  padding: 2px 20px; text-align: center; border-left: 1px solid var(--pm-border);
+  &:first-child { border-left: 0; }
+}
+.perm-stat-num { font-size: 22px; font-weight: 700; line-height: 1; color: var(--pm-text); }
+.perm-stat-lbl {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .03em;
+  color: var(--pm-muted); margin-top: 3px;
+}
+
+// ── Barre d'outils ────────────────────────────────────────────────────────────
+.perm-toolbar { border: 1px solid var(--pm-border); border-radius: 12px; }
+.perm-search {
+  i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--pm-muted); font-size: 16px; }
+  input { padding-left: 34px; border-radius: 8px; }
+}
+.perm-legend-btn {
+  border-color: var(--pm-border); color: var(--pm-muted); border-radius: 8px; white-space: nowrap;
+  &.active { background: rgba(79, 70, 229, .1); border-color: rgba(79, 70, 229, .35); color: #4f46e5; }
+}
+.perm-count-pill {
+  font-weight: 600; padding: .45em .8em;
+  color: var(--bs-primary, #4f46e5) !important;
+  background: color-mix(in srgb, var(--bs-primary, #4f46e5) 13%, transparent) !important;
+}
+
+// ── Légende ───────────────────────────────────────────────────────────────────
+.perm-legend {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 9px 20px;
+  padding: 4px 1rem 1rem; border-top: 1px dashed var(--pm-border); margin-top: 2px; padding-top: 12px;
+}
+.perm-legend-item { display: flex; align-items: center; gap: 9px; }
+.perm-legend-item .perm-pill { flex-shrink: 0; min-width: 82px; justify-content: center; }
+.perm-legend-txt { font-size: 12px; color: var(--pm-muted); }
+
+// ── Pastilles d'action ────────────────────────────────────────────────────────
+.perm-pill {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 1.5;
+  i { font-size: 13px; }
+
+  &.act-view    { color: var(--act-view);    background: color-mix(in srgb, var(--act-view) 12%, transparent); }
+  &.act-create  { color: var(--act-create);  background: color-mix(in srgb, var(--act-create) 12%, transparent); }
+  &.act-update  { color: #b45309;            background: color-mix(in srgb, var(--act-update) 14%, transparent); }
+  &.act-delete  { color: var(--act-delete);  background: color-mix(in srgb, var(--act-delete) 12%, transparent); }
+  &.act-manage  { color: var(--act-manage);  background: color-mix(in srgb, var(--act-manage) 12%, transparent); }
+  &.act-neutral { color: var(--act-neutral); background: color-mix(in srgb, var(--act-neutral) 14%, transparent); }
+}
+
+// ── Carte module ──────────────────────────────────────────────────────────────
+.perm-module {
+  border: 1px solid var(--pm-border); border-radius: 12px; overflow: hidden;
+  transition: box-shadow .15s ease;
+  &.is-open { box-shadow: 0 6px 22px rgba(20, 30, 60, .07); }
+}
+.perm-module-head {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  padding: .7rem 1rem; background: var(--pm-surface); border: 0;
+  &:hover { background: var(--pm-hover); }
+}
+.perm-module-icon {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 20px; color: #4f46e5;
+  background: linear-gradient(135deg, rgba(99, 102, 241, .14), rgba(79, 70, 229, .18));
+}
+.perm-module-title { flex: 1 1 auto; min-width: 0; }
+.perm-module-name { font-weight: 600; font-size: 14.5px; color: var(--pm-text); display: block; }
+.perm-progress {
+  height: 5px; border-radius: 999px; background: var(--pm-subtle);
+  margin-top: 6px; max-width: 340px; overflow: hidden;
+}
+.perm-progress-bar {
+  height: 100%; border-radius: 999px; transition: width .3s ease;
+  background: linear-gradient(90deg, #818cf8, #4f46e5);
+  &.is-full { background: linear-gradient(90deg, #34d399, #059669); }
+}
+.perm-count { flex-shrink: 0; font-weight: 600; }
+.perm-all { flex-shrink: 0; }
+.perm-chevron { color: var(--pm-muted); font-size: 18px; flex-shrink: 0; }
+
+// ── Grille ressources × actions ───────────────────────────────────────────────
+.perm-grid {
+  font-size: 13.5px;
+  thead th {
+    border-top: 0; border-bottom: 1px solid var(--pm-border);
+    background: var(--pm-subtle); padding: .55rem .5rem; font-weight: 600;
+    color: var(--pm-muted); vertical-align: middle;
+  }
+  tbody td { padding: .5rem; border-color: var(--pm-border); vertical-align: middle; }
+  tbody tr:hover { background: var(--pm-hover); }
+}
+.perm-res-col {
+  position: sticky; left: 0; z-index: 2; min-width: 200px; text-align: left;
+}
+.perm-grid thead .perm-res-col { background: var(--pm-subtle); }
+.perm-grid tbody .perm-res-col { background: var(--pm-surface); }
+.perm-grid tbody tr:hover .perm-res-col { background: var(--pm-hover); }
+.perm-res { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.perm-res-name { font-weight: 500; color: var(--pm-text); }
+.perm-na { color: color-mix(in srgb, var(--pm-muted) 45%, transparent); }
+
+// ── Case à cocher stylée (cellule) ────────────────────────────────────────────
+.perm-toggle {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: 22px; height: 22px; border-radius: 7px; cursor: pointer;
+  border: 1.5px solid var(--pm-border); background: var(--pm-surface);
+  position: relative; vertical-align: middle; transition: background .12s, border-color .12s;
+  &:hover { border-color: color-mix(in srgb, var(--pm-muted) 55%, transparent); }
+  &:checked { border-color: transparent; }
+  &:checked::after {
+    content: ''; position: absolute; left: 7px; top: 3px;
+    width: 6px; height: 11px; border: solid #fff; border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  &.act-view:checked    { background: var(--act-view); }
+  &.act-create:checked  { background: var(--act-create); }
+  &.act-update:checked  { background: var(--act-update); }
+  &.act-delete:checked  { background: var(--act-delete); }
+  &.act-manage:checked  { background: var(--act-manage); }
+  &.act-neutral:checked { background: var(--act-neutral); }
+  &:focus-visible { outline: 2px solid rgba(79, 70, 229, .4); outline-offset: 2px; }
+}

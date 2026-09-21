@@ -1713,7 +1713,13 @@
       "search_ph": "Search a permission by name, resource or code…",
       "selected_word": "permission(s) selected",
       "empty": "No permissions found.",
-      "col_resource": "Resource"
+      "col_resource": "Resource",
+      "legend": "Legend",
+      "enabled": "enabled",
+      "available": "available",
+      "modules": "modules",
+      "system": "System",
+      "toggle_all": "Toggle all"
     },
     "audit": {
       "title": "Audit log",
