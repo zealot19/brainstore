@@ -154,6 +154,16 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     from apps.voyages_config.services.expense_seed import seed_expense_types
     seed_expense_types(company, created_by=created_by)
 
+    # Référentiel Voyages (catégories tarifaires, plages horaires, natures/types de
+    # colis, plans de bus, paramètres) — billetterie/colis utilisables d'emblée.
+    from apps.voyages_config.services.defaults_seed import seed_voyages_defaults
+    seed_voyages_defaults(company, created_by=created_by)
+
+    # Référentiel Parc (carburants, transmissions, catégories véhicule, types de
+    # document, types d'intervention).
+    from apps.fleet.services.seed import seed_fleet_reference
+    seed_fleet_reference(company, created_by=created_by)
+
     return {
         "hq_agency_id":   str(hq.id),
         "hq_agency_name": hq.name,
