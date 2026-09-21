@@ -23,9 +23,47 @@ const ACTION_LABEL: Record<string, string> = {
   cancel: 'Annuler', confirm: 'Confirmer', noshow: 'No-show',
 };
 const ACTION_CLASS: Record<string, string> = {
-  view: 'bg-outline-info', create: 'bg-outline-success', update: 'bg-outline-warning',
-  delete: 'bg-outline-danger', manage: 'bg-outline-primary',
+  view: 'act-view', create: 'act-create', update: 'act-update',
+  delete: 'act-delete', manage: 'act-manage',
+  export: 'act-neutral', import: 'act-neutral', print: 'act-neutral', scan: 'act-neutral',
 };
+// Icône (Tabler) par action — en-têtes de colonnes.
+const ACTION_ICON: Record<string, string> = {
+  view: 'ti-eye', create: 'ti-plus', update: 'ti-pencil', delete: 'ti-trash',
+  manage: 'ti-settings', export: 'ti-download', import: 'ti-upload',
+  print: 'ti-printer', scan: 'ti-scan', admin: 'ti-shield',
+  board: 'ti-door-enter', arrive: 'ti-map-pin', depart: 'ti-map-pin-share',
+  cancel: 'ti-x', confirm: 'ti-check', noshow: 'ti-user-off',
+};
+// Explication de chaque action pour la légende (« plus explicite »).
+const ACTION_HELP: Record<string, string> = {
+  view: 'Consulter les données (lecture seule).',
+  create: 'Ajouter de nouveaux éléments.',
+  update: 'Modifier les éléments existants.',
+  delete: 'Supprimer des éléments.',
+  manage: 'Contrôle complet du module (inclut voir, créer, modifier, supprimer).',
+  export: 'Exporter les données (Excel, PDF…).',
+  import: 'Importer des données depuis un fichier.',
+  print: 'Imprimer des documents.',
+  scan: 'Scanner (QR / code-barres).',
+  admin: 'Administration avancée.',
+};
+
+// Icône par module — recherche par mot-clé sur le code/nom (robuste aux libellés).
+const MODULE_ICONS: [string, string][] = [
+  ['rbac', 'ti-shield-lock'], ['role', 'ti-shield-lock'], ['permission', 'ti-shield-lock'],
+  ['auth', 'ti-key'], ['user', 'ti-users'], ['hr', 'ti-briefcase'], ['rh', 'ti-briefcase'],
+  ['fleet', 'ti-bus'], ['parc', 'ti-bus'], ['vehicle', 'ti-bus'],
+  ['treasur', 'ti-cash'], ['tresor', 'ti-cash'], ['caiss', 'ti-cash'], ['financ', 'ti-cash'],
+  ['ticket', 'ti-ticket'], ['billet', 'ti-ticket'],
+  ['parcel', 'ti-package'], ['colis', 'ti-package'], ['bagage', 'ti-luggage'], ['baggage', 'ti-luggage'],
+  ['voyage', 'ti-route'], ['trip', 'ti-route'], ['transport', 'ti-map-2'],
+  ['online', 'ti-world'], ['booking', 'ti-world'], ['reserv', 'ti-calendar-event'],
+  ['sync', 'ti-refresh'], ['sage', 'ti-refresh'], ['scig', 'ti-refresh'],
+  ['config', 'ti-settings'], ['system', 'ti-settings'], ['param', 'ti-settings'],
+  ['account', 'ti-calculator'], ['compta', 'ti-calculator'], ['audit', 'ti-history'],
+  ['report', 'ti-chart-bar'], ['core', 'ti-adjustments'],
+];
 
 interface ResourceRow {
   key: string;                         // segment ressource
@@ -34,6 +72,7 @@ interface ResourceRow {
 }
 interface ModuleGroup {
   moduleName: string;
+  moduleCode: string;
   columns: string[];                   // union ordonnée des actions du module
   rows: ResourceRow[];
   expanded: boolean;
@@ -47,6 +86,7 @@ function prettify(seg: string): string {
 @Component({
   selector: 'app-role-permissions',
   templateUrl: './role-permissions.component.html',
+  styleUrls: ['./role-permissions.component.scss'],
   imports: [CommonModule, FormsModule, RouterModule, TranslocoModule],
 })
 export class RolePermissionsComponent implements OnInit {
@@ -56,11 +96,12 @@ export class RolePermissionsComponent implements OnInit {
   visibleGroups: ModuleGroup[] = [];
   selectedPermIds = new Set<string>();
 
-  search   = '';
-  loading  = true;
-  saving   = false;
-  saved    = false;
-  errorMsg = '';
+  search      = '';
+  loading     = true;
+  saving      = false;
+  saved       = false;
+  errorMsg    = '';
+  showLegend  = true;
 
   constructor(
     private route:       ActivatedRoute,
@@ -89,13 +130,14 @@ export class RolePermissionsComponent implements OnInit {
 
   // ── Construction hiérarchique Module → Ressource → Action ─────────────────────
   private buildGroups(perms: Permission[]): ModuleGroup[] {
-    const modules = new Map<string, { rows: Map<string, ResourceRow>; actions: Set<string> }>();
+    const modules = new Map<string, { rows: Map<string, ResourceRow>; actions: Set<string>; code: string }>();
 
     for (const p of perms) {
       const parts = p.code.split('.');
       const action = parts[parts.length - 1];
       const resKey = parts.length >= 3 ? parts.slice(1, -1).join('.') : '';
-      if (!modules.has(p.module_name)) modules.set(p.module_name, { rows: new Map(), actions: new Set() });
+      if (!modules.has(p.module_name))
+        modules.set(p.module_name, { rows: new Map(), actions: new Set(), code: p.module_code || parts[0] || '' });
       const mod = modules.get(p.module_name)!;
       mod.actions.add(action);
       if (!mod.rows.has(resKey))
@@ -109,13 +151,37 @@ export class RolePermissionsComponent implements OnInit {
     };
 
     return [...modules.entries()]
-      .map(([moduleName, { rows, actions }]) => ({
+      .map(([moduleName, { rows, actions, code }]) => ({
         moduleName,
+        moduleCode: code,
         columns: [...actions].sort((a, b) => orderIdx(a) - orderIdx(b) || a.localeCompare(b)),
         rows: [...rows.values()].sort((a, b) => a.label.localeCompare(b.label)),
         expanded: this.moduleHasSelection(rows),
       }))
       .sort((a, b) => a.moduleName.localeCompare(b.moduleName));
+  }
+
+  // ── Présentation module / actions (« plus explicite ») ───────────────────────
+  moduleIcon(group: ModuleGroup): string {
+    const hay = `${group.moduleCode} ${group.moduleName}`.toLowerCase();
+    for (const [kw, icon] of MODULE_ICONS) if (hay.includes(kw)) return icon;
+    return 'ti-lock';
+  }
+  progressPct(group: ModuleGroup): number {
+    const t = this.totalCount(group);
+    return t ? Math.round((this.selectedCount(group) / t) * 100) : 0;
+  }
+  /** Actions présentes dans l'ensemble des modules, ordonnées — pour la légende. */
+  get legendActions(): string[] {
+    const set = new Set<string>();
+    for (const g of this.allGroups) for (const c of g.columns) if (ACTION_HELP[c]) set.add(c);
+    const idx = (a: string) => { const i = ACTION_ORDER.indexOf(a); return i === -1 ? 99 : i; };
+    return [...set].sort((a, b) => idx(a) - idx(b));
+  }
+  actionIcon(a: string): string { return ACTION_ICON[a] ?? 'ti-point'; }
+  actionHelp(a: string): string { return ACTION_HELP[a] ?? ''; }
+  cellTitle(perm: Permission): string {
+    return perm.description ? `${perm.name} — ${perm.description}` : `${perm.name} · ${perm.code}`;
   }
 
   private moduleHasSelection(rows: Map<string, ResourceRow>): boolean {
@@ -197,7 +263,11 @@ export class RolePermissionsComponent implements OnInit {
   get totalSelected(): number { return this.selectedPermIds.size; }
 
   actionLabel(a: string): string { return ACTION_LABEL[a] ?? prettify(a); }
-  actionClass(a: string):  string { return ACTION_CLASS[a] ?? 'bg-outline-secondary'; }
+  actionClass(a: string):  string { return ACTION_CLASS[a] ?? 'act-neutral'; }
+
+  // Résumé global (bandeau d'aperçu).
+  get moduleCount(): number { return this.allGroups.length; }
+  get totalPerms(): number { return this.allGroups.reduce((n, g) => n + this.totalCount(g), 0); }
 
   // ── Enregistrement ────────────────────────────────────────────────────────────
   save(): void {

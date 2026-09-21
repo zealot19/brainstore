@@ -1713,7 +1713,13 @@
       "search_ph": "Pesquisar uma permissão por nome, recurso ou código…",
       "selected_word": "permissão(ões) selecionada(s)",
       "empty": "Nenhuma permissão encontrada.",
-      "col_resource": "Recurso"
+      "col_resource": "Recurso",
+      "legend": "Legenda",
+      "enabled": "ativadas",
+      "available": "disponíveis",
+      "modules": "módulos",
+      "system": "Sistema",
+      "toggle_all": "Ativar / desativar tudo"
     },
     "audit": {
       "title": "Registo de auditoria",
