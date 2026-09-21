@@ -3,7 +3,7 @@ from .services import (
     create_bank_account, update_bank_account, delete_bank_account,
     open_session, close_session,
     schedule_session, open_scheduled_session,
-    suspend_session, resume_session, extend_session, reopen_session,
+    suspend_session, resume_session, extend_session,
     create_transaction, delete_transaction,
     create_transfer,
 )
@@ -23,7 +23,7 @@ __all__ = [
     "create_bank_account", "update_bank_account", "delete_bank_account",
     "open_session", "close_session",
     "schedule_session", "open_scheduled_session",
-    "suspend_session", "resume_session", "extend_session", "reopen_session",
+    "suspend_session", "resume_session", "extend_session",
     "seed_denominations",
     "create_transaction", "delete_transaction",
     "create_transfer",

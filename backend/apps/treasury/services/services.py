@@ -298,25 +298,6 @@ def extend_session(session, *, scheduled_end, updated_by):
     return session
 
 
-@transaction.atomic
-def reopen_session(session, *, updated_by):
-    """Réouvre une session clôturée (administrateurs uniquement)."""
-    if not _is_admin(updated_by):
-        raise ApplicationError(_("Seul un administrateur peut réouvrir une session clôturée."))
-    if session.status != CashSession.Status.CLOSED:
-        raise ApplicationError(_("Seule une session clôturée peut être réouverte."))
-    session.status = CashSession.Status.OPEN
-    session.closed_at = None
-    session.closed_by = None
-    session.closing_balance = None
-    session.expected_closing = None
-    session.difference = None
-    session.updated_by = updated_by
-    session.save(update_fields=["status", "closed_at", "closed_by", "closing_balance",
-                                "expected_closing", "difference", "updated_by", "updated_at"])
-    return session
-
-
 # ── Transactions ───────────────────────────────────────────────────────────────
 
 @transaction.atomic

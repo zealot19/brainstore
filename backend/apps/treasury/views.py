@@ -374,10 +374,6 @@ class ResumeSessionView(_SessionActionView):
     action = "resume_session"
 
 
-class ReopenSessionView(_SessionActionView):
-    action = "reopen_session"
-
-
 class ExtendSessionView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"POST": "treasury.session.manage"}

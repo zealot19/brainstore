@@ -61,9 +61,9 @@ def test_suspend_resume_and_movement_blocked_while_suspended():
 
 
 @pytest.mark.django_db
-def test_extend_and_reopen():
+def test_extend_and_close():
     from apps.treasury.services import (schedule_session, open_scheduled_session,
-                                        extend_session, close_session, reopen_session)
+                                        extend_session, close_session)
     company, admin, g1, g2, reg = _setup()
     now = timezone.now()
     s = schedule_session(company=company, cash_register=reg, assigned_to=g1,
@@ -74,11 +74,6 @@ def test_extend_and_reopen():
     assert s.scheduled_end == new_end
     s = close_session(s, closing_balance=0, updated_by=g1)
     assert s.status == "closed"
-    # Guichetier cannot reopen; admin can
-    with pytest.raises(ApplicationError):
-        reopen_session(s, updated_by=g1)
-    s = reopen_session(s, updated_by=admin)
-    assert s.status == "open" and s.closed_at is None
 
 
 @pytest.mark.django_db
