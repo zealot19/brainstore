@@ -7,3 +7,11 @@
   font-size: 0.85rem;
 }
 .cst-time { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* Solde de la session — chip distinct (vert). */
+.cst-balance {
+  background: var(--bs-success-bg-subtle, #e6f6ec);
+  color: var(--bs-success, #16a34a);
+}
+.cst-amount { font-variant-numeric: tabular-nums; }
+.cst-cur { font-size: 0.72rem; font-weight: 700; opacity: 0.75; }

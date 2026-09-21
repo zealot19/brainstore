@@ -38,6 +38,7 @@ export interface CashSession {
   scheduled_start: string | null; scheduled_end: string | null;
   opened_by: string | null; opened_by_name: string | null; closed_by_name: string | null;
   opened_at: string | null; closed_at: string | null; notes: string;
+  current_balance?: string | null;
 }
 export interface Transaction {
   id: string; reference: string;

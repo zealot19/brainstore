@@ -226,7 +226,12 @@ class MyActiveSessionView(APIView):
                    .order_by("-opened_at").first())
         if not session:
             return Response({"data": None})
-        return Response({"data": CashSessionReadSerializer(session).data})
+        data = CashSessionReadSerializer(session).data
+        # Solde théorique « maintenant » (fond + recettes − dépenses + transferts),
+        # affiché à côté du minuteur dans l'en-tête.
+        from apps.treasury.services.expense_shared import principale_available_cash
+        data["current_balance"] = str(principale_available_cash(session))
+        return Response({"data": data})
 
 
 class OpenSessionView(APIView):

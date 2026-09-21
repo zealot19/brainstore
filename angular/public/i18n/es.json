@@ -496,6 +496,7 @@
       "filter_closed": "Cerradas",
       "col_register": "Caja",
       "col_opening": "Apertura",
+      "balance_now": "Efectivo en caja",
       "col_expected": "Esperado",
       "col_diff": "Diferencia",
       "col_opened_by": "Abierto por",

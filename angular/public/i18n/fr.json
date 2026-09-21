@@ -496,6 +496,7 @@
       "filter_closed": "Clôturées",
       "col_register": "Caisse",
       "col_opening": "Ouverture",
+      "balance_now": "Solde en caisse",
       "col_expected": "Attendu",
       "col_diff": "Écart",
       "col_opened_by": "Ouvert par",
