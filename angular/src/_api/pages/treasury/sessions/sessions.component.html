@@ -48,7 +48,6 @@
                 @if ((s.status === 'draft' || s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-extend-modal" (click)="openExtend(s)"><i class="ti ti-clock-plus me-1"></i>{{ 'treasury.session.extend' | transloco }}</a> }
                 @if ((s.status === 'open' || s.status === 'suspended') && canClose(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
                 @if (s.status === 'closed') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-report-modal" (click)="openReport(s)"><i class="ti ti-file-text me-1"></i>{{ 'treasury.session.report' | transloco }}</a> }
-                @if (s.status === 'closed' && isAdmin) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="reopen(s)"><i class="ti ti-refresh me-1"></i>{{ 'treasury.session.reopen' | transloco }}</a> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'treasury.session.empty' | transloco }}</td></tr> }

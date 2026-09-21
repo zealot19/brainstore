@@ -144,11 +144,10 @@ export class TrzSessionsComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
   }
 
-  // ── Suspendre / Reprendre / Réouvrir ──
+  // ── Suspendre / Reprendre ──
   private act(obs: any): void { obs.subscribe({ next: () => { this.load(); this.toast.success('Fait.'); }, error: (e: any) => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") }); }
   suspend(s: CashSession): void { this.act(this.svc.suspend(s.id)); }
   resume(s: CashSession): void { this.act(this.svc.resume(s.id)); }
-  reopen(s: CashSession): void { if (confirm('Réouvrir cette session clôturée ?')) this.act(this.svc.reopen(s.id)); }
 
   // ── Rapport ──
   openReport(s: CashSession): void {
