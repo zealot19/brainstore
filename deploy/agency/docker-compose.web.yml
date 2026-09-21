@@ -1,0 +1,74 @@
+# Pile AGENCE « tout-en-un » : UI Angular + API Django + PostgreSQL + workers de sync.
+# Une agence complète, avec écran, qui fonctionne hors-ligne et se synchronise au master.
+# (Le docker-compose.yml voisin est la variante API seule, sans UI.)
+#
+# Guide pas-à-pas : ../../ONLINE-OFFLINE-DEPLOYMENT.md (Partie B).
+#
+# Mise en route (depuis ce dossier deploy/agency/) :
+#   1) cp .env.example .env                 # puis renseigner (domaine, mots de passe, sync)
+#   2) éditer Caddyfile                      # domaine public OU nom LAN (tls internal)
+#   3) construire le frontend (Node jetable, depuis la RACINE du dépôt) :
+#        docker run --rm -v "$PWD/angular:/app" -w /app node:20-alpine \
+#          sh -c "npm ci && npx ng build --configuration production"
+#   4) docker compose -f docker-compose.web.yml up -d --build
+#   5) amorçage unique depuis le master :
+#        docker compose -f docker-compose.web.yml run --rm web \
+#          python manage.py bootstrap_from_master
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - agency_pgdata:/var/lib/postgresql/data
+
+  web:                       # Django + Gunicorn (le Dockerfile applique migrate au démarrage)
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/app/media     # fichiers téléversés (persistants)
+    depends_on:
+      - db
+
+  caddy:                     # reverse proxy + HTTPS : sert l'UI Angular et proxifie /api
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../../angular/dist/angular/browser:/srv/app:ro   # build Angular (étape 3)
+      - media:/srv/media:ro                              # médias servis directement
+      - caddy_data:/data                                 # certificats (persistants)
+      - caddy_config:/config
+    depends_on:
+      - web
+
+  sync_worker:               # pousse les ventes ↑ vers le master / tire la config ↓
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py sync_once || true; sleep ${SYNC_INTERVAL:-90}; done'
+    depends_on:
+      - db
+      - web
+
+  reserve_worker:            # heartbeat + réservations en ligne relayées (PWA / WhatsApp)
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py reserve_worker || true; sleep ${RESERVE_INTERVAL:-20}; done'
+    depends_on:
+      - db
+      - web
+
+volumes:
+  agency_pgdata:
+  media:
+  caddy_data:
+  caddy_config:

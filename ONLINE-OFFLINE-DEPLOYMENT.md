@@ -205,8 +205,9 @@ Dans l'interface du master :
 ## 6. PARTIE B — Déployer l'AGENCE hors-ligne (serveur local)
 
 Pile **tout-en-un + workers de sync** : `db + web + caddy + sync_worker + reserve_worker`.
-Aucune pile fournie ne combine l'UI (Caddy) *et* les workers : on assemble ci-dessous
-(compose complet à copier).
+Cette pile est **fournie prête à l'emploi** dans `deploy/agency/` :
+`docker-compose.web.yml`, `Caddyfile`, `.env.example`. (Listings ci-dessous pour référence ;
+il suffit d'éditer le domaine et le `.env`.)
 
 ### B.1 — Préparer le serveur d'agence
 ```bash
@@ -229,7 +230,7 @@ docker run --rm -v "$PWD/angular:/app" -w /app node:20-alpine \
   sh -c "npm ci && npx ng build --configuration production"
 ```
 
-### B.3 — `docker-compose.yml` de l'agence (à créer, ex. `deploy/agency/docker-compose.web.yml`)
+### B.3 — Compose de l'agence — **fourni** : `deploy/agency/docker-compose.web.yml`
 ```yaml
 services:
   db:
@@ -285,7 +286,7 @@ volumes:
   caddy_config:
 ```
 
-### B.4 — `Caddyfile` de l'agence (à côté du compose)
+### B.4 — `Caddyfile` de l'agence — **fourni** : `deploy/agency/Caddyfile`
 
 **Cas 1 — domaine public** (ports 80/443 ouverts, certificat Let's Encrypt) :
 ```caddyfile
