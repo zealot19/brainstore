@@ -29,6 +29,5 @@ export class SessionService {
   suspend(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSuspend(id), {}); }
   resume(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionResume(id), {}); }
   extend(id: string, scheduled_end: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionExtend(id), { scheduled_end }); }
-  reopen(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionReopen(id), {}); }
   report(id: string): Observable<any> { return this.http.get<any>(TREASURY.sessionReport(id)).pipe(map(r => r.data ?? r)); }
 }
