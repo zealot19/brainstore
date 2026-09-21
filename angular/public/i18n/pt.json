@@ -496,6 +496,7 @@
       "filter_closed": "Fechadas",
       "col_register": "Caixa",
       "col_opening": "Abertura",
+      "balance_now": "Dinheiro em caixa",
       "col_expected": "Esperado",
       "col_diff": "Diferença",
       "col_opened_by": "Aberto por",

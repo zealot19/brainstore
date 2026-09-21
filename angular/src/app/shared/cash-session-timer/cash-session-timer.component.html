@@ -1,12 +1,23 @@
 @if (session) {
-  @if (showCountdown) {
-    <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
-      <i class="ti ti-clock-play me-1"></i>
-      <span class="cst-time">{{ countdown }}</span>
-    </span>
-  } @else {
-    <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
-      <i class="ti ti-cash-register me-1"></i>{{ session.status_display }}
-    </span>
-  }
+  <span class="cst-wrap d-inline-flex align-items-center gap-2">
+    @if (showCountdown) {
+      <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
+        <i class="ti ti-clock-play me-1"></i>
+        <span class="cst-time">{{ countdown }}</span>
+      </span>
+    } @else {
+      <span class="cst-chip d-inline-flex align-items-center" [title]="session.register_name">
+        <i class="ti ti-cash-register me-1"></i>{{ session.status_display }}
+      </span>
+    }
+
+    @if (session.current_balance != null) {
+      <span class="cst-chip cst-balance d-inline-flex align-items-center"
+            [title]="('treasury.session.balance_now' | transloco) + ' — ' + session.register_name">
+        <i class="ti ti-wallet me-1"></i>
+        <span class="cst-amount">{{ session.current_balance | number:'1.0-0' }}</span>
+        <span class="cst-cur ms-1">XAF</span>
+      </span>
+    }
+  </span>
 }

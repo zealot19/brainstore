@@ -496,6 +496,7 @@
       "filter_closed": "Closed",
       "col_register": "Register",
       "col_opening": "Opening",
+      "balance_now": "Cash on hand",
       "col_expected": "Expected",
       "col_diff": "Difference",
       "col_opened_by": "Opened by",
