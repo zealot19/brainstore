@@ -155,7 +155,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
 
 class ScheduleSessionSerializer(serializers.Serializer):
     cash_register_id = serializers.UUIDField()
-    assigned_to_id   = serializers.UUIDField()
+    assigned_to_id   = serializers.UUIDField(required=False, allow_null=True, default=None)
     name             = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     scheduled_start  = serializers.DateTimeField(required=False, allow_null=True)
     scheduled_end    = serializers.DateTimeField(required=False, allow_null=True)

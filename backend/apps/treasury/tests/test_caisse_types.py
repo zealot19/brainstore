@@ -67,16 +67,3 @@ def test_closing_principale_needs_no_destination():
     princ.refresh_from_db()
     assert princ.current_balance == Decimal("2000")
     assert not Transfer.objects.filter(from_cash_register=princ, is_deleted=False).exists()
-
-
-@pytest.mark.django_db
-def test_guichetier_cannot_close():
-    company, admin = _company(name="GuichetierClose", email="gcl@x.com")
-    guichet = create_cash_register(company=company, name="G1", kind=CashRegister.Kind.GUICHET,
-                                   manager_ids=[admin.id], created_by=admin)
-    guichetier = User.objects.create(email="op@x.com", username="op", company=company, is_active=True)
-    session = open_session(company=company, cash_register=guichet, opening_balance=Decimal("1000"), created_by=admin)
-    session.assigned_to = guichetier
-    session.save(update_fields=["assigned_to"])
-    with pytest.raises(ApplicationError):
-        close_session(session, closing_balance=Decimal("1000"), updated_by=guichetier)

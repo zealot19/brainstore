@@ -25,12 +25,15 @@ def _setup():
 
 
 @pytest.mark.django_db
-def test_only_a_manager_opens_the_register():
+def test_agency_user_opens_the_register():
+    # L'ouverture n'exige plus d'être gestionnaire de la caisse : la gestion des
+    # sessions est gouvernée par le droit RBAC treasury.session.manage (imposé à
+    # l'endpoint) et bornée à l'agence au niveau service. Un utilisateur de l'agence
+    # ouvre donc au niveau service — même s'il n'est pas gestionnaire de la caisse
+    # (le gestionnaire/guichetier, lui, sert aux ventes : cf. test_only_a_manager_can_transact).
     from apps.treasury.services.services import open_session
     company, admin, mgr, other, reg = _setup()
-    with pytest.raises(ApplicationError):  # not a manager
-        open_session(company=company, cash_register=reg, created_by=other)
-    s = open_session(company=company, cash_register=reg, name="Matin", created_by=mgr)
+    s = open_session(company=company, cash_register=reg, name="Matin", created_by=other)
     assert s.status == "open" and s.name == "Matin"
 
 

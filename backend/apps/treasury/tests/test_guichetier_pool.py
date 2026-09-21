@@ -57,8 +57,9 @@ def test_counter_role_gets_operate_permission():
 
 
 @pytest.mark.django_db
-def test_guichetier_reads_and_closes_own_session_via_api():
-    from decimal import Decimal
+def test_guichetier_reads_own_session_but_cannot_close_via_api():
+    """Le guichetier (operate) voit sa session active (minuteur) mais ne la clôture
+    pas : la clôture est une action de gestion (treasury.session.manage) → 403."""
     from rest_framework.test import APIClient
     from apps.treasury.services import create_cash_register, schedule_session, open_scheduled_session
     company, admin, agency_id, staff = _setup()
@@ -74,7 +75,7 @@ def test_guichetier_reads_and_closes_own_session_via_api():
 
     r = c.post(f"/api/v1/treasury/sessions/{s.id}/close/",
                {"closing_balance": "0", "justification_reason": "comptage"}, format="json")
-    assert r.status_code in (200, 201), r.content
+    assert r.status_code == 403, r.content  # pas de droit de gestion
 
 
 @pytest.mark.django_db
@@ -88,4 +89,4 @@ def test_guichetier_cannot_close_others_session_via_api():
 
     c = APIClient(); c.force_authenticate(user=gui)
     r = c.post(f"/api/v1/treasury/sessions/{s.id}/close/", {"closing_balance": "0"}, format="json")
-    assert r.status_code == 400, r.content  # ni gestionnaire ni assigné
+    assert r.status_code == 403, r.content  # guichetier sans droit de gestion
