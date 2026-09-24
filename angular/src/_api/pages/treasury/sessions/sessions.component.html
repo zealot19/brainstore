@@ -150,9 +150,9 @@
 </div></div></div>
 
 <!-- Rapport de session -->
-<div class="modal fade" id="trz-report-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+<div class="modal fade" id="trz-report-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-xl"><div class="modal-content">
   <div class="modal-header">
-    <h5 class="modal-title">{{ 'treasury.session.report' | transloco }}</h5>
+    <h5 class="modal-title"><i class="ti ti-file-text me-2"></i>{{ 'treasury.session.report' | transloco }}</h5>
     <div class="ms-auto d-flex gap-2">
       <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="!reportData" (click)="printReport()"><i class="ti ti-printer me-1"></i>{{ 'treasury.report.print' | transloco }}</button>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -161,55 +161,80 @@
   <div class="modal-body">
     @if (!reportData) { <div class="text-center py-4"><div class="spinner-border text-primary"></div></div> }
     @else {
-      <div id="session-report-print">
-        <h4>{{ reportData.general.register_name }} @if (reportData.general.session_name) { — {{ reportData.general.session_name }} }</h4>
-        <table>
-          <tr><th>{{ 'treasury.session.col_guichetier' | transloco }}</th><td>{{ reportData.general.guichetier || '—' }}</td>
-              <th>{{ 'treasury.common.status' | transloco }}</th><td>{{ reportData.general.status_display }}</td></tr>
-          <tr><th>{{ 'treasury.session.col_opened_at' | transloco }}</th><td>{{ reportData.general.opened_at | date:'short' }}</td>
-              <th>{{ 'treasury.session.closed_at' | transloco }}</th><td>{{ reportData.general.closed_at ? (reportData.general.closed_at | date:'short') : '—' }}</td></tr>
-        </table>
+      <div id="session-report-print" class="sr-report">
 
-        <h4>{{ 'treasury.report.summary' | transloco }}</h4>
-        <table>
-          <tr><th>{{ 'treasury.common.opening_balance' | transloco }}</th><td class="text-end">{{ reportData.summary.opening_balance }}</td></tr>
-          <tr><th>{{ 'treasury.report.income' | transloco }}</th><td class="text-end">{{ reportData.summary.income_total }}</td></tr>
-          <tr><th>{{ 'treasury.report.expense' | transloco }}</th><td class="text-end">{{ reportData.summary.expense_total }}</td></tr>
-          <tr><th>{{ 'treasury.report.expected' | transloco }}</th><td class="text-end">{{ reportData.summary.expected_closing }}</td></tr>
-          <tr><th>{{ 'treasury.report.counted' | transloco }}</th><td class="text-end">{{ reportData.summary.closing_balance }}</td></tr>
-          <tr class="fw-bold"><th>{{ 'treasury.report.ecart' | transloco }}</th><td class="text-end" [ngClass]="ecartCss(reportData.summary.ecart_status)">{{ reportData.summary.difference }}</td></tr>
-        </table>
-        @if (reportData.justification?.reason_label) {
-          <p><strong>{{ 'treasury.ecart.reason' | transloco }} :</strong> {{ reportData.justification.reason_label }}@if (reportData.justification.note) { — {{ reportData.justification.note }} }</p>
-        }
+        <!-- En-tête -->
+        <div class="sr-head">
+          <div class="sr-head-top">
+            <h3 class="sr-title">{{ reportData.general.register_name }}@if (reportData.general.session_name) { <span class="sr-sub">— {{ reportData.general.session_name }}</span> }</h3>
+            <span class="sr-badge sr-badge-{{ reportData.general.status }}">{{ reportData.general.status_display }}</span>
+          </div>
+          <div class="sr-meta">
+            <div><span>{{ 'treasury.session.col_guichetier' | transloco }}</span><b>{{ reportData.general.guichetier || '—' }}</b></div>
+            <div><span>{{ 'treasury.report.agency' | transloco }}</span><b>{{ reportData.general.agency_name || '—' }}</b></div>
+            <div><span>{{ 'treasury.session.col_opened_at' | transloco }}</span><b>{{ reportData.general.opened_at | date:'short' }}</b></div>
+            <div><span>{{ 'treasury.session.closed_at' | transloco }}</span><b>{{ reportData.general.closed_at ? (reportData.general.closed_at | date:'short') : '—' }}</b></div>
+          </div>
+        </div>
 
-        <h4>{{ 'treasury.report.payments' | transloco }}</h4>
-        <table>
-          <thead><tr><th>{{ 'treasury.report.mode' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
-          <tbody>@for (p of reportData.payments; track p.mode) { <tr><td>{{ p.mode_label }}</td><td class="text-end">{{ p.total }}</td></tr> }
-            @if (!reportData.payments.length) { <tr><td colspan="2" class="text-muted">—</td></tr> }
-          </tbody>
-        </table>
+        <!-- Cartes chiffres -->
+        <div class="sr-kpis">
+          <div class="sr-kpi"><div class="sr-kpi-lbl">{{ 'treasury.common.opening_balance' | transloco }}</div><div class="sr-kpi-val">{{ reportData.summary.opening_balance | number:'1.0-0' }}</div></div>
+          <div class="sr-kpi"><div class="sr-kpi-lbl">{{ 'treasury.report.income' | transloco }}</div><div class="sr-kpi-val sr-pos">+{{ reportData.summary.income_total | number:'1.0-0' }}</div></div>
+          <div class="sr-kpi"><div class="sr-kpi-lbl">{{ 'treasury.report.expense' | transloco }}</div><div class="sr-kpi-val sr-neg">−{{ reportData.summary.expense_total | number:'1.0-0' }}</div></div>
+          <div class="sr-kpi"><div class="sr-kpi-lbl">{{ 'treasury.report.expected' | transloco }}</div><div class="sr-kpi-val">{{ reportData.summary.expected_closing | number:'1.0-0' }}</div></div>
+          <div class="sr-kpi sr-kpi-strong"><div class="sr-kpi-lbl">{{ 'treasury.report.counted' | transloco }}</div><div class="sr-kpi-val">{{ reportData.summary.closing_balance | number:'1.0-0' }}</div></div>
+        </div>
 
-        @if (reportData.billetage.length) {
-          <h4>{{ 'treasury.report.billetage' | transloco }}</h4>
-          <table>
-            <thead><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th>{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
-            <tbody>@for (b of reportData.billetage; track $index) { <tr><td>{{ b.value }}</td><td>{{ b.quantity }}</td><td class="text-end">{{ b.subtotal }}</td></tr> }</tbody>
-          </table>
-        }
+        <!-- Écart -->
+        <div class="sr-ecart">
+          <span class="sr-ecart-pill sr-ecart-{{ reportData.summary.ecart_status || 'balanced' }}">
+            {{ 'treasury.report.ecart' | transloco }} : {{ reportData.summary.difference | number:'1.0-0' }} XAF
+            @if (reportData.justification?.reason_label) { <span class="sr-ecart-reason">· {{ reportData.justification.reason_label }}@if (reportData.justification.note) { ({{ reportData.justification.note }}) }</span> }
+          </span>
+        </div>
 
+        <!-- Paiements + Billetage -->
+        <div class="sr-grid2">
+          <div class="sr-section">
+            <div class="sr-section-title">💳 {{ 'treasury.report.payments' | transloco }}</div>
+            <table class="sr-table">
+              <thead><tr><th>{{ 'treasury.report.mode' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+              <tbody>
+                @for (p of reportData.payments; track p.mode) { <tr><td>{{ p.mode_label }}</td><td class="text-end">{{ p.total | number:'1.0-0' }}</td></tr> }
+                @if (!reportData.payments.length) { <tr><td colspan="2" class="sr-empty">—</td></tr> }
+              </tbody>
+              @if (reportData.payments.length) { <tfoot><tr><td>{{ 'treasury.report.income' | transloco }}</td><td class="text-end">{{ reportData.summary.income_total | number:'1.0-0' }}</td></tr></tfoot> }
+            </table>
+          </div>
+
+          @if (reportData.billetage.length) {
+            <div class="sr-section">
+              <div class="sr-section-title">🧮 {{ 'treasury.report.billetage' | transloco }}</div>
+              <table class="sr-table">
+                <thead><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th class="text-end">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+                <tbody>@for (b of reportData.billetage; track $index) { <tr><td>{{ b.value | number:'1.0-0' }}</td><td class="text-end">{{ b.quantity }}</td><td class="text-end">{{ b.subtotal | number:'1.0-0' }}</td></tr> }</tbody>
+                <tfoot><tr><td colspan="2">{{ 'treasury.report.counted' | transloco }}</td><td class="text-end">{{ reportData.summary.closing_balance | number:'1.0-0' }}</td></tr></tfoot>
+              </table>
+            </div>
+          }
+        </div>
+
+        <!-- Bordereaux -->
         @for (grp of [
-          { title: ('treasury.report.tickets' | transloco), rows: reportData.tickets },
-          { title: ('treasury.report.parcels' | transloco), rows: reportData.parcels },
-          { title: ('treasury.report.baggage' | transloco), rows: reportData.baggage }
+          { icon: '🎫', title: ('treasury.report.tickets' | transloco), rows: reportData.tickets },
+          { icon: '📦', title: ('treasury.report.parcels' | transloco), rows: reportData.parcels },
+          { icon: '🧳', title: ('treasury.report.baggage' | transloco), rows: reportData.baggage }
         ]; track grp.title) {
           @if (grp.rows?.length) {
-            <h4>{{ grp.title }}</h4>
-            <table>
-              <thead><tr><th>{{ 'treasury.report.ref' | transloco }}</th><th>{{ 'treasury.common.label' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
-              <tbody>@for (r of grp.rows; track $index) { <tr><td>{{ r.ref || '—' }}</td><td>{{ r.label || '—' }}</td><td class="text-end">{{ r.amount }}</td></tr> }</tbody>
-            </table>
+            <div class="sr-section">
+              <div class="sr-section-title">{{ grp.icon }} {{ grp.title }} <span class="sr-count">({{ grp.rows.length }})</span></div>
+              <table class="sr-table">
+                <thead><tr><th>{{ 'treasury.report.ref' | transloco }}</th><th>{{ 'treasury.common.label' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+                <tbody>@for (r of grp.rows; track $index) { <tr><td class="sr-ref">{{ r.ref || '—' }}</td><td>{{ r.label || '—' }}</td><td class="text-end">{{ r.amount | number:'1.0-0' }}</td></tr> }</tbody>
+                <tfoot><tr><td colspan="2">{{ 'treasury.report.total' | transloco }}</td><td class="text-end">{{ srSum(grp.rows) | number:'1.0-0' }}</td></tr></tfoot>
+              </table>
+            </div>
           }
         }
       </div>

@@ -758,7 +758,9 @@
       "tickets": "Billets",
       "parcels": "Colis",
       "baggage": "Bagages",
-      "ref": "Réf."
+      "ref": "Réf.",
+      "agency": "Agence",
+      "total": "Total"
     },
     "timer": {
       "do_billetage": "Faire le billetage"

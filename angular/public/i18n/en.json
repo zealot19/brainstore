@@ -758,7 +758,9 @@
       "tickets": "Tickets",
       "parcels": "Parcels",
       "baggage": "Baggage",
-      "ref": "Ref."
+      "ref": "Ref.",
+      "agency": "Agency",
+      "total": "Total"
     },
     "timer": {
       "do_billetage": "Do the cash count"

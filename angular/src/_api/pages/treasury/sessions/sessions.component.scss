@@ -1,0 +1,72 @@
+// Rapport de session — mise en forme (écran). Le rendu impression a son propre
+// CSS embarqué (printReport()) reprenant les mêmes classes.
+:host {
+  --sr-border: var(--bs-border-color, #e5e7ef);
+  --sr-surface: var(--bs-tertiary-bg, #f7f8fb);
+  --sr-text: var(--bs-body-color, #1f2733);
+  --sr-muted: var(--bs-secondary-color, #6b7480);
+}
+
+.sr-report { color: var(--sr-text); font-size: 13.5px; }
+
+// ── En-tête ───────────────────────────────────────────────────────────────────
+.sr-head {
+  border: 1px solid var(--sr-border); border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 16px; background: var(--sr-surface);
+}
+.sr-head-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.sr-title { font-size: 18px; font-weight: 700; margin: 0; }
+.sr-sub { font-weight: 400; color: var(--sr-muted); }
+.sr-badge {
+  padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: rgba(125, 140, 165, .16); color: var(--sr-muted); white-space: nowrap;
+  &.sr-badge-closed { background: rgba(30, 41, 59, .12); color: #334155; }
+  &.sr-badge-open { background: rgba(22, 163, 74, .14); color: #16a34a; }
+  &.sr-badge-suspended { background: rgba(245, 158, 11, .16); color: #b45309; }
+}
+.sr-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px;
+  span { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--sr-muted); }
+  b { font-weight: 600; }
+}
+
+// ── Cartes chiffres ───────────────────────────────────────────────────────────
+.sr-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; }
+.sr-kpi {
+  border: 1px solid var(--sr-border); border-radius: 10px; padding: 10px 12px; text-align: center;
+  &.sr-kpi-strong { border-color: rgba(79, 70, 229, .35); background: rgba(79, 70, 229, .05); }
+}
+.sr-kpi-lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--sr-muted); }
+.sr-kpi-val { font-size: 17px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.sr-pos { color: #16a34a; }
+.sr-neg { color: #ef4444; }
+
+// ── Écart ─────────────────────────────────────────────────────────────────────
+.sr-ecart { text-align: center; margin: 4px 0 20px; }
+.sr-ecart-pill {
+  display: inline-block; padding: 5px 16px; border-radius: 999px; font-weight: 700; font-size: 13px;
+  &.sr-ecart-surplus { background: rgba(22, 163, 74, .12); color: #16a34a; }
+  &.sr-ecart-shortage { background: rgba(239, 68, 68, .12); color: #ef4444; }
+  &.sr-ecart-balanced { background: rgba(125, 140, 165, .14); color: var(--sr-muted); }
+}
+.sr-ecart-reason { font-weight: 500; opacity: .9; }
+
+// ── Sections & tables ─────────────────────────────────────────────────────────
+.sr-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 640px) { .sr-grid2, .sr-kpis { grid-template-columns: 1fr 1fr; } }
+.sr-section { margin-bottom: 16px; break-inside: avoid; }
+.sr-section-title {
+  font-size: 13.5px; font-weight: 700; margin: 0 0 8px; padding-bottom: 5px;
+  border-bottom: 2px solid var(--sr-border);
+}
+.sr-count { font-weight: 500; color: var(--sr-muted); }
+table.sr-table {
+  width: 100%; border-collapse: collapse; font-size: 12.5px;
+  th { background: var(--sr-surface); text-align: left; padding: 7px 9px; color: var(--sr-muted); font-weight: 600; border-bottom: 1px solid var(--sr-border); }
+  td { padding: 6px 9px; border-bottom: 1px solid var(--sr-border); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tfoot td { font-weight: 700; border-top: 2px solid var(--sr-border); background: var(--sr-surface); }
+}
+.sr-ref { font-variant-numeric: tabular-nums; color: var(--sr-muted); }
+.sr-empty { color: var(--sr-muted); }
+.text-end { text-align: right; }
