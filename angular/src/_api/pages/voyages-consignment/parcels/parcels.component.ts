@@ -34,7 +34,9 @@ export class VcgParcelsComponent implements OnInit {
   points: ServicePoint[] = []; types: ConsignmentType[] = []; typeOptions: any[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
-  pickupTarget: Parcel | null = null; pickupName = ''; pickupId = ''; pickupByMandataire = false;
+  pickupTarget: Parcel | null = null;
+  pickupKind: 'destinataire' | 'mandataire' = 'destinataire';
+  pickupName = ''; pickupPhone = ''; pickupId = '';
   editId: string | null = null;
   selected = new Set<string>();
 
@@ -49,7 +51,7 @@ export class VcgParcelsComponent implements OnInit {
       origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
       sender_name: [null, Validators.required], sender_phone: [null, Validators.required],
-      recipient_name: [null, Validators.required], recipient_phone: [null, Validators.required],
+      recipient_name: [''], recipient_phone: [''],
       recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
       amount_received: [null], payment_method: [''],
@@ -126,15 +128,29 @@ export class VcgParcelsComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
-  askPickup(p: Parcel): void { this.pickupTarget = p; this.pickupByMandataire = false; this.pickupName = ''; this.pickupId = ''; }
+  /** Vrai si un destinataire a été renseigné à la création (retrait = simple confirmation). */
+  get pickupHasRecipient(): boolean { return !!this.pickupTarget?.recipient_name; }
+  askPickup(p: Parcel): void {
+    this.pickupTarget = p; this.pickupKind = 'destinataire';
+    this.pickupName = ''; this.pickupPhone = ''; this.pickupId = '';
+  }
   doPickup(): void {
     if (!this.pickupTarget) return;
-    const by = this.pickupByMandataire ? this.pickupName.trim() : this.pickupTarget.recipient_name;
-    const idnum = this.pickupByMandataire ? this.pickupId.trim() : '';
-    if (this.pickupByMandataire && (!by || !idnum)) return;
-    this.svc.pickup(this.pickupTarget.id, by, idnum).subscribe({
+    if (this.pickupHasRecipient) {
+      // Destinataire déjà connu : simple confirmation (pièce présentée facultative).
+      this.svc.pickup(this.pickupTarget.id, { picked_up_id_number: this.pickupId.trim() }).subscribe({
+        next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
+        error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
+      return;
+    }
+    // Aucun destinataire : on capture qui retire (destinataire ou mandataire).
+    const name = this.pickupName.trim(), phone = this.pickupPhone.trim(), idn = this.pickupId.trim();
+    if (!name || !phone || !idn) { this.toast.error('Nom, téléphone et pièce sont requis.'); return; }
+    this.svc.pickup(this.pickupTarget.id, {
+      picked_up_by: name, picked_up_phone: phone, picked_up_id_number: idn, picked_up_kind: this.pickupKind,
+    }).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
-      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+      error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
   }
   cancel(p: Parcel): void {
     if (!confirm('Annuler ce colis ?')) return;

@@ -208,19 +208,45 @@ def receive_parcel(parcel, *, received_pieces=None, missing_pieces=0, damaged_pi
 
 
 @transaction.atomic
-def pickup_parcel(parcel, *, picked_up_by, picked_up_id_number="", user):
-    """Retrait par le destinataire (avec la pièce présentée)."""
+def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_number="",
+                  picked_up_kind="", user):
+    """Retrait du colis.
+
+    - Destinataire renseigné à la création → simple confirmation (retrait par le
+      destinataire ; pièce présentée facultative).
+    - Sinon → on capture qui retire (destinataire OU mandataire) avec nom,
+      téléphone et pièce (obligatoires). Un destinataire capturé ici renseigne
+      aussi le destinataire du colis.
+    """
     if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
         raise ApplicationError(_("Seul un colis disponible peut être retiré."))
-    if not picked_up_by:
-        raise ApplicationError(_("Indiquez le nom de la personne qui retire le colis."))
+
+    has_recipient = bool(parcel.recipient_name)
+    if has_recipient:
+        picked_up_by = picked_up_by or parcel.recipient_name
+        picked_up_phone = picked_up_phone or parcel.recipient_phone
+        kind = Parcel.PickupKind.DESTINATAIRE
+    else:
+        if not (picked_up_by and picked_up_phone and picked_up_id_number):
+            raise ApplicationError(_("Nom, téléphone et pièce sont requis pour le retrait."))
+        if picked_up_kind not in (Parcel.PickupKind.DESTINATAIRE, Parcel.PickupKind.MANDATAIRE):
+            raise ApplicationError(_("Précisez si le retrait est fait par le destinataire ou un mandataire."))
+        kind = picked_up_kind
+        if kind == Parcel.PickupKind.DESTINATAIRE:
+            parcel.recipient_name = picked_up_by
+            parcel.recipient_phone = picked_up_phone
+            parcel.recipient_id_number = picked_up_id_number
+
     parcel.status = Parcel.Status.PICKED_UP
     parcel.picked_up_by = picked_up_by
+    parcel.picked_up_phone = picked_up_phone or ""
     parcel.picked_up_id_number = picked_up_id_number or ""
+    parcel.picked_up_kind = kind
     parcel.picked_up_at = timezone.now()
     parcel.updated_by = user
     parcel.save()
-    note = picked_up_by + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
+    who = "mandataire" if kind == Parcel.PickupKind.MANDATAIRE else "destinataire"
+    note = f"{picked_up_by} ({who})" + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
     _event(parcel, ParcelEvent.Kind.PICKED_UP, from_status=Parcel.Status.AVAILABLE_FOR_PICKUP,
            to_status=Parcel.Status.PICKED_UP, user=user, note=note)
     return parcel
