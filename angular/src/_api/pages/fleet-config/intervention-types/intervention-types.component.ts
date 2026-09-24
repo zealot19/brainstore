@@ -20,11 +20,8 @@ export class FcInterventionTypesComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
   rows: InterventionType[] = []; filtered: InterventionType[] = []; loading = true; search = '';
-  categories = [
-    { value: 'SERVICE',  label: 'Service' },
-    { value: 'CONTRACT', label: 'Contrat' },
-    { value: 'BOTH',     label: 'Contrat et Service' },
-  ];
+  // La catégorie (Contrat/Service) n'est plus proposée : tout type est « Les deux »
+  // (BOTH), donc disponible aussi bien pour les contrats que pour les services.
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   selected = new Set<string>();
   constructor(private svc: InterventionTypeService, private fb: FormBuilder) {}
@@ -42,7 +39,7 @@ export class FcInterventionTypesComponent implements OnInit {
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ name: '', category: 'BOTH', interval_km: null, interval_days: null, is_active: true }); }
-  openEdit(r: InterventionType): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ name: r.name, category: r.category, interval_km: r.interval_km, interval_days: r.interval_days, is_active: r.is_active }); }
+  openEdit(r: InterventionType): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ name: r.name, category: 'BOTH', interval_km: r.interval_km, interval_days: r.interval_days, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);

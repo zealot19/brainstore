@@ -19,13 +19,12 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>{{ 'fcfg.common.name' | transloco }}</th><th>{{ 'fcfg.common.category' | transloco }}</th><th>{{ 'fcfg.common.perimeter' | transloco }}</th><th>{{ 'fcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+          <th>{{ 'fcfg.common.name' | transloco }}</th><th>{{ 'fcfg.common.perimeter' | transloco }}</th><th>{{ 'fcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
               <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
               <td class="fw-medium">{{ r.name }}</td>
-              <td>{{ r.category_display }}</td>
               <td>@if (r.scope === 'global') { <span class="badge bg-secondary">{{ 'fcfg.common.scope_global' | transloco }}</span> } @else { <span class="badge bg-info">{{ 'fcfg.common.scope_specific' | transloco }}</span> }</td>
               <td>@if (r.is_active) { <span class="badge bg-success">{{ 'fcfg.common.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'fcfg.common.inactive' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
@@ -35,7 +34,7 @@
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'fcfg.common.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">{{ 'fcfg.common.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -47,10 +46,6 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="mb-3"><label class="form-label">{{ 'fcfg.common.name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
-    <div class="mb-3"><label class="form-label">{{ 'fcfg.common.category' | transloco }}</label>
-      <select formControlName="category" class="form-select">
-        @for (c of categories; track c.value) { <option [value]="c.value">{{ c.label }}</option> }
-      </select></div>
     <div class="row">
       <div class="col-6 mb-3"><label class="form-label">{{ 'fcfg.it.f_interval_km' | transloco }}</label><input formControlName="interval_km" type="number" min="0" class="form-control" placeholder="ex. 10000" /></div>
       <div class="col-6 mb-3"><label class="form-label">{{ 'fcfg.it.f_interval_days' | transloco }}</label><input formControlName="interval_days" type="number" min="0" class="form-control" placeholder="ex. 180" /></div>
