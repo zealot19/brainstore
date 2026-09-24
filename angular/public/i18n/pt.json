@@ -758,7 +758,9 @@
       "tickets": "Bilhetes",
       "parcels": "Encomendas",
       "baggage": "Bagagens",
-      "ref": "Ref."
+      "ref": "Ref.",
+      "agency": "Agência",
+      "total": "Total"
     },
     "timer": {
       "do_billetage": "Fazer a contagem"

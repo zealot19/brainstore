@@ -758,7 +758,9 @@
       "tickets": "Billetes",
       "parcels": "Paquetes",
       "baggage": "Equipaje",
-      "ref": "Ref."
+      "ref": "Ref.",
+      "agency": "Agencia",
+      "total": "Total"
     },
     "timer": {
       "do_billetage": "Hacer el arqueo"

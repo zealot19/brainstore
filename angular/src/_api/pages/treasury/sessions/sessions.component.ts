@@ -17,6 +17,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-trz-sessions',
   templateUrl: './sessions.component.html',
+  styleUrls: ['./sessions.component.scss'],
   imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, TranslocoModule],
 })
 export class TrzSessionsComponent implements OnInit {
@@ -167,7 +168,39 @@ export class TrzSessionsComponent implements OnInit {
     if (!el) return;
     const w = window.open('', '_blank');
     if (!w) return;
-    w.document.write('<html><head><title>Rapport de session</title><style>body{font-family:sans-serif;padding:24px;color:#222}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #ccc;padding:6px;text-align:left}h4{margin:12px 0 4px}</style></head><body>' + el.innerHTML + '</body></html>');
+    const css = `
+      *{box-sizing:border-box}
+      body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1f2733;padding:20px;max-width:820px;margin:0 auto}
+      .sr-report{font-size:12.5px}
+      .sr-head{border:1px solid #e5e7ef;border-radius:10px;padding:12px 14px;margin-bottom:14px;background:#fafbff}
+      .sr-head-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+      .sr-title{font-size:17px;font-weight:700;margin:0}.sr-sub{font-weight:400;color:#6b7480}
+      .sr-badge{padding:3px 11px;border-radius:999px;font-size:11px;font-weight:600;background:#eef1f6;color:#475569}
+      .sr-badge-closed{background:#e7ebf2;color:#334155}
+      .sr-meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 20px}
+      .sr-meta span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.03em;color:#98a1b0}
+      .sr-meta b{font-weight:600}
+      .sr-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}
+      .sr-kpi{border:1px solid #e5e7ef;border-radius:8px;padding:8px 6px;text-align:center}
+      .sr-kpi-strong{border-color:#c7d2fe;background:#f5f6ff}
+      .sr-kpi-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:#98a1b0}
+      .sr-kpi-val{font-size:15px;font-weight:700;margin-top:2px}
+      .sr-pos{color:#16a34a}.sr-neg{color:#ef4444}
+      .sr-ecart{text-align:center;margin:4px 0 16px}
+      .sr-ecart-pill{display:inline-block;padding:5px 16px;border-radius:999px;font-weight:700}
+      .sr-ecart-surplus{background:#e6f6ec;color:#16a34a}.sr-ecart-shortage{background:#fdecec;color:#ef4444}
+      .sr-ecart-balanced{background:#eef1f6;color:#5a6474}.sr-ecart-reason{font-weight:500}
+      .sr-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+      .sr-section{margin-bottom:14px;break-inside:avoid}
+      .sr-section-title{font-size:13px;font-weight:700;margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid #eef1f6}
+      .sr-count{font-weight:500;color:#98a1b0}
+      table.sr-table{width:100%;border-collapse:collapse;font-size:12px}
+      .sr-table th{background:#f5f7fb;text-align:left;padding:6px 8px;color:#5a6474;font-weight:600;border-bottom:1px solid #e5e7ef}
+      .sr-table td{padding:5px 8px;border-bottom:1px solid #f0f2f7}
+      .sr-table tfoot td{font-weight:700;border-top:2px solid #e5e7ef;background:#fafbff}
+      .sr-ref{color:#98a1b0}.text-end{text-align:right}
+      @media print{body{padding:0}}`;
+    w.document.write(`<html><head><title>Rapport de session</title><meta charset="utf-8"><style>${css}</style></head><body>${el.innerHTML}</body></html>`);
     w.document.close(); w.focus(); w.print();
   }
 
@@ -177,5 +210,7 @@ export class TrzSessionsComponent implements OnInit {
   ecartCss(s: string | null): string {
     return { surplus: 'text-success', shortage: 'text-danger', balanced: 'text-muted' }[s ?? ''] ?? '';
   }
+  /** Total d'un bordereau (billets / colis / bagages). */
+  srSum(rows: any[]): number { return (rows || []).reduce((t, r) => t + (+r.amount || 0), 0); }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }
