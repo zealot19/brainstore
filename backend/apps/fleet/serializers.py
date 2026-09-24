@@ -193,7 +193,8 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             "status", "status_display",
             "current_odometer", "tank_capacity_liters", "is_active",
             "internal_driver_name", "external_driver_detail",
-            "owner_partner", "owner_partner_name", "partner_share_percent",
+            "owner_partner", "owner_partner_name",
+            "partner_pct_ticket", "partner_pct_parcel", "partner_pct_baggage",
             "notes", "created_at", "updated_at",
         ]
 
@@ -230,7 +231,9 @@ class VehicleCreateSerializer(serializers.Serializer):
     purchase_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True, default=None)
     residual_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True, default=None)
     owner_partner_id = serializers.UUIDField(required=False, allow_null=True, default=None)
-    partner_share_percent = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False, default=0)
+    partner_pct_ticket = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False, default=0)
+    partner_pct_parcel = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False, default=0)
+    partner_pct_baggage = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False, default=0)
 
 
 class VehicleUpdateSerializer(serializers.Serializer):
@@ -256,7 +259,9 @@ class VehicleUpdateSerializer(serializers.Serializer):
     purchase_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True)
     residual_value = serializers.DecimalField(max_digits=18, decimal_places=2, required=False, allow_null=True)
     owner_partner_id = serializers.UUIDField(required=False, allow_null=True)
-    partner_share_percent = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    partner_pct_ticket = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    partner_pct_parcel = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    partner_pct_baggage = serializers.DecimalField(max_digits=5, decimal_places=2, min_value=Decimal("0"), max_value=Decimal("100"), required=False)
 
 
 class OdometerUpdateSerializer(serializers.Serializer):

@@ -89,7 +89,7 @@ export class FleetVehiclesComponent implements OnInit {
       residual_value:    [null],
       tank_capacity_liters: [null],
       owner_partner_id: [null],
-      partner_share_percent: [0],
+      partner_pct_ticket: [0], partner_pct_parcel: [0], partner_pct_baggage: [0],
       initial_odometer: [0],
       notes:         [''],
     });
@@ -107,7 +107,7 @@ export class FleetVehiclesComponent implements OnInit {
       purchase_value:    [null],
       residual_value:    [null],
       owner_partner_id: [null],
-      partner_share_percent: [0],
+      partner_pct_ticket: [0], partner_pct_parcel: [0], partner_pct_baggage: [0],
       notes:         [''],
       is_active:     [true],
     });
@@ -194,7 +194,9 @@ export class FleetVehiclesComponent implements OnInit {
       residual_value:    v.residual_value    ? Number(v.residual_value)    : null,
       tank_capacity_liters: v.tank_capacity_liters ? Number(v.tank_capacity_liters) : null,
       owner_partner_id: v.owner_partner_id || null,
-      partner_share_percent: v.owner_partner_id ? Number(v.partner_share_percent || 0) : 0,
+      partner_pct_ticket: v.owner_partner_id ? Number(v.partner_pct_ticket || 0) : 0,
+      partner_pct_parcel: v.owner_partner_id ? Number(v.partner_pct_parcel || 0) : 0,
+      partner_pct_baggage: v.owner_partner_id ? Number(v.partner_pct_baggage || 0) : 0,
       initial_odometer: Number(v.initial_odometer ?? 0),
       notes:         v.notes || '',
     };
@@ -223,7 +225,7 @@ export class FleetVehiclesComponent implements OnInit {
         purchase_value:    d.purchase_value,
         residual_value:    d.residual_value,
         owner_partner_id: d.owner_partner,
-        partner_share_percent: d.partner_share_percent,
+        partner_pct_ticket: d.partner_pct_ticket, partner_pct_parcel: d.partner_pct_parcel, partner_pct_baggage: d.partner_pct_baggage,
         notes:         d.notes,
         is_active:     d.is_active,
       });
@@ -249,7 +251,9 @@ export class FleetVehiclesComponent implements OnInit {
       purchase_value:    v.purchase_value    ? Number(v.purchase_value)    : null,
       residual_value:    v.residual_value    ? Number(v.residual_value)    : null,
       owner_partner_id: v.owner_partner_id || null,
-      partner_share_percent: v.owner_partner_id ? Number(v.partner_share_percent || 0) : 0,
+      partner_pct_ticket: v.owner_partner_id ? Number(v.partner_pct_ticket || 0) : 0,
+      partner_pct_parcel: v.owner_partner_id ? Number(v.partner_pct_parcel || 0) : 0,
+      partner_pct_baggage: v.owner_partner_id ? Number(v.partner_pct_baggage || 0) : 0,
       notes:         v.notes || '',
       is_active:     v.is_active,
     };

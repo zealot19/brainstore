@@ -23,6 +23,7 @@
     @if (shows('agency')) { <div class="col-md-3"><label class="form-label">{{ 'report.f_agency' | transloco }}</label><select class="form-select" [(ngModel)]="f.agency"><option value="">{{ 'report.opt_all_f' | transloco }}</option>@for (a of agencies; track a.id) { <option [value]="a.id">{{ a.name }}</option> }</select></div> }
     @if (shows('register')) { <div class="col-md-3"><label class="form-label">{{ 'report.f_register' | transloco }}</label><select class="form-select" [(ngModel)]="f.register"><option value="">{{ 'report.opt_all_f' | transloco }}</option>@for (r of registers; track r.id) { <option [value]="r.id">{{ r.name }}</option> }</select></div> }
     @if (shows('vehicle')) { <div class="col-md-3"><label class="form-label">{{ 'report.f_vehicle' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="f.vehicle"></div> }
+    @if (shows('partner')) { <div class="col-md-3"><label class="form-label">{{ 'report.f_partner' | transloco }}</label><select class="form-select" [(ngModel)]="f.partner"><option value="">{{ 'report.opt_all_f' | transloco }}</option>@for (p of partners; track p.id) { <option [value]="p.id">{{ p.name }}</option> }</select></div> }
   </div>
 
   <div class="mt-3"><button class="btn btn-primary" [disabled]="!selectedCode" (click)="generate()"><i class="ti ti-download me-1"></i>{{ 'report.generate' | transloco }}</button></div>

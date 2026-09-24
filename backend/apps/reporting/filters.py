@@ -10,6 +10,7 @@ def parse_filters(request):
         "date_from": d("date_from"), "date_to": d("date_to"),
         "agency": q.get("agency") or None, "register": q.get("register") or None,
         "agent": q.get("agent") or None, "vehicle": q.get("vehicle") or None,
+        "partner": q.get("partner") or None,
         "year": int(q["year"]) if q.get("year") else None,
     }
 

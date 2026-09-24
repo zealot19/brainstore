@@ -1653,7 +1653,9 @@
       "submit_odometer": "Update",
       "f_owner_partner": "Owner (partner)",
       "owner_agency": "Agency",
-      "f_partner_share": "Partner share (%)"
+      "f_pct_ticket": "Ticket share (%)",
+      "f_pct_parcel": "Parcel share (%)",
+      "f_pct_baggage": "Baggage share (%)"
     },
     "crew": {
       "title": "Onboard crew",
@@ -2320,6 +2322,7 @@
     "f_agency": "Agency",
     "f_register": "Cash register",
     "f_vehicle": "Vehicle (ID)",
+    "f_partner": "Partner",
     "opt_all_f": "— All —",
     "generate": "Generate"
   },
