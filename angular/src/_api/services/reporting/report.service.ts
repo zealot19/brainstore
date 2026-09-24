@@ -1,15 +1,25 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { REPORTING } from '../../config/api.config';
 
-export interface ReportMeta { code: string; name: string; filters: string[]; }
+export type FilterType = 'date' | 'datetime' | 'text' | 'number' | 'select';
+export interface FilterSpec { key: string; type: FilterType; label: string; options?: string; }
+export interface ReportMeta { code: string; name: string; orientation?: string; filters: FilterSpec[]; }
+export interface Option { value: string; label: string; }
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  catalog(): Observable<ReportMeta[]> { return this.http.get<ReportMeta[]>(REPORTING.catalog); }
+  catalog(): Observable<ReportMeta[]> { return this.http.get<any>(REPORTING.catalog).pipe(map(r => r.data ?? r)); }
+
+  filterOptions(source: string, report?: string): Observable<Option[]> {
+    let p = new HttpParams().set('source', source);
+    if (report) p = p.set('report', report);
+    return this.http.get<any>(REPORTING.filterOptions, { params: p }).pipe(map(r => r.data ?? r));
+  }
 
   download(code: string, format: string, filters: Record<string, string>): void {
     let p = new HttpParams().set('fmt', format);

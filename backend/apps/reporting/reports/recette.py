@@ -4,6 +4,7 @@ from apps.treasury.models import Transaction
 from apps.reporting.core import ReportColumn, ReportGroup, ReportResult
 from apps.reporting.registry import register
 from apps.reporting.filters import period_label
+from apps.reporting.filter_apply import apply_filters
 
 _NATURE = {
     Transaction.Category.TICKET_SALES: "Voyage",
@@ -13,7 +14,9 @@ _NATURE = {
 }
 
 
-@register("recette", "Relevé des encaissements", ["date_from", "date_to"], "portrait")
+@register("recette", "Relevé des encaissements",
+          ["date_from", "date_to", "periode", "register", "agency", "payment_mode", "vehicle", "partner"],
+          "portrait")
 def build(company, f):
     qs = (Transaction.objects.filter(company=company, is_deleted=False,
                                      transaction_type=Transaction.Type.INCOME,
@@ -24,6 +27,12 @@ def build(company, f):
           .order_by("cash_session_id", "transaction_date"))
     if f["date_from"]: qs = qs.filter(transaction_date__gte=f["date_from"])
     if f["date_to"]:   qs = qs.filter(transaction_date__lte=f["date_to"])
+    qs = apply_filters(qs, f, {
+        "register": "cash_session__cash_register_id",
+        "agency": "cash_session__cash_register__agency_id",
+        "payment_mode": "payment_mode",
+        "vehicle": "voyage_booking__outbound_trip__vehicle_id",
+        "partner": "voyage_booking__outbound_trip__vehicle__owner_partner_id"})
     buckets, by_mode, grand = {}, defaultdict(Decimal), Decimal(0)
     for t in qs:
         sess = t.cash_session

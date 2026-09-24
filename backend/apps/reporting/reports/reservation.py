@@ -3,15 +3,21 @@ from apps.voyages_booking.models import Ticket
 from apps.reporting.core import ReportColumn, ReportGroup, ReportResult
 from apps.reporting.registry import register
 from apps.reporting.filters import period_label
+from apps.reporting.filter_apply import apply_filters
 
 
-@register("reservation", "Liste des réservations", ["date_from", "date_to"], "landscape")
+@register("reservation", "Liste des réservations",
+          ["date_from", "date_to", "periode", "categorie_tarifaire", "vehicle", "partner", "statut"],
+          "landscape")
 def build(company, f):
     qs = (Ticket.objects.filter(booking__company=company, is_deleted=False)
           .select_related("passenger", "trip__route", "trip__vehicle", "fare_class", "trip_seat")
           .order_by("created_at"))
     if f["date_from"]: qs = qs.filter(created_at__date__gte=f["date_from"])
     if f["date_to"]:   qs = qs.filter(created_at__date__lte=f["date_to"])
+    qs = apply_filters(qs, f, {
+        "categorie_tarifaire": "fare_class_id", "vehicle": "trip__vehicle_id",
+        "partner": "trip__vehicle__owner_partner_id", "statut": "status"})
     rows, total, count = [], Decimal(0), 0
     for i, t in enumerate(qs, 1):
         total += t.amount
