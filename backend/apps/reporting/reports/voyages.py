@@ -6,14 +6,20 @@ from apps.voyages_consignment.models import Parcel
 from apps.reporting.core import ReportColumn, ReportGroup, ReportResult
 from apps.reporting.registry import register
 from apps.reporting.filters import period_label
+from apps.reporting.filter_apply import apply_filters
 
 
-@register("voyages", "Liste des voyages", ["date_from", "date_to"], "landscape")
+@register("voyages", "Liste des voyages",
+          ["date_from", "date_to", "periode", "categorie_tarifaire", "vehicle", "partner", "statut"],
+          "landscape")
 def build(company, f):
     trips = (Trip.objects.filter(company=company, is_deleted=False)
              .select_related("route", "vehicle", "fare_class").order_by("scheduled_departure"))
     if f["date_from"]: trips = trips.filter(scheduled_departure__date__gte=f["date_from"])
     if f["date_to"]:   trips = trips.filter(scheduled_departure__date__lte=f["date_to"])
+    trips = apply_filters(trips, f, {
+        "categorie_tarifaire": "fare_class_id", "vehicle": "vehicle_id",
+        "partner": "vehicle__owner_partner_id", "statut": "status"})
     trip_ids = list(trips.values_list("id", flat=True))
     tk = {r["trip_id"]: r["s"] for r in
           Ticket.objects.filter(trip_id__in=trip_ids, is_deleted=False).values("trip_id").annotate(s=Sum("amount"))}

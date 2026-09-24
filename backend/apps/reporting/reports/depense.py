@@ -6,7 +6,8 @@ from apps.reporting.registry import register
 from apps.reporting.filters import period_label
 
 
-@register("depense", "Liste des dépenses", ["date_from", "date_to", "agency", "register", "vehicle"], "landscape")
+@register("depense", "Liste des dépenses",
+          ["date_from", "date_to", "periode", "agency", "register", "vehicle"], "landscape")
 def build(company, f):
     items = []  # (date, row)
 

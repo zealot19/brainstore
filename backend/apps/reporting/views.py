@@ -4,8 +4,18 @@ from apps.core.permissions import IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, error_response
 from apps.reporting.registry import REPORTS
 from apps.reporting.filters import parse_filters
+from apps.reporting.filter_defs import FILTER_DEFS, resolve_options
 from apps.reporting.render.csv_ import render_csv
 from apps.reporting.render.xlsx import render_xlsx
+
+
+def _filter_spec(key):
+    """Enrichit une clé de filtre déclarée par un rapport avec son type + libellé."""
+    d = FILTER_DEFS.get(key, {"type": "text", "label": key})
+    spec = {"key": key, "type": d["type"], "label": d["label"]}
+    if d.get("options"):
+        spec["options"] = d["options"]
+    return spec
 
 
 class ReportCatalogView(APIView):
@@ -13,8 +23,22 @@ class ReportCatalogView(APIView):
     permission_map = {"GET": "reporting.view"}
 
     def get(self, request):
-        data = [{"code": r["code"], "name": r["name"], "filters": r["filters"]} for r in REPORTS.values()]
+        data = [{"code": r["code"], "name": r["name"], "orientation": r["orientation"],
+                 "filters": [_filter_spec(k) for k in r["filters"]]} for r in REPORTS.values()]
         return success_response(sorted(data, key=lambda x: x["name"]))
+
+
+class FilterOptionsView(APIView):
+    """Options d'un filtre select (bornées à la société). ?source=<clé>[&report=<code>]."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "reporting.view"}
+
+    def get(self, request):
+        source = request.query_params.get("source")
+        if not source:
+            return error_response("Source manquante.", status_code=400)
+        report = request.query_params.get("report")
+        return success_response(resolve_options(source, request.user.company, report))
 
 
 class ReportGenerateView(APIView):

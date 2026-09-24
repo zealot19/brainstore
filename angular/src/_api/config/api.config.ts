@@ -416,6 +416,7 @@ const RP = `${API_BASE}/reporting`;
 
 export const REPORTING = {
   catalog: `${RP}/catalog/`,
+  filterOptions: `${RP}/filter-options/`,
   generate: (code: string) => `${RP}/${code}/`,
 };
 
