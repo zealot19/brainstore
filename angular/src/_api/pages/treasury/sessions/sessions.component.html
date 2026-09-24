@@ -197,7 +197,7 @@
         <!-- Paiements + Billetage -->
         <div class="sr-grid2">
           <div class="sr-section">
-            <div class="sr-section-title">💳 {{ 'treasury.report.payments' | transloco }}</div>
+            <div class="sr-section-title">{{ 'treasury.report.payments' | transloco }}</div>
             <table class="sr-table">
               <thead><tr><th>{{ 'treasury.report.mode' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
               <tbody>
@@ -210,7 +210,7 @@
 
           @if (reportData.billetage.length) {
             <div class="sr-section">
-              <div class="sr-section-title">🧮 {{ 'treasury.report.billetage' | transloco }}</div>
+              <div class="sr-section-title">{{ 'treasury.report.billetage' | transloco }}</div>
               <table class="sr-table">
                 <thead><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th class="text-end">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
                 <tbody>@for (b of reportData.billetage; track $index) { <tr><td>{{ b.value | number:'1.0-0' }}</td><td class="text-end">{{ b.quantity }}</td><td class="text-end">{{ b.subtotal | number:'1.0-0' }}</td></tr> }</tbody>
@@ -222,13 +222,13 @@
 
         <!-- Bordereaux -->
         @for (grp of [
-          { icon: '🎫', title: ('treasury.report.tickets' | transloco), rows: reportData.tickets },
-          { icon: '📦', title: ('treasury.report.parcels' | transloco), rows: reportData.parcels },
-          { icon: '🧳', title: ('treasury.report.baggage' | transloco), rows: reportData.baggage }
+          { title: ('treasury.report.tickets' | transloco), rows: reportData.tickets },
+          { title: ('treasury.report.parcels' | transloco), rows: reportData.parcels },
+          { title: ('treasury.report.baggage' | transloco), rows: reportData.baggage }
         ]; track grp.title) {
           @if (grp.rows?.length) {
             <div class="sr-section">
-              <div class="sr-section-title">{{ grp.icon }} {{ grp.title }} <span class="sr-count">({{ grp.rows.length }})</span></div>
+              <div class="sr-section-title">{{ grp.title }} <span class="sr-count">({{ grp.rows.length }})</span></div>
               <table class="sr-table">
                 <thead><tr><th>{{ 'treasury.report.ref' | transloco }}</th><th>{{ 'treasury.common.label' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
                 <tbody>@for (r of grp.rows; track $index) { <tr><td class="sr-ref">{{ r.ref || '—' }}</td><td>{{ r.label || '—' }}</td><td class="text-end">{{ r.amount | number:'1.0-0' }}</td></tr> }</tbody>
