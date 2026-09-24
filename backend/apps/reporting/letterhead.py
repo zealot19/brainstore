@@ -33,14 +33,16 @@ def doc_header_html(tpl: dict) -> str:
     e = _h.escape
     logo = f'<img src="{e(str(tpl.get("logo_url")))}" style="height:60px">' if tpl.get("logo_url") else ""
     ids = " · ".join(x for x in (tpl.get("head_office"), tpl.get("phones"), tpl.get("agencies_line")) if x)
+    # Logo à gauche + cale équivalente à droite -> texte réellement centré, espacement égal.
     return f"""
     <div class="head">
-      <div>{logo}</div>
+      <div class="logo-wrap">{logo}</div>
       <div class="co">
         <div class="co-name">{e(tpl.get("brand_name") or "")}</div>
         <div>{e(tpl.get("slogan") or "")}</div>
         <div>{e(ids)}</div>
       </div>
+      <div class="logo-wrap"></div>
     </div>"""
 
 

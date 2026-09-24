@@ -93,6 +93,23 @@ def test_report_filter_mappings_are_valid_orm_paths():
 
 
 @pytest.mark.django_db
+def test_filter_summary_lists_and_resolves_active_filters():
+    """Les critères imprimés sur le document : select résolu en libellé, texte tel quel,
+    filtres non renseignés / dates exclus."""
+    from apps.reporting.filter_defs import filter_summary, FILTER_DEFS
+    company, admin = _company("rep6@x.com")
+    f = {k: None for k in FILTER_DEFS}
+    f["statut"] = "picked_up"        # select -> résolu en libellé lisible
+    f["destinataire"] = "Jean"       # text -> tel quel
+    f["date_from"] = "2026-01-01"    # date -> exclue (gérée par period_label)
+    crit = filter_summary(company, "colis", f)
+    d = {c["label"]: c["value"] for c in crit}
+    assert d.get("Destinataire") == "Jean"
+    assert "Statut" in d and d["Statut"] != "picked_up"   # résolu, pas l'id brut
+    assert "Date début" not in d                           # dates exclues
+
+
+@pytest.mark.django_db
 def test_new_financial_reports_are_registered_and_build():
     """cashflow / tresorerie / fiscalite : enregistrés au catalogue et build renvoie
     un ReportResult cohérent (colonnes + groupes) sur une société vierge."""

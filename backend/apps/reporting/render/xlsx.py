@@ -11,6 +11,9 @@ def render_xlsx(result) -> bytes:
     ws["A1"].font = Font(bold=True, size=14)
     if result.period_label:
         ws.append([result.period_label])
+    for c in (result.meta or {}).get("criteria") or []:
+        ws.append([f"{c['label']} :", c["value"]])
+    ws.append([])  # séparation avant l'entête du tableau
     ws.append([c.label for c in result.columns])
     for cell in ws[ws.max_row]:
         cell.font = Font(bold=True)

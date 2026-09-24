@@ -138,3 +138,30 @@ def resolve_options(source, company, report=None):
         return pack((m.id, m.name or f"{m.first_name} {m.last_name}".strip() or str(m.id))
                     for m in CrewMember.objects.filter(company=company, is_deleted=False).order_by("name"))
     return []
+
+
+def filter_summary(company, report, f):
+    """Critères actifs à imprimer sur le document : [{label, value}].
+
+    Parcourt les filtres DÉCLARÉS par le rapport (ordre stable), ignore ceux non
+    renseignés, et résout la valeur des `select` (id → libellé de l'option). Les
+    dates sont couvertes séparément par `period_label`, donc exclues ici.
+    """
+    from apps.reporting.registry import REPORTS
+    declared = REPORTS.get(report, {}).get("filters", [])
+    out = []
+    for key in declared:
+        if key in ("date_from", "date_to", "periode", "year"):
+            continue
+        val = f.get(key)
+        if val in (None, ""):
+            continue
+        spec = FILTER_DEFS.get(key)
+        if not spec:
+            continue
+        display = val
+        if spec["type"] == "select" and spec.get("options"):
+            opts = resolve_options(spec["options"], company, report)
+            display = next((o["label"] for o in opts if str(o["value"]) == str(val)), val)
+        out.append({"label": spec["label"], "value": str(display)})
+    return out

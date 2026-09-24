@@ -49,7 +49,11 @@ class ReportGenerateView(APIView):
         entry = REPORTS.get(code)
         if not entry:
             return error_response("Rapport introuvable.", status_code=404)
-        result = entry["build"](request.user.company, parse_filters(request))
+        f = parse_filters(request)
+        result = entry["build"](request.user.company, f)
+        # Critères appliqués (agence, partenaire, véhicule, …) imprimés sur le document.
+        from apps.reporting.filter_defs import filter_summary
+        result.meta["criteria"] = filter_summary(request.user.company, code, f)
         # NB: 'format' est réservé par DRF (négociation de contenu) → on utilise 'fmt'.
         fmt = request.query_params.get("fmt", "pdf")
         if fmt == "csv":
