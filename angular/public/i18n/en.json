@@ -486,6 +486,16 @@
       "kind_principale": "Main cash register",
       "kind_guichet": "Counter"
     },
+    "billetage": {
+      "btn": "Cash count",
+      "title": "End-of-shift cash count",
+      "hint": "Count the cash on hand by denomination. A manager will validate and close the session.",
+      "col_denom": "Denomination",
+      "col_qty": "Quantity",
+      "col_subtotal": "Subtotal",
+      "total": "Counted total",
+      "no_denom": "No denomination configured."
+    },
     "session": {
       "title": "Cash sessions",
       "subtitle": "Opening and closing registers",

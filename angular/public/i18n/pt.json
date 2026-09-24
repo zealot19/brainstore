@@ -486,6 +486,16 @@
       "kind_principale": "Caixa principal",
       "kind_guichet": "Guichê"
     },
+    "billetage": {
+      "btn": "Contagem",
+      "title": "Contagem de fim de turno",
+      "hint": "Conte o dinheiro em caixa por denominação. Um gestor validará e fechará a sessão.",
+      "col_denom": "Denominação",
+      "col_qty": "Quantidade",
+      "col_subtotal": "Subtotal",
+      "total": "Total contado",
+      "no_denom": "Nenhuma denominação configurada."
+    },
     "session": {
       "title": "Sessões de caixa",
       "subtitle": "Abertura e fecho de caixas",

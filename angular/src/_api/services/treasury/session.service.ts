@@ -30,4 +30,9 @@ export class SessionService {
   resume(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionResume(id), {}); }
   extend(id: string, scheduled_end: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionExtend(id), { scheduled_end }); }
   report(id: string): Observable<any> { return this.http.get<any>(TREASURY.sessionReport(id)).pipe(map(r => r.data ?? r)); }
+  counts(id: string): Observable<any[]> { return this.http.get<any>(TREASURY.sessionCounts(id)).pipe(map(r => r.data ?? r)); }
+  billetageGet(id: string): Observable<any> { return this.http.get<any>(TREASURY.sessionBilletage(id)).pipe(map(r => r.data ?? r)); }
+  billetageSave(id: string, items: { denomination_id: string; quantity: number }[]): Observable<any> {
+    return this.http.post<any>(TREASURY.sessionBilletage(id), { items }).pipe(map(r => r.data ?? r));
+  }
 }

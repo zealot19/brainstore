@@ -15,3 +15,11 @@
 }
 .cst-amount { font-variant-numeric: tabular-nums; }
 .cst-cur { font-size: 0.72rem; font-weight: 700; opacity: 0.75; }
+
+/* Billetage de fin de poste — chip d'action (ambre) pour attirer l'attention. */
+.cst-billetage {
+  background: var(--bs-warning-bg-subtle, #fff3cd);
+  color: var(--bs-warning-text-emphasis, #b45309);
+  cursor: pointer;
+}
+.cst-billetage:hover { filter: brightness(0.97); }

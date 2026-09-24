@@ -486,6 +486,16 @@
       "kind_principale": "Caisse principale",
       "kind_guichet": "Guichet"
     },
+    "billetage": {
+      "btn": "Billetage",
+      "title": "Billetage de fin de poste",
+      "hint": "Comptez les espèces en caisse par coupure. Le gestionnaire validera et clôturera la session.",
+      "col_denom": "Coupure",
+      "col_qty": "Quantité",
+      "col_subtotal": "Sous-total",
+      "total": "Total compté",
+      "no_denom": "Aucune coupure configurée."
+    },
     "session": {
       "title": "Sessions de caisse",
       "subtitle": "Ouverture et clôture des caisses",

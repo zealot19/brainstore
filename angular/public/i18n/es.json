@@ -486,6 +486,16 @@
       "kind_principale": "Caja principal",
       "kind_guichet": "Ventanilla"
     },
+    "billetage": {
+      "btn": "Arqueo",
+      "title": "Arqueo de fin de turno",
+      "hint": "Cuente el efectivo en caja por denominación. Un gestor validará y cerrará la sesión.",
+      "col_denom": "Denominación",
+      "col_qty": "Cantidad",
+      "col_subtotal": "Subtotal",
+      "total": "Total contado",
+      "no_denom": "Ninguna denominación configurada."
+    },
     "session": {
       "title": "Sesiones de caja",
       "subtitle": "Apertura y cierre de cajas",
