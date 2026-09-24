@@ -1067,8 +1067,8 @@
       "f_html_verso": "Back HTML"
     },
     "manifest": {
-      "title": "Manifest settings",
-      "subtitle": "Bordereau header and footer",
+      "title": "Document settings",
+      "subtitle": "Header and footer for all documents (manifests, receipts, reports)",
       "header": "Header",
       "footer": "Footer (signatures)",
       "brand_name": "Display name",
@@ -1079,7 +1079,12 @@
       "logo": "Logo",
       "sign_voyage": "Signatures — Voyage",
       "sign_colis": "Signatures — Parcels / Baggage",
-      "add": "Add"
+      "add": "Add",
+      "custom_footer": "Custom footer",
+      "footer_hint": "Applied to all documents (manifests, receipts, vouchers, reports).",
+      "footer_text": "Footer text",
+      "footer_show_generated": "Show “Generated on …”",
+      "footer_show_page_numbers": "Show page numbers"
     }
   },
   "trips": {

@@ -51,6 +51,26 @@
       <button class="btn btn-sm btn-outline-secondary" type="button" (click)="addColis()"><i class="ti ti-plus me-1"></i>{{ 'vcfg.manifest.add' | transloco }}</button>
     </div></div>
   </div>
+
+  <!-- Pied de page personnalisé (tous documents) -->
+  <div class="col-12">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-1">{{ 'vcfg.manifest.custom_footer' | transloco }}</h6>
+      <p class="text-muted small mb-3">{{ 'vcfg.manifest.footer_hint' | transloco }}</p>
+      <div class="mb-3">
+        <label class="form-label">{{ 'vcfg.manifest.footer_text' | transloco }}</label>
+        <textarea class="form-control" rows="3" [(ngModel)]="tpl.footer_text"></textarea>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="footerGen" [(ngModel)]="tpl.footer_show_generated" />
+        <label class="form-check-label" for="footerGen">{{ 'vcfg.manifest.footer_show_generated' | transloco }}</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="footerPages" [(ngModel)]="tpl.footer_show_page_numbers" />
+        <label class="form-check-label" for="footerPages">{{ 'vcfg.manifest.footer_show_page_numbers' | transloco }}</label>
+      </div>
+    </div></div>
+  </div>
 </div>
 
 <button class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()" [disabled]="saving">

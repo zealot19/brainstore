@@ -1,7 +1,7 @@
 """Reçu de recette (PDF WeasyPrint) — voyage / colis / bagage / autre."""
 import html as _h
 from django.utils import timezone
-from apps.reporting.letterhead import company_header_html
+from apps.reporting.letterhead import doc_header_html, doc_inline_footer_html
 
 
 def _e(v):
@@ -19,7 +19,9 @@ def render_income_receipt(*, company, ref, date, source_label, party, amount,
                           payment_label, caisse_label=None, agency_name=None,
                           created_by=None, kind_label="Recette") -> bytes:
     from weasyprint import HTML
+    from apps.voyages_config.doc_template import resolve_doc_template
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
+    tpl = resolve_doc_template(company)
     rows = [
         ("Source", _e(source_label) or "—"),
         ("Client / Tiers", _e(party) or "—"),
@@ -44,12 +46,12 @@ def render_income_receipt(*, company, ref, date, source_label, party, amount,
       .sign div {{ width:45%; border-top:1px solid #999; padding-top:4px; text-align:center; font-size:10px; color:#555; }}
       .foot {{ margin-top:10px; color:#777; font-size:8px; }}
     </style></head><body>
-      {company_header_html(company)}
+      {doc_header_html(tpl)}
       <h1>Reçu de {_h.escape(kind_label.lower())}</h1>
       <div class="ref">Réf. {_e(ref)}</div>
       <table class="det"><tbody>{body}</tbody></table>
       <div class="amount">Montant : {_money(amount)} FCFA</div>
       <div class="sign"><div>Le caissier</div><div>Le client</div></div>
-      <div class="foot">Généré le {run}</div>
+      {doc_inline_footer_html(tpl, run)}
     </body></html>"""
     return HTML(string=html).write_pdf()

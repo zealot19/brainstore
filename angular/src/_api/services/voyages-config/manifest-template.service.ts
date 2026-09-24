@@ -7,6 +7,7 @@ export interface ManifestTemplate {
   brand_name: string; slogan: string; head_office: string; phones: string;
   agencies_line: string; logo_url: string | null;
   sign_labels_voyage: string[]; sign_labels_colis: string[];
+  footer_text: string; footer_show_generated: boolean; footer_show_page_numbers: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

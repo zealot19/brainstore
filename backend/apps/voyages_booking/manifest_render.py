@@ -151,11 +151,13 @@ _BUILDERS = {
 
 def render_manifest_pdf(data: dict, doc: str, tpl: dict) -> bytes:
     from weasyprint import HTML
+    from apps.reporting.letterhead import page_footer_bits
     builder = _BUILDERS.get(doc, build_passenger_manifest)
-    body = manifest_header_html(tpl) + _printed_line(tpl) + builder(data, tpl)
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
+    footer_css, footer_html = page_footer_bits(tpl or {}, run)
+    body = footer_html + manifest_header_html(tpl) + _printed_line(tpl) + builder(data, tpl)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A4 portrait; margin: 12mm 10mm; }}
+      @page {{ size: A4 portrait; margin: 12mm 10mm 18mm; {footer_css} }}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 10px; color:#111; }}
       .head {{ display:flex; gap:12px; border-bottom:2px solid #111; padding-bottom:6px; align-items:center; }}
       .logo {{ height:60px; width:auto; object-fit:contain; }}
@@ -176,6 +178,5 @@ def render_manifest_pdf(data: dict, doc: str, tpl: dict) -> bytes:
       .foot {{ margin-top:10px; color:#777; font-size:8px; }}
     </style></head><body>
       {body}
-      <div class="foot">Généré le {run}</div>
     </body></html>"""
     return HTML(string=html).write_pdf()

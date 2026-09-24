@@ -455,8 +455,12 @@ class ManifestTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManifestTemplate
         fields = ["brand_name", "slogan", "head_office", "phones", "agencies_line",
-                  "logo", "logo_url", "sign_labels_voyage", "sign_labels_colis"]
-        extra_kwargs = {"logo": {"required": False}}
+                  "logo", "logo_url", "sign_labels_voyage", "sign_labels_colis",
+                  "footer_text", "footer_show_generated", "footer_show_page_numbers"]
+        extra_kwargs = {"logo": {"required": False},
+                        "footer_text": {"required": False},
+                        "footer_show_generated": {"required": False},
+                        "footer_show_page_numbers": {"required": False}}
 
     def get_logo_url(self, obj):
         req = self.context.get("request")

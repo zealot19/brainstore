@@ -1,6 +1,6 @@
 import html as _h
 from django.utils import timezone
-from apps.reporting.letterhead import company_header_html
+from apps.reporting.letterhead import company_header_html, doc_header_html, page_footer_bits
 
 
 def _money(v):
@@ -14,7 +14,7 @@ def _cell(col, v):
     return _money(v) if col.money else ("" if v is None else _h.escape(str(v)))
 
 
-def render_pdf(result, company) -> bytes:
+def render_pdf(result, company, tpl=None) -> bytes:
     from weasyprint import HTML
     cols = result.columns
     thead = "".join(f'<th style="text-align:{c.align}">{_h.escape(c.label)}</th>' for c in cols)
@@ -33,9 +33,11 @@ def render_pdf(result, company) -> bytes:
         body.append(f'<tr class="tot">{tds}</tr>')
     orientation = "landscape" if len(cols) > 6 else "portrait"
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
-    meta = (" · " + _h.escape(result.period_label)) if result.period_label else ""
+    period = _h.escape(result.period_label) if result.period_label else ""
+    header = doc_header_html(tpl) if tpl else company_header_html(company)
+    footer_css, footer_html = page_footer_bits(tpl or {}, run)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A4 {orientation}; margin: 14mm 10mm; }}
+      @page {{ size: A4 {orientation}; margin: 14mm 10mm 18mm; {footer_css} }}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 10px; color:#111; }}
       .head {{ display:flex; gap:12px; border-bottom:1px solid #999; padding-bottom:6px; }}
       .co-name {{ font-weight:bold; font-size:14px; }}
@@ -47,9 +49,10 @@ def render_pdf(result, company) -> bytes:
       tr.grp td {{ background:#eef; font-weight:bold; }}
       tr.tot td {{ background:#f7f7f7; }}
     </style></head><body>
-      {company_header_html(company)}
+      {footer_html}
+      {header}
       <h1>{_h.escape(result.title)}</h1>
-      <div class="meta">Généré le {run}{meta}</div>
+      {f'<div class="meta">{period}</div>' if period else ''}
       <table><thead><tr>{thead}</tr></thead><tbody>{''.join(body)}</tbody></table>
     </body></html>"""
     return HTML(string=html).write_pdf()

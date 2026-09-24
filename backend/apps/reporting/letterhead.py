@@ -2,6 +2,7 @@ import html as _h
 
 
 def company_header_html(company) -> str:
+    """En-tête minimal depuis la société seule (repli / rétro-compatibilité)."""
     e = _h.escape
     ids = []
     for label, val in [("RCCM", company.rccm), ("NIU", company.tax_id),
@@ -23,3 +24,57 @@ def company_header_html(company) -> str:
         <div>{e(" · ".join(ids))}</div>
       </div>
     </div>"""
+
+
+def doc_header_html(tpl: dict) -> str:
+    """En-tête depuis la configuration des documents (dict résolu).
+
+    `tpl` provient de `apps.voyages_config.doc_template.resolve_doc_template`."""
+    e = _h.escape
+    logo = f'<img src="{e(str(tpl.get("logo_url")))}" style="height:60px">' if tpl.get("logo_url") else ""
+    ids = " · ".join(x for x in (tpl.get("head_office"), tpl.get("phones"), tpl.get("agencies_line")) if x)
+    return f"""
+    <div class="head">
+      <div>{logo}</div>
+      <div class="co">
+        <div class="co-name">{e(tpl.get("brand_name") or "")}</div>
+        <div>{e(tpl.get("slogan") or "")}</div>
+        <div>{e(ids)}</div>
+      </div>
+    </div>"""
+
+
+def footer_inner_html(tpl: dict, run: str | None = None) -> str:
+    """Contenu du pied de page : texte libre + éventuelle ligne « Généré le … »."""
+    e = _h.escape
+    parts = []
+    ft = (tpl or {}).get("footer_text")
+    if ft:
+        parts.append(e(str(ft)).replace("\n", "<br>"))
+    if (tpl or {}).get("footer_show_generated") and run:
+        parts.append(f"Généré le {e(run)}")
+    return "<br>".join(parts)
+
+
+def doc_inline_footer_html(tpl: dict, run: str | None = None) -> str:
+    """Pied de page en ligne (documents une page : reçus, bons)."""
+    inner = footer_inner_html(tpl, run)
+    return f'<div class="foot">{inner}</div>' if inner else ""
+
+
+def page_footer_bits(tpl: dict, run: str | None = None):
+    """Pied de page répété sur chaque page (documents multi-pages : rapports, bordereaux).
+
+    Renvoie (css, html) : `css` à insérer dans <style> (boîtes @page + élément running),
+    `html` = le <div> running à placer dans <body>. Vides si aucun pied ni numéro."""
+    inner = footer_inner_html(tpl, run)
+    page_boxes, extra_css, body_html = [], "", ""
+    if inner:
+        page_boxes.append("@bottom-center { content: element(pagefooter); }")
+        extra_css = "#pagefooter { position: running(pagefooter); font-size:8px; color:#777; text-align:center; }"
+        body_html = f'<div id="pagefooter">{inner}</div>'
+    if (tpl or {}).get("footer_show_page_numbers"):
+        page_boxes.append('@bottom-right { content: "Page " counter(page) " / " counter(pages); '
+                          'font-size:8px; color:#777; }')
+    css = "\n".join(page_boxes) + "\n" + extra_css
+    return css, body_html

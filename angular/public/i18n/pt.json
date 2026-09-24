@@ -1067,8 +1067,8 @@
       "f_html_verso": "HTML verso"
     },
     "manifest": {
-      "title": "Config. manifestos",
-      "subtitle": "Cabeçalho e rodapé dos manifestos",
+      "title": "Config. documentos",
+      "subtitle": "Cabeçalho e rodapé de todos os documentos (manifestos, recibos, relatórios)",
       "header": "Cabeçalho",
       "footer": "Rodapé (assinaturas)",
       "brand_name": "Nome exibido",
@@ -1079,7 +1079,12 @@
       "logo": "Logo",
       "sign_voyage": "Assinaturas — Viagem",
       "sign_colis": "Assinaturas — Encomendas / Bagagens",
-      "add": "Adicionar"
+      "add": "Adicionar",
+      "custom_footer": "Rodapé personalizado",
+      "footer_hint": "Aplicado a todos os documentos (manifestos, recibos, comprovantes, relatórios).",
+      "footer_text": "Texto do rodapé",
+      "footer_show_generated": "Mostrar « Gerado em … »",
+      "footer_show_page_numbers": "Mostrar números de página"
     }
   },
   "trips": {

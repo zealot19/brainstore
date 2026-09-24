@@ -413,33 +413,16 @@ def build_roadmap_data(trip, request):
 
 
 def resolve_manifest_template(company, request):
-    """En-tête/pied des bordereaux depuis ManifestTemplate, avec repli sur la société."""
+    """En-tête/pied des bordereaux : config documents partagée + signatures manifestes."""
     from apps.voyages_config.models import ManifestTemplate, DEFAULT_SIGN_VOYAGE, DEFAULT_SIGN_COLIS
-    from apps.core.media_uri import file_to_data_uri
-    from django.utils import timezone
-    user = getattr(request, "user", None)
+    from apps.voyages_config.doc_template import resolve_doc_template
+    base = resolve_doc_template(company, request)
     tpl = ManifestTemplate.objects.filter(company=company).first()
-    ch = _company_header(company, request)
-    # Logo embarqué en data URI (le rendu serveur ne peut pas récupérer une URL média).
-    logo_url = ""
-    if tpl and tpl.logo:
-        logo_url = file_to_data_uri(tpl.logo)
-    if not logo_url and getattr(company, "logo", None):
-        logo_url = file_to_data_uri(company.logo)
-    return {
-        "brand_name": (tpl.brand_name if tpl and tpl.brand_name else ch.get("name")),
-        "slogan": (tpl.slogan if tpl and tpl.slogan else ch.get("slogan")),
-        "head_office": (tpl.head_office if tpl else "") or "",
-        "phones": (tpl.phones if tpl and tpl.phones else ch.get("phone")) or "",
-        "agencies_line": (tpl.agencies_line if tpl else "") or "",
-        "logo_url": logo_url,
-        "sign_labels_voyage": (tpl.sign_labels_voyage if tpl and tpl.sign_labels_voyage else list(DEFAULT_SIGN_VOYAGE)),
-        "sign_labels_colis": (tpl.sign_labels_colis if tpl and tpl.sign_labels_colis else list(DEFAULT_SIGN_COLIS)),
-        # Contexte d'impression (agence + horodatage + agent).
-        "printed_agency": (user.default_agency.name if user and user.default_agency_id else ""),
-        "printed_by": ((user.get_full_name() or user.username) if user else ""),
-        "printed_at": timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M"),
-    }
+    base["sign_labels_voyage"] = (tpl.sign_labels_voyage if tpl and tpl.sign_labels_voyage
+                                  else list(DEFAULT_SIGN_VOYAGE))
+    base["sign_labels_colis"] = (tpl.sign_labels_colis if tpl and tpl.sign_labels_colis
+                                 else list(DEFAULT_SIGN_COLIS))
+    return base
 
 
 def _roadmap_trip(request, trip_id):

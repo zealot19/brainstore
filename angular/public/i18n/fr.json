@@ -1067,8 +1067,8 @@
       "f_html_verso": "HTML verso"
     },
     "manifest": {
-      "title": "Config manifestes",
-      "subtitle": "En-tête et pied des bordereaux",
+      "title": "Config documents",
+      "subtitle": "En-tête et pied de tous les documents (bordereaux, reçus, rapports)",
       "header": "En-tête",
       "footer": "Pied (signatures)",
       "brand_name": "Nom affiché",
@@ -1079,7 +1079,12 @@
       "logo": "Logo",
       "sign_voyage": "Signatures — Voyage",
       "sign_colis": "Signatures — Colis / Bagages",
-      "add": "Ajouter"
+      "add": "Ajouter",
+      "custom_footer": "Pied de page personnalisé",
+      "footer_hint": "Appliqué à tous les documents (bordereaux, reçus, bons, rapports).",
+      "footer_text": "Texte du pied de page",
+      "footer_show_generated": "Afficher « Généré le … »",
+      "footer_show_page_numbers": "Afficher les numéros de page"
     }
   },
   "trips": {

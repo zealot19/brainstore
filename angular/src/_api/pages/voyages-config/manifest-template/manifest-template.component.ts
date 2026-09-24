@@ -18,6 +18,7 @@ export class VcManifestTemplateComponent implements OnInit {
   tpl: ManifestTemplate = {
     brand_name: '', slogan: '', head_office: '', phones: '', agencies_line: '',
     logo_url: null, sign_labels_voyage: [], sign_labels_colis: [],
+    footer_text: '', footer_show_generated: true, footer_show_page_numbers: false,
   };
   logoFile: File | null = null;
   saving = false;
@@ -45,6 +46,9 @@ export class VcManifestTemplateComponent implements OnInit {
     fd.append('agencies_line', this.tpl.agencies_line || '');
     this.tpl.sign_labels_voyage.filter(s => s.trim()).forEach(s => fd.append('sign_labels_voyage', s));
     this.tpl.sign_labels_colis.filter(s => s.trim()).forEach(s => fd.append('sign_labels_colis', s));
+    fd.append('footer_text', this.tpl.footer_text || '');
+    fd.append('footer_show_generated', String(!!this.tpl.footer_show_generated));
+    fd.append('footer_show_page_numbers', String(!!this.tpl.footer_show_page_numbers));
     if (this.logoFile) fd.append('logo', this.logoFile);
     this.svc.save(fd).subscribe({
       next: t => { this.tpl = { ...this.tpl, ...t }; this.logoFile = null; this.saving = false; this.toast.success('Enregistré.'); },

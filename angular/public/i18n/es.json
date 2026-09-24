@@ -1067,8 +1067,8 @@
       "f_html_verso": "HTML reverso"
     },
     "manifest": {
-      "title": "Config. manifiestos",
-      "subtitle": "Encabezado y pie de los manifiestos",
+      "title": "Config. documentos",
+      "subtitle": "Encabezado y pie de todos los documentos (manifiestos, recibos, informes)",
       "header": "Encabezado",
       "footer": "Pie (firmas)",
       "brand_name": "Nombre mostrado",
@@ -1079,7 +1079,12 @@
       "logo": "Logo",
       "sign_voyage": "Firmas — Viaje",
       "sign_colis": "Firmas — Paquetes / Equipaje",
-      "add": "Añadir"
+      "add": "Añadir",
+      "custom_footer": "Pie de página personalizado",
+      "footer_hint": "Aplicado a todos los documentos (manifiestos, recibos, comprobantes, informes).",
+      "footer_text": "Texto del pie de página",
+      "footer_show_generated": "Mostrar « Generado el … »",
+      "footer_show_page_numbers": "Mostrar números de página"
     }
   },
   "trips": {

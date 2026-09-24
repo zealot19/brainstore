@@ -59,7 +59,9 @@ class ReportGenerateView(APIView):
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"
         else:
             from apps.reporting.render.pdf import render_pdf
-            body, ct, ext = render_pdf(result, request.user.company), "application/pdf", "pdf"
+            from apps.voyages_config.doc_template import resolve_doc_template
+            tpl = resolve_doc_template(request.user.company, request)
+            body, ct, ext = render_pdf(result, request.user.company, tpl), "application/pdf", "pdf"
         resp = HttpResponse(body, content_type=ct)
         resp["Content-Disposition"] = f'attachment; filename="{code}.{ext}"'
         return resp
