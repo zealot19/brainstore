@@ -261,9 +261,17 @@
                 @for (p of partners; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
               </select>
             </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_partner_share' | transloco }}</label>
-              <input formControlName="partner_share_percent" type="number" min="0" max="100" step="0.01" class="form-control" />
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_ticket' | transloco }}</label>
+              <input formControlName="partner_pct_ticket" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_parcel' | transloco }}</label>
+              <input formControlName="partner_pct_parcel" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_baggage' | transloco }}</label>
+              <input formControlName="partner_pct_baggage" type="number" min="0" max="100" step="0.01" class="form-control" />
             </div>
           </div>
 
@@ -394,9 +402,17 @@
                 @for (p of partners; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
               </select>
             </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_partner_share' | transloco }}</label>
-              <input formControlName="partner_share_percent" type="number" min="0" max="100" step="0.01" class="form-control" />
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_ticket' | transloco }}</label>
+              <input formControlName="partner_pct_ticket" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_parcel' | transloco }}</label>
+              <input formControlName="partner_pct_parcel" type="number" min="0" max="100" step="0.01" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_pct_baggage' | transloco }}</label>
+              <input formControlName="partner_pct_baggage" type="number" min="0" max="100" step="0.01" class="form-control" />
             </div>
           </div>
 

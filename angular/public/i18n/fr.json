@@ -1653,7 +1653,9 @@
       "submit_odometer": "Mettre à jour",
       "f_owner_partner": "Propriétaire (partenaire)",
       "owner_agency": "Agence",
-      "f_partner_share": "Part partenaire (%)"
+      "f_pct_ticket": "Part billets (%)",
+      "f_pct_parcel": "Part colis (%)",
+      "f_pct_baggage": "Part bagages (%)"
     },
     "crew": {
       "title": "Personnel naviguant",
@@ -2320,6 +2322,7 @@
     "f_agency": "Agence",
     "f_register": "Caisse",
     "f_vehicle": "Véhicule (ID)",
+    "f_partner": "Partenaire",
     "opt_all_f": "— Toutes —",
     "generate": "Générer"
   },
