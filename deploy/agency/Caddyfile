@@ -1,0 +1,45 @@
+# Caddy — reverse proxy + HTTPS pour la pile AGENCE (docker-compose.web.yml).
+# Sert l'UI Angular (SPA) et proxifie /api, /admin, /static vers Django.
+#
+# Choisissez UN des deux modes ci-dessous (l'HTTPS est obligatoire : les réglages de
+# production imposent SECURE_SSL_REDIRECT — Caddy fournit le X-Forwarded-Proto=https).
+
+# ── MODE 1 — Domaine public (certificat Let's Encrypt automatique) ────────────
+# Prérequis : DNS A « agence1.mondomaine.com » → IP du serveur, ports 80/443 ouverts.
+{
+    email admin@mondomaine.com          # avis Let's Encrypt (remplacez)
+}
+
+agence1.mondomaine.com {                # ← remplacez par VOTRE domaine d'agence
+    encode zstd gzip
+
+    handle_path /media/* {
+        root * /srv/media
+        file_server
+    }
+
+    @backend path /api/* /admin/* /static/*
+    handle @backend {
+        reverse_proxy web:8000
+    }
+
+    handle {
+        root * /srv/app
+        try_files {path} /index.html
+        file_server
+    }
+}
+
+# ── MODE 2 — LAN sans domaine public (HTTPS auto-signé) ───────────────────────
+# Supprimez le bloc MODE 1 ci-dessus (et le bloc {email …}) et décommentez celui-ci.
+# Faites résoudre « erp.agence1.lan » vers l'IP du serveur (DNS routeur ou /etc/hosts).
+# Au 1er accès, accepter l'avertissement de certificat (ou installer le CA local de Caddy).
+#
+# erp.agence1.lan {
+#     tls internal                       # Caddy fait office d'autorité de certification locale
+#     encode zstd gzip
+#     handle_path /media/* { root * /srv/media; file_server }
+#     @backend path /api/* /admin/* /static/*
+#     handle @backend { reverse_proxy web:8000 }
+#     handle { root * /srv/app; try_files {path} /index.html; file_server }
+# }
