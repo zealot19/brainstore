@@ -1,0 +1,46 @@
+# ERP — version EN LIGNE (master). Construit db + backend + frontend depuis GitHub.
+# Mise en route : voir README.md (copier .env.example → .env, remplir, puis up).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:                    # Django + Gunicorn (migrate au démarrage)
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        REPO_URL: ${REPO_URL}
+        REPO_REF: ${REPO_REF}
+    image: erp-backend-online
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/src/backend/media
+    depends_on:
+      - db
+
+  frontend:                   # Angular servi par nginx (+ proxy /api vers backend)
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        REPO_URL: ${REPO_URL}
+        REPO_REF: ${REPO_REF}
+        API_URL: /api/v1
+        ONLINE_COMPANY_ID: ${ONLINE_COMPANY_ID}
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  media:
