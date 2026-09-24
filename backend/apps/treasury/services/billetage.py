@@ -48,3 +48,24 @@ def record_count(session, *, kind, items, user):
         for (den, qty, unit_value, subtotal) in resolved
     ])
     return count, total
+
+
+def record_shift_billetage(session, *, items, user):
+    """Billetage de fin de poste par le guichetier ASSIGNÉ à la session.
+
+    État requis : session **ouverte** (pas encore clôturée) dont l'**heure de fin
+    prévue est dépassée**. Le gestionnaire valide/clôture ensuite (il peut reprendre
+    ce comptage). Enregistre un comptage CLOSING (compté par le guichetier).
+    Les administrateurs ne sont pas soumis aux contrôles d'agent/horaire.
+    """
+    from django.utils import timezone
+    from apps.treasury.models import CashSession, CashCount
+    is_admin = getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False)
+    if session.status != CashSession.Status.OPEN:
+        raise ApplicationError(_("Le billetage se fait sur une session ouverte non encore clôturée."))
+    if not is_admin:
+        if session.assigned_to_id != getattr(user, "id", None):
+            raise ApplicationError(_("Seul le guichetier assigné à cette session peut en faire le billetage."))
+        if not session.scheduled_end or session.scheduled_end > timezone.now():
+            raise ApplicationError(_("Le billetage n'est possible qu'une fois l'heure de fin prévue dépassée."))
+    return record_count(session, kind=CashCount.Kind.CLOSING, items=items, user=user)

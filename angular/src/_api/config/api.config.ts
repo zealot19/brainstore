@@ -437,6 +437,7 @@ export const TREASURY = {
   sessionResume:  (id: string) => `${TRZ}/sessions/${id}/resume/`,
   sessionExtend:  (id: string) => `${TRZ}/sessions/${id}/extend/`,
   sessionReport:  (id: string) => `${TRZ}/sessions/${id}/report/`,
+  sessionBilletage: (id: string) => `${TRZ}/sessions/${id}/billetage/`,
   transactions: `${TRZ}/transactions/`,   transaction:  (id: string) => `${TRZ}/transactions/${id}/`,
   transfers:    `${TRZ}/transfers/`,      transfer:     (id: string) => `${TRZ}/transfers/${id}/`,
   expGeneral:         `${TRZ}/expenses/general/`,

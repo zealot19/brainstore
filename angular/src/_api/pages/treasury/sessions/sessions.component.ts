@@ -121,7 +121,15 @@ export class TrzSessionsComponent implements OnInit {
   }
 
   // ── Clôturer ──
-  openClose(s: CashSession): void { this.closingId = s.id; this.closingSession = s; this.closeDestId = null; this.errorMsg = ''; this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = ''; }
+  openClose(s: CashSession): void {
+    this.closingId = s.id; this.closingSession = s; this.closeDestId = null; this.errorMsg = '';
+    this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = '';
+    // Pré-remplir le billetage à partir du dernier comptage saisi par le guichetier.
+    this.svc.counts(s.id).subscribe({ next: (cs: any[]) => {
+      const last = (cs || []).filter(c => c.kind === 'closing').pop();
+      if (last) for (const it of last.items || []) this.closeQty[it.denomination] = it.quantity;
+    }, error: () => {} });
+  }
   get closingIsGuichet(): boolean { return this.closingSession?.register_kind === 'guichet'; }
   get destinationRegisters(): CashRegister[] { return this.registers.filter(r => r.id !== this.closingSession?.cash_register); }
   submitClose(): void {

@@ -27,6 +27,7 @@ urlpatterns = [
     path("sessions/<uuid:session_id>/resume/", views.ResumeSessionView.as_view(),   name="session-resume"),
     path("sessions/<uuid:session_id>/extend/", views.ExtendSessionView.as_view(),   name="session-extend"),
     path("sessions/<uuid:session_id>/counts/", views.SessionCountsView.as_view(),   name="session-counts"),
+    path("sessions/<uuid:session_id>/billetage/", views.SessionBilletageView.as_view(), name="session-billetage"),
     path("sessions/<uuid:session_id>/report/", views.SessionReportView.as_view(),   name="session-report"),
 
     # ── Coupures monétaires (billetage) ──────────────────────────────────────────

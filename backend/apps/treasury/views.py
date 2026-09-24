@@ -215,14 +215,15 @@ class MyActiveSessionView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
 
     def get(self, request):
-        from django.db.models import Q
         from django.utils import timezone
         from apps.treasury.models import CashSession
         now = timezone.now()
+        # La session reste visible même après l'heure de fin prévue : c'est là que le
+        # guichetier fait son billetage (les ventes, elles, sont bloquées à part par
+        # get_open_session_for_user). Le fanion needs_billetage pilote le bouton.
         session = (CashSession.objects
                    .filter(assigned_to=request.user, company_id=_company(request).id,
                            status=CashSession.Status.OPEN, is_deleted=False)
-                   .filter(Q(scheduled_end__isnull=True) | Q(scheduled_end__gte=now))
                    .order_by("-opened_at").first())
         if not session:
             return Response({"data": None})
@@ -231,6 +232,8 @@ class MyActiveSessionView(APIView):
         # affiché à côté du minuteur dans l'en-tête.
         from apps.treasury.services.expense_shared import principale_available_cash
         data["current_balance"] = str(principale_available_cash(session))
+        # Fin de poste : session ouverte dont l'heure de fin prévue est dépassée → billetage.
+        data["needs_billetage"] = bool(session.scheduled_end and session.scheduled_end <= now)
         return Response({"data": data})
 
 
@@ -408,6 +411,40 @@ class SessionCountsView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         counts = session.counts.filter(is_deleted=False).prefetch_related("items").order_by("created_at")
         return success_response(CashCountSerializer(counts, many=True).data)
+
+
+class SessionBilletageView(APIView):
+    """Billetage de fin de poste par le guichetier assigné (session ouverte, heure de
+    fin dépassée). Le gestionnaire clôture ensuite en validant ce comptage."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.operate", "POST": "treasury.session.operate"}
+
+    def get(self, request, session_id):
+        from apps.treasury.models import CurrencyDenomination
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        denoms = (CurrencyDenomination.objects
+                  .filter(company=_company(request), is_active=True, is_deleted=False)
+                  .order_by("-value"))
+        last = (session.counts.filter(kind="closing", is_deleted=False)
+                .prefetch_related("items").order_by("-created_at").first())
+        return success_response({
+            "denominations": DenominationSerializer(denoms, many=True).data,
+            "count": CashCountSerializer(last).data if last else None,
+        })
+
+    def post(self, request, session_id):
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        from apps.treasury.services.billetage import record_shift_billetage
+        try:
+            count, _total = record_shift_billetage(
+                session, items=request.data.get("items") or [], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(CashCountSerializer(count).data)
 
 
 class SessionReportView(APIView):
