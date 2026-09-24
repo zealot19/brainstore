@@ -8,3 +8,6 @@ from . import bagages  # noqa: F401
 from . import colis  # noqa: F401
 from . import voyages  # noqa: F401
 from . import partenaires  # noqa: F401
+from . import cashflow  # noqa: F401
+from . import tresorerie  # noqa: F401
+from . import fiscalite  # noqa: F401

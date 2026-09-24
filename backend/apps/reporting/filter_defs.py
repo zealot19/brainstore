@@ -33,6 +33,7 @@ FILTER_DEFS = {
     "type_encaissement": {"type": "select", "label": "Type d'encaissement", "options": "income_categories"},
     "type_depense":      {"type": "select", "label": "Type de dépense",     "options": "expense_types"},
     "ecart":             {"type": "select", "label": "Écart",              "options": "ecart"},
+    "bucket":            {"type": "select", "label": "Regrouper par",       "options": "time_buckets"},
 
     # Champs texte / nombre (utilisés dès les phases suivantes ; déjà pris en charge).
     "client":       {"type": "text",   "label": "Client"},
@@ -48,6 +49,7 @@ _PERIODE = [("today", "Aujourd'hui"), ("week", "Cette semaine"),
 _GROUP_BY = [("agency", "Agence"), ("vehicle", "Véhicule"),
              ("route", "Trajet"), ("day", "Jour"), ("month", "Mois")]
 _ECART = [("excedent", "Excédent"), ("manquant", "Manquant"), ("equilibre", "Équilibré")]
+_TIME_BUCKETS = [("day", "Jour"), ("week", "Semaine"), ("month", "Mois")]
 
 # Natures d'encaissement retenues par le relevé des recettes (income).
 INCOME_CATEGORIES = [("ticket_sales", "Voyage"), ("parcel_shipping", "Colis"),
@@ -79,6 +81,7 @@ def resolve_options(source, company, report=None):
     if source == "periode":  return pack(_PERIODE)
     if source == "group_by": return pack(_GROUP_BY)
     if source == "ecart":    return pack(_ECART)
+    if source == "time_buckets": return pack(_TIME_BUCKETS)
     if source == "income_categories": return pack(INCOME_CATEGORIES)
     if source == "statut":   return pack(_statut_choices(report))
     if source == "sens":

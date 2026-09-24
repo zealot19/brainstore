@@ -81,7 +81,8 @@ def test_report_filter_mappings_are_valid_orm_paths():
     from apps.reporting.filter_defs import FILTER_DEFS
     company, admin = _company("rep3@x.com")
     U = str(uuid.uuid4())
-    for code in ("voyages", "reservation", "bagages", "colis", "recette", "depense", "journaux-vente"):
+    for code in ("voyages", "reservation", "bagages", "colis", "recette", "depense",
+                 "journaux-vente", "cashflow", "tresorerie", "fiscalite"):
         entry = REPORTS[code]
         f = {k: None for k in FILTER_DEFS}
         for k in entry["filters"]:
@@ -89,6 +90,21 @@ def test_report_filter_mappings_are_valid_orm_paths():
             f[k] = 1 if t == "number" else (None if t == "date" else U if t == "select" else "x")
         # ne doit pas lever (les querysets s'exécutent → valide les lookups)
         entry["build"](company, f)
+
+
+@pytest.mark.django_db
+def test_new_financial_reports_are_registered_and_build():
+    """cashflow / tresorerie / fiscalite : enregistrés au catalogue et build renvoie
+    un ReportResult cohérent (colonnes + groupes) sur une société vierge."""
+    from apps.reporting.registry import REPORTS
+    from apps.reporting.core import ReportResult
+    company, admin = _company("rep5@x.com")
+    f = {k: None for k in __import__("apps.reporting.filter_defs", fromlist=["FILTER_DEFS"]).FILTER_DEFS}
+    for code in ("cashflow", "tresorerie", "fiscalite"):
+        assert code in REPORTS
+        res = REPORTS[code]["build"](company, f)
+        assert isinstance(res, ReportResult)
+        assert res.columns and res.groups is not None
 
 
 @pytest.mark.django_db
