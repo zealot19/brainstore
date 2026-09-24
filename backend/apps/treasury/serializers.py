@@ -487,13 +487,19 @@ class PaymentMethodWriteSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False, default=True)
 
 
+class RefundKindConfigSerializer(serializers.Serializer):
+    """Config de remboursement d'un type : méthode + valeur (% ou montant fixe)."""
+    method = serializers.ChoiceField(choices=["percentage", "fixed"], required=False)
+    rate = serializers.DecimalField(max_digits=5, decimal_places=2,
+                                    min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2,
+                                      min_value=Decimal("0"), required=False)
+
+
 class RefundRateSerializer(serializers.Serializer):
-    # Taux distincts par type ; `rate` conservé pour rétro-compatibilité.
-    ticket = serializers.DecimalField(max_digits=5, decimal_places=2,
-                                      min_value=Decimal("0"), max_value=Decimal("100"), required=False)
-    colis = serializers.DecimalField(max_digits=5, decimal_places=2,
-                                     min_value=Decimal("0"), max_value=Decimal("100"), required=False)
-    bagage = serializers.DecimalField(max_digits=5, decimal_places=2,
-                                      min_value=Decimal("0"), max_value=Decimal("100"), required=False)
+    # Par type : objet {method, rate, amount}. `rate` plat conservé pour rétro-compat.
+    ticket = RefundKindConfigSerializer(required=False)
+    colis = RefundKindConfigSerializer(required=False)
+    bagage = RefundKindConfigSerializer(required=False)
     rate = serializers.DecimalField(max_digits=5, decimal_places=2,
                                     min_value=Decimal("0"), max_value=Decimal("100"), required=False)

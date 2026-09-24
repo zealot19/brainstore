@@ -14,7 +14,10 @@ from .trip_expense_sales import record_trip_expense
 from .general_expense_sales import record_general_expense
 from .expense_shared import resolve_disbursement_session
 from .other_income import record_other_income, record_voyage_income
-from .refund_config import get_refund_rate, set_refund_rate, get_refund_rates, set_refund_rates
+from .refund_config import (
+    get_refund_rate, set_refund_rate, get_refund_rates, set_refund_rates,
+    get_refund_config, set_refund_config, resolve_refund_amount,
+)
 from .refund import refund_on_cancel
 from .refund_by_reference import lookup_refundable, refund_by_reference
 

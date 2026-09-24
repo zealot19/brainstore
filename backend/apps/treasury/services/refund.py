@@ -1,16 +1,12 @@
-from decimal import Decimal
-
-
 def refund_on_cancel(company, *, amount_paid, user, description, cash_session=None, kind="ticket"):
-    """Rembourse amount_paid × taux (selon le type : ticket/colis/bagage) depuis
-    la caisse ouverte de l'agent. Retourne le mouvement (EXPENSE, catégorie
-    refund) ou None si nul."""
-    from apps.treasury.services.refund_config import get_refund_rate
+    """Rembourse selon la méthode configurée pour le type (ticket/colis/bagage) —
+    pourcentage du montant payé OU montant fixe — depuis la caisse ouverte de
+    l'agent. Retourne le mouvement (EXPENSE, catégorie refund) ou None si nul."""
+    from apps.treasury.services.refund_config import resolve_refund_amount
     from apps.treasury.services.expense_shared import resolve_disbursement_session
     from apps.treasury.services.services import create_transaction
     from apps.treasury.models import Transaction
-    rate = get_refund_rate(company, kind)
-    amount = (Decimal(str(amount_paid or 0)) * rate / Decimal("100")).quantize(Decimal("1."))
+    amount = resolve_refund_amount(company, kind, amount_paid)
     if amount <= 0:
         return None
     session = resolve_disbursement_session(company.id, user, cash_session)

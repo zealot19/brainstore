@@ -984,13 +984,18 @@ class RefundRateView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "treasury.config.view", "PUT": "treasury.config.manage"}
 
+    @staticmethod
+    def _serialize(cfg):
+        return {k: {"method": v["method"], "rate": str(v["rate"]), "amount": str(v["amount"])}
+                for k, v in cfg.items()}
+
     def get(self, request):
-        from apps.treasury.services.refund_config import get_refund_rates
-        rates = get_refund_rates(_company(request))
-        return success_response({k: str(v) for k, v in rates.items()})
+        from apps.treasury.services.refund_config import get_refund_config
+        return success_response(self._serialize(get_refund_config(_company(request))))
 
     def put(self, request):
-        from apps.treasury.services.refund_config import set_refund_rate, set_refund_rates, get_refund_rates
+        from apps.treasury.services.refund_config import (
+            set_refund_rate, set_refund_config, get_refund_config)
         ser = RefundRateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
@@ -998,13 +1003,12 @@ class RefundRateView(APIView):
         try:
             per_kind = {k: d[k] for k in ("ticket", "colis", "bagage") if k in d}
             if per_kind:
-                set_refund_rates(company, per_kind, user=request.user)
+                set_refund_config(company, per_kind, user=request.user)
             elif d.get("rate") is not None:
-                set_refund_rate(company, d["rate"], user=request.user)  # rétro-compat
+                set_refund_rate(company, d["rate"], user=request.user)  # rétro-compat (taux plat)
         except ApplicationError as ex:
             return error_response(str(ex))
-        rates = get_refund_rates(company)
-        return success_response({k: str(v) for k, v in rates.items()})
+        return success_response(self._serialize(get_refund_config(company)))
 
 
 # ── Coupures monétaires (billetage config) ──────────────────────────────────────
