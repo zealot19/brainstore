@@ -5,13 +5,18 @@ from apps.reporting.registry import register
 from apps.reporting.filters import period_label
 
 
-@register("journaux-vente", "Journaux de vente", ["date_from", "date_to", "register"], "portrait")
+@register("journaux-vente", "Journaux de vente",
+          ["date_from", "date_to", "periode", "register", "agency", "ecart"], "portrait")
 def build(company, f):
     qs = (CashSession.objects.filter(company=company, is_deleted=False, status=CashSession.Status.CLOSED)
           .select_related("cash_register").order_by("opened_at"))
     if f["date_from"]: qs = qs.filter(opened_at__date__gte=f["date_from"])
     if f["date_to"]:   qs = qs.filter(opened_at__date__lte=f["date_to"])
     if f["register"]:  qs = qs.filter(cash_register_id=f["register"])
+    if f["agency"]:    qs = qs.filter(cash_register__agency_id=f["agency"])
+    if f["ecart"] == "excedent":  qs = qs.filter(difference__gt=0)
+    elif f["ecart"] == "manquant":  qs = qs.filter(difference__lt=0)
+    elif f["ecart"] == "equilibre": qs = qs.filter(difference=0)
     rows, exc, man = [], Decimal(0), Decimal(0)
     for i, s in enumerate(qs, 1):
         diff = s.difference or Decimal(0)

@@ -81,7 +81,7 @@ def test_report_filter_mappings_are_valid_orm_paths():
     from apps.reporting.filter_defs import FILTER_DEFS
     company, admin = _company("rep3@x.com")
     U = str(uuid.uuid4())
-    for code in ("voyages", "reservation", "bagages", "colis", "recette", "depense"):
+    for code in ("voyages", "reservation", "bagages", "colis", "recette", "depense", "journaux-vente"):
         entry = REPORTS[code]
         f = {k: None for k in FILTER_DEFS}
         for k in entry["filters"]:
@@ -89,3 +89,15 @@ def test_report_filter_mappings_are_valid_orm_paths():
             f[k] = 1 if t == "number" else (None if t == "date" else U if t == "select" else "x")
         # ne doit pas lever (les querysets s'exécutent → valide les lookups)
         entry["build"](company, f)
+
+
+@pytest.mark.django_db
+def test_journaux_ecart_branches_execute():
+    """Chaque valeur d'écart exécute son lookup sur difference sans FieldError."""
+    from apps.reporting.registry import REPORTS
+    from apps.reporting.filter_defs import FILTER_DEFS
+    company, admin = _company("rep4@x.com")
+    for ecart in ("excedent", "manquant", "equilibre"):
+        f = {k: None for k in FILTER_DEFS}
+        f["ecart"] = ecart
+        REPORTS["journaux-vente"]["build"](company, f)

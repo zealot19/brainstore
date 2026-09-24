@@ -30,6 +30,9 @@ FILTER_DEFS = {
     "type_colis":  {"type": "select", "label": "Type de colis",      "options": "consignment_types"},
     "type_bagage": {"type": "select", "label": "Type de bagage",     "options": "consignment_types"},
     "sens":        {"type": "select", "label": "Sens",               "options": "sens"},
+    "type_encaissement": {"type": "select", "label": "Type d'encaissement", "options": "income_categories"},
+    "type_depense":      {"type": "select", "label": "Type de dépense",     "options": "expense_types"},
+    "ecart":             {"type": "select", "label": "Écart",              "options": "ecart"},
 
     # Champs texte / nombre (utilisés dès les phases suivantes ; déjà pris en charge).
     "client":       {"type": "text",   "label": "Client"},
@@ -44,6 +47,11 @@ _PERIODE = [("today", "Aujourd'hui"), ("week", "Cette semaine"),
             ("month", "Ce mois"), ("year", "Cette année")]
 _GROUP_BY = [("agency", "Agence"), ("vehicle", "Véhicule"),
              ("route", "Trajet"), ("day", "Jour"), ("month", "Mois")]
+_ECART = [("excedent", "Excédent"), ("manquant", "Manquant"), ("equilibre", "Équilibré")]
+
+# Natures d'encaissement retenues par le relevé des recettes (income).
+INCOME_CATEGORIES = [("ticket_sales", "Voyage"), ("parcel_shipping", "Colis"),
+                     ("baggage", "Bagage"), ("other_income", "Autre")]
 
 
 def _statut_choices(report):
@@ -70,6 +78,8 @@ def resolve_options(source, company, report=None):
 
     if source == "periode":  return pack(_PERIODE)
     if source == "group_by": return pack(_GROUP_BY)
+    if source == "ecart":    return pack(_ECART)
+    if source == "income_categories": return pack(INCOME_CATEGORIES)
     if source == "statut":   return pack(_statut_choices(report))
     if source == "sens":
         from apps.voyages_booking.models import Ticket
@@ -78,6 +88,10 @@ def resolve_options(source, company, report=None):
         from apps.voyages_config.models import ConsignmentType
         return pack((t.id, t.label) for t in ConsignmentType.objects
                     .filter(company=company, is_deleted=False).order_by("label"))
+    if source == "expense_types":
+        from apps.voyages_config.models import ExpenseType
+        return pack((t.id, t.name) for t in ExpenseType.objects
+                    .filter(company=company, is_deleted=False).order_by("code"))
 
     if source == "service_points":
         from apps.voyages_config.models import ServicePoint

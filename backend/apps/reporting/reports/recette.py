@@ -15,7 +15,8 @@ _NATURE = {
 
 
 @register("recette", "Relevé des encaissements",
-          ["date_from", "date_to", "periode", "register", "agency", "payment_mode", "vehicle", "partner"],
+          ["date_from", "date_to", "periode", "register", "bank", "agency", "payment_mode",
+           "type_encaissement", "vehicle", "partner"],
           "portrait")
 def build(company, f):
     qs = (Transaction.objects.filter(company=company, is_deleted=False,
@@ -29,8 +30,10 @@ def build(company, f):
     if f["date_to"]:   qs = qs.filter(transaction_date__lte=f["date_to"])
     qs = apply_filters(qs, f, {
         "register": "cash_session__cash_register_id",
+        "bank": "bank_account_id",
         "agency": "cash_session__cash_register__agency_id",
         "payment_mode": "payment_mode",
+        "type_encaissement": "category",
         "vehicle": "voyage_booking__outbound_trip__vehicle_id",
         "partner": "voyage_booking__outbound_trip__vehicle__owner_partner_id"})
     buckets, by_mode, grand = {}, defaultdict(Decimal), Decimal(0)
