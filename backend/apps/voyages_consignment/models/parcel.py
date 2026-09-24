@@ -29,8 +29,8 @@ class Parcel(BaseModel):
                                            on_delete=models.SET_NULL, null=True, blank=True, related_name="parcels")
     sender_name       = models.CharField(_("expéditeur"), max_length=150)
     sender_phone      = models.CharField(_("tél. expéditeur"), max_length=30)
-    recipient_name      = models.CharField(_("destinataire"), max_length=150)
-    recipient_phone     = models.CharField(_("tél. destinataire"), max_length=30)
+    recipient_name      = models.CharField(_("destinataire"), max_length=150, blank=True)
+    recipient_phone     = models.CharField(_("tél. destinataire"), max_length=30, blank=True)
     recipient_address   = models.CharField(_("adresse destinataire"), max_length=255, blank=True)
     recipient_id_number = models.CharField(_("pièce du destinataire"), max_length=100, blank=True)
     consignment_type  = models.ForeignKey("voyages_config.ConsignmentType", verbose_name=_("type de colis"),
@@ -53,7 +53,14 @@ class Parcel(BaseModel):
     available_at      = models.DateTimeField(_("disponible le"), null=True, blank=True)
     picked_up_at       = models.DateTimeField(_("retiré le"), null=True, blank=True)
     picked_up_by       = models.CharField(_("livré à"), max_length=150, blank=True)
+    picked_up_phone    = models.CharField(_("tél. du retirant"), max_length=30, blank=True)
     picked_up_id_number = models.CharField(_("pièce présentée"), max_length=100, blank=True)
+
+    class PickupKind(models.TextChoices):
+        DESTINATAIRE = "destinataire", _("Destinataire")
+        MANDATAIRE   = "mandataire",   _("Mandataire")
+    picked_up_kind     = models.CharField(_("retiré par"), max_length=12,
+                                          choices=PickupKind.choices, blank=True)
     delivery_amount         = models.DecimalField(_("montant livraison"), max_digits=12, decimal_places=2, default=0)
     delivery_address        = models.CharField(_("adresse de livraison"), max_length=255, blank=True)
     delivery_payment_method = models.CharField(_("mode de paiement livraison"), max_length=40, blank=True)

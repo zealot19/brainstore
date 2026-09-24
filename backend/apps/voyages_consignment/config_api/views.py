@@ -228,9 +228,12 @@ class ParcelPickupView(APIView):
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelPickupSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
+        d = payload.validated_data
         try:
-            p = services.pickup_parcel(p, picked_up_by=payload.validated_data["picked_up_by"],
-                                       picked_up_id_number=payload.validated_data["picked_up_id_number"],
+            p = services.pickup_parcel(p, picked_up_by=d["picked_up_by"],
+                                       picked_up_phone=d["picked_up_phone"],
+                                       picked_up_id_number=d["picked_up_id_number"],
+                                       picked_up_kind=d["picked_up_kind"],
                                        user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
