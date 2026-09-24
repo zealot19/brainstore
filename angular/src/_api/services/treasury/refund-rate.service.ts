@@ -4,19 +4,34 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TREASURY } from '../../config/api.config';
 
-export interface RefundRates { ticket: number; colis: number; bagage: number; }
+export type RefundMethod = 'percentage' | 'fixed';
+export interface RefundKindConfig { method: RefundMethod; rate: number; amount: number; }
+export interface RefundConfig {
+  ticket: RefundKindConfig;
+  colis: RefundKindConfig;
+  bagage: RefundKindConfig;
+}
 
 @Injectable({ providedIn: 'root' })
 export class RefundRateService {
   private http = inject(HttpClient);
-  private norm(r: any): RefundRates {
-    const d = r.data ?? r;
-    return { ticket: Number(d.ticket ?? 0), colis: Number(d.colis ?? 0), bagage: Number(d.bagage ?? 0) };
+
+  private oneKind(x: any): RefundKindConfig {
+    return {
+      method: x?.method === 'fixed' ? 'fixed' : 'percentage',
+      rate: Number(x?.rate ?? 0),
+      amount: Number(x?.amount ?? 0),
+    };
   }
-  get(): Observable<RefundRates> {
+  private norm(r: any): RefundConfig {
+    const d = r.data ?? r;
+    return { ticket: this.oneKind(d.ticket), colis: this.oneKind(d.colis), bagage: this.oneKind(d.bagage) };
+  }
+
+  get(): Observable<RefundConfig> {
     return this.http.get<any>(TREASURY.refundRate).pipe(map(r => this.norm(r)));
   }
-  set(rates: RefundRates): Observable<RefundRates> {
-    return this.http.put<any>(TREASURY.refundRate, rates).pipe(map(r => this.norm(r)));
+  set(cfg: RefundConfig): Observable<RefundConfig> {
+    return this.http.put<any>(TREASURY.refundRate, cfg).pipe(map(r => this.norm(r)));
   }
 }

@@ -128,20 +128,25 @@ def test_refund_rate_api():
     r = c.get("/api/v1/treasury/refund-rate/")
     assert r.status_code == 200
     body = r.json(); d = body["data"] if "data" in body else body
-    assert Decimal(str(d["ticket"])) == Decimal("0")
-    # Taux distincts par type
-    r = c.put("/api/v1/treasury/refund-rate/", {"ticket": 25, "colis": 10, "bagage": 5}, format="json")
+    assert d["ticket"]["method"] == "percentage"
+    assert Decimal(str(d["ticket"]["rate"])) == Decimal("0")
+    # Config par type : pourcentage pour billets/bagages, montant fixe pour colis
+    r = c.put("/api/v1/treasury/refund-rate/", {
+        "ticket": {"method": "percentage", "rate": 25},
+        "colis": {"method": "fixed", "amount": 1000},
+        "bagage": {"method": "percentage", "rate": 5},
+    }, format="json")
     assert r.status_code == 200, r.content
     r = c.get("/api/v1/treasury/refund-rate/")
     d = r.json().get("data", r.json())
-    assert Decimal(str(d["ticket"])) == Decimal("25")
-    assert Decimal(str(d["colis"])) == Decimal("10")
-    assert Decimal(str(d["bagage"])) == Decimal("5")
-    # Rétro-compat : un `rate` unique s'applique aux trois
+    assert d["ticket"]["method"] == "percentage" and Decimal(str(d["ticket"]["rate"])) == Decimal("25")
+    assert d["colis"]["method"] == "fixed" and Decimal(str(d["colis"]["amount"])) == Decimal("1000")
+    assert Decimal(str(d["bagage"]["rate"])) == Decimal("5")
+    # Rétro-compat : un `rate` unique (%) s'applique aux trois
     r = c.put("/api/v1/treasury/refund-rate/", {"rate": 40}, format="json")
     assert r.status_code == 200, r.content
     d = r.json().get("data", r.json())
-    assert Decimal(str(d["ticket"])) == Decimal("40") and Decimal(str(d["bagage"])) == Decimal("40")
+    assert Decimal(str(d["ticket"]["rate"])) == Decimal("40") and Decimal(str(d["bagage"]["rate"])) == Decimal("40")
 
 
 @pytest.mark.django_db

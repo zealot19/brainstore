@@ -674,10 +674,12 @@
       "subtitle": "Taux appliqué au montant payé lors d'une annulation",
       "saved": "Taux enregistré.",
       "label": "Taux de remboursement (%)",
-      "hint": "0 % = aucun remboursement. Le remboursement sort de la caisse ouverte de l'agent.",
-      "label_ticket": "Taux de remboursement — Billets (%)",
-      "label_colis": "Taux de remboursement — Colis (%)",
-      "label_bagage": "Taux de remboursement — Bagages (%)"
+      "hint": "Par type : un pourcentage du montant payé OU un montant fixe (plafonné au montant payé). Le remboursement sort de la caisse ouverte de l'agent.",
+      "label_ticket": "Billets",
+      "label_colis": "Colis",
+      "label_bagage": "Bagages",
+      "method_pct": "Pourcentage",
+      "method_fixed": "Montant fixe"
     },
     "refunds": {
       "title": "Remboursements",

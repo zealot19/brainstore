@@ -1,24 +1,33 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>{{ 'treasury.refund.title' | transloco }}</h4><h6>{{ 'treasury.refund.subtitle' | transloco }}</h6></div></div>
 </div>
-<div class="card"><div class="card-body" style="max-width:420px;">
+<div class="card"><div class="card-body" style="max-width:520px;">
   @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
   @if (saved) { <div class="alert alert-success py-2">{{ 'treasury.refund.saved' | transloco }}</div> }
-  <label class="form-label">{{ 'treasury.refund.label_ticket' | transloco }}</label>
-  <div class="input-group">
-    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.ticket" />
-    <span class="input-group-text">%</span>
-  </div>
-  <label class="form-label mt-3">{{ 'treasury.refund.label_colis' | transloco }}</label>
-  <div class="input-group">
-    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.colis" />
-    <span class="input-group-text">%</span>
-  </div>
-  <label class="form-label mt-3">{{ 'treasury.refund.label_bagage' | transloco }}</label>
-  <div class="input-group">
-    <input type="number" min="0" max="100" class="form-control" [(ngModel)]="rates.bagage" />
-    <span class="input-group-text">%</span>
-  </div>
+
+  @for (k of kinds; track k) {
+    <div class="mb-3">
+      <label class="form-label">{{ ('treasury.refund.label_' + k) | transloco }}</label>
+      <div class="d-flex gap-2 align-items-start">
+        <select class="form-select" style="max-width:180px" [(ngModel)]="cfg[k].method">
+          <option value="percentage">{{ 'treasury.refund.method_pct' | transloco }}</option>
+          <option value="fixed">{{ 'treasury.refund.method_fixed' | transloco }}</option>
+        </select>
+        @if (cfg[k].method === 'fixed') {
+          <div class="input-group">
+            <input type="number" min="0" class="form-control" [(ngModel)]="cfg[k].amount" />
+            <span class="input-group-text">XAF</span>
+          </div>
+        } @else {
+          <div class="input-group">
+            <input type="number" min="0" max="100" class="form-control" [(ngModel)]="cfg[k].rate" />
+            <span class="input-group-text">%</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   <small class="text-muted d-block mt-1">{{ 'treasury.refund.hint' | transloco }}</small>
   <button class="btn btn-primary mt-3" *hasPermission="'treasury.config.manage'" (click)="save()" [disabled]="saving">
     {{ (saving ? 'treasury.common.saving' : 'shared.actions.save') | transloco }}
