@@ -78,6 +78,25 @@ def test_deliver_home_endpoint(api_ctx):
 
 
 @pytest.mark.django_db
+def test_register_accepts_null_recipient_fields(api_ctx):
+    """Le form Angular envoie null pour les champs destinataire facultatifs (reset) :
+    la création doit réussir (None -> "") sans « Ce champ ne peut être nul »."""
+    c = api_ctx["client"]
+    r = c.post("/api/v1/voyages/consignment/parcels/", {
+        "origin_point_id": str(api_ctx["origin"].id),
+        "destination_point_id": str(api_ctx["dest"].id),
+        "consignment_type_id": str(api_ctx["ctype"].id),
+        "sender_name": "Exp", "sender_phone": "600",
+        "recipient_name": None, "recipient_phone": None, "recipient_id_number": None,
+        "amount_due": "0",
+    }, format="json")
+    assert r.status_code in (200, 201), r.content
+    data = r.json()["data"]
+    assert data["recipient_name"] == "" and data["recipient_phone"] == ""
+    assert data["recipient_id_number"] == ""
+
+
+@pytest.mark.django_db
 def test_expedition_lists_endpoint(api_ctx):
     c = api_ctx["client"]
     _register(api_ctx)

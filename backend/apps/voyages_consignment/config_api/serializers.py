@@ -2,6 +2,31 @@ from rest_framework import serializers
 from apps.voyages_consignment.models import Parcel, ParcelEvent, Baggage
 
 
+class _EmptyNormalizeMixin:
+    """Normalise les valeurs vides envoyées par un formulaire Angular :
+    - `blank_null_fields` : "" -> None (ex. <input type=date> vide, select non renseigné) ;
+    - `null_blank_fields` : None -> "" (ex. form.reset() met les contrôles non listés à null,
+      or les CharField/ChoiceField refusent null)."""
+    blank_null_fields = ()
+    null_blank_fields = ()
+
+    def to_internal_value(self, data):
+        if hasattr(data, "get"):
+            cleaned = {}
+            for k, v in data.items():
+                if k in self.blank_null_fields and v == "":
+                    v = None
+                elif k in self.null_blank_fields and v is None:
+                    v = ""
+                cleaned[k] = v
+            data = cleaned
+        return super().to_internal_value(data)
+
+
+# Rétro-compatibilité (l'ancien nom référencé ailleurs éventuellement)
+_BlankAsNullMixin = _EmptyNormalizeMixin
+
+
 class ParcelEventRead(serializers.ModelSerializer):
     kind_display = serializers.CharField(source="get_kind_display", read_only=True)
 
@@ -37,7 +62,10 @@ class ParcelRead(serializers.ModelSerializer):
                   "created_at", "updated_at", "events"]
 
 
-class ParcelWrite(serializers.Serializer):
+class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
+    # Le form Angular remet à null les contrôles facultatifs (reset) : None -> "".
+    null_blank_fields = ("recipient_name", "recipient_phone", "recipient_address",
+                         "recipient_id_number", "description", "payment_method")
     origin_point_id = serializers.UUIDField()
     destination_point_id = serializers.UUIDField()
     consignment_type_id = serializers.UUIDField()
@@ -113,30 +141,6 @@ class BaggageRead(serializers.ModelSerializer):
                   "status", "status_display", "loaded_at", "delivered_at", "delivered_comment", "notes",
                   "created_at", "updated_at"]
 
-
-class _EmptyNormalizeMixin:
-    """Normalise les valeurs vides envoyées par un formulaire Angular :
-    - `blank_null_fields` : "" -> None (ex. <input type=date> vide, select non renseigné) ;
-    - `null_blank_fields` : None -> "" (ex. form.reset() met les contrôles non listés à null,
-      or les CharField/ChoiceField refusent null)."""
-    blank_null_fields = ()
-    null_blank_fields = ()
-
-    def to_internal_value(self, data):
-        if hasattr(data, "get"):
-            cleaned = {}
-            for k, v in data.items():
-                if k in self.blank_null_fields and v == "":
-                    v = None
-                elif k in self.null_blank_fields and v is None:
-                    v = ""
-                cleaned[k] = v
-            data = cleaned
-        return super().to_internal_value(data)
-
-
-# Rétro-compatibilité (l'ancien nom référencé ailleurs éventuellement)
-_BlankAsNullMixin = _EmptyNormalizeMixin
 
 _BAG_TEXT_FIELDS = ("sender_name", "sender_phone", "civility", "id_type",
                     "id_number", "email", "description", "payment_method")
