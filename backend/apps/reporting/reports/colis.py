@@ -8,7 +8,8 @@ from apps.reporting.filter_apply import apply_filters
 
 @register("colis", "Liste des colis",
           ["date_from", "date_to", "periode", "station_depart", "station_arrivee",
-           "vehicle", "partner", "statut"],
+           "vehicle", "partner", "type_colis", "statut",
+           "destinataire", "no_cni", "telephone", "poids_min", "poids_max"],
           "landscape")
 def build(company, f):
     qs = (Parcel.objects.filter(company=company, is_deleted=False)
@@ -18,7 +19,10 @@ def build(company, f):
     qs = apply_filters(qs, f, {
         "station_depart": "origin_point_id", "station_arrivee": "destination_point_id",
         "vehicle": "trip__vehicle_id", "partner": "trip__vehicle__owner_partner_id",
-        "statut": "status"})
+        "type_colis": "consignment_type_id", "statut": "status",
+        "destinataire": "recipient_name__icontains", "no_cni": "recipient_id_number__icontains",
+        "telephone": "recipient_phone__icontains",
+        "poids_min": "weight_kg__gte", "poids_max": "weight_kg__lte"})
     rows, total, count = [], Decimal(0), 0
     for i, p in enumerate(qs, 1):
         total += p.amount_due

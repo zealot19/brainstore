@@ -27,6 +27,9 @@ FILTER_DEFS = {
     "agent":      {"type": "select", "label": "Agent",               "options": "agents"},
     "statut":     {"type": "select", "label": "Statut",              "options": "statut"},
     "group_by":   {"type": "select", "label": "Grouper par",         "options": "group_by"},
+    "type_colis":  {"type": "select", "label": "Type de colis",      "options": "consignment_types"},
+    "type_bagage": {"type": "select", "label": "Type de bagage",     "options": "consignment_types"},
+    "sens":        {"type": "select", "label": "Sens",               "options": "sens"},
 
     # Champs texte / nombre (utilisés dès les phases suivantes ; déjà pris en charge).
     "client":       {"type": "text",   "label": "Client"},
@@ -68,6 +71,13 @@ def resolve_options(source, company, report=None):
     if source == "periode":  return pack(_PERIODE)
     if source == "group_by": return pack(_GROUP_BY)
     if source == "statut":   return pack(_statut_choices(report))
+    if source == "sens":
+        from apps.voyages_booking.models import Ticket
+        return pack(Ticket.Direction.choices)
+    if source == "consignment_types":
+        from apps.voyages_config.models import ConsignmentType
+        return pack((t.id, t.label) for t in ConsignmentType.objects
+                    .filter(company=company, is_deleted=False).order_by("label"))
 
     if source == "service_points":
         from apps.voyages_config.models import ServicePoint
@@ -107,7 +117,7 @@ def resolve_options(source, company, report=None):
         return pack((u.id, u.get_full_name() or u.username) for u in U.objects
                     .filter(company=company, is_active=True).order_by("first_name"))
     if source == "crew":
-        from apps.fleet.models import ExternalDriver
-        return pack((d.id, d.full_name) for d in ExternalDriver.objects
-                    .filter(company=company, is_deleted=False))
+        from apps.voyages_trips.models import CrewMember
+        return pack((m.id, m.name or f"{m.first_name} {m.last_name}".strip() or str(m.id))
+                    for m in CrewMember.objects.filter(company=company, is_deleted=False).order_by("name"))
     return []

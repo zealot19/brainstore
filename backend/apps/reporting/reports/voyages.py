@@ -10,7 +10,8 @@ from apps.reporting.filter_apply import apply_filters
 
 
 @register("voyages", "Liste des voyages",
-          ["date_from", "date_to", "periode", "categorie_tarifaire", "vehicle", "partner", "statut"],
+          ["date_from", "date_to", "periode", "station_depart", "station_arrivee", "station_escale",
+           "categorie_tarifaire", "vehicle", "partner", "crew", "statut"],
           "landscape")
 def build(company, f):
     trips = (Trip.objects.filter(company=company, is_deleted=False)
@@ -18,8 +19,11 @@ def build(company, f):
     if f["date_from"]: trips = trips.filter(scheduled_departure__date__gte=f["date_from"])
     if f["date_to"]:   trips = trips.filter(scheduled_departure__date__lte=f["date_to"])
     trips = apply_filters(trips, f, {
+        "station_depart": "route__origin_id", "station_arrivee": "route__destination_id",
+        "station_escale": "route__stops__service_point_id",
         "categorie_tarifaire": "fare_class_id", "vehicle": "vehicle_id",
-        "partner": "vehicle__owner_partner_id", "statut": "status"})
+        "partner": "vehicle__owner_partner_id", "crew": "crew__member_id", "statut": "status"})
+    trips = trips.distinct()  # les jointures escale/équipage peuvent dupliquer
     trip_ids = list(trips.values_list("id", flat=True))
     tk = {r["trip_id"]: r["s"] for r in
           Ticket.objects.filter(trip_id__in=trip_ids, is_deleted=False).values("trip_id").annotate(s=Sum("amount"))}

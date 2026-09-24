@@ -7,7 +7,8 @@ from apps.reporting.filter_apply import apply_filters
 
 
 @register("bagages", "Liste des bagages",
-          ["date_from", "date_to", "periode", "categorie_tarifaire", "vehicle", "partner", "statut"],
+          ["date_from", "date_to", "periode", "station_depart", "station_arrivee",
+           "categorie_tarifaire", "vehicle", "partner", "type_bagage", "statut"],
           "landscape")
 def build(company, f):
     qs = (Baggage.objects.filter(company=company, is_deleted=False)
@@ -16,8 +17,10 @@ def build(company, f):
     if f["date_from"]: qs = qs.filter(created_at__date__gte=f["date_from"])
     if f["date_to"]:   qs = qs.filter(created_at__date__lte=f["date_to"])
     qs = apply_filters(qs, f, {
+        "station_depart": "trip__route__origin_id", "station_arrivee": "trip__route__destination_id",
         "categorie_tarifaire": "trip__fare_class_id", "vehicle": "trip__vehicle_id",
-        "partner": "trip__vehicle__owner_partner_id", "statut": "status"})
+        "partner": "trip__vehicle__owner_partner_id",
+        "type_bagage": "consignment_type_id", "statut": "status"})
     rows, total, count = [], Decimal(0), 0
     for i, b in enumerate(qs, 1):
         total += b.amount_due

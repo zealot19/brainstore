@@ -7,7 +7,8 @@ from apps.reporting.filter_apply import apply_filters
 
 
 @register("reservation", "Liste des réservations",
-          ["date_from", "date_to", "periode", "categorie_tarifaire", "vehicle", "partner", "statut"],
+          ["date_from", "date_to", "periode", "station_depart", "station_arrivee",
+           "categorie_tarifaire", "vehicle", "partner", "client", "sens", "statut"],
           "landscape")
 def build(company, f):
     qs = (Ticket.objects.filter(booking__company=company, is_deleted=False)
@@ -16,8 +17,10 @@ def build(company, f):
     if f["date_from"]: qs = qs.filter(created_at__date__gte=f["date_from"])
     if f["date_to"]:   qs = qs.filter(created_at__date__lte=f["date_to"])
     qs = apply_filters(qs, f, {
+        "station_depart": "trip__route__origin_id", "station_arrivee": "trip__route__destination_id",
         "categorie_tarifaire": "fare_class_id", "vehicle": "trip__vehicle_id",
-        "partner": "trip__vehicle__owner_partner_id", "statut": "status"})
+        "partner": "trip__vehicle__owner_partner_id",
+        "client": "passenger__name__icontains", "sens": "direction", "statut": "status"})
     rows, total, count = [], Decimal(0), 0
     for i, t in enumerate(qs, 1):
         total += t.amount
