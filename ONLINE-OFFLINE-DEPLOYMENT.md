@@ -49,6 +49,7 @@ sur son propre serveur, **fonctionne même sans Internet**, et se synchronise au
   **vend au guichet même sans Internet** ; les données remontent au retour du lien.
 
 > **Une seule agence, sans master distant ?** Déployez uniquement la Partie A et mettez
+
 > `SYNC_ENABLED=0`. Ce guide couvre le cas multi-sites synchronisé.
 
 ---
