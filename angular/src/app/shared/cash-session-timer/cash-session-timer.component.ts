@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -18,13 +18,14 @@ import { CashSession } from '../../../_api/models/treasury.models';
   styleUrls: ['./cash-session-timer.component.scss'],
   imports: [CommonModule, FormsModule, TranslocoModule],
 })
-export class CashSessionTimerComponent implements OnInit, OnDestroy {
+export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestroy {
   private svc = inject(SessionService);
 
   session: CashSession | null = null;
   now = Date.now();
   private tickId?: ReturnType<typeof setInterval>;
   private pollId?: ReturnType<typeof setInterval>;
+  private billetageModalEl?: HTMLElement;
 
   // Billetage de fin de poste
   denoms: any[] = [];
@@ -36,7 +37,20 @@ export class CashSessionTimerComponent implements OnInit, OnDestroy {
     this.tickId = setInterval(() => this.now = Date.now(), 1000);
     this.pollId = setInterval(() => this.refresh(), 60000);
   }
-  ngOnDestroy(): void { clearInterval(this.tickId); clearInterval(this.pollId); }
+  ngAfterViewInit(): void {
+    // La modale est rendue dans l'en-tête (contexte d'empilement) : on la déplace
+    // sur <body> pour qu'elle passe au-dessus du backdrop et reste cliquable.
+    const el = document.getElementById('cst-billetage-modal');
+    if (el && el.parentElement !== document.body) {
+      document.body.appendChild(el);
+      this.billetageModalEl = el;
+    }
+  }
+  ngOnDestroy(): void {
+    clearInterval(this.tickId);
+    clearInterval(this.pollId);
+    this.billetageModalEl?.remove();
+  }
 
   refresh(): void {
     this.svc.myActive().subscribe({ next: s => this.session = s, error: () => this.session = null });
