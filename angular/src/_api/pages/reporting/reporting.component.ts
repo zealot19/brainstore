@@ -74,12 +74,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.svc.generateBlob(code, format, this.activeFilters()).subscribe({
       next: blob => {
         this.loading = false;
-        this.lastBlob = blob;
         if (format === 'pdf') {
-          this.clearPreview();
+          this.clearPreview();                            // révoque l'aperçu précédent
+          this.lastBlob = blob;
           this.previewObjectUrl = URL.createObjectURL(blob);
           this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.previewObjectUrl);
         } else {
+          this.lastBlob = blob;
           this.svc.saveBlob(blob, `${code}.${format}`);   // non prévisualisable
         }
       },
