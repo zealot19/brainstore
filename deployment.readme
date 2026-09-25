@@ -1,0 +1,248 @@
+# Déploiement de l'ERP — Guide complet (En ligne + Agences)
+
+Ce guide explique comment déployer l'application :
+1. **En ligne (master)** — le serveur central, source de vérité + réservation en ligne, dossier **`online-master/`** ;
+2. **En agence** — une instance locale par agence (fonctionne hors-ligne, se synchronise au master), dossier **`agency/`**.
+
+> Chaque dossier est une **pile Docker autonome** qui **clone le code depuis GitHub** au build
+> (aucun code local requis). Vous remplissez un fichier `.env` et vous lancez.
+> Les `README.md` de `online-master/` et `agency/` restent la référence courte ; ce fichier
+> les relie et couvre HTTPS, l'ordre de déploiement et le dépannage.
+
+---
+
+## 1. Architecture en un coup d'œil
+
+```
+                 ┌──────────────────────────────────────┐
+                 │            MASTER (en ligne)          │
+                 │  online-master/                       │
+                 │  db + backend + frontend              │
+                 │  • Super Admin, institutions, RBAC    │
+                 │  • Réservation en ligne (PWA /reserver)│
+                 │  • Source de vérité de la config       │
+                 └───────────────▲───────────────────────┘
+                                 │  HTTPS  (SYNC_TOKEN partagé)
+             ┌───────────────────┼───────────────────┐
+             │ config ↓ / ventes ↑                    │
+   ┌─────────┴──────────┐               ┌─────────────┴────────┐
+   │   AGENCE A          │               │   AGENCE B            │
+   │   agency/ (copie)   │               │   agency/ (copie)     │
+   │   db + backend +    │               │   db + backend +      │
+   │   frontend +        │               │   frontend +          │
+   │   sync_worker +     │               │   sync_worker +       │
+   │   reserve_worker    │               │   reserve_worker      │
+   │   (marche offline)  │               │   (marche offline)    │
+   └─────────────────────┘               └───────────────────────┘
+```
+
+- **Master** : `NODE_ROLE=master`. Détient la config (institutions, agences, réseau, tarifs,
+  RBAC, utilisateurs) et sert la réservation en ligne. Les agences s'y synchronisent.
+- **Agence** : `NODE_ROLE=agency`. Base locale, ventes au guichet même **sans Internet**. Deux
+  workers : `sync_worker` (config ↓ / ventes ↑) et `reserve_worker` (réservations en ligne + heartbeat).
+- Les deux : nginx sert l'Angular et **proxifie** `/api`, `/admin`, `/static`, `/media` vers le
+  backend Django (même origine), en ajoutant `X-Forwarded-Proto: https` (évite la boucle de
+  redirection due à `SECURE_SSL_REDIRECT` en prod). Le backend **migre automatiquement** au démarrage.
+
+**Ordre impératif : déployez d'abord le master, puis les agences.** Une agence a besoin
+d'exister sur le master (avec un code + UUID) avant de pouvoir se synchroniser.
+
+---
+
+## 2. Prérequis (sur chaque machine)
+
+- Docker + Docker Compose :
+  ```bash
+  curl -fsSL https://get.docker.com | sh
+  sudo systemctl enable docker      # redémarre la pile après une coupure de courant
+  ```
+- Accès au dépôt GitHub. **Dépôt privé** → utilisez une URL avec token dans `REPO_URL` :
+  `https://<TOKEN>@github.com/<owner>/<repo>.git`
+- Pour le master exposé sur Internet : un **nom de domaine** pointant sur le serveur (pour HTTPS).
+
+Générateurs utiles :
+```bash
+python3 -c "import secrets;print(secrets.token_urlsafe(64))"   # SECRET_KEY / SYNC_TOKEN
+python3 -c "import uuid;print(uuid.uuid4())"                    # NODE_ID
+```
+
+---
+
+## 3. Déployer le MASTER (en ligne)
+
+Sur le serveur central :
+
+```bash
+# 1. Copier le dossier online-master/ sur le serveur, puis :
+cd online-master
+cp .env.example .env
+
+# 2. Éditer .env — au minimum :
+#    SECRET_KEY            longue clé aléatoire
+#    POSTGRES_PASSWORD     + le MÊME mot de passe dans DATABASE_URL
+#    SYNC_TOKEN            jeton partagé fort (à réutiliser à l'identique sur CHAQUE agence)
+#    ALLOWED_HOSTS         votre domaine (ex. erp.mondomaine.com) — voir §6 HTTPS
+#    CSRF_TRUSTED_ORIGINS  https://erp.mondomaine.com
+#    REPO_URL              (dépôt privé : ajouter un token)
+#    ONLINE_COMPANY_ID     (optionnel : UUID de l'institution servie par /reserver)
+
+# 3. Construire et démarrer (le build clone le code depuis GitHub) :
+docker compose up -d --build
+
+# 4. Vérifier les 3 services :
+docker compose ps            # db, backend, frontend
+
+# 5. Créer le super-administrateur (une seule fois) :
+docker compose exec backend python manage.py createsuperuser
+```
+
+Puis ouvrez `http://<hôte>:8080` (ou votre domaine HTTPS), connectez-vous et :
+1. **Super Admin → Institutions → Nouvelle institution** (la société de transport) ;
+2. **Administration → Agences → Nouvelle agence** pour chaque agence, **avec un code**.
+   Notez l'**UUID** de chaque agence : c'est le `NODE_AGENCY_ID` côté agence (§4).
+3. *(Réservation en ligne)* renseignez `ONLINE_COMPANY_ID` dans `.env` avec l'UUID de
+   l'institution, puis `docker compose up -d --build frontend` pour reconstruire la PWA.
+
+---
+
+## 4. Déployer une AGENCE  (répéter par agence)
+
+> Préalable : l'agence **existe déjà sur le master** (§3, étape 2) et vous avez son **UUID**.
+
+```bash
+# 1. Copier le dossier agency/ sur la machine de l'agence, puis :
+cd agency
+cp .env.example .env
+
+# 2. Éditer .env — au minimum :
+#    SECRET_KEY          longue clé aléatoire
+#    POSTGRES_PASSWORD   + le MÊME mot de passe dans DATABASE_URL
+#    NODE_ID             UUID unique de CETTE instance (généré, voir §2)
+#    NODE_AGENCY_ID      UUID de l'agence tel que créé sur le master
+#    SYNC_MASTER_URL     URL du master suffixée /api/v1 (ex. https://erp.mondomaine.com/api/v1)
+#    SYNC_TOKEN          le MÊME jeton que le master
+#    WEB_PORT            si 8080 est déjà pris sur la machine
+#    REPO_URL            (dépôt privé : ajouter un token)
+
+# 3. Construire et démarrer :
+docker compose up -d --build
+
+# 4. Vérifier les 5 services :
+docker compose ps            # db, backend, frontend, sync_worker, reserve_worker
+
+# 5. Amorcer depuis le master (UNE fois — tire toute la config) :
+docker compose exec backend python manage.py bootstrap_from_master
+
+# (optionnel) admin local garanti même hors-ligne :
+docker compose exec backend python manage.py createsuperuser
+```
+
+Ouvrez `http://<hôte-agence>:<WEB_PORT>`. Sur le **réseau local** de l'agence, l'HTTP suffit ;
+la vente au guichet fonctionne **même sans Internet**, et les données remontent dès le retour du lien.
+
+---
+
+## 5. Variables d'environnement (référence)
+
+| Variable | Master | Agence | Rôle |
+|---|:---:|:---:|---|
+| `REPO_URL` / `REPO_REF` | ✔ | ✔ | Dépôt + branche clonés au build (`master` par défaut) |
+| `WEB_PORT` | ✔ | ✔ | Port HTTP exposé (défaut 8080) |
+| `SECRET_KEY` | ✔ | ✔ | Clé Django (longue, aléatoire, secrète) |
+| `POSTGRES_PASSWORD` + `DATABASE_URL` | ✔ | ✔ | **Même** mot de passe aux deux endroits |
+| `ALLOWED_HOSTS` / `CSRF_TRUSTED_ORIGINS` | ✔ | ✔ | Restreindre au domaine réel en prod |
+| `SYNC_TOKEN` | ✔ | ✔ | **Identique** master ↔ toutes les agences |
+| `NODE_ROLE` | `master` | `agency` | Rôle de synchronisation |
+| `NODE_ID` | — | ✔ | UUID **unique** de l'instance agence |
+| `NODE_AGENCY_ID` | — | ✔ | UUID de l'agence **sur le master** |
+| `SYNC_MASTER_URL` | — | ✔ | URL du master + `/api/v1` |
+| `SYNC_INTERVAL` / `RESERVE_INTERVAL` | — | ✔ | Cadence des workers (90 s / 20 s par défaut) |
+| `ONLINE_COMPANY_ID` | ✔ | (placeholder) | Institution servie par la PWA `/reserver` |
+| `FAKE_PAYMENTS` | ✔ | ✔ | `1` = Mobile Money simulé ; `0` + Campay = vrais paiements |
+
+---
+
+## 6. HTTPS (master exposé sur Internet)
+
+Servez le master derrière un reverse proxy HTTPS. Le plus simple est **Caddy** (certificat
+Let's Encrypt automatique). nginx interne envoie déjà `X-Forwarded-Proto: https`, donc pas de
+boucle de redirection.
+
+```caddyfile
+# /etc/caddy/Caddyfile
+erp.mondomaine.com {
+    reverse_proxy localhost:8080     # WEB_PORT de la pile online-master
+}
+```
+
+```bash
+sudo apt install -y caddy       # ou : voir caddyserver.com/docs/install
+sudo systemctl reload caddy
+```
+
+Puis dans `online-master/.env` :
+```env
+ALLOWED_HOSTS=erp.mondomaine.com
+CSRF_TRUSTED_ORIGINS=https://erp.mondomaine.com
+```
+et `docker compose up -d --build`. Les agences pointent alors `SYNC_MASTER_URL=https://erp.mondomaine.com/api/v1`.
+
+*(Agence exposée sur Internet — rare : même principe, un domaine + Caddy par agence.)*
+
+---
+
+## 7. Mises à jour
+
+> Gardez **master et agences sur le même code** (`REPO_REF`). **Mettez le master à jour d'abord.**
+
+```bash
+docker compose build --no-cache      # re-clone le dernier code depuis GitHub
+docker compose up -d                 # migrations appliquées automatiquement au démarrage
+```
+
+---
+
+## 8. Sauvegardes
+
+```bash
+# Master
+docker compose exec -T db pg_dump -U erp erp | gzip > erp_$(date +%F).sql.gz
+# Agence
+docker compose exec -T db pg_dump -U erp_agency erp_agency | gzip > erp_agency_$(date +%F).sql.gz
+```
+Planifiez-les (cron) et stockez-les **hors du serveur**. Les médias sont dans le volume `media`.
+
+---
+
+## 9. Vérification & dépannage
+
+- **Sync OK ?** Sur le master, en admin : `GET /api/v1/sync/status/` doit lister l'agence **en ligne**.
+  Une vente créée en agence remonte après un cycle `sync_once`.
+- **Logs** : `docker compose logs -f backend` (ou `frontend`, `sync_worker`, `reserve_worker`).
+- **Boucle de redirection / « 400 Bad Request »** : vérifiez `ALLOWED_HOSTS` /
+  `CSRF_TRUSTED_ORIGINS` (domaine réel) ; le proxy doit transmettre `X-Forwarded-Proto https`
+  (déjà fait par le nginx interne).
+- **`git clone` échoue au build** : dépôt privé → token manquant dans `REPO_URL`.
+- **Port déjà utilisé** : changez `WEB_PORT`.
+- **Agence ne synchronise pas** : `SYNC_TOKEN` identique au master ? `SYNC_MASTER_URL` joignable
+  (suffixe `/api/v1`) ? `NODE_AGENCY_ID` correspond bien à l'UUID de l'agence sur le master ?
+- **Reprise après coupure** : `restart: unless-stopped` + `systemctl enable docker` relancent la
+  pile automatiquement. Un onduleur (UPS) est recommandé en agence.
+
+---
+
+## 10. Récapitulatif express
+
+```bash
+# —— MASTER ——
+cd online-master && cp .env.example .env    # remplir SECRET_KEY, POSTGRES_PASSWORD, SYNC_TOKEN, domaine
+docker compose up -d --build
+docker compose exec backend python manage.py createsuperuser
+# → créer institution + agences (noter les UUID)
+
+# —— CHAQUE AGENCE ——
+cd agency && cp .env.example .env           # remplir SECRET_KEY, POSTGRES_PASSWORD, NODE_ID,
+                                            #         NODE_AGENCY_ID, SYNC_MASTER_URL, SYNC_TOKEN
+docker compose up -d --build
+docker compose exec backend python manage.py bootstrap_from_master
+```
