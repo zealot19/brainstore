@@ -85,6 +85,16 @@ export class SidebarService {
           subMenus: [],
         },
         {
+          menuValue: 'Config documents',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'file-text',
+          route: routes.admDocuments,
+          base: 'documents',
+          permission: 'transport.config.view',
+          subMenus: [],
+        },
+        {
           // Plateforme (super admin) — fusion de Config Système + Admin RBAC + Super Admin
           menuValue: 'Super Admin',
           hasSubRoute: true,
@@ -292,7 +302,6 @@ export class SidebarService {
             { menuValue: "Barème dépenses",      route: routes.vcExpenseSchedules,   base: 'expense-schedules',   permission: 'transport.config.view' },
             { menuValue: 'Fidélité',             route: routes.vcLoyalty,            base: 'loyalty-rules',       permission: 'transport.config.view' },
             { menuValue: 'Config billets',       route: routes.vcTicketTemplate,     base: 'ticket-template',     permission: 'transport.config.view' },
-            { menuValue: 'Config manifestes',    route: routes.vcManifestTemplate,   base: 'manifest-template',   permission: 'transport.config.view' },
             { menuValue: 'Paramètres Voyages',   route: routes.vcSettings,           base: 'settings',            permission: 'transport.config.view' },
           ],
         },

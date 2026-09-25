@@ -112,7 +112,6 @@ export const Pages_routes: Routes = [
                 { path: 'service-patterns',    loadComponent: () => import('../../../_api/pages/voyages-config/service-patterns/service-patterns.component').then(m => m.VcServicePatternsComponent) },
                 { path: 'settings',            loadComponent: () => import('../../../_api/pages/voyages-config/settings/settings.component').then(m => m.VcSettingsComponent) },
                 { path: 'ticket-template',     loadComponent: () => import('../../../_api/pages/voyages-config/ticket-template/ticket-template.component').then(m => m.VcTicketTemplateComponent) },
-                { path: 'manifest-template',   loadComponent: () => import('../../../_api/pages/voyages-config/manifest-template/manifest-template.component').then(m => m.VcManifestTemplateComponent) },
                 { path: 'fares',               loadComponent: () => import('../../../_api/pages/voyages-pricing/fares/fares.component').then(m => m.VcFaresComponent) },
               ],
             },
@@ -258,6 +257,7 @@ export const Pages_routes: Routes = [
           { path: 'roles',    loadComponent: () => import('../../../_api/pages/admin/roles/admin-roles.component').then(m => m.AdminRolesComponent) },
           { path: 'roles/:id/permissions', loadComponent: () => import('../../../_api/pages/rbac/role-permissions/role-permissions.component').then(m => m.RolePermissionsComponent) },
           { path: 'audit',    loadComponent: () => import('../../../_api/pages/admin/audit/audit.component').then(m => m.AuditLogComponent) },
+          { path: 'documents', loadComponent: () => import('../../../_api/pages/voyages-config/manifest-template/manifest-template.component').then(m => m.VcManifestTemplateComponent) },
         ]
       },
       //ui interface

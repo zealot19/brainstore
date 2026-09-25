@@ -439,7 +439,7 @@ export const routes={
   vcLoyalty:            '/voyages-config/loyalty-rules',
   vcSettings:           '/voyages-config/settings',
   vcTicketTemplate:     '/voyages-config/ticket-template',
-  vcManifestTemplate:   '/voyages-config/manifest-template',
+  admDocuments:         '/admin/documents',
   vcFares:              '/voyages-config/fares',
   vcCrewMemberTypes:    '/voyages-config/crew-member-types',
   vcCrewMembers:        '/voyages-config/crew-members',
