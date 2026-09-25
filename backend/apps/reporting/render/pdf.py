@@ -40,9 +40,10 @@ def render_pdf(result, company, tpl=None) -> bytes:
         items = " · ".join(f"<b>{_h.escape(c['label'])} :</b> {_h.escape(c['value'])}" for c in criteria)
         criteria_html = f'<div class="crit">{items}</div>'
     header = doc_header_html(tpl) if tpl else company_header_html(company)
-    footer_css, footer_html = page_footer_bits(tpl or {}, run)
+    footer_page_css, footer_root_css, footer_html = page_footer_bits(tpl or {}, run)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A4 {orientation}; margin: 14mm 10mm 18mm; {footer_css} }}
+      @page {{ size: A4 {orientation}; margin: 14mm 10mm 18mm; {footer_page_css} }}
+      {footer_root_css}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 10px; color:#111; }}
       .head {{ display:flex; align-items:center; gap:12px; border-bottom:1px solid #999; padding-bottom:6px; }}
       .logo-wrap {{ flex:0 0 90px; text-align:center; }}

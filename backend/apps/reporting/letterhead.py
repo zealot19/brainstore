@@ -65,18 +65,21 @@ def doc_inline_footer_html(tpl: dict, run: str | None = None) -> str:
 
 
 def page_footer_bits(tpl: dict, run: str | None = None):
-    """Pied de page répété sur chaque page (documents multi-pages : rapports, bordereaux).
+    """Pied de page répété au BAS de chaque page (rapports, bordereaux multi-pages).
 
-    Renvoie (css, html) : `css` à insérer dans <style> (boîtes @page + élément running),
-    `html` = le <div> running à placer dans <body>. Vides si aucun pied ni numéro."""
+    Renvoie (page_css, root_css, body_html) :
+    - `page_css`  : boîtes de marge, à placer À L'INTÉRIEUR de la règle `@page {…}` ;
+    - `root_css`  : la règle de l'élément running, à placer HORS de `@page` (sinon
+      `position: running()` est ignoré et le pied retombe en haut du document) ;
+    - `body_html` : le `<div>` running à placer dans <body>.
+    Vides si aucun pied ni numéro de page."""
     inner = footer_inner_html(tpl, run)
-    page_boxes, extra_css, body_html = [], "", ""
+    page_boxes, root_css, body_html = [], "", ""
     if inner:
         page_boxes.append("@bottom-center { content: element(pagefooter); }")
-        extra_css = "#pagefooter { position: running(pagefooter); font-size:8px; color:#777; text-align:center; }"
+        root_css = "#pagefooter { position: running(pagefooter); font-size:8px; color:#777; text-align:center; }"
         body_html = f'<div id="pagefooter">{inner}</div>'
     if (tpl or {}).get("footer_show_page_numbers"):
         page_boxes.append('@bottom-right { content: "Page " counter(page) " / " counter(pages); '
                           'font-size:8px; color:#777; }')
-    css = "\n".join(page_boxes) + "\n" + extra_css
-    return css, body_html
+    return "\n".join(page_boxes), root_css, body_html

@@ -154,10 +154,11 @@ def render_manifest_pdf(data: dict, doc: str, tpl: dict) -> bytes:
     from apps.reporting.letterhead import page_footer_bits
     builder = _BUILDERS.get(doc, build_passenger_manifest)
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
-    footer_css, footer_html = page_footer_bits(tpl or {}, run)
+    footer_page_css, footer_root_css, footer_html = page_footer_bits(tpl or {}, run)
     body = footer_html + manifest_header_html(tpl) + _printed_line(tpl) + builder(data, tpl)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A4 portrait; margin: 12mm 10mm 18mm; {footer_css} }}
+      @page {{ size: A4 portrait; margin: 12mm 10mm 18mm; {footer_page_css} }}
+      {footer_root_css}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 10px; color:#111; }}
       .head {{ display:flex; gap:12px; border-bottom:2px solid #111; padding-bottom:6px; align-items:center; }}
       .logo {{ height:60px; width:auto; object-fit:contain; }}
