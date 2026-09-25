@@ -237,8 +237,10 @@ class BookingAssignReturnView(APIView):
 
 
 class BookingDetailView(APIView):
+    # GET régi par ticket.view : le détail expose les billets (siège, passager,
+    # montants) -> masqué au guichetier (anti-fraude). DELETE reste booking.cancel.
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.booking.view', 'DELETE': 'ticketing.booking.cancel'}
+    permission_map = {'GET': 'ticketing.ticket.view', 'DELETE': 'ticketing.booking.cancel'}
 
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)
@@ -531,9 +533,11 @@ def render_booking_tickets_html(request, b, *, duplicata=False):
 
 
 class BookingRenderTicketsView(APIView):
-    """HTML des billets d'une réservation, rendu depuis le modèle « Config billets »."""
+    """HTML des billets d'une réservation (impression). Régi par ticket.print :
+    l'impression automatique à la vente doit fonctionner pour le guichetier
+    (qui a ticket.print mais pas ticket.view)."""
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.ticket.view'}
+    permission_map = {'GET': 'ticketing.ticket.print'}
 
     def get(self, request, pk):
         b = selectors.booking_detail(request.user.company, pk)

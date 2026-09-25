@@ -7,11 +7,14 @@ import { FareClassService } from '../../../services/voyages-config/fare-class.se
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClass, TimeSlot, Route } from '../../../models/voyages-config.models';
-import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec } from '../../../models/voyages-booking.models';
+import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec, Booking } from '../../../models/voyages-booking.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PermissionService } from '../../../services/auth/permission.service';
+import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
@@ -48,7 +51,8 @@ export class VbNewBookingComponent implements OnInit {
   constructor(private svc: BookingService, private fcSvc: FareClassService,
               private tsSvc: TimeSlotService, private routeSvc: RouteService,
               private router: Router, private route: ActivatedRoute,
-              private pmSvc: PaymentMethodService) {}
+              private pmSvc: PaymentMethodService, private perm: PermissionService,
+              private toast: ToastService) {}
 
   ngOnInit(): void {
     this.isReservation = this.route.snapshot.data['mode'] === 'reservation';
@@ -169,8 +173,35 @@ export class VbNewBookingComponent implements OnInit {
     }
     const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: this.amountReceived } as BookingCreate;
     this.svc.create(body).subscribe({
-      next: b => this.router.navigate(['/voyages-booking/bookings', b.id]),
+      next: b => this.afterSale(b),
       error: e => this.fail(e) });
   }
+
+  /** Vente validée : impression automatique du billet, puis routage selon le rôle. */
+  private afterSale(b: Booking): void {
+    this.svc.renderTickets(b.id).subscribe({ next: r => printHtml(r.html), error: () => {} });
+    if (this.perm.has('ticketing.ticket.view')) {
+      this.router.navigate(['/voyages-booking/bookings', b.id]);   // accès détail : vue enrichie
+    } else {
+      // Guichetier : pas d'accès au détail -> billet imprimé + nouveau formulaire de vente.
+      this.toast.success('Vente enregistrée. Billet envoyé à l\'impression.');
+      this.resetForm();
+    }
+  }
+
+  /** Réinitialise le formulaire pour enchaîner une nouvelle vente (guichetier). */
+  private resetForm(): void {
+    this.saving = false; this.errorMsg = '';
+    this.tripType = 'one_way';
+    this.routeCode = ''; this.fareClassId = ''; this.outDate = ''; this.outSlotId = '';
+    this.outTrips = []; this.outboundTripId = '';
+    this.routeDests = []; this.tripDests = []; this.destinationId = '';
+    this.outSeats = []; this.outSeatId = '';
+    this.returnOpen = false; this.retDate = ''; this.retSlotId = ''; this.retTrips = []; this.returnTripId = '';
+    this.retSeats = []; this.retSeatId = '';
+    this.client = { name: '', phone: '', id_type: 'cni', id_number: '' };
+    this.paymentMethod = ''; this.amountReceived = null;
+  }
+
   private fail(e: any): void { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; }
 }

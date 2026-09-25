@@ -30,11 +30,14 @@ def _role_specs(codes):
         "treasury.session.operate", "treasury.session.view",
         "treasury.paymentmethod.view", "treasury.income.view",
     }
+    # Le guichetier vend et imprime le billet à la vente (ticket.print), mais ne
+    # consulte PAS le détail d'un billet (ticket.view) et ne réimprime pas de
+    # duplicata (ticket.duplicata) — contrôle anti-fraude.
     guichet = {
         "ticketing.booking.view", "ticketing.booking.create", "ticketing.booking.cancel",
         "ticketing.booking.noshow", "ticketing.booking.board",
         "ticketing.customer.view", "ticketing.customer.manage",
-        "ticketing.ticket.view", "ticketing.ticket.print", "ticketing.dashboard.view",
+        "ticketing.ticket.print", "ticketing.dashboard.view",
     }
     # Trésorerie d'agence (le chef d'agence pilote la caisse, hors banque/virements).
     treasury_agence = (
