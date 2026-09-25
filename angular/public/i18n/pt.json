@@ -2331,7 +2331,10 @@
     "f_vehicle": "Veículo (ID)",
     "f_partner": "Parceiro",
     "opt_all_f": "— Todas —",
-    "generate": "Gerar"
+    "generate": "Gerar pré-visualização",
+    "preview": "Pré-visualização do documento",
+    "print": "Imprimir",
+    "download": "Baixar"
   },
   "dash": {
     "title": "Painel",

@@ -21,14 +21,21 @@ export class ReportService {
     return this.http.get<any>(REPORTING.filterOptions, { params: p }).pipe(map(r => r.data ?? r));
   }
 
-  download(code: string, format: string, filters: Record<string, string>): void {
+  /** Récupère le document généré en blob (pour aperçu, impression ou téléchargement). */
+  generateBlob(code: string, format: string, filters: Record<string, string>): Observable<Blob> {
     let p = new HttpParams().set('fmt', format);
     Object.entries(filters).forEach(([k, v]) => { if (v) p = p.set(k, v); });
-    this.http.get(REPORTING.generate(code), { params: p, responseType: 'blob' }).subscribe(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${code}.${format}`; a.click();
-      URL.revokeObjectURL(url);
-    });
+    return this.http.get(REPORTING.generate(code), { params: p, responseType: 'blob' });
+  }
+
+  saveBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  download(code: string, format: string, filters: Record<string, string>): void {
+    this.generateBlob(code, format, filters).subscribe(blob => this.saveBlob(blob, `${code}.${format}`));
   }
 }

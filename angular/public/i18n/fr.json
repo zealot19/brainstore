@@ -2331,7 +2331,10 @@
     "f_vehicle": "Véhicule (ID)",
     "f_partner": "Partenaire",
     "opt_all_f": "— Toutes —",
-    "generate": "Générer"
+    "generate": "Générer l'aperçu",
+    "preview": "Aperçu du document",
+    "print": "Imprimer",
+    "download": "Télécharger"
   },
   "dash": {
     "title": "Tableau de bord",

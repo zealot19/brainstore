@@ -2331,7 +2331,10 @@
     "f_vehicle": "Vehículo (ID)",
     "f_partner": "Socio",
     "opt_all_f": "— Todas —",
-    "generate": "Generar"
+    "generate": "Generar vista previa",
+    "preview": "Vista previa del documento",
+    "print": "Imprimir",
+    "download": "Descargar"
   },
   "dash": {
     "title": "Panel de control",

@@ -2331,7 +2331,10 @@
     "f_vehicle": "Vehicle (ID)",
     "f_partner": "Partner",
     "opt_all_f": "— All —",
-    "generate": "Generate"
+    "generate": "Generate preview",
+    "preview": "Document preview",
+    "print": "Print",
+    "download": "Download"
   },
   "dash": {
     "title": "Dashboard",
