@@ -53,3 +53,22 @@ def test_push_applies_changes():
     r = APIClient().post(reverse("sync-push"), {"changes": [entry]}, format="json", **_auth())
     assert r.status_code == 200 and r.data["applied"] == 1
     assert Town.all_objects.filter(pk=town.id).exists()
+
+
+def test_pull_excludes_requester_origin_and_fans_out():
+    """Fan-out : le pull renvoie les changements des AUTRES origines (config master,
+    autres agences) mais jamais ceux de l'agence demandeuse ; le curseur avance
+    au-delà des entrées exclues."""
+    from apps.sync.models import ChangeLog
+    from django.utils import timezone
+    def mk(origin):
+        return ChangeLog.objects.create(entity="voyages_config.town",
+            object_id="00000000-0000-0000-0000-000000000001", op="upsert",
+            payload={}, version=timezone.now(), origin_node=origin)
+    a = mk("agencyA"); b = mk("agencyB"); m = mk("master")
+    # L'agence A tire : elle voit B et master, pas A.
+    r = APIClient().get(reverse("sync-pull") + "?since=0&node=agencyA", **_auth())
+    origins = [e["origin_node"] for e in r.data["changes"]]
+    assert "agencyA" not in origins
+    assert "agencyB" in origins and "master" in origins
+    assert r.data["cursor"] >= m.id          # curseur avance malgré l'exclusion de A

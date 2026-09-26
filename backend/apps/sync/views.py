@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,7 +8,6 @@ from rest_framework.views import APIView
 from apps.core.permissions import IsInstitutionAdmin
 from apps.core.responses import success_response
 
-from apps.sync import registry
 from apps.sync.apply import apply_change
 from apps.sync.models import ChangeLog
 from apps.sync.schema import schema_fingerprint
@@ -24,6 +25,20 @@ class IsSyncPeer(BasePermission):
         if not token:
             return False
         return request.headers.get("Authorization", "") == f"Bearer {token}"
+
+
+def _relog(entry):
+    """Ré-journalise sur le master un changement appliqué depuis une agence, en
+    conservant son origin_node → il devient disponible au pull pour LES AUTRES
+    agences (fan-out). L'agence d'origine l'exclut au pull (origin_node == soi)."""
+    ChangeLog.objects.create(
+        entity=entry["entity"],
+        object_id=entry["object_id"],
+        op=entry["op"],
+        payload=entry.get("payload") or {},
+        version=parse_datetime(entry["version"]) if entry.get("version") else timezone.now(),
+        origin_node=entry.get("origin_node") or "",
+    )
 
 
 def _schema_mismatch(request):
@@ -128,6 +143,7 @@ class SyncPushView(APIView):
             try:
                 if apply_change(entry) == "applied":
                     applied += 1
+                    _relog(entry)   # rediffusion vers les autres agences (fan-out)
             except Exception:  # one bad entry must not abort the batch
                 import logging
                 logging.getLogger(__name__).exception("sync push apply failed: %s", entry.get("entity"))
@@ -150,7 +166,9 @@ class SyncSnapshotView(APIView):
 
 
 class SyncPullView(APIView):
-    """Master → agency: DOWN (config) changes since the given cursor."""
+    """Master → agency: TOUS les changements depuis le curseur, sauf ceux dont
+    l'agence est elle-même l'origine (fan-out : elle reçoit la config du master +
+    les données des autres agences, jamais un écho des siennes)."""
     authentication_classes = []  # inter-instance token, not JWT
     permission_classes = [IsSyncPeer]
 
@@ -162,9 +180,10 @@ class SyncPullView(APIView):
             since = int(request.query_params.get("since", 0))
         except (TypeError, ValueError):
             since = 0
-        down = registry.labels_for_direction(registry.DOWN)
-        qs = (ChangeLog.objects.filter(id__gt=since, entity__in=down)
-              .order_by("id")[:_PULL_BATCH])
-        entries = [entry_to_dict(c) for c in qs]
-        cursor = entries[-1]["id"] if entries else since
+        node = request.query_params.get("node", "")   # NODE_ID du demandeur
+        # Fenêtre non filtrée pour un curseur monotone (on avance même au-delà des
+        # entrées exclues), puis exclusion de l'origine du demandeur pour la réponse.
+        window = list(ChangeLog.objects.filter(id__gt=since).order_by("id")[:_PULL_BATCH])
+        cursor = window[-1].id if window else since
+        entries = [entry_to_dict(c) for c in window if c.origin_node != node]
         return Response({"changes": entries, "cursor": cursor})

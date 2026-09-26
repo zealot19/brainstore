@@ -34,9 +34,10 @@ class Command(BaseCommand):
             ChangeLog.objects.filter(id__in=[c.id for c in pending]).update(synced_at=timezone.now())
             self.stdout.write(f"Poussé {len(pending)} changement(s).")
 
-        # 2) Pull master config (DOWN) changes since the watermark and apply them.
+        # 2) Pull tous les changements depuis le watermark (config master + données
+        #    des autres agences), sauf les nôtres (filtrés par node), et applique.
         cursor = SyncCursor.get()
-        resp = _req(f"{master}/sync/pull/?since={cursor.pull_cursor}", token)
+        resp = _req(f"{master}/sync/pull/?since={cursor.pull_cursor}&node={me}", token)
         changes = resp.get("changes", [])
         for entry in changes:
             apply_change(entry)
