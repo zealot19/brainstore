@@ -72,13 +72,12 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       first_name:           ['', Validators.required],
       last_name:            ['', Validators.required],
       username:             ['', Validators.required],
-      email:                ['', [Validators.required, Validators.email]],
+      email:                ['', [Validators.email]],   // facultatif à la création
       phone:                [''],
       default_agency_id:    [null],
       agency_ids:           [[] as string[]],
       profile_id:           [null],
       is_institution_admin: [false],
-      is_agency_admin:      [false],
       temp_password:        [''],
     });
 
@@ -140,7 +139,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.createForm.reset({
       first_name: '', last_name: '', username: '', email: '', phone: '',
       default_agency_id: null, agency_ids: [], profile_id: null,
-      is_institution_admin: false, is_agency_admin: false, temp_password: '',
+      is_institution_admin: false, temp_password: '',
     });
   }
 
@@ -168,7 +167,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     const v = this.createForm.value;
 
     const payload: UserCreateForm = {
-      email:                v.email,
+      email:                v.email || '',
       username:             v.username,
       first_name:           v.first_name,
       last_name:            v.last_name,
@@ -177,7 +176,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       default_agency_id:    v.default_agency_id || null,
       agency_ids:           this.withDefault(v.agency_ids, v.default_agency_id || null),
       is_institution_admin: v.is_institution_admin,
-      is_agency_admin:      v.is_agency_admin,
+      is_agency_admin:      false,
       temp_password:        v.temp_password || null,
     };
 

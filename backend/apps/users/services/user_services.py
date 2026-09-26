@@ -58,7 +58,9 @@ def create_user(
     Retourne (user, temp_password) — le mot de passe temporaire doit être transmis à l'utilisateur.
     L'utilisateur devra le changer à sa première connexion (must_change_password=True).
     """
-    if User.objects.filter(email__iexact=email).exists():
+    # Email facultatif : on ne vérifie l'unicité que s'il est renseigné (plusieurs
+    # utilisateurs peuvent être créés sans email — ils se connectent par username).
+    if email and User.objects.filter(email__iexact=email).exists():
         raise ApplicationError(_("Un utilisateur avec cet email existe déjà."))
 
     _check_user_limit(company)

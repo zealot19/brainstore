@@ -224,18 +224,7 @@ export class SidebarService {
             { menuValue: 'Types de document',   route: routes.fcDocumentTypes,     base: 'document-types'     , permission: 'fleet.config.view' },
             { menuValue: 'Étiquettes',          route: routes.fcTags,              base: 'tags'               , permission: 'fleet.config.view' },
             { menuValue: "Types d'intervention",route: routes.fcInterventionTypes, base: 'intervention-types' , permission: 'fleet.config.view' },
-            { menuValue: "Secteurs d'activité", route: routes.fcActivitySectors,   base: 'activity-sectors'   , permission: 'fleet.config.view' },
           ],
-        },
-        {
-          menuValue: 'Tableau de bord',
-          hasSubRoute: false,
-          showSubRoute: false,
-          icon2: 'chart-bar',
-          route: routes.fleetDashboard,
-          base: 'fleet-dashboard',
-          permission: 'fleet.dashboard.view',
-          subMenus: [],
         },
         {
           menuValue: 'Véhicules',

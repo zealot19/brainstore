@@ -1872,6 +1872,7 @@
     "f_force_change": "Force change on next login",
     "reset_submit": "Reset",
     "f_username": "Username",
+    "f_optional": "(optional)",
     "col_username": "Username",
     "f_agencies": "Allowed agencies",
     "f_agencies_hint": "(check one or more)",

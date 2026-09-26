@@ -1872,6 +1872,7 @@
     "f_force_change": "Forcer le changement à la prochaine connexion",
     "reset_submit": "Réinitialiser",
     "f_username": "Nom d'utilisateur",
+    "f_optional": "(facultatif)",
     "col_username": "Nom d'utilisateur",
     "f_agencies": "Agences autorisées",
     "f_agencies_hint": "(cochez une ou plusieurs)",

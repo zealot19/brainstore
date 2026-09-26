@@ -64,7 +64,7 @@ class UserDetailSerializer(UserListSerializer):
 # ── Serializers d'écriture ─────────────────────────────────────────────────────
 
 class UserCreateSerializer(serializers.Serializer):
-    email                = serializers.EmailField()
+    email                = serializers.EmailField(required=False, allow_blank=True, default="")
     username             = serializers.CharField(max_length=150)
     first_name           = serializers.CharField(max_length=150)
     last_name            = serializers.CharField(max_length=150)
