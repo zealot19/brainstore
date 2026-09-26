@@ -15,9 +15,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src/backend
-COPY backend/ /src/backend/
 
+# Dépendances d'abord : couche mise en cache tant que requirements/ ne change pas
+# → un changement de CODE ne re-déclenche plus l'installation pip (rebuild rapide).
+COPY backend/requirements/ /src/backend/requirements/
 RUN pip install --upgrade pip && pip install -r requirements/production.txt
+
+# Puis le reste du code backend.
+COPY backend/ /src/backend/
 
 # Statiques (servis par WhiteNoise). SECRET_KEY factice suffit au build.
 RUN SECRET_KEY=build-only python manage.py collectstatic --noinput
