@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from apps.sync import registry
 from apps.sync.apply import apply_change
 from apps.sync.client import request_json as _req
 from apps.sync.models import ChangeLog, SyncCursor
@@ -21,9 +20,13 @@ class Command(BaseCommand):
             self.stderr.write("SYNC_MASTER_URL / SYNC_TOKEN non configurés.")
             return
 
-        # 1) Push agency-owned (UP) changes not yet synced.
-        up = registry.labels_for_direction(registry.UP)
-        pending = list(ChangeLog.objects.filter(synced_at__isnull=True, entity__in=up)
+        # 1) Push ALL locally-originated changes not yet synced (toutes les tables
+        #    synchronisables, pas seulement l'ancien sous-ensemble UP). Le ChangeLog
+        #    de l'agence ne contient que des écritures locales (l'application des
+        #    changements distants se fait sous suspend_capture -> aucun écho), donc
+        #    on filtre par origin_node = ce nœud pour ne pousser que le local.
+        me = getattr(settings, "NODE_ID", "") or getattr(settings, "NODE_ROLE", "")
+        pending = list(ChangeLog.objects.filter(synced_at__isnull=True, origin_node=me)
                        .order_by("id")[:_BATCH])
         if pending:
             _req(f"{master}/sync/push/", token, "POST",
