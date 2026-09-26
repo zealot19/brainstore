@@ -69,3 +69,26 @@ def test_apply_does_not_echo_to_changelog():
     before = ChangeLog.objects.count()
     apply_change(entry)
     assert ChangeLog.objects.count() == before  # suspend_capture prevented echo
+
+
+def test_upsert_reconciles_unique_natural_key_conflict():
+    """Full-replica bootstrap : une ligne de référence semée localement (même code,
+    autre PK) est remplacée par celle du master (le master fait autorité)."""
+    import uuid
+    from apps.core.models import Currency
+    local = Currency.objects.create(code="ZZZ", name="Zed local", symbol="Z")
+    incoming_pk = str(uuid.uuid4())
+    entry = {
+        "entity": "core.currency",
+        "object_id": incoming_pk,
+        "op": ChangeLog.OP_UPSERT,
+        "payload": {"id": incoming_pk, "code": "ZZZ", "name": "Zed master",
+                    "symbol": "Z", "decimal_places": 2},
+        "version": timezone.now().isoformat(),
+    }
+    assert apply_change(entry) == "applied"
+    rows = Currency.objects.filter(code="ZZZ")
+    assert rows.count() == 1                       # pas de doublon
+    assert str(rows.first().pk) == incoming_pk     # PK du master adoptée
+    assert rows.first().name == "Zed master"       # valeurs du master
+    assert not Currency.objects.filter(pk=local.pk).exists()  # seed local remplacé

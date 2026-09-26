@@ -16,7 +16,7 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete, pre_migrate, post_migrate
 from django.utils import timezone
 
-from apps.sync import registry
+from apps.sync import membership
 from apps.sync.models import ChangeLog
 
 _state = local()
@@ -67,7 +67,7 @@ def _node() -> str:
 def record_change(instance, op):
     label = instance._meta.label_lower
     if not getattr(settings, "SYNC_ENABLED", False) or _suspended() \
-            or not registry.is_syncable(label):
+            or not membership.is_syncable_model(type(instance)):
         return None
     version = getattr(instance, "updated_at", None) or timezone.now()
     return ChangeLog.objects.create(
@@ -81,12 +81,12 @@ def record_change(instance, op):
 
 
 def _on_save(sender, instance, **kwargs):
-    if registry.is_syncable(sender._meta.label_lower):
+    if membership.is_syncable_model(sender):
         record_change(instance, ChangeLog.OP_UPSERT)
 
 
 def _on_delete(sender, instance, **kwargs):
-    if registry.is_syncable(sender._meta.label_lower):
+    if membership.is_syncable_model(sender):
         record_change(instance, ChangeLog.OP_DELETE)
 
 

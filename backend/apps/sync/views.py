@@ -143,8 +143,8 @@ class SyncSnapshotView(APIView):
         mismatch = _schema_mismatch(request)
         if mismatch:
             return mismatch
-        from apps.sync.snapshot import full_down_snapshot
-        entries = full_down_snapshot()
+        from apps.sync.snapshot import full_snapshot
+        entries = full_snapshot()
         cursor = ChangeLog.objects.order_by("-id").values_list("id", flat=True).first() or 0
         return Response({"changes": entries, "cursor": cursor})
 
