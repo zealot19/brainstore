@@ -9,13 +9,26 @@ ARG API_URL=/api/v1
 ARG ONLINE_COMPANY_ID=00000000-0000-0000-0000-000000000000
 
 WORKDIR /src/angular
-COPY angular/ /src/angular/
+
+# Réseau lent/instable : plus de tentatives et de patience pour npm (évite ECONNRESET).
+RUN npm config set fetch-retries 5 \
+ && npm config set fetch-retry-mintimeout 20000 \
+ && npm config set fetch-retry-maxtimeout 120000 \
+ && npm config set fetch-timeout 600000
+
+# Dépendances d'abord : couche mise en cache tant que package*.json ne change pas
+# → un rebuild ne re-télécharge pas tout (précieux sur réseau lent).
+COPY angular/package.json angular/package-lock.json ./
+RUN npm ci
+
+# Puis le reste du code source.
+COPY angular/ ./
 
 # Injecter la config de prod (apiUrl relatif + institution de la réservation en ligne).
 RUN printf "export const environment = {\n  production: true,\n  apiUrl: '%s',\n  onlineCompanyId: '%s',\n};\n" \
     "${API_URL}" "${ONLINE_COMPANY_ID}" > src/environments/environment.prod.ts
 
-RUN npm ci && npx ng build --configuration production
+RUN npx ng build --configuration production
 
 # ── Étape service ─────────────────────────────────────────────────────────────
 FROM nginx:1.27-alpine
