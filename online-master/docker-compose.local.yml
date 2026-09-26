@@ -1,0 +1,43 @@
+# ERP master — variante CODE LOCAL (aucun clone GitHub, aucun token requis).
+# Le code est pris depuis le dépôt déjà présent sur la machine (contexte = racine ..).
+# Lancer DEPUIS online-master/ :
+#   docker compose -f docker-compose.local.yml up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:                    # Django + Gunicorn (migrate au démarrage)
+    build:
+      context: ..             # racine du dépôt (contient backend/ et angular/)
+      dockerfile: online-master/Dockerfile.backend.local
+    image: erp-backend-online
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/src/backend/media
+    depends_on:
+      - db
+
+  frontend:                   # Angular servi par nginx (+ proxy /api vers backend)
+    build:
+      context: ..
+      dockerfile: online-master/Dockerfile.frontend.local
+      args:
+        API_URL: /api/v1
+        ONLINE_COMPANY_ID: ${ONLINE_COMPANY_ID}
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  media:

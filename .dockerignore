@@ -1,0 +1,15 @@
+# Utilisé quand le contexte de build = racine du dépôt (builds *.local).
+# Évite d'envoyer 1 Go+ inutile (venv, node_modules, .git) au démon Docker.
+.git/
+env/
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+angular/node_modules/
+angular/dist/
+angular/.angular/
+backend/media/
+**/*.sqlite3
+deploy/
+docs/
+graphify-out/

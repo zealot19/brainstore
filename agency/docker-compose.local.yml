@@ -1,0 +1,60 @@
+# ERP agence — variante CODE LOCAL (aucun clone GitHub, aucun token requis).
+# Le code est pris depuis le dépôt déjà présent sur la machine (contexte = racine ..).
+# Lancer DEPUIS agency/ :
+#   docker compose -f docker-compose.local.yml up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:                    # Django + Gunicorn (migrate au démarrage)
+    build:
+      context: ..             # racine du dépôt (contient backend/ et angular/)
+      dockerfile: agency/Dockerfile.backend.local
+    image: erp-backend-agency
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/src/backend/media
+    depends_on:
+      - db
+
+  frontend:                   # Angular servi par nginx (+ proxy /api vers backend)
+    build:
+      context: ..
+      dockerfile: agency/Dockerfile.frontend.local
+      args:
+        API_URL: /api/v1
+        ONLINE_COMPANY_ID: ${ONLINE_COMPANY_ID}
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+  # ── Synchronisation agence ↔ master (réutilisent l'image backend) ──
+  sync_worker:                # pousse les ventes ↑ / tire la config ↓
+    image: erp-backend-agency
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py sync_once || true; sleep ${SYNC_INTERVAL:-90}; done'
+    depends_on:
+      - backend
+
+  reserve_worker:             # heartbeat + réservations en ligne relayées
+    image: erp-backend-agency
+    restart: unless-stopped
+    env_file: .env
+    command: sh -c 'while true; do python manage.py reserve_worker || true; sleep ${RESERVE_INTERVAL:-20}; done'
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  media:
