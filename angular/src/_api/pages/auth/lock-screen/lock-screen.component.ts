@@ -60,6 +60,12 @@ export class LockScreenComponent implements OnInit {
     });
   }
 
+  /** Quitte le verrouillage et retourne à la page de connexion (session effacée). */
+  backToLogin(): void {
+    this.tokenService.clearTokens();   // efface tokens + profil en cache
+    this.router.navigate(['/signin']);
+  }
+
   get userInitials(): string {
     if (!this.user) return '?';
     return `${this.user.first_name?.[0] ?? ''}${this.user.last_name?.[0] ?? ''}`.toUpperCase();

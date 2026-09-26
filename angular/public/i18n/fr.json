@@ -2398,6 +2398,7 @@
     "welcome_back": "Bon retour !",
     "password_ph": "Saisissez votre mot de passe",
     "login_btn": "Se connecter",
+    "back_to_login": "Revenir à la page de connexion",
     "twostep_title": "Vérification en 2 étapes",
     "twostep_subtitle": "Saisissez le code à 6 chiffres de votre application d'authentification.",
     "verify": "Vérifier",

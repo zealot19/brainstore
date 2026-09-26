@@ -2398,6 +2398,7 @@
     "welcome_back": "Bem-vindo de volta!",
     "password_ph": "Introduza a sua palavra-passe",
     "login_btn": "Iniciar sessão",
+    "back_to_login": "Voltar à página de início de sessão",
     "twostep_title": "Verificação em 2 passos",
     "twostep_subtitle": "Introduza o código de 6 dígitos da sua aplicação de autenticação.",
     "verify": "Verificar",
