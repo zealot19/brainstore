@@ -13,7 +13,7 @@ import uuid
 from threading import local
 
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_migrate, post_migrate
 from django.utils import timezone
 
 from apps.sync import registry
@@ -90,6 +90,22 @@ def _on_delete(sender, instance, **kwargs):
         record_change(instance, ChangeLog.OP_DELETE)
 
 
+# ── Suspension pendant les migrations ────────────────────────────────────────
+# Django émet pre_migrate avant d'appliquer le plan et post_migrate après. Les
+# seeds de migration (RBAC, OHADA, …) ne sont PAS des changements incrémentaux —
+# ils font partie du snapshot de base (tiré par bootstrap_from_master). Les
+# capturer échouerait d'ailleurs sur une base neuve (table sync_changelog pas
+# encore créée). On suspend donc la capture le temps du `migrate`.
+def _suspend_for_migrate(**kwargs):
+    _state.suspended = True
+
+
+def _resume_after_migrate(**kwargs):
+    _state.suspended = False
+
+
 def connect():
     post_save.connect(_on_save, dispatch_uid="sync_capture_save")
     post_delete.connect(_on_delete, dispatch_uid="sync_capture_delete")
+    pre_migrate.connect(_suspend_for_migrate, dispatch_uid="sync_capture_pre_migrate")
+    post_migrate.connect(_resume_after_migrate, dispatch_uid="sync_capture_post_migrate")
