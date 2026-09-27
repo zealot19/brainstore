@@ -13,11 +13,15 @@ import uuid
 from threading import local
 
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete, pre_migrate, post_migrate
+from django.db.models import ForeignKey
+from django.db.models.signals import post_save, post_delete, pre_migrate, post_migrate, m2m_changed
 from django.utils import timezone
 
 from apps.sync import membership
 from apps.sync.models import ChangeLog
+
+# Namespace fixe pour dériver un object_id (UUID) stable d'un lien M2M (couple de FK).
+_M2M_NS = uuid.UUID("9d1e7c40-2f6b-5a8c-b3d4-6e0a1f2c3d4e")
 
 _state = local()
 
@@ -90,6 +94,46 @@ def _on_delete(sender, instance, **kwargs):
         record_change(instance, ChangeLog.OP_DELETE)
 
 
+# ── Liens M2M (tables de liaison auto-créées) ────────────────────────────────
+# PK bigint non fiable entre instances -> on identifie le lien par le COUPLE de FK
+# et on dérive un object_id (UUID) stable de ce couple.
+def m2m_object_id(label: str, ids: dict) -> str:
+    key = label + "|" + "|".join(f"{k}={ids[k]}" for k in sorted(ids))
+    return str(uuid.uuid5(_M2M_NS, key))
+
+
+def record_m2m(through, ids: dict, op):
+    if not getattr(settings, "SYNC_ENABLED", False) or _suspended():
+        return None
+    label = through._meta.label_lower
+    return ChangeLog.objects.create(
+        entity=label, object_id=m2m_object_id(label, ids), op=op,
+        payload=ids, version=timezone.now(), origin_node=_node(),
+    )
+
+
+def _on_m2m_changed(sender, instance, action, pk_set, model, **kwargs):
+    # sender = table de liaison ; instance = objet modifié ; pk_set = pk de l'autre côté.
+    if action not in ("post_add", "post_remove"):
+        return
+    if not membership.is_syncable_m2m(sender):
+        return
+    fks = [f for f in sender._meta.concrete_fields if isinstance(f, ForeignKey)]
+    if len(fks) != 2:
+        return
+    inst_cm = type(instance)._meta.concrete_model
+    op = ChangeLog.OP_UPSERT if action == "post_add" else ChangeLog.OP_DELETE
+    for pk in (pk_set or set()):
+        ids = {}
+        for f in fks:
+            if f.related_model._meta.concrete_model == inst_cm and f.attname not in ids:
+                ids[f.attname] = str(instance.pk)
+            else:
+                ids[f.attname] = str(pk)
+        if len(ids) == 2:
+            record_m2m(sender, ids, op)
+
+
 # ── Suspension pendant les migrations ────────────────────────────────────────
 # Django émet pre_migrate avant d'appliquer le plan et post_migrate après. Les
 # seeds de migration (RBAC, OHADA, …) ne sont PAS des changements incrémentaux —
@@ -107,5 +151,6 @@ def _resume_after_migrate(**kwargs):
 def connect():
     post_save.connect(_on_save, dispatch_uid="sync_capture_save")
     post_delete.connect(_on_delete, dispatch_uid="sync_capture_delete")
+    m2m_changed.connect(_on_m2m_changed, dispatch_uid="sync_capture_m2m")
     pre_migrate.connect(_suspend_for_migrate, dispatch_uid="sync_capture_pre_migrate")
     post_migrate.connect(_resume_after_migrate, dispatch_uid="sync_capture_post_migrate")

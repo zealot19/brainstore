@@ -5,10 +5,28 @@ can't be replayed from it — a new agency is seeded from a full snapshot instea
 Emitted in registration order, which is FK-dependency order.
 """
 from django.apps import apps as django_apps
+from django.db.models import ForeignKey
 
 from apps.sync import registry, membership
-from apps.sync.capture import snapshot as row_snapshot
+from apps.sync.capture import snapshot as row_snapshot, m2m_object_id
 from apps.sync.models import ChangeLog
+
+
+def _emit_m2m(through) -> list[dict]:
+    """Lignes de liaison M2M (couple de FK) — object_id dérivé du couple."""
+    label = through._meta.label_lower
+    fk_attnames = [f.attname for f in through._meta.concrete_fields if isinstance(f, ForeignKey)]
+    out = []
+    for row in through._default_manager.all():
+        ids = {a: str(getattr(row, a)) for a in fk_attnames}
+        out.append({
+            "entity": label,
+            "object_id": m2m_object_id(label, ids),
+            "op": ChangeLog.OP_UPSERT,
+            "payload": ids,
+            "version": None,
+        })
+    return out
 
 
 def _emit(model) -> list[dict]:
@@ -34,6 +52,8 @@ def full_snapshot() -> list[dict]:
     entries = []
     for model in membership.syncable_models():
         entries.extend(_emit(model))
+    for through in membership.syncable_m2m_throughs():   # liens M2M (ex. gestionnaires de caisse)
+        entries.extend(_emit_m2m(through))
     return entries
 
 

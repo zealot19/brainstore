@@ -34,7 +34,36 @@ def is_syncable_model(model) -> bool:
         return False
     if meta.label_lower in BLOCKLIST_MODELS:
         return False
+    if getattr(meta, "auto_created", False):   # table de liaison M2M : voie dédiée
+        return False
     return True
+
+
+def is_syncable_m2m(through) -> bool:
+    """Table de liaison M2M synchronisable : non exclue par la deny-list ET ses
+    deux extrémités (FK) sont elles-mêmes synchronisables."""
+    from django.db.models import ForeignKey
+    meta = through._meta
+    if meta.app_label in BLOCKLIST_APPS or meta.label_lower in BLOCKLIST_MODELS:
+        return False
+    for f in meta.concrete_fields:
+        if isinstance(f, ForeignKey) and not is_syncable_model(f.related_model):
+            return False
+    return True
+
+
+def syncable_m2m_throughs():
+    """Tables de liaison M2M auto-créées à synchroniser (une seule fois chacune)."""
+    seen, out = set(), []
+    for m in syncable_models():
+        for field in m._meta.many_to_many:
+            through = field.remote_field.through
+            lbl = through._meta.label_lower
+            if getattr(through._meta, "auto_created", False) and lbl not in seen \
+                    and is_syncable_m2m(through):
+                seen.add(lbl)
+                out.append(through)
+    return out
 
 
 def is_syncable(label: str) -> bool:

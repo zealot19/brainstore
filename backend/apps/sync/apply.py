@@ -59,9 +59,30 @@ def _incoming_dt(entry):
     return v
 
 
+def _apply_m2m(model, entry) -> str:
+    """Table de liaison M2M auto-créée (PK bigint non fiable entre instances) :
+    on identifie la ligne par le COUPLE de FK et on upsert/supprime par ce couple."""
+    payload = entry.get("payload") or {}
+    fks = [f for f in model._meta.concrete_fields if isinstance(f, ForeignKey)]
+    keys = {}
+    for f in fks:
+        raw = payload.get(f.attname)
+        if raw in (None, ""):
+            return "ignored"
+        keys[f.attname] = _to_python(f, raw)
+    with suspend_capture():
+        if entry["op"] == "delete":
+            model._default_manager.filter(**keys).delete()
+            return "applied"
+        model._default_manager.get_or_create(**keys)
+        return "applied"
+
+
 def apply_change(entry) -> str:
     """Apply one change entry. Returns 'applied' | 'skipped' | 'ignored'."""
     model = django_apps.get_model(entry["entity"])
+    if getattr(model._meta, "auto_created", False):   # M2M through table
+        return _apply_m2m(model, entry)
     pk = entry["object_id"]
     op = entry["op"]
     manager = getattr(model, "all_objects", None) or model._default_manager
