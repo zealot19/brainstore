@@ -10,6 +10,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import ForeignKey
 from django.utils.dateparse import parse_datetime
 
+from apps.sync import membership
 from apps.sync.capture import suspend_capture
 
 
@@ -108,7 +109,14 @@ def apply_change(entry) -> str:
             f = _field_by_attname(model, attname)
             if f is None:
                 continue
-            defaults[attname] = _to_python(f, raw)
+            val = _to_python(f, raw)
+            # FK vers une cible NON synchronisée (pile héritée morte, contenttype…) :
+            # la ligne n'existera jamais localement -> on annule le lien s'il est
+            # nullable (évite une violation de FK au commit). Sinon on le garde.
+            if isinstance(f, ForeignKey) and val is not None and f.null \
+                    and not membership.is_syncable_model(f.related_model):
+                val = None
+            defaults[attname] = val
 
         local = manager.filter(pk=pk).first()
         if local is not None:

@@ -22,6 +22,8 @@ BLOCKLIST_APPS = {
 BLOCKLIST_MODELS = {
     "core.auditlog",                          # journal d'audit propre à l'instance
     "core.sequence",                          # compteurs de numérotation par instance
+    "core.attachment",                        # GenericForeignKey (content_type = PK entier
+                                              # par instance, non synchronisé) + fichier média
     "authentication.loginattempt",
     "authentication.usersession",
     "authentication.passwordresettoken",
