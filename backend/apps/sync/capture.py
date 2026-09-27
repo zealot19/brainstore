@@ -6,6 +6,7 @@ events (Django fires post_delete per row for both instance and QuerySet deletes)
 Bulk `.update()` bypasses signals, so those paths call `record_change` explicitly
 (see set_seats_status / soft_delete_qs consumers).
 """
+import base64
 import contextlib
 import datetime
 import decimal
@@ -13,9 +14,13 @@ import uuid
 from threading import local
 
 from django.conf import settings
-from django.db.models import ForeignKey
+from django.db.models import ForeignKey, FileField
 from django.db.models.signals import post_save, post_delete, pre_migrate, post_migrate, m2m_changed
 from django.utils import timezone
+
+# Taille max d'un fichier média embarqué dans un changement (logos, avatars…).
+# Au-delà, seul le chemin est synchronisé (le fichier suit un autre canal).
+_MEDIA_CAP = 3 * 1024 * 1024
 
 from apps.sync import membership
 from apps.sync.models import ChangeLog
@@ -56,11 +61,32 @@ def _json_safe(v):
         return str(v)
 
 
+def _media_for(instance) -> dict:
+    """Fichiers média du row (FileField/ImageField non vides, < _MEDIA_CAP) encodés
+    en base64, pour reconstituer le fichier à l'identique sur l'autre instance
+    (les fichiers ne sont pas synchronisés autrement)."""
+    out = {}
+    for f in instance._meta.concrete_fields:
+        if isinstance(f, FileField):
+            ff = getattr(instance, f.attname, None)
+            if ff and getattr(ff, "name", ""):
+                try:
+                    ff.open("rb"); data = ff.read(); ff.close()
+                except Exception:
+                    continue
+                if 0 < len(data) <= _MEDIA_CAP:
+                    out[f.attname] = {"name": ff.name, "b64": base64.b64encode(data).decode()}
+    return out
+
+
 def snapshot(instance) -> dict:
     """Full-row snapshot keyed by field attname (FKs become '<field>_id')."""
     data = {}
     for f in instance._meta.concrete_fields:
         data[f.attname] = _json_safe(f.value_from_object(instance))
+    media = _media_for(instance)
+    if media:
+        data["__media__"] = media          # clé hors-champ ; ignorée par la boucle d'apply
     return data
 
 
@@ -114,7 +140,7 @@ def record_m2m(through, ids: dict, op):
 
 def _on_m2m_changed(sender, instance, action, pk_set, model, **kwargs):
     # sender = table de liaison ; instance = objet modifié ; pk_set = pk de l'autre côté.
-    if action not in ("post_add", "post_remove"):
+    if action not in ("post_add", "post_remove", "pre_clear"):
         return
     if not membership.is_syncable_m2m(sender):
         return
@@ -122,16 +148,23 @@ def _on_m2m_changed(sender, instance, action, pk_set, model, **kwargs):
     if len(fks) != 2:
         return
     inst_cm = type(instance)._meta.concrete_model
+    inst_fk = next((f for f in fks if f.related_model._meta.concrete_model == inst_cm), None)
+    other_fk = next((f for f in fks if f is not inst_fk), None)
+    if inst_fk is None or other_fk is None:
+        return
+
+    if action == "pre_clear":
+        # .clear() ne fournit pas de pk_set : on lit les liens encore présents et on
+        # émet un delete pour chacun (post_clear serait trop tard, ils auraient disparu).
+        for row in sender._default_manager.filter(**{inst_fk.attname: instance.pk}):
+            ids = {inst_fk.attname: str(instance.pk),
+                   other_fk.attname: str(getattr(row, other_fk.attname))}
+            record_m2m(sender, ids, ChangeLog.OP_DELETE)
+        return
+
     op = ChangeLog.OP_UPSERT if action == "post_add" else ChangeLog.OP_DELETE
     for pk in (pk_set or set()):
-        ids = {}
-        for f in fks:
-            if f.related_model._meta.concrete_model == inst_cm and f.attname not in ids:
-                ids[f.attname] = str(instance.pk)
-            else:
-                ids[f.attname] = str(pk)
-        if len(ids) == 2:
-            record_m2m(sender, ids, op)
+        record_m2m(sender, {inst_fk.attname: str(instance.pk), other_fk.attname: str(pk)}, op)
 
 
 # ── Suspension pendant les migrations ────────────────────────────────────────

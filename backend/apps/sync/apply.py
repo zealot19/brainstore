@@ -5,13 +5,40 @@ local ChangeLog entry (no echo loop). Upserts by UUID; preserves the incoming
 `updated_at` (via QuerySet.update, which bypasses auto_now) so watermarks and
 last-write-wins conflict resolution stay coherent.
 """
+import base64
+import os
+
 from django.apps import apps as django_apps
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import ForeignKey
 from django.utils.dateparse import parse_datetime
 
 from apps.sync import membership
 from apps.sync.capture import suspend_capture
+
+
+def _write_media(payload):
+    """Écrit les fichiers média embarqués (base64) dans le MEDIA_ROOT local, au même
+    chemin relatif que la source -> le FileField (dont le chemin est déjà appliqué)
+    résout un vrai fichier côté agence. Idempotent (n'écrase pas un fichier existant)."""
+    media = (payload or {}).get("__media__") or {}
+    root = getattr(settings, "MEDIA_ROOT", "")
+    if not root or not media:
+        return
+    for info in media.values():
+        name, b64 = info.get("name"), info.get("b64")
+        if not name or not b64:
+            continue
+        path = os.path.join(str(root), name)
+        if os.path.exists(path):
+            continue
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as fh:
+                fh.write(base64.b64decode(b64))
+        except Exception:
+            pass
 
 
 def _unique_conflict(model, manager, defaults):
@@ -117,6 +144,8 @@ def apply_change(entry) -> str:
                     and not membership.is_syncable_model(f.related_model):
                 val = None
             defaults[attname] = val
+
+        _write_media(payload)   # reconstitue les fichiers média (logos…) localement
 
         local = manager.filter(pk=pk).first()
         if local is not None:
