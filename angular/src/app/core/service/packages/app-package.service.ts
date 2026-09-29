@@ -14,7 +14,7 @@ export interface AppPackage {
 const KEY = 'activePackage';
 
 @Injectable({ providedIn: 'root' })
-export class PackageService {
+export class AppPackageService {
   activePackage = signal<AppPackage | null>(this.read());
 
   constructor(private http: HttpClient) {}
