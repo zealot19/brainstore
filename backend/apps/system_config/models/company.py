@@ -68,6 +68,10 @@ class Company(BaseModel):
                                          default="OHADA",
                                          help_text=_("OHADA, SYSCOHADA, PCG, IFRS…"))
 
+    # ── Packages accordés ────────────────────────────────────────────────
+    pkg_transport  = models.BooleanField(_("package Transport"),    default=True)
+    pkg_accounting = models.BooleanField(_("package Comptabilité"), default=True)
+
     # ── Plan & statut ────────────────────────────────────────────────────
     plan = models.ForeignKey(
         "system_config.Plan", verbose_name=_("plan"),

@@ -16,8 +16,6 @@ class PlanSerializer(serializers.ModelSerializer):
             "max_users", "max_agencies", "max_storage_gb",
             "price_monthly", "price_yearly", "sort_order",
             "has_api_access", "has_multi_agency", "has_advanced_reports", "has_sso",
-            "has_administration", "has_fleet", "has_voyages", "has_colis",
-            "has_bagages", "has_treasury", "has_accounting", "has_reporting",
             "is_active",
         ]
 
@@ -30,8 +28,6 @@ class PlanWriteSerializer(serializers.ModelSerializer):
             "max_users", "max_agencies", "max_storage_gb",
             "price_monthly", "price_yearly", "sort_order",
             "has_api_access", "has_multi_agency", "has_advanced_reports", "has_sso",
-            "has_administration", "has_fleet", "has_voyages", "has_colis",
-            "has_bagages", "has_treasury", "has_accounting", "has_reporting",
             "is_active",
         ]
 
