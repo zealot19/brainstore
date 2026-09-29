@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Package, Company, Subscription, Agency, Parameter, FeatureFlag
+from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag
 
 
-@admin.register(Package)
-class PackageAdmin(admin.ModelAdmin):
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
     list_display = ["name", "tier", "max_users", "max_agencies", "price_monthly", "is_active"]
     list_filter  = ["tier", "is_active"]
 
@@ -12,13 +12,13 @@ class PackageAdmin(admin.ModelAdmin):
 class SubscriptionInline(admin.TabularInline):
     model = Subscription
     extra = 0
-    fields = ["package", "status", "billing_cycle", "started_at", "expires_at"]
+    fields = ["plan", "status", "billing_cycle", "started_at", "expires_at"]
 
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display  = ["name", "slug", "status", "package", "country", "created_at"]
-    list_filter   = ["status", "country", "package"]
+    list_display  = ["name", "slug", "status", "plan", "country", "created_at"]
+    list_filter   = ["status", "country", "plan"]
     search_fields = ["name", "slug", "tax_id", "rccm"]
     inlines       = [SubscriptionInline]
     readonly_fields = ["slug", "created_at", "updated_at"]

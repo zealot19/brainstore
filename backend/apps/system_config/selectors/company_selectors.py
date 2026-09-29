@@ -4,17 +4,17 @@ from ..models import Company, Subscription
 
 def get_company(company_id):
     return (
-        Company.objects.select_related("package", "address", "currency")
+        Company.objects.select_related("plan", "address", "currency")
         .get(id=company_id, is_deleted=False)
     )
 
 
-def list_companies(*, status=None, package_id=None, search=None):
-    qs = Company.objects.select_related("package").filter(is_deleted=False)
+def list_companies(*, status=None, plan_id=None, search=None):
+    qs = Company.objects.select_related("plan").filter(is_deleted=False)
     if status:
         qs = qs.filter(status=status)
-    if package_id:
-        qs = qs.filter(package_id=package_id)
+    if plan_id:
+        qs = qs.filter(plan_id=plan_id)
     if search:
         qs = qs.filter(Q(name__icontains=search) | Q(slug__icontains=search) | Q(tax_id__icontains=search))
     return qs.annotate(user_count=Count("users", distinct=True), agency_count=Count("agencies", distinct=True))
@@ -40,7 +40,7 @@ def get_company_stats(company):
     return {
         "user_count":   User.objects.filter(company=company, is_active=True).count(),
         "agency_count": Agency.objects.filter(company=company, is_deleted=False).count(),
-        "package_tier": company.package.tier if company.package else None,
-        "max_users":    company.package.max_users if company.package else None,
-        "max_agencies": company.package.max_agencies if company.package else None,
+        "plan_tier":    company.plan.tier if company.plan else None,
+        "max_users":    company.plan.max_users if company.plan else None,
+        "max_agencies": company.plan.max_agencies if company.plan else None,
     }

@@ -4,32 +4,33 @@ from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
 from apps.core.exceptions import ApplicationError
-from ..models import Company, Package, Subscription
+from ..models import Company, Plan, Subscription
 
 
-# ── Package ───────────────────────────────────────────────────────────────────
+# ── Plan ──────────────────────────────────────────────────────────────────────
 
-def create_package(*, name, tier, description="", max_users=5, max_agencies=1,
-                   max_storage_gb=5, price_monthly=0, price_yearly=0,
-                   has_api_access=False, has_multi_agency=False,
-                   has_advanced_reports=False, has_sso=False, sort_order=0):
-    if Package.objects.filter(name__iexact=name).exists():
-        raise ApplicationError(_("Un package avec ce nom existe déjà."))
-    return Package.objects.create(
+def create_plan(*, name, tier, description="", max_users=5, max_agencies=1,
+                max_storage_gb=5, price_monthly=0, price_yearly=0,
+                has_api_access=False, has_multi_agency=False,
+                has_advanced_reports=False, has_sso=False, sort_order=0,
+                is_active=True, **kwargs):
+    if Plan.objects.filter(name__iexact=name).exists():
+        raise ApplicationError(_("Un plan avec ce nom existe déjà."))
+    return Plan.objects.create(
         name=name, tier=tier, description=description,
         max_users=max_users, max_agencies=max_agencies, max_storage_gb=max_storage_gb,
         price_monthly=price_monthly, price_yearly=price_yearly,
         has_api_access=has_api_access, has_multi_agency=has_multi_agency,
         has_advanced_reports=has_advanced_reports, has_sso=has_sso,
-        sort_order=sort_order,
+        sort_order=sort_order, is_active=is_active,
     )
 
 
-def update_package(package, **fields):
+def update_plan(plan, **fields):
     for key, value in fields.items():
-        setattr(package, key, value)
-    package.save()
-    return package
+        setattr(plan, key, value)
+    plan.save()
+    return plan
 
 
 # ── Company ───────────────────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ def _unique_slug(name):
 
 
 @transaction.atomic
-def create_company(*, name, package=None, package_id=None, legal_form="", country="CI",
+def create_company(*, name, plan=None, plan_id=None, legal_form="", country="CI",
                    language_code="fr", timezone="Africa/Abidjan",
                    email="", phone="", website="", tax_id="", rccm="",
                    cnps_number="", vat_number="", capital=None,
@@ -56,11 +57,11 @@ def create_company(*, name, package=None, package_id=None, legal_form="", countr
                    admin_email="", admin_first_name="", admin_last_name="",
                    created_by=None):
     slug = _unique_slug(name)
-    if package is None and package_id:
+    if plan is None and plan_id:
         try:
-            package = Package.objects.get(id=package_id, is_active=True)
-        except Package.DoesNotExist:
-            raise ApplicationError(_("Package introuvable ou inactif."))
+            plan = Plan.objects.get(id=plan_id, is_active=True)
+        except Plan.DoesNotExist:
+            raise ApplicationError(_("Plan introuvable ou inactif."))
 
     if address is None and address_input and address_input.get("line1"):
         from apps.core.models import Address
@@ -71,7 +72,7 @@ def create_company(*, name, package=None, package_id=None, legal_form="", countr
         )
 
     company = Company.objects.create(
-        name=name, slug=slug, package=package,
+        name=name, slug=slug, plan=plan,
         code=code, slogan=slogan, postal_box=postal_box, logo=logo,
         legal_form=legal_form, country=country,
         language_code=language_code, timezone=timezone,
@@ -85,8 +86,8 @@ def create_company(*, name, package=None, package_id=None, legal_form="", countr
         created_by=created_by,
     )
 
-    if package:
-        _create_trial_subscription(company, package)
+    if plan:
+        _create_trial_subscription(company, plan)
 
     setup = None
     if admin_email and admin_email.strip():
@@ -198,24 +199,24 @@ def update_company(company, *, updated_by=None, **fields):
 
 
 @transaction.atomic
-def change_package(company, package_id, billing_cycle=Subscription.BillingCycle.MONTHLY,
-                   updated_by=None):
+def change_plan(company, plan_id, billing_cycle=Subscription.BillingCycle.MONTHLY,
+                updated_by=None):
     try:
-        package = Package.objects.get(id=package_id, is_active=True)
-    except Package.DoesNotExist:
-        raise ApplicationError(_("Package introuvable ou inactif."))
+        plan = Plan.objects.get(id=plan_id, is_active=True)
+    except Plan.DoesNotExist:
+        raise ApplicationError(_("Plan introuvable ou inactif."))
 
     # Clôturer l'ancienne souscription active
     Subscription.objects.filter(
         company=company, status=Subscription.Status.ACTIVE
     ).update(status=Subscription.Status.CANCELLED, updated_at=timezone.now())
 
-    company.package = package
+    company.plan = plan
     company.updated_by = updated_by
-    company.save(update_fields=["package", "updated_by", "updated_at"])
+    company.save(update_fields=["plan", "updated_by", "updated_at"])
 
     sub = Subscription.objects.create(
-        company=company, package=package,
+        company=company, plan=plan,
         status=Subscription.Status.ACTIVE,
         billing_cycle=billing_cycle,
         started_at=timezone.now().date(),
@@ -250,25 +251,25 @@ def cancel_company(company, updated_by=None):
     ]).update(status=Subscription.Status.CANCELLED, updated_at=timezone.now())
 
 
-def start_trial(company, package_id, trial_days=30, updated_by=None):
+def start_trial(company, plan_id, trial_days=30, updated_by=None):
     try:
-        package = Package.objects.get(id=package_id, is_active=True)
-    except Package.DoesNotExist:
-        raise ApplicationError(_("Package introuvable."))
+        plan = Plan.objects.get(id=plan_id, is_active=True)
+    except Plan.DoesNotExist:
+        raise ApplicationError(_("Plan introuvable."))
 
-    company.package = package
+    company.plan = plan
     company.status = Company.Status.TRIAL
     company.updated_by = updated_by
-    company.save(update_fields=["package", "status", "updated_by", "updated_at"])
-    _create_trial_subscription(company, package, trial_days=trial_days)
+    company.save(update_fields=["plan", "status", "updated_by", "updated_at"])
+    _create_trial_subscription(company, plan, trial_days=trial_days)
 
 
 # ── Helpers privés ────────────────────────────────────────────────────────────
 
-def _create_trial_subscription(company, package, trial_days=30):
+def _create_trial_subscription(company, plan, trial_days=30):
     today = timezone.now().date()
     return Subscription.objects.create(
-        company=company, package=package,
+        company=company, plan=plan,
         status=Subscription.Status.TRIAL,
         billing_cycle=Subscription.BillingCycle.MONTHLY,
         started_at=today,

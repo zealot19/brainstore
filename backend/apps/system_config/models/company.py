@@ -68,9 +68,9 @@ class Company(BaseModel):
                                          default="OHADA",
                                          help_text=_("OHADA, SYSCOHADA, PCG, IFRS…"))
 
-    # ── Package & statut ─────────────────────────────────────────────────
-    package = models.ForeignKey(
-        "system_config.Package", verbose_name=_("package"),
+    # ── Plan & statut ────────────────────────────────────────────────────
+    plan = models.ForeignKey(
+        "system_config.Plan", verbose_name=_("plan"),
         on_delete=models.PROTECT, null=True, blank=True, related_name="companies",
     )
     status         = models.CharField(_("statut"), max_length=20,
@@ -91,7 +91,7 @@ class Company(BaseModel):
 
 
 class Subscription(BaseModel):
-    """Souscription active d'une institution à un package."""
+    """Souscription active d'une institution à un plan."""
 
     class BillingCycle(models.TextChoices):
         MONTHLY   = "monthly",   _("Mensuel")
@@ -107,7 +107,7 @@ class Subscription(BaseModel):
 
     company       = models.ForeignKey(Company, verbose_name=_("institution"),
                                       on_delete=models.CASCADE, related_name="subscriptions")
-    package       = models.ForeignKey("system_config.Package", verbose_name=_("package"),
+    plan          = models.ForeignKey("system_config.Plan", verbose_name=_("plan"),
                                       on_delete=models.PROTECT)
     status        = models.CharField(_("statut"), max_length=20,
                                      choices=Status.choices, default=Status.TRIAL)
@@ -123,4 +123,4 @@ class Subscription(BaseModel):
         ordering            = ["-started_at"]
 
     def __str__(self):
-        return f"{self.company} — {self.package} ({self.status})"
+        return f"{self.company} — {self.plan} ({self.status})"

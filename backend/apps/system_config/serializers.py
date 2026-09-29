@@ -1,16 +1,16 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from apps.core.models import Currency
-from .models import Package, Company, Subscription, Agency, Parameter, FeatureFlag
+from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PACKAGE
+# PLAN
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class PackageSerializer(serializers.ModelSerializer):
+class PlanSerializer(serializers.ModelSerializer):
     class Meta:
-        model  = Package
+        model  = Plan
         fields = [
             "id", "name", "tier", "description",
             "max_users", "max_agencies", "max_storage_gb",
@@ -22,9 +22,9 @@ class PackageSerializer(serializers.ModelSerializer):
         ]
 
 
-class PackageWriteSerializer(serializers.ModelSerializer):
+class PlanWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model  = Package
+        model  = Plan
         fields = [
             "name", "tier", "description",
             "max_users", "max_agencies", "max_storage_gb",
@@ -41,13 +41,13 @@ class PackageWriteSerializer(serializers.ModelSerializer):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    package_name = serializers.CharField(source="package.name", read_only=True)
-    package_tier = serializers.CharField(source="package.tier", read_only=True)
+    plan_name = serializers.CharField(source="plan.name", read_only=True)
+    plan_tier = serializers.CharField(source="plan.tier", read_only=True)
 
     class Meta:
         model  = Subscription
         fields = [
-            "id", "package", "package_name", "package_tier",
+            "id", "plan", "plan_name", "plan_tier",
             "status", "billing_cycle",
             "started_at", "expires_at", "trial_ends_at",
             "created_at",
@@ -58,7 +58,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class SubscriptionWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Subscription
-        fields = ["package", "billing_cycle", "started_at", "expires_at", "trial_ends_at"]
+        fields = ["plan", "billing_cycle", "started_at", "expires_at", "trial_ends_at"]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -66,7 +66,7 @@ class SubscriptionWriteSerializer(serializers.ModelSerializer):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class CompanyListSerializer(serializers.ModelSerializer):
-    package_name  = serializers.CharField(source="package.name", read_only=True)
+    plan_name     = serializers.CharField(source="plan.name", read_only=True)
     currency_code = serializers.SlugRelatedField(source="currency", slug_field="code", read_only=True)
     address_line  = serializers.CharField(source="address.line1", read_only=True)
     user_count    = serializers.IntegerField(read_only=True, default=0)
@@ -78,7 +78,7 @@ class CompanyListSerializer(serializers.ModelSerializer):
             "id", "name", "code", "slug", "logo", "slogan", "is_active",
             "country", "language_code",
             "legal_form", "capital", "rccm", "tax_id", "cnps_number", "vat_number",
-            "package", "package_name", "currency_code",
+            "plan", "plan_name", "currency_code",
             "address_line", "postal_box",
             "user_count", "agency_count",
             "email", "phone", "website", "created_at",
@@ -86,7 +86,7 @@ class CompanyListSerializer(serializers.ModelSerializer):
 
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
-    package_name        = serializers.CharField(source="package.name", read_only=True)
+    plan_name           = serializers.CharField(source="plan.name", read_only=True)
     active_subscription = serializers.SerializerMethodField()
     is_operational      = serializers.BooleanField(read_only=True)
 
@@ -98,7 +98,7 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
             "email", "phone", "website",
             "country", "language_code", "timezone", "currency",
             "fiscal_year_start", "fiscal_year_end", "accounting_plan",
-            "package", "package_name", "status", "suspension_reason", "suspended_at",
+            "plan", "plan_name", "status", "suspension_reason", "suspended_at",
             "active_subscription", "is_operational",
             "is_active", "created_at", "updated_at",
         ]
@@ -121,8 +121,8 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         slug_field="code", queryset=Currency.objects.all(),
         allow_null=True, required=False,
     )
-    package = serializers.PrimaryKeyRelatedField(
-        queryset=Package.objects.all(), allow_null=True, required=False,
+    plan = serializers.PrimaryKeyRelatedField(
+        queryset=Plan.objects.all(), allow_null=True, required=False,
     )
     address_input = _AddressInputSerializer(write_only=True, required=False)
 
@@ -139,7 +139,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             "email", "phone", "website", "postal_box",
             "country", "language_code", "timezone", "currency",
             "fiscal_year_start", "fiscal_year_end", "accounting_plan",
-            "package", "is_active", "address_input",
+            "plan", "is_active", "address_input",
             "admin_email", "admin_first_name", "admin_last_name",
         ]
 
@@ -183,8 +183,8 @@ class CompanySuspendSerializer(serializers.Serializer):
     reason = serializers.CharField(label=_("Raison"), required=False, allow_blank=True, default="")
 
 
-class ChangePackageSerializer(serializers.Serializer):
-    package_id    = serializers.UUIDField(label=_("ID du package"))
+class ChangePlanSerializer(serializers.Serializer):
+    plan_id       = serializers.UUIDField(label=_("ID du plan"))
     billing_cycle = serializers.ChoiceField(
         label=_("Cycle de facturation"),
         choices=Subscription.BillingCycle.choices,

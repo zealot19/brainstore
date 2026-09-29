@@ -2,11 +2,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # ── Packages ──────────────────────────────────────────────────────────────
-    path("packages/",            views.PackageListView.as_view(),        name="package-list"),
-    path("packages/<uuid:pk>/",  views.PackageDetailView.as_view(),      name="package-detail"),
-    path("packages/admin/",      views.PackageAdminView.as_view(),       name="package-admin-create"),
-    path("packages/admin/<uuid:pk>/", views.PackageAdminDetailView.as_view(), name="package-admin-detail"),
+    # ── Plans (paths stay as /packages/ for frontend/API compat) ─────────────
+    path("packages/",            views.PlanListView.as_view(),        name="package-list"),
+    path("packages/<uuid:pk>/",  views.PlanDetailView.as_view(),      name="package-detail"),
+    path("packages/admin/",      views.PlanAdminView.as_view(),       name="package-admin-create"),
+    path("packages/admin/<uuid:pk>/", views.PlanAdminDetailView.as_view(), name="package-admin-detail"),
 
     # ── Companies / Institutions ───────────────────────────────────────────────
     path("companies/",                              views.CompanyListView.as_view(),          name="company-list"),
@@ -15,7 +15,7 @@ urlpatterns = [
     path("companies/<uuid:pk>/activate/",           views.CompanyActivateView.as_view(),      name="company-activate"),
     path("companies/<uuid:pk>/cancel/",             views.CompanyCancelView.as_view(),        name="company-cancel"),
     path("companies/<uuid:pk>/stats/",              views.CompanyStatsView.as_view(),         name="company-stats"),
-    path("companies/<uuid:pk>/change-package/",     views.CompanyChangePackageView.as_view(), name="company-change-package"),
+    path("companies/<uuid:pk>/change-package/",     views.CompanyChangePlanView.as_view(),    name="company-change-package"),
     path("companies/<uuid:pk>/subscriptions/",      views.CompanySubscriptionListView.as_view(), name="company-subscriptions"),
 
     # ── Agencies ──────────────────────────────────────────────────────────────

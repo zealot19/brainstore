@@ -4,13 +4,13 @@ from ..models import Agency, Company
 
 
 def _check_agency_limit(company):
-    if not company.package:
+    if not company.plan:
         return
     current = Agency.objects.filter(company=company, is_deleted=False).count()
-    if current >= company.package.max_agencies:
+    if current >= company.plan.max_agencies:
         raise ApplicationError(
-            _("Limite d'agences atteinte (%(max)s). Passez à un package supérieur.")
-            % {"max": company.package.max_agencies}
+            _("Limite d'agences atteinte (%(max)s). Passez à un plan supérieur.")
+            % {"max": company.plan.max_agencies}
         )
 
 

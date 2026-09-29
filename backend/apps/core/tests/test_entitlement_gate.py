@@ -18,9 +18,9 @@ def test_middleware_blocks_disabled_module():
     from apps.system_config.services import create_company
     from apps.authentication.models import User
     from apps.authentication.tokens import CustomRefreshToken
-    from apps.system_config.models import Package
-    pkg = Package.objects.create(name="ColisOnly3", tier="starter", has_voyages=False)
-    company, _ = create_company(name="GC", package=pkg, admin_email="gc@x.com",
+    from apps.system_config.models import Plan
+    pkg = Plan.objects.create(name="ColisOnly3", tier="starter", has_voyages=False)
+    company, _ = create_company(name="GC", plan=pkg, admin_email="gc@x.com",
                                 admin_first_name="A", admin_last_name="B")
     admin = User.objects.get(email="gc@x.com")
     tok = str(CustomRefreshToken.for_user(admin).access_token)

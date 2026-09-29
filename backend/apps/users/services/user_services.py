@@ -24,13 +24,13 @@ def _generate_username(email: str) -> str:
 
 
 def _check_user_limit(company):
-    """Lève ApplicationError si la limite d'utilisateurs du package est atteinte."""
-    if company.package and company.package.max_users:
+    """Lève ApplicationError si la limite d'utilisateurs du plan est atteinte."""
+    if company.plan and company.plan.max_users:
         current = User.objects.filter(company=company, is_active=True).count()
-        if current >= company.package.max_users:
+        if current >= company.plan.max_users:
             raise ApplicationError(
-                _("Limite d'utilisateurs atteinte (%(max)s/%(max)s). Passez à un package supérieur.")
-                % {"max": company.package.max_users}
+                _("Limite d'utilisateurs atteinte (%(max)s/%(max)s). Passez à un plan supérieur.")
+                % {"max": company.plan.max_users}
             )
 
 

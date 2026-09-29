@@ -1,10 +1,10 @@
-from .package import Package
+from .plan import Plan
 from .company import Company, Subscription
 from .agency import Agency
 from .parameter import Parameter, FeatureFlag
 
 __all__ = [
-    "Package",
+    "Plan",
     "Company",
     "Subscription",
     "Agency",

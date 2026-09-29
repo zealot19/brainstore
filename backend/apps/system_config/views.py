@@ -10,12 +10,12 @@ from apps.core.responses import success_response, created_response, error_respon
 from apps.core.exceptions import ApplicationError
 
 from . import services, selectors
-from .models import Package, Company, Subscription, Agency, Parameter, FeatureFlag
+from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag
 from .serializers import (
-    PackageSerializer, PackageWriteSerializer,
+    PlanSerializer, PlanWriteSerializer,
     CompanyListSerializer, CompanyDetailSerializer,
     CompanyCreateSerializer, CompanyUpdateSerializer,
-    CompanySuspendSerializer, ChangePackageSerializer,
+    CompanySuspendSerializer, ChangePlanSerializer,
     SubscriptionSerializer, SubscriptionWriteSerializer,
     AgencySerializer, AgencyWriteSerializer, AgencyTreeSerializer,
     ParameterSerializer, ParameterWriteSerializer, ParameterBulkSerializer,
@@ -24,72 +24,72 @@ from .serializers import (
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PACKAGE
+# PLAN
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class PackageListView(APIView):
-    """GET /system/packages/ — liste publique des packages."""
+class PlanListView(APIView):
+    """GET /system/packages/ — liste publique des plans."""
     permission_classes = [AllowAny]
 
     def get(self, request):
-        packages = Package.active.all().order_by("sort_order")
-        return success_response(PackageSerializer(packages, many=True).data)
+        plans = Plan.active.all().order_by("sort_order")
+        return success_response(PlanSerializer(plans, many=True).data)
 
 
-class PackageDetailView(APIView):
+class PlanDetailView(APIView):
     """GET /system/packages/<id>/"""
     permission_classes = [AllowAny]
 
     def get(self, request, pk):
         try:
-            pkg = Package.objects.get(id=pk)
-        except Package.DoesNotExist:
-            return error_response(_("Package introuvable."), status_code=404)
-        return success_response(PackageSerializer(pkg).data)
+            plan = Plan.objects.get(id=pk)
+        except Plan.DoesNotExist:
+            return error_response(_("Plan introuvable."), status_code=404)
+        return success_response(PlanSerializer(plan).data)
 
 
-class PackageAdminView(APIView):
+class PlanAdminView(APIView):
     """GET (tous) / POST — SuperAdmin uniquement."""
     permission_classes = [IsSuperAdmin]
 
     def get(self, request):
-        packages = Package.objects.all().order_by("-created_at")
-        return success_response(PackageSerializer(packages, many=True).data)
+        plans = Plan.objects.all().order_by("-created_at")
+        return success_response(PlanSerializer(plans, many=True).data)
 
     def post(self, request):
-        payload = PackageWriteSerializer(data=request.data)
+        payload = PlanWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
-        pkg = services.create_package(**d)
-        return created_response(PackageSerializer(pkg).data)
+        plan = services.create_plan(**d)
+        return created_response(PlanSerializer(plan).data)
 
 
-class PackageAdminDetailView(APIView):
+class PlanAdminDetailView(APIView):
     """PATCH/DELETE /system/packages/<id>/ — SuperAdmin."""
     permission_classes = [IsSuperAdmin]
 
     def _get(self, pk):
         try:
-            return Package.objects.get(id=pk)
-        except Package.DoesNotExist:
+            return Plan.objects.get(id=pk)
+        except Plan.DoesNotExist:
             return None
 
     def patch(self, request, pk):
-        pkg = self._get(pk)
-        if not pkg:
-            return error_response(_("Package introuvable."), status_code=404)
-        payload = PackageWriteSerializer(pkg, data=request.data, partial=True)
+        plan = self._get(pk)
+        if not plan:
+            return error_response(_("Plan introuvable."), status_code=404)
+        payload = PlanWriteSerializer(plan, data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
-        pkg = services.update_package(pkg, **payload.validated_data)
-        return success_response(PackageSerializer(pkg).data)
+        plan = services.update_plan(plan, **payload.validated_data)
+        return success_response(PlanSerializer(plan).data)
 
     def delete(self, request, pk):
-        pkg = self._get(pk)
-        if not pkg:
-            return error_response(_("Package introuvable."), status_code=404)
-        pkg.is_active = False
-        pkg.save(update_fields=["is_active"])
-        return success_response(message=_("Package désactivé."))
+        plan = self._get(pk)
+        if not plan:
+            return error_response(_("Plan introuvable."), status_code=404)
+        plan.is_active = False
+        plan.save(update_fields=["is_active"])
+        return success_response(message=_("Plan désactivé."))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -103,7 +103,7 @@ class CompanyListView(APIView):
     def get(self, request):
         companies = selectors.list_companies(
             status=request.query_params.get("status"),
-            package_id=request.query_params.get("package"),
+            plan_id=request.query_params.get("plan"),
             search=request.query_params.get("search"),
         )
         return success_response(CompanyListSerializer(companies, many=True).data)
@@ -212,7 +212,7 @@ class CompanyStatsView(APIView):
         return success_response(selectors.get_company_stats(company))
 
 
-class CompanyChangePackageView(APIView):
+class CompanyChangePlanView(APIView):
     """POST /system/companies/<pk>/change-package/"""
     permission_classes = [IsSuperAdmin]
 
@@ -221,18 +221,18 @@ class CompanyChangePackageView(APIView):
             company = selectors.get_company(pk)
         except Company.DoesNotExist:
             return error_response(_("Institution introuvable."), status_code=404)
-        payload = ChangePackageSerializer(data=request.data)
+        payload = ChangePlanSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
-            sub = services.change_package(
+            sub = services.change_plan(
                 company,
-                package_id=payload.validated_data["package_id"],
+                plan_id=payload.validated_data["plan_id"],
                 billing_cycle=payload.validated_data["billing_cycle"],
                 updated_by=request.user,
             )
         except ApplicationError as e:
             return error_response(str(e), status_code=400)
-        return success_response(SubscriptionSerializer(sub).data, message=_("Package modifié."))
+        return success_response(SubscriptionSerializer(sub).data, message=_("Plan modifié."))
 
 
 # ── Subscriptions d'une company ───────────────────────────────────────────────
