@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
 from apps.core.exceptions import ApplicationError
+from apps.core.packages import all_package_codes, grant_field_for
 from ..models import Company, Plan, Subscription
 
 
@@ -55,7 +56,7 @@ def create_company(*, name, plan=None, plan_id=None, legal_form="", country="CI"
                    code="", slogan="", postal_box="", logo=None,
                    is_active=True, address=None, address_input=None,
                    admin_email="", admin_first_name="", admin_last_name="",
-                   created_by=None):
+                   created_by=None, packages=None):
     slug = _unique_slug(name)
     if plan is None and plan_id:
         try:
@@ -85,6 +86,18 @@ def create_company(*, name, plan=None, plan_id=None, legal_form="", country="CI"
         status=Company.Status.DRAFT,
         created_by=created_by,
     )
+
+    if packages is not None:
+        selected = set(packages) | {"administration"}   # administration toujours inclus
+        updates = {}
+        for code in all_package_codes():
+            field = grant_field_for(code)
+            if field:                                    # skip always-on
+                updates[field] = code in selected
+        if updates:
+            for k, v in updates.items():
+                setattr(company, k, v)
+            company.save(update_fields=list(updates))
 
     if plan:
         _create_trial_subscription(company, plan)

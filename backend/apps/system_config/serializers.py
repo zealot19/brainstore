@@ -127,6 +127,9 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     admin_first_name = serializers.CharField(max_length=150, write_only=True, required=False, allow_blank=True)
     admin_last_name  = serializers.CharField(max_length=150, write_only=True, required=False, allow_blank=True)
 
+    # Packages accordés à la création (Administration toujours forcé)
+    packages = serializers.ListField(child=serializers.CharField(), required=False)
+
     class Meta:
         model  = Company
         fields = [
@@ -137,6 +140,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             "fiscal_year_start", "fiscal_year_end", "accounting_plan",
             "plan", "is_active", "address_input",
             "admin_email", "admin_first_name", "admin_last_name",
+            "packages",
         ]
 
     def validate_name(self, value):
