@@ -36,6 +36,9 @@ export const routes={
 
   //FEATURES//
 
+  // Apps launcher
+  appsLauncher: '/apps',
+
   //dashboard
   index:'/dashboard/index',
   adminDashboard:'/dashboard/admin-dashboard',
