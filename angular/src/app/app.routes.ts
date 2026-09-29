@@ -1,11 +1,18 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../_api/guards/auth.guard';
 
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard/index',
+    redirectTo: 'apps',
     pathMatch: 'full'
+  },
+  // Apps launcher
+  {
+    path: 'apps',
+    canActivate: [authGuard],
+    loadComponent: () => import('../_api/pages/apps/apps-launcher.component').then(m => m.AppsLauncherComponent),
   },
   //Auth
   {path:'',loadChildren: () => import('./features/auth/auth.routes').then((m) => m.Auth_routes,)},

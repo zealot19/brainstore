@@ -20,7 +20,7 @@ export class SigninComponent implements OnInit {
   loading      = false;
   errorMsg     = '';
 
-  private returnUrl = '/dashboard/index';
+  private returnUrl = '/apps';
 
   constructor(
     private fb:          FormBuilder,
@@ -36,7 +36,7 @@ export class SigninComponent implements OnInit {
       identifier: ['', Validators.required],
       password:   ['', Validators.required],
     });
-    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard/index';
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/apps';
   }
 
   submit(): void {

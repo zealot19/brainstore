@@ -1,0 +1,30 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Applications</h4>
+      <h6>Choisissez un module pour commencer</h6>
+    </div>
+  </div>
+</div>
+
+<div class="launcher-wrapper">
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+    </div>
+  } @else if (items.length === 0) {
+    <div class="text-center py-5 text-muted">
+      <i class="ti ti-alert-circle fs-1 d-block mb-2"></i>
+      Aucun module disponible pour votre compte.
+    </div>
+  } @else {
+    <div class="launcher-grid">
+      @for (pkg of items; track pkg.code) {
+        <button type="button" class="launcher-card" (click)="open(pkg)">
+          <i class="launcher-icon {{ pkg.icon }}"></i>
+          <span class="launcher-label">{{ pkg.label }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>
