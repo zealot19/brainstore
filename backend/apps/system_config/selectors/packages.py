@@ -10,19 +10,22 @@ _PKG_PERM_PREFIXES = {
 }
 
 
-def _user_can_enter(user, pkg) -> bool:
-    """Détermine si l'utilisateur peut accéder à un package (filtre UX uniquement)."""
+def _user_can_enter(pkg, *, is_admin: bool, codes: set) -> bool:
+    """Détermine si l'utilisateur peut accéder à un package (filtre UX uniquement).
+
+    `is_admin` et `codes` sont calculés UNE seule fois par requête dans
+    `accessible_packages` — aucun appel DB ici.
+    """
     # Superuser ou admin institution : accès complet à tous les packages accordés.
-    if getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False):
+    if is_admin:
         return True
     # Package administration : toujours accessible à tout utilisateur authentifié.
     if pkg["code"] == "administration":
         return True
-    # Sinon : au moins une permission RBAC dont le code commence par un préfixe du package.
-    from apps.admin_rbac.selectors.user_role_selectors import get_user_permissions
-    codes = get_user_permissions(user)
+    # Wildcard (superuser via get_user_permissions) : accès complet.
     if "*" in codes:
         return True
+    # Sinon : au moins une permission RBAC dont le code commence par un préfixe du package.
     prefixes = _PKG_PERM_PREFIXES.get(pkg["code"], ())
     if not prefixes:
         return False
@@ -33,9 +36,21 @@ def accessible_packages(user) -> list:
     """Retourne les packages accordés à la société de l'utilisateur ET accessibles par lui."""
     company = getattr(user, "company", None)
     granted = granted_packages(company)
+
+    # Admin (superuser/institution) bypass : aucun appel RBAC nécessaire.
+    is_admin = bool(getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False))
+    # Permissions récupérées AU PLUS UNE FOIS par requête (jamais dans la boucle).
+    codes = set()
+    if not is_admin:
+        from apps.admin_rbac.selectors.user_role_selectors import get_user_permissions
+        # company_id résolu depuis la société de l'utilisateur : les UserRole/UserProfile
+        # sont scopés par société (cf. HasModulePermission dans apps.core.permissions).
+        company_id = getattr(company, "id", None)
+        codes = get_user_permissions(user, company_id)
+
     out = []
     for pkg in PACKAGES:
-        if pkg["code"] in granted and _user_can_enter(user, pkg):
+        if pkg["code"] in granted and _user_can_enter(pkg, is_admin=is_admin, codes=codes):
             out.append({
                 "code": pkg["code"],
                 "label": pkg["label"],
