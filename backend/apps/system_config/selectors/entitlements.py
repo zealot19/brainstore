@@ -1,31 +1,29 @@
-"""Résolution des modules activés pour une société (entitlements par plan)."""
+"""Résolution des modules activés pour une société via les packages accordés."""
+from apps.core.packages import modules_for_packages, all_package_codes, grant_field_for
 
-_MODULE_FLAGS = {  # code de module -> attribut booléen sur Plan
-    "administration": "has_administration",
-    "fleet": "has_fleet",
-    "voyage": "has_voyages",
-    "colis": "has_colis",
-    "bagages": "has_bagages",
-    "treasury": "has_treasury",
-    "accounting": "has_accounting",
-    "reporting": "has_reporting",
-}
-ALL_MODULES = set(_MODULE_FLAGS)
+ALL_MODULES = modules_for_packages(all_package_codes())
+
+
+def granted_packages(company) -> set:
+    """Codes de packages accordés à la société. Administration toujours inclus.
+    Société absente -> tous les packages (rétro-compat)."""
+    if company is None:
+        return set(all_package_codes())
+    granted = set()
+    for code in all_package_codes():
+        field = grant_field_for(code)
+        if field is None:            # always-on (administration)
+            granted.add(code)
+        elif getattr(company, field, True):
+            granted.add(code)
+    return granted
 
 
 def enabled_modules(company) -> set:
-    """Modules activés pour `company`. Pas de plan -> tout activé (rétro-compat)."""
-    plan = getattr(company, "plan", None)
-    if plan is None:
-        return set(ALL_MODULES)
-    return {code for code, attr in _MODULE_FLAGS.items() if getattr(plan, attr, True)}
+    return modules_for_packages(granted_packages(company))
 
 
 def enabled_modules_for_company_id(company_id) -> set:
-    """Idem depuis un id (utilisé par le middleware, qui n'a que le company_id du JWT)."""
     from apps.system_config.models import Company
-    company = (Company.objects
-               .select_related("plan")
-               .filter(id=company_id, is_deleted=False)
-               .first())
-    return enabled_modules(company) if company else set(ALL_MODULES)
+    company = (Company.objects.filter(id=company_id, is_deleted=False).first())
+    return enabled_modules(company)
