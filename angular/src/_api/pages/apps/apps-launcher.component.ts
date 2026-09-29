@@ -11,6 +11,7 @@ const LANDING: Record<string, string> = {
 
 @Component({
   selector: 'app-apps-launcher',
+  standalone: true,
   templateUrl: './apps-launcher.component.html',
   styleUrls: ['./apps-launcher.component.scss'],
   imports: [CommonModule],

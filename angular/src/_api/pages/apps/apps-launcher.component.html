@@ -21,7 +21,7 @@
     <div class="launcher-grid">
       @for (pkg of items; track pkg.code) {
         <button type="button" class="launcher-card" (click)="open(pkg)">
-          <i class="launcher-icon {{ pkg.icon }}"></i>
+          <i class="ti ti-{{ pkg.icon }} launcher-icon"></i>
           <span class="launcher-label">{{ pkg.label }}</span>
         </button>
       }

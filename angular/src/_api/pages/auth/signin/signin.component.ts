@@ -20,7 +20,7 @@ export class SigninComponent implements OnInit {
   loading      = false;
   errorMsg     = '';
 
-  private returnUrl = '/apps';
+  private returnUrl!: string;
 
   constructor(
     private fb:          FormBuilder,
