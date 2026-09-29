@@ -1,16 +1,27 @@
 from django.db.models import Q
 from apps.voyages_consignment.models import Parcel, Baggage
 from apps.core.filters import resolve_date_field, apply_date_range
+from apps.core.agency_scope import user_agency_ids, scope_by_agency_q
 
 _CONS_DATE_FIELDS = {"created": "created_at", "departure": "trip__scheduled_departure",
                      "arrival": "trip__scheduled_arrival", "delivered": "delivered_home_at"}
+
+# Un colis va de l'agence d'origine (A = parcel.agency) vers l'agence de destination
+# (B = destination_point.agency). Seules A et B le voient ; ce Q applique cette règle
+# (aucun filtrage pour un admin institution → user_agency_ids renvoie None).
+_PARCEL_AGENCY_FIELDS = ("agency_id", "destination_point__agency_id")
+
+
+def _parcel_visibility_q(user):
+    return scope_by_agency_q(user_agency_ids(user), *_PARCEL_AGENCY_FIELDS)
 
 
 def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
                  origin_point=None, destination_point=None,
                  date_field=None, date_from=None, date_to=None,
-                 delivered_home=None, delivery_payment_method=None):
+                 delivered_home=None, delivery_payment_method=None, user=None):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
+          .filter(_parcel_visibility_q(user))
           .select_related("origin_point", "destination_point", "trip", "trip__route",
                           "trip__vehicle", "consignment_type")
           .order_by("-created_at"))
@@ -38,26 +49,29 @@ def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=No
     return qs
 
 
-def parcel_detail(company, pk):
+def parcel_detail(company, pk, user=None):
     return (Parcel.objects.filter(is_deleted=False, company=company, id=pk)
+            .filter(_parcel_visibility_q(user))
             .select_related("origin_point", "destination_point", "trip", "consignment_type")
             .prefetch_related("events__trip")
             .first())
 
 
-def pending_for_trip(company, route_id=None):
+def pending_for_trip(company, route_id=None, user=None):
     """Colis prêts sans voyage — candidats au chargement/expédition."""
     qs = (Parcel.objects.filter(is_deleted=False, company=company,
                                 status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
+          .filter(_parcel_visibility_q(user))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("created_at"))
     return qs
 
 
-def ready_parcels(company, destination_point=None):
+def ready_parcels(company, destination_point=None, user=None):
     """Colis prêts, sans voyage — pool « à expédier » de l'Expédition."""
     qs = (Parcel.objects.filter(is_deleted=False, company=company,
                                 status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
+          .filter(_parcel_visibility_q(user))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("-created_at"))
     if destination_point:
@@ -65,17 +79,20 @@ def ready_parcels(company, destination_point=None):
     return qs
 
 
-def trip_parcels(company, trip_id):
+def trip_parcels(company, trip_id, user=None):
     """Colis (non annulés) affectés à un voyage."""
     return (Parcel.objects.filter(is_deleted=False, company=company, trip_id=trip_id)
+            .filter(_parcel_visibility_q(user))
             .exclude(status=Parcel.Status.CANCELLED)
             .select_related("origin_point", "destination_point", "consignment_type")
             .order_by("-created_at"))
 
 
 def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None,
-                 consignment_type=None, date_field=None, date_from=None, date_to=None):
+                 consignment_type=None, date_field=None, date_from=None, date_to=None, user=None):
     qs = (Baggage.objects.filter(is_deleted=False, company=company)
+          .filter(scope_by_agency_q(user_agency_ids(user),
+                                    "trip__origin__agency_id", "ticket__booking__agency_id"))
           .select_related("ticket__passenger", "trip", "consignment_type")
           .order_by("-created_at"))
     if ticket_id:

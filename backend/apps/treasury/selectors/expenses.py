@@ -26,10 +26,7 @@ def list_refunds(company_id, *, agency_scope=None, date_from=None, date_to=None)
                                      category=Transaction.Category.REFUND)
           .select_related("cash_session__cash_register__agency")
           .order_by("-transaction_date", "-created_at"))
-    if agency_scope:
-        scoped, agency_id = agency_scope
-        if scoped:
-            qs = qs.filter(cash_session__cash_register__agency_id=agency_id)
+    qs = _apply_agency_scope(qs, agency_scope, "cash_session__cash_register__agency_id")
     if date_from:
         qs = qs.filter(transaction_date__gte=date_from)
     if date_to:
@@ -58,9 +55,10 @@ def refund_row(t):
     }
 
 
-def list_voyage_expenses(company_id, *, status=None, date_from=None, date_to=None):
+def list_voyage_expenses(company_id, *, status=None, date_from=None, date_to=None, agency_scope=None):
     qs = (TripExpense.objects.filter(trip__company_id=company_id, is_deleted=False)
           .select_related("expense_type", "trip").order_by("-date", "-id"))
+    qs = _apply_agency_scope(qs, agency_scope, "trip__origin__agency_id")
     if status:
         qs = qs.filter(status=status)
     if date_from:
@@ -73,7 +71,7 @@ def list_voyage_expenses(company_id, *, status=None, date_from=None, date_to=Non
 def expenses_dashboard(company_id, *, agency_scope=None):
     today = timezone.localdate()
     gen = list_general_expenses(company_id, agency_scope=agency_scope)
-    voy = list_voyage_expenses(company_id)
+    voy = list_voyage_expenses(company_id, agency_scope=agency_scope)
 
     def _sum(qs):
         return qs.aggregate(t=Sum("amount"))["t"] or 0

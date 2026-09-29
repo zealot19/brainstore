@@ -138,16 +138,6 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Tableau de bord',
-          hasSubRoute: false,
-          showSubRoute: false,
-          icon2: 'chart-bar',
-          route: routes.trzDashboard,
-          base: 'treasury-dashboard',
-          permission: 'treasury.dashboard.view',
-          subMenus: [],
-        },
-        {
           menuValue: 'Caisse',
           hasSubRoute: true,
           showSubRoute: false,

@@ -5,6 +5,7 @@ from apps.voyages_trips.models import Trip, TripSeat
 from apps.voyages_config.models import TimeSlot
 from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
 from apps.core.filters import resolve_date_field, apply_date_range
+from apps.core.agency_scope import user_agency_ids, scope_by_agency
 
 # Réservable uniquement lorsque le voyage est soumis (« pending »), pas en brouillon.
 _BOOKABLE = ["pending"]
@@ -80,10 +81,12 @@ def trip_destinations(trip):
 
 
 def list_bookings(company, status=None, trip_id=None, q=None,
-                  trip_type=None, channel=None, date_field=None, date_from=None, date_to=None):
+                  trip_type=None, channel=None, date_field=None, date_from=None, date_to=None,
+                  user=None):
     qs = (Booking.objects.filter(is_deleted=False, company=company)
           .select_related("outbound_trip", "return_trip", "buyer")
           .order_by("-created_at"))
+    qs = scope_by_agency(qs, user_agency_ids(user), "agency_id")
     if status:
         qs = qs.filter(status=status)
     if trip_id:
@@ -102,19 +105,22 @@ def list_bookings(company, status=None, trip_id=None, q=None,
     return qs
 
 
-def open_return_bookings(company, q=None):
+def open_return_bookings(company, q=None, user=None):
     qs = (Booking.objects.filter(is_deleted=False, company=company, return_open=True)
           .exclude(status=Booking.Status.CANCELLED)
           .select_related("outbound_trip", "buyer")
           .order_by("-created_at"))
+    qs = scope_by_agency(qs, user_agency_ids(user), "agency_id")
     if q:
         qs = qs.filter(Q(reference__icontains=q) | Q(buyer__phone__icontains=q) |
                        Q(buyer__last_name__icontains=q) | Q(buyer__first_name__icontains=q))
     return qs
 
 
-def booking_detail(company, pk):
-    return (Booking.objects.filter(is_deleted=False, company=company, id=pk)
+def booking_detail(company, pk, user=None):
+    return (scope_by_agency(
+                Booking.objects.filter(is_deleted=False, company=company, id=pk),
+                user_agency_ids(user), "agency_id")
             .select_related("outbound_trip", "return_trip", "buyer")
             .prefetch_related("tickets__passenger", "tickets__trip_seat", "tickets__fare_class")
             .first())

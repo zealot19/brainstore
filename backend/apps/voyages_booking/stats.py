@@ -3,15 +3,17 @@ from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from apps.voyages_booking.models import Booking
+from apps.core.agency_scope import scope_by_agency
 
 
-def get_booking_series(company_id, days=14):
+def get_booking_series(company_id, days=14, agency_ids=None):
     """Réservations et recette par jour sur les `days` derniers jours (série continue)."""
     days = max(1, min(int(days), 90))
     today = timezone.localdate()
     start = today - timedelta(days=days - 1)
-    rows = (Booking.objects
-            .filter(company_id=company_id, is_deleted=False, created_at__date__gte=start)
+    rows = (scope_by_agency(
+                Booking.objects.filter(company_id=company_id, is_deleted=False, created_at__date__gte=start),
+                agency_ids, "agency_id")
             .annotate(d=TruncDate("created_at"))
             .values("d")
             .annotate(bookings=Count("id"), revenue=Sum("amount_paid"))
@@ -29,9 +31,10 @@ def get_booking_series(company_id, days=14):
     return out
 
 
-def get_booking_stats(company_id):
+def get_booking_stats(company_id, agency_ids=None):
     today = timezone.localdate()
-    base = Booking.objects.filter(company_id=company_id, is_deleted=False)
+    base = scope_by_agency(Booking.objects.filter(company_id=company_id, is_deleted=False),
+                           agency_ids, "agency_id")
     today_qs = base.filter(created_at__date=today)
     return {
         "bookings_today": today_qs.count(),

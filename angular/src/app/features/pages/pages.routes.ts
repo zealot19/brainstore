@@ -55,7 +55,6 @@ export const Pages_routes: Routes = [
               path: 'treasury',
               loadComponent: () => import('../../../_api/pages/treasury/treasury.component').then(m => m.TreasuryComponent),
               children: [
-                { path: 'dashboard', loadComponent: () => import('../../../_api/pages/treasury/dashboard/dashboard.component').then(m => m.TrzDashboardComponent) },
                 { path: 'registers', loadComponent: () => import('../../../_api/pages/treasury/registers/registers.component').then(m => m.TrzRegistersComponent) },
                 { path: 'banks',     loadComponent: () => import('../../../_api/pages/treasury/banks/banks.component').then(m => m.TrzBanksComponent) },
                 { path: 'partners',  loadComponent: () => import('../../../_api/pages/treasury/partners/partners.component').then(m => m.TrzPartnersComponent) },
@@ -75,7 +74,7 @@ export const Pages_routes: Routes = [
                 { path: 'refund-rate', loadComponent: () => import('../../../_api/pages/treasury/config/refund-rate/refund-rate.component').then(m => m.RefundRateComponent) },
                 { path: 'refunds', loadComponent: () => import('../../../_api/pages/treasury/refunds/refunds.component').then(m => m.TreasuryRefundsComponent) },
                 { path: 'denominations', loadComponent: () => import('../../../_api/pages/treasury/config/denominations/denominations.component').then(m => m.TrzDenominationsComponent) },
-                { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+                { path: '', redirectTo: 'registers', pathMatch: 'full' },
               ],
             },
             // ── MODULE : Comptabilité ─────────────────────────────────────────────────

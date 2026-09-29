@@ -8,7 +8,7 @@ from apps.core.pagination import StandardResultsSetPagination
 from apps.core.exceptions import ApplicationError
 
 from apps.treasury import selectors, services
-from apps.treasury.scoping import register_agency_scope
+from apps.core.agency_scope import user_agency_ids
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
 from apps.treasury.serializers import (
     CashRegisterReadSerializer, CashRegisterWriteSerializer, CashRegisterUpdateSerializer,
@@ -38,7 +38,8 @@ class TreasuryStatsView(APIView):
     permission_map = {"GET": "treasury.dashboard.view"}
 
     def get(self, request):
-        stats = selectors.get_treasury_stats(_company(request).id)
+        stats = selectors.get_treasury_stats(_company(request).id,
+                                             agency_ids=user_agency_ids(request.user))
         return Response(TreasuryStatsSerializer(stats).data)
 
 
@@ -52,7 +53,8 @@ class TreasurySeriesView(APIView):
             days = int(request.query_params.get("days", 14))
         except (TypeError, ValueError):
             days = 14
-        return Response(selectors.get_treasury_series(_company(request).id, days))
+        return Response(selectors.get_treasury_series(_company(request).id, days,
+                                                      agency_ids=user_agency_ids(request.user)))
 
 
 # ── Cash registers ─────────────────────────────────────────────────────────────
@@ -65,7 +67,7 @@ class CashRegisterListView(APIView):
         qs = selectors.list_cash_registers(
             _company(request).id,
             active_only=request.query_params.get("active") == "true",
-            agency_scope=register_agency_scope(request.user),
+            agency_scope=user_agency_ids(request.user),
         )
         return Response(CashRegisterReadSerializer(qs, many=True).data)
 
@@ -200,7 +202,7 @@ class CashSessionListView(APIView):
             status=params.get("status"),
             date_from=params.get("date_from"),
             date_to=params.get("date_to"),
-            agency_scope=register_agency_scope(request.user),
+            agency_scope=user_agency_ids(request.user),
         )
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
@@ -488,6 +490,7 @@ class TransactionListView(APIView):
             date_from=params.get("date_from"),
             date_to=params.get("date_to"),
             trip_id=params.get("trip_id"),
+            agency_scope=user_agency_ids(request.user),
         )
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
@@ -630,7 +633,7 @@ class GeneralExpenseListView(APIView):
     def get(self, request):
         p = request.query_params
         company_id = _company(request).id
-        scope = register_agency_scope(request.user)
+        scope = user_agency_ids(request.user)
         qs = expense_selectors.list_general_expenses(
             company_id, agency_scope=scope,
             status=p.get("status"), date_from=p.get("date_from"), date_to=p.get("date_to"))
@@ -736,7 +739,8 @@ class VoyageExpenseListView(APIView):
         p = request.query_params
         qs = expense_selectors.list_voyage_expenses(
             _company(request).id, status=p.get("status"),
-            date_from=p.get("date_from"), date_to=p.get("date_to"))
+            date_from=p.get("date_from"), date_to=p.get("date_to"),
+            agency_scope=user_agency_ids(request.user))
         page = StandardResultsSetPagination()
         return page.get_paginated_response(
             VoyageExpenseRowSerializer(page.paginate_queryset(qs, request), many=True).data)
@@ -748,7 +752,7 @@ class ExpenseDashboardView(APIView):
 
     def get(self, request):
         return success_response(expense_selectors.expenses_dashboard(
-            _company(request).id, agency_scope=register_agency_scope(request.user)))
+            _company(request).id, agency_scope=user_agency_ids(request.user)))
 
 
 class GeneralExpenseVoucherView(APIView):
@@ -826,7 +830,7 @@ class _IncomeListBase(APIView):
         p = request.query_params
         qs = income_selectors.list_income(
             _company(request).id, category=self.category,
-            agency_scope=register_agency_scope(request.user),
+            agency_scope=user_agency_ids(request.user),
             date_from=p.get("date_from"), date_to=p.get("date_to"),
             payment_mode=p.get("payment_mode"))
         page = StandardResultsSetPagination()
@@ -905,7 +909,7 @@ class IncomeDashboardView(APIView):
 
     def get(self, request):
         return success_response(income_selectors.income_dashboard(
-            _company(request).id, agency_scope=register_agency_scope(request.user)))
+            _company(request).id, agency_scope=user_agency_ids(request.user)))
 
 
 class IncomeReceiptView(APIView):

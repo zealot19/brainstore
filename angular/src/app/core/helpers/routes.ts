@@ -398,7 +398,6 @@ export const routes={
   accFiscalYears: '/accounting/fiscal-years',
 
   // ── Trésorerie ──────────────────────────────────────────────────────────────
-  trzDashboard: '/treasury/dashboard',
   trzRegisters: '/treasury/registers',
   trzPartners:  '/treasury/partners',
   trzBanks:     '/treasury/banks',

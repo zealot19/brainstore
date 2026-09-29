@@ -35,7 +35,8 @@ class ParcelListView(APIView):
             date_from=request.query_params.get("date_from"),
             date_to=request.query_params.get("date_to"),
             delivered_home=request.query_params.get("delivered_home"),
-            delivery_payment_method=request.query_params.get("delivery_payment_method"))
+            delivery_payment_method=request.query_params.get("delivery_payment_method"),
+            user=request.user)
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.ParcelRead(page, many=True).data)
@@ -72,11 +73,11 @@ class ParcelDetailView(APIView):
     permission_map = {'GET': 'ticketing.parcel.view', 'PATCH': 'ticketing.parcel.manage', 'PUT': 'ticketing.parcel.manage', 'DELETE': 'ticketing.parcel.manage'}
 
     def get(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         return success_response(S.ParcelRead(p).data) if p else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
 
     def patch(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelEditSerializer(data=request.data, partial=True)
@@ -88,7 +89,7 @@ class ParcelDetailView(APIView):
         return success_response(S.ParcelRead(p).data)
 
     def delete(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
@@ -103,7 +104,7 @@ class ParcelPendingView(APIView):
     permission_map = {'GET': 'ticketing.parcel.view'}
 
     def get(self, request):
-        qs = selectors.pending_for_trip(request.user.company, route_id=request.query_params.get("route"))
+        qs = selectors.pending_for_trip(request.user.company, route_id=request.query_params.get("route"), user=request.user)
         return success_response(S.ParcelRead(qs, many=True).data)
 
 
@@ -112,7 +113,7 @@ class ParcelAssignTripView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.AssignTripSerializer(data=request.data)
@@ -134,7 +135,7 @@ class ParcelArrivedView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelReceiveSerializer(data=request.data)
@@ -155,7 +156,7 @@ class ParcelUnloadView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
@@ -172,7 +173,7 @@ class _ParcelActionView(APIView):
     service_fn = None
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
@@ -207,8 +208,8 @@ class ParcelExpeditionView(APIView):
         company = request.user.company
         trip_id = request.query_params.get("trip")
         destination = request.query_params.get("destination")
-        ready = selectors.ready_parcels(company, destination_point=destination)
-        assigned = selectors.trip_parcels(company, trip_id) if trip_id else Parcel.objects.none()
+        ready = selectors.ready_parcels(company, destination_point=destination, user=request.user)
+        assigned = selectors.trip_parcels(company, trip_id, user=request.user) if trip_id else Parcel.objects.none()
         assigned = list(assigned)
         weight = sum(float(p.weight_kg or 0) for p in assigned)
         return success_response({
@@ -223,7 +224,7 @@ class ParcelPickupView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelPickupSerializer(data=request.data)
@@ -245,7 +246,7 @@ class ParcelDeliverHomeView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         payload = S.ParcelDeliverSerializer(data=request.data)
@@ -265,7 +266,7 @@ class ParcelCancelView(APIView):
     permission_map = {'POST': 'ticketing.parcel.manage'}
 
     def post(self, request, pk):
-        p = selectors.parcel_detail(request.user.company, pk)
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         try:
@@ -289,7 +290,8 @@ class BaggageListView(APIView):
             consignment_type=request.query_params.get("consignment_type"),
             date_field=request.query_params.get("date_field"),
             date_from=request.query_params.get("date_from"),
-            date_to=request.query_params.get("date_to"))
+            date_to=request.query_params.get("date_to"),
+            user=request.user)
         return success_response(S.BaggageRead(qs, many=True).data)
 
     def post(self, request):

@@ -4,13 +4,22 @@ from django.db.models import Q, Sum, Count
 from django.utils import timezone
 
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
+from apps.core.agency_scope import scope_by_agency
 
 
 # ── Cash registers ─────────────────────────────────────────────────────────────
 
 def _apply_agency_scope(qs, agency_scope, field):
-    """Restreint `qs` à l'agence de l'utilisateur. `agency_scope` = (scoped, agency_id)
-    ou None (aucune restriction). `field` = chemin ORM vers agency_id."""
+    """Restreint `qs` aux agences de l'utilisateur. `agency_scope` accepte :
+    - None → aucune restriction (admin institution) ;
+    - un ensemble d'UUID (union des agences, cf. core.agency_scope.user_agency_ids) →
+      filtre `field IN {…}` (ensemble vide → aucun résultat) ;
+    - (héritage) le tuple (scoped, agency_id) → restreint à une seule agence.
+    `field` = chemin ORM vers agency_id."""
+    if agency_scope is None:
+        return qs
+    if isinstance(agency_scope, (set, frozenset)):
+        return qs.filter(**{f"{field}__in": agency_scope}) if agency_scope else qs.none()
     if not agency_scope:
         return qs
     scoped, agency_id = agency_scope
@@ -99,12 +108,13 @@ def get_session(session_id, company_id):
 
 def list_transactions(company_id, *, transaction_type=None, category=None,
                       account_type=None, session_id=None, bank_account_id=None,
-                      date_from=None, date_to=None, trip_id=None):
+                      date_from=None, date_to=None, trip_id=None, agency_scope=None):
     qs = (Transaction.objects
           .filter(company_id=company_id, is_deleted=False)
           .select_related("cash_session__cash_register", "bank_account",
                           "trip", "booking", "parcel")
           .order_by("-transaction_date", "-created_at"))
+    qs = _apply_agency_scope(qs, agency_scope, "agency_id")
     if transaction_type:
         qs = qs.filter(transaction_type=transaction_type)
     if category:
@@ -162,26 +172,33 @@ def get_transfer(transfer_id, company_id):
 
 # ── Stats ──────────────────────────────────────────────────────────────────────
 
-def get_treasury_stats(company_id):
+def get_treasury_stats(company_id, agency_ids=None):
     today = timezone.now().date()
-    txns = Transaction.objects.filter(company_id=company_id, is_deleted=False)
+    txns = scope_by_agency(
+        Transaction.objects.filter(company_id=company_id, is_deleted=False),
+        agency_ids, "agency_id")
     today_txns = txns.filter(transaction_date=today)
 
-    total_cash = (CashRegister.objects
-                  .filter(company_id=company_id, is_deleted=False, is_active=True)
+    total_cash = (scope_by_agency(
+                    CashRegister.objects.filter(company_id=company_id, is_deleted=False, is_active=True),
+                    agency_ids, "agency_id")
                   .aggregate(total=Sum("current_balance"))["total"] or 0)
-    total_bank = (BankAccount.objects
-                  .filter(company_id=company_id, is_deleted=False, is_active=True)
-                  .aggregate(total=Sum("current_balance"))["total"] or 0)
+    # Les comptes bancaires n'ont pas de dimension agence (niveau institution) :
+    # non affichés aux utilisateurs cloisonnés à une agence.
+    total_bank = 0 if agency_ids is not None else (
+        BankAccount.objects
+        .filter(company_id=company_id, is_deleted=False, is_active=True)
+        .aggregate(total=Sum("current_balance"))["total"] or 0)
 
     today_income  = (today_txns.filter(transaction_type=Transaction.Type.INCOME)
                      .aggregate(total=Sum("amount"))["total"] or 0)
     today_expense = (today_txns.filter(transaction_type=Transaction.Type.EXPENSE)
                      .aggregate(total=Sum("amount"))["total"] or 0)
 
-    open_sessions = CashSession.objects.filter(
-        company_id=company_id, is_deleted=False, status=CashSession.Status.OPEN
-    ).count()
+    open_sessions = scope_by_agency(
+        CashSession.objects.filter(company_id=company_id, is_deleted=False,
+                                   status=CashSession.Status.OPEN),
+        agency_ids, "cash_register__agency_id").count()
 
     return {
         "total_cash_balance": total_cash,
@@ -194,13 +211,15 @@ def get_treasury_stats(company_id):
     }
 
 
-def get_treasury_series(company_id, days=14):
+def get_treasury_series(company_id, days=14, agency_ids=None):
     """Recettes vs dépenses par jour sur les `days` derniers jours (série continue)."""
     days = max(1, min(int(days), 90))
     today = timezone.now().date()
     start = today - timedelta(days=days - 1)
-    rows = (Transaction.objects
-            .filter(company_id=company_id, is_deleted=False, transaction_date__gte=start)
+    rows = (scope_by_agency(
+                Transaction.objects.filter(company_id=company_id, is_deleted=False,
+                                           transaction_date__gte=start),
+                agency_ids, "agency_id")
             .values("transaction_date")
             .annotate(
                 income=Sum("amount", filter=Q(transaction_type=Transaction.Type.INCOME)),

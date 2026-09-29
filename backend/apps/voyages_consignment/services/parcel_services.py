@@ -4,11 +4,22 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.core.models import Sequence
+from apps.core.agency_scope import agency_allowed
 from apps.core.services.sequence_service import next_number, daily_route_ref
 from apps.voyages_consignment.models import Parcel, ParcelEvent
 
 _PRE_DEPARTURE = ["draft", "pending"]
 _ASSIGNABLE = (Parcel.Status.REGISTERED, Parcel.Status.READY_FOR_TRAVEL, Parcel.Status.LOADED)
+
+
+def _assert_destination_agency(parcel, user):
+    """Réception / retrait / livraison ne sont permis qu'à l'agence de DESTINATION (B).
+    L'agence d'origine (A) voit le colis mais ne peut pas le réceptionner ni le remettre.
+    Admin institution et acteur système (user=None) sont exemptés."""
+    dest_agency_id = parcel.destination_point.agency_id
+    if not agency_allowed(user, dest_agency_id):
+        raise ApplicationError(
+            _("Seule l'agence de destination peut réceptionner ou remettre ce colis."))
 
 
 def _parcel_reference(company_id, origin, destination):
@@ -172,6 +183,7 @@ def mark_arrived(parcel, *, user):
 def receive_parcel(parcel, *, received_pieces=None, missing_pieces=0, damaged_pieces=0, user):
     """Réception à l'agence de destination : pièces reçues / manquantes / avariées
     -> disponible pour retrait."""
+    _assert_destination_agency(parcel, user)
     if parcel.status not in (Parcel.Status.ARRIVED, Parcel.Status.IN_TRANSIT):
         raise ApplicationError(_("Seul un colis arrivé peut être réceptionné."))
     total = parcel.quantity
@@ -218,6 +230,7 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
       téléphone et pièce (obligatoires). Un destinataire capturé ici renseigne
       aussi le destinataire du colis.
     """
+    _assert_destination_agency(parcel, user)
     if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
         raise ApplicationError(_("Seul un colis disponible peut être retiré."))
 
@@ -255,6 +268,7 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
 @transaction.atomic
 def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment_method="", user):
     """Livraison à domicile : clôt le colis et encaisse les frais de livraison (recettes)."""
+    _assert_destination_agency(parcel, user)
     if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
         raise ApplicationError(_("Seul un colis disponible peut être livré à domicile."))
     amount = Decimal(str(delivery_amount or 0))
