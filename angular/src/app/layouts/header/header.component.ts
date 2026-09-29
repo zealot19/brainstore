@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { routes, SidebarService } from '../../core/core.index';
 import { AuthService } from '../.././../_api/services/auth/auth.service';
@@ -8,6 +8,7 @@ import { HasPermissionDirective } from '../../shared/directives/has-permission.d
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { CashSessionTimerComponent } from '../../shared/cash-session-timer/cash-session-timer.component';
 import { TranslocoModule } from '@jsverse/transloco';
+import { AppPackageService } from '../../core/service/packages/app-package.service';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,12 @@ import { TranslocoModule } from '@jsverse/transloco';
 export class HeaderComponent {
   routes = routes;
 
-  constructor(private sidebar: SidebarService, private authService: AuthService) {}
+  constructor(
+    private sidebar: SidebarService,
+    private authService: AuthService,
+    private pkgSvc: AppPackageService,
+    private router: Router,
+  ) {}
 
   // ── Utilisateur connecté ─────────────────────────────────────────────────
   get userName(): string {
@@ -44,5 +50,10 @@ export class HeaderComponent {
   togglesMobileSideBar(): void { this.sidebar.switchMobileSideBarPosition(); }
   miniSideBarMouseHover(position: string): void {
     this.sidebar.expandSideBar.next(position === 'over');
+  }
+
+  switchToLauncher(): void {
+    this.pkgSvc.clear();
+    this.router.navigateByUrl('/apps');
   }
 }

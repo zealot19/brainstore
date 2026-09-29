@@ -9,7 +9,9 @@ import { ConnectedOverlayScrollHandler } from 'primeng/dom';
 import { AuthService } from '../../../_api/services/auth/auth.service';
 import { PermissionService } from '../../../_api/services/auth/permission.service';
 import { Subscription, merge } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { NavLabelPipe } from '../../core/i18n/nav-label.pipe';
+import { AppPackageService } from '../../core/service/packages/app-package.service';
 
 
 interface MenuItem {
@@ -47,6 +49,7 @@ export class SidebarOneComponent implements OnDestroy {
     private router: Router,
     private authService: AuthService,
     private permissionService: PermissionService,
+    private pkgSvc: AppPackageService,
   ) {
     router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
@@ -57,10 +60,12 @@ export class SidebarOneComponent implements OnDestroy {
     this.side_bar_data = this.buildMenuForUser();
     // Reconstruire le menu dès qu'une de ces sources arrive en async après login
     // (permissions, modules OU profil utilisateur) — évite une sidebar vide au 1er chargement.
+    // Also rebuild when the active package changes (app-switcher).
     this.permSub = merge(
       this.permissionService.permissions$,
       this.permissionService.modules$,
       this.authService.currentUser$,
+      toObservable(this.pkgSvc.activePackage),
     ).subscribe(() => {
       this.side_bar_data = this.buildMenuForUser();
     });
@@ -89,7 +94,8 @@ export class SidebarOneComponent implements OnDestroy {
       return true;
     };
 
-    const sections = this.sidebar.sidebarData1
+    const activeModules = this.pkgSvc.activePackage()?.modules ?? null;
+    const sections = this.sidebar.filteredSidebar(activeModules)
       .map((section: any) => ({
         ...section,
         menu: section.menu

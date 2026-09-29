@@ -9,6 +9,7 @@ import { SidebarTwoComponent } from '../../layouts/sidebar-two/sidebar-two.compo
 import { SidebarThreeComponent } from '../../layouts/sidebar-three/sidebar-three.component';
 import { FooterComponent } from '../../layouts/footer/footer.component';
 import { LayoutComponent } from '../../layouts/layout/layout.component';
+import { AppPackageService } from '../../core/service/packages/app-package.service';
 @Component({
   selector: 'app-pages',
   imports: [RouterModule,CommonModule,HeaderComponent,SidebarOneComponent,SidebarTwoComponent,SidebarThreeComponent,FooterComponent,LayoutComponent],
@@ -41,7 +42,8 @@ export class PagesComponent {
     private settings: SettingsService,
     private sidebar: SidebarService,
     private common: CommonService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public pkgSvc: AppPackageService,
   ) {
     this.sidebar.toggleMobileSideBar.subscribe((res: string) => {
       if (res == 'true' || res == 'true') {
@@ -159,6 +161,14 @@ export class PagesComponent {
     this.sidebar.collapse$.subscribe((collapse: boolean) => {
       this.isCollapsed = collapse;
     });
+    if (!this.pkgSvc.activePackage()) {
+      this.Router.navigateByUrl('/apps');
+    }
+  }
+
+  switchToLauncher(): void {
+    this.pkgSvc.clear();
+    this.Router.navigateByUrl('/apps');
   }
 
 

@@ -398,6 +398,12 @@ export class SidebarService {
     },
   ];
 
+  filteredSidebar(activeModules: string[] | null) {
+    if (!activeModules) return this.sidebarData1;
+    const set = new Set(activeModules);
+    return this.sidebarData1.filter((g: any) => set.has(g.module));
+  }
+
   public sidebarData2: SideBar[] = [
     {
       tittle: 'Main',
