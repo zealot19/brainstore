@@ -33,4 +33,7 @@ urlpatterns = [
     path("feature-flags/<uuid:pk>/",   views.FeatureFlagDetailView.as_view(), name="featureflag-detail"),
     path("feature-flags/<uuid:pk>/toggle/", views.FeatureFlagToggleView.as_view(), name="featureflag-toggle"),
     path("feature-flags/<uuid:pk>/set/",    views.FeatureFlagSetView.as_view(),    name="featureflag-set"),
+
+    # ── App Launcher ──────────────────────────────────────────────────────────
+    path("my-packages/",               views.MyPackagesView.as_view(),        name="my-packages"),
 ]

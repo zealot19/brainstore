@@ -11,6 +11,7 @@ from apps.core.exceptions import ApplicationError
 
 from . import services, selectors
 from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag
+from .selectors.packages import accessible_packages
 from .serializers import (
     PlanSerializer, PlanWriteSerializer,
     CompanyListSerializer, CompanyDetailSerializer,
@@ -556,3 +557,15 @@ class FeatureFlagSetView(APIView):
         payload.is_valid(raise_exception=True)
         flag = services.set_feature_flag(flag, enabled=payload.validated_data["enabled"], updated_by=request.user)
         return success_response(FeatureFlagSerializer(flag).data)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# APP LAUNCHER — packages accessibles à l'utilisateur connecté
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class MyPackagesView(APIView):
+    """GET /system/my-packages/ — Packages accessibles à l'utilisateur (launcher post-login)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return success_response(accessible_packages(request.user))
