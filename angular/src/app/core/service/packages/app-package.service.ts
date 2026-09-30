@@ -37,6 +37,8 @@ export class AppPackageService {
 
   private read(): AppPackage | null {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as AppPackage) : null;
+    if (!raw) return null;
+    try { return JSON.parse(raw) as AppPackage; }
+    catch { return null; }
   }
 }

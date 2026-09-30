@@ -90,10 +90,10 @@ def create_company(*, name, plan=None, plan_id=None, legal_form="", country="CI"
     if packages is not None:
         selected = set(packages) | {"administration"}   # administration toujours inclus
         updates = {}
-        for code in all_package_codes():
-            field = grant_field_for(code)
+        for pkg_code in all_package_codes():
+            field = grant_field_for(pkg_code)
             if field:                                    # skip always-on
-                updates[field] = code in selected
+                updates[field] = pkg_code in selected
         if updates:
             for k, v in updates.items():
                 setattr(company, k, v)
