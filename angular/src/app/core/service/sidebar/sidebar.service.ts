@@ -107,7 +107,7 @@ export class SidebarService {
             { menuValue: 'Companies',     route: routes.superadminCompanies,     base: 'companies' },
             { menuValue: 'Agences',       route: routes.superadminAgencies,      base: 'agencies' },
             { menuValue: 'Utilisateurs',  route: routes.adminUsers,              base: 'users' },
-            { menuValue: 'Packages',      route: routes.superadminPackages,      base: 'packages' },
+            { menuValue: 'Plans',          route: routes.superadminPackages,      base: 'packages' },
             { menuValue: 'Subscriptions', route: routes.superadminSubscriptions, base: 'subscriptions' },
             { menuValue: 'Paramètres',    route: routes.systemParameters,        base: 'parameters' },
             { menuValue: 'Feature Flags', route: routes.systemFeatureFlags,      base: 'feature-flags' },
@@ -464,7 +464,7 @@ export class SidebarService {
               base: 'subscriptions',
             },
             {
-              menuValue: 'Packages',
+              menuValue: 'Plans',
               route: routes.superadminPackages,
               base: 'packages',
             },
@@ -500,7 +500,7 @@ export class SidebarService {
               base: 'agencies',
             },
             {
-              menuValue: 'Packages',
+              menuValue: 'Plans',
               route: routes.superadminPackages,
               base: 'packages',
             },
@@ -2435,7 +2435,7 @@ export class SidebarService {
               subRoutes: [],
             },
             {
-              tittle: 'Packages',
+              tittle: 'Plans',
               hasSubRoute: false,
               showSubRoute: false,
               route: '/supeadmin',

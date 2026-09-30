@@ -50,6 +50,10 @@ export interface Company {
   postal_box?:   string;
   address_line?: string;
   currency_code?: string;
+  plan?:         string;
+  plan_name?:    string;
+  plan_tier?:    string;
+  /** @deprecated backend renamed to plan/plan_name/plan_tier */
   package?:      string;
   package_name?: string;
   status:        CompanyStatus;

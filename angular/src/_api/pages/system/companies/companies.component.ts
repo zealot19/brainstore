@@ -20,6 +20,8 @@ export class CompaniesComponent implements OnInit {
   companies:  Company[] = [];
   filtered:   Company[] = [];
   packages:   Package[] = [];
+  /** App-group codes selected for company creation (Administration is always on, not listed here) */
+  selectedAppGroups: string[] = ['transport'];
   loading     = true;
   search      = '';
   statusFilter: CompanyStatus | '' = '';
@@ -54,7 +56,7 @@ export class CompaniesComponent implements OnInit {
       code:       [''],
       slogan:     [''],
       currency:   ['XOF', Validators.required],
-      package:    [''],
+      plan:       [''],
       legal_form: [''],
       rccm:       [''],
       tax_id:     [''],
@@ -78,7 +80,7 @@ export class CompaniesComponent implements OnInit {
       code:       [''],
       slogan:     [''],
       currency:   ['XOF', Validators.required],
-      package:    [''],
+      plan:       [''],
       legal_form: [''],
       rccm:       [''],
       tax_id:     [''],
@@ -141,7 +143,8 @@ export class CompaniesComponent implements OnInit {
     const v = this.createForm.value;
     const payload: Record<string, any> = {
       name: v.name, code: v.code, slogan: v.slogan,
-      currency: v.currency, package: v.package || null,
+      currency: v.currency, plan: v.plan || null,
+      packages: ['administration', ...this.selectedAppGroups],
       legal_form: v.legal_form, rccm: v.rccm, tax_id: v.tax_id,
       cnps_number: v.cnps_number, vat_number: v.vat_number, capital: v.capital || null,
       email: v.email, phone: v.phone, website: v.website,
@@ -165,6 +168,7 @@ export class CompaniesComponent implements OnInit {
           this.closeModal('add-company');
         } else {
           this.createForm.reset({ currency: 'XOF', is_active: true });
+          this.selectedAppGroups = ['transport'];
           this.closeModal('add-company');
         }
       },
@@ -175,6 +179,20 @@ export class CompaniesComponent implements OnInit {
   closeSetup(): void {
     this.setupResult = null;
     this.createForm.reset({ currency: 'XOF', is_active: true });
+    this.selectedAppGroups = ['transport'];
+  }
+
+  toggleAppGroup(code: string): void {
+    const idx = this.selectedAppGroups.indexOf(code);
+    if (idx >= 0) {
+      this.selectedAppGroups.splice(idx, 1);
+    } else {
+      this.selectedAppGroups.push(code);
+    }
+  }
+
+  isAppGroupSelected(code: string): boolean {
+    return this.selectedAppGroups.includes(code);
   }
 
   copyToClipboard(text: string): void {
@@ -188,7 +206,7 @@ export class CompaniesComponent implements OnInit {
     this.editLogoPreview = c.logo ?? null;
     this.editForm.reset({
       name: c.name, code: c.code ?? '', slogan: c.slogan ?? '',
-      currency: c.currency_code ?? 'XOF', package: c.package ?? '',
+      currency: c.currency_code ?? 'XOF', plan: c.plan ?? '',
       legal_form: c.legal_form ?? '', rccm: c.rccm ?? '', tax_id: c.tax_id ?? '',
       cnps_number: c.cnps_number ?? '', vat_number: c.vat_number ?? '', capital: c.capital ?? null,
       email: c.email ?? '', phone: c.phone ?? '', website: c.website ?? '',
@@ -204,7 +222,7 @@ export class CompaniesComponent implements OnInit {
     const v = this.editForm.value;
     const payload: Record<string, any> = {
       name: v.name, code: v.code, slogan: v.slogan,
-      currency: v.currency, package: v.package || null,
+      currency: v.currency, plan: v.plan || null,
       legal_form: v.legal_form, rccm: v.rccm, tax_id: v.tax_id,
       cnps_number: v.cnps_number, vat_number: v.vat_number, capital: v.capital || null,
       email: v.email, phone: v.phone, website: v.website,

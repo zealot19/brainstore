@@ -91,7 +91,7 @@
               <th>{{ 'sys.co.col_institution' | transloco }}</th>
               <th>{{ 'admin.common.code' | transloco }}</th>
               <th>{{ 'sys.co.col_currency' | transloco }}</th>
-              <th>{{ 'sys.co.col_package' | transloco }}</th>
+              <th>{{ 'sys.co.col_plan' | transloco }}</th>
               <th>{{ 'admin.common.active' | transloco }}</th>
               <th>{{ 'sys.co.col_created' | transloco }}</th>
               <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
@@ -114,7 +114,7 @@
                 </td>
                 <td>{{ c.code || '—' }}</td>
                 <td>{{ c.currency_code ?? '—' }}</td>
-                <td>{{ c.package_name ?? '—' }}</td>
+                <td>{{ c.plan_name ?? '—' }}</td>
                 <td>
                   <span class="badge" [ngClass]="c.is_active ? 'bg-outline-success' : 'bg-outline-danger'">
                     {{ (c.is_active ? 'admin.common.active' : 'admin.common.inactive') | transloco }}
@@ -212,8 +212,8 @@
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">{{ 'sys.co.f_package' | transloco }}</label>
-              <select formControlName="package" class="form-select">
+              <label class="form-label">{{ 'sys.co.f_plan' | transloco }}</label>
+              <select formControlName="plan" class="form-select">
                 <option value="">{{ 'sys.co.opt_none_trial' | transloco }}</option>
                 @for (p of packages; track p.id) {
                   <option [value]="p.id">{{ p.name }}</option>
@@ -221,6 +221,33 @@
               </select>
             </div>
           </div>
+
+          <!-- Modules applicatifs (app-groups) -->
+          <div class="mb-3">
+            <label class="form-label">{{ 'sys.co.f_app_modules' | transloco }}</label>
+            <div class="d-flex flex-wrap gap-3 mt-1">
+              <!-- Administration : toujours activé -->
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ag-administration" checked disabled />
+                <label class="form-check-label" for="ag-administration">{{ 'sys.co.ag_administration' | transloco }}</label>
+              </div>
+              <!-- Transport -->
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ag-transport"
+                       [checked]="isAppGroupSelected('transport')"
+                       (change)="toggleAppGroup('transport')" />
+                <label class="form-check-label" for="ag-transport">{{ 'sys.co.ag_transport' | transloco }}</label>
+              </div>
+              <!-- Comptabilité -->
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ag-accounting"
+                       [checked]="isAppGroupSelected('accounting')"
+                       (change)="toggleAppGroup('accounting')" />
+                <label class="form-check-label" for="ag-accounting">{{ 'sys.co.ag_accounting' | transloco }}</label>
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'sys.co.f_legal_form' | transloco }}</label>
@@ -377,8 +404,8 @@
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">{{ 'sys.co.f_package' | transloco }}</label>
-              <select formControlName="package" class="form-select">
+              <label class="form-label">{{ 'sys.co.f_plan' | transloco }}</label>
+              <select formControlName="plan" class="form-select">
                 <option value="">{{ 'sys.co.opt_none_m' | transloco }}</option>
                 @for (p of packages; track p.id) {
                   <option [value]="p.id">{{ p.name }}</option>
