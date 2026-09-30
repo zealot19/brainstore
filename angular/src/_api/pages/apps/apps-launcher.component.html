@@ -1,30 +1,50 @@
-<div class="page-header">
-  <div class="add-item d-flex">
-    <div class="page-title">
-      <h4>Applications</h4>
-      <h6>Choisissez un module pour commencer</h6>
-    </div>
-  </div>
-</div>
+<div class="launcher-page">
+  <div class="launcher-inner">
 
-<div class="launcher-wrapper">
-  @if (loading) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary"></div>
+    <!-- Marque -->
+    <div class="launcher-brand">
+      <img src="assets/img/logo.svg" alt="Brainstore" class="launcher-logo">
     </div>
-  } @else if (items.length === 0) {
-    <div class="text-center py-5 text-muted">
-      <i class="ti ti-alert-circle fs-1 d-block mb-2"></i>
-      Aucun module disponible pour votre compte.
+
+    <!-- En-tête -->
+    <div class="launcher-heading">
+      <h2>Bienvenue{{ firstName ? ', ' + firstName : '' }}</h2>
+      <p>Choisissez une application pour commencer</p>
     </div>
-  } @else {
-    <div class="launcher-grid">
-      @for (pkg of items; track pkg.code) {
-        <button type="button" class="launcher-card" (click)="open(pkg)">
-          <i class="ti ti-{{ pkg.icon }} launcher-icon"></i>
-          <span class="launcher-label">{{ pkg.label }}</span>
-        </button>
-      }
+
+    @if (loading) {
+      <div class="launcher-state">
+        <div class="spinner-border text-primary"></div>
+      </div>
+    } @else if (items.length === 0) {
+      <div class="launcher-state launcher-empty">
+        <i class="ti ti-apps-off"></i>
+        <span>Aucune application disponible pour votre compte.</span>
+      </div>
+    } @else {
+      <div class="launcher-grid">
+        @for (pkg of items; track pkg.code) {
+          <button type="button"
+                  class="launcher-card accent-{{ meta(pkg.code).color }}"
+                  (click)="open(pkg)">
+            <span class="launcher-badge">
+              <i class="ti ti-{{ pkg.icon }}"></i>
+            </span>
+            <span class="launcher-body">
+              <span class="launcher-title">{{ pkg.label }}</span>
+              <span class="launcher-desc">{{ meta(pkg.code).desc }}</span>
+            </span>
+            <span class="launcher-open">
+              Ouvrir <i class="ti ti-arrow-right"></i>
+            </span>
+          </button>
+        }
+      </div>
+    }
+
+    <div class="launcher-footer">
+      © {{ year }} Brainstore — Tous droits réservés
     </div>
-  }
+
+  </div>
 </div>

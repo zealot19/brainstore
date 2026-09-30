@@ -1,41 +1,175 @@
-.launcher-wrapper {
-  padding: 1.5rem 0;
-}
-
-.launcher-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.25rem;
-}
-
-.launcher-card {
+// ── Écran de lancement (choix d'application) — plein écran, hors shell ──────────
+.launcher-page {
+  min-height: 100vh;
+  width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 2rem 1rem;
-  background: #fff;
-  border: 1px solid #e9ecef;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
-  width: 100%;
-  text-align: center;
+  padding: 2.5rem 1.25rem;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(67, 97, 238, 0.10), transparent 60%),
+    linear-gradient(180deg, #f8f9fc 0%, #eef1f8 100%);
+}
 
-  &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+.launcher-inner {
+  width: 100%;
+  max-width: 920px;
+  text-align: center;
+}
+
+// ── Marque + en-tête ───────────────────────────────────────────────────────────
+.launcher-brand {
+  margin-bottom: 1.5rem;
+}
+
+.launcher-logo {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.launcher-heading {
+  margin-bottom: 2.25rem;
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1b2559;
+    margin: 0 0 0.35rem;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.95rem;
   }
 }
 
-.launcher-icon {
-  font-size: 2.5rem;
-  color: #4361ee;
+// ── États (chargement / vide) ───────────────────────────────────────────────────
+.launcher-state {
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.launcher-label {
-  font-size: 0.9rem;
+.launcher-empty {
+  color: #98a2b3;
+
+  i { font-size: 2.25rem; }
+  span { font-size: 0.95rem; }
+}
+
+// ── Grille de cartes ────────────────────────────────────────────────────────────
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.launcher-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.85rem;
+  padding: 1.75rem 1.5rem;
+  background: #fff;
+  border: 1px solid #eceef3;
+  border-radius: 1rem;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+
+  // barre d'accent (haut) révélée au survol
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--accent, #4361ee);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(16, 24, 40, 0.12);
+    border-color: transparent;
+
+    &::before { transform: scaleX(1); }
+
+    .launcher-open {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.launcher-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--accent, #4361ee) 12%, #fff);
+  color: var(--accent, #4361ee);
+  font-size: 1.65rem;
+  flex-shrink: 0;
+}
+
+.launcher-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.launcher-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1b2559;
+}
+
+.launcher-desc {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #6b7280;
+}
+
+.launcher-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--accent, #4361ee);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  i { font-size: 0.95rem; }
+}
+
+// ── Accents par package ─────────────────────────────────────────────────────────
+.accent-admin      { --accent: #64748b; }
+.accent-transport  { --accent: #4361ee; }
+.accent-accounting { --accent: #12b76a; }
+.accent-default    { --accent: #6b7280; }
+
+// ── Pied ────────────────────────────────────────────────────────────────────────
+.launcher-footer {
+  font-size: 0.8rem;
+  color: #98a2b3;
+}
+
+@media (max-width: 575.98px) {
+  .launcher-heading h2 { font-size: 1.35rem; }
+  .launcher-grid { grid-template-columns: 1fr; }
 }
