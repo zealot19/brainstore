@@ -1,8 +1,8 @@
 // ── Barre de nav propre à cet écran (hors shell) ────────────────────────────────
-// Le header est prévu pour vivre au-dessus d'une sidebar : `.header-left` réserve
-// 346px (largeur sidebar) et flotte, laissant un vide à gauche. Ici il n'y a pas
-// de sidebar : on transforme le header en une barre pleine largeur en flex, logo
-// collé à gauche et actions à droite, et on masque les boutons de repli sidebar.
+// Le header est conçu pour coiffer une sidebar : sa zone logo (`.header-left`)
+// réserve 346px et, en plein écran, masque son logo (le logo « vit » normalement
+// dans la sidebar). Comme il n'y a pas de sidebar ici, on NEUTRALISE toute cette
+// zone et on pose NOTRE PROPRE logo fixe à gauche — visible à toutes les largeurs.
 :host ::ng-deep {
   .header {
     position: fixed;
@@ -13,30 +13,40 @@
     background: #fff;
   }
 
+  .header-left,
+  #toggle_btn,
+  #mobile_btn { display: none !important; }   // zone sidebar neutralisée
+
   .main-header {
     display: flex;
     align-items: center;
     height: 65px;
+    padding-left: 200px;                       // place réservée au logo fixe
   }
 
-  .header-left {
-    float: none !important;
-    width: auto !important;
-    justify-content: flex-start;
-    padding: 0 1.25rem;
-
-    .logo,
-    .logo.logo-normal { display: inline-block !important; }
-    .logo-white,
-    .logo-small { display: none !important; }
-    .logo img { width: 150px; }
-  }
-
-  #toggle_btn,
-  #mobile_btn { display: none !important; }
-
-  // Pousse le groupe d'actions (app-switcher, langue, profil…) tout à droite.
+  // Actions (app-switcher, langue, profil…) tout à droite.
   ul.user-menu { margin-left: auto; }
+}
+
+// Notre logo, fixé à gauche par-dessus la barre (indépendant des règles du header).
+.launcher-navlogo {
+  position: fixed;
+  top: 0;
+  left: 1.5rem;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  z-index: 1001;                               // au-dessus du header (z-index 999)
+
+  img {
+    width: 150px;
+    height: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  :host ::ng-deep .main-header { padding-left: 150px; }
+  .launcher-navlogo img { width: 120px; }
 }
 
 .launcher-page {
