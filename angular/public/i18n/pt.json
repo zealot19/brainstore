@@ -1,4 +1,24 @@
 {
+  "apps": {
+    "welcome": "Bem-vindo",
+    "subtitle": "Escolha um aplicativo para começar",
+    "open": "Abrir",
+    "soon": "Em breve",
+    "soon_desc": "Em breve disponível",
+    "footer": "Brainstore — Todos os direitos reservados",
+    "pkg": {
+      "administration": { "label": "Administração", "desc": "Usuários, perfis, agências e configuração" },
+      "transport": { "label": "Transporte", "desc": "Viagens, frota, encomendas, tesouraria e relatórios" },
+      "accounting": { "label": "Contabilidade", "desc": "Contabilidade OHADA, lançamentos e diários" }
+    },
+    "soon_mod": {
+      "hr": "Recursos Humanos",
+      "payroll": "Folha de Pagamento",
+      "stock": "Estoque",
+      "hotel": "Hotel",
+      "parking": "Estacionamento"
+    }
+  },
   "shared": {
     "actions": {
       "save": "Guardar",

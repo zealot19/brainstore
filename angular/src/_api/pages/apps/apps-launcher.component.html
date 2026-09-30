@@ -9,8 +9,8 @@
 
     <!-- En-tête -->
     <div class="launcher-heading">
-      <h2>Bienvenue{{ firstName ? ', ' + firstName : '' }}</h2>
-      <p>Choisissez une application pour commencer</p>
+      <h2>{{ 'apps.welcome' | transloco }}{{ firstName ? ', ' + firstName : '' }}</h2>
+      <p>{{ 'apps.subtitle' | transloco }}</p>
     </div>
 
     @if (loading) {
@@ -29,26 +29,26 @@
               <i class="ti ti-{{ pkg.icon }}"></i>
             </span>
             <span class="launcher-body">
-              <span class="launcher-title">{{ pkg.label }}</span>
-              <span class="launcher-desc">{{ meta(pkg.code).desc }}</span>
+              <span class="launcher-title">{{ ('apps.pkg.' + pkg.code + '.label') | transloco }}</span>
+              <span class="launcher-desc">{{ ('apps.pkg.' + pkg.code + '.desc') | transloco }}</span>
             </span>
             <span class="launcher-open">
-              Ouvrir <i class="ti ti-arrow-right"></i>
+              {{ 'apps.open' | transloco }} <i class="ti ti-arrow-right"></i>
             </span>
           </button>
         }
 
         <!-- Modules à venir (non disponibles) -->
-        @for (soon of comingSoon; track soon.label) {
+        @for (soon of comingSoon; track soon.key) {
           <div class="launcher-card is-soon accent-default" aria-disabled="true">
             <span class="launcher-badge">
               <i class="ti ti-{{ soon.icon }}"></i>
             </span>
             <span class="launcher-body">
-              <span class="launcher-title">{{ soon.label }}</span>
-              <span class="launcher-desc">Bientôt disponible</span>
+              <span class="launcher-title">{{ ('apps.soon_mod.' + soon.key) | transloco }}</span>
+              <span class="launcher-desc">{{ 'apps.soon_desc' | transloco }}</span>
             </span>
-            <span class="launcher-soon-chip">Bientôt</span>
+            <span class="launcher-soon-chip">{{ 'apps.soon' | transloco }}</span>
           </div>
         }
 
@@ -58,6 +58,6 @@
   </div>
 
   <div class="launcher-footer">
-    © {{ year }} Brainstore — Tous droits réservés
+    © {{ year }} {{ 'apps.footer' | transloco }}
   </div>
 </div>

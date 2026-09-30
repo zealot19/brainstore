@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 import { AppPackageService, AppPackage } from '../../../app/core/service/packages/app-package.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { HeaderComponent } from '../../../app/layouts/header/header.component';
@@ -11,23 +12,21 @@ const LANDING: Record<string, string> = {
   accounting:     '/accounting/accounts',
 };
 
-// Présentation (front) par package : teinte d'accent + description courte.
-interface PkgMeta { color: string; desc: string; }
-const META: Record<string, PkgMeta> = {
-  administration: { color: 'admin',      desc: 'Utilisateurs, rôles, agences et configuration' },
-  transport:      { color: 'transport',  desc: 'Voyages, flotte, colis, trésorerie et reporting' },
-  accounting:     { color: 'accounting', desc: 'Comptabilité OHADA, écritures et journaux' },
+// Teinte d'accent (présentation) par package. Libellés/descriptions -> i18n (clé par code).
+const ACCENT: Record<string, string> = {
+  administration: 'admin',
+  transport:      'transport',
+  accounting:     'accounting',
 };
-const META_FALLBACK: PkgMeta = { color: 'default', desc: 'Accéder au module' };
 
-// Modules à venir — affichés (non câblés) pour donner la vision d'ensemble.
-interface SoonPkg { label: string; icon: string; }
+// Modules à venir — affichés (non câblés). Libellés via i18n (apps.soon_mod.<key>).
+interface SoonPkg { key: string; icon: string; }
 const COMING_SOON: SoonPkg[] = [
-  { label: 'Ressources Humaines', icon: 'users' },
-  { label: 'Paie',               icon: 'cash' },
-  { label: 'Stock',              icon: 'packages' },
-  { label: 'Hôtel',              icon: 'bed' },
-  { label: 'Parking',            icon: 'parking' },
+  { key: 'hr',      icon: 'users' },
+  { key: 'payroll', icon: 'cash' },
+  { key: 'stock',   icon: 'packages' },
+  { key: 'hotel',   icon: 'bed' },
+  { key: 'parking', icon: 'parking' },
 ];
 
 @Component({
@@ -35,7 +34,7 @@ const COMING_SOON: SoonPkg[] = [
   standalone: true,
   templateUrl: './apps-launcher.component.html',
   styleUrls: ['./apps-launcher.component.scss'],
-  imports: [CommonModule, HeaderComponent],
+  imports: [CommonModule, TranslocoModule, HeaderComponent],
 })
 export class AppsLauncherComponent implements OnInit {
   private pkgSvc = inject(AppPackageService);
@@ -59,8 +58,8 @@ export class AppsLauncherComponent implements OnInit {
     });
   }
 
-  meta(code: string): PkgMeta {
-    return META[code] ?? META_FALLBACK;
+  meta(code: string): { color: string } {
+    return { color: ACCENT[code] ?? 'default' };
   }
 
   open(pkg: AppPackage): void {

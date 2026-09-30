@@ -1,4 +1,24 @@
 {
+  "apps": {
+    "welcome": "Welcome",
+    "subtitle": "Choose an application to get started",
+    "open": "Open",
+    "soon": "Soon",
+    "soon_desc": "Coming soon",
+    "footer": "Brainstore — All rights reserved",
+    "pkg": {
+      "administration": { "label": "Administration", "desc": "Users, roles, agencies and configuration" },
+      "transport": { "label": "Transport", "desc": "Trips, fleet, parcels, treasury and reporting" },
+      "accounting": { "label": "Accounting", "desc": "OHADA accounting, entries and journals" }
+    },
+    "soon_mod": {
+      "hr": "Human Resources",
+      "payroll": "Payroll",
+      "stock": "Inventory",
+      "hotel": "Hotel",
+      "parking": "Parking"
+    }
+  },
   "shared": {
     "actions": {
       "save": "Save",
