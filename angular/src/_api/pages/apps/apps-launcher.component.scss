@@ -1,9 +1,42 @@
-// ── Écran de lancement (choix d'application) — barre de nav en haut ─────────────
-// La barre `app-header` est fixée (65px). On masque le repli de sidebar (aucune
-// sidebar sur cet écran) et on décale le contenu sous la barre.
-:host ::ng-deep #toggle_btn,
-:host ::ng-deep #mobile_btn {
-  display: none;
+// ── Barre de nav propre à cet écran (hors shell) ────────────────────────────────
+// Le header est prévu pour vivre au-dessus d'une sidebar : `.header-left` réserve
+// 346px (largeur sidebar) et flotte, laissant un vide à gauche. Ici il n'y a pas
+// de sidebar : on transforme le header en une barre pleine largeur en flex, logo
+// collé à gauche et actions à droite, et on masque les boutons de repli sidebar.
+:host ::ng-deep {
+  .header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    max-width: none !important;
+    margin: 0 !important;
+    background: #fff;
+  }
+
+  .main-header {
+    display: flex;
+    align-items: center;
+    height: 65px;
+  }
+
+  .header-left {
+    float: none !important;
+    width: auto !important;
+    justify-content: flex-start;
+    padding: 0 1.25rem;
+
+    .logo,
+    .logo.logo-normal { display: inline-block !important; }
+    .logo-white,
+    .logo-small { display: none !important; }
+    .logo img { width: 150px; }
+  }
+
+  #toggle_btn,
+  #mobile_btn { display: none !important; }
+
+  // Pousse le groupe d'actions (app-switcher, langue, profil…) tout à droite.
+  ul.user-menu { margin-left: auto; }
 }
 
 .launcher-page {
