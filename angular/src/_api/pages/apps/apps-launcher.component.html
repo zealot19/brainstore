@@ -1,10 +1,8 @@
+<!-- Barre de navigation (identique au reste de l'application) -->
+<app-header />
+
 <div class="launcher-page">
   <div class="launcher-inner">
-
-    <!-- Marque -->
-    <div class="launcher-brand">
-      <img src="assets/img/logo.svg" alt="Brainstore" class="launcher-logo">
-    </div>
 
     <!-- En-tête -->
     <div class="launcher-heading">
@@ -16,13 +14,10 @@
       <div class="launcher-state">
         <div class="spinner-border text-primary"></div>
       </div>
-    } @else if (items.length === 0) {
-      <div class="launcher-state launcher-empty">
-        <i class="ti ti-apps-off"></i>
-        <span>Aucune application disponible pour votre compte.</span>
-      </div>
     } @else {
       <div class="launcher-grid">
+
+        <!-- Applications accessibles -->
         @for (pkg of items; track pkg.code) {
           <button type="button"
                   class="launcher-card accent-{{ meta(pkg.code).color }}"
@@ -39,6 +34,21 @@
             </span>
           </button>
         }
+
+        <!-- Modules à venir (non disponibles) -->
+        @for (soon of comingSoon; track soon.label) {
+          <div class="launcher-card is-soon accent-default" aria-disabled="true">
+            <span class="launcher-badge">
+              <i class="ti ti-{{ soon.icon }}"></i>
+            </span>
+            <span class="launcher-body">
+              <span class="launcher-title">{{ soon.label }}</span>
+              <span class="launcher-desc">Bientôt disponible</span>
+            </span>
+            <span class="launcher-soon-chip">Bientôt</span>
+          </div>
+        }
+
       </div>
     }
 

@@ -3,7 +3,6 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { routes, SidebarService } from '../../core/core.index';
 import { AuthService } from '../.././../_api/services/auth/auth.service';
-import { HasModuleDirective } from '../../shared/directives/has-module.directive';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { CashSessionTimerComponent } from '../../shared/cash-session-timer/cash-session-timer.component';
@@ -14,7 +13,7 @@ import { AppPackageService } from '../../core/service/packages/app-package.servi
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink, CommonModule, HasModuleDirective, HasPermissionDirective, LanguageSwitcherComponent, CashSessionTimerComponent, TranslocoModule],
+  imports: [RouterLink, CommonModule, HasPermissionDirective, LanguageSwitcherComponent, CashSessionTimerComponent, TranslocoModule],
 })
 export class HeaderComponent {
   routes = routes;

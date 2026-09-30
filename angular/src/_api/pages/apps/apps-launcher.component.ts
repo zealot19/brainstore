@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AppPackageService, AppPackage } from '../../../app/core/service/packages/app-package.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { HeaderComponent } from '../../../app/layouts/header/header.component';
 
 const LANDING: Record<string, string> = {
   administration: '/admin/agencies',
@@ -19,12 +20,22 @@ const META: Record<string, PkgMeta> = {
 };
 const META_FALLBACK: PkgMeta = { color: 'default', desc: 'Accéder au module' };
 
+// Modules à venir — affichés (non câblés) pour donner la vision d'ensemble.
+interface SoonPkg { label: string; icon: string; }
+const COMING_SOON: SoonPkg[] = [
+  { label: 'Ressources Humaines', icon: 'users' },
+  { label: 'Paie',               icon: 'cash' },
+  { label: 'Stock',              icon: 'packages' },
+  { label: 'Hôtel',              icon: 'bed' },
+  { label: 'Parking',            icon: 'parking' },
+];
+
 @Component({
   selector: 'app-apps-launcher',
   standalone: true,
   templateUrl: './apps-launcher.component.html',
   styleUrls: ['./apps-launcher.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, HeaderComponent],
 })
 export class AppsLauncherComponent implements OnInit {
   private pkgSvc = inject(AppPackageService);
@@ -33,6 +44,7 @@ export class AppsLauncherComponent implements OnInit {
 
   items: AppPackage[] = [];
   loading = true;
+  readonly comingSoon = COMING_SOON;
   readonly year = new Date().getFullYear();
 
   get firstName(): string {
