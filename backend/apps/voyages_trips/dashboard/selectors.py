@@ -54,7 +54,7 @@ def trip_cards(company, user, date_from, date_to):
 def _months(qs):
     """Liste de 12 compteurs (jan..déc) à partir d'un queryset filtré sur l'année."""
     out = [0] * 12
-    rows = qs.annotate(m=ExtractMonth("created_at")).values("m").annotate(c=Count("id"))
+    rows = qs.order_by().annotate(m=ExtractMonth("created_at")).values("m").annotate(c=Count("id"))
     for row in rows:
         if row["m"]:
             out[row["m"] - 1] = row["c"]
@@ -85,7 +85,14 @@ def monthly_series(company, user, year, metric):
         from apps.voyages_booking.models import Passenger
         qs = Passenger.objects.filter(is_deleted=False, company=company, created_at__year=year)
         if ids is not None:
-            # clients « de l'agence » = passagers ayant un billet sur un voyage de ces agences
-            qs = qs.filter(tickets__trip__origin__agency_id__in=ids).distinct()
-        return _months(qs)
+            qs = qs.filter(tickets__trip__origin__agency_id__in=ids)
+        out = [0] * 12
+        rows = (qs.order_by()
+                  .annotate(m=ExtractMonth("created_at"))
+                  .values("m")
+                  .annotate(c=Count("id", distinct=True)))
+        for row in rows:
+            if row["m"]:
+                out[row["m"] - 1] = row["c"]
+        return out
     return [0] * 12
