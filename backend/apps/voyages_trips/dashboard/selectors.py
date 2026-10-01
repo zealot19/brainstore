@@ -1,5 +1,6 @@
 """Agrégations du tableau de bord Transport (lecture seule, cloisonné par agence)."""
 from django.db.models import Count, Sum
+from django.db.models.functions import ExtractMonth
 from apps.core.agency_scope import user_agency_ids
 from apps.voyages_trips.models import Trip
 from apps.voyages_booking.models import Ticket
@@ -48,3 +49,43 @@ def trip_cards(company, user, date_from, date_to):
             "total_revenue": tr + br + cr,
         })
     return cards
+
+
+def _months(qs):
+    """Liste de 12 compteurs (jan..déc) à partir d'un queryset filtré sur l'année."""
+    out = [0] * 12
+    rows = qs.annotate(m=ExtractMonth("created_at")).values("m").annotate(c=Count("id"))
+    for row in rows:
+        if row["m"]:
+            out[row["m"] - 1] = row["c"]
+    return out
+
+
+def monthly_series(company, user, year, metric):
+    ids = user_agency_ids(user)
+    if metric == "tickets":
+        qs = Ticket.objects.filter(is_deleted=False, booking__company=company,
+                                   created_at__year=year).exclude(status="cancelled")
+        if ids is not None:
+            qs = qs.filter(trip__origin__agency_id__in=ids)
+        return _months(qs)
+    if metric == "baggage":
+        qs = Baggage.objects.filter(is_deleted=False, company=company,
+                                    created_at__year=year).exclude(status="cancelled")
+        if ids is not None:
+            qs = qs.filter(trip__origin__agency_id__in=ids)
+        return _months(qs)
+    if metric == "parcels":
+        qs = Parcel.objects.filter(is_deleted=False, company=company,
+                                   created_at__year=year).exclude(status="cancelled")
+        if ids is not None:
+            qs = qs.filter(agency_id__in=ids)   # colis : agence d'origine (peut ne pas avoir de voyage)
+        return _months(qs)
+    if metric == "clients":
+        from apps.voyages_booking.models import Passenger
+        qs = Passenger.objects.filter(is_deleted=False, company=company, created_at__year=year)
+        if ids is not None:
+            # clients « de l'agence » = passagers ayant un billet sur un voyage de ces agences
+            qs = qs.filter(tickets__trip__origin__agency_id__in=ids).distinct()
+        return _months(qs)
+    return [0] * 12
