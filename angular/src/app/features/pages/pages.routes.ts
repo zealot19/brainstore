@@ -119,6 +119,7 @@ export const Pages_routes: Routes = [
               path: 'voyages',
               loadComponent: () => import('../../../_api/pages/voyages/voyages.component').then(m => m.VoyagesComponent),
               children: [
+                { path: 'dashboard', loadComponent: () => import('../../../_api/pages/voyages-dashboard/transport-dashboard.component').then(m => m.TransportDashboardComponent) },
                 { path: 'list', loadComponent: () => import('../../../_api/pages/voyages/list/voyages-list.component').then(m => m.VoyagesListComponent) },
                 { path: 'trip/:id', loadComponent: () => import('../../../_api/pages/voyages/trip-detail/trip-detail.component').then(m => m.VoyagesTripDetailComponent) },
                 { path: 'roadmap/:tripId', loadComponent: () => import('../../../_api/pages/voyages/roadmap/roadmap.component').then(m => m.VbRoadmapComponent) },

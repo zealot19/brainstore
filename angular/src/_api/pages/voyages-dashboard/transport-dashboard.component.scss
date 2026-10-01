@@ -1,0 +1,7 @@
+.trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+@media (max-width: 991.98px) { .chart-grid { grid-template-columns: 1fr; } }
+
+.trip-card .trip-head { font-weight: 700; font-size: 1rem; color: #1b2559; }
+.trip-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.15rem 0; color: #475467; }
+.trip-total { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eceef3; }
