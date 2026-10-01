@@ -2701,5 +2701,12 @@
       "recheck_zone_body": "This zone will be sent back to Zebra operators (status →",
       "recheck_zone_note_ph": "e.g. Recount the shoe shelf…"
     }
+  },
+  "trdash": {
+    "title": "Dashboard", "from": "From", "to": "To", "refresh": "Refresh",
+    "total": "Total", "empty": "No trips for this period.",
+    "tickets": "Tickets", "baggage": "Baggage", "parcels": "Parcels",
+    "chart_tickets": "Ticket sales", "chart_baggage": "Baggage",
+    "chart_parcels": "Parcels", "chart_clients": "Clients"
   }
 }

@@ -2701,5 +2701,12 @@
       "recheck_zone_body": "Esta zona será devuelta a los operadores Zebra (estado →",
       "recheck_zone_note_ph": "ej.: Recontar el estante de zapatos…"
     }
+  },
+  "trdash": {
+    "title": "Panel", "from": "Desde", "to": "Hasta", "refresh": "Actualizar",
+    "total": "Total", "empty": "No hay viajes en el período.",
+    "tickets": "Billetes", "baggage": "Equipaje", "parcels": "Paquetes",
+    "chart_tickets": "Venta de billetes", "chart_baggage": "Equipaje",
+    "chart_parcels": "Paquetes", "chart_clients": "Clientes"
   }
 }

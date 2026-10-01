@@ -8,7 +8,7 @@ import { HeaderComponent } from '../../../app/layouts/header/header.component';
 
 const LANDING: Record<string, string> = {
   administration: '/admin/agencies',
-  transport:      '/voyages/list',
+  transport:      '/voyages/dashboard',
   accounting:     '/accounting/accounts',
 };
 

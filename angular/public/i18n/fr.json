@@ -2701,5 +2701,20 @@
       "recheck_zone_body": "Cette zone sera renvoyée aux opérateurs Zebra (statut →",
       "recheck_zone_note_ph": "ex : Recompter le rayon chaussures…"
     }
+  },
+  "trdash": {
+    "title": "Tableau de bord",
+    "from": "Du",
+    "to": "Au",
+    "refresh": "Actualiser",
+    "total": "Total",
+    "empty": "Aucun voyage sur la période.",
+    "tickets": "Billets",
+    "baggage": "Bagages",
+    "parcels": "Colis",
+    "chart_tickets": "Ventes de billets",
+    "chart_baggage": "Bagages",
+    "chart_parcels": "Colis",
+    "chart_clients": "Clients"
   }
 }
