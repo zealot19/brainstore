@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface TripCard {
@@ -21,11 +20,9 @@ export class TransportDashboardService {
   private base = `${environment.apiUrl}/voyages/dashboard`;
 
   loadTrips(dateFrom: string, dateTo: string): Observable<TripCardsResponse> {
-    return this.http.get<any>(`${this.base}/trips/`, { params: { date_from: dateFrom, date_to: dateTo } })
-      .pipe(map(r => r?.data ?? r));
+    return this.http.get<TripCardsResponse>(`${this.base}/trips/`, { params: { date_from: dateFrom, date_to: dateTo } });
   }
   loadSeries(year: number, metric: string): Observable<SeriesResponse> {
-    return this.http.get<any>(`${this.base}/series/`, { params: { year, metric } })
-      .pipe(map(r => r?.data ?? r));
+    return this.http.get<SeriesResponse>(`${this.base}/series/`, { params: { year, metric } });
   }
 }
