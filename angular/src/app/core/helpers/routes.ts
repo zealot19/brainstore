@@ -450,6 +450,7 @@ export const routes={
   reporting:            '/reporting/reports',
 
   // ── Gestion Voyages ──────────────────────────────────────────────────────────
+  voyagesDashboard: '/voyages/dashboard',
   voyagesList: '/voyages/list',
   voyagesTrip: '/voyages/trip',
 
