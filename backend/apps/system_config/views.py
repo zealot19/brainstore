@@ -1,5 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
@@ -569,3 +571,26 @@ class MyPackagesView(APIView):
 
     def get(self, request):
         return success_response(accessible_packages(request.user))
+
+
+class ArchivingSettingsView(APIView):
+    """GET/PUT the per-company data-archiving window (institution admin only)."""
+    permission_classes = [IsAuthenticated, IsInstitutionAdmin]
+
+    def get(self, request):
+        from apps.system_config.selectors.archiving import archive_window_days
+        return Response({"archive_window_days": archive_window_days(request.user.company_id)})
+
+    def put(self, request):
+        from apps.system_config.services.archiving import set_archive_window_days
+        raw = request.data.get("archive_window_days")
+        try:
+            days = int(raw)
+        except (TypeError, ValueError):
+            return Response({"detail": "archive_window_days doit être un entier."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            set_archive_window_days(request.user.company_id, days, updated_by=request.user)
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"archive_window_days": days})

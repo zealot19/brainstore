@@ -36,4 +36,7 @@ urlpatterns = [
 
     # ── App Launcher ──────────────────────────────────────────────────────────
     path("my-packages/",               views.MyPackagesView.as_view(),        name="my-packages"),
+
+    # ── Data Archiving ──────────────────────────────────────────────────────────
+    path("archiving/", views.ArchivingSettingsView.as_view(), name="archiving-settings"),
 ]
