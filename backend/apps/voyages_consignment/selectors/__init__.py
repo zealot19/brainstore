@@ -2,6 +2,7 @@ from django.db.models import Q
 from apps.voyages_consignment.models import Parcel, Baggage
 from apps.core.filters import resolve_date_field, apply_date_range
 from apps.core.agency_scope import user_agency_ids, scope_by_agency_q
+from apps.system_config.selectors.archiving import apply_archive_window
 
 _CONS_DATE_FIELDS = {"created": "created_at", "departure": "trip__scheduled_departure",
                      "arrival": "trip__scheduled_arrival", "delivered": "delivered_home_at"}
@@ -19,7 +20,8 @@ def _parcel_visibility_q(user):
 def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
                  origin_point=None, destination_point=None,
                  date_field=None, date_from=None, date_to=None,
-                 delivered_home=None, delivery_payment_method=None, user=None):
+                 delivered_home=None, delivery_payment_method=None, user=None,
+                 include_archived=False):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
           .filter(_parcel_visibility_q(user))
           .select_related("origin_point", "destination_point", "trip", "trip__route",
@@ -46,6 +48,8 @@ def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=No
                        Q(recipient_phone__icontains=q))
     field = resolve_date_field(_CONS_DATE_FIELDS, date_field, "created")
     qs = apply_date_range(qs, field, date_from, date_to)
+    qs = apply_archive_window(qs, date_field="created_at", company_id=company.id,
+                              include_archived=include_archived)
     return qs
 
 
@@ -89,7 +93,8 @@ def trip_parcels(company, trip_id, user=None):
 
 
 def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None,
-                 consignment_type=None, date_field=None, date_from=None, date_to=None, user=None):
+                 consignment_type=None, date_field=None, date_from=None, date_to=None, user=None,
+                 include_archived=False):
     qs = (Baggage.objects.filter(is_deleted=False, company=company)
           .filter(scope_by_agency_q(user_agency_ids(user),
                                     "trip__origin__agency_id", "ticket__booking__agency_id"))
@@ -111,6 +116,8 @@ def list_baggage(company, ticket_id=None, trip_id=None, status=None, q=None,
                        Q(ticket__passenger__phone__icontains=q))
     field = resolve_date_field(_CONS_DATE_FIELDS, date_field, "created")
     qs = apply_date_range(qs, field, date_from, date_to)
+    qs = apply_archive_window(qs, date_field="created_at", company_id=company.id,
+                              include_archived=include_archived)
     return qs
 
 

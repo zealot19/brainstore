@@ -9,6 +9,7 @@ from apps.voyages_trips.models import Trip
 from apps.voyages_booking.models import Ticket
 from apps.voyages_consignment.models import Parcel, Baggage
 from apps.voyages_consignment import selectors, services
+from apps.system_config.selectors.archiving import wants_archived
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global
 
@@ -36,7 +37,7 @@ class ParcelListView(APIView):
             date_to=request.query_params.get("date_to"),
             delivered_home=request.query_params.get("delivered_home"),
             delivery_payment_method=request.query_params.get("delivery_payment_method"),
-            user=request.user)
+            user=request.user, include_archived=wants_archived(request))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.ParcelRead(page, many=True).data)
@@ -291,7 +292,7 @@ class BaggageListView(APIView):
             date_field=request.query_params.get("date_field"),
             date_from=request.query_params.get("date_from"),
             date_to=request.query_params.get("date_to"),
-            user=request.user)
+            user=request.user, include_archived=wants_archived(request))
         return success_response(S.BaggageRead(qs, many=True).data)
 
     def post(self, request):
