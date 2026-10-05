@@ -5,6 +5,7 @@ from apps.core.responses import success_response, created_response, error_respon
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
 from apps.system_config.models import Company
+from apps.system_config.selectors.archiving import wants_archived
 
 from . import selectors, services, serializers as S
 from .models import TripCrew, TripSeat, CrewMember, TripExpense
@@ -52,7 +53,8 @@ class TripListCreateView(APIView):
             date_field=request.query_params.get("date_field"),
             date_from=request.query_params.get("date_from"),
             date_to=request.query_params.get("date_to"),
-            auto_expenses=(None if _ax is None else _ax.lower() == "true"))
+            auto_expenses=(None if _ax is None else _ax.lower() == "true"),
+            include_archived=wants_archived(request))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.TripListSerializer(page, many=True).data)
