@@ -27,7 +27,7 @@ services:
     build: ../../backend
     restart: unless-stopped
     env_file: .env
-    command: sh -c 'while true; do python manage.py sync_once || true; sleep ${SYNC_INTERVAL:-90}; done'
+    command: sh -c 'while true; do python manage.py sync_once || true; python manage.py auto_transition_trips || true; sleep ${SYNC_INTERVAL:-90}; done'
     depends_on:
       - db
       - web
