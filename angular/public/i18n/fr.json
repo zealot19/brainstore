@@ -2744,6 +2744,8 @@
     "chart_clients": "Clients"
   },
   "license": {
-    "expired_title": "Licence expirée"
+    "expired_title": "Licence expirée",
+    "manage_title": "Gérer la licence",
+    "expires_at_label": "Date d'expiration"
   }
 }

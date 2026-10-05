@@ -129,6 +129,12 @@
                        (click)="openEdit(c)" [title]="'shared.actions.edit' | transloco">
                       <i class="ti ti-pencil"></i>
                     </a>
+                    <a href="javascript:void(0);"
+                       class="me-2 p-2 d-flex align-items-center border rounded"
+                       data-bs-toggle="modal" data-bs-target="#company-license"
+                       (click)="openLicense(c)" [title]="'license.manage_title' | transloco">
+                      <i class="ti ti-key text-primary"></i>
+                    </a>
                     @if (c.status === 'suspended') {
                       <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" [title]="'sys.co.act_reactivate' | transloco" (click)="activate(c.id)">
                         <i class="ti ti-player-play text-success"></i>
@@ -316,6 +322,16 @@
               <label for="create-is-active" class="checktoggle"></label>
             </div>
             <label class="form-label mb-0">{{ 'admin.common.active' | transloco }}</label>
+          </div>
+
+          <!-- Licence -->
+          <hr class="my-3" />
+          <p class="fw-semibold mb-3"><i class="ti ti-key me-1 text-primary"></i>{{ 'license.manage_title' | transloco }}</p>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'license.expires_at_label' | transloco }} <span class="text-danger">*</span></label>
+              <input formControlName="license_expires_at" type="date" class="form-control" />
+            </div>
           </div>
 
           <!-- Bootstrap : premier administrateur -->
@@ -511,6 +527,33 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal : Licence -->
+<div class="modal fade" id="company-license" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ 'license.manage_title' | transloco }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">{{ licCompanyName }}</p>
+        @if (licErr) { <div class="alert alert-danger py-2">{{ licErr }}</div> }
+        <div class="mb-3">
+          <label class="form-label">{{ 'license.expires_at_label' | transloco }}</label>
+          <input [(ngModel)]="licDate" type="date" class="form-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="!licDate || licSaving" (click)="saveLicense()">
+          @if (licSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          {{ 'shared.actions.save' | transloco }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

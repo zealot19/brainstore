@@ -44,6 +44,13 @@ export class CompaniesComponent implements OnInit {
   editLogoFile: File | null = null;
   editLogoPreview: string | null = null;
 
+  // License management (super admin)
+  licCompanyId: string | null = null;
+  licCompanyName = '';
+  licDate = '';
+  licSaving = false;
+  licErr = '';
+
   constructor(
     private companyService: CompanyService,
     private packageService: PackageService,
@@ -74,6 +81,7 @@ export class CompaniesComponent implements OnInit {
       admin_email:      ['', Validators.email],
       admin_first_name: [''],
       admin_last_name:  [''],
+      license_expires_at: ['', Validators.required],
     });
     this.editForm = this.fb.group({
       name:       ['', Validators.required],
@@ -149,6 +157,7 @@ export class CompaniesComponent implements OnInit {
       cnps_number: v.cnps_number, vat_number: v.vat_number, capital: v.capital || null,
       email: v.email, phone: v.phone, website: v.website,
       postal_box: v.postal_box, is_active: v.is_active,
+      license_expires_at: v.license_expires_at,
     };
     if (v.address_line1) {
       payload['address_input'] = { line1: v.address_line1, city: v.address_city, postal_code: v.address_postal_code };
@@ -180,6 +189,27 @@ export class CompaniesComponent implements OnInit {
     this.setupResult = null;
     this.createForm.reset({ currency: 'XOF', is_active: true });
     this.selectedAppGroups = ['transport'];
+  }
+
+  openLicense(c: any): void {
+    this.licCompanyId = c.id;
+    this.licCompanyName = c.name;
+    this.licErr = '';
+    this.licDate = '';
+    this.companyService.getLicense(c.id).subscribe({
+      next: r => this.licDate = r.expires_at ?? '',
+      error: () => this.licDate = '',
+    });
+  }
+
+  saveLicense(): void {
+    if (!this.licCompanyId || !this.licDate || this.licSaving) return;
+    this.licSaving = true;
+    this.licErr = '';
+    this.companyService.setLicense(this.licCompanyId, this.licDate).subscribe({
+      next: () => { this.licSaving = false; this.load(); this.closeModal('company-license'); },
+      error: err => { this.licSaving = false; this.licErr = this.extractError(err); },
+    });
   }
 
   toggleAppGroup(code: string): void {

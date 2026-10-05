@@ -41,6 +41,14 @@ export class CompanyService {
     return this.http.post(SYSTEM.companyChangePackage(id), { package_id, billing_cycle });
   }
 
+  getLicense(id: string): Observable<{ status: string; expires_at: string | null }> {
+    return this.http.get<{ status: string; expires_at: string | null }>(`${SYSTEM.company(id)}license/`);
+  }
+
+  setLicense(id: string, expires_at: string, status?: string): Observable<{ status: string; expires_at: string | null }> {
+    return this.http.put<{ status: string; expires_at: string | null }>(`${SYSTEM.company(id)}license/`, { expires_at, status });
+  }
+
   private buildPayload(data: Record<string, any>, logoFile?: File | null): FormData | Record<string, any> {
     if (!logoFile) return data;
     const fd = new FormData();
