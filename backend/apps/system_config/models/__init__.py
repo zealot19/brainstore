@@ -2,6 +2,7 @@ from .plan import Plan
 from .company import Company, Subscription
 from .agency import Agency
 from .parameter import Parameter, FeatureFlag
+from .license import License
 
 __all__ = [
     "Plan",
@@ -10,4 +11,5 @@ __all__ = [
     "Agency",
     "Parameter",
     "FeatureFlag",
+    "License",
 ]
