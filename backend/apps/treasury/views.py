@@ -220,12 +220,16 @@ class MyActiveSessionView(APIView):
     def get(self, request):
         from django.utils import timezone
         from apps.treasury.models import CashSession
+        company = _company(request)
+        if company is None:
+            # Platform super admin / company-less user has no caisse session.
+            return Response({"data": None})
         now = timezone.now()
         # La session reste visible même après l'heure de fin prévue : c'est là que le
         # guichetier fait son billetage (les ventes, elles, sont bloquées à part par
         # get_open_session_for_user). Le fanion needs_billetage pilote le bouton.
         session = (CashSession.objects
-                   .filter(assigned_to=request.user, company_id=_company(request).id,
+                   .filter(assigned_to=request.user, company_id=company.id,
                            status=CashSession.Status.OPEN, is_deleted=False)
                    .order_by("-opened_at").first())
         if not session:
