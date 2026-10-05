@@ -61,7 +61,9 @@ export class VoyagesTripDetailComponent implements OnInit {
         this.trip = t; this.loading = false;
         this.loadSeats();
         this.loadTbHistory();
-        if (!t.vehicle) this.svc.eligibleVehicles(this.id).subscribe(v => this.eligible = v);
+        // Toujours charger les véhicules éligibles : on peut (ré)affecter même si un
+        // véhicule est déjà assigné (changement d'affectation, comme l'équipage).
+        if (!this.vehicleLocked) this.svc.eligibleVehicles(this.id).subscribe(v => this.eligible = v);
       },
       error: () => this.loading = false,
     });
@@ -84,12 +86,26 @@ export class VoyagesTripDetailComponent implements OnInit {
   }
 
   // ── vehicle ──
+  /** Voyage terminé/annulé : affectation véhicule figée (comme l'équipage). */
+  get vehicleLocked(): boolean {
+    return this.trip?.status === 'completed' || this.trip?.status === 'cancelled';
+  }
+
   assign(): void {
     if (!this.selectedVehicle) return;
     this.assignError = ''; this.assignWarnings = [];
     this.svc.assignVehicle(this.id, this.selectedVehicle).subscribe({
-      next: res => { this.assignWarnings = res.warnings || []; this.reload(); },
+      next: res => { this.assignWarnings = res.warnings || []; this.selectedVehicle = null; this.reload(); },
       error: e => { this.assignError = e?.error?.detail ?? 'Affectation impossible.'; },
+    });
+  }
+
+  removeVehicle(): void {
+    if (!confirm('Retirer le véhicule de ce voyage ?')) return;
+    this.assignError = ''; this.assignWarnings = [];
+    this.svc.unassignVehicle(this.id).subscribe({
+      next: () => this.reload(),
+      error: e => { this.assignError = e?.error?.detail ?? 'Retrait impossible.'; },
     });
   }
 

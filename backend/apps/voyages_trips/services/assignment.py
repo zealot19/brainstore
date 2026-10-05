@@ -38,6 +38,13 @@ def materialise_seats(trip):
 
 @transaction.atomic
 def assign_vehicle(trip, vehicle, *, user, alert_days=30):
+    # vehicle=None : désaffectation (retirer le véhicule du voyage). Les sièges déjà
+    # générés sont conservés (des billets peuvent exister) ; on ne touche qu'au lien.
+    if vehicle is None:
+        trip.vehicle = None
+        trip.updated_by = user
+        trip.save(update_fields=["vehicle", "updated_by", "updated_at"])
+        return []
     reasons = blocking_reasons(vehicle, window_start=trip.scheduled_departure,
                                window_end=trip.scheduled_arrival, exclude_trip=trip)
     if reasons:

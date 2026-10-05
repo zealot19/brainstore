@@ -183,10 +183,13 @@ class TripAssignVehicleView(APIView):
         if not trip:
             return error_response("Voyage introuvable.", status_code=404)
         from apps.fleet.models import Vehicle
-        vehicle = Vehicle.objects.filter(id=request.data.get("vehicle_id"),
-                                         company=company, is_deleted=False).first()
-        if not vehicle:
-            return error_response("Véhicule introuvable.", status_code=404)
+        vehicle_id = request.data.get("vehicle_id")
+        vehicle = None
+        if vehicle_id:
+            vehicle = Vehicle.objects.filter(id=vehicle_id, company=company, is_deleted=False).first()
+            if not vehicle:
+                return error_response("Véhicule introuvable.", status_code=404)
+        # vehicle_id absent/null -> désaffectation (vehicle=None).
         try:
             warnings = services.assign_vehicle(trip, vehicle, user=request.user)
         except ApplicationError as e:

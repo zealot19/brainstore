@@ -24,6 +24,9 @@ export class TripService {
   assignVehicle(id: string, vehicleId: string): Observable<{ trip: Trip; warnings: string[] }> {
     return this.http.post<{ trip: Trip; warnings: string[] }>(VOYAGES.assignVehicle(id), { vehicle_id: vehicleId });
   }
+  unassignVehicle(id: string): Observable<{ trip: Trip; warnings: string[] }> {
+    return this.http.post<{ trip: Trip; warnings: string[] }>(VOYAGES.assignVehicle(id), { vehicle_id: null });
+  }
 
   listCrew(id: string): Observable<TripCrew[]> { return this.http.get<TripCrew[]>(VOYAGES.crew(id)); }
   addCrew(id: string, memberId: string): Observable<TripCrew> { return this.http.post<TripCrew>(VOYAGES.crew(id), { member_id: memberId }); }

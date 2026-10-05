@@ -28,20 +28,32 @@
 
   <div class="row">
     <div class="col-lg-4">
-      <!-- Vehicle assignment -->
+      <!-- Vehicle assignment (boîte + corbeille, comme l'équipage) -->
       <div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'trips.detail.vehicle' | transloco }}</h6></div><div class="card-body">
-        @if (trip.vehicle) {
-          <p class="mb-1"><strong>{{ trip.vehicle_plate }}</strong></p>
-          <p class="text-muted mb-0">{{ 'trips.detail.plan' | transloco }} : {{ trip.seating_plan_code || '—' }}</p>
+        @if (assignError) { <div class="alert alert-danger py-2">{{ assignError }}</div> }
+        <ul class="list-group mb-2">
+          @if (trip.vehicle) {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ trip.vehicle_plate }} <span class="badge bg-light text-dark ms-1">{{ 'trips.detail.plan' | transloco }} : {{ trip.seating_plan_code || '—' }}</span></span>
+              @if (!vehicleLocked) { <a class="text-danger" *hasPermission="'voyage.trip.update'" (click)="removeVehicle()" [title]="'trips.detail.remove' | transloco"><i class="ti ti-trash"></i></a> }
+            </li>
+          } @else {
+            <li class="list-group-item text-muted">{{ 'trips.detail.no_vehicle' | transloco }}</li>
+          }
+        </ul>
+        @if (vehicleLocked) {
+          <div class="text-muted small"><i class="ti ti-lock me-1"></i>{{ 'trips.detail.vehicle_locked' | transloco }}</div>
         } @else {
-          @if (assignError) { <div class="alert alert-danger py-2">{{ assignError }}</div> }
-          <label class="form-label">{{ 'trips.detail.eligible_vehicle' | transloco }}</label>
-          <select class="form-select mb-2" [(ngModel)]="selectedVehicle">
-            <option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>
-            @for (v of eligible; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option> }
-          </select>
-          <button class="btn btn-sm btn-primary w-100" *hasPermission="'voyage.trip.update'" (click)="assign()" [disabled]="!selectedVehicle">{{ 'trips.detail.assign' | transloco }}</button>
-          @if (eligible.length === 0) { <p class="text-muted small mt-2">{{ 'trips.detail.no_eligible' | transloco }}</p> }
+          <div class="row g-2">
+            <div class="col-10">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedVehicle">
+                <option [ngValue]="null">{{ trip.vehicle ? ('trips.detail.change_vehicle' | transloco) : ('trips.list.choose' | transloco) }}</option>
+                @for (v of eligible; track v.id) { <option [ngValue]="v.id">{{ v.license_plate }} — {{ v.model_name }}</option> }
+              </select>
+            </div>
+            <div class="col-2"><button class="btn btn-sm btn-outline-primary w-100" *hasPermission="'voyage.trip.update'" (click)="assign()" [disabled]="!selectedVehicle">+</button></div>
+          </div>
+          @if (eligible.length === 0) { <p class="text-muted small mt-2 mb-0">{{ 'trips.detail.no_eligible' | transloco }}</p> }
         }
         @if (assignWarnings.length) {
           <div class="alert alert-warning py-2 mt-2 mb-0">

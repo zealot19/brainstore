@@ -10,6 +10,7 @@
             (mousedown)="pick(p)">
           <span class="fw-medium">{{ p.name }}</span>
           <small class="text-muted"> · {{ p.phone }}</small>
+          @if (p.id_number) { <small class="text-muted"> · {{ p.id_type_display || 'CNI' }} {{ p.id_number }}</small> }
         </li>
       }
     </ul>

@@ -75,3 +75,26 @@ def test_booking_with_name_creates_client_and_id_reuses():
                            "destination_point_id": None, "outbound_seat_id": str(seat2.id)}],
                    payment_method="cash", user=admin)
     assert Passenger.objects.filter(company=company, name="Alice Ngo").count() == 1
+
+
+@pytest.mark.django_db
+def test_get_or_create_passenger_dedupes_on_cni_despite_different_name():
+    """Même CNI = même client, même si le nom saisi diffère (homonymes distingués par la pièce)."""
+    from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+    company = _company(name="CniCo", email="cni@x.com")
+    p1 = get_or_create_passenger(company, id_type="cni", id_number="CNI-123", phone="690001",
+                                 name="Jean Dupont")
+    p2 = get_or_create_passenger(company, id_type="cni", id_number="CNI-123", phone="690999",
+                                 name="Jean Dupond")  # nom différent, même CNI
+    assert p2.id == p1.id
+    assert Passenger.objects.filter(company=company, id_number="CNI-123").count() == 1
+
+
+@pytest.mark.django_db
+def test_get_or_create_passenger_blank_cni_not_merged_by_cni():
+    """Deux clients sans CNI (pièce vide) ne sont PAS fusionnés sur la pièce vide."""
+    from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+    company = _company(name="BlankCni", email="blank@x.com")
+    a = get_or_create_passenger(company, id_type="cni", id_number="", phone="691001", name="Paul")
+    b = get_or_create_passenger(company, id_type="cni", id_number="", phone="691002", name="Pierre")
+    assert a.id != b.id
