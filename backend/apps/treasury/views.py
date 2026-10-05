@@ -9,6 +9,7 @@ from apps.core.exceptions import ApplicationError
 
 from apps.treasury import selectors, services
 from apps.core.agency_scope import user_agency_ids
+from apps.system_config.selectors.archiving import wants_archived
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
 from apps.treasury.serializers import (
     CashRegisterReadSerializer, CashRegisterWriteSerializer, CashRegisterUpdateSerializer,
@@ -491,6 +492,7 @@ class TransactionListView(APIView):
             date_to=params.get("date_to"),
             trip_id=params.get("trip_id"),
             agency_scope=user_agency_ids(request.user),
+            include_archived=wants_archived(request),
         )
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)

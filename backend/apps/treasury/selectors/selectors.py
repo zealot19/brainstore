@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
 from apps.core.agency_scope import scope_by_agency
+from apps.system_config.selectors.archiving import apply_archive_window
 
 
 # ── Cash registers ─────────────────────────────────────────────────────────────
@@ -108,7 +109,8 @@ def get_session(session_id, company_id):
 
 def list_transactions(company_id, *, transaction_type=None, category=None,
                       account_type=None, session_id=None, bank_account_id=None,
-                      date_from=None, date_to=None, trip_id=None, agency_scope=None):
+                      date_from=None, date_to=None, trip_id=None, agency_scope=None,
+                      include_archived=False):
     qs = (Transaction.objects
           .filter(company_id=company_id, is_deleted=False)
           .select_related("cash_session__cash_register", "bank_account",
@@ -131,6 +133,8 @@ def list_transactions(company_id, *, transaction_type=None, category=None,
         qs = qs.filter(transaction_date__lte=date_to)
     if trip_id:
         qs = qs.filter(trip_id=trip_id)
+    qs = apply_archive_window(qs, date_field="transaction_date", company_id=company_id,
+                              include_archived=include_archived)
     return qs
 
 
