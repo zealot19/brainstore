@@ -1,0 +1,24 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'admin.archiving.title' | transloco }}</h4>
+    <h6>{{ 'admin.archiving.subtitle' | transloco }}</h6>
+  </div></div>
+</div>
+<div class="card"><div class="card-body">
+  @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+  @else {
+    <form [formGroup]="form" (ngSubmit)="save()">
+      @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+      @if (okMsg) { <div class="alert alert-success py-2">{{ 'admin.archiving.saved' | transloco }}</div> }
+      <p class="text-muted">{{ 'admin.archiving.info' | transloco }}</p>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">{{ 'admin.archiving.f_days' | transloco }}</label>
+        <input formControlName="archive_window_days" type="number" min="0" class="form-control" />
+        <small class="text-muted">{{ 'admin.archiving.f_days_hint' | transloco }}</small>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
+      </button>
+    </form>
+  }
+</div></div>

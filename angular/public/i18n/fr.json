@@ -7,9 +7,18 @@
     "soon_desc": "Bientôt disponible",
     "footer": "Brainstore — Tous droits réservés",
     "pkg": {
-      "administration": { "label": "Administration", "desc": "Utilisateurs, rôles, agences et configuration" },
-      "transport": { "label": "Transport", "desc": "Voyages, flotte, colis, trésorerie et reporting" },
-      "accounting": { "label": "Comptabilité", "desc": "Comptabilité OHADA, écritures et journaux" }
+      "administration": {
+        "label": "Administration",
+        "desc": "Utilisateurs, rôles, agences et configuration"
+      },
+      "transport": {
+        "label": "Transport",
+        "desc": "Voyages, flotte, colis, trésorerie et reporting"
+      },
+      "accounting": {
+        "label": "Comptabilité",
+        "desc": "Comptabilité OHADA, écritures et journaux"
+      }
     },
     "soon_mod": {
       "hr": "Ressources Humaines",
@@ -1826,6 +1835,14 @@
       "f_parent": "Agence parente",
       "opt_none_root": "— Aucune (racine) —",
       "opt_select": "— Sélectionner —"
+    },
+    "archiving": {
+      "title": "Archivage des données",
+      "subtitle": "Fenêtre d'affichage des données opérationnelles",
+      "info": "Les listes opérationnelles n'affichent que les données des N derniers jours. Les données plus anciennes sont masquées (jamais supprimées) et restent accessibles via « Afficher les archives » et les rapports.",
+      "f_days": "Afficher les données des N derniers jours",
+      "f_days_hint": "0 = tout afficher (archivage désactivé)",
+      "saved": "Enregistré"
     }
   },
   "users": {

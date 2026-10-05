@@ -7,9 +7,18 @@
     "soon_desc": "Próximamente",
     "footer": "Brainstore — Todos los derechos reservados",
     "pkg": {
-      "administration": { "label": "Administración", "desc": "Usuarios, roles, agencias y configuración" },
-      "transport": { "label": "Transporte", "desc": "Viajes, flota, paquetes, tesorería e informes" },
-      "accounting": { "label": "Contabilidad", "desc": "Contabilidad OHADA, asientos y diarios" }
+      "administration": {
+        "label": "Administración",
+        "desc": "Usuarios, roles, agencias y configuración"
+      },
+      "transport": {
+        "label": "Transporte",
+        "desc": "Viajes, flota, paquetes, tesorería e informes"
+      },
+      "accounting": {
+        "label": "Contabilidad",
+        "desc": "Contabilidad OHADA, asientos y diarios"
+      }
     },
     "soon_mod": {
       "hr": "Recursos Humanos",
@@ -1826,6 +1835,14 @@
       "f_parent": "Agencia matriz",
       "opt_none_root": "— Ninguna (raíz) —",
       "opt_select": "— Seleccionar —"
+    },
+    "archiving": {
+      "title": "Archivado de datos",
+      "subtitle": "Ventana de visualización de los datos operativos",
+      "info": "Las listas operativas solo muestran los datos de los últimos N días. Los datos más antiguos se ocultan (nunca se eliminan) y siguen siendo accesibles mediante «Mostrar archivadas» y los informes.",
+      "f_days": "Mostrar los datos de los últimos N días",
+      "f_days_hint": "0 = mostrar todo (archivado desactivado)",
+      "saved": "Guardado"
     }
   },
   "users": {
@@ -2709,10 +2726,18 @@
     }
   },
   "trdash": {
-    "title": "Panel", "from": "Desde", "to": "Hasta", "refresh": "Actualizar",
-    "total": "Total", "empty": "No hay viajes en el período.",
-    "tickets": "Billetes", "baggage": "Equipaje", "parcels": "Paquetes",
-    "chart_tickets": "Venta de billetes", "chart_baggage": "Equipaje",
-    "chart_parcels": "Paquetes", "chart_clients": "Clientes"
+    "title": "Panel",
+    "from": "Desde",
+    "to": "Hasta",
+    "refresh": "Actualizar",
+    "total": "Total",
+    "empty": "No hay viajes en el período.",
+    "tickets": "Billetes",
+    "baggage": "Equipaje",
+    "parcels": "Paquetes",
+    "chart_tickets": "Venta de billetes",
+    "chart_baggage": "Equipaje",
+    "chart_parcels": "Paquetes",
+    "chart_clients": "Clientes"
   }
 }

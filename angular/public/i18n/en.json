@@ -7,9 +7,18 @@
     "soon_desc": "Coming soon",
     "footer": "Brainstore — All rights reserved",
     "pkg": {
-      "administration": { "label": "Administration", "desc": "Users, roles, agencies and configuration" },
-      "transport": { "label": "Transport", "desc": "Trips, fleet, parcels, treasury and reporting" },
-      "accounting": { "label": "Accounting", "desc": "OHADA accounting, entries and journals" }
+      "administration": {
+        "label": "Administration",
+        "desc": "Users, roles, agencies and configuration"
+      },
+      "transport": {
+        "label": "Transport",
+        "desc": "Trips, fleet, parcels, treasury and reporting"
+      },
+      "accounting": {
+        "label": "Accounting",
+        "desc": "OHADA accounting, entries and journals"
+      }
     },
     "soon_mod": {
       "hr": "Human Resources",
@@ -1826,6 +1835,14 @@
       "f_parent": "Parent agency",
       "opt_none_root": "— None (root) —",
       "opt_select": "— Select —"
+    },
+    "archiving": {
+      "title": "Data archiving",
+      "subtitle": "Display window for operational data",
+      "info": "Operational lists only show data from the last N days. Older data is hidden (never deleted) and remains reachable via \"Show archives\" and reports.",
+      "f_days": "Show data from the last N days",
+      "f_days_hint": "0 = show everything (archiving disabled)",
+      "saved": "Saved"
     }
   },
   "users": {
@@ -2709,10 +2726,18 @@
     }
   },
   "trdash": {
-    "title": "Dashboard", "from": "From", "to": "To", "refresh": "Refresh",
-    "total": "Total", "empty": "No trips for this period.",
-    "tickets": "Tickets", "baggage": "Baggage", "parcels": "Parcels",
-    "chart_tickets": "Ticket sales", "chart_baggage": "Baggage",
-    "chart_parcels": "Parcels", "chart_clients": "Clients"
+    "title": "Dashboard",
+    "from": "From",
+    "to": "To",
+    "refresh": "Refresh",
+    "total": "Total",
+    "empty": "No trips for this period.",
+    "tickets": "Tickets",
+    "baggage": "Baggage",
+    "parcels": "Parcels",
+    "chart_tickets": "Ticket sales",
+    "chart_baggage": "Baggage",
+    "chart_parcels": "Parcels",
+    "chart_clients": "Clients"
   }
 }

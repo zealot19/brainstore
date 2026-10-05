@@ -94,6 +94,16 @@ export class SidebarService {
           subMenus: [],
         },
         {
+          menuValue: 'Archivage des données',
+          hasSubRoute: false,
+          showSubRoute: false,
+          icon2: 'archive',
+          route: routes.adminInstArchiving,
+          base: 'archiving',
+          role: 'institution_admin',
+          subMenus: [],
+        },
+        {
           // Plateforme (super admin) — fusion de Config Système + Admin RBAC + Super Admin
           menuValue: 'Super Admin',
           hasSubRoute: true,

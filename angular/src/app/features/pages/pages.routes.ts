@@ -257,6 +257,7 @@ export const Pages_routes: Routes = [
           { path: 'roles',    loadComponent: () => import('../../../_api/pages/admin/roles/admin-roles.component').then(m => m.AdminRolesComponent) },
           { path: 'roles/:id/permissions', loadComponent: () => import('../../../_api/pages/rbac/role-permissions/role-permissions.component').then(m => m.RolePermissionsComponent) },
           { path: 'audit',    loadComponent: () => import('../../../_api/pages/admin/audit/audit.component').then(m => m.AuditLogComponent) },
+          { path: 'archiving', loadComponent: () => import('../../../_api/pages/admin/archiving/archiving.component').then(m => m.ArchivingComponent) },
           { path: 'documents', loadComponent: () => import('../../../_api/pages/voyages-config/manifest-template/manifest-template.component').then(m => m.VcManifestTemplateComponent) },
         ]
       },

@@ -47,6 +47,9 @@ export const SYSTEM = {
   // Feature Flags
   featureFlags:          `${API_BASE}/system/feature-flags/`,
   featureFlagToggle: (id: string) => `${API_BASE}/system/feature-flags/${id}/toggle/`,
+
+  // Data Archiving
+  archiving:             `${API_BASE}/system/archiving/`,
 };
 
 export const USERS = {

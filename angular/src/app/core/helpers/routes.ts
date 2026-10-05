@@ -61,6 +61,7 @@ export const routes={
   adminInstProfiles: '/admin/profiles',
   adminInstRoles:    '/admin/roles',
   adminInstAudit:    '/admin/audit',
+  adminInstArchiving: '/admin/archiving',
   // ── SCIG / Sync Sage 100 ──────────────────────────────────────────────────
   scigDepots:      '/scig/depots',
   scigInventaires: '/scig/inventaires',
