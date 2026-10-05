@@ -12,7 +12,7 @@ from django.apps import apps as django_apps
 BLOCKLIST_APPS = {
     "admin", "auth", "contenttypes", "sessions", "token_blacklist",  # internes Django/JWT
     "sync",                       # état du moteur de synchro (ne JAMAIS copier)
-    "sync_scig_sage",             # intégration Sage (locale là où tourne Sage)
+    # "sync_scig_sage",           # intégration Sage — désactivée (non utilisée)
     "whatsapp_bot",               # sessions du bot
     "online_booking",             # état de relais des réservations en ligne
     "voyage", "ticketing", "transport_config", "parcel",  # pile héritée morte

@@ -114,7 +114,9 @@ LOCAL_APPS = [
     # ── Synchronisation multi-instances (hub-and-spoke) ──
     "apps.sync",
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ──
-    "apps.sync_scig_sage",
+    # Désactivé (non utilisé pour l'instant). Réactiver = décommenter la ligne,
+    # la route scig-sage/ (api/v1/router.py) et la dépendance cryptography.
+    # "apps.sync_scig_sage",
 ]
 
 # ── Modèle utilisateur personnalisé ──────────────────────────────────────────

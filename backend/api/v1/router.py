@@ -71,7 +71,8 @@ urlpatterns = [
     path("reporting/",  include("apps.reporting.urls")),
 
     # ── Sync SCIG — Sage 100 (retail / inventaire / transferts) ────────────────
-    path("scig-sage/",  include("apps.sync_scig_sage.urls")),
+    # Désactivé (non utilisé pour l'instant). Réactiver = décommenter + réactiver l'app.
+    # path("scig-sage/",  include("apps.sync_scig_sage.urls")),
 
     # ── Journal d'audit global ──────────────────────────────────────────────────
     path("audit/",      include("apps.core.urls")),

@@ -34,5 +34,8 @@ segno==1.6.6   # génération QR code (billets), pur Python
 weasyprint==63.0
 openpyxl==3.1.5
 
-# ── Licensing ──
-cryptography==43.0.1
+# ── Sync SCIG — Sage 100 (désactivé, non utilisé pour l'instant) ──
+# cryptography sert au chiffrement des mots de passe Sage (sage/encryption.py) ;
+# pyodbc (optionnel) à la connexion SQL Sage. Réactiver avec l'app sync_scig_sage.
+# cryptography==43.0.1
+# pyodbc==5.1.0
