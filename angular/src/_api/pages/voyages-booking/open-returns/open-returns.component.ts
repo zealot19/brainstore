@@ -23,6 +23,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 export class VbOpenReturnsComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   rows: Booking[] = []; loading = false; q = '';
+  showArchived = false;
   fareClasses: FareClass[] = []; timeSlots: TimeSlot[] = [];
 
   // panneau d'affectation
@@ -43,8 +44,9 @@ export class VbOpenReturnsComponent implements OnInit {
 
   reload(): void {
     this.loading = true;
-    this.svc.openReturns(this.q).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
+    this.svc.openReturns(this.q, this.showArchived ? 1 : undefined).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.reload(); }
 
   tripLabel = (t: any): string =>
     `${t.number} · ${t.origin_name} → ${t.destination_name} · ${new Date(t.scheduled_departure).toLocaleString('fr-FR')}`;

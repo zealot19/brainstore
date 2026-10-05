@@ -29,6 +29,7 @@ export class VoyagesListComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   rows: Trip[] = []; filtered: Trip[] = []; loading = true; filterStatus = '';
   filterRoute = ''; filterVehicle = ''; dateField = 'departure'; dateFrom = ''; dateTo = '';
+  showArchived = false;
   vehicles: { id: string; license_plate: string }[] = [];
   seatingPlans: { id: string; code: string; name: string; total_seats: number }[] = [];
   crewMembers: { id: string; full_name: string; member_type_name: string }[] = [];
@@ -86,9 +87,11 @@ export class VoyagesListComponent implements OnInit {
       status: this.filterStatus || undefined, route: this.filterRoute || undefined,
       vehicle: this.filterVehicle || undefined, date_field: this.dateField,
       date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+      include_archived: this.showArchived ? 1 : undefined,
     }).subscribe({ next: d => { this.rows = d; this.filtered = d; this.loading = false; },
                    error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.load(); }
   clearFilters(): void {
     this.filterStatus = this.filterRoute = this.filterVehicle = this.dateFrom = this.dateTo = '';
     this.dateField = 'departure';

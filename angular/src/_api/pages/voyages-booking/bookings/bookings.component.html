@@ -39,6 +39,10 @@
       <input type="text" class="form-control" style="min-width:240px;flex:1 1 240px" [placeholder]="'booking.filter.search_placeholder' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
       <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'booking.filter.clear' | transloco }}</button>
+      <div class="form-check form-switch ms-2">
+        <input class="form-check-input" type="checkbox" id="arch-bookings" [ngModel]="showArchived" (ngModelChange)="toggleArchived()" />
+        <label class="form-check-label" for="arch-bookings">{{ 'shared.archiving.show_archived' | transloco }}</label>
+      </div>
     </div>
   </div>
   <div class="card-body p-0">

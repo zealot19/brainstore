@@ -10,7 +10,8 @@ export class BaggageService {
   constructor(private http: HttpClient) {}
 
   list(params: { ticket?: string; trip?: string; status?: string; q?: string; consignment_type?: string;
-                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Baggage[]> {
+                 date_field?: string; date_from?: string; date_to?: string;
+                 include_archived?: number } = {}): Observable<Baggage[]> {
     let p = new HttpParams();
     Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<any>(VOYAGES_CONSIGNMENT.baggage, { params: p }).pipe(map(r => r.data ?? r));

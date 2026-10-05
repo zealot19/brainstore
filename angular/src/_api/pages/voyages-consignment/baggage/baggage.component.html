@@ -34,6 +34,10 @@
       <input type="text" class="form-control" style="min-width:240px;flex:1 1 240px" [placeholder]="'cons.baggage.search_ph' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
       <button class="btn btn-sm btn-outline-secondary" (click)="reload()"><i class="ti ti-search me-1"></i>{{ 'shared.actions.search' | transloco }}</button>
       <button class="btn btn-sm btn-outline-secondary" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'cons.common.clear' | transloco }}</button>
+      <div class="form-check form-switch ms-2">
+        <input class="form-check-input" type="checkbox" id="arch-baggage" [ngModel]="showArchived" (ngModelChange)="toggleArchived()" />
+        <label class="form-check-label" for="arch-baggage">{{ 'shared.archiving.show_archived' | transloco }}</label>
+      </div>
     </div>
     @if (selected.size) {
       <div class="d-flex align-items-center gap-2">

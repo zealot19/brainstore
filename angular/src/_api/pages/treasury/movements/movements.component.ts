@@ -21,7 +21,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 export class TrzMovementsComponent implements OnInit {
   private toast = inject(ToastService);
   pg: PageState = { page: 1, size: 25 };
-  rows: Transaction[] = []; loading = true; typeFilter = '';
+  rows: Transaction[] = []; loading = true; typeFilter = ''; showArchived = false;
   openSessions: CashSession[] = []; banks: BankAccount[] = [];
   paymentModes = PAYMENT_MODES;
   form!: FormGroup; saving = false; errorMsg = '';
@@ -44,9 +44,10 @@ export class TrzMovementsComponent implements OnInit {
   onTypeChange(): void { const cats = this.categories; this.form.patchValue({ category: cats.length ? cats[0].value : '' }); }
   load(): void {
     this.loading = true;
-    this.svc.list(this.typeFilter ? { type: this.typeFilter } : undefined)
+    this.svc.list({ type: this.typeFilter || undefined, include_archived: this.showArchived ? 1 : undefined })
       .subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.load(); }
   openCreate(): void {
     this.errorMsg = '';
     this.form.reset({ transaction_type: 'income', category: 'ticket_sales', account_type: 'cash',

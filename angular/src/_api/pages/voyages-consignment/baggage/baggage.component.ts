@@ -30,6 +30,7 @@ export class VcgBaggageComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';
   tripFilter = ''; typeFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
+  showArchived = false;
   filterTrips: { id: string; number?: string; code?: string }[] = [];
   trips: TripOption[] = []; types: ConsignmentType[] = [];
   ticketOptions: { id: string; label: string }[] = [];
@@ -74,9 +75,11 @@ export class VcgBaggageComponent implements OnInit {
       status: this.statusFilter || undefined, q: this.q || undefined,
       trip: this.tripFilter || undefined, consignment_type: this.typeFilter || undefined,
       date_field: this.dateField, date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+      include_archived: this.showArchived ? 1 : undefined,
     }).subscribe({
       next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.reload(); }
 
   tripLabel = (t: any): string =>
     `${t.number} · ${t.origin_name} → ${t.destination_name} · ${new Date(t.scheduled_departure).toLocaleString('fr-FR')}`;

@@ -27,6 +27,7 @@ export class VbReservationsComponent implements OnInit {
 
   pg: PageState = { page: 1, size: 25 };
   rows: Booking[] = []; loading = true; search = '';
+  showArchived = false;
   paymentMethods: any[] = [];
 
   // Pay modal
@@ -38,9 +39,11 @@ export class VbReservationsComponent implements OnInit {
   }
   load(): void {
     this.loading = true;
-    this.svc.list({ status: 'reserved', q: this.search || undefined }).subscribe({
+    this.svc.list({ status: 'reserved', q: this.search || undefined,
+      include_archived: this.showArchived ? 1 : undefined }).subscribe({
       next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.load(); }
 
   expired(b: Booking): boolean { return !!b.hold_until && new Date(b.hold_until) < new Date(); }
 

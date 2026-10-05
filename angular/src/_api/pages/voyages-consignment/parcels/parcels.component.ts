@@ -29,6 +29,7 @@ export class VcgParcelsComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
+  showArchived = false;
   dateField = 'created'; dateFrom = ''; dateTo = '';
   trips: { id: string; number?: string; code?: string }[] = [];
   points: ServicePoint[] = []; types: ConsignmentType[] = []; typeOptions: any[] = [];
@@ -77,8 +78,10 @@ export class VcgParcelsComponent implements OnInit {
       trip: this.tripFilter || undefined, consignment_type: this.typeFilter || undefined,
       origin_point: this.originFilter || undefined, destination_point: this.destFilter || undefined,
       date_field: this.dateField, date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+      include_archived: this.showArchived ? 1 : undefined,
     }).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.reload(); }
   clearFilters(): void {
     this.statusFilter = this.q = this.tripFilter = this.typeFilter = this.originFilter = this.destFilter = this.dateFrom = this.dateTo = '';
     this.dateField = 'created';

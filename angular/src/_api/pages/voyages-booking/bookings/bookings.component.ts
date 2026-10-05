@@ -24,6 +24,7 @@ export class VbBookingsComponent implements OnInit {
   pg: PageState = { page: 1, size: 25 };
   rows: Booking[] = []; loading = false; statusFilter = ''; q = '';
   typeFilter = ''; channelFilter = ''; tripFilter = ''; dateField = 'created'; dateFrom = ''; dateTo = '';
+  showArchived = false;
   trips: { id: string; number?: string; code?: string }[] = [];
 
   constructor(private svc: BookingService, private tripSvc: TripService, private router: Router,
@@ -40,8 +41,10 @@ export class VbBookingsComponent implements OnInit {
       trip: this.tripFilter || undefined, trip_type: this.typeFilter || undefined,
       channel: this.channelFilter || undefined, date_field: this.dateField,
       date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+      include_archived: this.showArchived ? 1 : undefined,
     }).subscribe({ next: d => { this.rows = d; this.loading = false; }, error: () => this.loading = false });
   }
+  toggleArchived(): void { this.showArchived = !this.showArchived; this.reload(); }
   clearFilters(): void {
     this.statusFilter = this.q = this.typeFilter = this.channelFilter = this.tripFilter = this.dateFrom = this.dateTo = '';
     this.dateField = 'created';

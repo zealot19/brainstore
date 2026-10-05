@@ -22,7 +22,8 @@ export class BookingService {
   }
 
   list(params: { status?: string; trip?: string; q?: string; trip_type?: string; channel?: string;
-                 date_field?: string; date_from?: string; date_to?: string } = {}): Observable<Booking[]> {
+                 date_field?: string; date_from?: string; date_to?: string;
+                 include_archived?: number } = {}): Observable<Booking[]> {
     let p = new HttpParams().set('page_size', '500');
     Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<Booking[]>(VOYAGES_BOOKING.bookings, { params: p });
@@ -31,9 +32,10 @@ export class BookingService {
   printData(id: string): Observable<any> { return this.http.get<any>(VOYAGES_BOOKING.bookingPrint(id)); }
   renderTickets(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_BOOKING.bookingRenderTickets(id)); }
   renderDuplicata(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_BOOKING.bookingDuplicata(id)); }
-  openReturns(q?: string): Observable<Booking[]> {
+  openReturns(q?: string, includeArchived?: number): Observable<Booking[]> {
     let p = new HttpParams();
     if (q) p = p.set('q', q);
+    if (includeArchived) p = p.set('include_archived', String(includeArchived));
     return this.http.get<Booking[]>(VOYAGES_BOOKING.openReturns, { params: p });
   }
   assignReturn(id: string, body: AssignReturn): Observable<Booking> {

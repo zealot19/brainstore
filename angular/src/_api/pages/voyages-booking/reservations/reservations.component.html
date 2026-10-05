@@ -6,7 +6,12 @@
 </div>
 
 <div class="card table-list-card">
-  <div class="card-header"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (keyup.enter)="load()" type="search" class="form-control" [placeholder]="'booking.reserve.search_ph' | transloco" /></div></div></div>
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2"><div class="search-set"><div class="search-input"><input [(ngModel)]="search" (keyup.enter)="load()" type="search" class="form-control" [placeholder]="'booking.reserve.search_ph' | transloco" /></div></div>
+    <div class="form-check form-switch ms-2">
+      <input class="form-check-input" type="checkbox" id="arch-reservations" [ngModel]="showArchived" (ngModelChange)="toggleArchived()" />
+      <label class="form-check-label" for="arch-reservations">{{ 'shared.archiving.show_archived' | transloco }}</label>
+    </div>
+  </div>
   <div class="card-body p-0">
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {

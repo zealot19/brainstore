@@ -34,6 +34,10 @@
       <div class="col-md-1"><input type="date" class="form-control" [(ngModel)]="dateFrom" (ngModelChange)="load()"></div>
       <div class="col-md-1"><input type="date" class="form-control" [(ngModel)]="dateTo" (ngModelChange)="load()"></div>
       <div class="col-md-2"><button class="btn btn-outline-secondary w-100" (click)="clearFilters()"><i class="ti ti-eraser me-1"></i>{{ 'trips.list.clear' | transloco }}</button></div>
+      <div class="col-md-3 d-flex align-items-center"><div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="arch-voyages" [ngModel]="showArchived" (ngModelChange)="toggleArchived()" />
+        <label class="form-check-label" for="arch-voyages">{{ 'shared.archiving.show_archived' | transloco }}</label>
+      </div></div>
     </div>
   </div>
   <div class="card-body p-0">

@@ -90,6 +90,9 @@
     },
     "client": {
       "name_ph": "Nome do cliente"
+    },
+    "archiving": {
+      "show_archived": "Mostrar arquivadas"
     }
   },
   "nav": {
