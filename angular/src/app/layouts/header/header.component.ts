@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { routes, SidebarService } from '../../core/core.index';
 import { AuthService } from '../.././../_api/services/auth/auth.service';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { HasModuleDirective } from '../../shared/directives/has-module.directive';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { CashSessionTimerComponent } from '../../shared/cash-session-timer/cash-session-timer.component';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -13,10 +14,15 @@ import { AppPackageService } from '../../core/service/packages/app-package.servi
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink, CommonModule, HasPermissionDirective, LanguageSwitcherComponent, CashSessionTimerComponent, TranslocoModule],
+  imports: [RouterLink, CommonModule, HasPermissionDirective, HasModuleDirective, LanguageSwitcherComponent, CashSessionTimerComponent, TranslocoModule],
 })
 export class HeaderComponent {
   routes = routes;
+
+  // Raccourcis Transport (Vendre billet / colis / bagage) : uniquement dans l'app Transport.
+  get isTransport(): boolean {
+    return this.pkgSvc.activePackage()?.code === 'transport';
+  }
 
   constructor(
     private sidebar: SidebarService,

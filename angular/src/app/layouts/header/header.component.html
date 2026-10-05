@@ -20,11 +20,30 @@
     <ul class="nav user-menu align-items-center justify-content-end">
 
       <!-- App-switcher : retour au lanceur d'applications -->
-      <li class="nav-item me-2">
-        <a href="javascript:void(0);" class="nav-link px-2 d-inline-flex align-items-center" (click)="switchToLauncher()" title="Applications">
-          <i class="ti ti-grid-dots fs-18"></i>
+      <li class="nav-item me-3">
+        <a href="javascript:void(0);" class="nav-link px-2 d-inline-flex align-items-center gap-1" (click)="switchToLauncher()" title="Applications">
+          <i class="ti ti-grid-dots fs-18"></i><span>{{ 'shared.nav.apps' | transloco }}</span>
         </a>
       </li>
+
+      <!-- Raccourcis Transport : visibles uniquement dans l'app Transport -->
+      @if (isTransport) {
+        <ng-container *hasModule="'voyage'">
+          <li class="nav-item me-2" *hasPermission="'ticketing.booking.create'">
+            <span class="d-inline-flex"><a class="btn btn-primary" [routerLink]="routes.vbBookingNew">{{ 'shared.nav.new_booking' | transloco }}</a></span>
+          </li>
+        </ng-container>
+        <ng-container *hasModule="'colis'">
+          <li class="nav-item me-2" *hasPermission="'ticketing.parcel.manage'">
+            <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_parcel' | transloco }}</a></span>
+          </li>
+        </ng-container>
+        <ng-container *hasModule="'bagages'">
+          <li class="nav-item me-3" *hasPermission="'ticketing.luggage.manage'">
+            <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_baggage' | transloco }}</a></span>
+          </li>
+        </ng-container>
+      }
 
       <!-- Minuteur de session de caisse (billetage de fin depuis tout écran) -->
       <li class="nav-item me-3 d-inline-flex align-items-center" *hasPermission="['treasury.session.operate','treasury.session.manage','ticketing.booking.create','ticketing.parcel.manage','ticketing.luggage.manage']">

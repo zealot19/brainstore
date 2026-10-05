@@ -29,7 +29,8 @@
             <span class="trip-head">{{ t.header }}</span>
             <span class="badge {{ statusClass(t.status) }}">{{ t.status_display }}</span>
           </div>
-          <div class="text-muted small mb-2">{{ t.route_label }}</div>
+          <div class="text-muted small">{{ t.route_label }}</div>
+          <div class="text-muted small mb-2"><i class="ti ti-calendar-event me-1"></i>{{ t.scheduled_departure | date:'dd/MM/yyyy HH:mm' }}</div>
           <div class="trip-row"><span>{{ 'trdash.tickets' | transloco }}</span>
             <span>{{ t.tickets_count }} · {{ t.tickets_revenue | number:'1.0-0' }}</span></div>
           <div class="trip-row"><span>{{ 'trdash.baggage' | transloco }}</span>
