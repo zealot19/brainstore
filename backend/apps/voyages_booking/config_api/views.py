@@ -5,6 +5,7 @@ from apps.core.responses import success_response, created_response, error_respon
 from apps.core.pagination import StandardResultsSetPagination
 from apps.voyages_booking.models import Passenger
 from apps.voyages_booking import selectors, services
+from apps.system_config.selectors.archiving import wants_archived
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global
 
@@ -137,7 +138,7 @@ class BookingListView(APIView):
             date_field=request.query_params.get("date_field"),
             date_from=request.query_params.get("date_from"),
             date_to=request.query_params.get("date_to"),
-            user=request.user)
+            user=request.user, include_archived=wants_archived(request))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(S.BookingRead(page, many=True).data)
@@ -212,7 +213,8 @@ class OpenReturnsView(APIView):
     permission_map = {'GET': 'ticketing.booking.view'}
 
     def get(self, request):
-        qs = selectors.open_return_bookings(request.user.company, q=request.query_params.get("q"), user=request.user)
+        qs = selectors.open_return_bookings(request.user.company, q=request.query_params.get("q"),
+                                            user=request.user, include_archived=wants_archived(request))
         return success_response(S.BookingRead(qs, many=True).data)
 
 

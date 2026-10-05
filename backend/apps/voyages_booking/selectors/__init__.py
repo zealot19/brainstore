@@ -6,6 +6,7 @@ from apps.voyages_config.models import TimeSlot
 from apps.voyages_pricing.selectors.fare_selectors import route_points, resolve_fare
 from apps.core.filters import resolve_date_field, apply_date_range
 from apps.core.agency_scope import user_agency_ids, scope_by_agency
+from apps.system_config.selectors.archiving import apply_archive_window
 
 # Réservable uniquement lorsque le voyage est soumis (« pending »), pas en brouillon.
 _BOOKABLE = ["pending"]
@@ -82,7 +83,7 @@ def trip_destinations(trip):
 
 def list_bookings(company, status=None, trip_id=None, q=None,
                   trip_type=None, channel=None, date_field=None, date_from=None, date_to=None,
-                  user=None):
+                  user=None, include_archived=False):
     qs = (Booking.objects.filter(is_deleted=False, company=company)
           .select_related("outbound_trip", "return_trip", "buyer")
           .order_by("-created_at"))
@@ -102,10 +103,12 @@ def list_bookings(company, status=None, trip_id=None, q=None,
         {"created": "created_at", "departure": "outbound_trip__scheduled_departure",
          "arrival": "outbound_trip__scheduled_arrival"}, date_field, "created")
     qs = apply_date_range(qs, field, date_from, date_to)
+    qs = apply_archive_window(qs, date_field="created_at", company_id=company.id,
+                              include_archived=include_archived)
     return qs
 
 
-def open_return_bookings(company, q=None, user=None):
+def open_return_bookings(company, q=None, user=None, include_archived=False):
     qs = (Booking.objects.filter(is_deleted=False, company=company, return_open=True)
           .exclude(status=Booking.Status.CANCELLED)
           .select_related("outbound_trip", "buyer")
@@ -114,6 +117,8 @@ def open_return_bookings(company, q=None, user=None):
     if q:
         qs = qs.filter(Q(reference__icontains=q) | Q(buyer__phone__icontains=q) |
                        Q(buyer__last_name__icontains=q) | Q(buyer__first_name__icontains=q))
+    qs = apply_archive_window(qs, date_field="created_at", company_id=company.id,
+                              include_archived=include_archived)
     return qs
 
 
