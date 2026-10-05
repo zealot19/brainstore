@@ -580,6 +580,51 @@ class MyPackagesView(APIView):
         return success_response(accessible_packages(request.user))
 
 
+class LicenseStatusView(APIView):
+    """GET current tenant's license status (exempt from the lock)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from apps.core.licensing import license_is_valid
+        company_id = getattr(request.user, "company_id", None)
+        lic = License.objects.filter(company_id=company_id).first() if company_id else None
+        valid = bool(lic and license_is_valid(lic.token))
+        return Response({
+            "valid": valid,
+            "status": lic.status if lic else None,
+            "expires_at": lic.expires_at.isoformat() if lic and lic.expires_at else None,
+            "message": "" if valid else "Licence expirée, veuillez contacter l'administrateur.",
+        })
+
+
+class CompanyLicenseView(APIView):
+    """Super-admin: read / set a company's license expiry (re-mints)."""
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+
+    def get(self, request, pk):
+        lic = License.objects.filter(company_id=pk).first()
+        if not lic:
+            return Response({"detail": "Licence introuvable."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"status": lic.status,
+                         "expires_at": lic.expires_at.isoformat() if lic.expires_at else None})
+
+    def put(self, request, pk):
+        from datetime import date as _date
+        company = Company.objects.filter(id=pk).first()
+        if not company:
+            return Response({"detail": "Institution introuvable."}, status=status.HTTP_404_NOT_FOUND)
+        raw = request.data.get("expires_at")
+        try:
+            exp = _date.fromisoformat(raw)
+        except (TypeError, ValueError):
+            return Response({"detail": "expires_at doit être une date (YYYY-MM-DD)."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        new_status = request.data.get("status") or License.Status.ACTIVE
+        lic = set_license_expiry(company, expires_at=exp, status=new_status, actor=request.user)
+        return Response({"status": lic.status,
+                         "expires_at": lic.expires_at.isoformat() if lic.expires_at else None})
+
+
 class ArchivingSettingsView(APIView):
     """GET/PUT the per-company data-archiving window (institution admin only)."""
     permission_classes = [IsAuthenticated, IsInstitutionAdmin]

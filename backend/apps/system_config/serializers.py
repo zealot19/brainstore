@@ -130,6 +130,9 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     # Packages accordés à la création (Administration toujours forcé)
     packages = serializers.ListField(child=serializers.CharField(), required=False)
 
+    # Date d'expiration de la licence (obligatoire à la création)
+    license_expires_at = serializers.DateField(write_only=True)
+
     class Meta:
         model  = Company
         fields = [
@@ -140,7 +143,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             "fiscal_year_start", "fiscal_year_end", "accounting_plan",
             "plan", "is_active", "address_input",
             "admin_email", "admin_first_name", "admin_last_name",
-            "packages",
+            "packages", "license_expires_at",
         ]
 
     def validate_name(self, value):

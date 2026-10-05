@@ -39,4 +39,8 @@ urlpatterns = [
 
     # ── Data Archiving ──────────────────────────────────────────────────────────
     path("archiving/", views.ArchivingSettingsView.as_view(), name="archiving-settings"),
+
+    # ── License ───────────────────────────────────────────────────────────────
+    path("license/", views.LicenseStatusView.as_view(), name="license-status"),
+    path("companies/<uuid:pk>/license/", views.CompanyLicenseView.as_view(), name="company-license"),
 ]
