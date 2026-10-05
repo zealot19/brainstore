@@ -20,7 +20,9 @@
           <div class="col-md-3 mb-3"><label class="form-label">{{ 'vcfg.set.f_archive' | transloco }}</label><input formControlName="archive_delay_days" type="number" min="0" class="form-control" /></div>
         </div>
         <div class="form-check form-switch mb-2"><input formControlName="auto_print_default" type="checkbox" class="form-check-input" id="vc-print" /><label class="form-check-label" for="vc-print">{{ 'vcfg.set.f_autoprint' | transloco }}</label></div>
-        <div class="form-check form-switch mb-3"><input formControlName="sms_notification_default" type="checkbox" class="form-check-input" id="vc-sms" /><label class="form-check-label" for="vc-sms">{{ 'vcfg.set.f_sms' | transloco }}</label></div>
+        <div class="form-check form-switch mb-2"><input formControlName="sms_notification_default" type="checkbox" class="form-check-input" id="vc-sms" /><label class="form-check-label" for="vc-sms">{{ 'vcfg.set.f_sms' | transloco }}</label></div>
+        <div class="form-check form-switch mb-1"><input formControlName="auto_manage_trips" type="checkbox" class="form-check-input" id="vc-automanage" /><label class="form-check-label" for="vc-automanage">{{ 'vcfg.set.f_auto_manage' | transloco }}</label></div>
+        <p class="text-muted small mb-3">{{ 'vcfg.set.f_auto_manage_hint' | transloco }}</p>
         <button type="submit" class="btn btn-primary" [disabled]="saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}</button>
       </form>
     }

@@ -1020,6 +1020,8 @@
       "f_doc_alert": "Alerta documentos (días)",
       "f_archive": "Plazo de archivo (días)",
       "f_autoprint": "Impresión automática por defecto",
+      "f_auto_manage": "Inicio/parada automática de viajes",
+      "f_auto_manage_hint": "Usa los retrasos de inicio (h) y de parada (h) de arriba.",
       "f_sms": "Notificaciones SMS por defecto"
     },
     "plan": {

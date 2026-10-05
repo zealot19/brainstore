@@ -1020,6 +1020,8 @@
       "f_doc_alert": "Document alert (days)",
       "f_archive": "Archive delay (days)",
       "f_autoprint": "Auto-print by default",
+      "f_auto_manage": "Auto start/stop trips",
+      "f_auto_manage_hint": "Uses the departure lead (h) and arrival grace (h) above.",
       "f_sms": "SMS notifications by default"
     },
     "plan": {

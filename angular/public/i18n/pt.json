@@ -1020,6 +1020,8 @@
       "f_doc_alert": "Alerta documentos (dias)",
       "f_archive": "Prazo de arquivo (dias)",
       "f_autoprint": "Impressão automática por defeito",
+      "f_auto_manage": "Início/paragem automática das viagens",
+      "f_auto_manage_hint": "Usa os prazos de início (h) e de paragem (h) acima.",
       "f_sms": "Notificações SMS por defeito"
     },
     "plan": {
