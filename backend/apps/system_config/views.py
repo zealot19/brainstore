@@ -585,13 +585,13 @@ class LicenseStatusView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        from apps.core.licensing import license_is_valid
+        from apps.system_config.services.licensing import company_is_licensed
         company_id = getattr(request.user, "company_id", None)
         if not company_id:
             # No tenant (e.g. platform super admin) is never gated — not expired.
             return Response({"valid": True, "status": "platform", "expires_at": None, "message": ""})
         lic = License.objects.filter(company_id=company_id).first()
-        valid = bool(lic and license_is_valid(lic.token))
+        valid = company_is_licensed(company_id)
         return Response({
             "valid": valid,
             "status": lic.status if lic else None,
@@ -601,13 +601,14 @@ class LicenseStatusView(APIView):
 
 
 class CompanyLicenseView(APIView):
-    """Super-admin: read / set a company's license expiry (re-mints)."""
+    """Super-admin: read / set a company's license expiry date."""
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
     def get(self, request, pk):
         lic = License.objects.filter(company_id=pk).first()
         if not lic:
-            return Response({"detail": "Licence introuvable."}, status=status.HTTP_404_NOT_FOUND)
+            # Not provisioned yet — return an empty shape (200) so the UI opens cleanly.
+            return Response({"status": None, "expires_at": None})
         return Response({"status": lic.status,
                          "expires_at": lic.expires_at.isoformat() if lic.expires_at else None})
 

@@ -4,22 +4,19 @@ from apps.core.models import BaseModel
 
 
 class License(BaseModel):
-    """Licence d'utilisation signée d'une institution. L'autorité d'enforcement
-    est le jeton signé (`token`) ; les autres colonnes sont des miroirs."""
+    """Licence d'utilisation d'une institution. L'autorité d'enforcement est la
+    base de données (accès contrôlé) : `status` + `expires_at` pilotent le verrou."""
 
     class Status(models.TextChoices):
         ACTIVE    = "active",    _("Active")
         SUSPENDED = "suspended", _("Suspendue")
         CANCELLED = "cancelled", _("Résiliée")
 
-    company     = models.OneToOneField("system_config.Company", verbose_name=_("institution"),
-                                       on_delete=models.CASCADE, related_name="license")
-    expires_at  = models.DateField(_("expiration"), null=True, blank=True)
-    status      = models.CharField(_("statut"), max_length=20,
-                                   choices=Status.choices, default=Status.ACTIVE)
-    token       = models.TextField(_("jeton signé"), blank=True, default="")
-    issued_at   = models.DateTimeField(_("émis le"), null=True, blank=True)
-    key_version = models.SmallIntegerField(_("version de clé"), default=1)
+    company    = models.OneToOneField("system_config.Company", verbose_name=_("institution"),
+                                      on_delete=models.CASCADE, related_name="license")
+    expires_at = models.DateField(_("expiration"), null=True, blank=True)
+    status     = models.CharField(_("statut"), max_length=20,
+                                  choices=Status.choices, default=Status.ACTIVE)
 
     class Meta(BaseModel.Meta):
         verbose_name        = _("licence")

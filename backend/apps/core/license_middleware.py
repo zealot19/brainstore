@@ -1,5 +1,4 @@
 # backend/apps/core/license_middleware.py
-from django.conf import settings
 from django.http import JsonResponse
 from apps.core.middleware import get_current_tenant
 
@@ -13,21 +12,20 @@ def _is_exempt(path: str) -> bool:
 
 
 class LicenseMiddleware:
-    """Hard-locks an institution whose signed license is invalid/expired (I7).
-    Runs after TenantMiddleware (company_id resolved) and before EntitlementMiddleware.
-    Inert when no public key is configured (licensing not yet installed)."""
+    """Hard-locks an institution whose license date has passed (or is suspended/
+    cancelled). The DB row is the authority — no signature. Runs after
+    TenantMiddleware (company_id resolved) and before EntitlementMiddleware.
+    A company with no license row is not enforced; the platform super admin
+    (no tenant) is never gated."""
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if getattr(settings, "LICENSE_PUBLIC_KEYS", None):
-            tenant = get_current_tenant()
-            company_id = tenant["company_id"] if tenant else None
-            if company_id and not _is_exempt(request.path):
-                from apps.core.licensing import license_is_valid
-                from apps.system_config.models import License
-                lic = License.objects.filter(company_id=company_id).first()
-                if not (lic and license_is_valid(lic.token)):
-                    return JsonResponse(_LOCK, status=403)
+        tenant = get_current_tenant()
+        company_id = tenant["company_id"] if tenant else None
+        if company_id and not _is_exempt(request.path):
+            from apps.system_config.services.licensing import company_is_licensed
+            if not company_is_licensed(company_id):
+                return JsonResponse(_LOCK, status=403)
         return self.get_response(request)
