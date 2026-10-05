@@ -12,6 +12,7 @@ _DOWN = [
     # system / tenancy
     "system_config.Company",
     "system_config.Agency",
+    "system_config.License",
     # RBAC + identity
     "admin_rbac.Role",
     "admin_rbac.Permission",
