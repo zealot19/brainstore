@@ -12,7 +12,8 @@ from apps.core.responses import success_response, created_response, error_respon
 from apps.core.exceptions import ApplicationError
 
 from . import services, selectors
-from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag
+from .models import Plan, Company, Subscription, Agency, Parameter, FeatureFlag, License
+from .services.licensing import set_license_expiry
 from .selectors.packages import accessible_packages
 from .serializers import (
     PlanSerializer, PlanWriteSerializer,
@@ -171,6 +172,8 @@ class CompanySuspendView(APIView):
         payload = CompanySuspendSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         services.suspend_company(company, reason=payload.validated_data.get("reason", ""), updated_by=request.user)
+        lic, _ = License.objects.get_or_create(company=company)
+        set_license_expiry(company, expires_at=lic.expires_at, status=License.Status.SUSPENDED, actor=request.user)
         return success_response(message=_("Institution suspendue."))
 
 
@@ -187,6 +190,8 @@ class CompanyActivateView(APIView):
             services.activate_company(company, updated_by=request.user)
         except ApplicationError as e:
             return error_response(str(e), status_code=400)
+        lic, _ = License.objects.get_or_create(company=company)
+        set_license_expiry(company, expires_at=lic.expires_at, status=License.Status.ACTIVE, actor=request.user)
         return success_response(message=_("Institution activée."))
 
 
@@ -200,6 +205,8 @@ class CompanyCancelView(APIView):
         except Company.DoesNotExist:
             return error_response(_("Institution introuvable."), status_code=404)
         services.cancel_company(company, updated_by=request.user)
+        lic, _ = License.objects.get_or_create(company=company)
+        set_license_expiry(company, expires_at=lic.expires_at, status=License.Status.CANCELLED, actor=request.user)
         return success_response(message=_("Institution résiliée."))
 
 
