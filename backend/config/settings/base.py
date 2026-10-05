@@ -141,6 +141,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.TenantMiddleware",             # multi-tenant
+    "apps.core.license_middleware.LicenseMiddleware",       # licence (hard lock)
     "apps.core.entitlement_middleware.EntitlementMiddleware",  # modules inclus (entitlements)
     "apps.core.middleware.AuditMiddleware",              # journal d'audit automatique
 ]
