@@ -12,6 +12,7 @@ class VoyagesSettings(_CompanyScoped):
     archive_delay_days = models.PositiveSmallIntegerField(_("délai d'archivage (jours)"), default=365)
     auto_print_default = models.BooleanField(_("impression auto par défaut"), default=False)
     sms_notification_default = models.BooleanField(_("SMS par défaut"), default=False)
+    auto_manage_trips = models.BooleanField(_("démarrage/arrêt auto des voyages"), default=False)
     baggage_free_allowance_kg = models.PositiveSmallIntegerField(_("franchise bagage (kg)"), default=23)
     parcel_trip_max_weight_kg = models.DecimalField(_("capacité colis max/voyage (kg)"),
                                                     max_digits=8, decimal_places=2, null=True, blank=True)

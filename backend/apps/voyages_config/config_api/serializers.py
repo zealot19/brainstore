@@ -374,7 +374,7 @@ class VoyagesSettingsRead(_ScopeMixin):
         model = VoyagesSettings
         fields = ["id", "departure_lead_hours", "arrival_grace_hours", "ticket_expiry_days",
                   "shift_duration_hours", "document_alert_days", "archive_delay_days",
-                  "auto_print_default", "sms_notification_default",
+                  "auto_print_default", "sms_notification_default", "auto_manage_trips",
                   "baggage_free_allowance_kg", "parcel_trip_max_weight_kg", "parcel_trip_max_count",
                   "company", "scope", "created_at", "updated_at"]
 
@@ -388,6 +388,7 @@ class VoyagesSettingsWrite(serializers.Serializer):
     archive_delay_days = serializers.IntegerField(required=False, min_value=0)
     auto_print_default = serializers.BooleanField(required=False)
     sms_notification_default = serializers.BooleanField(required=False)
+    auto_manage_trips = serializers.BooleanField(required=False)
     baggage_free_allowance_kg = serializers.IntegerField(required=False, min_value=0)
     parcel_trip_max_weight_kg = serializers.DecimalField(required=False, allow_null=True, max_digits=8, decimal_places=2)
     parcel_trip_max_count = serializers.IntegerField(required=False, allow_null=True, min_value=0)
