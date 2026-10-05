@@ -32,6 +32,12 @@ SYNC_TOKEN = env("SYNC_TOKEN", default="")                # jeton d'authentifica
 SYNC_HEARTBEAT_TTL = env.int("SYNC_HEARTBEAT_TTL", default=90)   # s — fraîcheur présence agence
 SYNC_JOB_TIMEOUT = env.int("SYNC_JOB_TIMEOUT", default=15)       # s — attente réservation en ligne
 
+# ── Licensing ────────────────────────────────────────────────────────────────
+from apps.core.license_keys import PUBLIC_KEYS as LICENSE_PUBLIC_KEYS   # bundled, safe
+LICENSE_PRIVATE_KEY = env("LICENSE_PRIVATE_KEY", default="")            # PEM, master only
+LICENSE_KEY_VERSION = env.int("LICENSE_KEY_VERSION", default=1)
+LICENSE_BACKFILL_DAYS = env.int("LICENSE_BACKFILL_DAYS", default=365)
+
 # ── WhatsApp Cloud API (bot de réservation) ──────────────────────────────────
 WHATSAPP_TOKEN           = env("WHATSAPP_TOKEN", default="")
 WHATSAPP_PHONE_NUMBER_ID = env("WHATSAPP_PHONE_NUMBER_ID", default="")
