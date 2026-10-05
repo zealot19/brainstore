@@ -9,7 +9,7 @@ _LOCK = {"success": False,
 
 
 def _is_exempt(path: str) -> bool:
-    return "/api/v1/auth/" in path or path.rstrip("/").endswith("/api/v1/system/license")
+    return path.startswith("/api/v1/auth/") or path.rstrip("/") == "/api/v1/system/license"
 
 
 class LicenseMiddleware:

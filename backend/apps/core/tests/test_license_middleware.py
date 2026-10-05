@@ -57,6 +57,22 @@ def test_exempt_path_passes_even_if_expired(keyed, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_auth_path_passes_even_if_expired(keyed, monkeypatch):
+    c = Company.objects.create(name="Auth", slug="auth")
+    set_license_expiry(c, expires_at=date.today() - timedelta(days=1))
+    _tenant(monkeypatch, c.id)
+    assert _run("/api/v1/auth/refresh/").status_code == 200
+
+
+@pytest.mark.django_db
+def test_path_containing_auth_substring_is_not_exempt(keyed, monkeypatch):
+    c = Company.objects.create(name="Sub", slug="sub")
+    set_license_expiry(c, expires_at=date.today() - timedelta(days=1))
+    _tenant(monkeypatch, c.id)
+    assert _run("/api/v1/users/import-auth-records/").status_code == 403
+
+
+@pytest.mark.django_db
 def test_company_without_license_is_locked(keyed, monkeypatch):
     c = Company.objects.create(name="NoLic", slug="nolic")   # no License row minted
     _tenant(monkeypatch, c.id)
