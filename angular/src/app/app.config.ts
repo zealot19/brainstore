@@ -30,8 +30,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection(),
     importProvidersFrom(BsDatepickerModule),
     provideAnimations(),
+    // licenseInterceptor MUST sit after apiUnwrapInterceptor: error-path catchError runs
+    // in reverse order, so this makes licenseInterceptor fire BEFORE apiUnwrap rewrites
+    // the 403 body (which would strip error.code and hide LICENSE_EXPIRED).
     provideHttpClient(withInterceptors([
-      jwtInterceptor, errorInterceptor, licenseInterceptor, apiUnwrapInterceptor, acceptLanguageInterceptor,
+      jwtInterceptor, errorInterceptor, apiUnwrapInterceptor, licenseInterceptor, acceptLanguageInterceptor,
     ])),
     provideTransloco({
       config: TRANSLOCO_APP_CONFIG,
