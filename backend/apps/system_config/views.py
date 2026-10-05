@@ -587,7 +587,10 @@ class LicenseStatusView(APIView):
     def get(self, request):
         from apps.core.licensing import license_is_valid
         company_id = getattr(request.user, "company_id", None)
-        lic = License.objects.filter(company_id=company_id).first() if company_id else None
+        if not company_id:
+            # No tenant (e.g. platform super admin) is never gated — not expired.
+            return Response({"valid": True, "status": "platform", "expires_at": None, "message": ""})
+        lic = License.objects.filter(company_id=company_id).first()
         valid = bool(lic and license_is_valid(lic.token))
         return Response({
             "valid": valid,

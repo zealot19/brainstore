@@ -49,3 +49,11 @@ def test_status_endpoint_reports_validity(keyed):
     c = APIClient(); c.force_authenticate(admin)
     r = c.get("/api/v1/system/license/")
     assert r.status_code == 200 and r.json()["valid"] is True
+
+
+@pytest.mark.django_db
+def test_status_endpoint_platform_superadmin_not_gated(keyed):
+    su = User.objects.create_superuser(username="su2", email="su2@x.com", password="x", first_name="S", last_name="U")
+    c = APIClient(); c.force_authenticate(su)
+    r = c.get("/api/v1/system/license/")
+    assert r.status_code == 200 and r.json()["valid"] is True
