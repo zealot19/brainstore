@@ -50,6 +50,9 @@ export const SYSTEM = {
 
   // Data Archiving
   archiving:             `${API_BASE}/system/archiving/`,
+
+  // License
+  license:               `${API_BASE}/system/license/`,
 };
 
 export const USERS = {

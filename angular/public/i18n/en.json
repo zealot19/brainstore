@@ -2742,5 +2742,8 @@
     "chart_baggage": "Baggage",
     "chart_parcels": "Parcels",
     "chart_clients": "Clients"
+  },
+  "license": {
+    "expired_title": "License expired"
   }
 }

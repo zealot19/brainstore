@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   NavigationEnd,
   NavigationStart,
@@ -9,16 +9,22 @@ import {
 import { SpinnerService } from './core/core.index';
 import { LoaderComponent } from './layouts/loader/loader.component';
 import { ToastContainerComponent } from './shared/toast/toast-container.component';
+import { LicenseLockComponent } from './shared/license-lock/license-lock.component';
+import { LicenseService } from '../_api/services/system/license.service';
+import { TokenService } from '../_api/services/auth/token.service';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    imports: [RouterModule,LoaderComponent,ToastContainerComponent]
+    imports: [RouterModule, LoaderComponent, ToastContainerComponent, LicenseLockComponent]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'template';
   public page = '';
+
+  private licenseService = inject(LicenseService);
+  private tokenService = inject(TokenService);
 
   constructor(private router: Router, private spinner: SpinnerService) {
     this.router.events.subscribe((event: RouterEvent) => {
@@ -40,5 +46,11 @@ export class AppComponent {
         this.spinner.hide();
       }
     });
+  }
+
+  ngOnInit(): void {
+    if (this.tokenService.getAccessToken()) {
+      this.licenseService.check();
+    }
   }
 }

@@ -2742,5 +2742,8 @@
     "chart_baggage": "Bagagem",
     "chart_parcels": "Encomendas",
     "chart_clients": "Clientes"
+  },
+  "license": {
+    "expired_title": "Licença expirada"
   }
 }
