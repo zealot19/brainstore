@@ -584,6 +584,10 @@ class ArchivingSettingsView(APIView):
     def put(self, request):
         from apps.system_config.services.archiving import set_archive_window_days
         raw = request.data.get("archive_window_days")
+        # Reject bool and floats (JSON true / 5.5); accept int or an integer-valued string.
+        if isinstance(raw, bool) or not isinstance(raw, (int, str)):
+            return Response({"detail": "archive_window_days doit être un entier."},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
             days = int(raw)
         except (TypeError, ValueError):

@@ -44,3 +44,19 @@ def test_put_rejects_non_integer():
     c, company, _ = _admin_client("a4@x.com")
     r = c.put("/api/v1/system/archiving/", {"archive_window_days": "lots"}, format="json")
     assert r.status_code == 400
+
+
+@pytest.mark.django_db
+def test_put_rejects_float():
+    c, company, _ = _admin_client("a5@x.com")
+    r = c.put("/api/v1/system/archiving/", {"archive_window_days": 5.5}, format="json")
+    assert r.status_code == 400
+    assert archive_window_days(company.id) == 0
+
+
+@pytest.mark.django_db
+def test_put_rejects_bool():
+    c, company, _ = _admin_client("a6@x.com")
+    r = c.put("/api/v1/system/archiving/", {"archive_window_days": True}, format="json")
+    assert r.status_code == 400
+    assert archive_window_days(company.id) == 0
