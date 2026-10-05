@@ -2746,6 +2746,12 @@
   "license": {
     "expired_title": "Licença expirada",
     "manage_title": "Gerir licença",
-    "expires_at_label": "Data de expiração"
+    "expires_at_label": "Data de expiração",
+    "back_to_login": "Voltar ao login",
+    "bar_title": "Licença",
+    "expires_label": "Expira em",
+    "days_remaining": "{{n}} dia(s) restante(s)",
+    "expires_today": "Expira hoje",
+    "expired": "Licença expirada"
   }
 }

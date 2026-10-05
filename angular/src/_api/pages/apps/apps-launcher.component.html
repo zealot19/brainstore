@@ -55,6 +55,31 @@
       </div>
     }
 
+    @if (licenseExpiresAt) {
+      <div class="license-meter">
+        <div class="license-meter-head">
+          <span class="license-meter-title"><i class="ti ti-shield-check me-1"></i>{{ 'license.bar_title' | transloco }}</span>
+          <span class="license-meter-info" [class.text-danger]="daysRemaining < 0" [class.text-warning]="daysRemaining >= 0 && daysRemaining <= 30">
+            @if (daysRemaining > 0) {
+              {{ 'license.expires_label' | transloco }} {{ licenseExpiresAt | date:'dd/MM/yyyy' }} · {{ 'license.days_remaining' | transloco:{ n: daysRemaining } }}
+            } @else if (daysRemaining === 0) {
+              {{ 'license.expires_today' | transloco }}
+            } @else {
+              {{ 'license.expired' | transloco }} · {{ licenseExpiresAt | date:'dd/MM/yyyy' }}
+            }
+          </span>
+        </div>
+        <div class="progress license-meter-bar">
+          <div class="progress-bar"
+               [class.bg-success]="barClass === 'success'"
+               [class.bg-warning]="barClass === 'warning'"
+               [class.bg-danger]="barClass === 'danger'"
+               role="progressbar" [style.width.%]="barPercent"
+               [attr.aria-valuenow]="barPercent" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    }
+
   </div>
 
   <div class="launcher-footer">

@@ -219,3 +219,23 @@
   font-size: 0.78rem;
   color: #98a2b3;
 }
+
+// ── Barre d'expiration de la licence (bas de page) ──────────────────────────────
+.license-meter {
+  width: 100%;
+  max-width: 520px;
+  margin: 2rem auto 0;
+
+  .license-meter-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.8rem;
+  }
+  .license-meter-title { font-weight: 600; color: #475467; }
+  .license-meter-info  { color: #667085; }
+
+  .license-meter-bar { height: 8px; border-radius: 6px; background: #eceef1; }
+}
