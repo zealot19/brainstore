@@ -15,10 +15,16 @@ class Passenger(BaseModel):
         DRIVER_LICENSE = "driver_license", _("Permis de conduire")
         OTHER          = "other",          _("Autre")
 
+    class Civility(models.TextChoices):
+        MR   = "mr",   _("M.")
+        MRS  = "mrs",  _("Mme")
+        MISS = "miss", _("Mlle")
+
     company    = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
                                    on_delete=models.CASCADE, related_name="voyages_passengers")
     name       = models.CharField(_("nom"), max_length=300)
     gender     = models.CharField(_("genre"), max_length=1, choices=Gender.choices, blank=True)
+    civility   = models.CharField(_("civilité"), max_length=6, choices=Civility.choices, blank=True)
     birth_date = models.DateField(_("date de naissance"), null=True, blank=True)
     phone      = models.CharField(_("téléphone"), max_length=30, db_index=True)
     email      = models.EmailField(_("email"), blank=True)
