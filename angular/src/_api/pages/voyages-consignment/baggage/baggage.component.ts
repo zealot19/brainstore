@@ -146,7 +146,7 @@ export class VcgBaggageComponent implements OnInit {
     if (!this.isEdit && !v.ticket_id) {
       if (!this.senderClient.name) { this.errorMsg = 'Client requis (nom).'; return; }
       v.sender_name = this.senderClient.name; v.sender_phone = this.senderClient.phone;
-      v.civility = this.senderClient.civility; v.id_type = this.senderClient.id_type;
+      v.id_type = this.senderClient.id_type;
       v.id_number = this.senderClient.id_number; v.birth_date = this.senderClient.birth_date || null;
       v.email = this.senderClient.email || '';
     }

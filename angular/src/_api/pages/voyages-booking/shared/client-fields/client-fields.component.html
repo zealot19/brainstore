@@ -1,15 +1,6 @@
 <!-- client-fields.component.html -->
 <div class="row g-3">
-  <div class="col-md-2">
-    <label class="form-label">{{ 'shared.civility.label' | transloco }}</label>
-    <select class="form-select" [(ngModel)]="row.civility">
-      <option value="">—</option>
-      <option value="mr">{{ 'shared.civility.mr' | transloco }}</option>
-      <option value="mrs">{{ 'shared.civility.mrs' | transloco }}</option>
-      <option value="miss">{{ 'shared.civility.miss' | transloco }}</option>
-    </select>
-  </div>
-  <div class="col-md-4 position-relative">
+  <div class="col-md-6 position-relative">
     <label class="form-label">{{ 'shared.client.name' | transloco }}</label>
     <input class="form-control" [ngModel]="row.name" (ngModelChange)="onInput($event)" (blur)="hide()"
            [placeholder]="'shared.client.name_ph' | transloco" autocomplete="off" />
