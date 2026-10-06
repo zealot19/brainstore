@@ -2732,6 +2732,17 @@ tag-input{
   .card-body{
     padding: 0;
   }
+  // Barre de filtres au-dessus des tableaux : élargir légèrement les contrôles
+  // et agrandir un peu le texte pour que les libellés ne soient pas tronqués.
+  > .card-header {
+    .form-select,
+    .form-control {
+      font-size: 15px;
+    }
+    .form-select {
+      min-width: 185px !important;
+    }
+  }
 }
 .ng-scroll-content{
   margin-bottom: 45px;
