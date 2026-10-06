@@ -97,19 +97,27 @@
 
     @if (!hasTicket) {
       <h6 class="text-muted">{{ 'cons.baggage.sec_sender' | transloco }}</h6>
-      <div class="row">
-        <div class="col-md-2 mb-3"><label class="form-label">{{ 'cons.baggage.f_civility' | transloco }}</label>
-          <select formControlName="civility" class="form-select"><option value="">—</option><option value="mr">{{ 'cons.baggage.civ_mr' | transloco }}</option><option value="mrs">{{ 'cons.baggage.civ_mrs' | transloco }}</option><option value="miss">{{ 'cons.baggage.civ_miss' | transloco }}</option></select></div>
-        <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.baggage.f_sender_name' | transloco }}</label><input formControlName="sender_name" class="form-control" /></div>
-        <div class="col-md-3 mb-3"><label class="form-label">{{ 'admin.common.phone' | transloco }}</label><input formControlName="sender_phone" class="form-control" /></div>
-        <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.baggage.f_birth' | transloco }}</label><input formControlName="birth_date" type="date" class="form-control" /></div>
-      </div>
-      <div class="row">
-        <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.baggage.f_id_type' | transloco }}</label>
-          <select formControlName="id_type" class="form-select"><option value="cni">{{ 'cons.baggage.idt_cni' | transloco }}</option><option value="passport">{{ 'cons.baggage.idt_passport' | transloco }}</option><option value="driver_license">{{ 'cons.baggage.idt_license' | transloco }}</option><option value="other">{{ 'cons.baggage.idt_other' | transloco }}</option></select></div>
-        <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.baggage.f_id_number' | transloco }}</label><input formControlName="id_number" class="form-control" /></div>
-        <div class="col-md-5 mb-3"><label class="form-label">{{ 'admin.common.email' | transloco }}</label><input formControlName="email" type="email" class="form-control" /></div>
-      </div>
+      @if (!isEdit) {
+        <app-client-fields [row]="senderClient"></app-client-fields>
+        <div class="row g-3 mb-3 mt-1">
+          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_birth' | transloco }}</label>
+            <input [(ngModel)]="senderClient.birth_date" [ngModelOptions]="{ standalone: true }" type="date" class="form-control" /></div>
+          <div class="col-md-5"><label class="form-label">{{ 'admin.common.email' | transloco }}</label>
+            <input [(ngModel)]="senderClient.email" [ngModelOptions]="{ standalone: true }" type="email" class="form-control" /></div>
+        </div>
+      } @else {
+        <div class="row g-3 mb-3">
+          <div class="col-md-2"><label class="form-label">{{ 'cons.baggage.f_civility' | transloco }}</label>
+            <select formControlName="civility" class="form-select"><option value="">—</option><option value="mr">{{ 'cons.baggage.civ_mr' | transloco }}</option><option value="mrs">{{ 'cons.baggage.civ_mrs' | transloco }}</option><option value="miss">{{ 'cons.baggage.civ_miss' | transloco }}</option></select></div>
+          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_sender_name' | transloco }}</label><input formControlName="sender_name" class="form-control" /></div>
+          <div class="col-md-3"><label class="form-label">{{ 'admin.common.phone' | transloco }}</label><input formControlName="sender_phone" class="form-control" /></div>
+          <div class="col-md-3"><label class="form-label">{{ 'cons.baggage.f_birth' | transloco }}</label><input formControlName="birth_date" type="date" class="form-control" /></div>
+          <div class="col-md-3"><label class="form-label">{{ 'cons.baggage.f_id_type' | transloco }}</label>
+            <select formControlName="id_type" class="form-select"><option value="cni">{{ 'cons.baggage.idt_cni' | transloco }}</option><option value="passport">{{ 'cons.baggage.idt_passport' | transloco }}</option><option value="driver_license">{{ 'cons.baggage.idt_license' | transloco }}</option><option value="other">{{ 'cons.baggage.idt_other' | transloco }}</option></select></div>
+          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_id_number' | transloco }}</label><input formControlName="id_number" class="form-control" /></div>
+          <div class="col-md-5"><label class="form-label">{{ 'admin.common.email' | transloco }}</label><input formControlName="email" type="email" class="form-control" /></div>
+        </div>
+      }
     }
 
     <h6 class="text-muted">{{ 'cons.baggage.sec_baggage' | transloco }}</h6>

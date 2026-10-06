@@ -8,8 +8,9 @@ import { ConsignmentTypeService } from '../../../services/voyages-config/consign
 import { TripService } from '../../../services/voyages/trip.service';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Baggage, BaggageCreate } from '../../../models/voyages-consignment.models';
-import { TripOption } from '../../../models/voyages-booking.models';
+import { TripOption, PassengerSpec } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
+import { ClientFieldsComponent } from '../../voyages-booking/shared/client-fields/client-fields.component';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -23,7 +24,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, ClientFieldsComponent, TranslocoModule],
 })
 export class VcgBaggageComponent implements OnInit {
   private toast = inject(ToastService);
@@ -108,8 +109,12 @@ export class VcgBaggageComponent implements OnInit {
     });
   }
 
+  // Client (création, bagage sans billet) — piloté par le fieldset partagé app-client-fields
+  senderClient: PassengerSpec = { id_type: 'cni' };
+
   openCreate(): void {
     this.editId = null; this.errorMsg = '';
+    this.senderClient = { id_type: 'cni' };
     // Réinitialiser AVEC tous les champs : form.reset({partiel}) met les contrôles non listés
     // à null, or les CharField du backend refusent null.
     this.form.reset({
@@ -136,9 +141,17 @@ export class VcgBaggageComponent implements OnInit {
   }
   submit(): void {
     if (this.form.invalid || this.saving) return;
+    const v = this.form.getRawValue() as any;
+    // Création d'un bagage sans billet : le client vient du fieldset partagé.
+    if (!this.isEdit && !v.ticket_id) {
+      if (!this.senderClient.name) { this.errorMsg = 'Client requis (nom).'; return; }
+      v.sender_name = this.senderClient.name; v.sender_phone = this.senderClient.phone;
+      v.civility = this.senderClient.civility; v.id_type = this.senderClient.id_type;
+      v.id_number = this.senderClient.id_number; v.birth_date = this.senderClient.birth_date || null;
+      v.email = this.senderClient.email || '';
+    }
     this.saving = true; this.errorMsg = '';
-    const v = this.form.getRawValue() as BaggageCreate;
-    const req = this.isEdit ? this.svc.edit(this.editId!, v) : this.svc.create(v);
+    const req = this.isEdit ? this.svc.edit(this.editId!, v as BaggageCreate) : this.svc.create(v as BaggageCreate);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('baggage-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
