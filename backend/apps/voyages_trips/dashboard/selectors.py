@@ -82,15 +82,22 @@ def monthly_series(company, user, year, metric):
             qs = qs.filter(agency_id__in=ids)   # colis : agence d'origine (peut ne pas avoir de voyage)
         return _months(qs)
     if metric == "clients":
+        from django.db.models import Q
         from apps.voyages_booking.models import Passenger
-        qs = Passenger.objects.filter(is_deleted=False, company=company, created_at__year=year)
+        tick = Q(tickets__is_deleted=False) & ~Q(tickets__status="cancelled")
+        parc = Q(parcels_sent__is_deleted=False) & ~Q(parcels_sent__status="cancelled")
+        bag  = Q(baggage_sent__is_deleted=False) & ~Q(baggage_sent__status="cancelled")
         if ids is not None:
-            qs = qs.filter(tickets__trip__origin__agency_id__in=ids)
+            tick &= Q(tickets__trip__origin__agency_id__in=ids)
+            parc &= Q(parcels_sent__agency_id__in=ids)
+            bag  &= Q(baggage_sent__trip__origin__agency_id__in=ids)
+        client_ids = list(
+            Passenger.objects.filter(is_deleted=False, company=company, created_at__year=year)
+            .filter(tick | parc | bag).values_list("id", flat=True).distinct())
         out = [0] * 12
-        rows = (qs.order_by()
-                  .annotate(m=ExtractMonth("created_at"))
-                  .values("m")
-                  .annotate(c=Count("id", distinct=True)))
+        rows = (Passenger.objects.filter(id__in=client_ids)
+                .annotate(m=ExtractMonth("created_at")).values("m")
+                .annotate(c=Count("id", distinct=True)))
         for row in rows:
             if row["m"]:
                 out[row["m"] - 1] = row["c"]
