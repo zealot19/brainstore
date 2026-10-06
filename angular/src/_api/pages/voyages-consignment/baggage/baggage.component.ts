@@ -49,7 +49,6 @@ export class VcgBaggageComponent implements OnInit {
     this.form = this.fb.group({
       trip_id: [null, Validators.required], ticket_id: [null],
       sender_name: [''], sender_phone: [''], civility: [''], id_type: ['cni'], id_number: [''],
-      birth_date: [null], email: [''],
       consignment_type_id: [null], description: [''], weight_kg: [null], quantity: [1], declared_value: [1],
       amount_due: [0, [Validators.required, Validators.min(0)]], amount_received: [null], payment_method: [''],
     });
@@ -120,7 +119,6 @@ export class VcgBaggageComponent implements OnInit {
     this.form.reset({
       trip_id: null, ticket_id: null,
       sender_name: '', sender_phone: '', civility: '', id_type: 'cni', id_number: '',
-      birth_date: null, email: '',
       consignment_type_id: null, description: '', weight_kg: null, quantity: 1, declared_value: 1,
       amount_due: 0, amount_received: null, payment_method: '',
     });
@@ -130,8 +128,8 @@ export class VcgBaggageComponent implements OnInit {
     this.editId = b.id; this.errorMsg = '';
     this.form.reset({
       trip_id: b.trip, ticket_id: b.ticket, sender_name: b.sender_name, sender_phone: b.sender_phone,
-      civility: b.civility, id_type: b.id_type || 'cni', id_number: b.id_number, birth_date: b.birth_date,
-      email: b.email, consignment_type_id: b.consignment_type, description: b.description,
+      civility: b.civility, id_type: b.id_type || 'cni', id_number: b.id_number,
+      consignment_type_id: b.consignment_type, description: b.description,
       weight_kg: b.weight_kg, quantity: b.quantity, declared_value: b.declared_value,
       amount_due: b.amount_due, amount_received: b.amount_received, payment_method: b.payment_method,
     });
@@ -147,8 +145,7 @@ export class VcgBaggageComponent implements OnInit {
       if (!this.senderClient.name) { this.errorMsg = 'Client requis (nom).'; return; }
       v.sender_name = this.senderClient.name; v.sender_phone = this.senderClient.phone;
       v.id_type = this.senderClient.id_type;
-      v.id_number = this.senderClient.id_number; v.birth_date = this.senderClient.birth_date || null;
-      v.email = this.senderClient.email || '';
+      v.id_number = this.senderClient.id_number;
     }
     this.saving = true; this.errorMsg = '';
     const req = this.isEdit ? this.svc.edit(this.editId!, v as BaggageCreate) : this.svc.create(v as BaggageCreate);

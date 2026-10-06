@@ -2204,7 +2204,8 @@
       "voyage": "Viaje",
       "new_search": "Nueva búsqueda",
       "f_received_by": "Recibido por (nombre)",
-      "f_received_id": "Documento presentado (n.º)"
+      "f_received_id": "Documento presentado (n.º)",
+      "col_received_by": "Recibido por"
     },
     "retrait": {
       "bag_title": "Retiro",

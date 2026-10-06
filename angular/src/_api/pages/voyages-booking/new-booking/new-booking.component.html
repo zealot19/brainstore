@@ -8,14 +8,6 @@
 <div class="card"><div class="card-body">
   @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
 
-  <!-- ══ Section Client ══ -->
-  <h6 class="section-title fw-semibold text-primary mb-3">
-    <i class="ti ti-user me-1"></i>{{ 'booking.form.client' | transloco }}
-  </h6>
-  <app-client-fields [row]="buyer"></app-client-fields>
-
-  <hr class="my-4" />
-
   <!-- ══ Section Voyage ══ -->
   <h6 class="section-title fw-semibold text-primary mb-3">
     <i class="ti ti-bus me-1"></i>{{ 'booking.form.trip' | transloco }}
@@ -140,6 +132,14 @@
       <input class="form-control fw-bold" disabled [value]="fare != null ? ((fare | number:'1.0-0') + ' XAF') : '—'" />
     </div>
   </div>
+
+  <hr class="my-4" />
+
+  <!-- ══ Section Client ══ -->
+  <h6 class="section-title fw-semibold text-primary mb-3">
+    <i class="ti ti-user me-1"></i>{{ 'booking.form.client' | transloco }}
+  </h6>
+  <app-client-fields [row]="buyer"></app-client-fields>
 
   <hr class="my-4" />
 

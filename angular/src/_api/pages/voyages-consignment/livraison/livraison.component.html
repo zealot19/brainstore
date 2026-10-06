@@ -90,19 +90,20 @@
           </tbody>
         } @else {
           <thead class="thead-light"><tr>
-            <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.livraison.f_address' | transloco }}</th><th>{{ 'cons.common.col_amount' | transloco }}</th><th>{{ 'cons.common.f_payment_method' | transloco }}</th><th>{{ 'cons.livraison.col_delivered_at' | transloco }}</th>
+            <th>{{ 'cons.common.col_reference' | transloco }}</th><th>{{ 'cons.common.col_recipient' | transloco }}</th><th>{{ 'cons.livraison.col_received_by' | transloco }}</th><th>{{ 'cons.livraison.f_address' | transloco }}</th><th>{{ 'cons.common.col_amount' | transloco }}</th><th>{{ 'cons.common.f_payment_method' | transloco }}</th><th>{{ 'cons.livraison.col_delivered_at' | transloco }}</th>
           </tr></thead>
           <tbody>
             @for (p of rows | paginate:pg.page:pg.size; track p.id) {
               <tr>
                 <td class="fw-medium">{{ p.reference }}</td>
                 <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
+                <td>{{ p.picked_up_by || '—' }}@if (p.picked_up_id_number) { <br><small class="text-muted">{{ p.picked_up_id_number }}</small> }</td>
                 <td>{{ p.delivery_address || '—' }}</td>
                 <td>{{ p.delivery_amount | number:'1.0-0' }} XAF</td>
                 <td>{{ paymentLabel(p.delivery_payment_method) }}</td>
                 <td>{{ p.delivered_home_at | date:'short' }}</td>
               </tr>
-            } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'cons.livraison.empty_delivered' | transloco }}</td></tr> }
+            } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'cons.livraison.empty_delivered' | transloco }}</td></tr> }
           </tbody>
         }
       </table></div>

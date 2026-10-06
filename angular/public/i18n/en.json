@@ -2204,7 +2204,8 @@
       "voyage": "Voyage",
       "new_search": "New search",
       "f_received_by": "Received by (name)",
-      "f_received_id": "ID presented (no.)"
+      "f_received_id": "ID presented (no.)",
+      "col_received_by": "Received by"
     },
     "retrait": {
       "bag_title": "Pickup",
