@@ -2,7 +2,14 @@
 import pytest
 from apps.system_config.models import Company
 from apps.voyages_booking.models import Passenger
+from apps.voyages_booking.config_api.serializers import PassengerRead
 from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+
+
+def test_passenger_read_serializer_exposes_civility():
+    # The passenger list/read API must return civility so the client-fields
+    # autocomplete can fill it when picking an existing client.
+    assert "civility" in PassengerRead().fields
 
 
 @pytest.mark.django_db

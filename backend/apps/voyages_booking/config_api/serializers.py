@@ -9,7 +9,7 @@ class PassengerRead(serializers.ModelSerializer):
 
     class Meta:
         model = Passenger
-        fields = ["id", "name", "full_name", "gender", "gender_display",
+        fields = ["id", "name", "full_name", "civility", "gender", "gender_display",
                   "birth_date", "phone", "email", "id_type", "id_type_display", "id_number",
                   "notes", "company", "is_active", "created_at", "updated_at"]
 

@@ -1,5 +1,5 @@
 export interface Passenger {
-  id: string; name: string; full_name: string;
+  id: string; name: string; full_name: string; civility: string;
   gender: '' | 'M' | 'F' | 'O'; gender_display: string; birth_date: string | null;
   phone: string; email: string; id_type: string; id_type_display: string; id_number: string;
   notes: string; company: string | null; is_active: boolean; created_at: string; updated_at: string;

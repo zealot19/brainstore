@@ -32,7 +32,7 @@ export class ClientFieldsComponent {
   pick(p: Passenger) {
     this.row.id = p.id; this.row.name = p.name; this.row.phone = p.phone;
     this.row.id_type = p.id_type; this.row.id_number = p.id_number;
-    this.row.civility = (p as any).civility ?? '';
+    this.row.civility = p.civility ?? '';
     this.open = false;
   }
   hide() { setTimeout(() => (this.open = false), 150); }
