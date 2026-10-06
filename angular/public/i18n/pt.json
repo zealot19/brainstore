@@ -2156,7 +2156,9 @@
       "f_by_mandataire": "Retirado por um procurador",
       "f_mandataire_name": "Nome do procurador",
       "f_mandataire_id": "CNI do procurador",
-      "f_contenance": "Conteúdo"
+      "f_contenance": "Conteúdo",
+      "sec_sender": "Cliente — remetente",
+      "sec_recipient": "Destinatário"
     },
     "expedition": {
       "title": "Expedição",

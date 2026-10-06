@@ -107,15 +107,20 @@
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_dest' | transloco }} <span class="text-danger">*</span></label>
         <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>
-    <h6 class="text-muted">{{ 'cons.parcels.sec_parties' | transloco }}</h6>
-    <div class="row">
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_sender' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_sender_phone' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_phone" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient' | transloco }}</label><input formControlName="recipient_name" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient_phone' | transloco }}</label><input formControlName="recipient_phone" class="form-control" /></div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_recipient_id' | transloco }}</label><input formControlName="recipient_id_number" class="form-control" [placeholder]="'cons.parcels.recipient_id_ph' | transloco" /></div>
+    <h6 class="text-muted">{{ 'cons.parcels.sec_sender' | transloco }}</h6>
+    @if (!isEdit) {
+      <app-client-fields [row]="senderClient"></app-client-fields>
+    } @else {
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label">{{ 'cons.parcels.f_sender' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'cons.parcels.f_sender_phone' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_phone" class="form-control" /></div>
+      </div>
+    }
+    <h6 class="text-muted mt-3">{{ 'cons.parcels.sec_recipient' | transloco }}</h6>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4"><label class="form-label">{{ 'cons.parcels.f_recipient' | transloco }}</label><input formControlName="recipient_name" class="form-control" /></div>
+      <div class="col-md-4"><label class="form-label">{{ 'cons.parcels.f_recipient_phone' | transloco }}</label><input formControlName="recipient_phone" class="form-control" /></div>
+      <div class="col-md-4"><label class="form-label">{{ 'cons.parcels.f_recipient_id' | transloco }}</label><input formControlName="recipient_id_number" class="form-control" [placeholder]="'cons.parcels.recipient_id_ph' | transloco" /></div>
       <div class="col-12"><small class="text-muted"><i class="ti ti-info-circle me-1"></i>{{ 'cons.parcels.recipient_optional_hint' | transloco }}</small></div>
     </div>
     <h6 class="text-muted">{{ 'cons.parcels.sec_content' | transloco }}</h6>

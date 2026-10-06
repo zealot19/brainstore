@@ -2156,7 +2156,9 @@
       "f_by_mandataire": "Retiré par un mandataire",
       "f_mandataire_name": "Nom du mandataire",
       "f_mandataire_id": "CNI du mandataire",
-      "f_contenance": "Contenance"
+      "f_contenance": "Contenance",
+      "sec_sender": "Client — expéditeur",
+      "sec_recipient": "Destinataire"
     },
     "expedition": {
       "title": "Expédition",

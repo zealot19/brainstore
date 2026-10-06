@@ -2156,7 +2156,9 @@
       "f_by_mandataire": "Collected by a proxy",
       "f_mandataire_name": "Proxy name",
       "f_mandataire_id": "Proxy ID (CNI)",
-      "f_contenance": "Contents"
+      "f_contenance": "Contents",
+      "sec_sender": "Client — sender",
+      "sec_recipient": "Recipient"
     },
     "expedition": {
       "title": "Dispatch",

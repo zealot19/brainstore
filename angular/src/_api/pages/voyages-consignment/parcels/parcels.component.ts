@@ -8,7 +8,9 @@ import { ConsignmentTypeService } from '../../../services/voyages-config/consign
 import { TripService } from '../../../services/voyages/trip.service';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
+import { PassengerSpec } from '../../../models/voyages-booking.models';
 import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
+import { ClientFieldsComponent } from '../../voyages-booking/shared/client-fields/client-fields.component';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -22,7 +24,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-vcg-parcels',
   templateUrl: './parcels.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, ClientFieldsComponent, TranslocoModule],
 })
 export class VcgParcelsComponent implements OnInit {
   private toast = inject(ToastService);
@@ -47,11 +49,14 @@ export class VcgParcelsComponent implements OnInit {
               private fb: FormBuilder, private route: ActivatedRoute,
               private pmSvc: PaymentMethodService) {}
 
+  // Client expéditeur (création) — piloté par le fieldset partagé app-client-fields
+  senderClient: PassengerSpec = { id_type: 'cni' };
+
   ngOnInit(): void {
     this.form = this.fb.group({
       origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
-      sender_name: [null, Validators.required], sender_phone: [null, Validators.required],
+      sender_name: [null], sender_phone: [null],   // create: driven by the shared client fieldset (senderClient)
       recipient_name: [''], recipient_phone: [''],
       recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
@@ -108,7 +113,7 @@ export class VcgParcelsComponent implements OnInit {
     return r - d > 0 ? r - d : 0;
   }
   get isEdit(): boolean { return this.editId != null; }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
   openEdit(p: Parcel): void {
     this.editId = p.id; this.errorMsg = '';
     this.form.reset({
@@ -124,8 +129,17 @@ export class VcgParcelsComponent implements OnInit {
   }
   submit(): void {
     if (this.form.invalid || this.saving) return;
+    if (!this.isEdit && (!this.senderClient.name || !this.senderClient.phone)) {
+      this.errorMsg = 'Expéditeur requis (nom et téléphone).'; return;
+    }
     this.saving = true; this.errorMsg = '';
-    const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(this.form.value);
+    const createBody = {
+      ...this.form.value,
+      sender_name: this.senderClient.name, sender_phone: this.senderClient.phone,
+      sender_civility: this.senderClient.civility, sender_id_type: this.senderClient.id_type,
+      sender_id_number: this.senderClient.id_number,
+    };
+    const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(createBody);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal'); },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
