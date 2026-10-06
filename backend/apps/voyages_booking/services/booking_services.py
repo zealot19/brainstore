@@ -64,7 +64,7 @@ def _resolve_passenger(company, spec, user):
         company, user=user,
         id_type=spec.get("id_type", "cni"), id_number=spec.get("id_number", ""),
         phone=spec.get("phone", ""), name=spec.get("name", ""),
-        gender=spec.get("gender", ""),
+        gender=spec.get("gender", ""), civility=spec.get("civility", ""),
         birth_date=spec.get("birth_date"), email=spec.get("email", ""))
 
 

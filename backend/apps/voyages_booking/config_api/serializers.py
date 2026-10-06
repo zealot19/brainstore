@@ -16,6 +16,7 @@ class PassengerRead(serializers.ModelSerializer):
 
 class PassengerWrite(serializers.Serializer):
     name = serializers.CharField(max_length=300)
+    civility = serializers.ChoiceField(choices=Passenger.Civility.choices, required=False, allow_blank=True, default="")
     gender = serializers.ChoiceField(choices=Passenger.Gender.choices, required=False, allow_blank=True, default="")
     birth_date = serializers.DateField(required=False, allow_null=True, default=None)
     phone = serializers.CharField(max_length=30)
