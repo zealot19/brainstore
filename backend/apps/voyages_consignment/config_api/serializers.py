@@ -65,12 +65,17 @@ class ParcelRead(serializers.ModelSerializer):
 class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
     # Le form Angular remet à null les contrôles facultatifs (reset) : None -> "".
     null_blank_fields = ("recipient_name", "recipient_phone", "recipient_address",
-                         "recipient_id_number", "description", "payment_method")
+                         "recipient_id_number", "description", "payment_method",
+                         "sender_civility", "sender_id_number")
     origin_point_id = serializers.UUIDField()
     destination_point_id = serializers.UUIDField()
     consignment_type_id = serializers.UUIDField()
     sender_name = serializers.CharField(max_length=150)
     sender_phone = serializers.CharField(max_length=30)
+    sender_civility = serializers.ChoiceField(choices=["mr", "mrs", "miss"],
+                                              required=False, allow_blank=True, default="")
+    sender_id_type = serializers.CharField(max_length=20, required=False, default="cni")
+    sender_id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     recipient_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     recipient_phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
     recipient_address = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")

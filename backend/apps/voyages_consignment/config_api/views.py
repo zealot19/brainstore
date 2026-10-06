@@ -59,6 +59,8 @@ class ParcelListView(APIView):
             parcel = services.register_parcel(
                 company, origin_point=origin, destination_point=dest, consignment_type=ctype,
                 sender_name=d["sender_name"], sender_phone=d["sender_phone"],
+                sender_civility=d["sender_civility"], sender_id_type=d["sender_id_type"],
+                sender_id_number=d["sender_id_number"],
                 recipient_name=d["recipient_name"], recipient_phone=d["recipient_phone"],
                 recipient_address=d["recipient_address"], description=d["description"],
                 weight_kg=d["weight_kg"], quantity=d["quantity"], declared_value=d["declared_value"],

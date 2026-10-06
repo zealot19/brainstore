@@ -37,7 +37,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
                     sender_name, sender_phone, recipient_name, recipient_phone,
                     recipient_address="", recipient_id_number="", description="", weight_kg=None,
                     quantity=1, declared_value=None, amount_due, amount_received=None,
-                    payment_method="", user):
+                    payment_method="", sender_civility="", sender_id_type="cni",
+                    sender_id_number="", user):
     if origin_point.id == destination_point.id:
         raise ApplicationError(_("Le point de départ et le point d'arrivée doivent différer."))
     if getattr(destination_point, "station_kind", "") != "AGENCY":
@@ -51,10 +52,15 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
     if received < due:
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
+    from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+    sender_client = get_or_create_passenger(
+        company, id_type=sender_id_type, id_number=sender_id_number, phone=sender_phone,
+        name=sender_name, civility=sender_civility, user=user) if sender_name else None
     parcel = Parcel.objects.create(
         company=company, agency=origin_point.agency,
         reference=_parcel_reference(company.id, origin_point, destination_point), status=Parcel.Status.READY_FOR_TRAVEL,
         origin_point=origin_point, destination_point=destination_point, consignment_type=consignment_type,
+        sender_client=sender_client,
         sender_name=sender_name, sender_phone=sender_phone, recipient_name=recipient_name,
         recipient_phone=recipient_phone, recipient_address=recipient_address,
         recipient_id_number=recipient_id_number, description=description,

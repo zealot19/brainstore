@@ -27,6 +27,9 @@ class Parcel(BaseModel):
                                            on_delete=models.PROTECT, related_name="parcels_to")
     trip              = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage"),
                                            on_delete=models.SET_NULL, null=True, blank=True, related_name="parcels")
+    sender_client     = models.ForeignKey("voyages_booking.Passenger", verbose_name=_("client expéditeur"),
+                                          on_delete=models.SET_NULL, null=True, blank=True,
+                                          related_name="parcels_sent")
     sender_name       = models.CharField(_("expéditeur"), max_length=150)
     sender_phone      = models.CharField(_("tél. expéditeur"), max_length=30)
     recipient_name      = models.CharField(_("destinataire"), max_length=150, blank=True)
