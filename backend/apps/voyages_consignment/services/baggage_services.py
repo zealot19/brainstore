@@ -51,10 +51,17 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
     if received < due:
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
+    sender_client = None
+    if sender_name and ticket is None:
+        from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+        sender_client = get_or_create_passenger(
+            company, id_type=id_type, id_number=id_number, phone=sender_phone,
+            name=sender_name, civility=civility, user=user)
     baggage = Baggage.objects.create(
         company=company, tag_number=_tag_number(), trip=trip, ticket=ticket,
         sender_name=sender_name, sender_phone=sender_phone, civility=civility,
         id_type=id_type, id_number=id_number, birth_date=birth_date, email=email,
+        sender_client=sender_client,
         consignment_type=consignment_type, description=description, weight_kg=weight_kg,
         quantity=quantity, declared_value=declared_value or 1,
         free_allowance_kg=allowance, excess_kg=excess,

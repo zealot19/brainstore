@@ -35,6 +35,9 @@ class Baggage(BaseModel):
     civility          = models.CharField(_("civilité"), max_length=6, choices=Civility.choices, blank=True)
     id_type           = models.CharField(_("type de pièce"), max_length=20, choices=IdType.choices, blank=True)
     id_number         = models.CharField(_("no pièce"), max_length=100, blank=True)
+    sender_client     = models.ForeignKey("voyages_booking.Passenger", verbose_name=_("client"),
+                                          on_delete=models.SET_NULL, null=True, blank=True,
+                                          related_name="baggage_sent")
     birth_date        = models.DateField(_("date de naissance"), null=True, blank=True)
     email             = models.EmailField(_("email"), blank=True)
     consignment_type  = models.ForeignKey("voyages_config.ConsignmentType", verbose_name=_("type"),
