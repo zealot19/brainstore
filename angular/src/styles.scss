@@ -3395,3 +3395,34 @@ body { font-family: var(--bs-body-font-family); }
   background-color: #eef2ff;
   color: #1f2937;
 }
+
+// ── Tables de liste : tout voir sans défilement horizontal ──────────────────────
+// Objectif : afficher toutes les colonnes dans la largeur disponible. Le texte
+// s'enroule et la police/espacement sont compactés au lieu de scroller à gauche/droite.
+// (Les styles d'impression @media print plus haut ne sont pas affectés.)
+.table-responsive {
+  table {
+    width: 100%;
+    table-layout: auto;
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    white-space: normal !important;   // neutralise les `nowrap` en ligne
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    min-width: 0 !important;          // neutralise les min-width en ligne qui élargissent
+    padding: 0.45rem 0.5rem;
+    vertical-align: middle;
+  }
+
+  // En-têtes un peu plus serrés aussi
+  thead th { font-size: 0.78rem; }
+
+  // Les icônes d'action restent lisibles malgré la police réduite
+  td i[class*="ti-"] { font-size: 1rem; }
+
+  // La colonne d'actions (icônes) ne doit pas s'enrouler
+  .edit-delete-action { flex-wrap: nowrap; white-space: nowrap; }
+}
