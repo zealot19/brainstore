@@ -8,8 +8,7 @@ import { TimeSlotService } from '../../../services/voyages-config/time-slot.serv
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClass, TimeSlot, Route } from '../../../models/voyages-config.models';
 import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec, Booking } from '../../../models/voyages-booking.models';
-import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
-import { ClientAutocompleteComponent } from '../shared/client-autocomplete/client-autocomplete.component';
+import { ClientFieldsComponent } from '../shared/client-fields/client-fields.component';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PermissionService } from '../../../services/auth/permission.service';
@@ -21,7 +20,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, ClientAutocompleteComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, ClientFieldsComponent, TranslocoModule],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
@@ -40,8 +39,8 @@ export class VbNewBookingComponent implements OnInit {
   retDate = ''; retSlotId = ''; retTrips: TripOption[] = []; returnTripId = '';
   retSeats: SeatCell[] = []; retSeatId = '';
 
-  // Client (un seul par formulaire)
-  client: PassengerSpec = { name: '', phone: '', id_type: 'cni', id_number: '' };
+  // Client / acheteur (un seul par formulaire)
+  buyer: PassengerSpec = { name: '', phone: '', id_type: 'cni', id_number: '' };
 
   // Paiement / Réservation
   paymentMethod = ''; amountReceived: number | null = null;
@@ -144,7 +143,7 @@ export class VbNewBookingComponent implements OnInit {
       if (!this.returnTripId) return false;
       if (!this.returnAuto && !this.retSeatId) return false;
     }
-    if (!this.client.name || !this.client.phone) return false;
+    if (!this.buyer.name || !this.buyer.phone) return false;
     if (this.isReservation) return !!this.holdUntil;
     if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
     return true;
@@ -154,8 +153,8 @@ export class VbNewBookingComponent implements OnInit {
     if (!this.canSubmit) return;
     this.saving = true; this.errorMsg = '';
     const item = {
-      passenger: { id: this.client.id, name: this.client.name, phone: this.client.phone,
-                   id_type: this.client.id_type, id_number: this.client.id_number },
+      passenger: { id: this.buyer.id, name: this.buyer.name, phone: this.buyer.phone,
+                   civility: this.buyer.civility, id_type: this.buyer.id_type, id_number: this.buyer.id_number },
       destination_point_id: this.destinationId || null,
       outbound_seat_id: this.outboundAuto ? null : this.outSeatId,
       return_seat_id: (this.needReturnSel && !this.returnAuto) ? this.retSeatId : null,
@@ -199,7 +198,7 @@ export class VbNewBookingComponent implements OnInit {
     this.outSeats = []; this.outSeatId = '';
     this.returnOpen = false; this.retDate = ''; this.retSlotId = ''; this.retTrips = []; this.returnTripId = '';
     this.retSeats = []; this.retSeatId = '';
-    this.client = { name: '', phone: '', id_type: 'cni', id_number: '' };
+    this.buyer = { name: '', phone: '', id_type: 'cni', id_number: '' };
     this.paymentMethod = ''; this.amountReceived = null;
   }
 
