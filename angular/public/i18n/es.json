@@ -95,7 +95,8 @@
       "id_type": "Tipo doc.",
       "id_number": "N° doc.",
       "passport": "Pasaporte",
-      "license": "Licencia"
+      "license": "Licencia",
+      "other": "Otro"
     },
     "archiving": {
       "show_archived": "Mostrar archivadas"

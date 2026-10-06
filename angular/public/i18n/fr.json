@@ -95,7 +95,8 @@
       "id_type": "Type pièce",
       "id_number": "N° pièce",
       "passport": "Passeport",
-      "license": "Permis"
+      "license": "Permis",
+      "other": "Autre"
     },
     "archiving": {
       "show_archived": "Afficher les archives"

@@ -95,7 +95,8 @@
       "id_type": "Tipo de doc.",
       "id_number": "N° doc.",
       "passport": "Passaporte",
-      "license": "Carta de condução"
+      "license": "Carta de condução",
+      "other": "Outro"
     },
     "archiving": {
       "show_archived": "Mostrar arquivadas"

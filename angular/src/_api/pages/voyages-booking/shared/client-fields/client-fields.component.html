@@ -32,7 +32,8 @@
     <label class="form-label">{{ 'shared.client.id_type' | transloco }}</label>
     <select class="form-select" [(ngModel)]="row.id_type">
       <option value="cni">CNI</option><option value="passport">{{ 'shared.client.passport' | transloco }}</option>
-      <option value="permis">{{ 'shared.client.license' | transloco }}</option>
+      <option value="driver_license">{{ 'shared.client.license' | transloco }}</option>
+      <option value="other">{{ 'shared.client.other' | transloco }}</option>
     </select>
   </div>
   <div class="col-md-2">
