@@ -47,6 +47,7 @@ export interface LoyaltyView { account: LoyaltyAccount | null; movements: Loyalt
 export interface PassengerSpec {
   id?: string; name?: string; gender?: string; birth_date?: string | null;
   phone?: string; email?: string; id_type?: string; id_number?: string;
+  civility?: string;
 }
 export interface BookingItem {
   passenger: PassengerSpec; destination_point_id?: string | null;

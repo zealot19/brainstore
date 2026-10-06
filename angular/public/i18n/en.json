@@ -89,10 +89,22 @@
       "no_results": "No results"
     },
     "client": {
-      "name_ph": "Client name"
+      "name_ph": "Client name",
+      "name": "Name",
+      "phone": "Phone",
+      "id_type": "ID type",
+      "id_number": "ID number",
+      "passport": "Passport",
+      "license": "License"
     },
     "archiving": {
       "show_archived": "Show archives"
+    },
+    "civility": {
+      "label": "Title",
+      "mr": "Mr.",
+      "mrs": "Mrs.",
+      "miss": "Ms."
     }
   },
   "nav": {

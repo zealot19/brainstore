@@ -1,0 +1,42 @@
+<!-- client-fields.component.html -->
+<div class="row g-3">
+  <div class="col-md-2">
+    <label class="form-label">{{ 'shared.civility.label' | transloco }}</label>
+    <select class="form-select" [(ngModel)]="row.civility">
+      <option value="">—</option>
+      <option value="mr">{{ 'shared.civility.mr' | transloco }}</option>
+      <option value="mrs">{{ 'shared.civility.mrs' | transloco }}</option>
+      <option value="miss">{{ 'shared.civility.miss' | transloco }}</option>
+    </select>
+  </div>
+  <div class="col-md-4 position-relative">
+    <label class="form-label">{{ 'shared.client.name' | transloco }}</label>
+    <input class="form-control" [ngModel]="row.name" (ngModelChange)="onInput($event)" (blur)="hide()"
+           [placeholder]="'shared.client.name_ph' | transloco" autocomplete="off" />
+    @if (open) {
+      <ul class="list-group position-absolute w-100 shadow-sm" style="z-index:1050; max-height:240px; overflow:auto">
+        @for (p of results; track p.id) {
+          <li class="list-group-item list-group-item-action" (mousedown)="pick(p)">
+            {{ p.name }} @if (p.phone) { <small class="text-muted">· {{ p.phone }}</small> }
+            @if (p.id_number) { <small class="text-muted">· {{ p.id_type_display || 'CNI' }} {{ p.id_number }}</small> }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">{{ 'shared.client.phone' | transloco }}</label>
+    <input class="form-control" [(ngModel)]="row.phone" />
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">{{ 'shared.client.id_type' | transloco }}</label>
+    <select class="form-select" [(ngModel)]="row.id_type">
+      <option value="cni">CNI</option><option value="passport">{{ 'shared.client.passport' | transloco }}</option>
+      <option value="permis">{{ 'shared.client.license' | transloco }}</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">{{ 'shared.client.id_number' | transloco }}</label>
+    <input class="form-control" [(ngModel)]="row.id_number" />
+  </div>
+</div>

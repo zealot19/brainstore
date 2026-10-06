@@ -89,10 +89,22 @@
       "no_results": "Aucun résultat"
     },
     "client": {
-      "name_ph": "Nom du client"
+      "name_ph": "Nom du client",
+      "name": "Nom",
+      "phone": "Téléphone",
+      "id_type": "Type pièce",
+      "id_number": "N° pièce",
+      "passport": "Passeport",
+      "license": "Permis"
     },
     "archiving": {
       "show_archived": "Afficher les archives"
+    },
+    "civility": {
+      "label": "Civilité",
+      "mr": "M.",
+      "mrs": "Mme",
+      "miss": "Mlle"
     }
   },
   "nav": {
