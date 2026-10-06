@@ -19,27 +19,27 @@
     <!-- Header Menu -->
     <ul class="nav user-menu align-items-center justify-content-end">
 
-      <!-- App-switcher : retour au lanceur d'applications -->
-      <li class="nav-item me-3">
+      <!-- App-switcher : retour au lanceur d'applications (inline ≥ lg) -->
+      <li class="nav-item me-3 d-none d-lg-flex">
         <a href="javascript:void(0);" class="nav-link px-2 d-inline-flex align-items-center gap-1" (click)="switchToLauncher()" title="Applications">
           <i class="ti ti-grid-dots fs-18"></i><span>{{ 'shared.nav.apps' | transloco }}</span>
         </a>
       </li>
 
-      <!-- Raccourcis Transport : visibles uniquement dans l'app Transport -->
+      <!-- Raccourcis Transport : visibles uniquement dans l'app Transport (inline ≥ lg) -->
       @if (isTransport) {
         <ng-container *hasModule="'voyage'">
-          <li class="nav-item me-2" *hasPermission="'ticketing.booking.create'">
+          <li class="nav-item me-2 d-none d-lg-flex" *hasPermission="'ticketing.booking.create'">
             <span class="d-inline-flex"><a class="btn btn-primary" [routerLink]="routes.vbBookingNew">{{ 'shared.nav.new_booking' | transloco }}</a></span>
           </li>
         </ng-container>
         <ng-container *hasModule="'colis'">
-          <li class="nav-item me-2" *hasPermission="'ticketing.parcel.manage'">
+          <li class="nav-item me-2 d-none d-lg-flex" *hasPermission="'ticketing.parcel.manage'">
             <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_parcel' | transloco }}</a></span>
           </li>
         </ng-container>
         <ng-container *hasModule="'bagages'">
-          <li class="nav-item me-3" *hasPermission="'ticketing.luggage.manage'">
+          <li class="nav-item me-3 d-none d-lg-flex" *hasPermission="'ticketing.luggage.manage'">
             <span class="d-inline-flex"><a class="btn btn-outline-primary" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">{{ 'shared.nav.new_baggage' | transloco }}</a></span>
           </li>
         </ng-container>
@@ -55,24 +55,67 @@
         <app-language-switcher />
       </li>
 
-      <!-- Déconnexion -->
-      <li class="nav-item me-3">
+      <!-- Déconnexion (inline ≥ lg) -->
+      <li class="nav-item me-3 d-none d-lg-flex">
         <a href="javascript:void(0);" class="nav-link px-2 d-inline-flex align-items-center" (click)="logout()"
            [title]="'shared.nav.logout' | transloco">
           <i class="ti ti-logout me-1"></i>{{ 'shared.nav.logout' | transloco }}
         </a>
       </li>
 
-      <!-- Utilisateur connecté -->
+      <!-- Utilisateur connecté (nom/fonction masqués < md : avatar seul sur téléphone) -->
       <li class="nav-item">
         <div class="d-flex align-items-center">
           <span class="avatar avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
                 style="width:34px;height:34px;font-size:.8rem;">{{ userInitials }}</span>
-          <div class="lh-1">
+          <div class="lh-1 d-none d-md-block">
             <div class="fw-semibold" style="font-size:.85rem;">{{ userName }}</div>
             <small class="text-muted">{{ userTitle }}</small>
           </div>
         </div>
+      </li>
+
+      <!-- Menu compact (téléphones/tablettes < lg) : regroupe raccourcis + déconnexion -->
+      <li class="nav-item dropdown d-lg-none ms-1">
+        <a href="javascript:void(0);" class="nav-link px-2" data-bs-toggle="dropdown" aria-expanded="false" title="Menu">
+          <i class="ti ti-dots-vertical fs-20"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center gap-2" (click)="switchToLauncher()">
+              <i class="ti ti-grid-dots"></i>{{ 'shared.nav.apps' | transloco }}
+            </a>
+          </li>
+          @if (isTransport) {
+            <ng-container *hasModule="'voyage'">
+              <li *hasPermission="'ticketing.booking.create'">
+                <a class="dropdown-item d-flex align-items-center gap-2" [routerLink]="routes.vbBookingNew">
+                  <i class="ti ti-ticket"></i>{{ 'shared.nav.new_booking' | transloco }}
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *hasModule="'colis'">
+              <li *hasPermission="'ticketing.parcel.manage'">
+                <a class="dropdown-item d-flex align-items-center gap-2" [routerLink]="routes.vcgParcels" [queryParams]="{ new: 1 }">
+                  <i class="ti ti-package"></i>{{ 'shared.nav.new_parcel' | transloco }}
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *hasModule="'bagages'">
+              <li *hasPermission="'ticketing.luggage.manage'">
+                <a class="dropdown-item d-flex align-items-center gap-2" [routerLink]="routes.vcgBaggage" [queryParams]="{ new: 1 }">
+                  <i class="ti ti-luggage"></i>{{ 'shared.nav.new_baggage' | transloco }}
+                </a>
+              </li>
+            </ng-container>
+          }
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center gap-2" (click)="logout()">
+              <i class="ti ti-logout"></i>{{ 'shared.nav.logout' | transloco }}
+            </a>
+          </li>
+        </ul>
       </li>
 
     </ul>
