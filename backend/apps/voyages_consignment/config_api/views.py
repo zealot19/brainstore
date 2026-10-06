@@ -258,7 +258,10 @@ class ParcelDeliverHomeView(APIView):
             p = services.deliver_parcel_home(
                 p, delivery_amount=payload.validated_data["delivery_amount"],
                 delivery_address=payload.validated_data["delivery_address"],
-                payment_method=payload.validated_data["payment_method"], user=request.user)
+                payment_method=payload.validated_data["payment_method"],
+                delivered_to=payload.validated_data["delivered_to"],
+                delivered_to_id=payload.validated_data["delivered_to_id"],
+                user=request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.ParcelRead(p).data)

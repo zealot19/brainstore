@@ -71,6 +71,22 @@ def test_deliver_home_marks_picked_up_and_stores_fields(colis_ctx):
         amount=Decimal("2000"), is_deleted=False).exists()
 
 
+def test_deliver_home_stores_receiver_name_and_id(colis_ctx):
+    p = _to_available(colis_ctx)
+    p = S.deliver_parcel_home(p, delivery_amount=Decimal("2000"),
+                              delivered_to="Jean Mandataire", delivered_to_id="CNI-ZX9",
+                              payment_method="cash", user=colis_ctx.user)
+    assert p.picked_up_by == "Jean Mandataire"
+    assert p.picked_up_id_number == "CNI-ZX9"
+
+
+def test_deliver_home_defaults_receiver_to_recipient(colis_ctx):
+    # When no explicit receiver is entered, fall back to the registered recipient name.
+    p = _to_available(colis_ctx)
+    p = S.deliver_parcel_home(p, delivery_amount=Decimal("2000"), user=colis_ctx.user)
+    assert p.picked_up_by == "Dest"
+
+
 def test_deliver_home_rejected_when_not_available(colis_ctx):
     p = colis_ctx.register()  # status ready_for_travel, not available
     with pytest.raises(ApplicationError):

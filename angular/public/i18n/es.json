@@ -2202,7 +2202,9 @@
       "contents": "Contenido",
       "weight": "Peso",
       "voyage": "Viaje",
-      "new_search": "Nueva búsqueda"
+      "new_search": "Nueva búsqueda",
+      "f_received_by": "Recibido por (nombre)",
+      "f_received_id": "Documento presentado (n.º)"
     },
     "retrait": {
       "bag_title": "Retiro",

@@ -272,8 +272,11 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
 
 
 @transaction.atomic
-def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment_method="", user):
-    """Livraison à domicile : clôt le colis et encaisse les frais de livraison (recettes)."""
+def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment_method="",
+                        delivered_to="", delivered_to_id="", user):
+    """Livraison à domicile : clôt le colis et encaisse les frais de livraison (recettes).
+    `delivered_to`/`delivered_to_id` = nom et pièce de la personne ayant reçu le colis,
+    enregistrés dans picked_up_by / picked_up_id_number (« livré à » / « pièce présentée »)."""
     _assert_destination_agency(parcel, user)
     if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
         raise ApplicationError(_("Seul un colis disponible peut être livré à domicile."))
@@ -281,7 +284,8 @@ def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment
     if amount <= 0:
         raise ApplicationError(_("Indiquez le montant de la livraison."))
     parcel.status = Parcel.Status.PICKED_UP
-    parcel.picked_up_by = parcel.recipient_name
+    parcel.picked_up_by = delivered_to or parcel.recipient_name
+    parcel.picked_up_id_number = delivered_to_id or ""
     parcel.picked_up_at = timezone.now()
     parcel.delivery_amount = amount
     parcel.delivery_address = delivery_address or ""

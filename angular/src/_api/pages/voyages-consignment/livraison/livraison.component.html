@@ -13,6 +13,14 @@
         <input class="form-control" [(ngModel)]="address" [placeholder]="'cons.livraison.ph_address' | transloco" />
       </div>
       <div class="col-md-6">
+        <label class="form-label">{{ 'cons.livraison.f_received_by' | transloco }} <span class="text-danger">*</span></label>
+        <input class="form-control" [(ngModel)]="deliveredTo" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'cons.livraison.f_received_id' | transloco }} <span class="text-danger">*</span></label>
+        <input class="form-control" [(ngModel)]="deliveredToId" />
+      </div>
+      <div class="col-md-6">
         <label class="form-label">{{ 'cons.livraison.f_amount' | transloco }} <span class="text-danger">*</span></label>
         <input type="number" min="0" class="form-control" [(ngModel)]="amount" />
       </div>

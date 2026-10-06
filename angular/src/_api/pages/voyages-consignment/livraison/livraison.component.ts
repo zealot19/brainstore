@@ -31,6 +31,7 @@ export class VcgLivraisonComponent implements OnInit {
 
   // Deliver form
   target: Parcel | null = null; address = ''; amount: number | null = null; paymentMethod = ''; saving = false;
+  deliveredTo = ''; deliveredToId = '';   // nom + pièce de la personne ayant reçu le colis
 
   constructor(private svc: ParcelService, private pmSvc: PaymentMethodService,
               private spSvc: ServicePointService) {}
@@ -69,15 +70,20 @@ export class VcgLivraisonComponent implements OnInit {
     return this.paymentMethods.find(m => m.code === code)?.name ?? code;
   }
 
-  livrer(p: Parcel): void { this.target = p; this.address = p.recipient_address || ''; this.amount = null; this.paymentMethod = ''; }
+  livrer(p: Parcel): void {
+    this.target = p; this.address = p.recipient_address || ''; this.amount = null; this.paymentMethod = '';
+    this.deliveredTo = p.recipient_name || ''; this.deliveredToId = '';   // préremplit le nom avec le destinataire enregistré
+  }
   cancelDeliver(): void { this.target = null; }
 
   deliver(): void {
     if (!this.target || this.saving) return;
     if (!this.amount || this.amount <= 0) { this.toast.error('Indiquez le montant de la livraison.'); return; }
+    if (!this.deliveredTo.trim() || !this.deliveredToId.trim()) { this.toast.error('Indiquez le nom et la pièce du destinataire.'); return; }
     this.saving = true;
     this.svc.deliverHome(this.target.id, {
       delivery_amount: this.amount, delivery_address: this.address.trim(), payment_method: this.paymentMethod,
+      delivered_to: this.deliveredTo.trim(), delivered_to_id: this.deliveredToId.trim(),
     }).subscribe({
       next: () => { this.saving = false; this.target = null; this.toast.success('Colis livré. Recette enregistrée.'); this.reload(); },
       error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); },

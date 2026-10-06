@@ -70,7 +70,8 @@ def test_deliver_home_endpoint(api_ctx):
     c.post(f"/api/v1/voyages/consignment/parcels/{pid}/arrived/",
            {"received_pieces": 1, "missing_pieces": 0, "damaged_pieces": 0}, format="json")
     r = c.post(f"/api/v1/voyages/consignment/parcels/{pid}/deliver-home/",
-               {"delivery_amount": "2000", "delivery_address": "Akwa", "payment_method": "cash"},
+               {"delivery_amount": "2000", "delivery_address": "Akwa", "payment_method": "cash",
+                "delivered_to": "Jean", "delivered_to_id": "CNI-1"},
                format="json")
     assert r.status_code == 200, r.content
     assert r.json()["data"]["status"] == "picked_up"

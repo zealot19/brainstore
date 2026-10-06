@@ -103,6 +103,8 @@ class ParcelDeliverSerializer(serializers.Serializer):
     delivery_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
     delivery_address = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     payment_method = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
+    delivered_to = serializers.CharField(max_length=150)            # nom du destinataire réel
+    delivered_to_id = serializers.CharField(max_length=100)         # pièce présentée
 
 
 class ParcelReceiveSerializer(serializers.Serializer):
