@@ -154,14 +154,12 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     elif closing_balance is None:
         raise ApplicationError(_("Indiquez le montant compté (billetage ou saisie directe)."))
 
-    # Compute expected: opening + all income - all expense in this session
-    income = (session.transactions
-              .filter(transaction_type=Transaction.Type.INCOME, is_deleted=False)
-              .aggregate(t=Sum("amount"))["t"] or 0)
-    expense = (session.transactions
-               .filter(transaction_type=Transaction.Type.EXPENSE, is_deleted=False)
-               .aggregate(t=Sum("amount"))["t"] or 0)
-    expected = (session.opening_balance or 0) + income - expense
+    # Attendu = fond + recettes − dépenses + transferts entrants − transferts sortants.
+    # On réutilise le même calcul que la trésorerie « live » (principale_available_cash)
+    # pour que les approvisionnements / prélèvements et le balayage de clôture d'un guichet
+    # ne génèrent pas d'écart fantôme. Se réduit à ouverture+recettes−dépenses sans transfert.
+    from apps.treasury.services.expense_shared import principale_available_cash
+    expected = principale_available_cash(session)
     difference = closing_balance - expected
 
     # Un écart doit être justifié (motif obligatoire).
