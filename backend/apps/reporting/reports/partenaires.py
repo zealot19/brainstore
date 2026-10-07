@@ -11,17 +11,27 @@ from apps.reporting.filters import period_label
 _HUNDRED = Decimal(100)
 
 
-def partner_share(vehicle, rev_ticket, rev_parcel, rev_baggage):
-    """Part partenaire d'un bus : Σ (revenu_type × taux_type / 100).
+def partner_share(vehicle, rev_ticket, rev_parcel, rev_baggage, net):
+    """Part partenaire d'un bus, répartie sur le NET (dépenses partagées).
 
-    Taux par type de produit (billet / colis / bagage) configurés sur le véhicule.
-    0 si le véhicule n'a pas de propriétaire partenaire. Arrondie à l'unité (FCFA)."""
+    On calcule d'abord la part brute Σ(revenu_type × taux_type / 100) — taux par
+    type de produit (billet / colis / bagage) configurés sur le véhicule — puis le
+    taux effectif = part_brute / brut, appliqué au net (Brut − Dépenses). Le
+    partenaire porte ainsi sa quote-part des dépenses, proportionnelle au revenu
+    qu'il a généré ; la part peut être négative en cas de perte.
+
+    0 si pas de partenaire, ou si le brut est nul (aucune base de répartition :
+    l'agence porte alors l'intégralité des dépenses). Arrondie à l'unité (FCFA)."""
     if not vehicle or not vehicle.owner_partner_id:
         return Decimal(0)
-    total = (Decimal(rev_ticket or 0) * Decimal(vehicle.partner_pct_ticket or 0)
-             + Decimal(rev_parcel or 0) * Decimal(vehicle.partner_pct_parcel or 0)
-             + Decimal(rev_baggage or 0) * Decimal(vehicle.partner_pct_baggage or 0)) / _HUNDRED
-    return total.quantize(Decimal("1"))
+    brut = Decimal(rev_ticket or 0) + Decimal(rev_parcel or 0) + Decimal(rev_baggage or 0)
+    if brut == 0:
+        return Decimal(0)
+    partner_gross = (Decimal(rev_ticket or 0) * Decimal(vehicle.partner_pct_ticket or 0)
+                     + Decimal(rev_parcel or 0) * Decimal(vehicle.partner_pct_parcel or 0)
+                     + Decimal(rev_baggage or 0) * Decimal(vehicle.partner_pct_baggage or 0)) / _HUNDRED
+    effective_rate = partner_gross / brut
+    return (effective_rate * Decimal(net)).quantize(Decimal("1"))
 
 
 def _by_vehicle(qs, amount_field, df, dt):
@@ -72,7 +82,7 @@ def build(company, f):
         if fp and (not v or str(v.owner_partner_id) != str(fp)):
             continue
         net = brut - dep
-        part = partner_share(v, rt, rp, rb)
+        part = partner_share(v, rt, rp, rb, net)
         computed.append({
             "veh": v.license_plate if v else "— Sans bus —",
             "owner": v.owner_partner.name if (v and v.owner_partner_id) else "Agence",

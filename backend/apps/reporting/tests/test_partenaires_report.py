@@ -13,16 +13,44 @@ class _Veh:
         self.partner_pct_baggage = Decimal(pb)
 
 
-def test_partner_share_per_type_percent():
+def test_partner_share_no_expenses_equals_gross_blend():
+    # Sans dépenses (net == brut), la part partenaire vaut la part brute historique :
+    # 10000×40% + 2000×10% + 4000×25% = 5200 ; brut = 16000 ; net = 16000.
     v = _Veh(owner="X", pt=40, pp=10, pb=25)
-    # 10000×40% + 2000×10% + 4000×25% = 4000 + 200 + 1000 = 5200
-    assert partner_share(v, Decimal("10000"), Decimal("2000"), Decimal("4000")) == Decimal("5200")
+    assert partner_share(v, Decimal("10000"), Decimal("2000"), Decimal("4000"),
+                         net=Decimal("16000")) == Decimal("5200")
+
+
+def test_partner_share_splits_expenses_on_profit():
+    # Taux effectif = part_brute / brut appliqué au net : le partenaire porte sa
+    # quote-part des dépenses. 20000 ticket @50% ; dépenses 8000 ; net 12000.
+    v = _Veh(owner="X", pt=50)
+    # part_brute = 10000 ; taux = 10000/20000 = 0.5 ; 0.5 × 12000 = 6000.
+    assert partner_share(v, Decimal("20000"), Decimal("0"), Decimal("0"),
+                         net=Decimal("12000")) == Decimal("6000")
+
+
+def test_partner_share_negative_on_loss():
+    # Net négatif : le partenaire partage la perte (part négative autorisée).
+    # 13000 ticket @50% ; dépenses 85000 ; net -72000 ; taux 0.5 ; 0.5×-72000 = -36000.
+    v = _Veh(owner="X", pt=50)
+    assert partner_share(v, Decimal("13000"), Decimal("0"), Decimal("0"),
+                         net=Decimal("-72000")) == Decimal("-36000")
+
+
+def test_partner_share_zero_revenue_bears_nothing():
+    # Aucun revenu (que des dépenses) : pas de base de répartition, l'agence porte tout.
+    v = _Veh(owner="X", pt=50, pp=50, pb=50)
+    assert partner_share(v, Decimal("0"), Decimal("0"), Decimal("0"),
+                         net=Decimal("-40000")) == Decimal("0")
 
 
 def test_partner_share_zero_without_partner():
     v = _Veh(owner=None, pt=40, pp=10, pb=25)
-    assert partner_share(v, Decimal("10000"), Decimal("2000"), Decimal("4000")) == Decimal("0")
-    assert partner_share(None, Decimal("10000"), Decimal("0"), Decimal("0")) == Decimal("0")
+    assert partner_share(v, Decimal("10000"), Decimal("2000"), Decimal("4000"),
+                         net=Decimal("16000")) == Decimal("0")
+    assert partner_share(None, Decimal("10000"), Decimal("0"), Decimal("0"),
+                         net=Decimal("10000")) == Decimal("0")
 
 
 @pytest.mark.django_db
