@@ -26,9 +26,28 @@ def test_get_or_create_passenger_with_name():
     p = get_or_create_passenger(company, id_type="cni", id_number="", phone="690111",
                                 name="Bruno Foka")
     assert p.name == "Bruno Foka"
+    # Sans CNI, un nom différent sur le même téléphone est un NOUVEAU client :
+    # le téléphone n'est plus une clé de dédoublonnage (cf. bug du nom d'un ancien
+    # client imprimé sur le billet d'un nouveau).
     again = get_or_create_passenger(company, id_type="cni", id_number="", phone="690111",
                                     name="Autre Nom")
-    assert again.id == p.id
+    assert again.id != p.id
+    assert again.name == "Autre Nom"
+
+
+@pytest.mark.django_db
+def test_new_name_reused_phone_different_cni_not_merged():
+    """Bug : saisir un nouveau client dont le téléphone existe déjà reprenait
+    l'identité de l'ancien. Un CNI différent (ou aucun) ne doit jamais fusionner
+    sur le seul téléphone."""
+    from apps.voyages_booking.services.passenger_services import get_or_create_passenger
+    company = _company(name="PhoneCo", email="phone@x.com")
+    old = get_or_create_passenger(company, id_type="cni", id_number="CNI-A", phone="690000",
+                                  name="Ancien Client")
+    new = get_or_create_passenger(company, id_type="cni", id_number="CNI-B", phone="690000",
+                                  name="Nouveau Client")  # même téléphone, autre CNI
+    assert new.id != old.id
+    assert new.name == "Nouveau Client"
 
 
 @pytest.mark.django_db
