@@ -7,6 +7,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgxMaskModule } from 'ngx-mask';
 
@@ -28,6 +29,9 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideZoneChangeDetection(),
+    // Heure du Cameroun (WAT, UTC+1) forcée pour tous les pipes `date`, quel que soit
+    // le fuseau de l'appareil. WAT n'a pas d'heure d'été → décalage fixe +01:00.
+    { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { timezone: '+0100' } },
     importProvidersFrom(BsDatepickerModule),
     provideAnimations(),
     // licenseInterceptor MUST sit after apiUnwrapInterceptor: error-path catchError runs

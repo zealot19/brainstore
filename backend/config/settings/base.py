@@ -188,7 +188,7 @@ LANGUAGES = [
     # ("ar", _("العربية")),  # RTL — préparé, activé dans une tranche dédiée ultérieure
 ]
 
-TIME_ZONE = env("TIME_ZONE", default="Africa/Abidjan")
+TIME_ZONE = env("TIME_ZONE", default="Africa/Douala")
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
