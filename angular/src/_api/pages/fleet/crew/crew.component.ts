@@ -43,6 +43,7 @@ export class FleetCrewComponent implements OnInit {
       member_type_id: [null, Validators.required],
       agency_id: [null],
       phone: [''],
+      id_card_number: [''],
       is_active: [true],
     });
     this.typeSvc.list().subscribe({ next: d => this.types = d.filter(t => t.is_active) });
@@ -61,11 +62,11 @@ export class FleetCrewComponent implements OnInit {
 
   openCreate(): void {
     this.editId = null; this.errorMsg = ''; this.documents = [];
-    this.form.reset({ name: '', member_type_id: null, agency_id: null, phone: '', is_active: true });
+    this.form.reset({ name: '', member_type_id: null, agency_id: null, phone: '', id_card_number: '', is_active: true });
   }
   openEdit(r: CrewMember): void {
     this.editId = r.id; this.errorMsg = '';
-    this.form.reset({ name: r.full_name, member_type_id: r.member_type, agency_id: r.agency, phone: r.phone, is_active: r.is_active });
+    this.form.reset({ name: r.full_name, member_type_id: r.member_type, agency_id: r.agency, phone: r.phone, id_card_number: r.id_card_number, is_active: r.is_active });
     this.loadDocs(r.id);
   }
 

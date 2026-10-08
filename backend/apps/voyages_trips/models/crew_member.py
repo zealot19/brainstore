@@ -16,6 +16,7 @@ class CrewMember(BaseModel):
     member_type    = models.ForeignKey("voyages_config.CrewMemberType", verbose_name=_("type"),
                                        on_delete=models.PROTECT, related_name="members")
     phone          = models.CharField(_("téléphone"), max_length=30, blank=True)
+    id_card_number = models.CharField(_("n° carte d'identité"), max_length=50, blank=True)
     license_number = models.CharField(_("n° de permis"), max_length=50, blank=True)
     is_active      = models.BooleanField(_("actif"), default=True)
     notes          = models.TextField(_("notes"), blank=True)

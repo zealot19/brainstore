@@ -49,6 +49,9 @@
     </div>
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'fleet.crew.col_phone' | transloco }}</label><input formControlName="phone" type="text" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'fleet.crew.f_id_card' | transloco }}</label><input formControlName="id_card_number" type="text" class="form-control" /></div>
+    </div>
+    <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'fleet.crew.col_agency' | transloco }}</label>
         <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'fleet.crew.choose' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
       </div>

@@ -1734,7 +1734,8 @@
       "choose": "Choose…",
       "documents": "Documents",
       "no_documents": "No document.",
-      "documents_after_save": "Save first to add documents."
+      "documents_after_save": "Save first to add documents.",
+      "f_id_card": "ID card number"
     }
   },
   "admin": {

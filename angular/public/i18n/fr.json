@@ -1734,7 +1734,8 @@
       "choose": "Choisir…",
       "documents": "Documents",
       "no_documents": "Aucun document.",
-      "documents_after_save": "Enregistrez d'abord pour ajouter des documents."
+      "documents_after_save": "Enregistrez d'abord pour ajouter des documents.",
+      "f_id_card": "N° carte d'identité"
     }
   },
   "admin": {

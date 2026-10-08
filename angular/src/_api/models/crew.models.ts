@@ -2,7 +2,7 @@ export interface CrewMember {
   id: string; name: string; first_name: string; last_name: string; full_name: string;
   member_type: string; member_type_name: string; is_driver: boolean;
   agency: string | null; agency_name: string | null;
-  phone: string; license_number: string; is_active: boolean;
+  phone: string; id_card_number: string; license_number: string; is_active: boolean;
 }
 
 export interface CrewDocument {

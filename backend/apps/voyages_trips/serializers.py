@@ -157,7 +157,7 @@ class CrewMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrewMember
         fields = ["id", "name", "first_name", "last_name", "full_name", "member_type", "member_type_name",
-                  "is_driver", "agency", "agency_name", "phone", "license_number", "is_active"]
+                  "is_driver", "agency", "agency_name", "phone", "id_card_number", "license_number", "is_active"]
 
 
 class CrewMemberWriteSerializer(serializers.Serializer):
@@ -165,6 +165,7 @@ class CrewMemberWriteSerializer(serializers.Serializer):
     member_type_id = serializers.UUIDField()
     agency_id      = serializers.UUIDField(required=False, allow_null=True, default=None)
     phone          = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    id_card_number = serializers.CharField(max_length=50, required=False, allow_blank=True, default="")
     is_active      = serializers.BooleanField(required=False, default=True)
 
 

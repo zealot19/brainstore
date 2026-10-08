@@ -528,8 +528,14 @@ class CrewMemberListView(APIView):
         if not mt:
             return error_response("Type introuvable.", status_code=404)
         agency = _resolve_crew_agency(d.get("agency_id"), cid)
+        from apps.voyages_trips.services.crew_services import assert_crew_id_card_unique
+        try:
+            assert_crew_id_card_unique(cid, d["id_card_number"])
+        except ApplicationError as e:
+            return error_response(str(e))
         obj = CrewMember.objects.create(company_id=cid, name=d["name"], member_type=mt,
                                         agency=agency, phone=d["phone"],
+                                        id_card_number=d["id_card_number"],
                                         is_active=d["is_active"], created_by=request.user)
         return created_response(S.CrewMemberSerializer(obj).data)
 
@@ -550,7 +556,13 @@ class CrewMemberDetailView(APIView):
         if not o:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         d = request.data
-        for f in ("name", "phone", "is_active"):
+        if "id_card_number" in d:
+            from apps.voyages_trips.services.crew_services import assert_crew_id_card_unique
+            try:
+                assert_crew_id_card_unique(o.company_id, d["id_card_number"], exclude_id=o.id)
+            except ApplicationError as e:
+                return error_response(str(e))
+        for f in ("name", "phone", "id_card_number", "is_active"):
             if f in d:
                 setattr(o, f, d[f])
         if "member_type_id" in d:

@@ -1734,7 +1734,8 @@
       "choose": "Elegir…",
       "documents": "Documentos",
       "no_documents": "Sin documentos.",
-      "documents_after_save": "Guarde primero para añadir documentos."
+      "documents_after_save": "Guarde primero para añadir documentos.",
+      "f_id_card": "N.º de documento"
     }
   },
   "admin": {
