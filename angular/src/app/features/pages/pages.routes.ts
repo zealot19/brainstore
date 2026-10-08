@@ -114,6 +114,16 @@ export const Pages_routes: Routes = [
                 { path: 'fares',               loadComponent: () => import('../../../_api/pages/voyages-pricing/fares/fares.component').then(m => m.VcFaresComponent) },
               ],
             },
+            // ── Config à venir (stubs M01) : écrans réels livrés par M11/M26/M27/M28 ──
+            {
+              path: 'configuration',
+              children: [
+                { path: 'types-voyage',    loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de voyage' } },
+                { path: 'types-caisse',    loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de caisse' } },
+                { path: 'types-operation', loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: "Types d'opération" } },
+                { path: 'types-valeurs',   loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de valeurs' } },
+              ],
+            },
             // ── MODULE : Gestion Voyages ──────────────────────────────────────────────
             {
               path: 'voyages',

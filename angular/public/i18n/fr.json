@@ -2771,5 +2771,8 @@
     "days_remaining": "{{n}} jour(s) restant(s)",
     "expires_today": "Expire aujourd'hui",
     "expired": "Licence expirée"
+  },
+  "config": {
+    "coming_soon": "Bientôt disponible"
   }
 }
