@@ -441,7 +441,9 @@ export class SidebarService {
   filteredSidebar(activeModules: string[] | null) {
     if (!activeModules) return this.sidebarData1;
     const set = new Set(activeModules);
-    return this.sidebarData1.filter((g: any) => set.has(g.module));
+    // Garder les sections sans `module` (ex. Configuration) ; le gating par item
+    // gère ensuite leurs enfants selon le module de chaque item.
+    return this.sidebarData1.filter((g: any) => !g.module || set.has(g.module));
   }
 
   public sidebarData2: SideBar[] = [

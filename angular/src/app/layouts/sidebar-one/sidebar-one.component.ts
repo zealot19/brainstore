@@ -12,6 +12,7 @@ import { Subscription, merge } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { NavLabelPipe } from '../../core/i18n/nav-label.pipe';
 import { AppPackageService } from '../../core/service/packages/app-package.service';
+import { moduleAllowed } from './module-visibility';
 
 
 interface MenuItem {
@@ -102,7 +103,12 @@ export class SidebarOneComponent implements OnDestroy {
           .filter((item: any) => roleOk(item) && allowed(item.permission))
           .map((item: any) => {
             if (item.hasSubRoute && Array.isArray(item.subMenus)) {
-              return { ...item, subMenus: item.subMenus.filter((s: any) => allowed(s.permission)) };
+              return {
+                ...item,
+                subMenus: item.subMenus.filter((s: any) =>
+                  allowed(s.permission) &&
+                  moduleAllowed(s.module, isSuperAdmin, (m: string) => this.permissionService.hasModule(m))),
+              };
             }
             return item;
           })
