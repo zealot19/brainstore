@@ -329,9 +329,6 @@ class VehicleListView(APIView):
             return error_response(_("Modèle de véhicule introuvable."), status_code=404)
         company_id = str(company.id)
         category = _cfg(VehicleCategoryCfg, d.get("category_id"), company_id)
-        parking_id = d.get("parking_id")
-        if parking_id and not selectors.get_parking(parking_id, company_id):
-            return error_response(_("Parking introuvable."), status_code=404)
         owner_partner_id = d.get("owner_partner_id")
         if owner_partner_id:
             from apps.partners.models import Partner
@@ -340,15 +337,15 @@ class VehicleListView(APIView):
         try:
             vehicle = services.create_vehicle(
                 company=company, model=model,
+                code=d["code"],
                 license_plate=d["license_plate"],
-                vin=d["vin"], color=d["color"], year=d["year"],
+                color=d["color"], year=d["year"],
                 acquisition_date=d["acquisition_date"],
-                acquisition_cost=d["acquisition_cost"],
                 agency_id=d["agency_id"],
                 internal_driver_id=d["internal_driver_id"],
                 external_driver_id=d["external_driver_id"],
                 tank_capacity_liters=d["tank_capacity_liters"],
-                category=category, parking_id=parking_id, tag_ids=d.get("tag_ids"),
+                category=category, tag_ids=d.get("tag_ids"),
                 registration_date=d.get("registration_date"),
                 fiscal_horsepower=d.get("fiscal_horsepower"),
                 catalog_value=d.get("catalog_value"),

@@ -193,7 +193,7 @@ def delete_external_driver(driver, *, deleted_by):
 
 @transaction.atomic
 def create_vehicle(
-    *, company, model, license_plate: str,
+    *, company, model, code: str = "", license_plate: str = "",
     vin: str = "", color: str = "", year=None,
     acquisition_date=None, acquisition_cost=None,
     agency_id=None, internal_driver_id=None, external_driver_id=None,
@@ -208,10 +208,15 @@ def create_vehicle(
             .filter(company=company, license_plate=license_plate, is_deleted=False)
             .exists()):
         raise ApplicationError(_("Un véhicule avec cette immatriculation existe déjà dans votre institution."))
+    if (Vehicle.objects
+            .filter(company=company, code=code, is_deleted=False)
+            .exists()):
+        raise ApplicationError(_("Un véhicule avec ce code existe déjà dans votre institution."))
 
     vehicle = Vehicle.objects.create(
         company=company,
         model=model,
+        code=code,
         license_plate=license_plate,
         vin=vin,
         color=color,
@@ -258,7 +263,7 @@ def create_vehicle(
 @transaction.atomic
 def update_vehicle(vehicle, *, updated_by, **fields):
     allowed = {
-        "model_id", "license_plate", "vin", "color", "year",
+        "model_id", "code", "license_plate", "vin", "color", "year",
         "acquisition_date", "acquisition_cost",
         "agency_id", "internal_driver_id", "external_driver_id",
         "tank_capacity_liters", "notes", "is_active",
@@ -274,6 +279,12 @@ def update_vehicle(vehicle, *, updated_by, **fields):
                 .exclude(id=vehicle.id)
                 .exists()):
             raise ApplicationError(_("Cette immatriculation est déjà utilisée."))
+    if "code" in fields:
+        if (Vehicle.objects
+                .filter(company=vehicle.company, code=fields["code"], is_deleted=False)
+                .exclude(id=vehicle.id)
+                .exists()):
+            raise ApplicationError(_("Ce code véhicule est déjà utilisé."))
     for key, val in fields.items():
         if key in allowed:
             setattr(vehicle, key, val)

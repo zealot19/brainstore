@@ -39,6 +39,7 @@ class Vehicle(BaseModel):
     model         = models.ForeignKey("fleet.VehicleModel", verbose_name=_("modèle"),
                                       on_delete=models.PROTECT, related_name="vehicles")
     license_plate = models.CharField(_("immatriculation"), max_length=30)
+    code          = models.CharField(_("code véhicule"), max_length=30, default="")
     vin           = models.CharField(_("numéro de châssis (VIN)"), max_length=50, blank=True)
     color         = models.CharField(_("couleur"), max_length=50, blank=True)
     year          = models.PositiveSmallIntegerField(_("année"), null=True, blank=True)
@@ -80,11 +81,11 @@ class Vehicle(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("véhicule")
         verbose_name_plural = _("véhicules")
-        ordering = ["license_plate"]
-        unique_together = [("company", "license_plate")]
+        ordering = ["code"]
+        unique_together = [("company", "license_plate"), ("company", "code")]
 
     def __str__(self):
-        return f"{self.license_plate} — {self.model}"
+        return f"{self.code} — {self.model}"
 
     @property
     def current_driver_name(self):
