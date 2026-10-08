@@ -1813,7 +1813,10 @@
       "col_description": "Description",
       "col_target": "Cible",
       "col_device_ip": "Device / IP",
-      "empty": "Aucune entrée dans le journal pour ces critères."
+      "empty": "Aucune entrée dans le journal pour ces critères.",
+      "col_changes": "Modifications",
+      "f_user": "Utilisateur",
+      "all_users": "Tous les utilisateurs"
     },
     "profile": {
       "title": "Profils",

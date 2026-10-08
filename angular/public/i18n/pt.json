@@ -1813,7 +1813,10 @@
       "col_description": "Descrição",
       "col_target": "Alvo",
       "col_device_ip": "Dispositivo / IP",
-      "empty": "Sem entradas no registo para estes critérios."
+      "empty": "Sem entradas no registo para estes critérios.",
+      "col_changes": "Alterações",
+      "f_user": "Utilizador",
+      "all_users": "Todos os utilizadores"
     },
     "profile": {
       "title": "Perfis",

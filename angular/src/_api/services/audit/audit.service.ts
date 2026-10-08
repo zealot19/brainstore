@@ -17,6 +17,7 @@ export interface AuditLog {
   target_type: string;
   target_id: string;
   description: string;
+  changes: Record<string, { old: string; new: string }>;
   device_id: string;
   ip_address: string | null;
 }

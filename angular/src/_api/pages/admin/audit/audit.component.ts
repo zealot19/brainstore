@@ -34,6 +34,7 @@ const ACTIONS = [
   { value: 'LOGOUT',   label: 'Déconnexion' },
   { value: 'EXPORT',   label: 'Export' },
   { value: 'SYNC',     label: 'Synchronisation' },
+  { value: 'CANCEL',   label: 'Annulation' },
 ];
 
 @Component({
@@ -58,7 +59,10 @@ export class AuditLogComponent implements OnInit {
   filterAction   = '';
   filterDateFrom = '';
   filterDateTo   = '';
+  filterUser     = '';
   search         = '';
+
+  users: { id: string; label: string }[] = [];
 
   ngOnInit(): void {
     this.load();
@@ -76,6 +80,9 @@ export class AuditLogComponent implements OnInit {
     this.auditService.getLogs(filters).subscribe({
       next: logs => {
         this.logs     = logs;
+        this.users = Array.from(
+          new Map(logs.filter(l => l.user).map(l => [l.user as string, l.user_display ?? '—'])).entries(),
+        ).map(([id, label]) => ({ id, label }));
         this.filtered = this.applySearch(logs);
         this.loading  = false;
       },
@@ -91,9 +98,10 @@ export class AuditLogComponent implements OnInit {
   }
 
   private applySearch(logs: AuditLog[]): AuditLog[] {
+    const out = this.filterUser ? logs.filter(l => l.user === this.filterUser) : logs;
     const q = this.search.toLowerCase().trim();
-    if (!q) return logs;
-    return logs.filter(l =>
+    if (!q) return out;
+    return out.filter(l =>
       l.user_display?.toLowerCase().includes(q) ||
       l.description.toLowerCase().includes(q) ||
       l.target_type.toLowerCase().includes(q) ||
@@ -107,6 +115,7 @@ export class AuditLogComponent implements OnInit {
     this.filterAction   = '';
     this.filterDateFrom = '';
     this.filterDateTo   = '';
+    this.filterUser     = '';
     this.search         = '';
     this.load();
   }
@@ -128,6 +137,7 @@ export class AuditLogComponent implements OnInit {
       LOGOUT:   'bg-outline-secondary',
       EXPORT:   'bg-outline-info',
       SYNC:     'bg-outline-warning',
+      CANCEL:   'bg-outline-danger',
     };
     return map[action] ?? 'bg-outline-secondary';
   }

@@ -1813,7 +1813,10 @@
       "col_description": "Description",
       "col_target": "Target",
       "col_device_ip": "Device / IP",
-      "empty": "No log entries for these criteria."
+      "empty": "No log entries for these criteria.",
+      "col_changes": "Changes",
+      "f_user": "User",
+      "all_users": "All users"
     },
     "profile": {
       "title": "Profiles",

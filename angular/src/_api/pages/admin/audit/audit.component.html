@@ -50,6 +50,16 @@
         <input type="date" class="form-control form-control-sm" [(ngModel)]="filterDateTo" />
       </div>
 
+      <div class="col-12 col-md-2">
+        <label class="form-label small mb-1">{{ 'admin.audit.f_user' | transloco }}</label>
+        <select class="form-select form-select-sm" [(ngModel)]="filterUser" (change)="onSearch()">
+          <option value="">{{ 'admin.audit.all_users' | transloco }}</option>
+          @for (u of users; track u.id) {
+            <option [value]="u.id">{{ u.label }}</option>
+          }
+        </select>
+      </div>
+
       <div class="col-12 col-md-3">
         <label class="form-label small mb-1">{{ 'admin.audit.search_label' | transloco }}</label>
         <input type="text" class="form-control form-control-sm"
@@ -96,6 +106,7 @@
               <th>{{ 'admin.audit.f_module' | transloco }}</th>
               <th>{{ 'admin.audit.f_action' | transloco }}</th>
               <th>{{ 'admin.audit.col_description' | transloco }}</th>
+              <th>{{ 'admin.audit.col_changes' | transloco }}</th>
               <th>{{ 'admin.audit.col_target' | transloco }}</th>
               <th>{{ 'admin.audit.col_device_ip' | transloco }}</th>
             </tr>
@@ -126,6 +137,18 @@
                 <td class="small" style="max-width:280px; white-space:normal">
                   {{ log.description || '—' }}
                 </td>
+                <td class="small" style="max-width:260px; white-space:normal">
+                  @if (log.changes && (log.changes | keyvalue).length) {
+                    @for (c of log.changes | keyvalue; track c.key) {
+                      <div class="text-nowrap overflow-hidden text-truncate" [title]="c.key + ': ' + c.value.old + ' → ' + c.value.new">
+                        <span class="text-muted">{{ c.key }}:</span>
+                        <span class="text-danger">{{ c.value.old || '∅' }}</span>
+                        <i class="ti ti-arrow-right mx-1"></i>
+                        <span class="text-success">{{ c.value.new || '∅' }}</span>
+                      </div>
+                    }
+                  } @else { — }
+                </td>
                 <td class="small text-muted text-nowrap">
                   @if (log.target_type) {
                     <span>{{ log.target_type }}</span>
@@ -154,7 +177,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="text-center py-5 text-muted">
+                <td colspan="8" class="text-center py-5 text-muted">
                   <i class="ti ti-history-off fs-2 d-block mb-2"></i>
                   {{ 'admin.audit.empty' | transloco }}
                 </td>
