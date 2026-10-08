@@ -1714,7 +1714,8 @@
       "owner_agency": "Agency",
       "f_pct_ticket": "Ticket share (%)",
       "f_pct_parcel": "Parcel share (%)",
-      "f_pct_baggage": "Baggage share (%)"
+      "f_pct_baggage": "Baggage share (%)",
+      "f_code": "Vehicle code"
     },
     "crew": {
       "title": "Onboard crew",

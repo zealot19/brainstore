@@ -83,6 +83,7 @@ export type VehicleStatus = 'available' | 'on_mission' | 'in_maintenance' | 'out
 
 export interface VehicleListItem {
   id:               string;
+  code:             string;
   license_plate:    string;
   vin:              string;
   color:            string;
@@ -103,6 +104,7 @@ export interface VehicleListItem {
 
 export interface VehicleDetail {
   id:                     string;
+  code:                   string;
   license_plate:          string;
   vin:                    string;
   color:                  string;

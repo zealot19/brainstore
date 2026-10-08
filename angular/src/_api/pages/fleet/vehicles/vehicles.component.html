@@ -93,6 +93,7 @@
         <table class="table datanew">
           <thead class="thead-light">
             <tr>
+              <th>{{ 'fleet.veh.f_code' | transloco }}</th>
               <th>{{ 'fleet.veh.col_plate' | transloco }}</th>
               <th>{{ 'fleet.veh.col_brand_model' | transloco }}</th>
               <th>{{ 'fleet.veh.col_category' | transloco }}</th>
@@ -106,7 +107,8 @@
           <tbody>
             @for (v of filtered | paginate:pg.page:pg.size; track v.id) {
               <tr>
-                <td class="fw-medium">{{ v.license_plate }}</td>
+                <td class="fw-medium">{{ v.code }}</td>
+                <td>{{ v.license_plate }}</td>
                 <td>
                   <div>{{ v.brand_name }}</div>
                   <small class="text-muted">{{ v.model_name }}</small>
@@ -153,7 +155,7 @@
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="10" class="text-center py-4 text-muted">{{ 'fleet.veh.empty' | transloco }}</td></tr>
+              <tr><td colspan="11" class="text-center py-4 text-muted">{{ 'fleet.veh.empty' | transloco }}</td></tr>
             }
           </tbody>
         </table>
@@ -185,18 +187,18 @@
                 }
               </select>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_code' | transloco }} <span class="text-danger">*</span></label>
+              <input formControlName="code" type="text" class="form-control" placeholder="BUS-001" />
+            </div>
+            <div class="col-md-3 mb-3">
               <label class="form-label">{{ 'fleet.veh.col_plate' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="license_plate" type="text" class="form-control" placeholder="AB-123-CD" />
             </div>
           </div>
 
           <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_vin' | transloco }}</label>
-              <input formControlName="vin" type="text" class="form-control" />
-            </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_color' | transloco }}</label>
               <input formControlName="color" type="text" class="form-control" placeholder="Blanc, Noir…" />
             </div>
@@ -212,13 +214,6 @@
               <select formControlName="category_id" class="form-select">
                 <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (c of categories; track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
-              </select>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_parking' | transloco }}</label>
-              <select formControlName="parking_id" class="form-select">
-                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
-                @for (p of parkings; track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
               </select>
             </div>
             <div class="col-md-4 mb-3">
@@ -269,15 +264,11 @@
           </div>
 
           <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_acq_date' | transloco }}</label>
               <input formControlName="acquisition_date" type="date" class="form-control" />
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_acq_cost' | transloco }}</label>
-              <input formControlName="acquisition_cost" type="number" min="0" class="form-control" placeholder="0" />
-            </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_tank' | transloco }}</label>
               <input formControlName="tank_capacity_liters" type="number" min="0" class="form-control" placeholder="60" />
             </div>
@@ -320,37 +311,30 @@
           @if (editErrorMsg) { <div class="alert alert-danger py-2">{{ editErrorMsg }}</div> }
 
           <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_code' | transloco }} <span class="text-danger">*</span></label>
+              <input formControlName="code" type="text" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'fleet.veh.col_plate' | transloco }} <span class="text-danger">*</span></label>
               <input formControlName="license_plate" type="text" class="form-control" />
             </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">VIN</label>
-              <input formControlName="vin" type="text" class="form-control" />
-            </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_color' | transloco }}</label>
               <input formControlName="color" type="text" class="form-control" />
             </div>
           </div>
 
           <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_year' | transloco }}</label>
               <input formControlName="year" type="number" min="1900" max="2100" class="form-control" />
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label">{{ 'fleet.veh.col_category' | transloco }}</label>
               <select formControlName="category_id" class="form-select">
                 <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (c of categories; track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
-              </select>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_parking' | transloco }}</label>
-              <select formControlName="parking_id" class="form-select">
-                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
-                @for (p of parkings; track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
               </select>
             </div>
           </div>

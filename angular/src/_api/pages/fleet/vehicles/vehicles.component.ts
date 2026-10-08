@@ -73,16 +73,14 @@ export class FleetVehiclesComponent implements OnInit {
   ngOnInit(): void {
     this.createForm = this.fb.group({
       model_id:      ['', Validators.required],
+      code:          ['', Validators.required],
       license_plate: ['', Validators.required],
-      vin:           [''],
       color:         [''],
       year:          [null],
       category_id:   [null],
-      parking_id:    [null],
       tag_ids:       [[]],
       registration_date: [null],
       acquisition_date:  [null],
-      acquisition_cost:  [null],
       fiscal_horsepower: [null],
       catalog_value:     [null],
       purchase_value:    [null],
@@ -94,12 +92,11 @@ export class FleetVehiclesComponent implements OnInit {
       notes:         [''],
     });
     this.editForm = this.fb.group({
+      code:          ['', Validators.required],
       license_plate: ['', Validators.required],
-      vin:           [''],
       color:         [''],
       year:          [null],
       category_id:   [null],
-      parking_id:    [null],
       tag_ids:       [[]],
       registration_date: [null],
       fiscal_horsepower: [null],
@@ -178,16 +175,14 @@ export class FleetVehiclesComponent implements OnInit {
     const v = this.createForm.value;
     const payload: Record<string, unknown> = {
       model_id:      v.model_id,
+      code:          v.code,
       license_plate: v.license_plate,
-      vin:           v.vin   || '',
       color:         v.color || '',
       year:          v.year          ? Number(v.year)          : null,
       category_id:   v.category_id || null,
-      parking_id:    v.parking_id || null,
       tag_ids:       v.tag_ids || [],
       registration_date: v.registration_date || null,
       acquisition_date:  v.acquisition_date  || null,
-      acquisition_cost:  v.acquisition_cost  ? Number(v.acquisition_cost) : null,
       fiscal_horsepower: v.fiscal_horsepower ? Number(v.fiscal_horsepower) : null,
       catalog_value:     v.catalog_value     ? Number(v.catalog_value)     : null,
       purchase_value:    v.purchase_value    ? Number(v.purchase_value)    : null,
@@ -212,12 +207,11 @@ export class FleetVehiclesComponent implements OnInit {
     // Fetch the full detail to get FK ids (list only carries names)
     this.vehicleService.get(v.id).subscribe(d => {
       this.editForm.patchValue({
+        code:          d.code,
         license_plate: d.license_plate,
-        vin:           d.vin,
         color:         d.color,
         year:          d.year,
         category_id:   d.category,
-        parking_id:    d.parking,
         tag_ids:       (d.tags || []).map(t => t.id),
         registration_date: d.registration_date,
         fiscal_horsepower: d.fiscal_horsepower,
@@ -238,12 +232,11 @@ export class FleetVehiclesComponent implements OnInit {
     this.editErrorMsg = '';
     const v = this.editForm.value;
     const payload: Record<string, unknown> = {
+      code:          v.code,
       license_plate: v.license_plate,
-      vin:           v.vin   || '',
       color:         v.color || '',
       year:          v.year ? Number(v.year) : null,
       category_id:   v.category_id || null,
-      parking_id:    v.parking_id || null,
       tag_ids:       v.tag_ids || [],
       registration_date: v.registration_date || null,
       fiscal_horsepower: v.fiscal_horsepower ? Number(v.fiscal_horsepower) : null,

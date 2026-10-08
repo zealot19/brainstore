@@ -1714,7 +1714,8 @@
       "owner_agency": "Agence",
       "f_pct_ticket": "Part billets (%)",
       "f_pct_parcel": "Part colis (%)",
-      "f_pct_baggage": "Part bagages (%)"
+      "f_pct_baggage": "Part bagages (%)",
+      "f_code": "Code véhicule"
     },
     "crew": {
       "title": "Personnel naviguant",
