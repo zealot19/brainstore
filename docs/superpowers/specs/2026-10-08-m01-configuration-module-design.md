@@ -74,14 +74,45 @@ rien ne change (les items sans `module` restent gouvernés par la section).
 
 C'est une amélioration petite, isolée et testable — et nécessaire à l'exactitude de M01.
 
-**Appliquer le gating partout où le menu est filtré.** `app-sidebar-one` est la sidebar
-principale (layout par défaut), mais `app-sidebar-two` (layout *twocolumn*) et
-`app-sidebar-three` (layout *horizontal*) rendent le même menu. Le prédicat de visibilité par
-item (rôle + permission + **module**) doit s'appliquer dans **chaque** variante utilisée, sinon
-l'entitlement fuite dans ces modes. **Recommandé :** factoriser le prédicat de visibilité (ou
-centraliser le filtrage dans `sidebar.service`) pour que les trois sidebars le partagent — le
-plan décidera de l'emplacement exact. À défaut, répliquer le même `moduleOk(item)` dans
-sidebar-two et sidebar-three.
+**Seule `app-sidebar-one` filtre le vrai menu.** Vérifié : `sidebar-one` est la seule à appeler
+`filteredSidebar()` → `sidebarData1` (le vrai menu de l'app) et à appliquer rôle/permission/
+module. `sidebar-two` et `sidebar-three` rendent des données de **démonstration** du thème
+(`sidebarData2`/`sidebarData3`) sans filtrage — comportement préexistant, **hors périmètre M01**.
+M01 ne touche donc que `sidebar.service.ts` (`sidebarData1` + `filteredSidebar`) et
+`sidebar-one.component.ts`.
+
+**Deuxième correctif nécessaire — `filteredSidebar` doit garder les sections sans `module`.**
+Actuel (`sidebar.service.ts:441`) :
+
+```ts
+filteredSidebar(activeModules) {
+  if (!activeModules) return this.sidebarData1;
+  const set = new Set(activeModules);
+  return this.sidebarData1.filter((g) => set.has(g.module)); // set.has(undefined) === false
+}
+```
+
+Une section **sans** `module` (notre « Configuration ») serait **supprimée** dès qu'`activeModules`
+est non-nul (cas normal). Correctif :
+
+```ts
+return this.sidebarData1.filter((g) => !g.module || set.has(g.module));
+```
+
+Ainsi la section Configuration (sans `module`) traverse `filteredSidebar`, puis le gating par
+item (ci-dessus) gère ses enfants selon leur `module`. Les deux correctifs sont indispensables
+ensemble.
+
+**Emplacement du gating par item :** les items de config seront des `subMenus` d'un unique groupe
+« Configuration ». Le filtre des subMenus (`sidebar-one.component.ts:105`) ne teste aujourd'hui que
+`allowed(s.permission)` ; on y ajoute `&& moduleOk(s)` avec
+`moduleOk(s) = !s.module || isSuperAdmin || permissionService.hasModule(s.module)`
+(l'admin d'institution **ne** contourne **pas** l'entitlement module, cf. filtre de section).
+
+**Tests exécutables :** le harnais karma/jasmine fonctionne en headless —
+`CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npx ng test
+--watch=false --browsers=ChromeHeadless --include='**/<spec>.spec.ts'`. Les correctifs de
+filtrage sont donc testés en RED→GREEN, pas seulement au build.
 
 ## Architecture de la solution
 
