@@ -60,7 +60,7 @@ export class VcgParcelsComponent implements OnInit {
       recipient_name: [''], recipient_phone: [''],
       recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
-      amount_received: [null], payment_method: [''],
+      payment_method: [''],
     });
     this.spSvc.list().subscribe(d => this.points = d);
     this.ctSvc.list().subscribe(d => {
@@ -108,10 +108,6 @@ export class VcgParcelsComponent implements OnInit {
              in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
              picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
-  get change(): number {
-    const r = +this.form.value.amount_received || 0; const d = +this.form.value.amount_due || 0;
-    return r - d > 0 ? r - d : 0;
-  }
   get isEdit(): boolean { return this.editId != null; }
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
   openEdit(p: Parcel): void {
@@ -121,10 +117,10 @@ export class VcgParcelsComponent implements OnInit {
       sender_name: p.sender_name, sender_phone: p.sender_phone, recipient_name: p.recipient_name,
       recipient_phone: p.recipient_phone, recipient_id_number: p.recipient_id_number,
       description: p.description, weight_kg: p.weight_kg, quantity: p.quantity, declared_value: p.declared_value,
-      amount_due: p.amount_due, amount_received: p.amount_received, payment_method: p.payment_method,
+      amount_due: p.amount_due, payment_method: p.payment_method,
     });
     // Le trajet, le type et l'encaissement ne se modifient pas ici (repricing = action dédiée)
-    ['origin_point_id', 'destination_point_id', 'consignment_type_id', 'amount_due', 'amount_received', 'payment_method']
+    ['origin_point_id', 'destination_point_id', 'consignment_type_id', 'amount_due', 'payment_method']
       .forEach(k => this.form.get(k)?.disable());
   }
   submit(): void {

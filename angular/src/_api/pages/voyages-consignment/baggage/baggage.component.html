@@ -128,8 +128,6 @@
           @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.baggage.f_fare' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_received' | transloco }}</label><input formControlName="amount_received" type="number" min="0" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_change' | transloco }}</label><input class="form-control" [value]="(change | number:'1.0-0') + ' XAF'" disabled /></div>
     </div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (isEdit ? 'cons.common.submit_edit' : 'cons.common.submit_new') | transloco }}</button></div></form>
 </div></div></div>

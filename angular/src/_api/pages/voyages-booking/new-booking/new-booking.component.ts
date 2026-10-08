@@ -145,7 +145,8 @@ export class VbNewBookingComponent implements OnInit {
     }
     if (!this.buyer.name || !this.buyer.phone) return false;
     if (this.isReservation) return !!this.holdUntil;
-    if (this.requiresPayment && (this.amountReceived ?? 0) < this.total) return false;
+    // Paiement exact : plus de saisie « montant reçu ». Il suffit de choisir une méthode.
+    if (!this.paymentMethod) return false;
     return true;
   }
 
@@ -170,7 +171,8 @@ export class VbNewBookingComponent implements OnInit {
         error: e => this.fail(e) });
       return;
     }
-    const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: this.amountReceived } as BookingCreate;
+    // Paiement exact : montant reçu = montant dû (backend : amount_received null ⇒ total).
+    const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: null } as BookingCreate;
     this.svc.create(body).subscribe({
       next: b => this.afterSale(b),
       error: e => this.fail(e) });

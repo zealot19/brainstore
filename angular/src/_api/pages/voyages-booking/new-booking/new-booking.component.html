@@ -125,14 +125,6 @@
     </div>
   }
 
-  <!-- Tarif affiché -->
-  <div class="row g-3 mb-3">
-    <div class="col-md-3">
-      <label class="form-label">{{ 'booking.form.fare' | transloco }}</label>
-      <input class="form-control fw-bold" disabled [value]="fare != null ? ((fare | number:'1.0-0') + ' XAF') : '—'" />
-    </div>
-  </div>
-
   <hr class="my-4" />
 
   <!-- ══ Section Client ══ -->
@@ -172,14 +164,6 @@
       <div class="col-md-3">
         <label class="form-label">{{ 'booking.new.total_due' | transloco }}</label>
         <input class="form-control fw-bold" disabled [value]="(total | number:'1.0-0') + ' XAF'" />
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">{{ 'booking.new.amount_received' | transloco }} @if (requiresPayment) { <span class="text-danger">*</span> }</label>
-        <input type="number" min="0" class="form-control" [(ngModel)]="amountReceived" placeholder="0" [disabled]="!requiresPayment" />
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">{{ 'booking.new.change' | transloco }}</label>
-        <input class="form-control" disabled [value]="(change | number:'1.0-0') + ' XAF'" />
       </div>
     </div>
   }

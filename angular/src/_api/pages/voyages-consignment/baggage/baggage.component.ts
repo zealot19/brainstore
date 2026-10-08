@@ -50,7 +50,7 @@ export class VcgBaggageComponent implements OnInit {
       trip_id: [null, Validators.required], ticket_id: [null],
       sender_name: [''], sender_phone: [''], civility: [''], id_type: ['cni'], id_number: [''],
       consignment_type_id: [null], description: [''], weight_kg: [null], quantity: [1], declared_value: [1],
-      amount_due: [0, [Validators.required, Validators.min(0)]], amount_received: [null], payment_method: [''],
+      amount_due: [0, [Validators.required, Validators.min(0)]], payment_method: [''],
     });
     this.booking.bookableTrips().subscribe(t => this.trips = t);
     this.ctSvc.list().subscribe(d => this.types = d);
@@ -87,10 +87,6 @@ export class VcgBaggageComponent implements OnInit {
   statusClass(s: string): string {
     return { checked_in: 'bg-warning', loaded: 'bg-info', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
-  get change(): number {
-    const r = +this.form.value.amount_received || 0; const d = +this.form.value.amount_due || 0;
-    return r - d > 0 ? r - d : 0;
-  }
   get isEdit(): boolean { return this.editId != null; }
   get hasTicket(): boolean { return !!this.form.value.ticket_id; }
 
@@ -120,7 +116,7 @@ export class VcgBaggageComponent implements OnInit {
       trip_id: null, ticket_id: null,
       sender_name: '', sender_phone: '', civility: '', id_type: 'cni', id_number: '',
       consignment_type_id: null, description: '', weight_kg: null, quantity: 1, declared_value: 1,
-      amount_due: 0, amount_received: null, payment_method: '',
+      amount_due: 0, payment_method: '',
     });
     this.form.enable(); this.ticketOptions = [];
   }
@@ -131,10 +127,10 @@ export class VcgBaggageComponent implements OnInit {
       civility: b.civility, id_type: b.id_type || 'cni', id_number: b.id_number,
       consignment_type_id: b.consignment_type, description: b.description,
       weight_kg: b.weight_kg, quantity: b.quantity, declared_value: b.declared_value,
-      amount_due: b.amount_due, amount_received: b.amount_received, payment_method: b.payment_method,
+      amount_due: b.amount_due, payment_method: b.payment_method,
     });
     // À l'édition, le voyage / le billet / l'encaissement sont figés (comme le legacy).
-    ['trip_id', 'ticket_id', 'amount_due', 'amount_received', 'payment_method']
+    ['trip_id', 'ticket_id', 'amount_due', 'payment_method']
       .forEach(k => this.form.get(k)?.disable());
   }
   submit(): void {
