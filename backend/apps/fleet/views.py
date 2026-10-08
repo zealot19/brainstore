@@ -340,7 +340,6 @@ class VehicleListView(APIView):
                 code=d["code"],
                 license_plate=d["license_plate"],
                 color=d["color"], year=d["year"],
-                acquisition_date=d["acquisition_date"],
                 agency_id=d["agency_id"],
                 internal_driver_id=d["internal_driver_id"],
                 external_driver_id=d["external_driver_id"],
