@@ -28,4 +28,30 @@ describe('SidebarService', () => {
     service.sidebarData1 = [{ tittle: 'A', module: 'voyage', menu: [] }] as any;
     expect(service.filteredSidebar(null).length).toBe(1);
   });
+
+  describe('M01 — module Configuration', () => {
+    const byTitle = (t: string) => service.sidebarData1.find((s: any) => s.tittle === t);
+
+    it('expose une section Configuration sans module, juste après Dashboard', () => {
+      const titles = service.sidebarData1.map((s: any) => s.tittle);
+      expect(titles.indexOf('Configuration')).toBe(titles.indexOf('Dashboard') + 1);
+      expect((byTitle('Configuration') as any).module).toBeUndefined();
+    });
+
+    it('Configuration contient les items config avec module + commence par les lieux', () => {
+      const grp = (byTitle('Configuration') as any).menu[0];
+      const vals = grp.subMenus.map((s: any) => s.menuValue);
+      expect(vals.slice(0, 3)).toEqual(['Villes', 'Points de service', 'Trajets']);
+      expect(grp.subMenus.find((s: any) => s.menuValue === 'Marques de véhicules').module).toBe('fleet');
+      expect(grp.subMenus.find((s: any) => s.menuValue === 'Types de voyage').module).toBe('voyage');
+    });
+
+    it('les modules opérationnels ne portent plus de groupe de configuration', () => {
+      const flotte = byTitle('Flotte') as any;
+      expect(flotte.menu.find((m: any) => m.menuValue === 'Configuration')).toBeUndefined();
+      const veh = flotte.menu.find((m: any) => m.menuValue === 'Véhicules');
+      expect((veh?.subMenus ?? []).map((s: any) => s.menuValue)).not.toContain('Marques');
+      expect((byTitle('Voyages') as any).menu.find((m: any) => m.menuValue === 'Configurations')).toBeUndefined();
+    });
+  });
 });
