@@ -18,6 +18,7 @@ class AuditLogSerializer(serializers.ModelSerializer):
             "action", "action_label",
             "target_type", "target_id",
             "description",
+            "changes",
             "device_id", "ip_address",
         ]
 

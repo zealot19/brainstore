@@ -35,6 +35,7 @@ class AuditLog(models.Model):
         LOGOUT   = "LOGOUT",   "Déconnexion"
         EXPORT   = "EXPORT",   "Export"
         SYNC     = "SYNC",     "Synchronisation"
+        CANCEL   = "CANCEL",   "Annulation"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     timestamp = models.DateTimeField(_("horodatage"), auto_now_add=True, db_index=True)
@@ -61,6 +62,8 @@ class AuditLog(models.Model):
     target_id   = models.CharField(_("id cible"),   max_length=36,  blank=True, default="")
 
     description = models.TextField(_("description"), blank=True, default="")
+
+    changes = models.JSONField(_("modifications"), default=dict, blank=True)
 
     device_id  = models.CharField(_("device"), max_length=150, blank=True, default="")
     ip_address = models.GenericIPAddressField(_("adresse IP"), null=True, blank=True)
