@@ -30,7 +30,7 @@ export class VcServicePointsComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       town_id: [null, Validators.required], code: ['', Validators.required], name: ['', Validators.required],
-      is_station: [false], station_kind: [''], latitude: [null], longitude: [null], is_active: [true],
+      latitude: [null], longitude: [null], is_active: [true],
       agency_id: [null],
     });
     this.townSvc.list().subscribe(d => this.towns = d);
@@ -49,13 +49,12 @@ export class VcServicePointsComponent implements OnInit {
     if (!confirm(`Supprimer ${this.selected.size} élément(s) ?`)) return;
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ town_id: null, code: '', name: '', is_station: false, station_kind: '', latitude: null, longitude: null, is_active: true, agency_id: null }); }
-  openEdit(r: ServicePoint): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ town_id: r.town, code: r.code, name: r.name, is_station: r.is_station, station_kind: r.station_kind, latitude: r.latitude, longitude: r.longitude, is_active: r.is_active, agency_id: r.agency ?? null }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ town_id: null, code: '', name: '', latitude: null, longitude: null, is_active: true, agency_id: null }); }
+  openEdit(r: ServicePoint): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ town_id: r.town, code: r.code, name: r.name, latitude: r.latitude, longitude: r.longitude, is_active: r.is_active, agency_id: r.agency ?? null }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = { ...this.form.value };
-    if (!v.is_station) v.station_kind = '';
-    v.agency_id = (v.is_station && v.station_kind === 'AGENCY') ? v.agency_id : null;
+    v.agency_id = v.agency_id || null;
     v.latitude = v.latitude || null; v.longitude = v.longitude || null;
     const a = this.editId ? this.svc.update(this.editId, v) : this.svc.create(v);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); }, error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });

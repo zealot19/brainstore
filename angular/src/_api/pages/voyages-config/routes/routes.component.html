@@ -65,17 +65,16 @@
       <p class="text-muted small">{{ 'vcfg.routes.save_first' | transloco }}</p>
     } @else {
       <table class="table table-sm mb-2">
-        <thead><tr><th>{{ 'vcfg.routes.st_order' | transloco }}</th><th>{{ 'vcfg.routes.st_sp' | transloco }}</th><th>{{ 'vcfg.routes.st_type' | transloco }}</th><th>{{ 'vcfg.routes.col_distance' | transloco }}</th><th></th></tr></thead>
+        <thead><tr><th>{{ 'vcfg.routes.st_order' | transloco }}</th><th>{{ 'vcfg.routes.st_sp' | transloco }}</th><th>{{ 'vcfg.routes.col_distance' | transloco }}</th><th></th></tr></thead>
         <tbody>
           @for (st of stops; track st.id) {
             <tr>
               <td>{{ st.sequence }}</td>
               <td>{{ st.service_point_name }}</td>
-              <td>@if (st.is_station) { <span class="badge bg-success">{{ 'vcfg.routes.badge_station' | transloco }}</span> } @else { <span class="badge bg-light text-dark">{{ 'vcfg.routes.badge_stop' | transloco }}</span> }</td>
               <td>{{ st.distance_from_origin_km ? (st.distance_from_origin_km + ' km') : '—' }}</td>
               <td><a class="text-danger" (click)="deleteStop(st.id)" [title]="'vcfg.routes.remove' | transloco"><i class="ti ti-trash"></i></a></td>
             </tr>
-          } @empty { <tr><td colspan="5" class="text-muted">{{ 'vcfg.routes.no_stops' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="4" class="text-muted">{{ 'vcfg.routes.no_stops' | transloco }}</td></tr> }
         </tbody>
       </table>
       <div class="row g-2 align-items-end">

@@ -868,7 +868,7 @@
     },
     "towns": {
       "title": "Villes",
-      "info": "Les villes desservies par le réseau. Chaque point de service (gare, agence ou arrêt) appartient à une ville.",
+      "info": "Les villes desservies par le réseau. Chaque lieu (gare, agence ou arrêt) appartient à une ville.",
       "new": "Nouvelle ville",
       "col_region": "Région"
     },
@@ -881,23 +881,16 @@
       "col_ordering": "Ordre"
     },
     "sp": {
-      "title": "Points de service",
-      "subtitle": "Gares, agences et arrêts",
-      "info": "Points d'arrêt du réseau. Cochez « Gare/Agence » pour un point où l'on vend des billets (origine/destination des trajets). Les autres sont de simples arrêts pouvant servir d'escale.",
-      "new": "Nouveau point de service",
+      "title": "Lieux",
+      "subtitle": "Lieux du réseau (départs, destinations, arrêts)",
+      "info": "Lieux du réseau : n'importe lequel peut servir de départ, de destination ou d'arrêt. Rattachez un lieu à une agence pour qu'il puisse recevoir des colis.",
+      "new": "Nouveau lieu",
       "col_town": "Ville",
-      "col_station_q": "Gare ?",
-      "col_type": "Type",
-      "badge_station": "Gare/Agence",
-      "badge_stop": "Arrêt",
       "f_town": "Ville",
-      "f_is_station": "Gare / Agence (vend des billets)",
-      "f_station_kind": "Type de gare",
-      "opt_terminal": "Gare / Terminal",
-      "opt_agency": "Agence",
-      "f_agency": "Agence (institution)",
+      "f_agency": "Agence",
       "f_lat": "Latitude",
-      "f_lon": "Longitude"
+      "f_lon": "Longitude",
+      "agency_hint": "Un lieu rattaché à une agence peut recevoir des colis et possède ses propres voyages (synchronisation)."
     },
     "routes": {
       "title": "Trajets",
@@ -918,13 +911,10 @@
       "stops_header": "Escales",
       "save_first": "Enregistrez d'abord le trajet pour ajouter des escales.",
       "st_order": "Ordre",
-      "st_sp": "Point de service",
-      "st_type": "Type",
-      "badge_station": "Gare",
-      "badge_stop": "Arrêt",
+      "st_sp": "Lieu",
       "remove": "Retirer",
       "no_stops": "Aucune escale.",
-      "f_stop_sp": "Escale (point de service)",
+      "f_stop_sp": "Escale (lieu)",
       "f_stop_distance": "Distance depuis origine (km)",
       "add_stop": "+ Ajouter"
     },
@@ -1306,7 +1296,7 @@
       "seat_hint": "Cliquez un siège disponible pour le bloquer (ou l'inverse). Les sièges vendus/réservés arriveront avec les réservations.",
       "stops": "Escales",
       "stop_order": "Ordre",
-      "stop_sp": "Point de service",
+      "stop_sp": "Lieu",
       "stop_arrival": "Arrivée prévue",
       "no_stops": "Aucune escale."
     }

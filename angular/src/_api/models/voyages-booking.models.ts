@@ -16,7 +16,7 @@ export interface TripOption {
 }
 
 export interface TripDestination {
-  id: string; name: string; code: string; is_station: boolean;
+  id: string; name: string; code: string;
   one_way_amount: string | null; round_trip_amount: string | null;
 }
 

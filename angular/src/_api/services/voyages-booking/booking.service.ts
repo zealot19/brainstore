@@ -17,8 +17,8 @@ export class BookingService {
   }
   seatMap(tripId: string): Observable<SeatCell[]> { return this.http.get<SeatCell[]>(VOYAGES_BOOKING.seatMap(tripId)); }
   destinations(tripId: string): Observable<TripDestination[]> { return this.http.get<TripDestination[]>(VOYAGES_BOOKING.destinations(tripId)); }
-  routeDestinations(routeId: string): Observable<{ id: string; name: string; code: string; is_station: boolean }[]> {
-    return this.http.get<{ id: string; name: string; code: string; is_station: boolean }[]>(VOYAGES_BOOKING.routeDestinations(routeId));
+  routeDestinations(routeId: string): Observable<{ id: string; name: string; code: string }[]> {
+    return this.http.get<{ id: string; name: string; code: string }[]>(VOYAGES_BOOKING.routeDestinations(routeId));
   }
 
   list(params: { status?: string; trip?: string; q?: string; trip_type?: string; channel?: string;

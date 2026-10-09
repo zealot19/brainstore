@@ -1,5 +1,4 @@
 export type ConfigScope = 'global' | 'company';
-export type StationKind = 'TERMINAL' | 'AGENCY' | '';
 export type SeatType = 'STANDARD' | 'VIP' | 'DRIVER' | 'CREW';
 export type AppliesTo = 'BAGGAGE' | 'PARCEL' | 'BOTH';
 
@@ -23,9 +22,6 @@ export interface ServicePoint extends VcBase {
   town_name: string | null;
   code: string;
   name: string;
-  is_station: boolean;
-  station_kind: StationKind;
-  station_kind_display: string;
   latitude: string | null;
   longitude: string | null;
   agency?: string | null;
@@ -36,7 +32,6 @@ export interface RouteStop {
   id: string;
   service_point: string;
   service_point_name: string | null;
-  is_station: boolean;
   sequence: number;
   distance_from_origin_km: string | null;
   offset_from_departure: string | null;

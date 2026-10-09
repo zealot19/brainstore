@@ -33,7 +33,8 @@ export class VcRoutesComponent implements OnInit {
 
   constructor(private svc: RouteService, private spSvc: ServicePointService, private fb: FormBuilder) {}
 
-  get stations(): ServicePoint[] { return this.servicePoints.filter(s => s.is_station); }
+  // M09 : n'importe quel lieu peut être origine/destination.
+  get stations(): ServicePoint[] { return this.servicePoints; }
 
   ngOnInit(): void {
     this.form = this.fb.group({

@@ -40,7 +40,8 @@ export class VcgManifestComponent implements OnInit {
   ngOnInit(): void {
     this.tripSvc.list({ status: 'pending' }).subscribe(t => this.allTrips = t ?? []);
     this.routeSvc.list().subscribe(r => this.routes = r ?? []);
-    this.spSvc.list().subscribe(s => this.destinations = (s ?? []).filter(x => x.station_kind === 'AGENCY'));
+    // M09 : destinations de colis = lieux rattachés à une agence.
+    this.spSvc.list().subscribe(s => this.destinations = (s ?? []).filter(x => !!x.agency));
     this.tsSvc.list().subscribe(t => this.timeslots = t ?? []);
     this.refresh();
   }

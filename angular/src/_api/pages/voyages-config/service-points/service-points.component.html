@@ -19,7 +19,7 @@
       <div class="table-responsive"><table class="table datanew">
         <thead class="thead-light"><tr>
           <th style="width:36px"><input type="checkbox" class="form-check-input" [checked]="allSelected" (change)="toggleAll()" [disabled]="!selectable.length" /></th>
-          <th>{{ 'vcfg.common.code' | transloco }}</th><th>{{ 'vcfg.common.name' | transloco }}</th><th>{{ 'vcfg.sp.col_town' | transloco }}</th><th>{{ 'vcfg.sp.col_station_q' | transloco }}</th><th>{{ 'vcfg.sp.col_type' | transloco }}</th><th>{{ 'vcfg.common.perimeter' | transloco }}</th><th>{{ 'vcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+          <th>{{ 'vcfg.common.code' | transloco }}</th><th>{{ 'vcfg.common.name' | transloco }}</th><th>{{ 'vcfg.sp.col_town' | transloco }}</th><th>{{ 'vcfg.sp.f_agency' | transloco }}</th><th>{{ 'vcfg.common.perimeter' | transloco }}</th><th>{{ 'vcfg.common.status' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (r of filtered | paginate:pg.page:pg.size; track r.id) {
             <tr>
@@ -27,8 +27,7 @@
               <td class="fw-medium">{{ r.code }}</td>
               <td>{{ r.name }}</td>
               <td>{{ r.town_name || '—' }}</td>
-              <td>@if (r.is_station) { <span class="badge bg-success">{{ 'vcfg.sp.badge_station' | transloco }}</span> } @else { <span class="badge bg-light text-dark">{{ 'vcfg.sp.badge_stop' | transloco }}</span> }</td>
-              <td>{{ r.station_kind_display || '—' }}</td>
+              <td>{{ r.agency_name || '—' }}</td>
               <td>@if (r.scope === 'global') { <span class="badge bg-secondary">{{ 'vcfg.common.scope_global' | transloco }}</span> } @else { <span class="badge bg-info">{{ 'vcfg.common.scope_specific' | transloco }}</span> }</td>
               <td>@if (r.is_active) { <span class="badge bg-success">{{ 'vcfg.common.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'vcfg.common.inactive' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
@@ -38,7 +37,7 @@
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="9" class="text-center py-4 text-muted">{{ 'vcfg.common.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'vcfg.common.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -56,17 +55,10 @@
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.common.code' | transloco }} <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="DLA" /></div>
       <div class="col-md-8 mb-3"><label class="form-label">{{ 'vcfg.common.name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" placeholder="Gare Bonabéri" /></div>
     </div>
-    <div class="form-check form-switch mb-2"><input formControlName="is_station" type="checkbox" class="form-check-input" id="vc-station" /><label class="form-check-label" for="vc-station">{{ 'vcfg.sp.f_is_station' | transloco }}</label></div>
-    @if (form.value.is_station) {
-      <div class="mb-3"><label class="form-label">{{ 'vcfg.sp.f_station_kind' | transloco }}</label>
-        <select formControlName="station_kind" class="form-select"><option value="">{{ 'vcfg.common.choose' | transloco }}</option><option value="TERMINAL">{{ 'vcfg.sp.opt_terminal' | transloco }}</option><option value="AGENCY">{{ 'vcfg.sp.opt_agency' | transloco }}</option></select>
-      </div>
-      @if (form.value.station_kind === 'AGENCY') {
-        <div class="mb-3"><label class="form-label">{{ 'vcfg.sp.f_agency' | transloco }}</label>
-          <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'vcfg.common.none_f' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
-        </div>
-      }
-    }
+    <div class="mb-3"><label class="form-label">{{ 'vcfg.sp.f_agency' | transloco }}</label>
+      <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'vcfg.common.none_f' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
+      <small class="text-muted">{{ 'vcfg.sp.agency_hint' | transloco }}</small>
+    </div>
     <div class="row">
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.sp.f_lat' | transloco }}</label><input formControlName="latitude" type="number" step="0.000001" class="form-control" /></div>
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.sp.f_lon' | transloco }}</label><input formControlName="longitude" type="number" step="0.000001" class="form-control" /></div>

@@ -868,7 +868,7 @@
     },
     "towns": {
       "title": "Cidades",
-      "info": "As cidades servidas pela rede. Cada ponto de serviço (estação, agência ou paragem) pertence a uma cidade.",
+      "info": "As cidades servidas pela rede. Cada local (estação, agência ou paragem) pertence a uma cidade.",
       "new": "Nova cidade",
       "col_region": "Região"
     },
@@ -881,23 +881,16 @@
       "col_ordering": "Ordem"
     },
     "sp": {
-      "title": "Pontos de serviço",
-      "subtitle": "Estações, agências e paragens",
-      "info": "Pontos de paragem da rede. Assinale «Estação/Agência» para um ponto onde se vendem bilhetes (origem/destino das rotas). Os restantes são simples paragens que podem servir de escala.",
-      "new": "Novo ponto de serviço",
+      "title": "Locais",
+      "subtitle": "Locais da rede (partidas, destinos, paragens)",
+      "info": "Locais da rede: qualquer um pode servir de partida, destino ou paragem. Associe um local a uma agência para que possa receber encomendas.",
+      "new": "Novo local",
       "col_town": "Cidade",
-      "col_station_q": "Estação?",
-      "col_type": "Tipo",
-      "badge_station": "Estação/Agência",
-      "badge_stop": "Paragem",
       "f_town": "Cidade",
-      "f_is_station": "Estação / Agência (vende bilhetes)",
-      "f_station_kind": "Tipo de estação",
-      "opt_terminal": "Estação / Terminal",
-      "opt_agency": "Agência",
-      "f_agency": "Agência (instituição)",
+      "f_agency": "Agência",
       "f_lat": "Latitude",
-      "f_lon": "Longitude"
+      "f_lon": "Longitude",
+      "agency_hint": "Um local associado a uma agência pode receber encomendas e tem as suas próprias viagens (sincronização)."
     },
     "routes": {
       "title": "Rotas",
@@ -918,13 +911,10 @@
       "stops_header": "Paragens",
       "save_first": "Guarde primeiro a rota para adicionar paragens.",
       "st_order": "Ordem",
-      "st_sp": "Ponto de serviço",
-      "st_type": "Tipo",
-      "badge_station": "Estação",
-      "badge_stop": "Paragem",
+      "st_sp": "Local",
       "remove": "Remover",
       "no_stops": "Sem paragens.",
-      "f_stop_sp": "Paragem (ponto de serviço)",
+      "f_stop_sp": "Paragem (local)",
       "f_stop_distance": "Distância desde a origem (km)",
       "add_stop": "+ Adicionar"
     },
@@ -1306,7 +1296,7 @@
       "seat_hint": "Clique num lugar disponível para o bloquear (ou vice-versa). Os lugares vendidos/reservados chegarão com as reservas.",
       "stops": "Paragens",
       "stop_order": "Ordem",
-      "stop_sp": "Ponto de serviço",
+      "stop_sp": "Local",
       "stop_arrival": "Chegada prevista",
       "no_stops": "Sem paragens."
     }
