@@ -1,6 +1,8 @@
 # Backend Django — image de déploiement (Railway).
 # Contexte de build = dossier backend/ (Root Directory Railway).
-FROM python:3.12-slim
+# Image de base tirée depuis le miroir AWS ECR Public (images officielles Docker)
+# pour éviter le rate-limit anonyme du Docker Hub (HTTP 429) sur les builds Railway.
+FROM public.ecr.aws/docker/library/python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
