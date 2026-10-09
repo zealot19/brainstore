@@ -118,7 +118,6 @@ export const Pages_routes: Routes = [
             {
               path: 'configuration',
               children: [
-                { path: 'types-voyage',    loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de voyage' } },
                 { path: 'types-caisse',    loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de caisse' } },
                 { path: 'types-operation', loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: "Types d'opération" } },
                 { path: 'types-valeurs',   loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de valeurs' } },

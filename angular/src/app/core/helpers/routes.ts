@@ -444,7 +444,6 @@ export const routes={
   admDocuments:         '/admin/documents',
 
   // Config à venir (stubs M01 → écrans réels en M11/M26/M27/M28)
-  cfgTypesVoyage:    '/configuration/types-voyage',
   cfgTypesCaisse:    '/configuration/types-caisse',
   cfgTypesOperation: '/configuration/types-operation',
   cfgTypesValeurs:   '/configuration/types-valeurs',
