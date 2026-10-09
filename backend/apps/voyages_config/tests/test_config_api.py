@@ -106,7 +106,7 @@ def test_service_point_with_agency():
     town = Town.objects.create(company=company, name="Douala")
     agency = Agency.objects.filter(company=company).first()
     payload = {"town_id": str(town.id), "code": "PV1", "name": "Point Vente 1",
-               "is_station": True, "station_kind": "AGENCY", "agency_id": str(agency.id)}
+               "agency_id": str(agency.id)}
     req = APIRequestFactory().post("/x", payload, format="json")
     force_authenticate(req, user=admin)
     r = ServicePointListView.as_view()(req)

@@ -12,10 +12,10 @@ def api_ctx(db):
                                 admin_first_name="A", admin_last_name="B")
     admin = User.objects.get(email="api@x.com")
     town = Town.objects.create(company=company, name="Douala")
-    origin = ServicePoint.objects.create(company=company, town=town, code="O", name="Agence O",
-                                         is_station=True, station_kind="AGENCY")
-    dest = ServicePoint.objects.create(company=company, town=town, code="D", name="Agence D",
-                                       is_station=True, station_kind="AGENCY")
+    from apps.system_config.models import Agency
+    hq = Agency.objects.filter(company=company).first()
+    origin = ServicePoint.objects.create(company=company, town=town, code="O", name="Agence O")
+    dest = ServicePoint.objects.create(company=company, town=town, code="D", name="Agence D", agency=hq)
     nature = ConsignmentNature.objects.create(company=company, code="STD", name="Standard")
     ctype = ConsignmentType.objects.create(company=company, code="CT", label="Type", nature=nature)
     c = APIClient(); c.force_authenticate(user=admin)

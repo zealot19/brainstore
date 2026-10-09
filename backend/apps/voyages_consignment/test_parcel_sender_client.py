@@ -14,12 +14,12 @@ def make_parcel_prereqs():
     from apps.authentication.models import User
     user = User.objects.get(email="parcelsender@x.com")
     town = Town.objects.create(company=company, name="Yaoundé")
+    from apps.system_config.models import Agency
+    hq = Agency.objects.filter(company=company).first()
     origin = ServicePoint.objects.create(
-        company=company, town=town, code="ORG", name="Agence Origine",
-        is_station=True, station_kind="AGENCY")
+        company=company, town=town, code="ORG", name="Agence Origine")
     destination = ServicePoint.objects.create(
-        company=company, town=town, code="DST", name="Agence Destination",
-        is_station=True, station_kind="AGENCY")
+        company=company, town=town, code="DST", name="Agence Destination", agency=hq)
     nature = ConsignmentNature.objects.create(company=company, code="STD", name="Standard")
     ctype = ConsignmentType.objects.create(company=company, code="CT", label="Standard", nature=nature)
     return {"company": company, "origin": origin, "destination": destination,

@@ -86,8 +86,7 @@ def test_create_parcel_without_recipient_via_api():
     ag = Agency.objects.filter(company=company).first()
     town = Town.objects.create(company=company, name="Douala")
     a = ServicePoint.objects.create(company=company, town=town, code="A", name="Gare A")
-    b = ServicePoint.objects.create(company=company, town=town, code="B", name="Agence B",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
+    b = ServicePoint.objects.create(company=company, town=town, code="B", name="Agence B", agency=ag)
     nature = ConsignmentNature.objects.create(company=company, code="GEN", name="Général")
     ct = ConsignmentType.objects.create(company=company, code="STD", label="Standard", nature=nature)
     c = APIClient(); c.force_authenticate(user=admin)

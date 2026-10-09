@@ -14,10 +14,8 @@ def _setup(email, *, auto=True, lead=24, grace=48):
     company, _ = create_company(name="AT", admin_email=email, admin_first_name="A", admin_last_name="B")
     ag = Agency.objects.create(company=company, name="D", code="DLA")
     town = Town.objects.create(company=company, name="T")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", agency=ag)
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D", agency=ag)
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fc = FareClass.objects.create(company=company, code="STD", name="Standard")
     VoyagesSettings.objects.create(company=company, auto_manage_trips=auto,

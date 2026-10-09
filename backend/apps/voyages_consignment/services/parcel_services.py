@@ -41,8 +41,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
                     sender_id_number="", user):
     if origin_point.id == destination_point.id:
         raise ApplicationError(_("Le point de départ et le point d'arrivée doivent différer."))
-    if getattr(destination_point, "station_kind", "") != "AGENCY":
-        raise ApplicationError(_("Le colis ne peut être envoyé que vers une agence."))
+    if destination_point.agency_id is None:
+        raise ApplicationError(_("Le colis ne peut être envoyé que vers un lieu rattaché à une agence."))
     if nature is not None and consignment_type.nature_id != nature.id:
         raise ApplicationError(_("Le type choisi n'appartient pas à la nature sélectionnée."))
     if consignment_type.nature.is_prohibited:

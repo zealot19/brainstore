@@ -51,7 +51,6 @@ class TripDestinationSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField()
     code = serializers.CharField()
-    is_station = serializers.BooleanField()
     one_way_amount = serializers.DecimalField(max_digits=12, decimal_places=2, allow_null=True)
     round_trip_amount = serializers.DecimalField(max_digits=12, decimal_places=2, allow_null=True)
 
@@ -60,7 +59,6 @@ class RouteDestinationSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField()
     code = serializers.CharField()
-    is_station = serializers.BooleanField()
 
 
 class TicketRead(serializers.ModelSerializer):

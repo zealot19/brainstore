@@ -15,8 +15,8 @@ def _trip(company, admin, **kw):
     from apps.voyages_config.models import Town, ServicePoint, Route, FareClass
     from apps.voyages_trips.models import Trip
     town = Town.objects.create(company=company, name="D")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", is_station=True)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D2", is_station=True)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O")
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D2")
     route = Route.objects.create(company=company, code="R", origin=o, destination=d)
     fc = FareClass.objects.create(company=company, code="C", name="C")
     dep = kw.pop("dep", timezone.now())

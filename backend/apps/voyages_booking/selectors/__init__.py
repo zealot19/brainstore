@@ -60,7 +60,7 @@ def route_destinations(route):
     The point ids are the service-point ids — identical to trip_destinations ids —
     so a destination chosen from the route still resolves and prices on the trip."""
     from apps.voyages_pricing.selectors.fare_selectors import route_points
-    return [{"id": p.id, "name": p.name, "code": p.code, "is_station": p.is_station}
+    return [{"id": p.id, "name": p.name, "code": p.code}
             for p in route_points(route)[1:]]
 
 
@@ -74,7 +74,7 @@ def trip_destinations(trip):
         ow = resolve_fare(company, trip.route, trip.origin, p, trip.fare_class, trip_type="one_way")
         rt = resolve_fare(company, trip.route, trip.origin, p, trip.fare_class, trip_type="round_trip")
         out.append({
-            "id": p.id, "name": p.name, "code": p.code, "is_station": p.is_station,
+            "id": p.id, "name": p.name, "code": p.code,
             "one_way_amount": ow.amount if ow else None,
             "round_trip_amount": rt.amount if rt else None,
         })

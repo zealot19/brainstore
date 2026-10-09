@@ -30,11 +30,9 @@ def _make_company(email):
     ag = Agency.objects.get(company=company, code="HQ")
     town = Town.objects.create(company=company, name="Town")
     origin = ServicePoint.objects.create(
-        company=company, town=town, code="OR", name="Origin",
-        is_station=True, station_kind="AGENCY", agency=ag)
+        company=company, town=town, code="OR", name="Origin", agency=ag)
     dest = ServicePoint.objects.create(
-        company=company, town=town, code="DS", name="Dest",
-        is_station=True, station_kind="AGENCY", agency=ag)
+        company=company, town=town, code="DS", name="Dest", agency=ag)
     route = Route.objects.create(company=company, code="R1", origin=origin, destination=dest)
     fare_class = FareClass.objects.create(company=company, code="STD", name="Standard")
     trip = Trip.objects.create(
@@ -176,11 +174,9 @@ def test_clients_parcel_in_other_agency_excluded_for_scoped_user():
     # Create agency B with its own origin/destination
     ag_b = Agency.objects.create(company=company, name="AgB", code="AGB")
     o_b = ServicePoint.objects.create(
-        company=company, town=town, code="OB", name="Origin B",
-        is_station=True, station_kind="AGENCY", agency=ag_b)
+        company=company, town=town, code="OB", name="Origin B", agency=ag_b)
     d_b = ServicePoint.objects.create(
-        company=company, town=town, code="DB", name="Dest B",
-        is_station=True, station_kind="AGENCY", agency=ag_b)
+        company=company, town=town, code="DB", name="Dest B", agency=ag_b)
 
     # Non-admin user scoped ONLY to agency A
     agent_a = User.objects.create_user(

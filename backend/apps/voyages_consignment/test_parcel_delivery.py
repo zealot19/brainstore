@@ -28,10 +28,10 @@ def colis_ctx(db):
                                   admin_first_name="A", admin_last_name="B")
     c.user = User.objects.get(email="delivflow@x.com")
     town = Town.objects.create(company=c.company, name="Douala")
-    c.origin = ServicePoint.objects.create(company=c.company, town=town, code="O", name="Agence O",
-                                           is_station=True, station_kind="AGENCY")
-    c.dest = ServicePoint.objects.create(company=c.company, town=town, code="D", name="Agence D",
-                                         is_station=True, station_kind="AGENCY")
+    from apps.system_config.models import Agency
+    hq = Agency.objects.filter(company=c.company).first()
+    c.origin = ServicePoint.objects.create(company=c.company, town=town, code="O", name="Agence O")
+    c.dest = ServicePoint.objects.create(company=c.company, town=town, code="D", name="Agence D", agency=hq)
     nature = ConsignmentNature.objects.create(company=c.company, code="STD", name="Standard")
     c.ctype = ConsignmentType.objects.create(company=c.company, code="CT", label="Type", nature=nature)
     reg = create_cash_register(company=c.company, name="C1", created_by=c.user)

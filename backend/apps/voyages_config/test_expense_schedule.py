@@ -8,8 +8,8 @@ from apps.voyages_config.models import (
 
 def _route_fc(company):
     town = Town.objects.create(company=company, name="Bamenda")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Origin", is_station=True)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest", is_station=True)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Origin")
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest")
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fc = FareClass.objects.create(company=company, code="CL", name="Classic")
     return route, fc

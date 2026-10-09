@@ -15,10 +15,10 @@ def ctx(db):
                                 admin_first_name="A", admin_last_name="B")
     user = User.objects.get(email="co@x.com")
     town = Town.objects.create(company=company, name="Douala")
-    origin = ServicePoint.objects.create(company=company, town=town, code="O", name="Ag O",
-                                         is_station=True, station_kind="AGENCY")
-    dest = ServicePoint.objects.create(company=company, town=town, code="D", name="Ag D",
-                                       is_station=True, station_kind="AGENCY")
+    from apps.system_config.models import Agency
+    hq = Agency.objects.filter(company=company).first()
+    origin = ServicePoint.objects.create(company=company, town=town, code="O", name="Ag O")
+    dest = ServicePoint.objects.create(company=company, town=town, code="D", name="Ag D", agency=hq)
     nat = ConsignmentNature.objects.create(company=company, code="STD", name="Standard")
     other_nat = ConsignmentNature.objects.create(company=company, code="FRG", name="Fragile")
     typ = ConsignmentType.objects.create(company=company, code="CT", label="Carton", nature=nat)

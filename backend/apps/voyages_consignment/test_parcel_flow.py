@@ -19,12 +19,12 @@ def colis_ctx(db):
                                   admin_first_name="A", admin_last_name="B")
     c.user = User.objects.get(email="colis@x.com")
     town = Town.objects.create(company=c.company, name="Douala")
-    c.origin = ServicePoint.objects.create(company=c.company, town=town, code="O", name="Agence O",
-                                           is_station=True, station_kind="AGENCY")
-    c.dest_agency = ServicePoint.objects.create(company=c.company, town=town, code="D", name="Agence D",
-                                                is_station=True, station_kind="AGENCY")
-    c.dest_terminal = ServicePoint.objects.create(company=c.company, town=town, code="T", name="Gare T",
-                                                  is_station=True, station_kind="TERMINAL")
+    from apps.system_config.models import Agency
+    hq = Agency.objects.filter(company=c.company).first()
+    c.origin = ServicePoint.objects.create(company=c.company, town=town, code="O", name="Agence O")
+    # M09 : destination « agence » = lieu rattaché à une agence ; « terminal » = lieu sans agence (livraison refusée).
+    c.dest_agency = ServicePoint.objects.create(company=c.company, town=town, code="D", name="Agence D", agency=hq)
+    c.dest_terminal = ServicePoint.objects.create(company=c.company, town=town, code="T", name="Gare T")
     nature = ConsignmentNature.objects.create(company=c.company, code="STD", name="Standard")
     c.ctype = ConsignmentType.objects.create(company=c.company, code="CT", label="Type", nature=nature)
 
