@@ -460,6 +460,16 @@
       "id_number": "ID number",
       "payment": "Payment",
       "seats_left": "Seats left"
+    },
+    "avail": {
+      "sold": "Sold:",
+      "reserved": "Reserved:",
+      "blocked": "Blocked:",
+      "available": "Available:",
+      "reservations_possible": "Reservations possible:",
+      "full": "Trip full",
+      "quota_reached": "Reservation quota reached",
+      "none": "No trip scheduled for these criteria."
     }
   },
   "treasury": {

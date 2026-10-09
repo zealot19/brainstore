@@ -62,3 +62,13 @@ export interface BookingCreate {
 
 export interface AssignReturnItem { outbound_ticket_id: string; return_seat_id: string; }
 export interface AssignReturn { return_trip_id: string; items: AssignReturnItem[]; }
+
+export interface TripAvailability {
+  total: number;
+  sold: number;
+  reserved: number;
+  blocked: number;
+  available: number;
+  max_reservations: number | null;
+  reservations_possible: number | null;
+}

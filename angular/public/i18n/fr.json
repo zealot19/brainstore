@@ -460,6 +460,16 @@
       "id_number": "No pièce",
       "payment": "Paiement",
       "seats_left": "Sièges disponibles"
+    },
+    "avail": {
+      "sold": "Vendues :",
+      "reserved": "Réservées :",
+      "blocked": "Bloquées :",
+      "available": "Disponibles :",
+      "reservations_possible": "Réservations possibles :",
+      "full": "Voyage complet",
+      "quota_reached": "Quota de réservation atteint",
+      "none": "Aucun voyage programmé pour ces critères."
     }
   },
   "treasury": {
