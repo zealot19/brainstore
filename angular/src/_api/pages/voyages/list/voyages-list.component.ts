@@ -73,11 +73,14 @@ export class VoyagesListComponent implements OnInit {
     this.vehicleSvc.list().subscribe(d => this.vehicles = d);
     this.planSvc.list().subscribe(d => this.seatingPlans = d as any);
     this.crewSvc.list().subscribe(d => this.crewMembers = d as any);
-    // « Réservations autorisées » dérivé de la charte (lecture seule).
-    this.form.get('seating_plan_id')!.valueChanges.subscribe(id => {
-      const p = this.seatingPlans.find(x => x.id === id);
-      this.form.get('max_reservations')!.setValue(p ? p.total_seats : null);
-    });
+    // M12 : le quota de réservation est éditable, défauté aux places vendables (total − bloquées).
+    const resetQuotaDefault = () => {
+      const p = this.seatingPlans.find(x => x.id === this.form.get('seating_plan_id')!.value);
+      const blocked = +this.form.get('blocked_seats_count')!.value || 0;
+      this.form.get('max_reservations')!.setValue(p ? Math.max(0, p.total_seats - blocked) : null);
+    };
+    this.form.get('seating_plan_id')!.valueChanges.subscribe(resetQuotaDefault);
+    this.form.get('blocked_seats_count')!.valueChanges.subscribe(resetQuotaDefault);
     this.load();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau voyage" (sidebar) : ?new=1
     this.route.queryParams.subscribe(q => {
@@ -156,11 +159,12 @@ export class VoyagesListComponent implements OnInit {
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; },
     });
   }
-  // ── Places en vente = autorisées − bloquées ──
+  // ── Places vendables = total du plan − places bloquées (M12) ──
   get sellableSeats(): number {
-    const max = +this.form?.get('max_reservations')?.value || 0;
+    const plan = this.seatingPlans.find(p => p.id === this.form?.get('seating_plan_id')?.value);
+    const total = plan ? plan.total_seats : 0;
     const blocked = +this.form?.get('blocked_seats_count')?.value || 0;
-    return Math.max(0, max - blocked);
+    return Math.max(0, total - blocked);
   }
 
   // ── Équipage (searchable select + suppression) ──
