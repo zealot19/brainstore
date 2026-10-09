@@ -143,6 +143,17 @@ class TripUpdateSerializer(serializers.Serializer):
     voyage_type_id = serializers.UUIDField(required=False, allow_null=True)
 
 
+class GenerateTripsSerializer(serializers.Serializer):
+    service_pattern_id = serializers.UUIDField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+
+    def validate(self, attrs):
+        if attrs["end_date"] < attrs["start_date"]:
+            raise serializers.ValidationError("La date de fin doit être postérieure ou égale à la date de début.")
+        return attrs
+
+
 class MarkDelayedSerializer(serializers.Serializer):
     delayed_until = serializers.DateTimeField(required=False, allow_null=True, default=None)
     delay_reason = serializers.CharField(required=False, allow_blank=True, default="")

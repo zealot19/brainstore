@@ -138,6 +138,37 @@ def create_trip_from_pattern(*, company, pattern, service_date, code="", notes="
     return trip
 
 
+_MAX_RANGE_DAYS = 366
+
+
+def generate_trips_from_pattern(*, company, pattern, start_date, end_date, user):
+    """M13 : crée un voyage par date circulée de [start_date, end_date] (idempotent).
+
+    Ignore les jours non circulés (flag jour de semaine / hors validité) et les dates
+    déjà pourvues d'un voyage pour cette charte. Réutilise create_trip_from_pattern."""
+    from datetime import timedelta
+    if end_date < start_date:
+        raise ApplicationError(_("La date de fin doit être postérieure ou égale à la date de début."))
+    if (end_date - start_date).days + 1 > _MAX_RANGE_DAYS:
+        raise ApplicationError(_("La période ne peut pas dépasser 366 jours."))
+    created = skipped_existing = skipped_offday = 0
+    d = start_date
+    while d <= end_date:
+        circulates = bool(getattr(pattern, _WEEKDAY_FIELDS[d.weekday()]))
+        in_validity = ((not pattern.valid_from or d >= pattern.valid_from)
+                       and (not pattern.valid_to or d <= pattern.valid_to))
+        if not circulates or not in_validity:
+            skipped_offday += 1
+        elif Trip.objects.filter(company=company, service_pattern=pattern, is_deleted=False,
+                                 scheduled_departure__date=d).exists():
+            skipped_existing += 1
+        else:
+            create_trip_from_pattern(company=company, pattern=pattern, service_date=d, user=user)
+            created += 1
+        d += timedelta(days=1)
+    return {"created": created, "skipped_existing": skipped_existing, "skipped_offday": skipped_offday}
+
+
 @transaction.atomic
 def submit_trip(trip, *, user):
     if trip.status != Trip.Status.DRAFT:

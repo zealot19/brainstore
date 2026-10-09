@@ -117,6 +117,30 @@ class TripListCreateView(APIView):
         return created_response(S.TripDetailSerializer(trip).data)
 
 
+class GenerateTripsView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'voyage.trip.create'}
+
+    def post(self, request):
+        company, err = _scope(request)
+        if err:
+            return err
+        payload = S.GenerateTripsSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        d = payload.validated_data
+        from apps.voyages_config.models import ServicePattern
+        pattern = _cfg(ServicePattern, d["service_pattern_id"], company)
+        if not pattern:
+            return error_response("Planification introuvable.", status_code=404)
+        try:
+            res = services.generate_trips_from_pattern(
+                company=company, pattern=pattern,
+                start_date=d["start_date"], end_date=d["end_date"], user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(res)
+
+
 class TripDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'voyage.trip.view', 'PATCH': 'voyage.trip.update', 'PUT': 'voyage.trip.update', 'DELETE': 'voyage.trip.delete'}
