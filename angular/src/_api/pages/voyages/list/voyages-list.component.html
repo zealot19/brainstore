@@ -1,6 +1,9 @@
 <div class="page-header">
   <div class="add-item d-flex"><div class="page-title"><h4>{{ 'trips.list.title' | transloco }}</h4><h6>{{ 'trips.list.subtitle' | transloco }}</h6></div></div>
-  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip-modal" *hasPermission="'voyage.trip.create'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'trips.list.new' | transloco }}</a></div>
+  <div class="page-btn d-flex gap-2">
+    <a href="javascript:void(0);" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#gen-modal" *hasPermission="'voyage.trip.create'" (click)="openGen()"><i class="ti ti-calendar-plus me-2"></i>{{ 'trips.gen.btn' | transloco }}</a>
+    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip-modal" *hasPermission="'voyage.trip.create'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'trips.list.new' | transloco }}</a>
+  </div>
 </div>
 <app-info-banner [text]="'trips.list.info' | transloco"></app-info-banner>
 <div class="card table-list-card">
@@ -195,4 +198,22 @@
     </div>
     <div class="mb-3"><label class="form-label">{{ 'trips.list.f_notes' | transloco }}</label><textarea formControlName="notes" rows="2" class="form-control"></textarea></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (saving ? 'trips.list.creating' : 'shared.actions.create') | transloco }}</button></div></form>
+</div></div></div>
+
+<!-- M13 : Génération en lot -->
+<div class="modal fade" id="gen-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'trips.gen.title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="mb-3"><label class="form-label">{{ 'trips.gen.f_charte' | transloco }} <span class="text-danger">*</span></label>
+      <select class="form-select" [(ngModel)]="genPatternId">
+        <option value="">{{ 'booking.new.choose' | transloco }}</option>
+        @for (p of patterns; track p.id) { <option [value]="p.id">{{ p.route_code }} · {{ p.time_slot_label }}</option> }
+      </select></div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.gen.f_start' | transloco }} <span class="text-danger">*</span></label><input type="date" class="form-control" [(ngModel)]="genStart" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.gen.f_end' | transloco }} <span class="text-danger">*</span></label><input type="date" class="form-control" [(ngModel)]="genEnd" /></div>
+    </div>
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
+    <button type="button" class="btn btn-primary" [disabled]="!genPatternId || !genStart || !genEnd || generating" (click)="generate()"><span *ngIf="generating" class="spinner-border spinner-border-sm me-1"></span>{{ 'trips.gen.run' | transloco }}</button></div>
 </div></div></div>

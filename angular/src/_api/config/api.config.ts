@@ -316,6 +316,7 @@ const VT = `${API_BASE}/voyages/trips`;
 
 export const VOYAGES = {
   tripsStats: `${VT}/stats/`,
+  generateTrips: `${VT}/generate/`,
   trips: `${VT}/`, trip: (id: string) => `${VT}/${id}/`,
   eligibleVehicles: (id: string) => `${VT}/${id}/eligible-vehicles/`,
   assignVehicle: (id: string) => `${VT}/${id}/assign-vehicle/`,

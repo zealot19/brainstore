@@ -17,6 +17,9 @@ export class TripService {
   }
   get(id: string): Observable<Trip> { return this.http.get<Trip>(VOYAGES.trip(id)); }
   create(data: Record<string, unknown>): Observable<Trip> { return this.http.post<Trip>(VOYAGES.trips, data); }
+  generateBatch(body: { service_pattern_id: string; start_date: string; end_date: string }): Observable<{ created: number; skipped_existing: number; skipped_offday: number }> {
+    return this.http.post<{ created: number; skipped_existing: number; skipped_offday: number }>(VOYAGES.generateTrips, body);
+  }
   update(id: string, data: Record<string, unknown>): Observable<Trip> { return this.http.patch<Trip>(VOYAGES.trip(id), data); }
   delete(id: string): Observable<unknown> { return this.http.delete(VOYAGES.trip(id)); }
 

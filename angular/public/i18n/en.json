@@ -1307,6 +1307,14 @@
       "stop_sp": "Place",
       "stop_arrival": "Scheduled arrival",
       "no_stops": "No stops."
+    },
+    "gen": {
+      "btn": "Batch generate",
+      "title": "Batch trip generation",
+      "f_charte": "Schedule",
+      "f_start": "Start date",
+      "f_end": "End date",
+      "run": "Generate"
     }
   },
   "fcfg": {
