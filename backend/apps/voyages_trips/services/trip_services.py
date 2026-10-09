@@ -32,14 +32,20 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
                 service_pattern=None, origin=None, destination=None, code="", notes="",
                 seat_assignment_mode=Trip.SeatAssignment.MANUAL, auto_expenses=True,
                 seating_plan=None, vehicle=None, max_reservations=None,
-                blocked_seats_count=0, crew_member_ids=None, user):
+                blocked_seats_count=0, crew_member_ids=None, voyage_type=None, user):
     if scheduled_arrival <= scheduled_departure:
         raise ApplicationError(_("L'arrivée prévue doit être postérieure au départ."))
     o = origin or route.origin
     d = destination or route.destination
+    if voyage_type is None:
+        # M11 : type par défaut de la société (Départ), si défini.
+        from apps.voyages_config.models import VoyageType
+        voyage_type = VoyageType.objects.filter(
+            company=company, is_default=True, is_deleted=False).first()
     trip = Trip.objects.create(
         company=company, number=_trip_number(company, o, d, scheduled_departure), code=code,
         route=route, service_pattern=service_pattern, fare_class=fare_class,
+        voyage_type=voyage_type,
         origin=o, destination=d,
         scheduled_departure=scheduled_departure, scheduled_arrival=scheduled_arrival,
         status=Trip.Status.DRAFT, seat_assignment_mode=seat_assignment_mode,

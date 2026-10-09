@@ -8,8 +8,12 @@ from datetime import time
 
 from apps.voyages_config.models import (
     FareClass, TimeSlot, ConsignmentNature, ConsignmentType,
-    SeatingPlan, VoyagesSettings,
+    SeatingPlan, VoyagesSettings, VoyageType,
 )
+
+# (code, nom, par défaut)
+_VOYAGE_TYPES = [("DEPART", "Départ", True), ("COMPLEMENT", "Complément", False),
+                 ("ADDITIF", "Additif", False)]
 
 # (code, nom, rang, couleur)
 _FARE_CLASSES = [
@@ -106,6 +110,17 @@ def _seed_seating_plans(company, created_by):
     return n
 
 
+def _seed_voyage_types(company, created_by):
+    n = 0
+    for code, name, is_default in _VOYAGE_TYPES:
+        if VoyageType.objects.filter(company=company, code=code).exists():
+            continue
+        VoyageType.objects.create(company=company, code=code, name=name, is_default=is_default,
+                                  created_by=created_by)
+        n += 1
+    return n
+
+
 def _seed_settings(company, created_by):
     if VoyagesSettings.objects.filter(company=company).exists():
         return 0
@@ -114,12 +129,13 @@ def _seed_settings(company, created_by):
 
 
 def seed_voyages_defaults(company, created_by=None) -> int:
-    """Seed fare classes, time slots, consignment natures/types, seat plans and the
-    default Voyages settings row. Returns the number of top-level rows created."""
+    """Seed fare classes, time slots, consignment natures/types, seat plans, voyage types
+    and the default Voyages settings row. Returns the number of top-level rows created."""
     return (
         _seed_fare_classes(company, created_by)
         + _seed_time_slots(company, created_by)
         + _seed_consignments(company, created_by)
         + _seed_seating_plans(company, created_by)
+        + _seed_voyage_types(company, created_by)
         + _seed_settings(company, created_by)
     )

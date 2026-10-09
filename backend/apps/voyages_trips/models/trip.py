@@ -26,6 +26,8 @@ class Trip(BaseModel):
                                              on_delete=models.SET_NULL, null=True, blank=True, related_name="trips")
     fare_class          = models.ForeignKey("voyages_config.FareClass", verbose_name=_("catégorie tarifaire"),
                                              on_delete=models.PROTECT, related_name="trips")
+    voyage_type         = models.ForeignKey("voyages_config.VoyageType", verbose_name=_("type de voyage"),
+                                             on_delete=models.PROTECT, null=True, blank=True, related_name="trips")
     vehicle             = models.ForeignKey("fleet.Vehicle", verbose_name=_("véhicule"),
                                              on_delete=models.SET_NULL, null=True, blank=True, related_name="voyages_trips")
     seating_plan        = models.ForeignKey("voyages_config.SeatingPlan", verbose_name=_("plan de bus"),
