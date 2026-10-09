@@ -975,15 +975,6 @@
       "f_last": "Apelido",
       "f_license": "N.º de carta"
     },
-    "va": {
-      "title": "Atribuições de planta",
-      "subtitle": "Planta de autocarro por veículo (histórico de configuração)",
-      "info": "Associa uma planta de autocarro a um veículo durante um período. Mantém o histórico de reconfigurações de lugares.",
-      "col_vehicle": "Veículo",
-      "col_plan": "Planta",
-      "new_title": "Nova atribuição",
-      "f_plan": "Planta de autocarro"
-    },
     "spat": {
       "title": "Planeamentos",
       "subtitle": "Modelos de serviço (rota · período · dias)",

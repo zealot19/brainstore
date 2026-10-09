@@ -975,15 +975,6 @@
       "f_last": "Nom",
       "f_license": "N° de permis"
     },
-    "va": {
-      "title": "Affectations de plan",
-      "subtitle": "Plan de bus par véhicule (historique de configuration)",
-      "info": "Associe un plan de bus à un véhicule sur une période. Conserve l'historique des reconfigurations de sièges.",
-      "col_vehicle": "Véhicule",
-      "col_plan": "Plan",
-      "new_title": "Nouvelle affectation",
-      "f_plan": "Plan de bus"
-    },
     "spat": {
       "title": "Planifications",
       "subtitle": "Modèles de service (trajet · plage · jours)",

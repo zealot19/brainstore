@@ -975,15 +975,6 @@
       "f_last": "Last name",
       "f_license": "License number"
     },
-    "va": {
-      "title": "Plan assignments",
-      "subtitle": "Bus layout per vehicle (configuration history)",
-      "info": "Links a bus layout to a vehicle over a period. Keeps the history of seat reconfigurations.",
-      "col_vehicle": "Vehicle",
-      "col_plan": "Layout",
-      "new_title": "New assignment",
-      "f_plan": "Bus layout"
-    },
     "spat": {
       "title": "Schedules",
       "subtitle": "Service templates (route · slot · days)",

@@ -975,15 +975,6 @@
       "f_last": "Apellido",
       "f_license": "N.º de licencia"
     },
-    "va": {
-      "title": "Asignaciones de plano",
-      "subtitle": "Plano de autobús por vehículo (historial de configuración)",
-      "info": "Asocia un plano de autobús a un vehículo durante un período. Conserva el historial de reconfiguraciones de asientos.",
-      "col_vehicle": "Vehículo",
-      "col_plan": "Plano",
-      "new_title": "Nueva asignación",
-      "f_plan": "Plano de autobús"
-    },
     "spat": {
       "title": "Planificaciones",
       "subtitle": "Plantillas de servicio (ruta · franja · días)",
