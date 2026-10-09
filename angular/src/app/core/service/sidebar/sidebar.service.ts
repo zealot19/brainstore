@@ -213,6 +213,7 @@ export class SidebarService {
             { menuValue: 'Tout Afficher', route: routes.fleetVehicles, base: 'vehicles', permission: 'fleet.vehicle.view' },
             { menuValue: 'Nouveau véhicule', route: routes.fleetVehicles, queryParams: { new: 1 }, base: 'vehicles', permission: 'fleet.vehicle.create' },
             { menuValue: 'Parkings',  route: routes.fleetParking,  base: 'parking',  permission: 'fleet.parking.view' },
+            { menuValue: 'Documents', route: routes.fleetDocuments, base: 'documents', permission: 'fleet.document.view' },
           ],
         },
         {
@@ -223,7 +224,6 @@ export class SidebarService {
           base: 'fleet-maintenance',
           subMenus: [
             { menuValue: 'Garage',    route: routes.fleetServices,  base: 'services',  permission: 'fleet.maintenance.view' },
-            { menuValue: 'Documents', route: routes.fleetDocuments, base: 'documents', permission: 'fleet.document.view' },
             { menuValue: 'Accidents', route: routes.fleetAccidents, base: 'accidents', permission: 'fleet.accident.view' },
           ],
         },
