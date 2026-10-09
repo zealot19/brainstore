@@ -91,11 +91,13 @@ export class VcgBaggageComponent implements OnInit {
 
   /** Propriétaire du bagage = passager du billet choisi (lecture seule). */
   get selectedOwner(): { name: string; phone: string; id_number: string } | null {
-    const id = this.form.value.ticket_id;
-    if (!id) return null;
-    const o = this.ticketOptions.find(t => t.id === id);
-    if (o) return { name: o.name, phone: o.phone, id_number: o.id_number };
-    // édition : propriétaire figé sur le bagage
+    // form.value omet les contrôles désactivés (ticket_id l'est en édition) : lire le contrôle directement.
+    const id = this.form.get('ticket_id')?.value;
+    if (id) {
+      const o = this.ticketOptions.find(t => t.id === id);
+      if (o) return { name: o.name, phone: o.phone, id_number: o.id_number };
+    }
+    // édition (billet figé / options non rechargées) ou bagage legacy sans billet : propriétaire figé sur le bagage.
     return this.editOwner;
   }
 
