@@ -12,8 +12,8 @@ def _base(company, admin):
     from apps.voyages_trips.models import TripSeat
     from apps.voyages_trips.services.trip_services import create_trip
     town = Town.objects.create(company=company, name="Bamenda")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Origin", is_station=True)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest", is_station=True)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Origin")
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest")
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fc = FareClass.objects.create(company=company, code="CL", name="Classic")
     dep = timezone.now()

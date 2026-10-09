@@ -2,8 +2,6 @@ export interface RoutePoint {
   id: string;
   name: string;
   code: string;
-  is_station: boolean;
-  station_kind: string;
 }
 
 export interface Fare {

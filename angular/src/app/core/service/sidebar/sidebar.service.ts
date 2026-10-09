@@ -153,7 +153,7 @@ export class SidebarService {
           base: 'configuration',
           subMenus: [
             { menuValue: 'Villes',               route: routes.vcTowns,             base: 'towns',               permission: 'transport.city.view',         module: 'voyage' },
-            { menuValue: 'Points de service',    route: routes.vcServicePoints,     base: 'service-points',      permission: 'transport.terminal.view',     module: 'voyage' },
+            { menuValue: 'Lieux',    route: routes.vcServicePoints,     base: 'service-points',      permission: 'transport.terminal.view',     module: 'voyage' },
             { menuValue: 'Trajets',              route: routes.vcRoutes,            base: 'routes',              permission: 'transport.route.view',        module: 'voyage' },
             { menuValue: 'Plages horaires',      route: routes.vcTimeSlots,         base: 'time-slots',          permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Planifications',       route: routes.vcServicePatterns,   base: 'service-patterns',    permission: 'transport.config.view',       module: 'voyage' },

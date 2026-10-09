@@ -27,10 +27,8 @@ def _agencies(company):
 def _points(company, a, b):
     from apps.voyages_config.models import Town, ServicePoint, ConsignmentNature, ConsignmentType
     town = Town.objects.create(company=company, name="T")
-    sp_a = ServicePoint.objects.create(company=company, town=town, code="PA", name="Point A",
-                                       is_station=True, station_kind="AGENCY", agency=a)
-    sp_b = ServicePoint.objects.create(company=company, town=town, code="PB", name="Point B",
-                                       is_station=True, station_kind="AGENCY", agency=b)
+    sp_a = ServicePoint.objects.create(company=company, town=town, code="PA", name="Point A", agency=a)
+    sp_b = ServicePoint.objects.create(company=company, town=town, code="PB", name="Point B", agency=b)
     nature = ConsignmentNature.objects.create(company=company, code="GEN", name="Général")
     ct = ConsignmentType.objects.create(company=company, code="STD", label="Standard", nature=nature)
     return sp_a, sp_b, ct

@@ -18,35 +18,20 @@ class Town(_CompanyScoped):
 
 
 class ServicePoint(_CompanyScoped):
-    class StationKind(models.TextChoices):
-        TERMINAL = "TERMINAL", _("Gare / Terminal")
-        AGENCY   = "AGENCY",   _("Agence")
-
     town = models.ForeignKey("voyages_config.Town", verbose_name=_("ville"),
                              on_delete=models.PROTECT, related_name="service_points")
     code = models.CharField(_("code"), max_length=20)
     name = models.CharField(_("nom"), max_length=150)
-    is_station = models.BooleanField(_("est une gare/agence"), default=False)
-    station_kind = models.CharField(_("type de gare"), max_length=10,
-                                    choices=StationKind.choices, blank=True)
     latitude = models.DecimalField(_("latitude"), max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(_("longitude"), max_digits=9, decimal_places=6, null=True, blank=True)
+    # M09 : agence optionnelle sur n'importe quel lieu — porte la livraison colis
+    # (destination rattachée à une agence) et la propriété des voyages pour la sync.
     agency = models.ForeignKey("system_config.Agency", verbose_name=_("agence"), null=True, blank=True,
                                on_delete=models.SET_NULL, related_name="service_points")
 
     class Meta(_CompanyScoped.Meta):
-        verbose_name = _("point de service")
+        verbose_name = _("lieu")
         ordering = ["town__name", "name"]
-
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        super().clean()
-        # Départs de synchronisation multi-instances : une gare/agence doit être
-        # rattachée à une agence (le propriétaire des voyages qui en partent).
-        if self.is_station and not self.agency_id:
-            raise ValidationError(
-                {"agency": _("Une gare/agence doit être rattachée à une agence.")}
-            )
 
     def __str__(self):
         return f"{self.name} ({self.code})"
@@ -67,10 +52,7 @@ class Route(_CompanyScoped):
         ordering = ["code"]
 
     def clean(self):
-        if self.origin_id and not self.origin.is_station:
-            raise ValidationError({"origin": _("L'origine doit être une gare/agence.")})
-        if self.destination_id and not self.destination.is_station:
-            raise ValidationError({"destination": _("La destination doit être une gare/agence.")})
+        # M09 : n'importe quel lieu peut être origine/destination ; seule contrainte restante.
         if self.origin_id and self.origin_id == self.destination_id:
             raise ValidationError(_("Origine et destination doivent différer."))
 

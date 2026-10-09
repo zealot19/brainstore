@@ -41,7 +41,7 @@ describe('SidebarService', () => {
     it('Configuration contient les items config avec module + commence par les lieux', () => {
       const grp = (byTitle('Configuration') as any).menu[0];
       const vals = grp.subMenus.map((s: any) => s.menuValue);
-      expect(vals.slice(0, 3)).toEqual(['Villes', 'Points de service', 'Trajets']);
+      expect(vals.slice(0, 3)).toEqual(['Villes', 'Lieux', 'Trajets']);
       expect(grp.subMenus.find((s: any) => s.menuValue === 'Marques de véhicules').module).toBe('fleet');
       expect(grp.subMenus.find((s: any) => s.menuValue === 'Types de voyage').module).toBe('voyage');
     });

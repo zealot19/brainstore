@@ -15,10 +15,8 @@ def _base(email):
     admin = User.objects.get(email=email)
     ag = Agency.objects.create(company=company, name="D", code="DLA")
     town = Town.objects.create(company=company, name="T")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", agency=ag)
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D", agency=ag)
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fare_class = FareClass.objects.create(company=company, code="STD", name="Standard")
     trip = Trip.objects.create(
@@ -117,13 +115,11 @@ def test_clients_agency_scoped_excludes_other_agency():
     # agence B avec son propre voyage
     town = ag_a.company and trip_a.origin.town
     o_b = ServicePoint.objects.create(
-        company=company, town=trip_a.origin.town, code="OB", name="OB",
-        is_station=True, station_kind="AGENCY", agency=Agency.objects.create(company=company, name="AgB", code="AGB"),
+        company=company, town=trip_a.origin.town, code="OB", name="OB", agency=Agency.objects.create(company=company, name="AgB", code="AGB"),
     )
     ag_b = o_b.agency
     d_b = ServicePoint.objects.create(
-        company=company, town=trip_a.origin.town, code="DB", name="DB",
-        is_station=True, station_kind="AGENCY", agency=ag_b,
+        company=company, town=trip_a.origin.town, code="DB", name="DB", agency=ag_b,
     )
     route_b = Route.objects.create(company=company, code="R2", origin=o_b, destination=d_b)
     trip_b = Trip.objects.create(

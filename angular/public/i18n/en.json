@@ -868,7 +868,7 @@
     },
     "towns": {
       "title": "Cities",
-      "info": "The cities served by the network. Each service point (station, agency or stop) belongs to a city.",
+      "info": "The cities served by the network. Each place (station, agency or stop) belongs to a city.",
       "new": "New city",
       "col_region": "Region"
     },
@@ -881,23 +881,16 @@
       "col_ordering": "Order"
     },
     "sp": {
-      "title": "Service points",
-      "subtitle": "Stations, agencies and stops",
-      "info": "Network stop points. Tick \"Station/Agency\" for a point where tickets are sold (route origin/destination). Others are simple stops that can serve as intermediate stops.",
-      "new": "New service point",
+      "title": "Places",
+      "subtitle": "Network places (departures, destinations, stops)",
+      "info": "Network places: any one can serve as a departure, destination or stop. Link a place to an agency so it can receive parcels.",
+      "new": "New place",
       "col_town": "City",
-      "col_station_q": "Station?",
-      "col_type": "Type",
-      "badge_station": "Station/Agency",
-      "badge_stop": "Stop",
       "f_town": "City",
-      "f_is_station": "Station / Agency (sells tickets)",
-      "f_station_kind": "Station type",
-      "opt_terminal": "Station / Terminal",
-      "opt_agency": "Agency",
-      "f_agency": "Agency (institution)",
+      "f_agency": "Agency",
       "f_lat": "Latitude",
-      "f_lon": "Longitude"
+      "f_lon": "Longitude",
+      "agency_hint": "A place linked to an agency can receive parcels and owns its own trips (sync)."
     },
     "routes": {
       "title": "Routes",
@@ -918,13 +911,10 @@
       "stops_header": "Stops",
       "save_first": "Save the route first to add stops.",
       "st_order": "Order",
-      "st_sp": "Service point",
-      "st_type": "Type",
-      "badge_station": "Station",
-      "badge_stop": "Stop",
+      "st_sp": "Place",
       "remove": "Remove",
       "no_stops": "No stops.",
-      "f_stop_sp": "Stop (service point)",
+      "f_stop_sp": "Stop (place)",
       "f_stop_distance": "Distance from origin (km)",
       "add_stop": "+ Add"
     },
@@ -1306,7 +1296,7 @@
       "seat_hint": "Click an available seat to block it (or vice versa). Sold/held seats will come with bookings.",
       "stops": "Stops",
       "stop_order": "Order",
-      "stop_sp": "Service point",
+      "stop_sp": "Place",
       "stop_arrival": "Scheduled arrival",
       "no_stops": "No stops."
     }

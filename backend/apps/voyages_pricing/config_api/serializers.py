@@ -38,5 +38,3 @@ class RoutePointSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField()
     code = serializers.CharField()
-    is_station = serializers.BooleanField()
-    station_kind = serializers.CharField()

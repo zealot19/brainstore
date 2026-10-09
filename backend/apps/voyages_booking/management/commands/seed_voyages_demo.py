@@ -102,14 +102,14 @@ class Command(BaseCommand):
 
         gare_dla, _ = ServicePoint.objects.get_or_create(
             company=company, code="GDLA",
-            defaults={"town": dla, "name": "Gare de Douala", "is_station": True})
+            defaults={"town": dla, "name": "Gare de Douala"})
         gare_yde, _ = ServicePoint.objects.get_or_create(
             company=company, code="GYDE",
-            defaults={"town": yde, "name": "Gare de Yaoundé", "is_station": True})
-        # An escale (drop point) that is not a station
+            defaults={"town": yde, "name": "Gare de Yaoundé"})
+        # Un lieu d'escale (point de dépôt intermédiaire)
         esc_bfs, _ = ServicePoint.objects.get_or_create(
             company=company, code="EBFS",
-            defaults={"town": bfs, "name": "Carrefour Bafoussam", "is_station": False})
+            defaults={"town": bfs, "name": "Carrefour Bafoussam"})
 
         route_out, _ = Route.objects.get_or_create(
             company=company, code="DLA-YDE",

@@ -122,13 +122,11 @@ class TownWrite(serializers.Serializer):
 # ── ServicePoint ─────────────────────────────────────────────────────────────
 class ServicePointRead(_ScopeMixin):
     town_name = serializers.CharField(source="town.name", read_only=True, default=None)
-    station_kind_display = serializers.CharField(source="get_station_kind_display", read_only=True)
     agency_name = serializers.CharField(source="agency.name", read_only=True, default=None)
 
     class Meta:
         model = ServicePoint
-        fields = ["id", "town", "town_name", "code", "name", "is_station",
-                  "station_kind", "station_kind_display", "latitude", "longitude",
+        fields = ["id", "town", "town_name", "code", "name", "latitude", "longitude",
                   "agency", "agency_name",
                   "company", "scope", "is_active", "created_at", "updated_at"]
 
@@ -137,9 +135,6 @@ class ServicePointWrite(serializers.Serializer):
     town_id = serializers.UUIDField()
     code = serializers.CharField(max_length=20)
     name = serializers.CharField(max_length=150)
-    is_station = serializers.BooleanField(required=False, default=False)
-    station_kind = serializers.ChoiceField(choices=ServicePoint.StationKind.choices,
-                                           required=False, allow_blank=True, default="")
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)
@@ -242,11 +237,10 @@ class LoyaltyRuleWrite(serializers.Serializer):
 # ── RouteStop (escale) ────────────────────────────────────────────────────────
 class RouteStopRead(serializers.ModelSerializer):
     service_point_name = serializers.CharField(source="service_point.name", read_only=True, default=None)
-    is_station = serializers.BooleanField(source="service_point.is_station", read_only=True, default=False)
 
     class Meta:
         model = RouteStop
-        fields = ["id", "service_point", "service_point_name", "is_station",
+        fields = ["id", "service_point", "service_point_name",
                   "sequence", "distance_from_origin_km", "offset_from_departure"]
 
 

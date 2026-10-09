@@ -13,8 +13,8 @@ def test_parcel_stats_endpoint():
                                 admin_first_name="A", admin_last_name="B")
     admin = User.objects.get(email="pk@x.com")
     town = Town.objects.create(company=company, name="D")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", is_station=True)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D2", is_station=True)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O")
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D2")
     nature = ConsignmentNature.objects.create(company=company, code="STD", name="Standard")
     ct = ConsignmentType.objects.create(company=company, code="STD", label="Standard", nature=nature)
 

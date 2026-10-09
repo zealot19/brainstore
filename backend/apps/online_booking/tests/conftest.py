@@ -27,9 +27,9 @@ def booking_world(db):
     town_from = Town.objects.create(company=company, name="Douala")
     town_to = Town.objects.create(company=company, name="Yaoundé")
     o = ServicePoint.objects.create(company=company, town=town_from, code="DLA",
-                                    name="Gare Douala", is_station=True)
+                                    name="Gare Douala")
     d = ServicePoint.objects.create(company=company, town=town_to, code="YDE",
-                                    name="Gare Yaoundé", is_station=True)
+                                    name="Gare Yaoundé")
     route = Route.objects.create(company=company, code="DLA-YDE", origin=o, destination=d)
     fc = FareClass.objects.create(company=company, code="STD", name="Standard")
 

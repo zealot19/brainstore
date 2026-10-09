@@ -30,7 +30,7 @@ export class VbNewBookingComponent implements OnInit {
   // Aller
   routeCode = ''; fareClassId = ''; outDate = ''; outSlotId = '';
   outTrips: TripOption[] = []; outboundTripId = '';
-  routeDests: { id: string; name: string; code: string; is_station: boolean }[] = [];
+  routeDests: { id: string; name: string; code: string }[] = [];
   tripDests: TripDestination[] = []; destinationId = '';
   outSeats: SeatCell[] = []; outSeatId = '';
 

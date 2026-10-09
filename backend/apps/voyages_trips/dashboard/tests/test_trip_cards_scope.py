@@ -20,10 +20,8 @@ def test_other_agency_user_sees_no_cards_admin_sees_all():
     a = Agency.objects.create(company=company, name="Douala", code="DLA")
     b = Agency.objects.create(company=company, name="Yaoundé", code="YDE")
     town = Town.objects.create(company=company, name="T")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O",
-                                    is_station=True, station_kind="AGENCY", agency=a)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D",
-                                    is_station=True, station_kind="AGENCY", agency=a)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", agency=a)
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="D", agency=a)
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fare_class = FareClass.objects.create(company=company, code="STD", name="Standard")
     today = dt.date.today()

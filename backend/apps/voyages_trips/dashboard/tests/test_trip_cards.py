@@ -15,10 +15,8 @@ def _setup(email="dash@x.com"):
     admin = User.objects.get(email=email)
     ag = Agency.objects.create(company=company, name="Douala", code="DLA")
     town = Town.objects.create(company=company, name="Dla")
-    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Orig",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
-    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest",
-                                    is_station=True, station_kind="AGENCY", agency=ag)
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="Orig", agency=ag)
+    d = ServicePoint.objects.create(company=company, town=town, code="D", name="Dest", agency=ag)
     route = Route.objects.create(company=company, code="R1", origin=o, destination=d)
     fare_class = FareClass.objects.create(company=company, code="STD", name="Standard")
     today = dt.date.today()

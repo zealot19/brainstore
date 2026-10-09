@@ -133,6 +133,5 @@ class RoutePointsView(APIView):
         if not route:
             return error_response("Trajet introuvable.", status_code=404)
         pts = selectors.route_points(route)
-        data = [{"id": p.id, "name": p.name, "code": p.code,
-                 "is_station": p.is_station, "station_kind": p.station_kind} for p in pts]
+        data = [{"id": p.id, "name": p.name, "code": p.code} for p in pts]
         return success_response(S.RoutePointSerializer(data, many=True).data)

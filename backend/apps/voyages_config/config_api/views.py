@@ -321,9 +321,7 @@ class RouteListView(APIView):
         origin = cfg_lookup(ServicePoint, d.pop("origin_id"), cid)
         dest = cfg_lookup(ServicePoint, d.pop("destination_id"), cid)
         if not origin or not dest:
-            return error_response("Point de service introuvable.", status_code=404)
-        if not origin.is_station or not dest.is_station:
-            return error_response("Origine et destination doivent être des gares/agences.")
+            return error_response("Lieu introuvable.", status_code=404)
         if origin.id == dest.id:
             return error_response("Origine et destination doivent différer.")
         try:
@@ -357,13 +355,13 @@ class RouteDetailView(APIView):
         d = dict(payload.validated_data)
         if "origin_id" in d:
             origin = cfg_lookup(ServicePoint, d.pop("origin_id"), route.company_id)
-            if not origin or not origin.is_station:
-                return error_response("L'origine doit être une gare/agence.")
+            if not origin:
+                return error_response("Lieu introuvable.", status_code=404)
             route.origin = origin
         if "destination_id" in d:
             dest = cfg_lookup(ServicePoint, d.pop("destination_id"), route.company_id)
-            if not dest or not dest.is_station:
-                return error_response("La destination doit être une gare/agence.")
+            if not dest:
+                return error_response("Lieu introuvable.", status_code=404)
             route.destination = dest
         if route.origin_id == route.destination_id:
             return error_response("Origine et destination doivent différer.")
