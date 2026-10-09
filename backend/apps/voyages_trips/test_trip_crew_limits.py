@@ -42,10 +42,10 @@ def test_blocked_seats_and_crew_at_creation():
 
 
 @pytest.mark.django_db
-def test_max_reservations_derived_from_plan_and_sellable_minus_blocked():
+def test_reservation_quota_honored_and_capped_at_sellable():
     company, admin, route, fc, plan, member = _setup()  # plan = 9 seats
+    # M12 : le quota saisi par l'agent (1 ≤ 7 vendables) est honoré, pas écrasé par la capacité.
     trip = _mk(company, admin, route, fc, plan, blocked_seats_count=2, max_reservations=1)
-    # Autorisées = capacité de la charte (9), pas la valeur saisie par l'agent (1).
-    assert trip.max_reservations == 9
-    # Places en vente = autorisées - bloquées = 7 (sièges AVAILABLE).
-    assert trip.seats.filter(status="available").count() == trip.max_reservations - trip.blocked_seats_count == 7
+    assert trip.max_reservations == 1
+    # Places en vente = total − bloquées = 7 (sièges AVAILABLE), indépendant du quota.
+    assert trip.seats.filter(status="available").count() == 7
