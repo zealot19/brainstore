@@ -8,7 +8,7 @@ from datetime import time
 
 from apps.voyages_config.models import (
     FareClass, TimeSlot, ConsignmentNature, ConsignmentType,
-    SeatingPlan, PlanSeat, VoyagesSettings,
+    SeatingPlan, VoyagesSettings,
 )
 
 # (code, nom, rang, couleur)
@@ -43,8 +43,9 @@ _CONS_TYPES = [
 
 # (code, nom, rangées, colonnes)  → rangées × colonnes sièges vendables
 _SEATING_PLANS = [
-    ("BUS70", "Bus 70 places (2+3)",    14, 5),
-    ("MINI30", "Minibus 30 places (2+1)", 10, 3),
+    # (code, nom, total, bloquées)
+    ("BUS70", "Bus 70 places (2+3)",    70, 0),
+    ("MINI30", "Minibus 30 places (2+1)", 30, 0),
 ]
 
 
@@ -95,21 +96,12 @@ def _seed_consignments(company, created_by):
 
 def _seed_seating_plans(company, created_by):
     n = 0
-    for code, name, rows, cols in _SEATING_PLANS:
+    for code, name, total, blocked in _SEATING_PLANS:
         if SeatingPlan.objects.filter(company=company, code=code).exists():
             continue
-        plan = SeatingPlan.objects.create(company=company, code=code, name=name,
-                                          rows=rows, columns=cols, total_seats=rows * cols,
-                                          created_by=created_by)
-        seat_no = 0
-        seats = []
-        for r in range(1, rows + 1):
-            for c in range(1, cols + 1):
-                seat_no += 1
-                seats.append(PlanSeat(company=company, plan=plan, seat_number=str(seat_no),
-                                      row=r, column=c, seat_type=PlanSeat.SeatType.STANDARD,
-                                      is_sellable=True, created_by=created_by))
-        PlanSeat.objects.bulk_create(seats)
+        SeatingPlan.objects.create(company=company, code=code, name=name,
+                                   total_seats=total, blocked_seats=blocked,
+                                   created_by=created_by)
         n += 1
     return n
 

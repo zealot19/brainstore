@@ -8,7 +8,7 @@ from apps.core.exceptions import ApplicationError
 
 def _setup():
     from apps.system_config.services import create_company
-    from apps.voyages_config.models import Town, ServicePoint, FareClass, Route, SeatingPlan, PlanSeat
+    from apps.voyages_config.models import Town, ServicePoint, FareClass, Route, SeatingPlan
     from apps.voyages_trips.models import Trip
     from apps.voyages_trips.services.assignment import materialise_seats
     from apps.voyages_pricing.models import Fare
@@ -19,10 +19,7 @@ def _setup():
     b = ServicePoint.objects.create(company=company, town=town, code="B", name="Gare B")
     route = Route.objects.create(company=company, code="A-B", origin=a, destination=b)
     fc = FareClass.objects.create(company=company, code="ECO", name="Éco")
-    plan = SeatingPlan.objects.create(company=company, code="P1", name="P1", rows=1, columns=2, total_seats=2)
-    for i in range(2):
-        PlanSeat.objects.create(company=company, plan=plan, seat_number=f"S{i+1}", row=1, column=i + 1,
-                                seat_type="standard", is_sellable=True)
+    plan = SeatingPlan.objects.create(company=company, code="P1", name="P1", total_seats=2, blocked_seats=0)
     now = timezone.now() + timedelta(days=1)
     trip = Trip.objects.create(company=company, route=route, fare_class=fc, origin=a, destination=b,
                                seating_plan=plan, scheduled_departure=now, scheduled_arrival=now + timedelta(hours=3),

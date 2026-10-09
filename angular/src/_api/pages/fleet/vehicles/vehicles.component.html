@@ -217,6 +217,13 @@
               </select>
             </div>
             <div class="col-md-4 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_seating_plan' | transloco }}</label>
+              <select formControlName="seating_plan_id" class="form-select">
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
+                @for (p of seatingPlans; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_reg_date' | transloco }}</label>
               <input formControlName="registration_date" type="date" class="form-control" />
             </div>
@@ -331,6 +338,13 @@
               <select formControlName="category_id" class="form-select">
                 <option [ngValue]="null">{{ 'fleet.common.none_f' | transloco }}</option>
                 @for (c of categories; track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_seating_plan' | transloco }}</label>
+              <select formControlName="seating_plan_id" class="form-select">
+                <option [ngValue]="null">{{ 'fleet.common.none_m' | transloco }}</option>
+                @for (p of seatingPlans; track p.id) { <option [ngValue]="p.id">{{ p.code }} — {{ p.name }}</option> }
               </select>
             </div>
           </div>

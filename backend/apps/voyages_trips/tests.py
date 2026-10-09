@@ -44,13 +44,9 @@ from apps.voyages_trips.services.assignment import materialise_seats
 
 
 def _plan(company, code, n_sellable):
-    from apps.voyages_config.models import SeatingPlan, PlanSeat
-    plan = SeatingPlan.objects.create(company=company, code=code, name=code,
-                                      rows=1, columns=n_sellable, total_seats=n_sellable)
-    for i in range(n_sellable):
-        PlanSeat.objects.create(company=company, plan=plan, seat_number=f"{code}{i+1}",
-                                row=1, column=i + 1, seat_type="standard", is_sellable=True)
-    return plan
+    from apps.voyages_config.models import SeatingPlan
+    return SeatingPlan.objects.create(company=company, code=code, name=code,
+                                      total_seats=n_sellable, blocked_seats=0)
 
 
 def _trip(company, route, fare_class, origin, dest, plan, status="pending"):
@@ -277,16 +273,14 @@ def test_transbord_selection_new_bus_creates_full_voyage_with_expenses():
     from apps.voyages_trips.services.transbordement import transbord_selection
     from apps.voyages_trips.models import Trip, TripExpense
     from apps.fleet.models import Vehicle, VehicleBrand, VehicleModel
-    from apps.voyages_config.models import (VehicleSeatingAssignment, ExpenseType,
+    from apps.voyages_config.models import (ExpenseType,
                                             ExpenseSchedule, ExpenseScheduleLine)
     g = _graph()
     c, src = g["company"], g["src"]
     brand = VehicleBrand.objects.create(name="Toyota")
     model = VehicleModel.objects.create(brand=brand, name="Coaster")
-    veh = Vehicle.objects.create(company=c, model=model, license_plate="LT-9",
-                                 status="available", is_active=True)
-    VehicleSeatingAssignment.objects.create(company=c, vehicle=veh, seating_plan=g["plan_big"],
-                                            is_active=True)
+    veh = Vehicle.objects.create(company=c, model=model, license_plate="LT-9", code="LT-9",
+                                 status="available", is_active=True, seating_plan=g["plan_big"])
     et = ExpenseType.objects.create(company=c, code="CARB", name="Carburant", account_code="601")
     sch = ExpenseSchedule.objects.create(company=c, route=src.route, fare_class=src.fare_class)
     ExpenseScheduleLine.objects.create(schedule=sch, expense_type=et, amount=Decimal("15000"))

@@ -26,15 +26,13 @@ def _second_trip(company, base_trip, *, offset_hours=0):
 @pytest.mark.django_db
 def test_vehicle_blocked_by_overlapping_fleet_mission():
     from apps.fleet.models import Vehicle, VehicleBrand, VehicleModel, Assignment
-    from apps.voyages_config.models import VehicleSeatingAssignment
     from apps.voyages_trips.selectors.eligibility import blocking_reasons
     company, admin, trip = _setup()
     brand = VehicleBrand.objects.create(name="Toyota")
     model = VehicleModel.objects.create(brand=brand, name="Coaster")
-    veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-1",
-                                 status=Vehicle.Status.AVAILABLE, is_active=True)
-    VehicleSeatingAssignment.objects.create(
-        company=company, vehicle=veh, seating_plan=trip.seating_plan, is_active=True)
+    veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-1", code="LT-1",
+                                 status=Vehicle.Status.AVAILABLE, is_active=True,
+                                 seating_plan=trip.seating_plan)
     # Sans mission : éligible.
     assert blocking_reasons(veh, window_start=trip.scheduled_departure,
                             window_end=trip.scheduled_arrival) == []

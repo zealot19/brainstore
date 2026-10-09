@@ -1,5 +1,4 @@
 export type ConfigScope = 'global' | 'company';
-export type SeatType = 'STANDARD' | 'VIP' | 'DRIVER' | 'CREW';
 export type AppliesTo = 'BAGGAGE' | 'PARCEL' | 'BOTH';
 
 export interface VcBase {
@@ -49,31 +48,12 @@ export interface Route extends VcBase {
   stops: RouteStop[];
 }
 
-export interface PlanSeat {
-  id?: string;
-  seat_number: string;
-  row: number;
-  column: number;
-  seat_type: SeatType;
-  is_sellable: boolean;
-}
-
 export interface SeatingPlan extends VcBase {
   code: string;
   name: string;
-  rows: number;
-  columns: number;
   total_seats: number;
-  seats: PlanSeat[];
-}
-
-export interface VehicleSeatingAssignment extends VcBase {
-  vehicle: string;
-  vehicle_plate: string | null;
-  seating_plan: string;
-  seating_plan_code: string | null;
-  valid_from: string;
-  valid_to: string | null;
+  blocked_seats: number;
+  sellable_seats: number;
 }
 
 export interface FareClass extends VcBase {

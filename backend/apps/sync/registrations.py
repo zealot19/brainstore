@@ -29,7 +29,6 @@ _DOWN = [
     "voyages_config.Route",
     "voyages_config.FareClass",
     "voyages_config.SeatingPlan",
-    "voyages_config.PlanSeat",
     "voyages_pricing.Fare",
 ]
 

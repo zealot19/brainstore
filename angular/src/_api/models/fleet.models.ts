@@ -113,6 +113,8 @@ export interface VehicleDetail {
   agency_name:            string | null;
   category:               string | null;
   category_name:          string | null;
+  seating_plan:           string | null;
+  seating_plan_code:      string | null;
   parking:                string | null;
   parking_name:           string | null;
   tags:                   { id: string; name: string; color: string }[];

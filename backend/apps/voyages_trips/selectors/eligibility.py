@@ -1,20 +1,13 @@
 from datetime import timedelta
 from django.db.models import Q
 from apps.fleet.models import Vehicle, VehicleDocument, Service
-from apps.voyages_config.models import VehicleSeatingAssignment
 from apps.voyages_trips.models import Trip
 
 
 def active_seating_plan(vehicle, on_date=None):
-    """The vehicle's current seating plan = its latest active assignment, else None.
-    `on_date` is accepted for call-site compatibility but no longer used (plan
-    assignments are no longer date-bounded)."""
-    a = (VehicleSeatingAssignment.objects
-         .filter(vehicle=vehicle, is_deleted=False, is_active=True)
-         .select_related("seating_plan")
-         .order_by("-created_at")
-         .first())
-    return a.seating_plan if a else None
+    """Le plan de bus du véhicule (M05 : FK directe sur le véhicule).
+    `on_date` est accepté pour compatibilité des appels mais ignoré."""
+    return getattr(vehicle, "seating_plan", None)
 
 
 def blocking_reasons(vehicle, *, window_start, window_end, exclude_trip=None):

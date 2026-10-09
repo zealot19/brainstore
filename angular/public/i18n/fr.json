@@ -975,15 +975,6 @@
       "f_last": "Nom",
       "f_license": "N° de permis"
     },
-    "va": {
-      "title": "Affectations de plan",
-      "subtitle": "Plan de bus par véhicule (historique de configuration)",
-      "info": "Associe un plan de bus à un véhicule sur une période. Conserve l'historique des reconfigurations de sièges.",
-      "col_vehicle": "Véhicule",
-      "col_plan": "Plan",
-      "new_title": "Nouvelle affectation",
-      "f_plan": "Plan de bus"
-    },
     "spat": {
       "title": "Planifications",
       "subtitle": "Modèles de service (trajet · plage · jours)",
@@ -1041,25 +1032,17 @@
     },
     "plan": {
       "title": "Plans de bus",
-      "subtitle": "Plans de sièges réutilisables",
+      "subtitle": "Plans de bus (capacité par compteurs)",
       "new": "Nouveau plan",
-      "info": "Dessinez la disposition des sièges du bus. Cliquez une case vide pour ajouter un siège, cliquez un siège pour changer son type (Standard, VIP, Chauffeur, Personnel) ou le rendre non vendable.",
-      "col_grid": "Grille",
+      "info": "Définissez la capacité du bus par des nombres : total de places et places bloquées. Les places vendables = total − bloquées.",
       "col_sellable": "Places vendables",
       "empty": "Aucun plan.",
       "edit_title": "Modifier le plan",
       "new_title": "Nouveau plan de bus",
-      "f_rows": "Rangées",
-      "f_cols": "Colonnes",
-      "leg_standard": "Standard",
-      "leg_driver": "Chauffeur",
-      "leg_crew": "Personnel",
-      "leg_empty": "Allée / vide",
-      "seat_label": "Siège",
-      "f_number": "Numéro",
-      "f_sellable": "Vendable",
-      "remove_seat": "Retirer le siège",
-      "click_hint": "Cliquez une case pour ajouter ou modifier un siège."
+      "col_total": "Total",
+      "col_blocked": "Bloquées",
+      "f_total": "Nombre total de places",
+      "f_blocked": "Places bloquées"
     },
     "tt": {
       "title": "Config billets",
@@ -1705,7 +1688,8 @@
       "f_pct_ticket": "Part billets (%)",
       "f_pct_parcel": "Part colis (%)",
       "f_pct_baggage": "Part bagages (%)",
-      "f_code": "Code véhicule"
+      "f_code": "Code véhicule",
+      "f_seating_plan": "Plan de bus"
     },
     "crew": {
       "title": "Personnel naviguant",

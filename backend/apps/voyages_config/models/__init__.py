@@ -1,5 +1,5 @@
 from .network import Town, ServicePoint, Route, RouteStop
-from .seating import SeatingPlan, PlanSeat, VehicleSeatingAssignment
+from .seating import SeatingPlan
 from .commercial import FareClass, TimeSlot, ConsignmentNature, ConsignmentType
 from .scheduling import ServicePattern
 from .loyalty import LoyaltyRule
@@ -11,7 +11,7 @@ from .expense import ExpenseType, ExpenseSchedule, ExpenseScheduleLine
 
 __all__ = [
     "Town", "ServicePoint", "Route", "RouteStop",
-    "SeatingPlan", "PlanSeat", "VehicleSeatingAssignment",
+    "SeatingPlan",
     "FareClass", "TimeSlot", "ConsignmentNature", "ConsignmentType",
     "ServicePattern", "LoyaltyRule", "VoyagesSettings",
     "TicketTemplate", "DEFAULT_TICKET_RECTO", "DEFAULT_TICKET_VERSO",

@@ -27,8 +27,8 @@ from apps.system_config.models import Company
 from apps.hr.models import Employee
 from apps.fleet.models import Vehicle, ExternalDriver
 from apps.voyages_config.models import (
-    ServicePoint, Route, RouteStop, SeatingPlan, PlanSeat,
-    VehicleSeatingAssignment, FareClass, TimeSlot, LoyaltyRule, VoyagesSettings,
+    ServicePoint, Route, RouteStop, SeatingPlan,
+    FareClass, TimeSlot, LoyaltyRule, VoyagesSettings,
 )
 from apps.voyages_pricing.models import Fare
 from apps.voyages_trips.models import Trip, TripCrew
@@ -127,21 +127,11 @@ class Command(BaseCommand):
             defaults={"label": "Yaoundé → Douala", "origin": destination, "destination": origin,
                       "distance_km": route_out.distance_km})
 
-        # ── 4. Seating plan : reuse existing, else build a 40-seat plan ────────
+        # ── 4. Seating plan : reuse existing, else build a 40-seat numeric plan (M05) ─
         plan = SeatingPlan.objects.filter(is_deleted=False, company=company).order_by("code").first()
         if not plan:
             plan = SeatingPlan.objects.create(company=company, code="BUS40",
-                                              name="Bus 40 places", rows=10, columns=4, total_seats=40)
-        if not plan.seats.filter(is_deleted=False).exists():
-            n = 0
-            for row in range(1, 11):
-                for col in range(1, 5):
-                    if n >= 40:
-                        break
-                    n += 1
-                    PlanSeat.objects.create(company=company, plan=plan,
-                                            seat_number=f"{row}{_COLS[col - 1]}", row=row, column=col,
-                                            seat_type=PlanSeat.SeatType.STANDARD, is_sellable=True)
+                                              name="Bus 40 places", total_seats=40, blocked_seats=0)
 
         # ── 5. Fare class(es) ─────────────────────────────────────────────────
         fc_std = FareClass.objects.filter(is_deleted=False, company=company).order_by("rank").first()
@@ -156,8 +146,9 @@ class Command(BaseCommand):
             raise CommandError("Au moins deux véhicules sont requis dans Voyageur Express.")
         bus_a, bus_b = vehicles[0], vehicles[1]
         for v in (bus_a, bus_b):
-            VehicleSeatingAssignment.objects.get_or_create(
-                company=company, vehicle=v, seating_plan=plan)
+            if v.seating_plan_id != plan.id:
+                v.seating_plan = plan
+                v.save(update_fields=["seating_plan"])
 
         # ── 7. Time slots (plages horaires) + loyalty + settings ──────────────
         slot_am, _ = TimeSlot.objects.get_or_create(

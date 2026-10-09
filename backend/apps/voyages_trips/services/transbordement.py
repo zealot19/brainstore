@@ -13,15 +13,13 @@ def overflow_split(sold_ids, capacity):
 def apply_transbord(trip, new_plan, *, overflow_trip=None, user=None):
     """Applique un nouveau plan de sièges au voyage : ré-attribue les billets vendus,
     bascule le surplus vers `overflow_trip`. Ne touche pas au véhicule (voir transbord_trip)."""
-    from apps.voyages_config.models import PlanSeat
     from apps.voyages_trips.models import TripSeat
     from apps.voyages_consignment.models import Baggage
 
     sold = list(trip.tickets.filter(is_deleted=False, status__in=["sold", "boarded"])
                 .select_related("trip_seat")
                 .order_by("trip_seat__row", "trip_seat__column", "trip_seat__seat_number"))
-    plan_seats = list(PlanSeat.objects.filter(plan=new_plan, is_deleted=False).order_by("row", "column"))
-    capacity = sum(1 for ps in plan_seats if ps.is_sellable)
+    capacity = new_plan.sellable_seats  # M05 : total − bloquées
 
     kept_ids, overflow_ids = overflow_split([t.id for t in sold], capacity)
     if overflow_ids and overflow_trip is None:
@@ -39,12 +37,14 @@ def apply_transbord(trip, new_plan, *, overflow_trip=None, user=None):
         for s in trip.seats.filter(status=TripSeat.Status.SOLD):
             s.seat_number = f"OLD-{s.id}"
             s.save(update_fields=["seat_number"])
+        total = new_plan.total_seats or 0
+        blocked = min(new_plan.blocked_seats or 0, total)
+        first_blocked = total - blocked
         TripSeat.objects.bulk_create([
-            TripSeat(trip=trip, seat_number=ps.seat_number, row=ps.row, column=ps.column,
-                     seat_type=ps.seat_type,
-                     status=TripSeat.Status.AVAILABLE if ps.is_sellable else TripSeat.Status.BLOCKED,
+            TripSeat(trip=trip, seat_number=str(i), row=i, column=1, seat_type="STANDARD",
+                     status=TripSeat.Status.BLOCKED if i > first_blocked else TripSeat.Status.AVAILABLE,
                      created_by=user)
-            for ps in plan_seats])
+            for i in range(1, total + 1)])
         free_new = list(trip.seats.filter(status=TripSeat.Status.AVAILABLE).order_by("row", "column"))
         kept_tickets = [t for t in sold if t.id in kept_set]
         for tk, seat in zip(kept_tickets, free_new):

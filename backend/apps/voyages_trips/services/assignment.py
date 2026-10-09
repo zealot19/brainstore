@@ -1,6 +1,5 @@
 from django.db import transaction
 from django.utils import timezone
-from apps.voyages_config.models import PlanSeat
 from apps.voyages_trips.models import TripSeat
 from apps.voyages_trips.exceptions import VehicleNotEligible
 from apps.voyages_trips.selectors.eligibility import (
@@ -21,18 +20,25 @@ def set_seats_status(trip, seat_ids, target_status, *, from_status=None, user=No
 
 
 def materialise_seats(trip):
-    """Rebuild TripSeat rows from the trip's snapshot seating plan."""
+    """Génère les TripSeat 1..N depuis les compteurs du plan (M05).
+
+    Les `blocked_seats` derniers sièges sont bloqués ; les autres sont vendables.
+    Séquence plate (row=i, column=1) — les champs restent renseignés pour le rendu."""
     trip.seats.all().delete()
-    if not trip.seating_plan_id:
+    plan = trip.seating_plan
+    if not plan:
         return
-    rows = []
-    for ps in PlanSeat.objects.filter(plan=trip.seating_plan, is_deleted=False):
-        rows.append(TripSeat(
-            trip=trip, seat_number=ps.seat_number, row=ps.row, column=ps.column,
-            seat_type=ps.seat_type,
-            status=TripSeat.Status.AVAILABLE if ps.is_sellable else TripSeat.Status.BLOCKED,
+    total = plan.total_seats or 0
+    blocked = min(plan.blocked_seats or 0, total)
+    first_blocked = total - blocked  # sièges de numéro > first_blocked => bloqués
+    rows = [
+        TripSeat(
+            trip=trip, seat_number=str(i), row=i, column=1, seat_type="STANDARD",
+            status=TripSeat.Status.BLOCKED if i > first_blocked else TripSeat.Status.AVAILABLE,
             created_by=trip.updated_by or trip.created_by,
-        ))
+        )
+        for i in range(1, total + 1)
+    ]
     TripSeat.objects.bulk_create(rows)
 
 

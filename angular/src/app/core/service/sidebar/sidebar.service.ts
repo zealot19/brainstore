@@ -171,7 +171,6 @@ export class SidebarService {
             { menuValue: "Types d'intervention", route: routes.fcInterventionTypes, base: 'intervention-types',  permission: 'fleet.config.view',           module: 'fleet'  },
             { menuValue: 'Types de personnel',   route: routes.vcCrewMemberTypes,   base: 'crew-member-types',   permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Plans de bus',         route: routes.vcSeatingPlans,      base: 'seating-plans',       permission: 'transport.config.view',       module: 'voyage' },
-            { menuValue: 'Affectations de plan', route: routes.vcVehicleAssignments,base: 'vehicle-assignments', permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes',        permission: 'transport.fareclass.view',    module: 'voyage' },
             { menuValue: 'Tarifs',               route: routes.vcFares,             base: 'fares',               permission: 'transport.fare.view',         module: 'voyage' },
             { menuValue: 'Types de voyage',      route: routes.cfgTypesVoyage,      base: 'configuration',       permission: 'transport.config.view',       module: 'voyage' },

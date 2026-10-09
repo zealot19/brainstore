@@ -2,7 +2,7 @@ import pytest
 
 from apps.voyages_config.models import (
     FareClass, TimeSlot, ConsignmentNature, ConsignmentType,
-    SeatingPlan, PlanSeat, VoyagesSettings,
+    SeatingPlan, VoyagesSettings,
 )
 from apps.voyages_config.services.defaults_seed import seed_voyages_defaults
 
@@ -33,10 +33,8 @@ def test_seat_plans_generate_full_seat_grid():
     seed_voyages_defaults(company)
     bus = SeatingPlan.objects.get(company=company, code="BUS70")
     mini = SeatingPlan.objects.get(company=company, code="MINI30")
-    assert bus.total_seats == 70
-    assert PlanSeat.objects.filter(company=company, plan=bus).count() == 70
-    assert mini.total_seats == 30
-    assert PlanSeat.objects.filter(company=company, plan=mini).count() == 30
+    assert bus.total_seats == 70 and bus.blocked_seats == 0 and bus.sellable_seats == 70
+    assert mini.total_seats == 30 and mini.sellable_seats == 30
 
 
 @pytest.mark.django_db
@@ -47,7 +45,6 @@ def test_seed_is_idempotent():
     assert FareClass.objects.filter(company=company).count() == 2
     assert ConsignmentType.objects.filter(company=company).count() == 3
     assert SeatingPlan.objects.filter(company=company).count() == 2
-    assert PlanSeat.objects.filter(company=company).count() == 100
     assert VoyagesSettings.objects.filter(company=company).count() == 1
 
 

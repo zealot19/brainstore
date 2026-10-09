@@ -10,7 +10,7 @@ from apps.voyages_config.models import (
     Town, ServicePoint, FareClass, TimeSlot, CrewMemberType, ExpenseType, ExpenseSchedule,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
-    SeatingPlan, PlanSeat, VehicleSeatingAssignment,
+    SeatingPlan,
     ServicePattern, VoyagesSettings,
     TicketTemplate, DEFAULT_TICKET_RECTO, DEFAULT_TICKET_VERSO,
 )
@@ -480,117 +480,6 @@ class SeatingPlanDetailView(_ConfigDetailView):
 
 
 SeatingPlanBulkDeleteView = _bulk(SeatingPlan)
-
-
-class SeatingPlanSeatsView(APIView):
-    permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
-
-    def _plan(self, request, plan_id):
-        return scoped_qs(SeatingPlan, scope_company_id(request)).filter(id=plan_id).first()
-
-    def get(self, request, plan_id):
-        plan = self._plan(request, plan_id)
-        if not plan:
-            return error_response("Plan introuvable.", status_code=404)
-        seats = plan.seats.filter(is_deleted=False).order_by("row", "column")
-        return success_response(S.PlanSeatRead(seats, many=True).data)
-
-    def put(self, request, plan_id):
-        plan = self._plan(request, plan_id)
-        if not plan:
-            return error_response("Plan introuvable.", status_code=404)
-        payload = S.SeatBulkWrite(data=request.data)
-        payload.is_valid(raise_exception=True)
-        seats = payload.validated_data["seats"]
-        with transaction.atomic():
-            plan.seats.all().delete()  # hard replace of the layout
-            PlanSeat.objects.bulk_create([
-                PlanSeat(company=plan.company, plan=plan, created_by=request.user, **s)
-                for s in seats
-            ])
-            plan.total_seats = sum(1 for s in seats if s.get("is_sellable", True))
-            plan.updated_by = request.user
-            plan.save(update_fields=["total_seats", "updated_by", "updated_at"])
-        plan.refresh_from_db()
-        return success_response(S.SeatingPlanRead(plan).data)
-
-
-# ── VehicleSeatingAssignment ──────────────────────────────────────────────────
-
-class VehicleSeatingAssignmentListView(APIView):
-    permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
-
-    def get(self, request):
-        qs = (scoped_qs(VehicleSeatingAssignment, scope_company_id(request))
-              .select_related("vehicle", "seating_plan").order_by("-created_at"))
-        paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(qs, request)
-        return paginator.get_paginated_response(S.VehicleSeatingAssignmentRead(page, many=True).data)
-
-    def post(self, request):
-        company, err = resolve_company_or_global(request)
-        if err:
-            return err
-        payload = S.VehicleSeatingAssignmentWrite(data=request.data)
-        payload.is_valid(raise_exception=True)
-        d = dict(payload.validated_data)
-        cid = company.id if company else None
-        from apps.fleet.models import Vehicle
-        vehicle = Vehicle.objects.filter(id=d.pop("vehicle_id"), company_id=cid, is_deleted=False).first()
-        if not vehicle:
-            return error_response("Véhicule introuvable.", status_code=404)
-        plan = cfg_lookup(SeatingPlan, d.pop("seating_plan_id"), cid)
-        if not plan:
-            return error_response("Plan de bus introuvable.", status_code=404)
-        obj = VehicleSeatingAssignment.objects.create(
-            company=company, created_by=request.user, vehicle=vehicle, seating_plan=plan, **d)
-        return created_response(S.VehicleSeatingAssignmentRead(obj).data)
-
-
-class VehicleSeatingAssignmentDetailView(APIView):
-    permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}
-
-    def _get(self, request, pk):
-        return scoped_qs(VehicleSeatingAssignment, scope_company_id(request)).filter(id=pk).first()
-
-    def patch(self, request, pk):
-        obj = self._get(request, pk)
-        if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
-        payload = S.VehicleSeatingAssignmentWrite(data=request.data, partial=True)
-        payload.is_valid(raise_exception=True)
-        d = dict(payload.validated_data)
-        if "vehicle_id" in d:
-            from apps.fleet.models import Vehicle
-            vehicle = Vehicle.objects.filter(id=d.pop("vehicle_id"), company_id=obj.company_id, is_deleted=False).first()
-            if not vehicle:
-                return error_response("Véhicule introuvable.", status_code=404)
-            obj.vehicle = vehicle
-        if "seating_plan_id" in d:
-            plan = cfg_lookup(SeatingPlan, d.pop("seating_plan_id"), obj.company_id)
-            if not plan:
-                return error_response("Plan de bus introuvable.", status_code=404)
-            obj.seating_plan = plan
-        for k, v in d.items():
-            setattr(obj, k, v)
-        obj.updated_by = request.user
-        obj.save()
-        return success_response(S.VehicleSeatingAssignmentRead(obj).data)
-
-    def delete(self, request, pk):
-        obj = self._get(request, pk)
-        if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
-        obj.is_deleted = True
-        obj.updated_by = request.user
-        obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
-        return no_content_response()
-
-
-VehicleSeatingAssignmentBulkDeleteView = _bulk(VehicleSeatingAssignment)
 
 
 # ── ServicePattern (planification) ────────────────────────────────────────────
