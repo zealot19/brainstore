@@ -1123,6 +1123,15 @@
       "info": "Les types de voyage (Départ par défaut). Un seul type peut être marqué « par défaut ».",
       "f_default": "Type par défaut",
       "col_default": "Défaut"
+    },
+    "stops": {
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "pick_ph": "Choisir des arrêts (sélection multiple)",
+      "need_od": "Choisissez d'abord l'origine et la destination.",
+      "col_stop": "Arrêt",
+      "col_distance": "Distance (km)",
+      "empty": "Aucun arrêt."
     }
   },
   "trips": {

@@ -421,6 +421,30 @@ class RouteStopListView(APIView):
                                         route=route, service_point=sp, sequence=seq, **d)
         return created_response(S.RouteStopRead(stop).data)
 
+    def put(self, request, route_id):
+        """M10 : remplace en bloc la liste ordonnée des escales (sequence = index+1).
+        Valide tous les lieux AVANT toute écriture (pas de remplacement partiel)."""
+        from django.db import transaction
+        route = self._route(request, route_id)
+        if not route:
+            return error_response("Trajet introuvable.", status_code=404)
+        payload = S.RouteStopsBulkWrite(data=request.data)
+        payload.is_valid(raise_exception=True)
+        resolved = []
+        for it in payload.validated_data["stops"]:
+            sp = cfg_lookup(ServicePoint, it["service_point_id"], route.company_id)
+            if not sp:
+                return error_response("Lieu introuvable.", status_code=404)
+            resolved.append((sp, it.get("distance_from_origin_km")))
+        with transaction.atomic():
+            route.stops.all().delete()  # hard delete — évite la collision unique (route, sequence)
+            for idx, (sp, dist) in enumerate(resolved, start=1):
+                RouteStop.objects.create(company=route.company, created_by=request.user,
+                                         route=route, service_point=sp, sequence=idx,
+                                         distance_from_origin_km=dist)
+        stops = route.stops.filter(is_deleted=False).select_related("service_point").order_by("sequence")
+        return success_response(S.RouteStopRead(stops, many=True).data)
+
 
 class RouteStopDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]

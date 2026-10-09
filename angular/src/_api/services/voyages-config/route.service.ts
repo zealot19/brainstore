@@ -19,6 +19,9 @@ export class RouteService {
   delete(id: string): Observable<unknown> { return this.http.delete(VOYAGES_CONFIG.route(id)); }
 
   listStops(routeId: string): Observable<RouteStop[]> { return this.http.get<RouteStop[]>(VOYAGES_CONFIG.routeStops(routeId)); }
+  setStops(routeId: string, stops: { service_point_id: string; distance_from_origin_km?: number | null }[]): Observable<RouteStop[]> {
+    return this.http.put<RouteStop[]>(VOYAGES_CONFIG.routeStops(routeId), { stops });
+  }
   addStop(routeId: string, data: Record<string, unknown>): Observable<RouteStop> { return this.http.post<RouteStop>(VOYAGES_CONFIG.routeStops(routeId), data); }
   updateStop(routeId: string, stopId: string, data: Record<string, unknown>): Observable<RouteStop> { return this.http.patch<RouteStop>(VOYAGES_CONFIG.routeStop(routeId, stopId), data); }
   deleteStop(routeId: string, stopId: string): Observable<unknown> { return this.http.delete(VOYAGES_CONFIG.routeStop(routeId, stopId)); }
