@@ -146,6 +146,22 @@ def trip_passengers(trip):
             .order_by("trip_seat__row", "trip_seat__column"))
 
 
+def trip_availability(trip):
+    from django.db.models import Count, Q
+    from apps.voyages_trips.models import TripSeat
+    agg = TripSeat.objects.filter(trip=trip, is_deleted=False).aggregate(
+        total=Count("id"),
+        sold=Count("id", filter=Q(status=TripSeat.Status.SOLD)),
+        reserved=Count("id", filter=Q(status=TripSeat.Status.HELD)),
+        blocked=Count("id", filter=Q(status=TripSeat.Status.BLOCKED)),
+        available=Count("id", filter=Q(status=TripSeat.Status.AVAILABLE)),
+    )
+    mr = trip.max_reservations
+    agg["max_reservations"] = mr
+    agg["reservations_possible"] = None if mr is None else max(0, mr - agg["reserved"])
+    return agg
+
+
 __all__ = ["find_passengers", "bookable_trips", "seat_map", "trip_destinations", "route_destinations",
            "list_bookings", "booking_detail", "loyalty_view", "trip_passengers",
-           "open_return_bookings"]
+           "open_return_bookings", "trip_availability"]

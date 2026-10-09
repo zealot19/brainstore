@@ -99,6 +99,19 @@ class TripSeatMapView(APIView):
         return success_response(S.SeatCellSerializer(selectors.seat_map(trip), many=True).data)
 
 
+class TripAvailabilityView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.view'}
+
+    def get(self, request, trip_id):
+        trip = _trip(request.user.company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        from apps.voyages_booking.services.reservation_services import release_expired_reservations
+        release_expired_reservations(company=request.user.company, trip=trip)
+        return success_response(S.TripAvailabilitySerializer(selectors.trip_availability(trip)).data)
+
+
 class TripDestinationsView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.booking.view'}
