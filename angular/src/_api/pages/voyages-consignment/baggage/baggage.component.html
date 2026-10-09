@@ -91,23 +91,19 @@
     <div class="row">
       <div class="col-md-8 mb-3"><label class="form-label">{{ 'cons.common.f_trip' | transloco }} <span class="text-danger">*</span></label>
         <app-searchable-select formControlName="trip_id" [items]="trips" [labelFn]="tripLabel" valueKey="id" [placeholder]="'cons.baggage.opt_choose_trip' | transloco" (ngModelChange)="onTripChange()"></app-searchable-select></div>
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.baggage.f_passenger' | transloco }}</label>
-        <app-searchable-select formControlName="ticket_id" [items]="ticketOptions" labelKey="label" valueKey="id" [placeholder]="'acct.common.none_m' | transloco"></app-searchable-select></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.baggage.f_passenger' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select formControlName="ticket_id" [items]="ticketOptions" labelKey="label" valueKey="id" [placeholder]="'cons.baggage.opt_choose_passenger' | transloco"></app-searchable-select></div>
     </div>
 
-    @if (!hasTicket) {
-      <h6 class="text-muted">{{ 'cons.baggage.sec_sender' | transloco }}</h6>
-      @if (!isEdit) {
-        <app-client-fields [row]="senderClient"></app-client-fields>
-      } @else {
-        <div class="row g-3 mb-3">
-          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_sender_name' | transloco }}</label><input formControlName="sender_name" class="form-control" /></div>
-          <div class="col-md-4"><label class="form-label">{{ 'admin.common.phone' | transloco }}</label><input formControlName="sender_phone" class="form-control" /></div>
-          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_id_type' | transloco }}</label>
-            <select formControlName="id_type" class="form-select"><option value="cni">{{ 'cons.baggage.idt_cni' | transloco }}</option><option value="passport">{{ 'cons.baggage.idt_passport' | transloco }}</option><option value="driver_license">{{ 'cons.baggage.idt_license' | transloco }}</option><option value="other">{{ 'cons.baggage.idt_other' | transloco }}</option></select></div>
-          <div class="col-md-4"><label class="form-label">{{ 'cons.baggage.f_id_number' | transloco }}</label><input formControlName="id_number" class="form-control" /></div>
-        </div>
-      }
+    @if (selectedOwner) {
+      <div class="row g-2 mb-3">
+        <div class="col-md-5"><label class="form-label">{{ 'cons.baggage.f_owner' | transloco }}</label>
+          <input class="form-control" [value]="selectedOwner.name" disabled /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'admin.common.phone' | transloco }}</label>
+          <input class="form-control" [value]="selectedOwner.phone" disabled /></div>
+        <div class="col-md-3"><label class="form-label">{{ 'cons.baggage.f_id_number' | transloco }}</label>
+          <input class="form-control" [value]="selectedOwner.id_number" disabled /></div>
+      </div>
     }
 
     <h6 class="text-muted">{{ 'cons.baggage.sec_baggage' | transloco }}</h6>

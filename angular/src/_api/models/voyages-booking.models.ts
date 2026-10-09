@@ -22,6 +22,7 @@ export interface TripDestination {
 
 export interface Ticket {
   id: string; number: string; passenger: string; passenger_name: string;
+  passenger_phone: string; passenger_id_number: string;
   trip: string; trip_seat: string; seat_number: string | null;
   origin_point: string | null; origin_point_name: string | null;
   destination_point: string | null; destination_point_name: string | null;
