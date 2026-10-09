@@ -5,8 +5,8 @@
 Ce document regroupe les modifications dictées les 7 et 8 octobre 2026. Les demandes portant sur un même écran ou une même fonctionnalité ont été fusionnées en une seule modification (référence M01, M02…). Chaque modification indique les numéros des dictées d'origine (n° 1 à 42).
 
 > **Suivi d'implémentation (Claude / shimi).** Statut au fil de l'eau.
-> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M10** (sélecteur d'arrêts), **M11** (types de voyage), **M12** (quota réservations + archivage), **M17** (formulaires compacts — paiement), **M18** (disponibilité formulaire de vente), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
-> - ⏳ Restant : M02, M06, M13, M14, M15, M16, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
+> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M10** (sélecteur d'arrêts), **M11** (types de voyage), **M12** (quota réservations + archivage), **M13** (génération de voyages en lot), **M17** (formulaires compacts — paiement), **M18** (disponibilité formulaire de vente), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
+> - ⏳ Restant : M02, M06, M14, M15, M16, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
 > - ⚠️ Conflits à arbitrer avec l'existant : **M06** (suppression Garage/Accidents) défait le travail récent *accidents ↔ voyage* déjà mergé ; **M05** (plans de bus numériques, suppression de l'éditeur visuel) recoupe le travail existant *blockable-seats / seat-assignment / plan-drives-seats*.
 
 ---
@@ -72,7 +72,7 @@ Configuration des types de voyage : **Départ, Complément, Additif**. Un voyage
 - Ajout du **nombre de places réservables** (réserver maintenant, payer plus tard). Les places vendables proviennent du plan de bus ; le quota de réservation ne peut pas les dépasser.
 - Suppression du paramètre délai d'archivage de la configuration des voyages (déjà géré dans l'Administration).
 
-### M13. Génération de voyages en lot — *(dictée 23)*
+### M13. Génération de voyages en lot — *(dictée 23)* — ✅ livré
 Écran de génération de plusieurs voyages en une opération.
 - Paramètres : trajet, charte, catégorie tarifaire, date de début, date de fin.
 - Création d'un voyage pour chaque date de la période.
