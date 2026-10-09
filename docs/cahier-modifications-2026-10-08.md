@@ -5,8 +5,8 @@
 Ce document regroupe les modifications dictées les 7 et 8 octobre 2026. Les demandes portant sur un même écran ou une même fonctionnalité ont été fusionnées en une seule modification (référence M01, M02…). Chaque modification indique les numéros des dictées d'origine (n° 1 à 42).
 
 > **Suivi d'implémentation (Claude / shimi).** Statut au fil de l'eau.
-> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M17** (formulaires compacts — paiement), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
-> - ⏳ Restant : M02, M06, M10, M11, M12, M13, M14, M15, M16, M18, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
+> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M11** (types de voyage), **M17** (formulaires compacts — paiement), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
+> - ⏳ Restant : M02, M06, M10, M12, M13, M14, M15, M16, M18, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
 > - ⚠️ Conflits à arbitrer avec l'existant : **M06** (suppression Garage/Accidents) défait le travail récent *accidents ↔ voyage* déjà mergé ; **M05** (plans de bus numériques, suppression de l'éditeur visuel) recoupe le travail existant *blockable-seats / seat-assignment / plan-drives-seats*.
 
 ---
@@ -65,7 +65,7 @@ Nouveau composant réutilisable pour choisir les points de dépôt entre le dép
 - Un même lieu peut être sélectionné plusieurs fois.
 - Propositions pertinentes uniquement, une fois le départ et la destination choisis.
 
-### M11. Types de voyage — *(dictée 25)*
+### M11. Types de voyage — *(dictée 25)* — ✅ livré
 Configuration des types de voyage : **Départ, Complément, Additif**. Un voyage est de type Départ par défaut ; les autres types sont sélectionnables.
 
 ### M12. Création de voyage : quota de réservations et archivage — *(dictées 19, 22)*
