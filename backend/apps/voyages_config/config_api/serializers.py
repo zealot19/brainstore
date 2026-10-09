@@ -265,6 +265,17 @@ class RouteStopWrite(serializers.Serializer):
     offset_from_departure = serializers.DurationField(required=False, allow_null=True, default=None)
 
 
+class RouteStopItemWrite(serializers.Serializer):
+    service_point_id = serializers.UUIDField()
+    distance_from_origin_km = serializers.DecimalField(max_digits=8, decimal_places=1,
+                                                       required=False, allow_null=True, default=None)
+
+
+class RouteStopsBulkWrite(serializers.Serializer):
+    # M10 : définir en bloc la liste ordonnée des escales (remplacement complet).
+    stops = RouteStopItemWrite(many=True)
+
+
 # ── Route (trajet) ────────────────────────────────────────────────────────────
 class RouteRead(_ScopeMixin):
     origin_name = serializers.CharField(source="origin.name", read_only=True, default=None)
