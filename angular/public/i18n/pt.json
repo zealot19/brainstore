@@ -1041,25 +1041,17 @@
     },
     "plan": {
       "title": "Plantas de autocarro",
-      "subtitle": "Plantas de lugares reutilizáveis",
+      "subtitle": "Planos de autocarro (capacidade por números)",
       "new": "Nova planta",
-      "info": "Desenhe a disposição dos lugares do autocarro. Clique numa célula vazia para adicionar um lugar, clique num lugar para mudar o tipo (Padrão, VIP, Motorista, Pessoal) ou torná-lo não vendável.",
-      "col_grid": "Grelha",
+      "info": "Defina a capacidade do autocarro com números: lugares totais e bloqueados. Vendáveis = total − bloqueados.",
       "col_sellable": "Lugares vendáveis",
       "empty": "Sem plantas.",
       "edit_title": "Editar planta",
       "new_title": "Nova planta de autocarro",
-      "f_rows": "Filas",
-      "f_cols": "Colunas",
-      "leg_standard": "Padrão",
-      "leg_driver": "Motorista",
-      "leg_crew": "Pessoal",
-      "leg_empty": "Corredor / vazio",
-      "seat_label": "Lugar",
-      "f_number": "Número",
-      "f_sellable": "Vendável",
-      "remove_seat": "Remover o lugar",
-      "click_hint": "Clique numa célula para adicionar ou editar um lugar."
+      "col_total": "Total",
+      "col_blocked": "Bloqueados",
+      "f_total": "Lugares totais",
+      "f_blocked": "Lugares bloqueados"
     },
     "tt": {
       "title": "Config. de bilhetes",
@@ -1705,7 +1697,8 @@
       "f_pct_ticket": "Parte bilhetes (%)",
       "f_pct_parcel": "Parte encomendas (%)",
       "f_pct_baggage": "Parte bagagens (%)",
-      "f_code": "Código do veículo"
+      "f_code": "Código do veículo",
+      "f_seating_plan": "Plano de lugares"
     },
     "crew": {
       "title": "Pessoal de bordo",

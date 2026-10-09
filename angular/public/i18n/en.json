@@ -1041,25 +1041,17 @@
     },
     "plan": {
       "title": "Bus layouts",
-      "subtitle": "Reusable seat layouts",
+      "subtitle": "Bus plans (capacity by counts)",
       "new": "New layout",
-      "info": "Draw the bus seat layout. Click an empty cell to add a seat, click a seat to change its type (Standard, VIP, Driver, Crew) or make it non-sellable.",
-      "col_grid": "Grid",
+      "info": "Define the bus capacity with numbers: total seats and blocked seats. Sellable = total − blocked.",
       "col_sellable": "Sellable seats",
       "empty": "No layouts.",
       "edit_title": "Edit layout",
       "new_title": "New bus layout",
-      "f_rows": "Rows",
-      "f_cols": "Columns",
-      "leg_standard": "Standard",
-      "leg_driver": "Driver",
-      "leg_crew": "Crew",
-      "leg_empty": "Aisle / empty",
-      "seat_label": "Seat",
-      "f_number": "Number",
-      "f_sellable": "Sellable",
-      "remove_seat": "Remove seat",
-      "click_hint": "Click a cell to add or edit a seat."
+      "col_total": "Total",
+      "col_blocked": "Blocked",
+      "f_total": "Total seats",
+      "f_blocked": "Blocked seats"
     },
     "tt": {
       "title": "Ticket config",
@@ -1705,7 +1697,8 @@
       "f_pct_ticket": "Ticket share (%)",
       "f_pct_parcel": "Parcel share (%)",
       "f_pct_baggage": "Baggage share (%)",
-      "f_code": "Vehicle code"
+      "f_code": "Vehicle code",
+      "f_seating_plan": "Seating plan"
     },
     "crew": {
       "title": "Onboard crew",

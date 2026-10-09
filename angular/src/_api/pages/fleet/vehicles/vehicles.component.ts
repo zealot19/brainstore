@@ -9,6 +9,8 @@ import { ParkingService } from '../../../services/fleet/parking.service';
 import { VehicleCategoryCfgService } from '../../../services/fleet-config/vehicle-category-cfg.service';
 import { TagService } from '../../../services/fleet-config/tag.service';
 import { PartnerService } from '../../../services/partners/partner.service';
+import { SeatingPlanService } from '../../../services/voyages-config/seating-plan.service';
+import { SeatingPlan } from '../../../models/voyages-config.models';
 import { Partner } from '../../../models/partners.models';
 import { VehicleListItem, FleetVehicleModel, VehicleBrand, VehicleStatus, Parking } from '../../../models/fleet.models';
 import { VehicleCategoryCfg, Tag } from '../../../models/fleet-config.models';
@@ -57,6 +59,7 @@ export class FleetVehiclesComponent implements OnInit {
   tags:       Tag[] = [];
   parkings:   Parking[] = [];
   partners:   Partner[] = [];
+  seatingPlans: SeatingPlan[] = [];
 
   constructor(
     private vehicleService: VehicleService,
@@ -66,6 +69,7 @@ export class FleetVehiclesComponent implements OnInit {
     private categoryService: VehicleCategoryCfgService,
     private tagService: TagService,
     private partnerService: PartnerService,
+    private seatingPlanService: SeatingPlanService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
   ) {}
@@ -78,6 +82,7 @@ export class FleetVehiclesComponent implements OnInit {
       color:         [''],
       year:          [null],
       category_id:   [null],
+      seating_plan_id: [null],
       tag_ids:       [[]],
       registration_date: [null],
       fiscal_horsepower: [null],
@@ -96,6 +101,7 @@ export class FleetVehiclesComponent implements OnInit {
       color:         [''],
       year:          [null],
       category_id:   [null],
+      seating_plan_id: [null],
       tag_ids:       [[]],
       registration_date: [null],
       fiscal_horsepower: [null],
@@ -119,6 +125,7 @@ export class FleetVehiclesComponent implements OnInit {
     this.categoryService.list().subscribe(d => this.categories = d);
     this.tagService.list().subscribe(d => this.tags = d);
     this.parkingService.list().subscribe(d => this.parkings = d);
+    this.seatingPlanService.list().subscribe(d => this.seatingPlans = d);
     this.load();
     // Ouverture directe du formulaire depuis le raccourci "Nouveau véhicule" (sidebar) : ?new=1
     this.route.queryParams.subscribe(q => {
@@ -179,6 +186,7 @@ export class FleetVehiclesComponent implements OnInit {
       color:         v.color || '',
       year:          v.year          ? Number(v.year)          : null,
       category_id:   v.category_id || null,
+      seating_plan_id: v.seating_plan_id || null,
       tag_ids:       v.tag_ids || [],
       registration_date: v.registration_date || null,
       fiscal_horsepower: v.fiscal_horsepower ? Number(v.fiscal_horsepower) : null,
@@ -210,6 +218,7 @@ export class FleetVehiclesComponent implements OnInit {
         color:         d.color,
         year:          d.year,
         category_id:   d.category,
+        seating_plan_id: d.seating_plan,
         tag_ids:       (d.tags || []).map(t => t.id),
         registration_date: d.registration_date,
         fiscal_horsepower: d.fiscal_horsepower,
@@ -235,6 +244,7 @@ export class FleetVehiclesComponent implements OnInit {
       color:         v.color || '',
       year:          v.year ? Number(v.year) : null,
       category_id:   v.category_id || null,
+      seating_plan_id: v.seating_plan_id || null,
       tag_ids:       v.tag_ids || [],
       registration_date: v.registration_date || null,
       fiscal_horsepower: v.fiscal_horsepower ? Number(v.fiscal_horsepower) : null,

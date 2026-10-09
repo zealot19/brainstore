@@ -433,7 +433,6 @@ export const routes={
   vcServicePoints:      '/voyages-config/service-points',
   vcRoutes:             '/voyages-config/routes',
   vcSeatingPlans:       '/voyages-config/seating-plans',
-  vcVehicleAssignments: '/voyages-config/vehicle-assignments',
   vcFareClasses:        '/voyages-config/fare-classes',
   vcTimeSlots:          '/voyages-config/time-slots',
   vcConsignmentNatures: '/voyages-config/consignment-natures',

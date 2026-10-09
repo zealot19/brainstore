@@ -9,14 +9,15 @@
     @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
     @else {
       <div class="table-responsive"><table class="table datanew">
-        <thead class="thead-light"><tr><th>{{ 'vcfg.common.code' | transloco }}</th><th>{{ 'vcfg.common.name' | transloco }}</th><th>{{ 'vcfg.plan.col_grid' | transloco }}</th><th>{{ 'vcfg.plan.col_sellable' | transloco }}</th><th>{{ 'vcfg.common.perimeter' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
+        <thead class="thead-light"><tr><th>{{ 'vcfg.common.code' | transloco }}</th><th>{{ 'vcfg.common.name' | transloco }}</th><th>{{ 'vcfg.plan.col_total' | transloco }}</th><th>{{ 'vcfg.plan.col_blocked' | transloco }}</th><th>{{ 'vcfg.plan.col_sellable' | transloco }}</th><th>{{ 'vcfg.common.perimeter' | transloco }}</th><th class="no-sort">{{ 'shared.common.actions' | transloco }}</th></tr></thead>
         <tbody>
           @for (p of filtered | paginate:pg.page:pg.size; track p.id) {
             <tr>
               <td class="fw-medium">{{ p.code }}</td>
               <td>{{ p.name }}</td>
-              <td>{{ p.rows }} × {{ p.columns }}</td>
-              <td><span class="badge bg-primary">{{ p.total_seats }}</span></td>
+              <td>{{ p.total_seats }}</td>
+              <td>{{ p.blocked_seats }}</td>
+              <td><span class="badge bg-primary">{{ p.sellable_seats }}</span></td>
               <td>@if (p.scope === 'global') { <span class="badge bg-secondary">{{ 'vcfg.common.scope_global' | transloco }}</span> } @else { <span class="badge bg-info">{{ 'vcfg.common.scope_specific' | transloco }}</span> }</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 @if (p.scope !== 'global') {
@@ -25,7 +26,7 @@
                 } @else { <span class="text-muted small">—</span> }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'vcfg.plan.empty' | transloco }}</td></tr> }
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'vcfg.plan.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
         <app-table-paginator [total]="filtered.length" [state]="pg"></app-table-paginator>
@@ -33,66 +34,18 @@
   </div>
 </div>
 
-<div class="modal fade" id="plan-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-xl"><div class="modal-content">
+<div class="modal fade" id="plan-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
   <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'vcfg.plan.edit_title' : 'vcfg.plan.new_title') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.common.code' | transloco }} <span class="text-danger">*</span></label><input [(ngModel)]="code" type="text" class="form-control" placeholder="BUS70" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.common.name' | transloco }} <span class="text-danger">*</span></label><input [(ngModel)]="name" type="text" class="form-control" placeholder="Bus 70 places" /></div>
-      <div class="col-md-2 mb-3"><label class="form-label">{{ 'vcfg.plan.f_rows' | transloco }}</label><input [(ngModel)]="nrows" type="number" min="1" max="40" class="form-control" /></div>
-      <div class="col-md-2 mb-3"><label class="form-label">{{ 'vcfg.plan.f_cols' | transloco }}</label><input [(ngModel)]="ncols" type="number" min="1" max="10" class="form-control" /></div>
+      <div class="col-md-5 mb-3"><label class="form-label">{{ 'vcfg.common.code' | transloco }} <span class="text-danger">*</span></label><input [(ngModel)]="code" type="text" class="form-control" placeholder="BUS70" /></div>
+      <div class="col-md-7 mb-3"><label class="form-label">{{ 'vcfg.common.name' | transloco }} <span class="text-danger">*</span></label><input [(ngModel)]="name" type="text" class="form-control" placeholder="Bus 70 places" /></div>
     </div>
-
     <div class="row">
-      <div class="col-lg-9">
-        <div class="seatmap-legend mb-2">
-          <span class="seat seat-standard">S</span> {{ 'vcfg.plan.leg_standard' | transloco }}
-          <span class="seat seat-vip">V</span> VIP
-          <span class="seat seat-driver">C</span> {{ 'vcfg.plan.leg_driver' | transloco }}
-          <span class="seat seat-crew">P</span> {{ 'vcfg.plan.leg_crew' | transloco }}
-          <span class="seat seat-empty">·</span> {{ 'vcfg.plan.leg_empty' | transloco }}
-          <span class="ms-3 fw-semibold">{{ 'vcfg.plan.col_sellable' | transloco }} : {{ sellableCount }}</span>
-        </div>
-        <div class="seatmap">
-          @for (r of rowsArr; track r) {
-            <div class="seatmap-row">
-              @for (c of colsArr; track c) {
-                <div class="seat"
-                     [class.seat-empty]="!seatAt(r, c)"
-                     [class.seat-standard]="seatAt(r, c)?.seat_type === 'STANDARD'"
-                     [class.seat-vip]="seatAt(r, c)?.seat_type === 'VIP'"
-                     [class.seat-driver]="seatAt(r, c)?.seat_type === 'DRIVER'"
-                     [class.seat-crew]="seatAt(r, c)?.seat_type === 'CREW'"
-                     [class.not-sellable]="seatAt(r, c) && !seatAt(r, c)?.is_sellable"
-                     [class.selected]="selectedKey === key(r, c)"
-                     (click)="cellClick(r, c)">
-                  {{ seatAt(r, c)?.seat_number || '' }}
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-      <div class="col-lg-3">
-        @if (selectedSeat) {
-          <div class="border rounded p-3">
-            <h6 class="fw-semibold">{{ 'vcfg.plan.seat_label' | transloco }} {{ selectedSeat.seat_number }}</h6>
-            <label class="form-label small mt-2">{{ 'vcfg.plan.f_number' | transloco }}</label>
-            <input [(ngModel)]="selectedSeat.seat_number" type="text" class="form-control form-control-sm mb-2" />
-            <label class="form-label small">{{ 'vcfg.common.type' | transloco }}</label>
-            <div class="btn-group-vertical w-100 mb-2">
-              @for (t of seatTypes; track t.value) {
-                <button type="button" class="btn btn-sm" [class.btn-primary]="selectedSeat.seat_type === t.value" [class.btn-outline-secondary]="selectedSeat.seat_type !== t.value" (click)="setType(t.value)">{{ t.label }}</button>
-              }
-            </div>
-            <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="seat-sell" [checked]="selectedSeat.is_sellable" (change)="toggleSellable()" /><label class="form-check-label" for="seat-sell">{{ 'vcfg.plan.f_sellable' | transloco }}</label></div>
-            <button type="button" class="btn btn-sm btn-outline-danger w-100" (click)="removeSelected()"><i class="ti ti-trash me-1"></i>{{ 'vcfg.plan.remove_seat' | transloco }}</button>
-          </div>
-        } @else {
-          <p class="text-muted small">{{ 'vcfg.plan.click_hint' | transloco }}</p>
-        }
-      </div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.plan.f_total' | transloco }}</label><input [(ngModel)]="totalSeats" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.plan.f_blocked' | transloco }}</label><input [(ngModel)]="blockedSeats" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.plan.col_sellable' | transloco }}</label><input [value]="sellableSeats" type="number" class="form-control" disabled /></div>
     </div>
   </div>
   <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()" [disabled]="saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div>

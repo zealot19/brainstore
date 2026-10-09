@@ -1041,25 +1041,17 @@
     },
     "plan": {
       "title": "Planos de autobús",
-      "subtitle": "Planos de asientos reutilizables",
+      "subtitle": "Planes de autobús (capacidad por números)",
       "new": "Nuevo plano",
-      "info": "Dibuje la disposición de los asientos del autobús. Haga clic en una celda vacía para añadir un asiento, haga clic en un asiento para cambiar su tipo (Estándar, VIP, Chófer, Personal) o hacerlo no vendible.",
-      "col_grid": "Cuadrícula",
+      "info": "Defina la capacidad del autobús con números: plazas totales y bloqueadas. Vendibles = total − bloqueadas.",
       "col_sellable": "Asientos vendibles",
       "empty": "Sin planos.",
       "edit_title": "Editar plano",
       "new_title": "Nuevo plano de autobús",
-      "f_rows": "Filas",
-      "f_cols": "Columnas",
-      "leg_standard": "Estándar",
-      "leg_driver": "Chófer",
-      "leg_crew": "Personal",
-      "leg_empty": "Pasillo / vacío",
-      "seat_label": "Asiento",
-      "f_number": "Número",
-      "f_sellable": "Vendible",
-      "remove_seat": "Quitar el asiento",
-      "click_hint": "Haga clic en una celda para añadir o editar un asiento."
+      "col_total": "Total",
+      "col_blocked": "Bloqueadas",
+      "f_total": "Plazas totales",
+      "f_blocked": "Plazas bloqueadas"
     },
     "tt": {
       "title": "Config. de billetes",
@@ -1705,7 +1697,8 @@
       "f_pct_ticket": "Parte billetes (%)",
       "f_pct_parcel": "Parte paquetes (%)",
       "f_pct_baggage": "Parte equipaje (%)",
-      "f_code": "Código de vehículo"
+      "f_code": "Código de vehículo",
+      "f_seating_plan": "Plan de asientos"
     },
     "crew": {
       "title": "Personal de a bordo",
