@@ -43,6 +43,10 @@ class Vehicle(BaseModel):
     vin           = models.CharField(_("numéro de châssis (VIN)"), max_length=50, blank=True)
     color         = models.CharField(_("couleur"), max_length=50, blank=True)
     year          = models.PositiveSmallIntegerField(_("année"), null=True, blank=True)
+    # M05 : le plan de bus est choisi directement sur le véhicule (plus d'affectation séparée).
+    seating_plan  = models.ForeignKey("voyages_config.SeatingPlan", verbose_name=_("plan de bus"),
+                                      on_delete=models.PROTECT, null=True, blank=True,
+                                      related_name="vehicles")
 
     # ── Acquisition ────────────────────────────────────────────────────────────
     acquisition_date = models.DateField(_("date d'acquisition"), null=True, blank=True)

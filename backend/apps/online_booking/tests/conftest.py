@@ -14,7 +14,7 @@ def booking_world(db):
     from apps.system_config.services import create_company
     from apps.authentication.models import User
     from apps.voyages_config.models import (
-        Town, ServicePoint, FareClass, Route, SeatingPlan, PlanSeat,
+        Town, ServicePoint, FareClass, Route, SeatingPlan,
     )
     from apps.voyages_trips.models import Trip, TripSeat
     from apps.voyages_trips.services.assignment import materialise_seats
@@ -34,10 +34,7 @@ def booking_world(db):
     fc = FareClass.objects.create(company=company, code="STD", name="Standard")
 
     plan = SeatingPlan.objects.create(company=company, code="P1", name="Bus 30",
-                                      rows=1, columns=2, total_seats=2)
-    for i in range(2):
-        PlanSeat.objects.create(company=company, plan=plan, seat_number=f"{i + 1}",
-                                row=1, column=i + 1, seat_type="standard", is_sellable=True)
+                                      total_seats=2, blocked_seats=0)
 
     dep = timezone.now() + timedelta(days=1)
     trip = Trip.objects.create(company=company, route=route, fare_class=fc,

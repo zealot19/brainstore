@@ -1,12 +1,12 @@
-from apps.voyages_config.models import PlanSeat
 from apps.voyages_trips.models import Trip, TripSeat
 from apps.voyages_trips.selectors.eligibility import eligible_vehicles, active_seating_plan
 
 
 def _plan_capacity(plan):
+    """Places vendables du plan (M05 : total − bloquées)."""
     if plan is None:
         return 0
-    return PlanSeat.objects.filter(plan=plan, is_deleted=False, is_sellable=True).count()
+    return plan.sellable_seats
 
 
 def transbord_options(company, trip):

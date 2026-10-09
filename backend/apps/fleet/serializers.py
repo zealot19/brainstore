@@ -178,6 +178,7 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True, default=None)
     parking_name = serializers.CharField(source="parking.name", read_only=True, default=None)
     owner_partner_name = serializers.CharField(source="owner_partner.name", read_only=True, default=None)
+    seating_plan_code = serializers.CharField(source="seating_plan.code", read_only=True, default=None)
     tags = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
@@ -186,6 +187,7 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id", "code", "license_plate", "vin", "color", "year",
             "model_detail", "agency_name",
+            "seating_plan", "seating_plan_code",
             "category", "category_name", "parking", "parking_name", "tags",
             "registration_date", "fiscal_horsepower", "catalog_value",
             "purchase_value", "residual_value",
@@ -221,6 +223,7 @@ class VehicleCreateSerializer(serializers.Serializer):
     initial_odometer = serializers.DecimalField(max_digits=10, decimal_places=1, required=False, default=0)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
     category_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    seating_plan_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     tag_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     registration_date = serializers.DateField(required=False, allow_null=True, default=None)
     fiscal_horsepower = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, allow_null=True, default=None)
@@ -246,6 +249,7 @@ class VehicleUpdateSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, allow_blank=True)
     is_active = serializers.BooleanField(required=False)
     category_id = serializers.UUIDField(required=False, allow_null=True)
+    seating_plan_id = serializers.UUIDField(required=False, allow_null=True)
     tag_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     registration_date = serializers.DateField(required=False, allow_null=True)
     fiscal_horsepower = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, allow_null=True)

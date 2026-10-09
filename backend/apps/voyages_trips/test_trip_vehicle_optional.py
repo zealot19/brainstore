@@ -5,7 +5,7 @@ from django.utils import timezone
 
 def _setup():
     from apps.system_config.services import create_company
-    from apps.voyages_config.models import Town, ServicePoint, FareClass, Route, SeatingPlan, PlanSeat
+    from apps.voyages_config.models import Town, ServicePoint, FareClass, Route, SeatingPlan
     from apps.authentication.models import User
     company, _ = create_company(name="TwCo", admin_email="tw@x.com", admin_first_name="A", admin_last_name="B")
     admin = User.objects.get(email="tw@x.com")
@@ -14,10 +14,7 @@ def _setup():
     b = ServicePoint.objects.create(company=company, town=town, code="B", name="B")
     route = Route.objects.create(company=company, code="A-B", origin=a, destination=b)
     fc = FareClass.objects.create(company=company, code="ECO", name="Éco")
-    plan = SeatingPlan.objects.create(company=company, code="BUS09", name="Bus 9", rows=1, columns=9, total_seats=9)
-    for i in range(9):
-        PlanSeat.objects.create(company=company, plan=plan, seat_number=f"S{i+1}", row=1, column=i + 1,
-                                seat_type="standard", is_sellable=True)
+    plan = SeatingPlan.objects.create(company=company, code="BUS09", name="Bus 9", total_seats=9, blocked_seats=0)
     return company, admin, route, fc, plan
 
 
@@ -58,7 +55,6 @@ def test_assign_vehicle_later_keeps_existing_seats():
     from apps.voyages_trips.services.assignment import assign_vehicle
     from apps.voyages_trips.models import TripSeat
     from apps.fleet.models import Vehicle, VehicleBrand, VehicleModel
-    from apps.voyages_config.models import VehicleSeatingAssignment
     company, admin, route, fc, plan = _setup()
     trip = _mk(company, admin, route, fc, plan=plan)
     # Sell one seat
@@ -66,10 +62,9 @@ def test_assign_vehicle_later_keeps_existing_seats():
     seat.status = TripSeat.Status.SOLD; seat.save(update_fields=["status"])
     brand = VehicleBrand.objects.create(name="Toyota")
     model = VehicleModel.objects.create(brand=brand, name="Coaster")
-    veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-733-LB",
-                                 status=Vehicle.Status.AVAILABLE, is_active=True, created_by=admin)
-    VehicleSeatingAssignment.objects.create(company=company, vehicle=veh, seating_plan=plan,
-                                            is_active=True)
+    veh = Vehicle.objects.create(company=company, model=model, license_plate="LT-733-LB", code="LT-733-LB",
+                                 status=Vehicle.Status.AVAILABLE, is_active=True, seating_plan=plan,
+                                 created_by=admin)
     assign_vehicle(trip, veh, user=admin)
     trip.refresh_from_db()
     assert trip.vehicle_id == veh.id

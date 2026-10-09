@@ -3,7 +3,7 @@ from apps.voyages_config.models import (
     Town, ServicePoint, FareClass, TimeSlot,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
     Route, RouteStop,
-    SeatingPlan, PlanSeat, VehicleSeatingAssignment,
+    SeatingPlan,
     ServicePattern, VoyagesSettings, CrewMemberType, ExpenseType,
     ExpenseSchedule, ExpenseScheduleLine,
 )
@@ -274,59 +274,28 @@ class RouteWrite(serializers.Serializer):
     is_active = serializers.BooleanField(required=False, default=True)
 
 
-# ── SeatingPlan + seats ───────────────────────────────────────────────────────
-class PlanSeatRead(serializers.ModelSerializer):
-    class Meta:
-        model = PlanSeat
-        fields = ["id", "seat_number", "row", "column", "seat_type", "is_sellable"]
-
-
+# ── SeatingPlan (numérique, M05) ──────────────────────────────────────────────
 class SeatingPlanRead(_ScopeMixin):
-    seats = PlanSeatRead(many=True, read_only=True)
+    sellable_seats = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = SeatingPlan
-        fields = ["id", "code", "name", "rows", "columns", "total_seats", "seats",
+        fields = ["id", "code", "name", "total_seats", "blocked_seats", "sellable_seats",
                   "company", "scope", "is_active", "created_at", "updated_at"]
 
 
 class SeatingPlanWrite(serializers.Serializer):
     code = serializers.CharField(max_length=30)
     name = serializers.CharField(max_length=150)
-    rows = serializers.IntegerField(required=False, default=0, min_value=0)
-    columns = serializers.IntegerField(required=False, default=0, min_value=0)
+    total_seats = serializers.IntegerField(required=False, default=0, min_value=0)
+    blocked_seats = serializers.IntegerField(required=False, default=0, min_value=0)
     is_active = serializers.BooleanField(required=False, default=True)
 
-
-class PlanSeatWrite(serializers.Serializer):
-    seat_number = serializers.CharField(max_length=10)
-    row = serializers.IntegerField(min_value=1)
-    column = serializers.IntegerField(min_value=1)
-    seat_type = serializers.ChoiceField(choices=PlanSeat.SeatType.choices, required=False,
-                                        default=PlanSeat.SeatType.STANDARD)
-    is_sellable = serializers.BooleanField(required=False, default=True)
-
-
-class SeatBulkWrite(serializers.Serializer):
-    seats = PlanSeatWrite(many=True)
-
-
-# ── VehicleSeatingAssignment ──────────────────────────────────────────────────
-class VehicleSeatingAssignmentRead(_ScopeMixin):
-    vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True, default=None)
-    seating_plan_code = serializers.CharField(source="seating_plan.code", read_only=True, default=None)
-
-    class Meta:
-        model = VehicleSeatingAssignment
-        fields = ["id", "vehicle", "vehicle_plate", "seating_plan", "seating_plan_code",
-                  "company", "scope", "is_active",
-                  "created_at", "updated_at"]
-
-
-class VehicleSeatingAssignmentWrite(serializers.Serializer):
-    vehicle_id = serializers.UUIDField()
-    seating_plan_id = serializers.UUIDField()
-    is_active = serializers.BooleanField(required=False, default=True)
+    def validate(self, data):
+        if (data.get("blocked_seats") or 0) > (data.get("total_seats") or 0):
+            raise serializers.ValidationError(
+                {"blocked_seats": "Les places bloquées ne peuvent pas dépasser le total."})
+        return data
 
 
 # ── ServicePattern (planification) ────────────────────────────────────────────

@@ -23,8 +23,8 @@ from apps.fleet.models import (
 )
 from apps.fleet.models.config.reference import VehicleCategoryCfg
 from apps.voyages_config.models import (
-    Town, ServicePoint, Route, RouteStop, SeatingPlan, PlanSeat,
-    VehicleSeatingAssignment, FareClass, TimeSlot, LoyaltyRule, VoyagesSettings,
+    Town, ServicePoint, Route, RouteStop, SeatingPlan,
+    FareClass, TimeSlot, LoyaltyRule, VoyagesSettings,
 )
 from apps.voyages_pricing.models import Fare
 from apps.voyages_trips.models import Trip, TripCrew
@@ -124,26 +124,16 @@ class Command(BaseCommand):
             route=route_out, sequence=1,
             defaults={"company": company, "service_point": esc_bfs, "distance_from_origin_km": 120})
 
-        # ── 4b. Seating plan + seats ──────────────────────────────────────────
+        # ── 4b. Seating plan (numérique, M05) ─────────────────────────────────
         plan, created = SeatingPlan.objects.get_or_create(
             company=company, code="COASTER-30",
-            defaults={"name": "Coaster 30 places", "rows": 8, "columns": 4, "total_seats": 30})
-        if created or not plan.seats.exists():
-            plan.seats.all().delete()
-            n = 0
-            for row in range(1, 9):
-                for col in range(1, 5):
-                    if n >= 30:
-                        break
-                    n += 1
-                    PlanSeat.objects.create(
-                        company=company, plan=plan, seat_number=f"{row}{_COLS[col - 1]}",
-                        row=row, column=col, seat_type=PlanSeat.SeatType.STANDARD, is_sellable=True)
+            defaults={"name": "Coaster 30 places", "total_seats": 30, "blocked_seats": 0})
 
-        # Assign the plan to both vehicles
+        # Plan choisi directement sur chaque véhicule
         for v in vehicles:
-            VehicleSeatingAssignment.objects.get_or_create(
-                company=company, vehicle=v, seating_plan=plan)
+            if v.seating_plan_id != plan.id:
+                v.seating_plan = plan
+                v.save(update_fields=["seating_plan"])
 
         # ── 4c. Commercial config ─────────────────────────────────────────────
         fc_std, _ = FareClass.objects.get_or_create(company=company, code="STD",

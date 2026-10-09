@@ -329,6 +329,9 @@ class VehicleListView(APIView):
             return error_response(_("Modèle de véhicule introuvable."), status_code=404)
         company_id = str(company.id)
         category = _cfg(VehicleCategoryCfg, d.get("category_id"), company_id)
+        from apps.voyages_config.models import SeatingPlan
+        if d.get("seating_plan_id") and not _cfg(SeatingPlan, d["seating_plan_id"], company_id):
+            return error_response(_("Plan de bus introuvable."), status_code=404)
         owner_partner_id = d.get("owner_partner_id")
         if owner_partner_id:
             from apps.partners.models import Partner
@@ -345,6 +348,7 @@ class VehicleListView(APIView):
                 external_driver_id=d["external_driver_id"],
                 tank_capacity_liters=d["tank_capacity_liters"],
                 category=category, tag_ids=d.get("tag_ids"),
+                seating_plan_id=d.get("seating_plan_id"),
                 registration_date=d.get("registration_date"),
                 fiscal_horsepower=d.get("fiscal_horsepower"),
                 catalog_value=d.get("catalog_value"),
@@ -389,6 +393,10 @@ class VehicleDetailView(APIView):
             return error_response(_("Catégorie introuvable."), status_code=404)
         if d.get("parking_id") and not selectors.get_parking(d["parking_id"], company_id):
             return error_response(_("Parking introuvable."), status_code=404)
+        if d.get("seating_plan_id"):
+            from apps.voyages_config.models import SeatingPlan
+            if not _cfg(SeatingPlan, d["seating_plan_id"], company_id):
+                return error_response(_("Plan de bus introuvable."), status_code=404)
         if d.get("owner_partner_id"):
             from apps.partners.models import Partner
             if not Partner.objects.filter(company_id=company_id, id=d["owner_partner_id"], is_deleted=False).exists():

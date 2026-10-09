@@ -5,7 +5,7 @@ from django.utils import timezone
 
 def _setup():
     from apps.system_config.services import create_company
-    from apps.voyages_config.models import (Town, ServicePoint, FareClass, Route, SeatingPlan, PlanSeat,
+    from apps.voyages_config.models import (Town, ServicePoint, FareClass, Route, SeatingPlan,
                                             CrewMemberType)
     from apps.voyages_trips.models import CrewMember
     from apps.authentication.models import User
@@ -16,10 +16,7 @@ def _setup():
     b = ServicePoint.objects.create(company=company, town=town, code="B", name="B")
     route = Route.objects.create(company=company, code="A-B", origin=a, destination=b)
     fc = FareClass.objects.create(company=company, code="ECO", name="Éco")
-    plan = SeatingPlan.objects.create(company=company, code="BUS09", name="Bus 9", rows=1, columns=9, total_seats=9)
-    for i in range(9):
-        PlanSeat.objects.create(company=company, plan=plan, seat_number=f"S{i+1}", row=1, column=i + 1,
-                                seat_type="standard", is_sellable=True)
+    plan = SeatingPlan.objects.create(company=company, code="BUS09", name="Bus 9", total_seats=9, blocked_seats=0)
     mt = CrewMemberType.objects.get(company=company, code="DRIVER")
     member = CrewMember.objects.create(company=company, name="Chauffeur A", member_type=mt, created_by=admin)
     return company, admin, route, fc, plan, member
