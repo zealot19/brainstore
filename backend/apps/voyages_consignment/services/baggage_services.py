@@ -32,13 +32,19 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
     s'il est absent, l'expéditeur est identifié par les champs d'identité."""
     if trip is None:
         raise ApplicationError(_("Sélectionnez le voyage du bagage."))
-    if ticket is not None:
-        if ticket.status == "cancelled":
-            raise ApplicationError(_("Impossible d'ajouter un bagage à un billet annulé."))
-        if ticket.trip_id != trip.id:
-            raise ApplicationError(_("Le billet choisi n'appartient pas à ce voyage."))
-    elif not sender_name:
-        raise ApplicationError(_("Indiquez le passager (billet) ou le nom de l'expéditeur."))
+    if ticket is None:
+        raise ApplicationError(_("Le passager (billet) est obligatoire."))
+    if ticket.status == "cancelled":
+        raise ApplicationError(_("Impossible d'ajouter un bagage à un billet annulé."))
+    if ticket.trip_id != trip.id:
+        raise ApplicationError(_("Le billet choisi n'appartient pas à ce voyage."))
+    # M23 : le propriétaire est le passager du billet (snapshot) — plus de saisie manuelle.
+    pax = ticket.passenger
+    sender_name = pax.full_name
+    sender_phone = pax.phone or ""
+    id_type = pax.id_type or ""
+    id_number = pax.id_number or ""
+    civility = getattr(pax, "civility", "") or ""
     if consignment_type and consignment_type.max_weight_kg and weight_kg and weight_kg > consignment_type.max_weight_kg:
         raise ApplicationError(_("Poids supérieur au maximum autorisé pour ce type."))
     allowance = _free_allowance(company)
@@ -51,12 +57,7 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
     if received < due:
         raise ApplicationError(
             _("Montant encaissé insuffisant : %(r)s < %(d)s.") % {"r": received, "d": due})
-    sender_client = None
-    if sender_name and ticket is None:
-        from apps.voyages_booking.services.passenger_services import get_or_create_passenger
-        sender_client = get_or_create_passenger(
-            company, id_type=id_type, id_number=id_number, phone=sender_phone,
-            name=sender_name, civility=civility, user=user)
+    sender_client = pax
     baggage = Baggage.objects.create(
         company=company, tag_number=_tag_number(), trip=trip, ticket=ticket,
         sender_name=sender_name, sender_phone=sender_phone, civility=civility,
