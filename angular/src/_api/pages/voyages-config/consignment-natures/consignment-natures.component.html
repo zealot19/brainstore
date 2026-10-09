@@ -53,9 +53,6 @@
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.common.code' | transloco }} <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" /></div>
       <div class="col-md-8 mb-3"><label class="form-label">{{ 'vcfg.common.name' | transloco }} <span class="text-danger">*</span></label><input formControlName="name" type="text" class="form-control" /></div>
     </div>
-    <div class="form-check form-switch mb-2"><input formControlName="is_fragile" type="checkbox" class="form-check-input" id="vc-frag" /><label class="form-check-label" for="vc-frag">{{ 'vcfg.cn.col_fragile' | transloco }}</label></div>
-    <div class="form-check form-switch mb-2"><input formControlName="requires_declaration" type="checkbox" class="form-check-input" id="vc-decl" /><label class="form-check-label" for="vc-decl">{{ 'vcfg.cn.f_declaration' | transloco }}</label></div>
-    <div class="form-check form-switch mb-2"><input formControlName="is_prohibited" type="checkbox" class="form-check-input" id="vc-proh" /><label class="form-check-label" for="vc-proh">{{ 'vcfg.cn.col_prohibited' | transloco }}</label></div>
     <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="vc-active" /><label class="form-check-label" for="vc-active">{{ 'vcfg.common.active' | transloco }}</label></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

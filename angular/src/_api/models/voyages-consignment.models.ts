@@ -11,7 +11,8 @@ export interface Parcel {
   trip_departure?: string | null; trip_vehicle_plate?: string | null;
   sender_name: string; sender_phone: string;
   recipient_name: string; recipient_phone: string; recipient_address: string; recipient_id_number: string;
-  consignment_type: string; consignment_type_label: string | null; description: string;
+  consignment_type: string; consignment_type_label: string | null;
+  nature: string | null; nature_name: string | null; content: string; description: string;
   weight_kg: string | null; quantity: number;
   received_pieces: number; missing_pieces: number; damaged_pieces: number;
   declared_value: string | null;

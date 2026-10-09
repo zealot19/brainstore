@@ -5,11 +5,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
+import { ConsignmentNatureService } from '../../../services/voyages-config/consignment-nature.service';
 import { TripService } from '../../../services/voyages/trip.service';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Parcel } from '../../../models/voyages-consignment.models';
 import { PassengerSpec } from '../../../models/voyages-booking.models';
-import { ServicePoint, ConsignmentType } from '../../../models/voyages-config.models';
+import { ServicePoint, ConsignmentType, ConsignmentNature } from '../../../models/voyages-config.models';
 import { ClientFieldsComponent } from '../../voyages-booking/shared/client-fields/client-fields.component';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
@@ -35,6 +36,7 @@ export class VcgParcelsComponent implements OnInit {
   dateField = 'created'; dateFrom = ''; dateTo = '';
   trips: { id: string; number?: string; code?: string }[] = [];
   points: ServicePoint[] = []; types: ConsignmentType[] = []; typeOptions: any[] = [];
+  natures: ConsignmentNature[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
   detail: Parcel | null = null;
   pickupTarget: Parcel | null = null;
@@ -45,7 +47,8 @@ export class VcgParcelsComponent implements OnInit {
 
   paymentMethods: any[] = [];
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
-              private ctSvc: ConsignmentTypeService, private tripSvc: TripService,
+              private ctSvc: ConsignmentTypeService, private cnSvc: ConsignmentNatureService,
+              private tripSvc: TripService,
               private fb: FormBuilder, private route: ActivatedRoute,
               private pmSvc: PaymentMethodService) {}
 
@@ -55,10 +58,12 @@ export class VcgParcelsComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
+      nature_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
       sender_name: [null], sender_phone: [null],   // create: driven by the shared client fieldset (senderClient)
       recipient_name: [''], recipient_phone: [''],
-      recipient_id_number: [''], description: [''], weight_kg: [null], quantity: [1],
+      recipient_id_number: [''], description: ['', Validators.required], content: ['', Validators.required],
+      weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
       payment_method: [''],
     });
@@ -67,6 +72,7 @@ export class VcgParcelsComponent implements OnInit {
       this.types = d;
       this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
     });
+    this.cnSvc.list().subscribe(d => this.natures = d.filter(n => n.is_active));
     this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
@@ -109,18 +115,31 @@ export class VcgParcelsComponent implements OnInit {
              picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   get isEdit(): boolean { return this.editId != null; }
+  /** Types filtrés par la nature choisie (M24 : la nature filtre les types). */
+  get filteredTypeOptions(): any[] {
+    const n = this.form?.value?.nature_id;
+    return n ? this.typeOptions.filter(t => t.nature === n) : this.typeOptions;
+  }
+  /** Au changement de nature, invalider le type s'il n'appartient pas à la nature. */
+  onNatureChange(): void {
+    const t = this.form.value.consignment_type_id;
+    if (t && !this.filteredTypeOptions.some(o => o.id === t)) {
+      this.form.patchValue({ consignment_type_id: null });
+    }
+  }
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
   openEdit(p: Parcel): void {
     this.editId = p.id; this.errorMsg = '';
     this.form.reset({
-      origin_point_id: p.origin_point, destination_point_id: p.destination_point, consignment_type_id: p.consignment_type,
+      origin_point_id: p.origin_point, destination_point_id: p.destination_point,
+      nature_id: p.nature, consignment_type_id: p.consignment_type,
       sender_name: p.sender_name, sender_phone: p.sender_phone, recipient_name: p.recipient_name,
       recipient_phone: p.recipient_phone, recipient_id_number: p.recipient_id_number,
-      description: p.description, weight_kg: p.weight_kg, quantity: p.quantity, declared_value: p.declared_value,
+      description: p.description, content: p.content, weight_kg: p.weight_kg, quantity: p.quantity, declared_value: p.declared_value,
       amount_due: p.amount_due, payment_method: p.payment_method,
     });
-    // Le trajet, le type et l'encaissement ne se modifient pas ici (repricing = action dédiée)
-    ['origin_point_id', 'destination_point_id', 'consignment_type_id', 'amount_due', 'payment_method']
+    // Le trajet, la nature, le type et l'encaissement ne se modifient pas ici (repricing = action dédiée)
+    ['origin_point_id', 'destination_point_id', 'nature_id', 'consignment_type_id', 'amount_due', 'payment_method']
       .forEach(k => this.form.get(k)?.disable());
   }
   submit(): void {

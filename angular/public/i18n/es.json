@@ -2164,7 +2164,9 @@
       "f_mandataire_id": "DNI del apoderado",
       "f_contenance": "Contenido",
       "sec_sender": "Cliente — remitente",
-      "sec_recipient": "Destinatario"
+      "sec_recipient": "Destinatario",
+      "f_nature": "Naturaleza",
+      "f_content": "Contenido"
     },
     "expedition": {
       "title": "Expedición",

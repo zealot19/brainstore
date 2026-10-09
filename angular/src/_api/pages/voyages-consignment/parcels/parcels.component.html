@@ -125,13 +125,23 @@
     </div>
     <h6 class="text-muted">{{ 'cons.parcels.sec_content' | transloco }}</h6>
     <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_type' | transloco }} <span class="text-danger">*</span></label>
-        <app-searchable-select formControlName="consignment_type_id" [items]="typeOptions" labelKey="label_nature" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_weight' | transloco }}</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
-      <div class="col-md-2 mb-3"><label class="form-label">{{ 'cons.parcels.f_qty' | transloco }}</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_declared' | transloco }}</label><input formControlName="declared_value" type="number" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_nature' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="nature_id" class="form-select" (change)="onNatureChange()">
+          <option [ngValue]="null" disabled>{{ 'cons.common.opt_choose' | transloco }}</option>
+          @for (n of natures; track n.id) { <option [ngValue]="n.id">{{ n.name }}</option> }
+        </select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_type' | transloco }} <span class="text-danger">*</span></label>
+        <app-searchable-select formControlName="consignment_type_id" [items]="filteredTypeOptions" labelKey="label_nature" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>
-    <div class="mb-3"><label class="form-label">{{ 'cons.parcels.f_contenance' | transloco }}</label><input formControlName="description" class="form-control" /></div>
+    <div class="row">
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.common.f_weight' | transloco }}</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_qty' | transloco }}</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_declared' | transloco }}</label><input formControlName="declared_value" type="number" class="form-control" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_contenance' | transloco }} <span class="text-danger">*</span></label><input formControlName="description" class="form-control" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_content' | transloco }} <span class="text-danger">*</span></label><input formControlName="content" class="form-control" /></div>
+    </div>
     <h6 class="text-muted">{{ 'cons.common.sec_payment' | transloco }}</h6>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>

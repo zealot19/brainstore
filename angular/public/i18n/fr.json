@@ -2164,7 +2164,9 @@
       "f_mandataire_id": "CNI du mandataire",
       "f_contenance": "Contenance",
       "sec_sender": "Client — expéditeur",
-      "sec_recipient": "Destinataire"
+      "sec_recipient": "Destinataire",
+      "f_nature": "Nature",
+      "f_content": "Contenu"
     },
     "expedition": {
       "title": "Expédition",

@@ -2164,7 +2164,9 @@
       "f_mandataire_id": "CNI do procurador",
       "f_contenance": "Conteúdo",
       "sec_sender": "Cliente — remetente",
-      "sec_recipient": "Destinatário"
+      "sec_recipient": "Destinatário",
+      "f_nature": "Natureza",
+      "f_content": "Conteúdo"
     },
     "expedition": {
       "title": "Expedição",
