@@ -93,9 +93,12 @@ class TripListCreateView(APIView):
         service_pattern = _cfg(ServicePattern, d.get("service_pattern_id"), company)
         origin = _cfg(ServicePoint, d.get("origin_id"), company)
         destination = _cfg(ServicePoint, d.get("destination_id"), company)
-        from apps.voyages_config.models import SeatingPlan
+        from apps.voyages_config.models import SeatingPlan, VoyageType
         from apps.fleet.models import Vehicle
         seating_plan = _cfg(SeatingPlan, d.get("seating_plan_id"), company) if d.get("seating_plan_id") else None
+        voyage_type = _cfg(VoyageType, d.get("voyage_type_id"), company) if d.get("voyage_type_id") else None
+        if d.get("voyage_type_id") and not voyage_type:
+            return error_response("Type de voyage introuvable.", status_code=404)
         vehicle = (Vehicle.objects.filter(id=d["vehicle_id"], company=company, is_deleted=False).first()
                    if d.get("vehicle_id") else None)
         try:
@@ -107,7 +110,7 @@ class TripListCreateView(APIView):
                 seat_assignment_mode=d["seat_assignment_mode"],
                 auto_expenses=d["auto_expenses"], seating_plan=seating_plan, vehicle=vehicle,
                 max_reservations=d["max_reservations"], blocked_seats_count=d["blocked_seats_count"],
-                crew_member_ids=d["crew_member_ids"], user=request.user,
+                crew_member_ids=d["crew_member_ids"], voyage_type=voyage_type, user=request.user,
             )
         except ApplicationError as e:
             return error_response(str(e))
@@ -141,7 +144,15 @@ class TripDetailView(APIView):
             return error_response("Seul un brouillon peut être modifié.")
         payload = S.TripUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
-        for k, v in payload.validated_data.items():
+        data = dict(payload.validated_data)
+        if "voyage_type_id" in data:
+            from apps.voyages_config.models import VoyageType
+            vtid = data.pop("voyage_type_id")
+            voyage_type = _cfg(VoyageType, vtid, trip.company) if vtid else None
+            if vtid and not voyage_type:
+                return error_response("Type de voyage introuvable.", status_code=404)
+            trip.voyage_type = voyage_type
+        for k, v in data.items():
             setattr(trip, k, v)
         trip.updated_by = request.user
         trip.save()

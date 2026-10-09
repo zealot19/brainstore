@@ -44,6 +44,8 @@ describe('SidebarService', () => {
       expect(vals.slice(0, 3)).toEqual(['Villes', 'Lieux', 'Trajets']);
       expect(grp.subMenus.find((s: any) => s.menuValue === 'Marques de véhicules').module).toBe('fleet');
       expect(grp.subMenus.find((s: any) => s.menuValue === 'Types de voyage').module).toBe('voyage');
+      // M11 : une seule entrée « Types de voyage » (pas de placeholder « coming soon » en double).
+      expect(vals.filter((v: string) => v === 'Types de voyage').length).toBe(1);
     });
 
     it('les modules opérationnels ne portent plus de groupe de configuration', () => {

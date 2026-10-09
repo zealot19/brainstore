@@ -5,7 +5,7 @@ from apps.voyages_config.models import (
     Route, RouteStop,
     SeatingPlan,
     ServicePattern, VoyagesSettings, CrewMemberType, ExpenseType,
-    ExpenseSchedule, ExpenseScheduleLine,
+    ExpenseSchedule, ExpenseScheduleLine, VoyageType,
 )
 
 
@@ -36,6 +36,20 @@ class CrewMemberTypeWrite(serializers.Serializer):
     name      = serializers.CharField(max_length=100)
     is_driver = serializers.BooleanField(required=False, default=False)
     is_active = serializers.BooleanField(required=False, default=True)
+
+
+class VoyageTypeRead(_ScopeMixin):
+    class Meta:
+        model = VoyageType
+        fields = ["id", "code", "name", "is_default", "company", "scope",
+                  "is_active", "created_at", "updated_at"]
+
+
+class VoyageTypeWrite(serializers.Serializer):
+    code       = serializers.CharField(max_length=20)
+    name       = serializers.CharField(max_length=100)
+    is_default = serializers.BooleanField(required=False, default=False)
+    is_active  = serializers.BooleanField(required=False, default=True)
 
 
 class ExpenseTypeRead(_ScopeMixin):

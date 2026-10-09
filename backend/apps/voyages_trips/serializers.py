@@ -61,6 +61,7 @@ class TripListSerializer(serializers.ModelSerializer):
     route_code = serializers.CharField(source="route.code", read_only=True, default=None)
     vehicle_plate = serializers.CharField(source="vehicle.license_plate", read_only=True, default=None)
     fare_class_name = serializers.CharField(source="fare_class.name", read_only=True, default=None)
+    voyage_type_name = serializers.CharField(source="voyage_type.name", read_only=True, default=None)
     seating_plan_code = serializers.CharField(source="seating_plan.code", read_only=True, default=None)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     seats_available = serializers.SerializerMethodField()
@@ -69,7 +70,8 @@ class TripListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
         fields = ["id", "number", "code", "route", "route_code", "vehicle", "vehicle_plate",
-                  "fare_class_name", "seating_plan_code", "scheduled_departure", "scheduled_arrival",
+                  "fare_class_name", "voyage_type", "voyage_type_name",
+                  "seating_plan_code", "scheduled_departure", "scheduled_arrival",
                   "status", "status_display", "seat_assignment_mode",
                   "is_delayed", "seats_available", "seats_total"]
 
@@ -114,6 +116,7 @@ class TripCreateSerializer(serializers.Serializer):
         choices=Trip.SeatAssignment.choices, required=False, default=Trip.SeatAssignment.MANUAL)
     auto_expenses = serializers.BooleanField(required=False, default=True)
     seating_plan_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    voyage_type_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     vehicle_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     max_reservations = serializers.IntegerField(required=False, allow_null=True, default=None, min_value=0)
     blocked_seats_count = serializers.IntegerField(required=False, default=0, min_value=0)
@@ -137,6 +140,7 @@ class TripUpdateSerializer(serializers.Serializer):
     scheduled_arrival = serializers.DateTimeField(required=False)
     seat_assignment_mode = serializers.ChoiceField(choices=Trip.SeatAssignment.choices, required=False)
     auto_expenses = serializers.BooleanField(required=False)
+    voyage_type_id = serializers.UUIDField(required=False, allow_null=True)
 
 
 class MarkDelayedSerializer(serializers.Serializer):

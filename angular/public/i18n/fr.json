@@ -1107,6 +1107,13 @@
       "footer_text": "Texte du pied de page",
       "footer_show_generated": "Afficher « Généré le … »",
       "footer_show_page_numbers": "Afficher les numéros de page"
+    },
+    "vtype": {
+      "title": "Types de voyage",
+      "subtitle": "Départ, Complément, Additif",
+      "info": "Les types de voyage (Départ par défaut). Un seul type peut être marqué « par défaut ».",
+      "f_default": "Type par défaut",
+      "col_default": "Défaut"
     }
   },
   "trips": {
@@ -1178,7 +1185,8 @@
       "f_max_res_auto": "Auto (charte)",
       "f_max_res_hint": "Déduit du plan de bus.",
       "f_sellable": "Places en vente",
-      "f_crew_add": "Ajouter un personnel…"
+      "f_crew_add": "Ajouter un personnel…",
+      "f_voyage_type": "Type de voyage"
     },
     "rm": {
       "board_all": "Tout embarquer",

@@ -293,6 +293,7 @@ export const VOYAGES_CONFIG = {
   servicePoints:      `${VC}/service-points/`,     servicePoint:    (id: string) => `${VC}/service-points/${id}/`,
   fareClasses:        `${VC}/fare-classes/`,       fareClass:       (id: string) => `${VC}/fare-classes/${id}/`,
   crewMemberTypes:    `${VC}/crew-member-types/`,  crewMemberType:  (id: string) => `${VC}/crew-member-types/${id}/`,
+  voyageTypes:        `${VC}/voyage-types/`,        voyageType:      (id: string) => `${VC}/voyage-types/${id}/`,
   expenseTypes:       `${VC}/expense-types/`,      expenseType:     (id: string) => `${VC}/expense-types/${id}/`,
   expenseSchedules:   `${VC}/expense-schedules/`,  expenseSchedule: (id: string) => `${VC}/expense-schedules/${id}/`,
   timeSlots:          `${VC}/time-slots/`,         timeSlot:        (id: string) => `${VC}/time-slots/${id}/`,

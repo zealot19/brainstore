@@ -140,6 +140,10 @@
           <select formControlName="fare_class_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>@for (f of fareClasses; track f.id) { <option [ngValue]="f.id">{{ f.name }}</option> }</select></div>
       </div>
       <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_voyage_type' | transloco }}</label>
+          <select formControlName="voyage_type_id" class="form-select"><option [ngValue]="null">{{ 'trips.list.choose' | transloco }}</option>@for (t of voyageTypes; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }</select></div>
+      </div>
+      <div class="row">
         <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_departure' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_departure" type="datetime-local" class="form-control" /></div>
         <div class="col-md-6 mb-3"><label class="form-label">{{ 'trips.list.f_arrival' | transloco }} <span class="text-danger">*</span></label><input formControlName="scheduled_arrival" type="datetime-local" class="form-control" /></div>
       </div>
