@@ -1107,6 +1107,13 @@
       "footer_text": "Texto do rodapé",
       "footer_show_generated": "Mostrar « Gerado em … »",
       "footer_show_page_numbers": "Mostrar números de página"
+    },
+    "vtype": {
+      "title": "Tipos de viagem",
+      "subtitle": "Partida, Complemento, Adicional",
+      "info": "Os tipos de viagem (Partida por defeito). Apenas um tipo pode ser marcado como predefinido.",
+      "f_default": "Tipo por defeito",
+      "col_default": "Defeito"
     }
   },
   "trips": {
@@ -1178,7 +1185,8 @@
       "f_max_res_auto": "Auto (plano)",
       "f_max_res_hint": "Derivado do plano de lugares.",
       "f_sellable": "Lugares à venda",
-      "f_crew_add": "Adicionar pessoal…"
+      "f_crew_add": "Adicionar pessoal…",
+      "f_voyage_type": "Tipo de viagem"
     },
     "rm": {
       "board_all": "Embarcar todos",

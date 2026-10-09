@@ -172,6 +172,7 @@ export class SidebarService {
             { menuValue: 'Types de personnel',   route: routes.vcCrewMemberTypes,   base: 'crew-member-types',   permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Plans de bus',         route: routes.vcSeatingPlans,      base: 'seating-plans',       permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Catégories tarifaires',route: routes.vcFareClasses,       base: 'fare-classes',        permission: 'transport.fareclass.view',    module: 'voyage' },
+            { menuValue: 'Types de voyage',      route: routes.vcVoyageTypes,       base: 'voyage-types',        permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Tarifs',               route: routes.vcFares,             base: 'fares',               permission: 'transport.fare.view',         module: 'voyage' },
             { menuValue: 'Types de voyage',      route: routes.cfgTypesVoyage,      base: 'configuration',       permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Barème dépenses',      route: routes.vcExpenseSchedules,  base: 'expense-schedules',   permission: 'transport.config.view',       module: 'voyage' },

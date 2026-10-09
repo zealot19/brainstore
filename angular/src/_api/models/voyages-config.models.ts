@@ -140,6 +140,10 @@ export interface CrewMemberType {
   id: string; code: string; name: string; is_driver: boolean; is_active: boolean; scope?: string;
 }
 
+export interface VoyageType {
+  id: string; code: string; name: string; is_default: boolean; is_active: boolean; scope?: string;
+}
+
 export interface ExpenseType {
   id: string; code: string; name: string; account_code: string; is_active: boolean; scope?: string;
 }

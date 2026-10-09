@@ -450,6 +450,7 @@ export const routes={
   cfgTypesValeurs:   '/configuration/types-valeurs',
   vcFares:              '/voyages-config/fares',
   vcCrewMemberTypes:    '/voyages-config/crew-member-types',
+  vcVoyageTypes:        '/voyages-config/voyage-types',
   vcCrewMembers:        '/voyages-config/crew-members',
   vcExpenseTypes:       '/voyages-config/expense-types',
   vcExpenseSchedules:   '/voyages-config/expense-schedules',

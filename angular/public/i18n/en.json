@@ -1107,6 +1107,13 @@
       "footer_text": "Footer text",
       "footer_show_generated": "Show “Generated on …”",
       "footer_show_page_numbers": "Show page numbers"
+    },
+    "vtype": {
+      "title": "Voyage types",
+      "subtitle": "Departure, Supplement, Additional",
+      "info": "The voyage types (Departure by default). Only one type can be marked as default.",
+      "f_default": "Default type",
+      "col_default": "Default"
     }
   },
   "trips": {
@@ -1178,7 +1185,8 @@
       "f_max_res_auto": "Auto (plan)",
       "f_max_res_hint": "Derived from the seating plan.",
       "f_sellable": "Seats on sale",
-      "f_crew_add": "Add crew member…"
+      "f_crew_add": "Add crew member…",
+      "f_voyage_type": "Voyage type"
     },
     "rm": {
       "board_all": "Board all",

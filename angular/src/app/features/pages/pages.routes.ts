@@ -96,6 +96,7 @@ export const Pages_routes: Routes = [
               loadComponent: () => import('../../../_api/pages/voyages-config/voyages-config.component').then(m => m.VoyagesConfigComponent),
               children: [
                 { path: 'crew-member-types',   loadComponent: () => import('../../../_api/pages/voyages-config/crew-member-types/crew-member-types.component').then(m => m.VcCrewMemberTypesComponent) },
+                { path: 'voyage-types',        loadComponent: () => import('../../../_api/pages/voyages-config/voyage-types/voyage-types.component').then(m => m.VcVoyageTypesComponent) },
                 { path: 'expense-types',       loadComponent: () => import('../../../_api/pages/voyages-config/expense-types/expense-types.component').then(m => m.VcExpenseTypesComponent) },
                 { path: 'expense-schedules',   loadComponent: () => import('../../../_api/pages/voyages-config/expense-schedules/expense-schedules.component').then(m => m.VcExpenseSchedulesComponent) },
                 { path: 'towns',               loadComponent: () => import('../../../_api/pages/voyages-config/towns/towns.component').then(m => m.VcTownsComponent) },
