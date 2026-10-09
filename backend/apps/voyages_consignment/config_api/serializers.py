@@ -40,6 +40,7 @@ class ParcelRead(serializers.ModelSerializer):
     origin_point_name = serializers.CharField(source="origin_point.name", read_only=True, default=None)
     destination_point_name = serializers.CharField(source="destination_point.name", read_only=True, default=None)
     consignment_type_label = serializers.CharField(source="consignment_type.label", read_only=True, default=None)
+    nature_name = serializers.CharField(source="nature.name", read_only=True, default=None)
     trip_number = serializers.CharField(source="trip.number", read_only=True, default=None)
     trip_route_code = serializers.CharField(source="trip.route.code", read_only=True, default=None)
     trip_departure = serializers.DateTimeField(source="trip.scheduled_departure", read_only=True, default=None)
@@ -53,7 +54,8 @@ class ParcelRead(serializers.ModelSerializer):
                   "trip", "trip_number", "trip_route_code", "trip_departure", "trip_vehicle_plate",
                   "sender_name", "sender_phone", "recipient_name", "recipient_phone",
                   "recipient_address", "recipient_id_number", "consignment_type", "consignment_type_label",
-                  "description", "weight_kg", "quantity", "received_pieces", "missing_pieces",
+                  "nature", "nature_name",
+                  "description", "content", "weight_kg", "quantity", "received_pieces", "missing_pieces",
                   "damaged_pieces", "declared_value", "amount_due", "amount_received",
                   "change_due", "payment_method", "paid_at", "loaded_at", "arrived_at",
                   "picked_up_at", "picked_up_by", "picked_up_phone", "picked_up_id_number",
@@ -65,11 +67,13 @@ class ParcelRead(serializers.ModelSerializer):
 class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
     # Le form Angular remet à null les contrôles facultatifs (reset) : None -> "".
     null_blank_fields = ("recipient_name", "recipient_phone", "recipient_address",
-                         "recipient_id_number", "description", "payment_method",
+                         "recipient_id_number", "payment_method",
                          "sender_civility", "sender_id_number")
     origin_point_id = serializers.UUIDField()
     destination_point_id = serializers.UUIDField()
     consignment_type_id = serializers.UUIDField()
+    nature_id = serializers.UUIDField()
+    content = serializers.CharField(max_length=255)
     sender_name = serializers.CharField(max_length=150)
     sender_phone = serializers.CharField(max_length=30)
     sender_civility = serializers.ChoiceField(choices=["mr", "mrs", "miss"],
@@ -80,7 +84,7 @@ class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
     recipient_phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
     recipient_address = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     recipient_id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
-    description = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
+    description = serializers.CharField(max_length=255)
     weight_kg = serializers.DecimalField(max_digits=8, decimal_places=3, required=False, allow_null=True, default=None)
     quantity = serializers.IntegerField(required=False, default=1)
     declared_value = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
@@ -121,10 +125,18 @@ class ParcelEditSerializer(serializers.Serializer):
     recipient_address = serializers.CharField(max_length=255, required=False, allow_blank=True)
     recipient_id_number = serializers.CharField(max_length=100, required=False, allow_blank=True)
     description = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    content = serializers.CharField(max_length=255, required=False, allow_blank=True)
     weight_kg = serializers.DecimalField(max_digits=8, decimal_places=3, required=False, allow_null=True)
     quantity = serializers.IntegerField(required=False)
     declared_value = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, data):
+        # M24 : description et contenu obligatoires — interdit de les vider à l'édition.
+        for f in ("description", "content"):
+            if f in data and not str(data[f]).strip():
+                raise serializers.ValidationError({f: "Ce champ est obligatoire."})
+        return data
 
 
 class AssignTripSerializer(serializers.Serializer):

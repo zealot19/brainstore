@@ -33,8 +33,8 @@ def _event(parcel, kind, *, from_status="", to_status="", trip=None, user=None, 
 
 
 @transaction.atomic
-def register_parcel(company, *, origin_point, destination_point, consignment_type,
-                    sender_name, sender_phone, recipient_name, recipient_phone,
+def register_parcel(company, *, origin_point, destination_point, consignment_type, nature=None,
+                    content="", sender_name, sender_phone, recipient_name, recipient_phone,
                     recipient_address="", recipient_id_number="", description="", weight_kg=None,
                     quantity=1, declared_value=None, amount_due, amount_received=None,
                     payment_method="", sender_civility="", sender_id_type="cni",
@@ -43,6 +43,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
         raise ApplicationError(_("Le point de départ et le point d'arrivée doivent différer."))
     if getattr(destination_point, "station_kind", "") != "AGENCY":
         raise ApplicationError(_("Le colis ne peut être envoyé que vers une agence."))
+    if nature is not None and consignment_type.nature_id != nature.id:
+        raise ApplicationError(_("Le type choisi n'appartient pas à la nature sélectionnée."))
     if consignment_type.nature.is_prohibited:
         raise ApplicationError(_("Cette nature de colis est interdite au transport."))
     if consignment_type.max_weight_kg and weight_kg and weight_kg > consignment_type.max_weight_kg:
@@ -60,6 +62,7 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
         company=company, agency=origin_point.agency,
         reference=_parcel_reference(company.id, origin_point, destination_point), status=Parcel.Status.READY_FOR_TRAVEL,
         origin_point=origin_point, destination_point=destination_point, consignment_type=consignment_type,
+        nature=nature or consignment_type.nature, content=content,
         sender_client=sender_client,
         sender_name=sender_name, sender_phone=sender_phone, recipient_name=recipient_name,
         recipient_phone=recipient_phone, recipient_address=recipient_address,
@@ -76,7 +79,7 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
 
 
 _EDITABLE = {"sender_name", "sender_phone", "recipient_name", "recipient_phone",
-             "recipient_address", "recipient_id_number", "description", "weight_kg",
+             "recipient_address", "recipient_id_number", "description", "content", "weight_kg",
              "quantity", "declared_value", "notes"}
 
 

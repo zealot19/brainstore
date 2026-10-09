@@ -38,7 +38,10 @@ class Parcel(BaseModel):
     recipient_id_number = models.CharField(_("pièce du destinataire"), max_length=100, blank=True)
     consignment_type  = models.ForeignKey("voyages_config.ConsignmentType", verbose_name=_("type de colis"),
                                            on_delete=models.PROTECT, related_name="parcels")
+    nature            = models.ForeignKey("voyages_config.ConsignmentNature", verbose_name=_("nature"),
+                                           on_delete=models.PROTECT, null=True, blank=True, related_name="parcels")
     description       = models.CharField(_("description"), max_length=255, blank=True)
+    content           = models.CharField(_("contenu"), max_length=255, blank=True)
     weight_kg         = models.DecimalField(_("poids (kg)"), max_digits=8, decimal_places=3, null=True, blank=True)
     quantity          = models.PositiveSmallIntegerField(_("nombre de pièces"), default=1)
     received_pieces   = models.PositiveSmallIntegerField(_("pièces reçues"), default=0)

@@ -53,11 +53,14 @@ class ParcelListView(APIView):
         origin = _cfg(ServicePoint, cid, d["origin_point_id"])
         dest = _cfg(ServicePoint, cid, d["destination_point_id"])
         ctype = _cfg(ConsignmentType, cid, d["consignment_type_id"])
-        if not origin or not dest or not ctype:
-            return error_response("Référence introuvable (point ou type).", status_code=404)
+        from apps.voyages_config.models import ConsignmentNature
+        nature = _cfg(ConsignmentNature, cid, d["nature_id"])
+        if not origin or not dest or not ctype or not nature:
+            return error_response("Référence introuvable (point, type ou nature).", status_code=404)
         try:
             parcel = services.register_parcel(
                 company, origin_point=origin, destination_point=dest, consignment_type=ctype,
+                nature=nature, content=d["content"],
                 sender_name=d["sender_name"], sender_phone=d["sender_phone"],
                 sender_civility=d["sender_civility"], sender_id_type=d["sender_id_type"],
                 sender_id_number=d["sender_id_number"],

@@ -19,7 +19,7 @@ def api_ctx(db):
     nature = ConsignmentNature.objects.create(company=company, code="STD", name="Standard")
     ctype = ConsignmentType.objects.create(company=company, code="CT", label="Type", nature=nature)
     c = APIClient(); c.force_authenticate(user=admin)
-    return {"client": c, "origin": origin, "dest": dest, "ctype": ctype}
+    return {"client": c, "origin": origin, "dest": dest, "ctype": ctype, "nature": nature}
 
 
 def _register(ctx):
@@ -27,9 +27,11 @@ def _register(ctx):
         "origin_point_id": str(ctx["origin"].id),
         "destination_point_id": str(ctx["dest"].id),
         "consignment_type_id": str(ctx["ctype"].id),
+        "nature_id": str(ctx["nature"].id),
+        "content": "Objets divers",
         "sender_name": "Exp", "sender_phone": "600",
         "recipient_name": "Dest", "recipient_phone": "601",
-        "amount_due": "0",
+        "description": "Colis test", "amount_due": "0",
     }, format="json")
 
 
@@ -87,9 +89,10 @@ def test_register_accepts_null_recipient_fields(api_ctx):
         "origin_point_id": str(api_ctx["origin"].id),
         "destination_point_id": str(api_ctx["dest"].id),
         "consignment_type_id": str(api_ctx["ctype"].id),
+        "nature_id": str(api_ctx["nature"].id), "content": "Objets",
         "sender_name": "Exp", "sender_phone": "600",
         "recipient_name": None, "recipient_phone": None, "recipient_id_number": None,
-        "amount_due": "0",
+        "description": "Colis", "amount_due": "0",
     }, format="json")
     assert r.status_code in (200, 201), r.content
     data = r.json()["data"]
