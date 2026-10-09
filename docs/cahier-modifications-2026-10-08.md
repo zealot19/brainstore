@@ -5,8 +5,8 @@
 Ce document regroupe les modifications dictées les 7 et 8 octobre 2026. Les demandes portant sur un même écran ou une même fonctionnalité ont été fusionnées en une seule modification (référence M01, M02…). Chaque modification indique les numéros des dictées d'origine (n° 1 à 42).
 
 > **Suivi d'implémentation (Claude / shimi).** Statut au fil de l'eau.
-> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M17** (formulaires compacts — paiement), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
-> - ⏳ Restant : M02, M05, M06, M10, M11, M12, M13, M14, M15, M16, M18, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
+> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M17** (formulaires compacts — paiement), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
+> - ⏳ Restant : M02, M06, M10, M11, M12, M13, M14, M15, M16, M18, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
 > - ⚠️ Conflits à arbitrer avec l'existant : **M06** (suppression Garage/Accidents) défait le travail récent *accidents ↔ voyage* déjà mergé ; **M05** (plans de bus numériques, suppression de l'éditeur visuel) recoupe le travail existant *blockable-seats / seat-assignment / plan-drives-seats*.
 
 ---
@@ -38,7 +38,7 @@ Simplification du formulaire et nouvel identifiant.
 - Suppression des champs : données de stationnement, coût d'acquisition, immatriculation, numéro VIN.
 - Ajout d'un champ **Code véhicule**, identifiant du véhicule à la place de l'immatriculation et du VIN.
 
-### M05. Plans de bus — *(dictées 14, 18)*
+### M05. Plans de bus — *(dictées 14, 18)* — ✅ livré
 Les plans de bus sont créés dans la Configuration puis choisis directement à la création du bus.
 - Suppression de la fonctionnalité séparée d'affectation d'un plan à un bus.
 - Suppression de l'éditeur visuel de plan : le plan est défini uniquement par des champs numériques (nombre total de places, places disponibles, places bloquées, places vendables, etc.).
