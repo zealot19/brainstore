@@ -1307,6 +1307,14 @@
       "stop_sp": "Local",
       "stop_arrival": "Chegada prevista",
       "no_stops": "Sem paragens."
+    },
+    "gen": {
+      "btn": "Gerar em lote",
+      "title": "Geração de viagens em lote",
+      "f_charte": "Planificação",
+      "f_start": "Data de início",
+      "f_end": "Data de fim",
+      "run": "Gerar"
     }
   },
   "fcfg": {

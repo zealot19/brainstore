@@ -1307,6 +1307,14 @@
       "stop_sp": "Lieu",
       "stop_arrival": "Arrivée prévue",
       "no_stops": "Aucune escale."
+    },
+    "gen": {
+      "btn": "Générer en lot",
+      "title": "Génération de voyages en lot",
+      "f_charte": "Planification (charte)",
+      "f_start": "Date de début",
+      "f_end": "Date de fin",
+      "run": "Générer"
     }
   },
   "fcfg": {

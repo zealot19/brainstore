@@ -38,6 +38,9 @@ export class VoyagesListComponent implements OnInit {
   voyageTypes: VoyageType[] = [];
   form!: FormGroup; saving = false; errorMsg = '';
 
+  // M13 : génération en lot
+  genPatternId = ''; genStart = ''; genEnd = ''; generating = false;
+
   // Équipage sélectionné (chips avec suppression), comme sur le détail.
   selectedCrew: { id: string; label: string }[] = [];
   crewPick: string | null = null;
@@ -209,4 +212,20 @@ export class VoyagesListComponent implements OnInit {
   goReservations(t: Trip): void { this.router.navigate(['/voyages-booking/bookings'], { queryParams: { trip: t.id } }); }
 
   private close(): void { document.getElementById('trip-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
+
+  // ── M13 : génération en lot ──
+  openGen(): void { this.genPatternId = ''; this.genStart = ''; this.genEnd = ''; this.generating = false; }
+  generate(): void {
+    if (!this.genPatternId || !this.genStart || !this.genEnd || this.generating) return;
+    this.generating = true;
+    this.svc.generateBatch({ service_pattern_id: this.genPatternId, start_date: this.genStart, end_date: this.genEnd }).subscribe({
+      next: r => {
+        this.generating = false;
+        this.toast.success(`${r.created} voyage(s) créé(s), ${r.skipped_existing + r.skipped_offday} ignoré(s).`);
+        this.load(); this.closeGen();
+      },
+      error: e => { this.generating = false; this.toast.error(e?.error?.detail ?? "Génération impossible. Réessayez ou contactez un administrateur."); },
+    });
+  }
+  private closeGen(): void { document.getElementById('gen-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }
