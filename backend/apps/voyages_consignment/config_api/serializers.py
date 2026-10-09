@@ -166,10 +166,10 @@ _BAG_TEXT_FIELDS = ("sender_name", "sender_phone", "civility", "id_type",
 
 
 class BaggageWrite(_EmptyNormalizeMixin, serializers.Serializer):
-    blank_null_fields = ("birth_date", "ticket_id", "consignment_type_id")
+    blank_null_fields = ("birth_date", "consignment_type_id")
     null_blank_fields = _BAG_TEXT_FIELDS
     trip_id = serializers.UUIDField()
-    ticket_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+    ticket_id = serializers.UUIDField()
     sender_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     sender_phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
     civility = serializers.ChoiceField(choices=Baggage.Civility.choices, required=False, allow_blank=True, default="")

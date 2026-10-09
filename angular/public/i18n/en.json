@@ -2104,7 +2104,9 @@
       "withdraw_bag": "Baggage",
       "f_comment": "Comment",
       "comment_ph": "Optional note at handover",
-      "withdraw_confirm": "Confirm pickup"
+      "withdraw_confirm": "Confirm pickup",
+      "f_owner": "Owner",
+      "opt_choose_passenger": "— Choose passenger —"
     },
     "parcels": {
       "title": "Parcels",

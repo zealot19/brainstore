@@ -2104,7 +2104,9 @@
       "withdraw_bag": "Bagage",
       "f_comment": "Commentaire",
       "comment_ph": "Observation éventuelle à la remise",
-      "withdraw_confirm": "Confirmer le retrait"
+      "withdraw_confirm": "Confirmer le retrait",
+      "f_owner": "Propriétaire",
+      "opt_choose_passenger": "— Choisir le passager —"
     },
     "parcels": {
       "title": "Colis",

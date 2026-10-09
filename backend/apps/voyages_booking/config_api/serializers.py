@@ -65,6 +65,8 @@ class RouteDestinationSerializer(serializers.Serializer):
 
 class TicketRead(serializers.ModelSerializer):
     passenger_name = serializers.CharField(source="passenger.full_name", read_only=True)
+    passenger_phone = serializers.CharField(source="passenger.phone", read_only=True, default="")
+    passenger_id_number = serializers.CharField(source="passenger.id_number", read_only=True, default="")
     seat_number = serializers.CharField(source="trip_seat.seat_number", read_only=True, default=None)
     origin_point_name = serializers.CharField(source="origin_point.name", read_only=True, default=None)
     destination_point_name = serializers.CharField(source="destination_point.name", read_only=True, default=None)
@@ -73,7 +75,8 @@ class TicketRead(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ["id", "number", "passenger", "passenger_name", "trip", "trip_seat", "seat_number",
+        fields = ["id", "number", "passenger", "passenger_name", "passenger_phone", "passenger_id_number",
+                  "trip", "trip_seat", "seat_number",
                   "origin_point", "origin_point_name", "destination_point", "destination_point_name",
                   "direction", "direction_display", "return_of", "fare", "fare_class", "amount",
                   "is_reward", "status", "status_display", "boarded_at"]

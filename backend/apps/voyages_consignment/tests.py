@@ -64,20 +64,24 @@ def test_list_baggage_filters_type_and_created_default():
 
 
 def test_baggage_write_accepts_empty_optional_fields():
+    # M23 : ticket_id est désormais requis ; birth_date/consignment_type_id vides -> None.
     from apps.voyages_consignment.config_api.serializers import BaggageWrite
     data = {"trip_id": "00000000-0000-0000-0000-000000000001",
-            "sender_name": "X", "birth_date": "", "ticket_id": "", "consignment_type_id": ""}
+            "ticket_id": "00000000-0000-0000-0000-000000000002",
+            "sender_name": "X", "birth_date": "", "consignment_type_id": ""}
     s = BaggageWrite(data=data)
     assert s.is_valid(), s.errors
     assert s.validated_data["birth_date"] is None
-    assert s.validated_data["ticket_id"] is None
+    assert str(s.validated_data["ticket_id"]) == "00000000-0000-0000-0000-000000000002"
     assert s.validated_data["consignment_type_id"] is None
 
 
 def test_baggage_write_accepts_null_optional_text_fields():
-    """form.reset() envoie null pour les champs non listés -> le serializer doit coercer null->''."""
+    """form.reset() envoie null pour les champs non listés -> le serializer doit coercer null->''.
+    M23 : ticket_id est requis, on le fournit."""
     from apps.voyages_consignment.config_api.serializers import BaggageWrite
-    data = {"trip_id": "00000000-0000-0000-0000-000000000001", "id_type": "cni",
+    data = {"trip_id": "00000000-0000-0000-0000-000000000001",
+            "ticket_id": "00000000-0000-0000-0000-000000000002", "id_type": "cni",
             "sender_name": None, "sender_phone": None, "civility": None,
             "id_number": None, "email": None, "description": None}
     s = BaggageWrite(data=data)

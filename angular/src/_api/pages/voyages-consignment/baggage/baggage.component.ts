@@ -8,9 +8,8 @@ import { ConsignmentTypeService } from '../../../services/voyages-config/consign
 import { TripService } from '../../../services/voyages/trip.service';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { Baggage, BaggageCreate } from '../../../models/voyages-consignment.models';
-import { TripOption, PassengerSpec } from '../../../models/voyages-booking.models';
+import { TripOption } from '../../../models/voyages-booking.models';
 import { ConsignmentType } from '../../../models/voyages-config.models';
-import { ClientFieldsComponent } from '../../voyages-booking/shared/client-fields/client-fields.component';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { SearchableSelectComponent } from '../../shared/searchable-select/searchable-select.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -24,7 +23,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, ClientFieldsComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
 })
 export class VcgBaggageComponent implements OnInit {
   private toast = inject(ToastService);
@@ -34,7 +33,8 @@ export class VcgBaggageComponent implements OnInit {
   showArchived = false;
   filterTrips: { id: string; number?: string; code?: string }[] = [];
   trips: TripOption[] = []; types: ConsignmentType[] = [];
-  ticketOptions: { id: string; label: string }[] = [];
+  ticketOptions: { id: string; label: string; name: string; phone: string; id_number: string }[] = [];
+  editOwner: { name: string; phone: string; id_number: string } | null = null;
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   selected = new Set<string>();
   deliverTarget: Baggage | null = null; deliverComment = '';
@@ -47,7 +47,7 @@ export class VcgBaggageComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      trip_id: [null, Validators.required], ticket_id: [null],
+      trip_id: [null, Validators.required], ticket_id: [null, Validators.required],
       sender_name: [''], sender_phone: [''], civility: [''], id_type: ['cni'], id_number: [''],
       consignment_type_id: [null], description: [''], weight_kg: [null], quantity: [1], declared_value: [1],
       amount_due: [0, [Validators.required, Validators.min(0)]], payment_method: [''],
@@ -88,28 +88,37 @@ export class VcgBaggageComponent implements OnInit {
     return { checked_in: 'bg-warning', loaded: 'bg-info', delivered: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   get isEdit(): boolean { return this.editId != null; }
-  get hasTicket(): boolean { return !!this.form.value.ticket_id; }
 
-  /** Charge les passagers (billets) du voyage choisi pour le champ facultatif. */
+  /** Propriétaire du bagage = passager du billet choisi (lecture seule). */
+  get selectedOwner(): { name: string; phone: string; id_number: string } | null {
+    // form.value omet les contrôles désactivés (ticket_id l'est en édition) : lire le contrôle directement.
+    const id = this.form.get('ticket_id')?.value;
+    if (id) {
+      const o = this.ticketOptions.find(t => t.id === id);
+      if (o) return { name: o.name, phone: o.phone, id_number: o.id_number };
+    }
+    // édition (billet figé / options non rechargées) ou bagage legacy sans billet : propriétaire figé sur le bagage.
+    return this.editOwner;
+  }
+
+  /** Charge les passagers (billets) du voyage choisi — le billet est requis. */
   onTripChange(): void {
     this.ticketOptions = []; this.form.patchValue({ ticket_id: null });
     const tripId = this.form.value.trip_id;
     if (!tripId) return;
     this.booking.list({ trip: tripId }).subscribe(bookings => {
-      const opts: { id: string; label: string }[] = [];
+      const opts: { id: string; label: string; name: string; phone: string; id_number: string }[] = [];
       bookings.forEach(b => (b.tickets ?? []).forEach(t => {
-        if (t.trip === tripId) opts.push({ id: t.id, label: `${t.passenger_name} · ${t.number}` });
+        if (t.trip === tripId) opts.push({
+          id: t.id, label: `${t.passenger_name} · ${t.number}`,
+          name: t.passenger_name, phone: t.passenger_phone, id_number: t.passenger_id_number });
       }));
       this.ticketOptions = opts;
     });
   }
 
-  // Client (création, bagage sans billet) — piloté par le fieldset partagé app-client-fields
-  senderClient: PassengerSpec = { id_type: 'cni' };
-
   openCreate(): void {
-    this.editId = null; this.errorMsg = '';
-    this.senderClient = { id_type: 'cni' };
+    this.editId = null; this.errorMsg = ''; this.editOwner = null;
     // Réinitialiser AVEC tous les champs : form.reset({partiel}) met les contrôles non listés
     // à null, or les CharField du backend refusent null.
     this.form.reset({
@@ -122,6 +131,7 @@ export class VcgBaggageComponent implements OnInit {
   }
   openEdit(b: Baggage): void {
     this.editId = b.id; this.errorMsg = '';
+    this.editOwner = { name: b.owner_name, phone: b.sender_phone, id_number: b.id_number };
     this.form.reset({
       trip_id: b.trip, ticket_id: b.ticket, sender_name: b.sender_name, sender_phone: b.sender_phone,
       civility: b.civility, id_type: b.id_type || 'cni', id_number: b.id_number,
@@ -136,13 +146,7 @@ export class VcgBaggageComponent implements OnInit {
   submit(): void {
     if (this.form.invalid || this.saving) return;
     const v = this.form.getRawValue() as any;
-    // Création d'un bagage sans billet : le client vient du fieldset partagé.
-    if (!this.isEdit && !v.ticket_id) {
-      if (!this.senderClient.name) { this.errorMsg = 'Client requis (nom).'; return; }
-      v.sender_name = this.senderClient.name; v.sender_phone = this.senderClient.phone;
-      v.id_type = this.senderClient.id_type;
-      v.id_number = this.senderClient.id_number;
-    }
+    // M23 : le propriétaire est le passager du billet (snapshot côté backend) — rien à envoyer ici.
     this.saving = true; this.errorMsg = '';
     const req = this.isEdit ? this.svc.edit(this.editId!, v as BaggageCreate) : this.svc.create(v as BaggageCreate);
     req.subscribe({
