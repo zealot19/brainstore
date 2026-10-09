@@ -60,10 +60,19 @@ def create_trip(*, company, route, fare_class, scheduled_departure, scheduled_ar
     # La charte (plan de bus) suffit à générer les sièges — le véhicule est optionnel.
     if trip.seating_plan_id:
         from apps.voyages_trips.services.assignment import materialise_seats
+        from apps.voyages_trips.models import TripSeat
         materialise_seats(trip)
         _block_seats(trip, blocked_seats_count or 0, user)
-        # « Réservations autorisées » = capacité de la charte (non saisie par l'agent).
-        trip.max_reservations = trip.seats.filter(is_deleted=False).count()
+        # M12 : quota de réservation réglable par l'agent, défauté aux places vendables
+        # (total − bloquées) et plafonné à celles-ci.
+        sellable = trip.seats.filter(is_deleted=False, status=TripSeat.Status.AVAILABLE).count()
+        if max_reservations is None:
+            trip.max_reservations = sellable
+        elif max_reservations > sellable:
+            raise ApplicationError(
+                _("Le quota de réservation ne peut pas dépasser %(n)s places vendables.") % {"n": sellable})
+        else:
+            trip.max_reservations = max_reservations
         trip.save(update_fields=["max_reservations", "updated_by", "updated_at"])
     _assign_crew(trip, crew_member_ids or [], company, user)
     if auto_expenses:

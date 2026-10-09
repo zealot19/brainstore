@@ -9,7 +9,6 @@ class VoyagesSettings(_CompanyScoped):
     ticket_expiry_days = models.PositiveSmallIntegerField(_("expiration billet (jours)"), default=7)
     shift_duration_hours = models.PositiveSmallIntegerField(_("durée de quart (h)"), default=8)
     document_alert_days = models.PositiveSmallIntegerField(_("alerte documents (jours)"), default=30)
-    archive_delay_days = models.PositiveSmallIntegerField(_("délai d'archivage (jours)"), default=365)
     auto_print_default = models.BooleanField(_("impression auto par défaut"), default=False)
     sms_notification_default = models.BooleanField(_("SMS par défaut"), default=False)
     auto_manage_trips = models.BooleanField(_("démarrage/arrêt auto des voyages"), default=False)

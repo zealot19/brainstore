@@ -158,7 +158,7 @@
     </div>
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_max_res' | transloco }}</label>
-        <input formControlName="max_reservations" type="number" class="form-control" readonly [placeholder]="'trips.list.f_max_res_auto' | transloco" />
+        <input formControlName="max_reservations" type="number" min="0" [max]="sellableSeats" class="form-control" />
         <small class="text-muted d-block mt-1">{{ 'trips.list.f_max_res_hint' | transloco }}</small></div>
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'trips.list.f_blocked' | transloco }}</label>
         <input formControlName="blocked_seats_count" type="number" min="0" class="form-control" /></div>

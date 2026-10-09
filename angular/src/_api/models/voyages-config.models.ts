@@ -129,7 +129,6 @@ export interface VoyagesSettings {
   ticket_expiry_days: number;
   shift_duration_hours: number;
   document_alert_days: number;
-  archive_delay_days: number;
   auto_print_default: boolean;
   sms_notification_default: boolean;
   created_at: string;
