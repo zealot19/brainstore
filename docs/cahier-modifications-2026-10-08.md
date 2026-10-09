@@ -5,8 +5,8 @@
 Ce document regroupe les modifications dictées les 7 et 8 octobre 2026. Les demandes portant sur un même écran ou une même fonctionnalité ont été fusionnées en une seule modification (référence M01, M02…). Chaque modification indique les numéros des dictées d'origine (n° 1 à 42).
 
 > **Suivi d'implémentation (Claude / shimi).** Statut au fil de l'eau.
-> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M11** (types de voyage), **M12** (quota réservations + archivage), **M17** (formulaires compacts — paiement), **M18** (disponibilité formulaire de vente), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
-> - ⏳ Restant : M02, M06, M10, M13, M14, M15, M16, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
+> - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M10** (sélecteur d'arrêts), **M11** (types de voyage), **M12** (quota réservations + archivage), **M17** (formulaires compacts — paiement), **M18** (disponibilité formulaire de vente), **M23** (bagage lié au passager), **M24** (nature/contenu colis).
+> - ⏳ Restant : M02, M06, M13, M14, M15, M16, M19, M20, M21, M22, M25, M26, M27, M28, M29, M30, M31.
 > - ⚠️ Conflits à arbitrer avec l'existant : **M06** (suppression Garage/Accidents) défait le travail récent *accidents ↔ voyage* déjà mergé ; **M05** (plans de bus numériques, suppression de l'éditeur visuel) recoupe le travail existant *blockable-seats / seat-assignment / plan-drives-seats*.
 
 ---
@@ -58,7 +58,7 @@ Ajout d'un champ **Numéro de carte d'identité** sur le modèle et le formulair
 ### M09. Lieux unifiés — *(dictée 8)* — ✅ livré
 Suppression de la distinction entre point de service et point de dépôt. On définit des **Lieux**, dont n'importe lequel peut servir de départ ou de destination, sans préciser s'il s'agit d'un point de vente de tickets.
 
-### M10. Sélecteur des arrêts intermédiaires — *(dictée 9)*
+### M10. Sélecteur des arrêts intermédiaires — *(dictée 9)* — ✅ livré
 Nouveau composant réutilisable pour choisir les points de dépôt entre le départ et la destination.
 - Sélection multiple en une fois.
 - Retrait d'un arrêt déjà sélectionné.
