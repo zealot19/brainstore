@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VOYAGES_BOOKING } from '../../config/api.config';
-import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate, AssignReturn } from '../../models/voyages-booking.models';
+import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate, AssignReturn, TripAvailability } from '../../models/voyages-booking.models';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -16,6 +16,7 @@ export class BookingService {
     return this.http.get<TripOption[]>(VOYAGES_BOOKING.bookableTrips, { params: p });
   }
   seatMap(tripId: string): Observable<SeatCell[]> { return this.http.get<SeatCell[]>(VOYAGES_BOOKING.seatMap(tripId)); }
+  availability(tripId: string): Observable<TripAvailability> { return this.http.get<TripAvailability>(VOYAGES_BOOKING.availability(tripId)); }
   destinations(tripId: string): Observable<TripDestination[]> { return this.http.get<TripDestination[]>(VOYAGES_BOOKING.destinations(tripId)); }
   routeDestinations(routeId: string): Observable<{ id: string; name: string; code: string }[]> {
     return this.http.get<{ id: string; name: string; code: string }[]>(VOYAGES_BOOKING.routeDestinations(routeId));

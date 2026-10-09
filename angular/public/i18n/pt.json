@@ -460,6 +460,16 @@
       "id_number": "N.º de documento",
       "payment": "Pagamento",
       "seats_left": "Lugares disponíveis"
+    },
+    "avail": {
+      "sold": "Vendidos:",
+      "reserved": "Reservados:",
+      "blocked": "Bloqueados:",
+      "available": "Disponíveis:",
+      "reservations_possible": "Reservas possíveis:",
+      "full": "Viagem completa",
+      "quota_reached": "Quota de reserva atingida",
+      "none": "Nenhuma viagem programada para estes critérios."
     }
   },
   "treasury": {

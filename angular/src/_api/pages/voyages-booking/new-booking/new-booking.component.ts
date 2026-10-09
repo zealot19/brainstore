@@ -7,7 +7,7 @@ import { FareClassService } from '../../../services/voyages-config/fare-class.se
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { FareClass, TimeSlot, Route } from '../../../models/voyages-config.models';
-import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec, Booking } from '../../../models/voyages-booking.models';
+import { TripOption, TripDestination, SeatCell, BookingCreate, PassengerSpec, Booking, TripAvailability } from '../../../models/voyages-booking.models';
 import { ClientFieldsComponent } from '../shared/client-fields/client-fields.component';
 import { PaymentMethodService } from '../../../services/treasury/payment-method.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
@@ -33,6 +33,7 @@ export class VbNewBookingComponent implements OnInit {
   routeDests: { id: string; name: string; code: string }[] = [];
   tripDests: TripDestination[] = []; destinationId = '';
   outSeats: SeatCell[] = []; outSeatId = '';
+  outAvail: TripAvailability | null = null;
 
   // Retour
   returnOpen = false;
@@ -97,7 +98,7 @@ export class VbNewBookingComponent implements OnInit {
   onTripTypeChange(): void { if (!this.needReturnSel) { this.retTrips = []; this.returnTripId = ''; this.retSeats = []; this.retSeatId = ''; } else { this.onRetCriteria(); } }
 
   // Le trajet/destination sont choisis avant le voyage : on ne réinitialise que la tarification + sièges.
-  private resetOutTrip(): void { this.tripDests = []; this.outSeats = []; this.outSeatId = ''; }
+  private resetOutTrip(): void { this.tripDests = []; this.outSeats = []; this.outSeatId = ''; this.outAvail = null; }
 
   get outboundTrip(): TripOption | undefined { return this.outTrips.find(t => t.id === this.outboundTripId); }
   get returnTrip(): TripOption | undefined { return this.retTrips.find(t => t.id === this.returnTripId); }
@@ -106,12 +107,17 @@ export class VbNewBookingComponent implements OnInit {
   get availOutSeats(): SeatCell[] { return this.outSeats.filter(s => s.status === 'available'); }
   get availRetSeats(): SeatCell[] { return this.retSeats.filter(s => s.status === 'available'); }
 
+  get outCriteriaChosen(): boolean { return !!(this.fareClassId && this.outDate && this.outSlotId); }
+  get tripFull(): boolean { return !!this.outAvail && this.outAvail.available === 0; }
+  get reservationQuotaReached(): boolean { return !!this.outAvail && this.outAvail.reservations_possible === 0; }
+
   onOutboundChange(): void {
     this.resetOutTrip();
     if (this.outboundTripId) {
       // La destination est déjà choisie (depuis le trajet) ; on charge la tarification du voyage.
       this.svc.destinations(this.outboundTripId).subscribe(d => this.tripDests = d);
       if (!this.outboundAuto) this.svc.seatMap(this.outboundTripId).subscribe(s => this.outSeats = s);
+      this.svc.availability(this.outboundTripId).subscribe(a => this.outAvail = a);
     }
   }
   onReturnChange(): void {
@@ -138,6 +144,8 @@ export class VbNewBookingComponent implements OnInit {
   get canSubmit(): boolean {
     if (this.saving || !this.outboundTripId || !this.destinationId) return false;
     if (this.fare == null) return false;
+    if (this.tripFull) return false;
+    if (this.isReservation && this.reservationQuotaReached) return false;
     if (!this.outboundAuto && !this.outSeatId) return false;
     if (this.needReturnSel) {
       if (!this.returnTripId) return false;
@@ -197,7 +205,7 @@ export class VbNewBookingComponent implements OnInit {
     this.routeCode = ''; this.fareClassId = ''; this.outDate = ''; this.outSlotId = '';
     this.outTrips = []; this.outboundTripId = '';
     this.routeDests = []; this.tripDests = []; this.destinationId = '';
-    this.outSeats = []; this.outSeatId = '';
+    this.outSeats = []; this.outSeatId = ''; this.outAvail = null;
     this.returnOpen = false; this.retDate = ''; this.retSlotId = ''; this.retTrips = []; this.returnTripId = '';
     this.retSeats = []; this.retSeatId = '';
     this.buyer = { name: '', phone: '', id_type: 'cni', id_number: '' };

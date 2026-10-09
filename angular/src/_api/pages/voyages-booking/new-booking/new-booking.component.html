@@ -64,6 +64,9 @@
         <option value="">{{ outTrips.length ? ('booking.new.choose' | transloco) : ('booking.form.no_trip' | transloco) }}</option>
         @for (t of outTrips; track t.id) { <option [value]="t.id">{{ t.number }} @if (t.route_code) { · {{ t.route_code }} }</option> }
       </select>
+      @if (outCriteriaChosen && !outTrips.length) {
+        <small class="text-muted d-block mt-1">{{ 'booking.avail.none' | transloco }}</small>
+      }
     </div>
     <div class="col-md-3">
       <label class="form-label">{{ 'booking.form.seat' | transloco }} @if (!outboundAuto) { <span class="text-danger">*</span> }</label>
@@ -77,6 +80,28 @@
       }
     </div>
   </div>
+
+  <!-- ══ Panneau de disponibilité ══ -->
+  @if (outAvail) {
+    <div class="alert alert-light border py-2 px-3 mb-3 small">
+      <div class="d-flex flex-wrap gap-3">
+        <span>{{ 'booking.avail.sold' | transloco }}&nbsp;<strong>{{ outAvail.sold }}</strong></span>
+        <span>{{ 'booking.avail.reserved' | transloco }}&nbsp;<strong>{{ outAvail.reserved }}</strong></span>
+        <span>{{ 'booking.avail.blocked' | transloco }}&nbsp;<strong>{{ outAvail.blocked }}</strong></span>
+        <span>{{ 'booking.avail.available' | transloco }}&nbsp;<strong>{{ outAvail.available }}</strong></span>
+        <span>{{ 'booking.avail.reservations_possible' | transloco }}&nbsp;<strong>{{ outAvail.reservations_possible ?? '∞' }}</strong></span>
+      </div>
+      @if (tripFull) {
+        <div class="alert alert-danger py-1 px-2 mt-2 mb-0">
+          <i class="ti ti-ban me-1"></i>{{ 'booking.avail.full' | transloco }}
+        </div>
+      } @else if (isReservation && reservationQuotaReached) {
+        <div class="alert alert-warning py-1 px-2 mt-2 mb-0">
+          <i class="ti ti-alert-triangle me-1"></i>{{ 'booking.avail.quota_reached' | transloco }}
+        </div>
+      }
+    </div>
+  }
 
   <!-- Option aller-retour ouvert -->
   @if (isRound) {

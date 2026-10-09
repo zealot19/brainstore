@@ -139,6 +139,16 @@ class AssignReturnSerializer(serializers.Serializer):
     items = AssignReturnItemSerializer(many=True)
 
 
+class TripAvailabilitySerializer(serializers.Serializer):
+    total = serializers.IntegerField()
+    sold = serializers.IntegerField()
+    reserved = serializers.IntegerField()
+    blocked = serializers.IntegerField()
+    available = serializers.IntegerField()
+    max_reservations = serializers.IntegerField(allow_null=True)
+    reservations_possible = serializers.IntegerField(allow_null=True)
+
+
 class LoyaltyMovementRead(serializers.ModelSerializer):
     kind_display = serializers.CharField(source="get_kind_display", read_only=True)
 

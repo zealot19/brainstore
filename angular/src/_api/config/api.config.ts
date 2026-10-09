@@ -357,6 +357,7 @@ export const VOYAGES_BOOKING = {
   passengerLoyalty: (id: string) => `${VB}/passengers/${id}/loyalty/`,
   bookableTrips: `${VB}/trips/bookable/`,
   seatMap: (tripId: string) => `${VB}/trips/${tripId}/seat-map/`,
+  availability: (tripId: string) => `${VB}/trips/${tripId}/availability/`,
   destinations: (tripId: string) => `${VB}/trips/${tripId}/destinations/`,
   routeDestinations: (routeId: string) => `${VB}/routes/${routeId}/destinations/`,
   bookings: `${VB}/bookings/`,
