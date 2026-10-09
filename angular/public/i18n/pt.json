@@ -1123,6 +1123,15 @@
       "info": "Os tipos de viagem (Partida por defeito). Apenas um tipo pode ser marcado como predefinido.",
       "f_default": "Tipo por defeito",
       "col_default": "Defeito"
+    },
+    "stops": {
+      "add": "Adicionar",
+      "remove": "Remover",
+      "pick_ph": "Escolher paragens (seleção múltipla)",
+      "need_od": "Escolha primeiro a origem e o destino.",
+      "col_stop": "Paragem",
+      "col_distance": "Distância (km)",
+      "empty": "Sem paragens."
     }
   },
   "trips": {

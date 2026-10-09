@@ -1123,6 +1123,15 @@
       "info": "The voyage types (Departure by default). Only one type can be marked as default.",
       "f_default": "Default type",
       "col_default": "Default"
+    },
+    "stops": {
+      "add": "Add",
+      "remove": "Remove",
+      "pick_ph": "Pick stops (multi-select)",
+      "need_od": "Choose the origin and destination first.",
+      "col_stop": "Stop",
+      "col_distance": "Distance (km)",
+      "empty": "No stops."
     }
   },
   "trips": {

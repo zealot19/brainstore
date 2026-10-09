@@ -61,30 +61,8 @@
 
     <hr>
     <h6 class="fw-semibold">{{ 'vcfg.routes.stops_header' | transloco }}</h6>
-    @if (!stopFor) {
-      <p class="text-muted small">{{ 'vcfg.routes.save_first' | transloco }}</p>
-    } @else {
-      <table class="table table-sm mb-2">
-        <thead><tr><th>{{ 'vcfg.routes.st_order' | transloco }}</th><th>{{ 'vcfg.routes.st_sp' | transloco }}</th><th>{{ 'vcfg.routes.col_distance' | transloco }}</th><th></th></tr></thead>
-        <tbody>
-          @for (st of stops; track st.id) {
-            <tr>
-              <td>{{ st.sequence }}</td>
-              <td>{{ st.service_point_name }}</td>
-              <td>{{ st.distance_from_origin_km ? (st.distance_from_origin_km + ' km') : '—' }}</td>
-              <td><a class="text-danger" (click)="deleteStop(st.id)" [title]="'vcfg.routes.remove' | transloco"><i class="ti ti-trash"></i></a></td>
-            </tr>
-          } @empty { <tr><td colspan="4" class="text-muted">{{ 'vcfg.routes.no_stops' | transloco }}</td></tr> }
-        </tbody>
-      </table>
-      <div class="row g-2 align-items-end">
-        <div class="col-md-6"><label class="form-label small">{{ 'vcfg.routes.f_stop_sp' | transloco }}</label>
-          <select class="form-select form-select-sm" [(ngModel)]="newStopSp"><option [ngValue]="null">{{ 'vcfg.common.choose' | transloco }}</option>@for (s of servicePoints; track s.id) { <option [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option> }</select>
-        </div>
-        <div class="col-md-4"><label class="form-label small">{{ 'vcfg.routes.f_stop_distance' | transloco }}</label><input type="number" step="0.1" min="0" class="form-control form-control-sm" [(ngModel)]="newStopDistance"></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-outline-primary w-100" *hasPermission="'transport.route.manage'" (click)="addStop()" [disabled]="!newStopSp || savingStop">{{ 'vcfg.routes.add_stop' | transloco }}</button></div>
-      </div>
-    }
+    <app-stops-picker [options]="stopOptions" [disabled]="stopsDisabled" [stops]="pickerStops"
+                      (stopsChange)="pickerStops = $event"></app-stops-picker>
   </div>
   <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="closeAndReload()">{{ 'shared.actions.close' | transloco }}</button></div>
 </div></div></div>

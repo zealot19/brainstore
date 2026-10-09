@@ -1123,6 +1123,15 @@
       "info": "Los tipos de viaje (Salida por defecto). Solo un tipo puede marcarse como predeterminado.",
       "f_default": "Tipo por defecto",
       "col_default": "Defecto"
+    },
+    "stops": {
+      "add": "Añadir",
+      "remove": "Quitar",
+      "pick_ph": "Elegir paradas (selección múltiple)",
+      "need_od": "Elija primero el origen y el destino.",
+      "col_stop": "Parada",
+      "col_distance": "Distancia (km)",
+      "empty": "Sin paradas."
     }
   },
   "trips": {
