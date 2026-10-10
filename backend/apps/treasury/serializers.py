@@ -150,7 +150,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
             "assigned_to", "assigned_to_name",
             "scheduled_start", "scheduled_end",
             "opened_by", "opened_by_name", "closed_by_name",
-            "opened_at", "closed_at",
+            "opened_at", "closed_at", "stopped_at",
             "notes", "created_at",
         ]
 
