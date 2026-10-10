@@ -16,7 +16,9 @@ def _company(name="OI Co", email="oi@x.com"):
 
 
 @pytest.mark.django_db
-def test_record_other_income_creates_cash_income_and_updates_balance():
+def test_record_other_income_pending_then_validated_updates_balance():
+    # M26 : une recette manuelle est enregistrée EN ATTENTE (aucun impact), puis validée.
+    from apps.treasury.services.operation_validation import validate_operation
     company, admin = _company()
     reg = create_cash_register(company=company, name="C1", created_by=admin)
     open_session(company=company, cash_register=reg, created_by=admin)
@@ -24,7 +26,11 @@ def test_record_other_income_creates_cash_income_and_updates_balance():
                               description="Vente carton", user=admin)
     assert txn.transaction_type == "income"
     assert txn.category == "other_income"
-    assert txn.account_type == "cash"
+    assert txn.status == Transaction.Status.PENDING
+    assert txn.journal_entry is None                                           # pas encore postée
+    assert CashRegister.objects.get(id=reg.id).current_balance == Decimal("0")  # pas d'impact
+    validate_operation(txn, user=admin)
+    txn.refresh_from_db()
     assert txn.journal_entry is not None
     assert CashRegister.objects.get(id=reg.id).current_balance == Decimal("4000")
 

@@ -15,7 +15,7 @@ def record_trip_expense(company, *, trip_expense, cash_session, user):
         cash_session=cash_session, amount=trip_expense.amount,
         payment_mode=Transaction.PaymentMode.CASH, counterpart_account=account,
         description=f"{trip_expense.expense_type.name} — {trip_expense.trip.number}".strip(),
-        created_by=user)
+        status=Transaction.Status.PENDING, created_by=user)  # M26 : frais de route en attente
     txn.voyage_expense = trip_expense
     txn.save(update_fields=["voyage_expense"])
     return txn
