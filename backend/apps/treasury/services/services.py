@@ -409,8 +409,10 @@ def delete_transaction(txn, *, deleted_by):
                 AccountingService.cancel_entry(txn.journal_entry_id, reason="Annulation mouvement")
         except Exception:
             pass
-    # Reverse balance impact
-    _apply_transaction_balance(txn, sign=-1)
+    # M26 : n'extourner le solde que si le mouvement avait été appliqué (validé).
+    # Une opération en attente (ou déjà invalidée) n'a jamais impacté le solde.
+    if txn.status == Transaction.Status.VALIDATED:
+        _apply_transaction_balance(txn, sign=-1)
     txn.soft_delete(user=deleted_by)
 
 

@@ -35,6 +35,23 @@ def test_pending_does_not_touch_balance_or_accounting():
 
 
 @pytest.mark.django_db
+def test_deleting_pending_does_not_touch_balance():
+    # delete_transaction ne doit extourner le solde QUE pour une opération validée ;
+    # supprimer une opération en attente (jamais appliquée) ne change pas le solde.
+    from apps.treasury.models import Transaction
+    from apps.treasury.services.services import create_transaction, delete_transaction
+    company, admin, reg, sess = _ctx("m26g3@x.com")
+    reg.refresh_from_db(); before = reg.current_balance
+    txn = create_transaction(company=company, transaction_type=Transaction.Type.EXPENSE,
+                             category=Transaction.Category.GENERAL_EXPENSE, account_type=Transaction.AccountType.CASH,
+                             cash_session=sess, amount=Decimal("3000"), payment_mode="cash",
+                             status=Transaction.Status.PENDING, created_by=admin)
+    delete_transaction(txn, deleted_by=admin)
+    reg.refresh_from_db()
+    assert reg.current_balance == before   # pas d'extourne fantôme
+
+
+@pytest.mark.django_db
 def test_validated_default_applies_immediately():
     from apps.treasury.models import Transaction
     from apps.treasury.services.services import create_transaction
