@@ -139,6 +139,17 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     """
     if not items:
         raise ApplicationError(_("Aucun passager sélectionné."))
+    # M19 : un règlement « Non payé » (requires_payment=False) crée une RÉSERVATION
+    # (sièges tenus, quota consommé), pas une vente ; elle est convertie au paiement
+    # via pay_reservation. Échéance = départ du voyage par défaut.
+    from apps.treasury.services.payment_resolution import resolve_payment
+    _pm = resolve_payment(company, payment_method)
+    if _pm is not None and not _pm.requires_payment:
+        from apps.voyages_booking.services.reservation_services import create_reservation
+        return create_reservation(
+            company, trip_type=trip_type, outbound_trip=outbound_trip, return_trip=return_trip,
+            buyer_spec=buyer_spec, items=items, hold_until=outbound_trip.scheduled_departure,
+            return_open=return_open, channel=channel, user=user)
     _assert_can_sell(user, outbound_trip)
     _assert_bookable(outbound_trip)
     is_round = trip_type == Booking.TripType.ROUND_TRIP
