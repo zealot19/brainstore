@@ -468,6 +468,8 @@ export const TREASURY = {
   refundPerform: `${TRZ}/refunds/`,
   denominations: `${TRZ}/denominations/`,
   denomination:  (id: string) => `${TRZ}/denominations/${id}/`,
+  valueTypes: `${TRZ}/value-types/`,
+  valueType:  (id: string) => `${TRZ}/value-types/${id}/`,
   sessionCounts: (id: string) => `${TRZ}/sessions/${id}/counts/`,
 };
 

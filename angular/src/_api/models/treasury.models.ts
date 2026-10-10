@@ -25,9 +25,16 @@ export interface CurrencyDenomination {
   id: string; currency: string; currency_code: string; value: string;
   kind: 'banknote' | 'coin'; kind_display: string; is_active: boolean; display_order: number;
 }
-export interface CashCountItem { id: string; denomination: string; quantity: number; unit_value: string; subtotal: string; }
+export interface CashValueType {
+  id: string; code: string; label: string; is_active: boolean; display_order: number;
+}
+export interface CashCountItem {
+  id: string; denomination: string | null; value_type: string | null; value_type_label: string | null;
+  quantity: number; unit_value: string; subtotal: string;
+}
 export interface CashCount {
-  id: string; kind: string; kind_display: string; total_amount: string; created_at: string; items: CashCountItem[];
+  id: string; kind: string; kind_display: string; total_amount: string;
+  cash_total: string; other_total: string; created_at: string; items: CashCountItem[];
 }
 
 export interface CashSession {

@@ -846,6 +846,19 @@
       "add": "Adicionar receita de viagem",
       "f_title": "Título",
       "f_vehicle": "Veículo"
+    },
+    "valuetype": {
+      "title": "Tipos de valor",
+      "subtitle": "Valores não monetários registáveis na contagem (vales, dinheiro eletrónico…).",
+      "new": "Novo tipo",
+      "edit_title": "Editar tipo",
+      "col_code": "Código",
+      "col_label": "Rótulo",
+      "col_order": "Ordem",
+      "col_active": "Estado",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "empty": "Sem tipo de valor."
     }
   },
   "vcfg": {

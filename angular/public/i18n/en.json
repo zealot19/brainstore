@@ -846,6 +846,19 @@
       "add": "Add trip income",
       "f_title": "Title",
       "f_vehicle": "Vehicle"
+    },
+    "valuetype": {
+      "title": "Value types",
+      "subtitle": "Non-cash values enterable at cash count (vouchers, e-money…).",
+      "new": "New type",
+      "edit_title": "Edit type",
+      "col_code": "Code",
+      "col_label": "Label",
+      "col_order": "Order",
+      "col_active": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No value type."
     }
   },
   "vcfg": {
