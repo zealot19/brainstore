@@ -605,7 +605,10 @@
       "open_scheduled_title": "Open the scheduled session",
       "f_close_destination": "Destination cash register",
       "opt_destination": "Choose a cash register…",
-      "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0."
+      "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0.",
+      "cash_total": "Cash total",
+      "other_values": "Other values",
+      "grand_total": "Grand total"
     },
     "movement": {
       "title": "Movements",
@@ -846,6 +849,19 @@
       "add": "Add trip income",
       "f_title": "Title",
       "f_vehicle": "Vehicle"
+    },
+    "valuetype": {
+      "title": "Value types",
+      "subtitle": "Non-cash values enterable at cash count (vouchers, e-money…).",
+      "new": "New type",
+      "edit_title": "Edit type",
+      "col_code": "Code",
+      "col_label": "Label",
+      "col_order": "Order",
+      "col_active": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No value type."
     }
   },
   "vcfg": {

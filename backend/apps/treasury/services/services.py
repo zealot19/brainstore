@@ -155,8 +155,11 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
         raise ApplicationError(_("Vous ne pouvez clôturer qu'une caisse de votre agence."))
 
     # Montant compté : billetage prioritaire, sinon montant saisi.
+    # M28 : l'écart/solde/transfert portent sur les ESPÈCES uniquement (cash_total).
+    # Les autres valeurs (bons, monnaie électronique) sont enregistrées via record_count
+    # (plus bas) mais n'entrent pas dans la réconciliation espèces.
     if closing_count:
-        closing_balance, _resolved = compute_count_total(session.company, closing_count)
+        closing_balance = compute_count_total(session.company, closing_count)["cash_total"]
     elif closing_balance is None:
         raise ApplicationError(_("Indiquez le montant compté (billetage ou saisie directe)."))
 

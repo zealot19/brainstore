@@ -56,8 +56,21 @@
               </tr>
             } @empty { <tr><td colspan="3" class="text-center text-muted py-3">{{ 'treasury.billetage.no_denom' | transloco }}</td></tr> }
           </tbody>
-          <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.billetage.total' | transloco }}</td><td class="text-end">{{ billetageTotal | number:'1.0-0' }} XAF</td></tr></tfoot>
+          <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.session.cash_total' | transloco }}</td><td class="text-end">{{ billetageTotal | number:'1.0-0' }} XAF</td></tr></tfoot>
         </table></div>
+        @if (valueTypes.length) {
+          <div class="mt-2 mb-1 fw-medium small text-muted">{{ 'treasury.session.other_values' | transloco }}</div>
+          <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+            <tbody>@for (v of valueTypes; track v.id) {
+              <tr><td>{{ v.label }}</td>
+              <td style="width:160px"><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="bamt[v.id]" /></td></tr>
+            }</tbody>
+            <tfoot>
+              <tr><td>{{ 'treasury.session.other_values' | transloco }}</td><td class="text-end">{{ otherTotal | number:'1.0-0' }}</td></tr>
+              <tr class="fw-bold"><td>{{ 'treasury.session.grand_total' | transloco }}</td><td class="text-end">{{ grandTotal | number:'1.0-0' }} XAF</td></tr>
+            </tfoot>
+          </table></div>
+        }
       }
     </div>
     <div class="modal-footer">

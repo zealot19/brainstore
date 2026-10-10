@@ -123,8 +123,21 @@
           <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeQty[d.id]" /></td>
           <td class="text-end">{{ (+d.value) * (closeQty[d.id] || 0) }}</td></tr>
         }</tbody>
-        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.denom.counted_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
+        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.session.cash_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
       </table></div>
+      @if (valueTypes.length) {
+        <div class="mb-1 fw-medium small text-muted">{{ 'treasury.session.other_values' | transloco }}</div>
+        <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+          <tbody>@for (v of valueTypes; track v.id) {
+            <tr><td>{{ v.label }}</td>
+            <td style="width:160px"><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeAmounts[v.id]" /></td></tr>
+          }</tbody>
+          <tfoot>
+            <tr><td>{{ 'treasury.session.other_values' | transloco }}</td><td class="text-end">{{ otherTotal }}</td></tr>
+            <tr class="fw-bold"><td>{{ 'treasury.session.grand_total' | transloco }}</td><td class="text-end">{{ grandTotal }}</td></tr>
+          </tfoot>
+        </table></div>
+      }
     } @else {
       <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="closeManual" /></div>
     }

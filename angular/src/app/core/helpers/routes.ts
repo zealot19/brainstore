@@ -421,6 +421,7 @@ export const routes={
   trzRefundRate:        '/treasury/refund-rate',
   trzRefunds:           '/treasury/refunds',
   trzDenominations:     '/treasury/denominations',
+  trzValueTypes:        '/treasury/value-types',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

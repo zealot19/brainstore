@@ -6,8 +6,8 @@ from .transfer      import Transfer
 from .posting_rule  import MovementAccountMapping
 from .general_expense import GeneralExpense
 from .payment_method import PaymentMethod
-from .billetage     import CurrencyDenomination, CashCount, CashCountItem
+from .billetage     import CurrencyDenomination, CashValueType, CashCount, CashCountItem
 
 __all__ = ["CashRegister", "BankAccount", "CashSession", "Transaction", "Transfer",
            "MovementAccountMapping", "GeneralExpense", "PaymentMethod",
-           "CurrencyDenomination", "CashCount", "CashCountItem"]
+           "CurrencyDenomination", "CashValueType", "CashCount", "CashCountItem"]

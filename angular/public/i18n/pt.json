@@ -605,7 +605,10 @@
       "open_scheduled_title": "Abrir a sessão agendada",
       "f_close_destination": "Caixa de destino",
       "opt_destination": "Escolha uma caixa…",
-      "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0."
+      "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0.",
+      "cash_total": "Total em numerário",
+      "other_values": "Outros valores",
+      "grand_total": "Total geral"
     },
     "movement": {
       "title": "Movimentos",
@@ -846,6 +849,19 @@
       "add": "Adicionar receita de viagem",
       "f_title": "Título",
       "f_vehicle": "Veículo"
+    },
+    "valuetype": {
+      "title": "Tipos de valor",
+      "subtitle": "Valores não monetários registáveis na contagem (vales, dinheiro eletrónico…).",
+      "new": "Novo tipo",
+      "edit_title": "Editar tipo",
+      "col_code": "Código",
+      "col_label": "Rótulo",
+      "col_order": "Ordem",
+      "col_active": "Estado",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "empty": "Sem tipo de valor."
     }
   },
   "vcfg": {

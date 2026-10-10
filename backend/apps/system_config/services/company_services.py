@@ -166,8 +166,9 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
     seed_payment_methods(company, created_by=created_by)
 
     # Coupures monétaires (billetage) par défaut — XAF.
-    from apps.treasury.services.seed import seed_denominations
+    from apps.treasury.services.seed import seed_denominations, seed_cash_value_types
     seed_denominations(company, created_by=created_by)
+    seed_cash_value_types(company, created_by=created_by)
 
     # Types de membre d'équipage par défaut (Voyages).
     from apps.voyages_config.services.crew_seed import seed_crew_member_types

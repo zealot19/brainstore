@@ -605,7 +605,10 @@
       "open_scheduled_title": "Abrir la sesión programada",
       "f_close_destination": "Caja de destino",
       "opt_destination": "Elija una caja…",
-      "close_destination_hint": "El efectivo contado se transferirá allí; la ventanilla queda a 0."
+      "close_destination_hint": "El efectivo contado se transferirá allí; la ventanilla queda a 0.",
+      "cash_total": "Total efectivo",
+      "other_values": "Otros valores",
+      "grand_total": "Total general"
     },
     "movement": {
       "title": "Movimientos",
@@ -846,6 +849,19 @@
       "add": "Añadir ingreso de viaje",
       "f_title": "Título",
       "f_vehicle": "Vehículo"
+    },
+    "valuetype": {
+      "title": "Tipos de valor",
+      "subtitle": "Valores no en efectivo registrables en el arqueo (bonos, dinero electrónico…).",
+      "new": "Nuevo tipo",
+      "edit_title": "Editar tipo",
+      "col_code": "Código",
+      "col_label": "Etiqueta",
+      "col_order": "Orden",
+      "col_active": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "empty": "Sin tipo de valor."
     }
   },
   "vcfg": {

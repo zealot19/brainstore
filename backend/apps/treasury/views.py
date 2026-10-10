@@ -20,7 +20,7 @@ from apps.treasury.serializers import (
     TransferReadSerializer, TransferWriteSerializer,
     TreasuryStatsSerializer,
     IncomeRowSerializer, OtherIncomeWriteSerializer, VoyageIncomeWriteSerializer,
-    DenominationSerializer, CashCountSerializer,
+    DenominationSerializer, CashValueTypeSerializer, CashCountSerializer,
 )
 
 
@@ -432,13 +432,18 @@ class SessionBilletageView(APIView):
         session = selectors.get_session(session_id, _company(request).id)
         if not session:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        from apps.treasury.models import CashValueType
         denoms = (CurrencyDenomination.objects
                   .filter(company=_company(request), is_active=True, is_deleted=False)
                   .order_by("-value"))
+        vts = (CashValueType.objects
+               .filter(company=_company(request), is_active=True, is_deleted=False)
+               .order_by("display_order", "label"))
         last = (session.counts.filter(kind="closing", is_deleted=False)
                 .prefetch_related("items").order_by("-created_at").first())
         return success_response({
             "denominations": DenominationSerializer(denoms, many=True).data,
+            "value_types": CashValueTypeSerializer(vts, many=True).data,
             "count": CashCountSerializer(last).data if last else None,
         })
 
@@ -1115,6 +1120,57 @@ class DenominationDetailView(APIView):
         obj = self._get(request, pk)
         if not obj:
             return error_response("Coupure introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        obj.is_deleted = True; obj.updated_by = request.user
+        obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return no_content_response()
+
+
+# ── Types de valeur (billetage étendu — M28) ─────────────────────────────────────
+
+class CashValueTypeListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.config.view", "POST": "treasury.config.manage"}
+
+    def get(self, request):
+        from apps.treasury.models import CashValueType
+        qs = CashValueType.objects.filter(company=_company(request), is_deleted=False).order_by("display_order", "label")
+        return success_response(CashValueTypeSerializer(qs, many=True).data)
+
+    def post(self, request):
+        from apps.treasury.models import CashValueType
+        ser = CashValueTypeSerializer(data=request.data); ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        obj, created = CashValueType.objects.get_or_create(
+            company=_company(request), code=d["code"],
+            defaults={"label": d["label"], "is_active": d.get("is_active", True),
+                      "display_order": d.get("display_order", 0), "created_by": request.user})
+        if not created:
+            return error_response("Ce type de valeur existe déjà.")
+        return created_response(CashValueTypeSerializer(obj).data)
+
+
+class CashValueTypeDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"PATCH": "treasury.config.manage", "DELETE": "treasury.config.manage"}
+
+    def _get(self, request, pk):
+        from apps.treasury.models import CashValueType
+        return CashValueType.objects.filter(id=pk, company=_company(request), is_deleted=False).first()
+
+    def patch(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Type de valeur introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        for f in ("code", "label", "is_active", "display_order"):
+            if f in request.data:
+                setattr(obj, f, request.data[f])
+        obj.updated_by = request.user; obj.save()
+        return success_response(CashValueTypeSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Type de valeur introuvable.", status_code=status.HTTP_404_NOT_FOUND)
         obj.is_deleted = True; obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return no_content_response()

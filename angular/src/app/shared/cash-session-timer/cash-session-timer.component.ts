@@ -30,6 +30,8 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   // Billetage de fin de poste
   denoms: any[] = [];
   bqty: Record<string, number> = {};
+  valueTypes: any[] = [];                 // M28 : autres valeurs (bons, monnaie électronique…)
+  bamt: Record<string, number> = {};
   billetageLoading = false; billetageSaving = false; billetageErr = ''; billetageDone = false;
 
   ngOnInit(): void {
@@ -77,11 +79,15 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   openBilletage(): void {
     if (!this.session) return;
     this.billetageErr = ''; this.billetageDone = false; this.billetageLoading = true;
-    this.bqty = {}; this.denoms = [];
+    this.bqty = {}; this.denoms = []; this.bamt = {}; this.valueTypes = [];
     this.svc.billetageGet(this.session.id).subscribe({
       next: d => {
         this.denoms = d?.denominations ?? [];
-        for (const it of d?.count?.items ?? []) this.bqty[it.denomination] = it.quantity;
+        this.valueTypes = d?.value_types ?? [];
+        for (const it of d?.count?.items ?? []) {
+          if (it.denomination) this.bqty[it.denomination] = it.quantity;
+          else if (it.value_type) this.bamt[it.value_type] = +it.subtotal;
+        }
         this.billetageLoading = false;
       },
       error: () => { this.billetageLoading = false; this.billetageErr = "Chargement impossible."; },
@@ -90,12 +96,15 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   get billetageTotal(): number {
     return this.denoms.reduce((s, d) => s + (+d.value) * (this.bqty[d.id] || 0), 0);
   }
+  get otherTotal(): number { return this.valueTypes.reduce((s, v) => s + (+this.bamt[v.id] || 0), 0); }
+  get grandTotal(): number { return this.billetageTotal + this.otherTotal; }
   saveBilletage(): void {
     if (!this.session || this.billetageSaving) return;
     this.billetageSaving = true; this.billetageErr = '';
-    const items = this.denoms
-      .filter(d => (this.bqty[d.id] || 0) > 0)
-      .map(d => ({ denomination_id: d.id, quantity: this.bqty[d.id] }));
+    const items = [
+      ...this.denoms.filter(d => (this.bqty[d.id] || 0) > 0).map(d => ({ denomination_id: d.id, quantity: this.bqty[d.id] })),
+      ...this.valueTypes.filter(v => (+this.bamt[v.id] || 0) > 0).map(v => ({ value_type_id: v.id, amount: this.bamt[v.id] })),
+    ];
     this.svc.billetageSave(this.session.id, items).subscribe({
       next: () => { this.billetageSaving = false; this.billetageDone = true;
         document.getElementById('cst-billetage-modal')?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); },
