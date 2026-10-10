@@ -8,8 +8,9 @@ from .general_expense import GeneralExpense
 from .payment_method import PaymentMethod
 from .billetage     import CurrencyDenomination, CashValueType, CashCount, CashCountItem
 from .operation_type import OperationType
+from .explanation import SessionExplanationRequest
 
 __all__ = ["CashRegister", "BankAccount", "CashSession", "Transaction", "Transfer",
            "MovementAccountMapping", "GeneralExpense", "PaymentMethod",
            "CurrencyDenomination", "CashValueType", "CashCount", "CashCountItem",
-           "OperationType"]
+           "OperationType", "SessionExplanationRequest"]

@@ -5,6 +5,7 @@ import { SessionService } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
 import { DenominationService } from '../../../services/treasury/denomination.service';
 import { ValueTypeService } from '../../../services/treasury/value-type.service';
+import { ExplanationService, ExplanationRequest } from '../../../services/treasury/explanation.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { CashSession, CashRegister, CurrencyDenomination, CashValueType } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -44,9 +45,39 @@ export class TrzSessionsComponent implements OnInit {
   // Rapport de session
   reportData: any = null;
 
+  // M30 — demandes d'explication d'écart
+  explSession: CashSession | null = null; expl: ExplanationRequest[] = [];
+  explNote = ''; respNote: Record<string, string> = {}; decVal: Record<string, string> = {}; decNote: Record<string, string> = {};
+
   constructor(private svc: SessionService, private regSvc: RegisterService,
               private denSvc: DenominationService, private vtSvc: ValueTypeService,
+              private explSvc: ExplanationService,
               private fb: FormBuilder, private auth: AuthService) {}
+
+  hasEcart(s: CashSession): boolean { return s.status === 'closed' && s.difference != null && +s.difference !== 0; }
+  openExpl(s: CashSession): void {
+    this.explSession = s; this.explNote = ''; this.expl = [];
+    this.explSvc.list(s.id).subscribe({ next: d => this.expl = d, error: () => {} });
+  }
+  private reloadExpl(): void { if (this.explSession) this.explSvc.list(this.explSession.id).subscribe(d => this.expl = d); }
+  doRaise(): void {
+    if (!this.explSession || !this.explNote.trim()) return;
+    this.explSvc.raise(this.explSession.id, this.explNote).subscribe({
+      next: () => { this.explNote = ''; this.reloadExpl(); this.toast.success('Demande envoyée.'); },
+      error: e => this.toast.error(e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué.") });
+  }
+  doRespond(id: string): void {
+    const note = (this.respNote[id] || '').trim(); if (!note) return;
+    this.explSvc.respond(id, note).subscribe({
+      next: () => { this.reloadExpl(); this.toast.success('Réponse envoyée.'); },
+      error: e => this.toast.error(e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué.") });
+  }
+  doDecide(id: string): void {
+    const d = this.decVal[id] || 'justified';
+    this.explSvc.decide(id, d, this.decNote[id] || '').subscribe({
+      next: () => { this.reloadExpl(); this.toast.success('Décision enregistrée.'); },
+      error: e => this.toast.error(e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué.") });
+  }
 
   private get me(): any { return this.auth.currentUser; }
   get isAdmin(): boolean { const u = this.me; return !!u && (!!u.is_superuser || !!u.is_institution_admin); }

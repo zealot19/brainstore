@@ -37,6 +37,9 @@ urlpatterns = [
     path("value-types/<uuid:pk>/",   views.CashValueTypeDetailView.as_view(), name="value-type-detail"),
     path("operation-types/",           views.OperationTypeListView.as_view(),   name="operation-type-list"),
     path("operation-types/<uuid:pk>/", views.OperationTypeDetailView.as_view(), name="operation-type-detail"),
+    path("sessions/<uuid:session_id>/explanations/", views.SessionExplanationListView.as_view(), name="explanation-list"),
+    path("explanations/<uuid:pk>/respond/", views.ExplanationRespondView.as_view(), name="explanation-respond"),
+    path("explanations/<uuid:pk>/decide/", views.ExplanationDecideView.as_view(), name="explanation-decide"),
 
     # ── Transactions ───────────────────────────────────────────────────────────
     path("transactions/",               views.TransactionListView.as_view(),   name="transaction-list"),

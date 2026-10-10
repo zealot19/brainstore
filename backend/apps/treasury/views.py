@@ -21,7 +21,7 @@ from apps.treasury.serializers import (
     TreasuryStatsSerializer,
     IncomeRowSerializer, OtherIncomeWriteSerializer, VoyageIncomeWriteSerializer,
     DenominationSerializer, CashValueTypeSerializer, CashCountSerializer,
-    OperationTypeSerializer,
+    OperationTypeSerializer, SessionExplanationRequestSerializer,
 )
 
 
@@ -1269,6 +1269,70 @@ class OperationTypeDetailView(APIView):
         obj.is_deleted = True; obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return no_content_response()
+
+
+# ── Demandes d'explication d'écart (M30) ─────────────────────────────────────────
+
+class SessionExplanationListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.session.view", "POST": "treasury.session.manage"}
+
+    def get(self, request, session_id):
+        from apps.treasury.models import SessionExplanationRequest
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        qs = SessionExplanationRequest.objects.filter(cash_session=session, is_deleted=False).order_by("-created_at")
+        return success_response(SessionExplanationRequestSerializer(qs, many=True).data)
+
+    def post(self, request, session_id):
+        from apps.treasury.services.explanation import raise_explanation
+        session = selectors.get_session(session_id, _company(request).id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            req = raise_explanation(session, note=request.data.get("request_note", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(SessionExplanationRequestSerializer(req).data)
+
+
+def _get_explanation(request, pk):
+    from apps.treasury.models import SessionExplanationRequest
+    return SessionExplanationRequest.objects.filter(id=pk, company=_company(request), is_deleted=False).first()
+
+
+class ExplanationRespondView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.operate"}
+
+    def post(self, request, pk):
+        from apps.treasury.services.explanation import respond_explanation
+        req = _get_explanation(request, pk)
+        if not req:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            respond_explanation(req, note=request.data.get("response_note", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(SessionExplanationRequestSerializer(_get_explanation(request, pk)).data)
+
+
+class ExplanationDecideView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+
+    def post(self, request, pk):
+        from apps.treasury.services.explanation import decide_explanation
+        req = _get_explanation(request, pk)
+        if not req:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            decide_explanation(req, decision=request.data.get("decision", ""),
+                               note=request.data.get("decision_note", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(SessionExplanationRequestSerializer(_get_explanation(request, pk)).data)
 
 
 # ── Remboursement par référence (guichet caisse) ─────────────────────────────────

@@ -898,6 +898,17 @@
       "a_modify": "Modificar",
       "modify_title": "Modificar importe",
       "empty": "Sin operación."
+    },
+    "explanation": {
+      "btn": "Explicación",
+      "title": "Solicitud de explicación de descuadre",
+      "ask": "Solicitar explicación",
+      "respond": "Responder",
+      "decide": "Decidir",
+      "justified": "Justificado",
+      "not_justified": "No justificado",
+      "f_note": "Nota…",
+      "empty": "Sin solicitud."
     }
   },
   "vcfg": {
