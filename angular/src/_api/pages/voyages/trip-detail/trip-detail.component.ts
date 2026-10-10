@@ -61,6 +61,7 @@ export class VoyagesTripDetailComponent implements OnInit {
         this.trip = t; this.loading = false;
         this.loadSeats();
         this.loadTbHistory();
+        this.svc.tripExpenses(this.id).subscribe(e => this.pendingExpenses = (e || []).filter((x: any) => x.status === 'planned'));
         // Toujours charger les véhicules éligibles : on peut (ré)affecter même si un
         // véhicule est déjà assigné (changement d'affectation, comme l'équipage).
         if (!this.vehicleLocked) this.svc.eligibleVehicles(this.id).subscribe(v => this.eligible = v);
@@ -133,6 +134,8 @@ export class VoyagesTripDetailComponent implements OnInit {
     obs.subscribe({ next: () => this.reload(), error: (e: any) => { this.actionError = e?.error?.detail ?? 'Action impossible.'; } });
   }
   submit(): void { this.run(this.svc.submit(this.id)); }
+  pendingExpenses: any[] = [];
+  get hasPendingExpenses(): boolean { return this.pendingExpenses.length > 0; }
   depart(): void { this.run(this.svc.depart(this.id)); }
   complete(): void { this.run(this.svc.complete(this.id)); }
   cancel(): void { if (confirm('Annuler ce voyage ?')) this.run(this.svc.cancel(this.id)); }

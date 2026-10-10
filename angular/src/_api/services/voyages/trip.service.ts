@@ -62,6 +62,7 @@ export class TripService {
   transbordVehicleEligible(vehicleId: string): Observable<any> { return this.http.get<any>(VOYAGES.transbordVehicleEligible(vehicleId)).pipe(map((r: any) => r.data ?? r)); }
   transbordVehicle(vehicleId: string, body: { to_vehicle_id: string; reason: string }): Observable<any> { return this.http.post<any>(VOYAGES.transbordVehicle(vehicleId), body).pipe(map((r: any) => r.data ?? r)); }
   transbordHistory(id: string): Observable<any[]> { return this.http.get<any[]>(VOYAGES.transbordHistory(id)); }
+  tripExpenses(id: string): Observable<any[]> { return this.http.get<any>(VOYAGES.tripExpenses(id)).pipe(map((r: any) => r.results ?? r.data ?? r)); }
 
   selectionOptions(id: string): Observable<{
     tickets: { id: string; seat: string; passenger_name: string }[];
