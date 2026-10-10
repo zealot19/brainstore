@@ -898,6 +898,17 @@
       "a_modify": "Modifier",
       "modify_title": "Modifier le montant",
       "empty": "Aucune opération."
+    },
+    "explanation": {
+      "btn": "Explication",
+      "title": "Demande d'explication d'écart",
+      "ask": "Demander une explication",
+      "respond": "Répondre",
+      "decide": "Décider",
+      "justified": "Justifié",
+      "not_justified": "Non justifié",
+      "f_note": "Note…",
+      "empty": "Aucune demande."
     }
   },
   "vcfg": {

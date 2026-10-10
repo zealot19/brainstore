@@ -898,6 +898,17 @@
       "a_modify": "Modify",
       "modify_title": "Modify amount",
       "empty": "No operation."
+    },
+    "explanation": {
+      "btn": "Explanation",
+      "title": "Écart explanation request",
+      "ask": "Request explanation",
+      "respond": "Respond",
+      "decide": "Decide",
+      "justified": "Justified",
+      "not_justified": "Not justified",
+      "f_note": "Note…",
+      "empty": "No request."
     }
   },
   "vcfg": {

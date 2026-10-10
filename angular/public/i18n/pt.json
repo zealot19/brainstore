@@ -898,6 +898,17 @@
       "a_modify": "Modificar",
       "modify_title": "Modificar montante",
       "empty": "Sem operação."
+    },
+    "explanation": {
+      "btn": "Explicação",
+      "title": "Pedido de explicação de diferença",
+      "ask": "Pedir explicação",
+      "respond": "Responder",
+      "decide": "Decidir",
+      "justified": "Justificado",
+      "not_justified": "Não justificado",
+      "f_note": "Nota…",
+      "empty": "Sem pedido."
     }
   },
   "vcfg": {

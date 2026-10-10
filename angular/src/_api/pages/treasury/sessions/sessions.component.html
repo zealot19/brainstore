@@ -48,6 +48,7 @@
                 @if ((s.status === 'draft' || s.status === 'open' || s.status === 'suspended') && canManage(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-extend-modal" (click)="openExtend(s)"><i class="ti ti-clock-plus me-1"></i>{{ 'treasury.session.extend' | transloco }}</a> }
                 @if ((s.status === 'open' || s.status === 'suspended') && canClose(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
                 @if (s.status === 'closed') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-report-modal" (click)="openReport(s)"><i class="ti ti-file-text me-1"></i>{{ 'treasury.session.report' | transloco }}</a> }
+                @if (hasEcart(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-expl-modal" (click)="openExpl(s)"><i class="ti ti-message-circle me-1"></i>{{ 'treasury.explanation.btn' | transloco }}</a> }
               </div></td>
             </tr>
           } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'treasury.session.empty' | transloco }}</td></tr> }
@@ -253,4 +254,51 @@
       </div>
     }
   </div>
+</div></div></div>
+
+<!-- M30 : demandes d'explication d'écart -->
+<div class="modal fade" id="trz-expl-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.explanation.title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <!-- Nouvelle demande (chef d'agence) -->
+    <div class="mb-3" *hasPermission="'treasury.session.manage'">
+      <label class="form-label">{{ 'treasury.explanation.ask' | transloco }}</label>
+      <div class="d-flex gap-2">
+        <input type="text" class="form-control" [(ngModel)]="explNote" [placeholder]="'treasury.explanation.f_note' | transloco" />
+        <button class="btn btn-primary" [disabled]="!explNote.trim()" (click)="doRaise()">{{ 'treasury.explanation.ask' | transloco }}</button>
+      </div>
+    </div>
+    <!-- Fil -->
+    @for (e of expl; track e.id) {
+      <div class="border rounded p-2 mb-2">
+        <div class="d-flex justify-content-between">
+          <span class="badge" [class.bg-warning]="e.status==='pending_response'" [class.bg-info]="e.status==='responded'" [class.bg-success]="e.status==='decided'">{{ e.status_display }}</span>
+          <small class="text-muted">{{ e.requested_at | date:'short' }}</small>
+        </div>
+        <div class="small mt-1"><strong>{{ e.requested_by_name }}</strong> — {{ e.request_note }}</div>
+        @if (e.response_note) { <div class="small mt-1 ps-3"><strong>{{ e.responded_by_name }}</strong> ({{ e.responded_at | date:'short' }}) — {{ e.response_note }}</div> }
+        @if (e.decision) { <div class="small mt-1 ps-3"><strong>{{ e.decided_by_name }}</strong> — <em>{{ e.decision_display }}</em> {{ e.decision_note }}</div> }
+
+        <!-- Répondre (caissier assigné) -->
+        @if (e.status === 'pending_response') {
+          <div class="d-flex gap-2 mt-2" *hasPermission="'treasury.session.operate'">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="respNote[e.id]" [placeholder]="'treasury.explanation.respond' | transloco" />
+            <button class="btn btn-sm btn-outline-primary" [disabled]="!(respNote[e.id] && respNote[e.id].trim())" (click)="doRespond(e.id)">{{ 'treasury.explanation.respond' | transloco }}</button>
+          </div>
+        }
+        <!-- Décider (chef) -->
+        @if (e.status === 'responded') {
+          <div class="d-flex gap-2 mt-2 align-items-center" *hasPermission="'treasury.session.manage'">
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="decVal[e.id]">
+              <option value="justified">{{ 'treasury.explanation.justified' | transloco }}</option>
+              <option value="not_justified">{{ 'treasury.explanation.not_justified' | transloco }}</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="decNote[e.id]" [placeholder]="'treasury.explanation.f_note' | transloco" />
+            <button class="btn btn-sm btn-success" (click)="doDecide(e.id)">{{ 'treasury.explanation.decide' | transloco }}</button>
+          </div>
+        }
+      </div>
+    } @empty { <div class="text-muted small">{{ 'treasury.explanation.empty' | transloco }}</div> }
+  </div>
+  <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.close' | transloco }}</button></div>
 </div></div></div>
