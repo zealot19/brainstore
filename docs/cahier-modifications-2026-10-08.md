@@ -6,7 +6,8 @@ Ce document regroupe les modifications dictées les 7 et 8 octobre 2026. Les dem
 
 > **Suivi d'implémentation (Claude / shimi).** Statut au fil de l'eau.
 > - ✅ Livré & mergé sur master→deploy : **M01** (module Configuration), **M02** (densité d'interface + sidebar/header + retrait des bandeaux d'info), **M03** (journal d'audit), **M04** (code véhicule), **M05** (plans de bus numériques), **M07** (menu Documents), **M08** (n° carte d'identité équipage), **M09** (lieux unifiés), **M10** (sélecteur d'arrêts), **M11** (types de voyage), **M12** (quota réservations + archivage), **M13** (génération de voyages en lot), **M14** (catégorie tarifaire Location), **M16** (transbordement — 3 modes + motif), **M17** (formulaires compacts — paiement), **M18** (disponibilité formulaire de vente), **M23** (bagage lié au passager), **M24** (nature/contenu colis), **M26** (types d'opération + frais de route + validation des opérations), **M27** (types de caisse + solde négatif), **M28** (billetage étendu — valeurs configurables).
-> - ⏳ Restant : M06, M15, M19, M20, M21, M22, M25, M29, M30, M31.
+> - 🟡 Partiel : **M15** — *start-gate livré* (un voyage ne peut pas démarrer tant que ses dépenses ne sont pas décaissées : contrôle serveur + bouton désactivé + liste des dépenses en attente). Reste la 2ᵉ moitié : **récapitulatif des recettes par voyage** (différé — dépend du démêlage du double modèle Trip, à faire avec revue indépendante).
+> - ⏳ Restant : M06, M19, M20, M21, M22, M25, M29, M30, M31 (+ M15 recettes).
 > - ⚠️ Conflits à arbitrer avec l'existant : **M06** (suppression Garage/Accidents) défait le travail récent *accidents ↔ voyage* déjà mergé ; **M05** (plans de bus numériques, suppression de l'éditeur visuel) recoupe le travail existant *blockable-seats / seat-assignment / plan-drives-seats*.
 
 ---
