@@ -4,8 +4,9 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { SessionService } from '../../../services/treasury/session.service';
 import { RegisterService } from '../../../services/treasury/register.service';
 import { DenominationService } from '../../../services/treasury/denomination.service';
+import { ValueTypeService } from '../../../services/treasury/value-type.service';
 import { AuthService } from '../../../services/auth/auth.service';
-import { CashSession, CashRegister, CurrencyDenomination } from '../../../models/treasury.models';
+import { CashSession, CashRegister, CurrencyDenomination, CashValueType } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
@@ -26,6 +27,7 @@ export class TrzSessionsComponent implements OnInit {
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
   denoms: CurrencyDenomination[] = [];
+  valueTypes: CashValueType[] = [];
 
   extendForm!: FormGroup;
   saving = false; errorMsg = '';
@@ -35,6 +37,7 @@ export class TrzSessionsComponent implements OnInit {
 
   // Billetage (clôture uniquement)
   closeBilletage = true; closeQty: Record<string, number> = {}; closeManual: number | null = null;
+  closeAmounts: Record<string, number> = {};   // M28 : montants des autres valeurs par type
   closeReason = ''; closeNote = '';
   readonly ecartReasons = ['rendu', 'encaissement', 'depense', 'comptage', 'perte', 'autre'];
 
@@ -42,8 +45,8 @@ export class TrzSessionsComponent implements OnInit {
   reportData: any = null;
 
   constructor(private svc: SessionService, private regSvc: RegisterService,
-              private denSvc: DenominationService, private fb: FormBuilder,
-              private auth: AuthService) {}
+              private denSvc: DenominationService, private vtSvc: ValueTypeService,
+              private fb: FormBuilder, private auth: AuthService) {}
 
   private get me(): any { return this.auth.currentUser; }
   get isAdmin(): boolean { const u = this.me; return !!u && (!!u.is_superuser || !!u.is_institution_admin); }
@@ -68,6 +71,7 @@ export class TrzSessionsComponent implements OnInit {
     this.extendForm = this.fb.group({ scheduled_end: ['', Validators.required] });
     this.regSvc.list().subscribe({ next: d => this.registers = d.filter(r => r.is_active) });
     this.denSvc.list().subscribe({ next: d => this.denoms = d.filter(x => x.is_active) });
+    this.vtSvc.list().subscribe({ next: d => this.valueTypes = d.filter(x => x.is_active) });
     this.load();
   }
   load(): void {
@@ -78,9 +82,13 @@ export class TrzSessionsComponent implements OnInit {
 
   // ── Billetage helpers ──
   private total(qty: Record<string, number>): number { return this.denoms.reduce((s, d) => s + (+d.value) * (qty[d.id] || 0), 0); }
-  get closeTotal(): number { return this.total(this.closeQty); }
-  private toItems(qty: Record<string, number>): { denomination_id: string; quantity: number }[] {
-    return this.denoms.filter(d => (qty[d.id] || 0) > 0).map(d => ({ denomination_id: d.id, quantity: qty[d.id] }));
+  get closeTotal(): number { return this.total(this.closeQty); }            // espèces (base de l'écart)
+  get otherTotal(): number { return this.valueTypes.reduce((s, v) => s + (+this.closeAmounts[v.id] || 0), 0); }
+  get grandTotal(): number { return this.closeTotal + this.otherTotal; }    // total affiché
+  private toItems(qty: Record<string, number>): any[] {
+    const cash = this.denoms.filter(d => (qty[d.id] || 0) > 0).map(d => ({ denomination_id: d.id, quantity: qty[d.id] }));
+    const vals = this.valueTypes.filter(v => (+this.closeAmounts[v.id] || 0) > 0).map(v => ({ value_type_id: v.id, amount: this.closeAmounts[v.id] }));
+    return [...cash, ...vals];
   }
 
   // ── Ouvrir une session (directement, par un gestionnaire) ──
@@ -124,11 +132,14 @@ export class TrzSessionsComponent implements OnInit {
   // ── Clôturer ──
   openClose(s: CashSession): void {
     this.closingId = s.id; this.closingSession = s; this.closeDestId = null; this.errorMsg = '';
-    this.closeBilletage = true; this.closeQty = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = '';
+    this.closeBilletage = true; this.closeQty = {}; this.closeAmounts = {}; this.closeManual = null; this.closeReason = ''; this.closeNote = '';
     // Pré-remplir le billetage à partir du dernier comptage saisi par le guichetier.
     this.svc.counts(s.id).subscribe({ next: (cs: any[]) => {
       const last = (cs || []).filter(c => c.kind === 'closing').pop();
-      if (last) for (const it of last.items || []) this.closeQty[it.denomination] = it.quantity;
+      if (last) for (const it of last.items || []) {
+        if (it.denomination) this.closeQty[it.denomination] = it.quantity;
+        else if (it.value_type) this.closeAmounts[it.value_type] = +it.subtotal;
+      }
     }, error: () => {} });
   }
   get closingIsGuichet(): boolean { return this.closingSession?.register_kind === 'guichet'; }

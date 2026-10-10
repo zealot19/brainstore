@@ -605,7 +605,10 @@
       "open_scheduled_title": "Abrir a sessão agendada",
       "f_close_destination": "Caixa de destino",
       "opt_destination": "Escolha uma caixa…",
-      "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0."
+      "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0.",
+      "cash_total": "Total em numerário",
+      "other_values": "Outros valores",
+      "grand_total": "Total geral"
     },
     "movement": {
       "title": "Movimentos",

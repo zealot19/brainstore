@@ -605,7 +605,10 @@
       "open_scheduled_title": "Open the scheduled session",
       "f_close_destination": "Destination cash register",
       "opt_destination": "Choose a cash register…",
-      "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0."
+      "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0.",
+      "cash_total": "Cash total",
+      "other_values": "Other values",
+      "grand_total": "Grand total"
     },
     "movement": {
       "title": "Movements",

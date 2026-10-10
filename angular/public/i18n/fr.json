@@ -605,7 +605,10 @@
       "open_scheduled_title": "Ouvrir la session planifiée",
       "f_close_destination": "Caisse de destination",
       "opt_destination": "Choisir une caisse…",
-      "close_destination_hint": "L'espèce comptée y sera transférée ; le guichet finira à 0 FCFA."
+      "close_destination_hint": "L'espèce comptée y sera transférée ; le guichet finira à 0 FCFA.",
+      "cash_total": "Total espèces",
+      "other_values": "Autres valeurs",
+      "grand_total": "Total général"
     },
     "movement": {
       "title": "Mouvements",

@@ -432,13 +432,18 @@ class SessionBilletageView(APIView):
         session = selectors.get_session(session_id, _company(request).id)
         if not session:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        from apps.treasury.models import CashValueType
         denoms = (CurrencyDenomination.objects
                   .filter(company=_company(request), is_active=True, is_deleted=False)
                   .order_by("-value"))
+        vts = (CashValueType.objects
+               .filter(company=_company(request), is_active=True, is_deleted=False)
+               .order_by("display_order", "label"))
         last = (session.counts.filter(kind="closing", is_deleted=False)
                 .prefetch_related("items").order_by("-created_at").first())
         return success_response({
             "denominations": DenominationSerializer(denoms, many=True).data,
+            "value_types": CashValueTypeSerializer(vts, many=True).data,
             "count": CashCountSerializer(last).data if last else None,
         })
 
