@@ -970,7 +970,9 @@
       "new": "New class",
       "info": "Commercial classes (VIP, Classic…). Distinct from the physical seat type: a VIP class can be sold on a standard seat during a reroute.",
       "col_rank": "Rank",
-      "col_color": "Color"
+      "col_color": "Color",
+      "f_rental": "Rental (whole bus)",
+      "badge_rental": "Rental"
     },
     "cm": {
       "title": "Crew members",

@@ -970,7 +970,9 @@
       "new": "Nouvelle catégorie",
       "info": "Classes commerciales (VIP, Classic…). Distinctes du type physique de siège : une classe VIP peut être vendue sur un siège standard lors d’un déroutement.",
       "col_rank": "Rang",
-      "col_color": "Couleur"
+      "col_color": "Couleur",
+      "f_rental": "Location (bus entier)",
+      "badge_rental": "Location"
     },
     "cm": {
       "title": "Membres d'équipage",

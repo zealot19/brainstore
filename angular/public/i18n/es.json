@@ -970,7 +970,9 @@
       "new": "Nueva categoría",
       "info": "Clases comerciales (VIP, Classic…). Distintas del tipo físico de asiento: una clase VIP puede venderse en un asiento estándar durante un desvío.",
       "col_rank": "Rango",
-      "col_color": "Color"
+      "col_color": "Color",
+      "f_rental": "Alquiler (autobús entero)",
+      "badge_rental": "Alquiler"
     },
     "cm": {
       "title": "Miembros de tripulación",

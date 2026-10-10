@@ -970,7 +970,9 @@
       "new": "Nova categoria",
       "info": "Classes comerciais (VIP, Classic…). Distintas do tipo físico de lugar: uma classe VIP pode ser vendida num lugar padrão durante um desvio.",
       "col_rank": "Classificação",
-      "col_color": "Cor"
+      "col_color": "Cor",
+      "f_rental": "Aluguer (autocarro inteiro)",
+      "badge_rental": "Aluguer"
     },
     "cm": {
       "title": "Membros da tripulação",
