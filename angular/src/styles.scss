@@ -3437,3 +3437,76 @@ body { font-family: var(--bs-body-font-family); }
   // La colonne d'actions (icônes) ne doit pas s'enrouler
   .edit-delete-action { flex-wrap: nowrap; white-space: nowrap; }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   M02 — Densité d'interface (réduction globale modérée, toute l'application).
+   Couche ajoutée en dernier : gagne la spécificité sur le thème acheté.
+   On réduit la densité INTERNE (polices, paddings, rythme vertical) partout ;
+   les dimensions structurelles (largeur de la sidebar, hauteur du header, marge
+   du contenu) restent inchangées pour ne pas casser le gabarit du thème.
+   ─────────────────────────────────────────────────────────────────────────── */
+html,
+body {
+  font-size: 13px !important;        // base 14 → 13
+}
+
+// Zone de contenu un peu plus serrée
+.page-wrapper-new,
+.page-wrapper .content { padding: 16px !important; }
+
+// Formulaires
+.form-control,
+.form-select {
+  padding: 0.3rem 0.6rem !important;
+  font-size: 13px !important;
+}
+.form-label { font-size: 13px; margin-bottom: 0.25rem; }
+.col-form-label { font-size: 13px; }
+.input-group-text { padding: 0.3rem 0.6rem; font-size: 13px; }
+
+// Boutons
+.btn { padding: 0.35rem 0.7rem; font-size: 13px; }
+.btn-sm { padding: 0.2rem 0.5rem; font-size: 12px; }
+.btn-lg { padding: 0.5rem 1rem; font-size: 14px; }
+
+// Tableaux
+.table > :not(caption) > * > * { padding: 0.4rem 0.5rem; }
+.table { font-size: 13px; }
+
+// Cartes
+.card-body { padding: 1rem; }
+.card-header,
+.card-footer { padding: 0.6rem 1rem; }
+
+// Modales
+.modal-body { padding: 1rem; }
+.modal-header,
+.modal-footer { padding: 0.6rem 1rem; }
+.modal-title { font-size: 1rem; }
+
+// En-tête de page
+.page-header { margin-bottom: 1rem; }
+.page-header .page-title h4 { font-size: 1.15rem; }
+.page-header .page-title h6 { font-size: 0.8rem; }
+
+// Badges
+.badge { font-size: 0.72rem; }
+
+// Menus (sidebar) — rythme vertical réduit, largeur conservée
+.sidebar .sidebar-menu > ul > li > a { padding: 6px 12px !important; font-size: 13px !important; }
+.sidebar .sidebar-menu li.submenu ul li a { padding: 5px 10px 5px 28px !important; font-size: 12px !important; }
+.sidebar .sidebar-menu .menu-title { font-size: 11px !important; }
+
+// Barre supérieure — densité interne (hauteur conservée)
+.header .header-left,
+.header .nav-link { font-size: 13px; }
+
+// Petits écrans : compacter davantage et éviter le débordement horizontal
+@media (max-width: 575.98px) {
+  .page-wrapper-new,
+  .page-wrapper .content { padding: 10px !important; }
+  .card-body { padding: 0.75rem; }
+  .modal-dialog { margin: 0.5rem; }
+  .page-header { flex-wrap: wrap; gap: 0.5rem; }
+  .table-responsive { overflow-x: auto; }
+}
