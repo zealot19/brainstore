@@ -19,7 +19,7 @@ def _bare_company(name="VoyDef Co"):
 def test_seed_creates_all_reference_rows():
     company = _bare_company()
     seed_voyages_defaults(company)
-    assert FareClass.objects.filter(company=company).count() == 2
+    assert FareClass.objects.filter(company=company).count() == 3  # ECO, VIP, LOC (M14)
     assert TimeSlot.objects.filter(company=company).count() == 4
     assert ConsignmentNature.objects.filter(company=company).count() == 5
     assert ConsignmentType.objects.filter(company=company).count() == 3
@@ -42,7 +42,7 @@ def test_seed_is_idempotent():
     company = _bare_company("IdemCo")
     seed_voyages_defaults(company)
     seed_voyages_defaults(company)  # second run must not duplicate
-    assert FareClass.objects.filter(company=company).count() == 2
+    assert FareClass.objects.filter(company=company).count() == 3
     assert ConsignmentType.objects.filter(company=company).count() == 3
     assert SeatingPlan.objects.filter(company=company).count() == 2
     assert VoyagesSettings.objects.filter(company=company).count() == 1
@@ -56,5 +56,5 @@ def test_bootstrap_seeds_voyages_defaults():
         name="Boot Voy Co", admin_email="bv@x.com",
         admin_first_name="B", admin_last_name="V")
     assert setup is not None
-    assert FareClass.objects.filter(company=company).count() == 2
+    assert FareClass.objects.filter(company=company).count() == 3
     assert SeatingPlan.objects.filter(company=company).count() == 2
