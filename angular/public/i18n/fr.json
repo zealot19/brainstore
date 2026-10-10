@@ -1365,7 +1365,8 @@
       "stop_order": "Ordre",
       "stop_sp": "Lieu",
       "stop_arrival": "Arrivée prévue",
-      "no_stops": "Aucune escale."
+      "no_stops": "Aucune escale.",
+      "depart_blocked": "Des dépenses de ce voyage ne sont pas encore décaissées — à régler avant le départ."
     },
     "gen": {
       "btn": "Générer en lot",

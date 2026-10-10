@@ -1365,7 +1365,8 @@
       "stop_order": "Orden",
       "stop_sp": "Lugar",
       "stop_arrival": "Llegada prevista",
-      "no_stops": "Sin paradas."
+      "no_stops": "Sin paradas.",
+      "depart_blocked": "Este viaje tiene gastos no desembolsados — liquídelos antes de la salida."
     },
     "gen": {
       "btn": "Generar en lote",

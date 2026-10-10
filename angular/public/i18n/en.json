@@ -1365,7 +1365,8 @@
       "stop_order": "Order",
       "stop_sp": "Place",
       "stop_arrival": "Scheduled arrival",
-      "no_stops": "No stops."
+      "no_stops": "No stops.",
+      "depart_blocked": "This trip has undisbursed expenses — settle them before departure."
     },
     "gen": {
       "btn": "Batch generate",

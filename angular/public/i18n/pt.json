@@ -1365,7 +1365,8 @@
       "stop_order": "Ordem",
       "stop_sp": "Local",
       "stop_arrival": "Chegada prevista",
-      "no_stops": "Sem paragens."
+      "no_stops": "Sem paragens.",
+      "depart_blocked": "Esta viagem tem despesas não desembolsadas — regularize-as antes da partida."
     },
     "gen": {
       "btn": "Gerar em lote",
