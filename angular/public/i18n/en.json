@@ -878,6 +878,26 @@
       "active": "Active",
       "inactive": "Inactive",
       "empty": "No operation type."
+    },
+    "operation": {
+      "title": "Operations validation",
+      "subtitle": "Validate, invalidate or modify manual expenses and incomes.",
+      "f_status": "Status",
+      "st_pending": "Pending",
+      "st_validated": "Validated",
+      "st_invalidated": "Invalidated",
+      "st_all": "All",
+      "col_date": "Date",
+      "col_type": "Type",
+      "col_desc": "Description",
+      "col_caisse": "Register",
+      "col_amount": "Amount",
+      "col_status": "Status",
+      "a_validate": "Validate",
+      "a_invalidate": "Invalidate",
+      "a_modify": "Modify",
+      "modify_title": "Modify amount",
+      "empty": "No operation."
     }
   },
   "vcfg": {

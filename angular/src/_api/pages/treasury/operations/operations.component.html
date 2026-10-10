@@ -1,0 +1,65 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'treasury.operation.title' | transloco }}</h4><h6>{{ 'treasury.operation.subtitle' | transloco }}</h6>
+  </div></div>
+</div>
+<div class="card table-list-card">
+  <div class="card-header d-flex align-items-center gap-2">
+    <label class="small text-muted mb-0">{{ 'treasury.operation.f_status' | transloco }}</label>
+    <select class="form-select form-select-sm w-auto" [(ngModel)]="statusFilter" (ngModelChange)="load()">
+      <option value="pending">{{ 'treasury.operation.st_pending' | transloco }}</option>
+      <option value="validated">{{ 'treasury.operation.st_validated' | transloco }}</option>
+      <option value="invalidated">{{ 'treasury.operation.st_invalidated' | transloco }}</option>
+      <option value="">{{ 'treasury.operation.st_all' | transloco }}</option>
+    </select>
+  </div>
+  <div class="card-body p-0">
+    @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+    @else {
+      <div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>{{ 'treasury.operation.col_date' | transloco }}</th>
+          <th>{{ 'treasury.operation.col_type' | transloco }}</th>
+          <th>{{ 'treasury.operation.col_desc' | transloco }}</th>
+          <th>{{ 'treasury.operation.col_caisse' | transloco }}</th>
+          <th class="text-end">{{ 'treasury.operation.col_amount' | transloco }}</th>
+          <th>{{ 'treasury.operation.col_status' | transloco }}</th>
+          <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+        </tr></thead>
+        <tbody>
+          @for (r of rows; track r.id) {
+            <tr>
+              <td>{{ r.transaction_date }}</td>
+              <td>{{ r.category_display }} <span class="text-muted small">({{ r.type_display }})</span></td>
+              <td>{{ r.description }}</td>
+              <td>{{ r.account_label || '—' }}</td>
+              <td class="text-end fw-medium">{{ r.amount }}</td>
+              <td><span class="badge" [ngClass]="badgeClass(r.status)">{{ r.status_display }}</span></td>
+              <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center gap-1">
+                @if (r.status === 'pending') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#op-modify-modal" (click)="openModify(r)">{{ 'treasury.operation.a_modify' | transloco }}</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-success" *hasPermission="'treasury.operation.validate'" (click)="validate(r)">{{ 'treasury.operation.a_validate' | transloco }}</a>
+                }
+                @if (r.status !== 'invalidated') {
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'treasury.operation.validate'" (click)="invalidate(r)">{{ 'treasury.operation.a_invalidate' | transloco }}</a>
+                }
+              </div></td>
+            </tr>
+          } @empty { <tr><td colspan="7" class="text-center py-4 text-muted">{{ 'treasury.operation.empty' | transloco }}</td></tr> }
+        </tbody>
+      </table></div>
+    }
+  </div>
+</div>
+
+<div class="modal fade" id="op-modify-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ 'treasury.operation.modify_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <label class="form-label">{{ 'treasury.operation.col_amount' | transloco }}</label>
+    <input type="number" min="1" class="form-control" [(ngModel)]="editAmount" />
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
+    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="saving" (click)="submitModify()">{{ 'shared.actions.save' | transloco }}</button>
+  </div>
+</div></div></div>

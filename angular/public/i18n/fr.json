@@ -878,6 +878,26 @@
       "active": "Actif",
       "inactive": "Inactif",
       "empty": "Aucun type d'opération."
+    },
+    "operation": {
+      "title": "Validation des opérations",
+      "subtitle": "Valider, invalider ou modifier les dépenses et recettes manuelles.",
+      "f_status": "Statut",
+      "st_pending": "En attente",
+      "st_validated": "Validées",
+      "st_invalidated": "Invalidées",
+      "st_all": "Toutes",
+      "col_date": "Date",
+      "col_type": "Type",
+      "col_desc": "Description",
+      "col_caisse": "Caisse",
+      "col_amount": "Montant",
+      "col_status": "Statut",
+      "a_validate": "Valider",
+      "a_invalidate": "Invalider",
+      "a_modify": "Modifier",
+      "modify_title": "Modifier le montant",
+      "empty": "Aucune opération."
     }
   },
   "vcfg": {

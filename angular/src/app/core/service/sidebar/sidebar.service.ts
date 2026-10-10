@@ -351,6 +351,13 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Validation des opérations',
+          route: routes.trzOperations,
+          base: 'operations',
+          icon2: 'checklist',
+          permission: 'treasury.operation.validate',
+        },
+        {
           menuValue: 'Dépenses',
           hasSubRoute: true,
           showSubRoute: false,

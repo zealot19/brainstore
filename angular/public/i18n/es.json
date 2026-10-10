@@ -878,6 +878,26 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "empty": "Sin tipo de operación."
+    },
+    "operation": {
+      "title": "Validación de operaciones",
+      "subtitle": "Validar, invalidar o modificar gastos e ingresos manuales.",
+      "f_status": "Estado",
+      "st_pending": "Pendientes",
+      "st_validated": "Validadas",
+      "st_invalidated": "Invalidadas",
+      "st_all": "Todas",
+      "col_date": "Fecha",
+      "col_type": "Tipo",
+      "col_desc": "Descripción",
+      "col_caisse": "Caja",
+      "col_amount": "Importe",
+      "col_status": "Estado",
+      "a_validate": "Validar",
+      "a_invalidate": "Invalidar",
+      "a_modify": "Modificar",
+      "modify_title": "Modificar importe",
+      "empty": "Sin operación."
     }
   },
   "vcfg": {
