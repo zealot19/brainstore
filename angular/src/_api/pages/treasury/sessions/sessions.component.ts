@@ -87,6 +87,14 @@ export class TrzSessionsComponent implements OnInit {
   // La clôture (billetage de fin) est aussi permise au guichetier assigné.
   // La clôture appartient au chef d'agence (gestionnaire) ; le guichetier ne clôture plus.
   canClose(s: CashSession): boolean { return this.canManage(s); }
+  // M29 : le caissier assigné (ou admin) arrête sa session ouverte.
+  canStop(s: CashSession): boolean { return s.status === 'open' && (this.isAdmin || s.assigned_to === this.me?.id); }
+  stopSession(s: CashSession): void {
+    this.svc.stop(s.id).subscribe({
+      next: () => { this.load(); this.toast.success('Session arrêtée.'); },
+      error: e => this.toast.error(e?.error?.error?.message ?? e?.error?.detail ?? "L'opération a échoué."),
+    });
+  }
 
   openForm!: FormGroup;
   scheduleForm!: FormGroup;

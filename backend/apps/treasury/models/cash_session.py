@@ -12,6 +12,7 @@ class CashSession(BaseModel):
         DRAFT     = "draft",     _("Planifiée")
         OPEN      = "open",      _("Open")
         SUSPENDED = "suspended", _("Suspendue")
+        STOPPED   = "stopped",   _("Arrêtée")
         CLOSED    = "closed",    _("Closed")
 
     class EcartReason(models.TextChoices):
@@ -38,6 +39,9 @@ class CashSession(BaseModel):
     closed_by      = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("closed by"),
                                         on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name="closed_sessions")
+    stopped_at     = models.DateTimeField(_("arrêtée le"), null=True, blank=True)
+    stopped_by     = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("arrêtée par"),
+                                        on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
 
     opening_balance  = models.DecimalField(_("opening balance"), max_digits=12, decimal_places=2,
                                             null=True, blank=True)

@@ -391,6 +391,22 @@ class ResumeSessionView(_SessionActionView):
     action = "resume_session"
 
 
+class SessionStopView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.operate"}
+
+    def post(self, request, session_id):
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            services.stop_session(session, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
 class ExtendSessionView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"POST": "treasury.session.manage"}

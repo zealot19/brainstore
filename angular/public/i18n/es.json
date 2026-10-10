@@ -608,7 +608,8 @@
       "close_destination_hint": "El efectivo contado se transferirá allí; la ventanilla queda a 0.",
       "cash_total": "Total efectivo",
       "other_values": "Otros valores",
-      "grand_total": "Total general"
+      "grand_total": "Total general",
+      "stop_btn": "Detener mi sesión"
     },
     "movement": {
       "title": "Movimientos",

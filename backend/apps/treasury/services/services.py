@@ -144,8 +144,9 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
                   justification_reason="", justification_note="",
                   destination_cash_register_id=None, updated_by):
     from apps.treasury.services.billetage import compute_count_total, record_count
-    if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED):
-        raise ApplicationError(_("Seule une session ouverte ou suspendue peut être clôturée."))
+    if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED,
+                              CashSession.Status.STOPPED):
+        raise ApplicationError(_("Seule une session ouverte, suspendue ou arrêtée peut être clôturée."))
     # La clôture appartient au chef d'agence (droit RBAC treasury.session.manage, imposé au
     # niveau de la vue), borné à son agence. Le guichetier (gestionnaire de la caisse) ne
     # clôture pas : il ne fait qu'opérer/vendre.
@@ -298,6 +299,25 @@ def resume_session(session, *, updated_by):
     session.status = CashSession.Status.OPEN
     session.updated_by = updated_by
     session.save(update_fields=["status", "updated_by", "updated_at"])
+    return session
+
+
+@transaction.atomic
+def stop_session(session, *, user):
+    """M29 — le caissier assigné arrête sa session après le billetage de fin de poste."""
+    from apps.treasury.models import CashCount
+    if session.status != CashSession.Status.OPEN:
+        raise ApplicationError(_("Seule une session ouverte peut être arrêtée."))
+    is_admin = bool(getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False))
+    if not is_admin and session.assigned_to_id != getattr(user, "id", None):
+        raise ApplicationError(_("Seul le caissier assigné peut arrêter cette session."))
+    if not session.counts.filter(kind=CashCount.Kind.CLOSING, is_deleted=False).exists():
+        raise ApplicationError(_("Faites le billetage de fin de poste avant d'arrêter la session."))
+    session.status = CashSession.Status.STOPPED
+    session.stopped_at = timezone.now()
+    session.stopped_by = user
+    session.updated_by = user
+    session.save(update_fields=["status", "stopped_at", "stopped_by", "updated_by", "updated_at"])
     return session
 
 

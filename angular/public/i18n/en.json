@@ -608,7 +608,8 @@
       "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0.",
       "cash_total": "Cash total",
       "other_values": "Other values",
-      "grand_total": "Grand total"
+      "grand_total": "Grand total",
+      "stop_btn": "Stop my session"
     },
     "movement": {
       "title": "Movements",

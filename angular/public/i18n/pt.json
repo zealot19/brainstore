@@ -608,7 +608,8 @@
       "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0.",
       "cash_total": "Total em numerário",
       "other_values": "Outros valores",
-      "grand_total": "Total geral"
+      "grand_total": "Total geral",
+      "stop_btn": "Parar a minha sessão"
     },
     "movement": {
       "title": "Movimentos",

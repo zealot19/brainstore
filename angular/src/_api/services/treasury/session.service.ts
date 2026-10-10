@@ -26,6 +26,7 @@ export class SessionService {
       .pipe(map(r => r.data ?? r));
   }
   openScheduled(id: string, data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionOpenScheduled(id), data); }
+  stop(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionStop(id), {}); }
   suspend(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSuspend(id), {}); }
   resume(id: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionResume(id), {}); }
   extend(id: string, scheduled_end: string): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionExtend(id), { scheduled_end }); }
