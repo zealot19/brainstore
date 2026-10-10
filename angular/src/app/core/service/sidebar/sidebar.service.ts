@@ -257,6 +257,7 @@ export class SidebarService {
           subMenus: [
             { menuValue: 'Tout Afficher', route: routes.voyagesList, base: 'list', permission: 'voyage.trip.view' },
             { menuValue: 'Nouveau voyage', route: routes.voyagesList, queryParams: { new: 1 }, base: 'list', permission: 'voyage.trip.create' },
+            { menuValue: 'Transbordement', route: routes.vtTransbordement, base: 'transbordement', permission: 'voyage.trip.update' },
           ],
         },
         {

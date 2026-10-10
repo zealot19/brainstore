@@ -461,6 +461,7 @@ export const routes={
   // ── Gestion Voyages ──────────────────────────────────────────────────────────
   voyagesDashboard: '/voyages/dashboard',
   voyagesList: '/voyages/list',
+  vtTransbordement: '/voyages/transbordement',
   voyagesTrip: '/voyages/trip',
 
   // ── Réservations Voyages ─────────────────────────────────────────────────────

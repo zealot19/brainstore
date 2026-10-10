@@ -2849,5 +2849,22 @@
   },
   "config": {
     "coming_soon": "Coming soon"
+  },
+  "voyages": {
+    "transbord": {
+      "title": "Transfer",
+      "f_reason": "Reason",
+      "col_reason": "Reason",
+      "by_vehicle": "By vehicle",
+      "by_vehicle_btn": "Transfer the vehicle",
+      "target_vehicle": "Target vehicle",
+      "impacted_trips": "Impacted trips",
+      "general": "General",
+      "source_trip": "Source trip",
+      "dest_trip": "Destination trip",
+      "execute": "Transfer",
+      "no_trips": "No trip.",
+      "history": "History"
+    }
   }
 }

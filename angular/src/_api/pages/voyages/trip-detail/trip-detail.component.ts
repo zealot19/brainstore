@@ -33,7 +33,7 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   tbVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
   tbOverflow: { id: string; number: string; code: string; free_seats: number }[] = [];
-  tbSoldCount = 0; tbVehicle = ''; tbOverflowTrip = ''; tbNote = '';
+  tbSoldCount = 0; tbVehicle = ''; tbOverflowTrip = ''; tbNote = ''; tbReason = '';
   tbError = ''; tbBusy = false; tbHistory: any[] = [];
 
   selTickets: { id: string; seat: string; passenger_name: string }[] = [];
@@ -43,7 +43,7 @@ export class VoyagesTripDetailComponent implements OnInit {
   selVehicles: { id: string; license_plate: string; model_name: string; seats: number }[] = [];
   selTicketIds = new Set<string>(); selParcelIds = new Set<string>(); selBaggageIds = new Set<string>();
   selDestKind: 'trip' | 'vehicle' = 'trip'; selDestTrip = ''; selDestVehicle = '';
-  selNote = ''; selError = ''; selBusy = false;
+  selNote = ''; selReason = ''; selError = ''; selBusy = false;
 
   constructor(private svc: TripService, private crewSvc: CrewMemberService,
               private route: ActivatedRoute, private router: Router) {}
@@ -148,7 +148,7 @@ export class VoyagesTripDetailComponent implements OnInit {
   get tbNeedsOverflow(): boolean { return this.tbVehicle !== '' && this.tbSelectedSeats < this.tbSoldCount; }
 
   openTransbord(): void {
-    this.tbError = ''; this.tbVehicle = ''; this.tbOverflowTrip = ''; this.tbNote = '';
+    this.tbError = ''; this.tbVehicle = ''; this.tbOverflowTrip = ''; this.tbNote = ''; this.tbReason = '';
     this.svc.transbordEligible(this.id).subscribe({
       next: r => { this.tbVehicles = r.vehicles; this.tbOverflow = r.overflow_trips; this.tbSoldCount = r.sold_count; },
       error: () => {},
@@ -158,12 +158,14 @@ export class VoyagesTripDetailComponent implements OnInit {
 
   doTransbord(): void {
     if (!this.tbVehicle) { this.tbError = 'Choisissez un bus.'; return; }
+    if (!this.tbReason.trim()) { this.tbError = 'Le motif est obligatoire.'; return; }
     if (this.tbNeedsOverflow && !this.tbOverflowTrip) { this.tbError = 'Capacité insuffisante : choisissez un voyage de bascule.'; return; }
     this.tbBusy = true; this.tbError = '';
     this.svc.transbord(this.id, {
       vehicle_id: this.tbVehicle,
       overflow_trip_id: this.tbOverflowTrip || undefined,
       note: this.tbNote || undefined,
+      reason: this.tbReason,
     }).subscribe({
       next: () => { this.tbBusy = false; this.reload(); this.loadTbHistory(); },
       error: e => { this.tbBusy = false; this.tbError = e?.error?.detail ?? 'Transbordement impossible.'; },
@@ -171,7 +173,7 @@ export class VoyagesTripDetailComponent implements OnInit {
   }
 
   openSelection(): void {
-    this.selError = ''; this.selNote = ''; this.selDestKind = 'trip'; this.selDestTrip = ''; this.selDestVehicle = '';
+    this.selError = ''; this.selNote = ''; this.selReason = ''; this.selDestKind = 'trip'; this.selDestTrip = ''; this.selDestVehicle = '';
     this.selTicketIds.clear(); this.selParcelIds.clear(); this.selBaggageIds.clear();
     this.svc.selectionOptions(this.id).subscribe({
       next: r => {
@@ -189,10 +191,12 @@ export class VoyagesTripDetailComponent implements OnInit {
     const destTrip = this.selDestKind === 'trip' ? this.selDestTrip : '';
     const destVehicle = this.selDestKind === 'vehicle' ? this.selDestVehicle : '';
     if (!destTrip && !destVehicle) { this.selError = 'Choisissez une destination.'; return; }
+    if (!this.selReason.trim()) { this.selError = 'Le motif est obligatoire.'; return; }
     this.selBusy = true; this.selError = '';
     this.svc.transbordSelection(this.id, {
       ticket_ids: [...this.selTicketIds], parcel_ids: [...this.selParcelIds], baggage_ids: [...this.selBaggageIds],
       dest_trip_id: destTrip || undefined, dest_vehicle_id: destVehicle || undefined, note: this.selNote || undefined,
+      reason: this.selReason,
     }).subscribe({
       next: () => { this.selBusy = false; this.reload(); this.loadTbHistory(); },
       error: e => { this.selBusy = false; this.selError = e?.error?.detail ?? 'Transbordement impossible.'; },

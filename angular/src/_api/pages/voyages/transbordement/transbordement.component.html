@@ -1,0 +1,88 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'voyages.transbord.title' | transloco }}</h4></div></div>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item"><a class="nav-link" [class.active]="tab==='vehicle'" href="javascript:void(0)" (click)="tab='vehicle'">{{ 'voyages.transbord.by_vehicle' | transloco }}</a></li>
+  <li class="nav-item"><a class="nav-link" [class.active]="tab==='general'" href="javascript:void(0)" (click)="tab='general'">{{ 'voyages.transbord.general' | transloco }}</a></li>
+</ul>
+
+@if (error) { <div class="alert alert-danger py-2">{{ error }}</div> }
+
+<!-- Par véhicule -->
+@if (tab==='vehicle') {
+  <div class="card"><div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">{{ 'voyages.transbord.by_vehicle' | transloco }} <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="srcVehicle" (ngModelChange)="onSrcVehicle()">
+          <option value="">—</option>
+          @for (v of vehicleList; track v.id) { <option [value]="v.id">{{ v.code || v.license_plate }}</option> }
+        </select>
+      </div>
+      @if (vEligible) {
+        <div class="col-md-6">
+          <label class="form-label">{{ 'voyages.transbord.target_vehicle' | transloco }} <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="targetVehicle">
+            <option value="">—</option>
+            @for (t of vEligible.target_vehicles; track t.id) { <option [value]="t.id">{{ t.license_plate }} ({{ t.seats }})</option> }
+          </select>
+        </div>
+        <div class="col-12">
+          <div class="small text-muted mb-1">{{ 'voyages.transbord.impacted_trips' | transloco }} ({{ vEligible.trips.length }})</div>
+          @if (vEligible.trips.length) {
+            <ul class="list-group list-group-flush">
+              @for (tr of vEligible.trips; track tr.id) { <li class="list-group-item small py-1">{{ tr.number || tr.code }} — {{ tr.scheduled_departure | date:'short' }} · {{ tr.sold }} 🎫</li> }
+            </ul>
+          } @else { <div class="text-muted small">{{ 'voyages.transbord.no_trips' | transloco }}</div> }
+        </div>
+        <div class="col-md-8"><label class="form-label">{{ 'voyages.transbord.f_reason' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="vReason" /></div>
+        <div class="col-12"><button class="btn btn-primary" [disabled]="busy || !vEligible.trips.length" (click)="doVehicle()">{{ 'voyages.transbord.execute' | transloco }}</button></div>
+      }
+    </div>
+  </div></div>
+}
+
+<!-- Général -->
+@if (tab==='general') {
+  <div class="card"><div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">{{ 'voyages.transbord.source_trip' | transloco }} <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="srcTrip" (ngModelChange)="onSrcTrip()">
+          <option value="">—</option>
+          @for (t of tripList; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
+        </select>
+      </div>
+      @if (gOptions) {
+        <div class="col-md-6">
+          <label class="form-label">{{ 'voyages.transbord.dest_trip' | transloco }} <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="gDestTrip">
+            <option value="">—</option>
+            @for (t of gOptions.dest_trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }} ({{ t.free_seats }})</option> }
+          </select>
+        </div>
+        <div class="col-md-4">
+          <div class="small fw-medium mb-1">Passagers</div>
+          @for (tk of gOptions.tickets; track tk.id) {
+            <div class="form-check"><input type="checkbox" class="form-check-input" [checked]="gTickets.has(tk.id)" (change)="toggle(gTickets, tk.id)" /><label class="form-check-label small">{{ tk.seat }} — {{ tk.passenger_name }}</label></div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="small fw-medium mb-1">Colis</div>
+          @for (p of gOptions.parcels; track p.id) {
+            <div class="form-check"><input type="checkbox" class="form-check-input" [checked]="gParcels.has(p.id)" (change)="toggle(gParcels, p.id)" /><label class="form-check-label small">{{ p.reference }}</label></div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="small fw-medium mb-1">Bagages</div>
+          @for (b of gOptions.baggage; track b.id) {
+            <div class="form-check"><input type="checkbox" class="form-check-input" [checked]="gBaggage.has(b.id)" (change)="toggle(gBaggage, b.id)" /><label class="form-check-label small">{{ b.tag_number }}</label></div>
+          }
+        </div>
+        <div class="col-md-8"><label class="form-label">{{ 'voyages.transbord.f_reason' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="gReason" /></div>
+        <div class="col-12"><button class="btn btn-primary" [disabled]="busy" (click)="doGeneral()">{{ 'voyages.transbord.execute' | transloco }}</button></div>
+      }
+    </div>
+  </div></div>
+}

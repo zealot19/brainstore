@@ -339,6 +339,8 @@ export const VOYAGES = {
   transbordHistory: (id: string) => `${VT}/${id}/transbord/history/`,
   transbordSelectionOptions: (id: string) => `${VT}/${id}/transbord/selection/options/`,
   transbordSelection: (id: string) => `${VT}/${id}/transbord/selection/`,
+  transbordVehicleEligible: (vid: string) => `${VT}/transbord/vehicle/${vid}/eligible/`,
+  transbordVehicle: (vid: string) => `${VT}/transbord/vehicle/${vid}/`,
 };
 
 const VP = `${API_BASE}/voyages/pricing`;
