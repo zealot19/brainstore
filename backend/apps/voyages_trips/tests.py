@@ -143,7 +143,7 @@ def test_transbord_trip_rejects_non_transbordable_status():
     g["src"].status = "draft"
     g["src"].save(update_fields=["status"])
     with pytest.raises(ApplicationError):
-        transbord_trip(g["src"], None, user=None)
+        transbord_trip(g["src"], None, user=None, reason="x")
 
 
 def test_transbordement_selection_kind_defaults():
@@ -173,7 +173,7 @@ def test_transbord_selection_to_existing_trip():
     t0 = g["tickets"][0]
     src_seat_id = t0.trip_seat_id
     res = transbord_selection(g["src"], ticket_ids=[str(t0.id)], parcel_ids=[str(parcel.id)],
-                              baggage_ids=[str(g["baggage"].id)], dest_trip=g["dest"], user=None)
+                              baggage_ids=[str(g["baggage"].id)], dest_trip=g["dest"], user=None, reason="x")
     assert res["passengers_moved"] == 1 and res["parcels_moved"] == 1 and res["baggage_moved"] == 1
     t0.refresh_from_db(); parcel.refresh_from_db(); g["baggage"].refresh_from_db()
     assert t0.trip_id == g["dest"].id and t0.trip_seat.trip_id == g["dest"].id
@@ -192,7 +192,7 @@ def test_transbord_selection_empty_raises():
     g = _graph()
     with pytest.raises(ApplicationError):
         transbord_selection(g["src"], ticket_ids=[], parcel_ids=[], baggage_ids=[],
-                            dest_trip=g["dest"], user=None)
+                            dest_trip=g["dest"], user=None, reason="x")
 
 
 @pytest.mark.django_db
@@ -209,7 +209,7 @@ def test_transbord_selection_capacity_insufficient_raises():
     dest1 = _trip(g["company"], route, fc, a, b, small)
     with pytest.raises(ApplicationError):
         transbord_selection(g["src"], ticket_ids=[str(g["tickets"][0].id), str(g["tickets"][1].id)],
-                            parcel_ids=[], baggage_ids=[], dest_trip=dest1, user=None)
+                            parcel_ids=[], baggage_ids=[], dest_trip=dest1, user=None, reason="x")
 
 
 import pytest
@@ -287,7 +287,7 @@ def test_transbord_selection_new_bus_creates_full_voyage_with_expenses():
 
     t0 = g["tickets"][0]
     res = transbord_selection(src, ticket_ids=[str(t0.id)], parcel_ids=[], baggage_ids=[],
-                              dest_vehicle=veh, user=None)
+                              dest_vehicle=veh, user=None, reason="x")
     dest = Trip.objects.get(id=res["destination_trip_id"])
     assert dest.number                      # numéro -> vrai voyage
     assert dest.vehicle_id == veh.id and dest.status == "pending"

@@ -86,11 +86,13 @@ def apply_transbord(trip, new_plan, *, overflow_trip=None, user=None):
 
 
 @transaction.atomic
-def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note=""):
+def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note="", reason=""):
     from apps.voyages_trips.models import Transbordement
     from apps.voyages_trips.selectors.eligibility import (
         blocking_reasons, active_seating_plan, document_warnings)
 
+    if not (reason or "").strip():
+        raise ApplicationError(_("Le motif du transbordement est obligatoire."))
     if trip.status not in ("pending", "departed"):
         raise ApplicationError(_("Ce voyage ne peut pas être transbordé (statut invalide)."))
 
@@ -117,7 +119,7 @@ def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note=""):
 
     tb = Transbordement.objects.create(
         company=trip.company, kind="bus", trip=trip, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
-        overflow_trip=overflow_trip, note=note or "", created_by=user, **counts)
+        overflow_trip=overflow_trip, note=note or "", reason=reason, created_by=user, **counts)
     warnings = document_warnings(to_vehicle, before_date=trip.scheduled_arrival.date(), alert_days=30)
     return {"transbordement_id": str(tb.id), "warnings": warnings, **counts}
 
@@ -144,7 +146,7 @@ def _clone_trip_for_vehicle(trip, vehicle, *, user):
 
 @transaction.atomic
 def transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids,
-                        dest_trip=None, dest_vehicle=None, user=None, note=""):
+                        dest_trip=None, dest_vehicle=None, user=None, note="", reason=""):
     """Déplace une sélection (passagers/colis/bagages) vers un voyage existant ou un nouveau
     voyage créé pour un bus de remplacement."""
     from apps.voyages_trips.models import Transbordement, TripSeat
@@ -152,6 +154,8 @@ def transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids,
     from apps.voyages_booking.models import Ticket
     from apps.voyages_consignment.models import Parcel, Baggage
 
+    if not (reason or "").strip():
+        raise ApplicationError(_("Le motif du transbordement est obligatoire."))
     if trip.status not in ("pending", "departed"):
         raise ApplicationError(_("Ce voyage ne peut pas être transbordé (statut invalide)."))
 
@@ -216,7 +220,7 @@ def transbord_selection(trip, *, ticket_ids, parcel_ids, baggage_ids,
 
     tb = Transbordement.objects.create(
         company=trip.company, kind="selection", trip=trip, from_vehicle=trip.vehicle,
-        to_vehicle=dest.vehicle, destination_trip=dest, note=note or "", created_by=user,
+        to_vehicle=dest.vehicle, destination_trip=dest, note=note or "", reason=reason, created_by=user,
         passengers_moved=passengers_moved, parcels_moved=parcels_moved, baggage_moved=baggage_moved)
     return {"transbordement_id": str(tb.id), "destination_trip_id": str(dest.id),
             "passengers_moved": passengers_moved, "parcels_moved": parcels_moved,

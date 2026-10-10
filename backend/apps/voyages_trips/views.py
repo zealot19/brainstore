@@ -455,7 +455,8 @@ class TripTransbordView(APIView):
                 return error_response("Voyage de bascule introuvable.", status_code=404)
         try:
             res = transbord_trip(trip, vehicle, overflow_trip=overflow_trip,
-                                 user=request.user, note=request.data.get("note", ""))
+                                 user=request.user, note=request.data.get("note", ""),
+                                 reason=request.data.get("reason", ""))
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(res)
@@ -481,6 +482,7 @@ class TripTransbordHistoryView(APIView):
             "passengers_overflow": tb.passengers_overflow,
             "baggage_moved": tb.baggage_moved,
             "note": tb.note,
+            "reason": tb.reason,
             "created_at": tb.created_at,
         } for tb in selectors.trip_transbordements(trip)]
         return success_response(rows)
@@ -534,7 +536,8 @@ class TripTransbordSelectionView(APIView):
                 parcel_ids=request.data.get("parcel_ids", []),
                 baggage_ids=request.data.get("baggage_ids", []),
                 dest_trip=dest_trip, dest_vehicle=dest_vehicle,
-                user=request.user, note=request.data.get("note", ""))
+                user=request.user, note=request.data.get("note", ""),
+                reason=request.data.get("reason", ""))
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(res)

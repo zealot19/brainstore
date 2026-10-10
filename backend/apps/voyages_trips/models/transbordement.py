@@ -25,6 +25,7 @@ class Transbordement(BaseModel):
     destination_trip = models.ForeignKey("voyages_trips.Trip", verbose_name=_("voyage de destination"),
                                           on_delete=models.SET_NULL, null=True, blank=True,
                                           related_name="transbordements_destination")
+    reason              = models.CharField(_("motif"), max_length=255, blank=True)
     passengers_moved    = models.PositiveIntegerField(_("passagers ré-attribués"), default=0)
     passengers_overflow = models.PositiveIntegerField(_("passagers basculés"), default=0)
     parcels_moved       = models.PositiveIntegerField(_("colis déplacés"), default=0)
