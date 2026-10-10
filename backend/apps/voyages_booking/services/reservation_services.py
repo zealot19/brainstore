@@ -57,7 +57,7 @@ def create_reservation(company, *, trip_type, outbound_trip, return_trip, buyer_
         fare = B._price(company, outbound_trip, dest, trip_type)
         out_seat = B._pick_seat(outbound_trip, item.get("outbound_seat_id"))
         out_ticket = Ticket.objects.create(
-            booking=booking, number=B._ticket_number(outbound_trip.origin.agency), passenger=passenger,
+            booking=booking, number=B._ticket_number(outbound_trip, outbound_trip.origin, dest), passenger=passenger,
             trip=outbound_trip, trip_seat=out_seat, origin_point=outbound_trip.origin, destination_point=dest,
             direction=Ticket.Direction.OUTBOUND, fare=fare, fare_class=outbound_trip.fare_class,
             amount=fare.amount, status=Ticket.Status.RESERVED, created_by=user)
@@ -67,7 +67,7 @@ def create_reservation(company, *, trip_type, outbound_trip, return_trip, buyer_
         if is_round and not open_return:
             ret_seat = B._pick_seat(return_trip, item.get("return_seat_id"))
             Ticket.objects.create(
-                booking=booking, number=B._ticket_number(return_trip.origin.agency), passenger=passenger,
+                booking=booking, number=B._ticket_number(return_trip, return_trip.origin, return_trip.destination), passenger=passenger,
                 trip=return_trip, trip_seat=ret_seat, origin_point=return_trip.origin,
                 destination_point=return_trip.destination, direction=Ticket.Direction.RETURN,
                 return_of=out_ticket, fare=None, fare_class=return_trip.fare_class,
