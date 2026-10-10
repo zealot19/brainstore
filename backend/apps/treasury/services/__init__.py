@@ -21,9 +21,11 @@ from .refund_config import (
 from .refund import refund_on_cancel
 from .refund_by_reference import lookup_refundable, refund_by_reference
 from .operation_validation import validate_operation, invalidate_operation, modify_operation
+from .explanation import raise_explanation, respond_explanation, decide_explanation
 
 __all__ = [
     "validate_operation", "invalidate_operation", "modify_operation",
+    "raise_explanation", "respond_explanation", "decide_explanation",
     "create_cash_register", "update_cash_register", "delete_cash_register",
     "create_bank_account", "update_bank_account", "delete_bank_account",
     "open_session", "close_session",
