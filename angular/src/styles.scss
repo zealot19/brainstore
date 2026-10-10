@@ -3515,7 +3515,10 @@ body {
    hors-écran (off-canvas) et le contenu n'a pas de marge gauche — on n'y touche pas.
    Les 3 cotes couplées (sidebar, marge contenu, en-tête logo) sont alignées. */
 @media (min-width: 992px) {
-  .sidebar { width: 250px !important; }
+  .sidebar { width: 250px !important; top: 0 !important; }
   .page-wrapper { margin-left: 250px !important; }
-  .header .header-left { width: 250px !important; }
+  // L'en-tête démarre au bord droit de la sidebar (il la « touche » au lieu de la survoler).
+  .header { left: 250px !important; }
+  // Plus de bloc logo dédié dans l'en-tête : le logo est déjà en haut de la sidebar.
+  .header .header-left { width: 0 !important; padding: 0 !important; overflow: hidden; }
 }
