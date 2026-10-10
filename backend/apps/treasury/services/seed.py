@@ -61,6 +61,21 @@ _XAF_DENOMINATIONS = [
 ]
 
 
+def seed_operation_types(company, created_by=None) -> int:
+    """Types d'opération par défaut (dépense + recette), éditables ensuite."""
+    from apps.treasury.models import OperationType
+    rows = [("CARBURANT", "Carburant", "depense", 1), ("SALAIRE", "Salaire / avance", "depense", 2),
+            ("DIVERS_DEP", "Dépense diverse", "depense", 3), ("DIVERS_REC", "Recette diverse", "recette", 1),
+            ("COMMISSION", "Commission", "recette", 2)]
+    created = 0
+    for code, label, sens, order in rows:
+        _, was_created = OperationType.objects.get_or_create(
+            company=company, code=code,
+            defaults={"label": label, "sens": sens, "display_order": order, "created_by": created_by})
+        created += int(was_created)
+    return created
+
+
 def seed_cash_value_types(company, created_by=None) -> int:
     """Types de valeur billetage par défaut (bon de caisse, monnaie électronique, autre)."""
     from apps.treasury.models import CashValueType

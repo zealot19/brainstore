@@ -1,0 +1,55 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title">
+    <h4>{{ 'treasury.optype.title' | transloco }}</h4><h6>{{ 'treasury.optype.subtitle' | transloco }}</h6>
+  </div></div>
+  <div class="page-btn"><a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ot-modal" *hasPermission="'treasury.config.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'treasury.optype.new' | transloco }}</a></div>
+</div>
+<div class="card table-list-card"><div class="card-body p-0">
+  @if (loading) { <div class="text-center py-5"><div class="spinner-border text-primary"></div></div> }
+  @else {
+    <div class="table-responsive"><table class="table datanew">
+      <thead class="thead-light"><tr>
+        <th>{{ 'treasury.optype.col_code' | transloco }}</th>
+        <th>{{ 'treasury.optype.col_label' | transloco }}</th>
+        <th>{{ 'treasury.optype.col_sens' | transloco }}</th>
+        <th>{{ 'treasury.optype.col_active' | transloco }}</th>
+        <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+      </tr></thead>
+      <tbody>
+        @for (r of rows; track r.id) {
+          <tr>
+            <td class="fw-medium">{{ r.code }}</td>
+            <td>{{ r.label }}</td>
+            <td><span class="badge" [class.bg-danger]="r.sens === 'depense'" [class.bg-success]="r.sens === 'recette'">{{ r.sens_display }}</span></td>
+            <td>@if (r.is_active) { <span class="badge bg-success">{{ 'treasury.optype.active' | transloco }}</span> } @else { <span class="badge bg-secondary">{{ 'treasury.optype.inactive' | transloco }}</span> }</td>
+            <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
+              <a href="javascript:void(0);" class="me-2 p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#ot-modal" *hasPermission="'treasury.config.manage'" (click)="openEdit(r)"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a>
+              <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.config.manage'" (click)="delete(r)"><i class="ti ti-trash text-danger me-1"></i>{{ 'shared.actions.delete' | transloco }}</a>
+            </div></td>
+          </tr>
+        } @empty { <tr><td colspan="5" class="text-center py-4 text-muted">{{ 'treasury.optype.empty' | transloco }}</td></tr> }
+      </tbody>
+    </table></div>
+  }
+</div></div>
+
+<div class="modal fade" id="ot-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">{{ (editId ? 'treasury.optype.edit_title' : 'treasury.optype.new') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
+    @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
+    <div class="row">
+      <div class="col-md-5 mb-3"><label class="form-label">{{ 'treasury.optype.col_code' | transloco }} <span class="text-danger">*</span></label><input formControlName="code" type="text" class="form-control" placeholder="CARBURANT" /></div>
+      <div class="col-md-7 mb-3"><label class="form-label">{{ 'treasury.optype.col_label' | transloco }} <span class="text-danger">*</span></label><input formControlName="label" type="text" class="form-control" placeholder="Carburant" /></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.optype.col_sens' | transloco }} <span class="text-danger">*</span></label>
+        <select formControlName="sens" class="form-select">
+          <option value="depense">{{ 'treasury.optype.sens_depense' | transloco }}</option>
+          <option value="recette">{{ 'treasury.optype.sens_recette' | transloco }}</option>
+        </select>
+      </div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'treasury.optype.col_order' | transloco }}</label><input formControlName="display_order" type="number" class="form-control" /></div>
+    </div>
+    <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="ot-active" /><label class="form-check-label" for="ot-active">{{ 'treasury.optype.active' | transloco }}</label></div>
+  </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
+</div></div></div>

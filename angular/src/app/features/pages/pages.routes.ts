@@ -75,6 +75,7 @@ export const Pages_routes: Routes = [
                 { path: 'refunds', loadComponent: () => import('../../../_api/pages/treasury/refunds/refunds.component').then(m => m.TreasuryRefundsComponent) },
                 { path: 'denominations', loadComponent: () => import('../../../_api/pages/treasury/config/denominations/denominations.component').then(m => m.TrzDenominationsComponent) },
                 { path: 'value-types', loadComponent: () => import('../../../_api/pages/treasury/config/value-types/value-types.component').then(m => m.TrzValueTypesComponent) },
+                { path: 'operation-types', loadComponent: () => import('../../../_api/pages/treasury/config/operation-types/operation-types.component').then(m => m.TrzOperationTypesComponent) },
                 { path: '', redirectTo: 'registers', pathMatch: 'full' },
               ],
             },

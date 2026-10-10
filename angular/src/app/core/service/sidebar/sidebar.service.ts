@@ -185,6 +185,7 @@ export class SidebarService {
             { menuValue: 'Remboursement',        route: routes.trzRefundRate,       base: 'refund-rate',         permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Dénominations',        route: routes.trzDenominations,    base: 'denominations',       permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Types de valeurs',     route: routes.trzValueTypes,       base: 'value-types',         permission: 'treasury.config.view',        module: 'treasury' },
+            { menuValue: "Types d'opération",    route: routes.trzOperationTypes,   base: 'operation-types',     permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Types de valeurs',     route: routes.cfgTypesValeurs,     base: 'configuration',       permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Moyens de paiement',   route: routes.trzPaymentMethods,   base: 'payment-methods',     permission: 'treasury.paymentmethod.view', module: 'treasury' },
             { menuValue: 'Config billets',       route: routes.vcTicketTemplate,    base: 'ticket-template',     permission: 'transport.config.view',       module: 'voyage' },

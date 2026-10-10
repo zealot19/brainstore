@@ -28,6 +28,10 @@ export interface CurrencyDenomination {
 export interface CashValueType {
   id: string; code: string; label: string; is_active: boolean; display_order: number;
 }
+export interface OperationType {
+  id: string; code: string; label: string; sens: 'depense' | 'recette'; sens_display: string;
+  is_active: boolean; display_order: number;
+}
 export interface CashCountItem {
   id: string; denomination: string | null; value_type: string | null; value_type_label: string | null;
   quantity: number; unit_value: string; subtotal: string;

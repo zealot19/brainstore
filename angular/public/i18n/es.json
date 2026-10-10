@@ -862,6 +862,22 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "empty": "Sin tipo de valor."
+    },
+    "optype": {
+      "title": "Tipos de operación",
+      "subtitle": "Categorías de operaciones de tesorería (gasto / ingreso).",
+      "new": "Nuevo tipo",
+      "edit_title": "Editar tipo",
+      "col_code": "Código",
+      "col_label": "Etiqueta",
+      "col_sens": "Sentido",
+      "col_order": "Orden",
+      "col_active": "Estado",
+      "sens_depense": "Gasto",
+      "sens_recette": "Ingreso",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "empty": "Sin tipo de operación."
     }
   },
   "vcfg": {

@@ -470,6 +470,12 @@ export const TREASURY = {
   denomination:  (id: string) => `${TRZ}/denominations/${id}/`,
   valueTypes: `${TRZ}/value-types/`,
   valueType:  (id: string) => `${TRZ}/value-types/${id}/`,
+  operationTypes: `${TRZ}/operation-types/`,
+  operationType:  (id: string) => `${TRZ}/operation-types/${id}/`,
+  operations: `${TRZ}/operations/`,
+  operationValidate:   (id: string) => `${TRZ}/operations/${id}/validate/`,
+  operationInvalidate: (id: string) => `${TRZ}/operations/${id}/invalidate/`,
+  operationModify:     (id: string) => `${TRZ}/operations/${id}/modify/`,
   sessionCounts: (id: string) => `${TRZ}/sessions/${id}/counts/`,
 };
 

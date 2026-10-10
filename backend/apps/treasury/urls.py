@@ -35,6 +35,8 @@ urlpatterns = [
     path("denominations/<uuid:pk>/", views.DenominationDetailView.as_view(), name="denomination-detail"),
     path("value-types/",             views.CashValueTypeListView.as_view(),   name="value-type-list"),
     path("value-types/<uuid:pk>/",   views.CashValueTypeDetailView.as_view(), name="value-type-detail"),
+    path("operation-types/",           views.OperationTypeListView.as_view(),   name="operation-type-list"),
+    path("operation-types/<uuid:pk>/", views.OperationTypeDetailView.as_view(), name="operation-type-detail"),
 
     # ── Transactions ───────────────────────────────────────────────────────────
     path("transactions/",               views.TransactionListView.as_view(),   name="transaction-list"),

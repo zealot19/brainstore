@@ -862,6 +862,22 @@
       "active": "Active",
       "inactive": "Inactive",
       "empty": "No value type."
+    },
+    "optype": {
+      "title": "Operation types",
+      "subtitle": "Treasury operation categories (expense / income).",
+      "new": "New type",
+      "edit_title": "Edit type",
+      "col_code": "Code",
+      "col_label": "Label",
+      "col_sens": "Direction",
+      "col_order": "Order",
+      "col_active": "Status",
+      "sens_depense": "Expense",
+      "sens_recette": "Income",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No operation type."
     }
   },
   "vcfg": {

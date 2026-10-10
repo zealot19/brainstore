@@ -862,6 +862,22 @@
       "active": "Actif",
       "inactive": "Inactif",
       "empty": "Aucun type de valeur."
+    },
+    "optype": {
+      "title": "Types d'opération",
+      "subtitle": "Catégories d'opérations de trésorerie (dépense / recette).",
+      "new": "Nouveau type",
+      "edit_title": "Modifier le type",
+      "col_code": "Code",
+      "col_label": "Libellé",
+      "col_sens": "Sens",
+      "col_order": "Ordre",
+      "col_active": "Statut",
+      "sens_depense": "Dépense",
+      "sens_recette": "Recette",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "empty": "Aucun type d'opération."
     }
   },
   "vcfg": {

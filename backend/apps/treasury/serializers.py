@@ -1,7 +1,8 @@
 from decimal import Decimal
 from rest_framework import serializers
 from apps.treasury.models import (CashRegister, BankAccount, CashSession, Transaction, Transfer,
-                                  CurrencyDenomination, CashValueType, CashCount, CashCountItem)
+                                  CurrencyDenomination, CashValueType, CashCount, CashCountItem,
+                                  OperationType)
 
 
 # ── Cash register ──────────────────────────────────────────────────────────────
@@ -225,6 +226,15 @@ class CashValueTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CashValueType
         fields = ["id", "code", "label", "is_active", "display_order", "created_at", "updated_at"]
+
+
+class OperationTypeSerializer(serializers.ModelSerializer):
+    sens_display = serializers.CharField(source="get_sens_display", read_only=True)
+
+    class Meta:
+        model = OperationType
+        fields = ["id", "code", "label", "sens", "sens_display", "is_active", "display_order",
+                  "created_at", "updated_at"]
 
 
 class CashCountItemSerializer(serializers.ModelSerializer):

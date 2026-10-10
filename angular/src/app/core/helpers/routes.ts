@@ -422,6 +422,9 @@ export const routes={
   trzRefunds:           '/treasury/refunds',
   trzDenominations:     '/treasury/denominations',
   trzValueTypes:        '/treasury/value-types',
+  trzOperationTypes:    '/treasury/operation-types',
+  trzOperations:        '/treasury/operations',
+  trzRoadExpenses:      '/treasury/road-expenses',
 
   // ── Administration institution ──────────────────────────────────────────────
   admAgencies:  '/admin/agencies',

@@ -862,6 +862,22 @@
       "active": "Ativo",
       "inactive": "Inativo",
       "empty": "Sem tipo de valor."
+    },
+    "optype": {
+      "title": "Tipos de operação",
+      "subtitle": "Categorias de operações de tesouraria (despesa / receita).",
+      "new": "Novo tipo",
+      "edit_title": "Editar tipo",
+      "col_code": "Código",
+      "col_label": "Rótulo",
+      "col_sens": "Sentido",
+      "col_order": "Ordem",
+      "col_active": "Estado",
+      "sens_depense": "Despesa",
+      "sens_recette": "Receita",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "empty": "Sem tipo de operação."
     }
   },
   "vcfg": {
