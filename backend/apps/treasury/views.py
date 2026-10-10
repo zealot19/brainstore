@@ -564,6 +564,49 @@ class TransactionDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# ── Validation des opérations (M26) ──────────────────────────────────────────────
+
+class OperationListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.operation.validate"}
+
+    def get(self, request):
+        company = _company(request)
+        qs = selectors.list_transactions(company.id)
+        st = request.query_params.get("status")
+        if st:
+            qs = qs.filter(status=st)
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(TransactionReadSerializer(page, many=True).data)
+
+
+class _OperationActionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.operation.validate"}
+    action = None  # set by subclass
+
+    def post(self, request, pk):
+        obj = selectors.get_transaction(pk, _company(request).id)
+        if not obj:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            if self.action == "modify":
+                services.modify_operation(obj, amount=request.data.get("amount"), user=request.user)
+            elif self.action == "validate":
+                services.validate_operation(obj, user=request.user)
+            elif self.action == "invalidate":
+                services.invalidate_operation(obj, user=request.user)
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(TransactionReadSerializer(selectors.get_transaction(pk, _company(request).id)).data)
+
+
+class OperationValidateView(_OperationActionView):   action = "validate"
+class OperationInvalidateView(_OperationActionView): action = "invalidate"
+class OperationModifyView(_OperationActionView):     action = "modify"
+
+
 # ── Transfers ──────────────────────────────────────────────────────────────────
 
 class TransferListView(APIView):

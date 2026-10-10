@@ -40,6 +40,12 @@ urlpatterns = [
     path("transactions/",               views.TransactionListView.as_view(),   name="transaction-list"),
     path("transactions/<uuid:txn_id>/", views.TransactionDetailView.as_view(), name="transaction-detail"),
 
+    # ── Validation des opérations (M26) ──────────────────────────────────────────
+    path("operations/",                        views.OperationListView.as_view(),       name="operation-list"),
+    path("operations/<uuid:pk>/validate/",     views.OperationValidateView.as_view(),   name="operation-validate"),
+    path("operations/<uuid:pk>/invalidate/",   views.OperationInvalidateView.as_view(), name="operation-invalidate"),
+    path("operations/<uuid:pk>/modify/",       views.OperationModifyView.as_view(),     name="operation-modify"),
+
     # ── Transfers ──────────────────────────────────────────────────────────────
     path("transfers/",                        views.TransferListView.as_view(),   name="transfer-list"),
     path("transfers/<uuid:transfer_id>/",     views.TransferDetailView.as_view(), name="transfer-detail"),
