@@ -49,7 +49,7 @@ def resolve_disbursement_session(company_id, user, cash_session=None, *,
     if require_principale and session.cash_register.kind != CashRegister.Kind.PRINCIPALE:
         raise ApplicationError(_("Les dépenses se décaissent depuis une caisse principale. "
                                  "Ouvrez ou choisissez une caisse principale."))
-    if require_principale and amount is not None:
+    if require_principale and amount is not None and not session.cash_register.allow_negative_balance:
         avail = principale_available_cash(session)
         if Decimal(str(amount)) > avail:
             raise ApplicationError(_("Solde insuffisant dans la caisse principale (%(b)s). "
