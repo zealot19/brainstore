@@ -41,6 +41,11 @@ class Transaction(BaseModel):
         CASH = "cash", _("Cash Register")
         BANK = "bank", _("Bank Account")
 
+    class Status(models.TextChoices):
+        VALIDATED   = "validated",   _("Validée")
+        PENDING     = "pending",     _("En attente")
+        INVALIDATED = "invalidated", _("Invalidée")
+
     company          = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                           on_delete=models.CASCADE, related_name="transactions")
     agency           = models.ForeignKey("system_config.Agency", verbose_name=_("agence"),
@@ -49,6 +54,11 @@ class Transaction(BaseModel):
     reference        = models.CharField(_("reference"), max_length=30, blank=True)
     transaction_type = models.CharField(_("type"), max_length=10, choices=Type.choices)
     category         = models.CharField(_("category"), max_length=30, choices=Category.choices)
+    status           = models.CharField(_("statut"), max_length=12, choices=Status.choices,
+                                        default=Status.VALIDATED)
+    validated_by     = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("validée par"),
+                                         null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    validated_at     = models.DateTimeField(_("validée le"), null=True, blank=True)
     account_type     = models.CharField(_("account type"), max_length=10,
                                          choices=AccountType.choices)
 

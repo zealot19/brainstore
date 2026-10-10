@@ -254,6 +254,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
     payment_display  = serializers.CharField(source="get_payment_mode_display", read_only=True)
     account_label    = serializers.SerializerMethodField()
     journal_entry_name = serializers.CharField(source="journal_entry.name", read_only=True, default=None)
+    status_display   = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Transaction
@@ -261,6 +262,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
             "id", "reference",
             "transaction_type", "type_display",
             "category", "category_display",
+            "status", "status_display",
             "account_type", "account_label",
             "amount", "payment_mode", "payment_display",
             "description", "transaction_date",

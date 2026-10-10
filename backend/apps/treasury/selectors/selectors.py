@@ -194,9 +194,11 @@ def get_treasury_stats(company_id, agency_ids=None):
         .filter(company_id=company_id, is_deleted=False, is_active=True)
         .aggregate(total=Sum("current_balance"))["total"] or 0)
 
-    today_income  = (today_txns.filter(transaction_type=Transaction.Type.INCOME)
+    today_income  = (today_txns.filter(transaction_type=Transaction.Type.INCOME,
+                                       status=Transaction.Status.VALIDATED)
                      .aggregate(total=Sum("amount"))["total"] or 0)
-    today_expense = (today_txns.filter(transaction_type=Transaction.Type.EXPENSE)
+    today_expense = (today_txns.filter(transaction_type=Transaction.Type.EXPENSE,
+                                       status=Transaction.Status.VALIDATED)
                      .aggregate(total=Sum("amount"))["total"] or 0)
 
     open_sessions = scope_by_agency(
@@ -226,8 +228,10 @@ def get_treasury_series(company_id, days=14, agency_ids=None):
                 agency_ids, "agency_id")
             .values("transaction_date")
             .annotate(
-                income=Sum("amount", filter=Q(transaction_type=Transaction.Type.INCOME)),
-                expense=Sum("amount", filter=Q(transaction_type=Transaction.Type.EXPENSE)),
+                income=Sum("amount", filter=Q(transaction_type=Transaction.Type.INCOME,
+                                               status=Transaction.Status.VALIDATED)),
+                expense=Sum("amount", filter=Q(transaction_type=Transaction.Type.EXPENSE,
+                                                status=Transaction.Status.VALIDATED)),
             ))
     by = {r["transaction_date"]: r for r in rows}
     out = []

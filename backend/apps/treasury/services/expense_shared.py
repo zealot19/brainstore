@@ -14,10 +14,12 @@ def principale_available_cash(session):
     from apps.treasury.models import Transaction, Transfer
     reg_id = session.cash_register_id
     income = (session.transactions
-              .filter(transaction_type=Transaction.Type.INCOME, is_deleted=False)
+              .filter(transaction_type=Transaction.Type.INCOME,
+                      status=Transaction.Status.VALIDATED, is_deleted=False)
               .aggregate(t=Sum("amount"))["t"] or Decimal(0))
     expense = (session.transactions
-               .filter(transaction_type=Transaction.Type.EXPENSE, is_deleted=False)
+               .filter(transaction_type=Transaction.Type.EXPENSE,
+                       status=Transaction.Status.VALIDATED, is_deleted=False)
                .aggregate(t=Sum("amount"))["t"] or Decimal(0))
     transfers_in = (Transfer.objects
                     .filter(to_cash_register_id=reg_id, is_deleted=False, created_at__gte=session.opened_at)
