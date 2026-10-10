@@ -541,7 +541,12 @@
       "f_kind": "Type de caisse",
       "opt_kind": "Choisir…",
       "kind_principale": "Caisse principale",
-      "kind_guichet": "Guichet"
+      "kind_guichet": "Guichet",
+      "f_category": "Catégorie",
+      "category_recette": "Recette",
+      "category_depense": "Dépense",
+      "category_agence": "Agence",
+      "f_allow_negative": "Autoriser un solde négatif"
     },
     "billetage": {
       "btn": "Billetage",

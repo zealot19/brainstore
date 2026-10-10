@@ -541,7 +541,12 @@
       "f_kind": "Tipo de caja",
       "opt_kind": "Elegir…",
       "kind_principale": "Caja principal",
-      "kind_guichet": "Ventanilla"
+      "kind_guichet": "Ventanilla",
+      "f_category": "Categoría",
+      "category_recette": "Ingreso",
+      "category_depense": "Gasto",
+      "category_agence": "Agencia",
+      "f_allow_negative": "Permitir saldo negativo"
     },
     "billetage": {
       "btn": "Arqueo",
