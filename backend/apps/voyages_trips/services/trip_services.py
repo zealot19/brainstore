@@ -190,6 +190,14 @@ def submit_trip(trip, *, user):
 def depart_trip(trip, *, user, lead_hours=24):
     if trip.status != Trip.Status.PENDING:
         raise ApplicationError(_("Seul un voyage en attente peut démarrer."))
+    # M15 : un voyage ne peut pas démarrer tant que ses dépenses définies ne sont pas décaissées.
+    from apps.voyages_trips.models import TripExpense
+    unpaid = trip.expenses.filter(is_deleted=False, status=TripExpense.Status.PLANNED)
+    if unpaid.exists():
+        total = sum((e.amount for e in unpaid), 0)
+        raise ApplicationError(
+            _("Ce voyage a des dépenses non décaissées (%(n)d, total %(t)s). Décaissez-les avant le départ.")
+            % {"n": unpaid.count(), "t": total})
     now = timezone.now()
     delta = (trip.scheduled_departure - now).total_seconds() / 3600
     if delta > lead_hours:
