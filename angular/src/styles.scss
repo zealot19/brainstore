@@ -3510,3 +3510,12 @@ body {
   .page-header { flex-wrap: wrap; gap: 0.5rem; }
   .table-responsive { overflow-x: auto; }
 }
+
+/* M02 — Sidebar réduite (346 → 250px). Scopé desktop : sous 992px la sidebar est
+   hors-écran (off-canvas) et le contenu n'a pas de marge gauche — on n'y touche pas.
+   Les 3 cotes couplées (sidebar, marge contenu, en-tête logo) sont alignées. */
+@media (min-width: 992px) {
+  .sidebar { width: 250px !important; }
+  .page-wrapper { margin-left: 250px !important; }
+  .header .header-left { width: 250px !important; }
+}
