@@ -1,5 +1,6 @@
 export interface CashRegister {
   id: string; name: string; kind: string | null; kind_display: string | null;
+  category: string | null; category_display: string | null; allow_negative_balance: boolean;
   terminal_name: string | null; responsible_name: string | null;
   managers: string[]; manager_names: string[];
   current_balance: string; is_active: boolean; notes: string;

@@ -16,11 +16,14 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
     managers = serializers.SerializerMethodField()
     manager_names = serializers.SerializerMethodField()
     kind_display = serializers.CharField(source="get_kind_display", read_only=True, default=None)
+    category_display = serializers.CharField(source="get_category_display", read_only=True, default=None)
 
     class Meta:
         model = CashRegister
         fields = [
-            "id", "name", "kind", "kind_display", "terminal_name", "responsible_name",
+            "id", "name", "kind", "kind_display",
+            "category", "category_display", "allow_negative_balance",
+            "terminal_name", "responsible_name",
             "managers", "manager_names",
             "current_balance", "is_active", "notes",
             "account", "journal", "account_code", "journal_code", "journal_name",
@@ -48,6 +51,9 @@ class CashRegisterReadSerializer(serializers.ModelSerializer):
 class CashRegisterWriteSerializer(serializers.Serializer):
     name             = serializers.CharField(max_length=150)
     kind             = serializers.ChoiceField(choices=CashRegister.Kind.choices)
+    category         = serializers.ChoiceField(choices=CashRegister.Category.choices,
+                                                required=False, allow_blank=True, default="")
+    allow_negative_balance = serializers.BooleanField(required=False, default=False)
     terminal_id      = serializers.UUIDField(required=False, allow_null=True)
     responsible_id   = serializers.UUIDField(required=False, allow_null=True)
     opening_balance  = serializers.DecimalField(max_digits=12, decimal_places=2,
@@ -62,6 +68,9 @@ class CashRegisterWriteSerializer(serializers.Serializer):
 class CashRegisterUpdateSerializer(serializers.Serializer):
     name           = serializers.CharField(max_length=150, required=False)
     kind           = serializers.ChoiceField(choices=CashRegister.Kind.choices, required=False)
+    category       = serializers.ChoiceField(choices=CashRegister.Category.choices,
+                                              required=False, allow_blank=True)
+    allow_negative_balance = serializers.BooleanField(required=False)
     terminal_id    = serializers.UUIDField(required=False, allow_null=True)
     responsible_id = serializers.UUIDField(required=False, allow_null=True)
     is_active      = serializers.BooleanField(required=False)

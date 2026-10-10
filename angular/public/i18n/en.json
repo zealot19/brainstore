@@ -541,7 +541,12 @@
       "f_kind": "Cash register type",
       "opt_kind": "Choose…",
       "kind_principale": "Main cash register",
-      "kind_guichet": "Counter"
+      "kind_guichet": "Counter",
+      "f_category": "Category",
+      "category_recette": "Income",
+      "category_depense": "Expense",
+      "category_agence": "Agency",
+      "f_allow_negative": "Allow negative balance"
     },
     "billetage": {
       "btn": "Cash count",

@@ -42,6 +42,7 @@ export class TrzRegistersComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       name: ['', Validators.required], kind: [null, Validators.required], notes: [''], is_active: [true],
+      category: [''], allow_negative_balance: [false],
       account_id: [null], journal_id: [null], agency_id: [null], opening_balance: [0],
     });
     this.accSvc.list().subscribe({ next: d => this.accounts = d.filter(a => a.account_type === 'asset_cash') });
@@ -70,17 +71,17 @@ export class TrzRegistersComponent implements OnInit {
     const q = this.search.toLowerCase();
     this.filtered = this.rows.filter(r => !q || r.name.toLowerCase().includes(q));
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.selectedManagers = []; this.managerPick = null; this.form.reset({ name: '', kind: null, notes: '', is_active: true, account_id: null, journal_id: null, agency_id: null, opening_balance: 0 }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.selectedManagers = []; this.managerPick = null; this.form.reset({ name: '', kind: null, notes: '', is_active: true, category: '', allow_negative_balance: false, account_id: null, journal_id: null, agency_id: null, opening_balance: 0 }); }
   openEdit(r: CashRegister): void {
     this.editId = r.id; this.errorMsg = '';
     this.selectedManagers = (r.managers || []).map((id, i) => ({ id, label: (r.manager_names || [])[i] || id }));
     this.managerPick = null;
-    this.form.reset({ name: r.name, kind: r.kind, notes: r.notes, is_active: r.is_active, account_id: r.account, journal_id: r.journal, agency_id: r.agency, opening_balance: 0 });
+    this.form.reset({ name: r.name, kind: r.kind, notes: r.notes, is_active: r.is_active, category: r.category || '', allow_negative_balance: r.allow_negative_balance, account_id: r.account, journal_id: r.journal, agency_id: r.agency, opening_balance: 0 });
   }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = this.form.value;
-    const payload: Record<string, unknown> = { name: v.name, kind: v.kind, notes: v.notes, account_id: v.account_id, journal_id: v.journal_id, agency_id: v.agency_id, manager_ids: this.selectedManagers.map(m => m.id) };
+    const payload: Record<string, unknown> = { name: v.name, kind: v.kind, notes: v.notes, category: v.category || '', allow_negative_balance: !!v.allow_negative_balance, account_id: v.account_id, journal_id: v.journal_id, agency_id: v.agency_id, manager_ids: this.selectedManagers.map(m => m.id) };
     if (this.editId) { payload['is_active'] = v.is_active; } else { payload['opening_balance'] = v.opening_balance; }
     const a = this.editId ? this.svc.update(this.editId, payload) : this.svc.create(payload);
     a.subscribe({ next: () => { this.saving = false; this.load(); this.toast.success('Enregistré.'); this.editId ? this.close() : this.openCreate(); },

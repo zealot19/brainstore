@@ -541,7 +541,12 @@
       "f_kind": "Tipo de caixa",
       "opt_kind": "Escolher…",
       "kind_principale": "Caixa principal",
-      "kind_guichet": "Guichê"
+      "kind_guichet": "Guichê",
+      "f_category": "Categoria",
+      "category_recette": "Receita",
+      "category_depense": "Despesa",
+      "category_agence": "Agência",
+      "f_allow_negative": "Permitir saldo negativo"
     },
     "billetage": {
       "btn": "Contagem",

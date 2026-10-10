@@ -23,12 +23,14 @@ def _next_ref(model, company, prefix_key):
 @transaction.atomic
 def create_cash_register(*, company, name, kind=None, terminal=None, responsible=None,
                           opening_balance=0, notes="", account_id=None, journal_id=None,
-                          agency_id=None, manager_ids=None, created_by):
+                          agency_id=None, manager_ids=None, category="",
+                          allow_negative_balance=False, created_by):
     reg = CashRegister.objects.create(
         company=company, name=name, kind=kind, terminal=terminal,
         responsible=responsible,
         current_balance=opening_balance,
         account_id=account_id, journal_id=journal_id, agency_id=agency_id,
+        category=category or "", allow_negative_balance=allow_negative_balance,
         notes=notes, created_by=created_by,
     )
     if manager_ids:
@@ -43,7 +45,8 @@ def _company_users(company, ids):
 
 @transaction.atomic
 def update_cash_register(register, *, updated_by, **fields):
-    allowed = {"name", "kind", "terminal_id", "responsible_id", "is_active", "notes", "account_id", "journal_id", "agency_id"}
+    allowed = {"name", "kind", "category", "allow_negative_balance", "terminal_id", "responsible_id",
+               "is_active", "notes", "account_id", "journal_id", "agency_id"}
     manager_ids = fields.pop("manager_ids", None)
     for k, v in fields.items():
         if k in allowed:

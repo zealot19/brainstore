@@ -11,11 +11,18 @@ class CashRegister(BaseModel):
         PRINCIPALE = "principale", _("Caisse principale")
         GUICHET    = "guichet",    _("Guichet")
 
+    class Category(models.TextChoices):
+        RECETTE = "recette", _("Recette")
+        DEPENSE = "depense", _("Dépense")
+        AGENCE  = "agence",  _("Agence")
+
     company   = models.ForeignKey("system_config.Company", verbose_name=_("company"),
                                    on_delete=models.CASCADE, related_name="cash_registers")
     name      = models.CharField(_("name"), max_length=150)
     kind      = models.CharField(_("type de caisse"), max_length=12, choices=Kind.choices,
                                  null=True, blank=True)
+    category  = models.CharField(_("catégorie"), max_length=10, choices=Category.choices, blank=True)
+    allow_negative_balance = models.BooleanField(_("autoriser le solde négatif"), default=False)
     terminal  = models.ForeignKey("transport_config.Terminal", verbose_name=_("terminal"),
                                    on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name="cash_registers")

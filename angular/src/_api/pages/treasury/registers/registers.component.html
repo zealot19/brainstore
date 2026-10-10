@@ -45,6 +45,15 @@
         <option value="guichet">{{ 'treasury.register.kind_guichet' | transloco }}</option>
       </select>
     </div>
+    <div class="mb-3"><label class="form-label">{{ 'treasury.register.f_category' | transloco }}</label>
+      <select formControlName="category" class="form-select">
+        <option value="">{{ 'treasury.common.none_f' | transloco }}</option>
+        <option value="recette">{{ 'treasury.register.category_recette' | transloco }}</option>
+        <option value="depense">{{ 'treasury.register.category_depense' | transloco }}</option>
+        <option value="agence">{{ 'treasury.register.category_agence' | transloco }}</option>
+      </select>
+    </div>
+    <div class="form-check form-switch mb-3"><input formControlName="allow_negative_balance" type="checkbox" class="form-check-input" id="trz-reg-neg" /><label class="form-check-label" for="trz-reg-neg">{{ 'treasury.register.f_allow_negative' | transloco }}</label></div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.register.col_agency' | transloco }}</label>
       <select formControlName="agency_id" class="form-select"><option [ngValue]="null">{{ 'treasury.common.none_f' | transloco }}</option>@for (a of agencies; track a.id) { <option [ngValue]="a.id">{{ a.name }}</option> }</select>
     </div>
