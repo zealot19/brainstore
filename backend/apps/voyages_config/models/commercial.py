@@ -8,6 +8,7 @@ class FareClass(_CompanyScoped):
     name = models.CharField(_("nom"), max_length=100)
     rank = models.PositiveSmallIntegerField(_("rang"), default=0)
     color = models.CharField(_("couleur"), max_length=7, blank=True)
+    is_rental = models.BooleanField(_("location (bus entier)"), default=False)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("catégorie tarifaire")

@@ -159,7 +159,7 @@ class ServicePointWrite(serializers.Serializer):
 class FareClassRead(_ScopeMixin):
     class Meta:
         model = FareClass
-        fields = ["id", "code", "name", "rank", "color", "company", "scope",
+        fields = ["id", "code", "name", "rank", "color", "is_rental", "company", "scope",
                   "is_active", "created_at", "updated_at"]
 
 
@@ -168,6 +168,7 @@ class FareClassWrite(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     rank = serializers.IntegerField(required=False, default=0, min_value=0)
     color = serializers.CharField(max_length=7, required=False, allow_blank=True, default="")
+    is_rental = serializers.BooleanField(required=False, default=False)
     is_active = serializers.BooleanField(required=False, default=True)
 
 

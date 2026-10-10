@@ -17,8 +17,10 @@ _VOYAGE_TYPES = [("DEPART", "Départ", True), ("COMPLEMENT", "Complément", Fals
 
 # (code, nom, rang, couleur)
 _FARE_CLASSES = [
-    ("ECO", "Économique", 1, "#2e7d32"),
-    ("VIP", "VIP",        2, "#6a1b9a"),
+    # (code, libellé, rang, couleur, location)
+    ("ECO", "Économique", 1, "#2e7d32", False),
+    ("VIP", "VIP",        2, "#6a1b9a", False),
+    ("LOC", "Location",   3, "#00695c", True),
 ]
 
 # (code, libellé, début, fin, ordre)
@@ -55,11 +57,11 @@ _SEATING_PLANS = [
 
 def _seed_fare_classes(company, created_by):
     n = 0
-    for code, name, rank, color in _FARE_CLASSES:
+    for code, name, rank, color, is_rental in _FARE_CLASSES:
         if FareClass.objects.filter(company=company, code=code).exists():
             continue
         FareClass.objects.create(company=company, code=code, name=name, rank=rank,
-                                 color=color, created_by=created_by)
+                                 color=color, is_rental=is_rental, created_by=created_by)
         n += 1
     return n
 

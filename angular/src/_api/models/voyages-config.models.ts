@@ -61,6 +61,7 @@ export interface FareClass extends VcBase {
   name: string;
   rank: number;
   color: string;
+  is_rental: boolean;
 }
 
 export interface TimeSlot extends VcBase {

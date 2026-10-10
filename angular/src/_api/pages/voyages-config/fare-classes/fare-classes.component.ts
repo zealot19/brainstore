@@ -21,7 +21,7 @@ export class VcFareClassesComponent implements OnInit {
   rows: FareClass[] = []; filtered: FareClass[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: FareClassService, private fb: FormBuilder) {}
-  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], rank: [0], color: ['#3b7ddd'], is_active: [true] }); this.load(); }
+  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], rank: [0], color: ['#3b7ddd'], is_rental: [false], is_active: [true] }); this.load(); }
   load(): void { this.loading = true; this.selected.clear(); this.svc.list().subscribe({ next: d => { this.rows = d; this.applyFilter(); this.loading = false; }, error: () => this.loading = false }); }
   applyFilter(): void { const q = this.search.toLowerCase(); this.filtered = this.rows.filter(r => !q || r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)); }
   get selectable(): FareClass[] { return this.filtered.filter(r => r.scope !== 'global'); }
@@ -34,8 +34,8 @@ export class VcFareClassesComponent implements OnInit {
     if (!confirm(`Supprimer ${this.selected.size} élément(s) ?`)) return;
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', rank: 0, color: '#3b7ddd', is_active: true }); }
-  openEdit(r: FareClass): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, name: r.name, rank: r.rank, color: r.color || '#3b7ddd', is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', rank: 0, color: '#3b7ddd', is_rental: false, is_active: true }); }
+  openEdit(r: FareClass): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, name: r.name, rank: r.rank, color: r.color || '#3b7ddd', is_rental: r.is_rental, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);

@@ -25,7 +25,7 @@
             <tr>
               <td>@if (r.scope !== 'global') { <input type="checkbox" class="form-check-input" [checked]="isSelected(r.id)" (change)="toggle(r.id)" /> }</td>
               <td class="fw-medium">{{ r.code }}</td>
-              <td>{{ r.name }}</td>
+              <td>{{ r.name }}@if (r.is_rental) { <span class="badge bg-warning text-dark ms-2">{{ 'vcfg.fc.badge_rental' | transloco }}</span> }</td>
               <td>{{ r.rank }}</td>
               <td>@if (r.color) { <span class="badge" [style.background]="r.color">{{ r.color }}</span> } @else { <span class="text-muted">—</span> }</td>
               <td>@if (r.scope === 'global') { <span class="badge bg-secondary">{{ 'vcfg.common.scope_global' | transloco }}</span> } @else { <span class="badge bg-info">{{ 'vcfg.common.scope_specific' | transloco }}</span> }</td>
@@ -56,6 +56,7 @@
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.fc.col_rank' | transloco }}</label><input formControlName="rank" type="number" min="0" class="form-control" /></div>
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'vcfg.fc.col_color' | transloco }}</label><input formControlName="color" type="color" class="form-control form-control-color" /></div>
     </div>
+    <div class="form-check form-switch mb-2"><input formControlName="is_rental" type="checkbox" class="form-check-input" id="vc-rental" /><label class="form-check-label" for="vc-rental">{{ 'vcfg.fc.f_rental' | transloco }}</label></div>
     <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="vc-active" /><label class="form-check-label" for="vc-active">{{ 'vcfg.common.active' | transloco }}</label></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

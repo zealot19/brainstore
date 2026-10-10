@@ -23,6 +23,7 @@ def bookable_trips(company, fare_class_id=None, time_slot_id=None, travel_date=N
     qs = (Trip.objects.filter(is_deleted=False, company=company,
                               status__in=_BOOKABLE,
                               scheduled_departure__gte=timezone.now())
+          .exclude(fare_class__is_rental=True)  # M14 : pas de vente sur un voyage en location
           .filter(seats__isnull=False).distinct()
           .select_related("route", "origin", "destination", "fare_class", "service_pattern")
           .order_by("scheduled_departure"))

@@ -30,6 +30,8 @@ def _ticket_number(trip, origin, destination):
 def _assert_bookable(trip):
     if trip.status not in _BOOKABLE:
         raise ApplicationError(_("Le voyage doit être soumis avant toute réservation (les brouillons ne sont pas réservables)."))
+    if trip.fare_class.is_rental:
+        raise ApplicationError(_("Aucune vente de billet sur un voyage en location (bus loué en entier)."))
     if not TripSeat.objects.filter(is_deleted=False, trip=trip).exists():
         raise ApplicationError(_("Les sièges de ce voyage ne sont pas encore générés."))
 
