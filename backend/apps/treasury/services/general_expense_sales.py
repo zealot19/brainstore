@@ -17,7 +17,7 @@ def record_general_expense(company, *, expense, cash_session, user):
         cash_session=cash_session, amount=expense.amount,
         payment_mode=Transaction.PaymentMode.CASH, counterpart_account=account,
         description=f"{expense.expense_type.name} — {expense.label}".strip(),
-        created_by=user)
+        status=Transaction.Status.PENDING, created_by=user)  # M26 : dépense en attente
     txn.general_expense = expense
     txn.save(update_fields=["general_expense"])
     return txn

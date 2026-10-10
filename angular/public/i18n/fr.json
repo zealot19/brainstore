@@ -862,6 +862,42 @@
       "active": "Actif",
       "inactive": "Inactif",
       "empty": "Aucun type de valeur."
+    },
+    "optype": {
+      "title": "Types d'opération",
+      "subtitle": "Catégories d'opérations de trésorerie (dépense / recette).",
+      "new": "Nouveau type",
+      "edit_title": "Modifier le type",
+      "col_code": "Code",
+      "col_label": "Libellé",
+      "col_sens": "Sens",
+      "col_order": "Ordre",
+      "col_active": "Statut",
+      "sens_depense": "Dépense",
+      "sens_recette": "Recette",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "empty": "Aucun type d'opération."
+    },
+    "operation": {
+      "title": "Validation des opérations",
+      "subtitle": "Valider, invalider ou modifier les dépenses et recettes manuelles.",
+      "f_status": "Statut",
+      "st_pending": "En attente",
+      "st_validated": "Validées",
+      "st_invalidated": "Invalidées",
+      "st_all": "Toutes",
+      "col_date": "Date",
+      "col_type": "Type",
+      "col_desc": "Description",
+      "col_caisse": "Caisse",
+      "col_amount": "Montant",
+      "col_status": "Statut",
+      "a_validate": "Valider",
+      "a_invalidate": "Invalider",
+      "a_modify": "Modifier",
+      "modify_title": "Modifier le montant",
+      "empty": "Aucune opération."
     }
   },
   "vcfg": {

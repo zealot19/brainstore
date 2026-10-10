@@ -185,6 +185,7 @@ export class SidebarService {
             { menuValue: 'Remboursement',        route: routes.trzRefundRate,       base: 'refund-rate',         permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Dénominations',        route: routes.trzDenominations,    base: 'denominations',       permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Types de valeurs',     route: routes.trzValueTypes,       base: 'value-types',         permission: 'treasury.config.view',        module: 'treasury' },
+            { menuValue: "Types d'opération",    route: routes.trzOperationTypes,   base: 'operation-types',     permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Types de valeurs',     route: routes.cfgTypesValeurs,     base: 'configuration',       permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Moyens de paiement',   route: routes.trzPaymentMethods,   base: 'payment-methods',     permission: 'treasury.paymentmethod.view', module: 'treasury' },
             { menuValue: 'Config billets',       route: routes.vcTicketTemplate,    base: 'ticket-template',     permission: 'transport.config.view',       module: 'voyage' },
@@ -348,6 +349,13 @@ export class SidebarService {
             { menuValue: 'Comptes bancaires', route: routes.trzBanks,     base: 'banks',     permission: 'treasury.bank.view' },
             { menuValue: 'Transferts',        route: routes.trzTransfers, base: 'transfers', permission: 'treasury.transfer.view' },
           ],
+        },
+        {
+          menuValue: 'Validation des opérations',
+          route: routes.trzOperations,
+          base: 'operations',
+          icon2: 'checklist',
+          permission: 'treasury.operation.validate',
         },
         {
           menuValue: 'Dépenses',

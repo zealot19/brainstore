@@ -21,6 +21,7 @@ from apps.treasury.serializers import (
     TreasuryStatsSerializer,
     IncomeRowSerializer, OtherIncomeWriteSerializer, VoyageIncomeWriteSerializer,
     DenominationSerializer, CashValueTypeSerializer, CashCountSerializer,
+    OperationTypeSerializer,
 )
 
 
@@ -562,6 +563,49 @@ class TransactionDetailView(APIView):
         except ApplicationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ── Validation des opérations (M26) ──────────────────────────────────────────────
+
+class OperationListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.operation.validate"}
+
+    def get(self, request):
+        company = _company(request)
+        qs = selectors.list_transactions(company.id)
+        st = request.query_params.get("status")
+        if st:
+            qs = qs.filter(status=st)
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(TransactionReadSerializer(page, many=True).data)
+
+
+class _OperationActionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.operation.validate"}
+    action = None  # set by subclass
+
+    def post(self, request, pk):
+        obj = selectors.get_transaction(pk, _company(request).id)
+        if not obj:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            if self.action == "modify":
+                services.modify_operation(obj, amount=request.data.get("amount"), user=request.user)
+            elif self.action == "validate":
+                services.validate_operation(obj, user=request.user)
+            elif self.action == "invalidate":
+                services.invalidate_operation(obj, user=request.user)
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(TransactionReadSerializer(selectors.get_transaction(pk, _company(request).id)).data)
+
+
+class OperationValidateView(_OperationActionView):   action = "validate"
+class OperationInvalidateView(_OperationActionView): action = "invalidate"
+class OperationModifyView(_OperationActionView):     action = "modify"
 
 
 # ── Transfers ──────────────────────────────────────────────────────────────────
@@ -1171,6 +1215,57 @@ class CashValueTypeDetailView(APIView):
         obj = self._get(request, pk)
         if not obj:
             return error_response("Type de valeur introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        obj.is_deleted = True; obj.updated_by = request.user
+        obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
+        return no_content_response()
+
+
+# ── Types d'opération (M26) ──────────────────────────────────────────────────────
+
+class OperationTypeListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "treasury.config.view", "POST": "treasury.config.manage"}
+
+    def get(self, request):
+        from apps.treasury.models import OperationType
+        qs = OperationType.objects.filter(company=_company(request), is_deleted=False).order_by("sens", "display_order", "label")
+        return success_response(OperationTypeSerializer(qs, many=True).data)
+
+    def post(self, request):
+        from apps.treasury.models import OperationType
+        ser = OperationTypeSerializer(data=request.data); ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        obj, created = OperationType.objects.get_or_create(
+            company=_company(request), code=d["code"],
+            defaults={"label": d["label"], "sens": d["sens"], "is_active": d.get("is_active", True),
+                      "display_order": d.get("display_order", 0), "created_by": request.user})
+        if not created:
+            return error_response("Ce type d'opération existe déjà.")
+        return created_response(OperationTypeSerializer(obj).data)
+
+
+class OperationTypeDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"PATCH": "treasury.config.manage", "DELETE": "treasury.config.manage"}
+
+    def _get(self, request, pk):
+        from apps.treasury.models import OperationType
+        return OperationType.objects.filter(id=pk, company=_company(request), is_deleted=False).first()
+
+    def patch(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Type d'opération introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+        for f in ("code", "label", "sens", "is_active", "display_order"):
+            if f in request.data:
+                setattr(obj, f, request.data[f])
+        obj.updated_by = request.user; obj.save()
+        return success_response(OperationTypeSerializer(obj).data)
+
+    def delete(self, request, pk):
+        obj = self._get(request, pk)
+        if not obj:
+            return error_response("Type d'opération introuvable.", status_code=status.HTTP_404_NOT_FOUND)
         obj.is_deleted = True; obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return no_content_response()

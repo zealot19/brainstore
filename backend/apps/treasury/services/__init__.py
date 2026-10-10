@@ -7,7 +7,7 @@ from .services import (
     create_transaction, delete_transaction,
     create_transfer,
 )
-from .seed import seed_treasury_mapping, seed_payment_methods, seed_denominations, seed_cash_value_types
+from .seed import seed_treasury_mapping, seed_payment_methods, seed_denominations, seed_cash_value_types, seed_operation_types
 from .booking_sales import record_booking_payment
 from .consignment_sales import record_parcel_payment, record_baggage_payment, record_parcel_delivery
 from .trip_expense_sales import record_trip_expense
@@ -20,8 +20,10 @@ from .refund_config import (
 )
 from .refund import refund_on_cancel
 from .refund_by_reference import lookup_refundable, refund_by_reference
+from .operation_validation import validate_operation, invalidate_operation, modify_operation
 
 __all__ = [
+    "validate_operation", "invalidate_operation", "modify_operation",
     "create_cash_register", "update_cash_register", "delete_cash_register",
     "create_bank_account", "update_bank_account", "delete_bank_account",
     "open_session", "close_session",

@@ -1,7 +1,8 @@
 from decimal import Decimal
 from rest_framework import serializers
 from apps.treasury.models import (CashRegister, BankAccount, CashSession, Transaction, Transfer,
-                                  CurrencyDenomination, CashValueType, CashCount, CashCountItem)
+                                  CurrencyDenomination, CashValueType, CashCount, CashCountItem,
+                                  OperationType)
 
 
 # ── Cash register ──────────────────────────────────────────────────────────────
@@ -227,6 +228,15 @@ class CashValueTypeSerializer(serializers.ModelSerializer):
         fields = ["id", "code", "label", "is_active", "display_order", "created_at", "updated_at"]
 
 
+class OperationTypeSerializer(serializers.ModelSerializer):
+    sens_display = serializers.CharField(source="get_sens_display", read_only=True)
+
+    class Meta:
+        model = OperationType
+        fields = ["id", "code", "label", "sens", "sens_display", "is_active", "display_order",
+                  "created_at", "updated_at"]
+
+
 class CashCountItemSerializer(serializers.ModelSerializer):
     value_type_label = serializers.CharField(source="value_type.label", read_only=True, default=None)
 
@@ -254,6 +264,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
     payment_display  = serializers.CharField(source="get_payment_mode_display", read_only=True)
     account_label    = serializers.SerializerMethodField()
     journal_entry_name = serializers.CharField(source="journal_entry.name", read_only=True, default=None)
+    status_display   = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Transaction
@@ -261,6 +272,7 @@ class TransactionReadSerializer(serializers.ModelSerializer):
             "id", "reference",
             "transaction_type", "type_display",
             "category", "category_display",
+            "status", "status_display",
             "account_type", "account_label",
             "amount", "payment_mode", "payment_display",
             "description", "transaction_date",

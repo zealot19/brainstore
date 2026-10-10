@@ -18,6 +18,7 @@ def record_other_income(company, *, amount, payment_mode, description, user,
         account_type=Transaction.AccountType.CASH,
         amount=amount, payment_mode=payment_mode,
         description=description, cash_session=session,
+        status=Transaction.Status.PENDING,  # M26 : recette manuelle en attente
         created_by=user,
     )
 
@@ -38,6 +39,7 @@ def record_voyage_income(company, *, amount, payment_mode, description, vehicle=
         account_type=Transaction.AccountType.CASH,
         amount=amount, payment_mode=payment_mode,
         description=description, cash_session=session,
+        status=Transaction.Status.PENDING,  # M26 : recette voyage manuelle en attente
         created_by=user,
     )
     updates = []

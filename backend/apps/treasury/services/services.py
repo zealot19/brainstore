@@ -324,6 +324,7 @@ def create_transaction(
     cash_session=None, bank_account=None,
     trip=None, booking=None, parcel=None,
     counterpart_account=None,
+    status=Transaction.Status.VALIDATED,
     created_by,
 ):
     if amount <= 0:
@@ -356,17 +357,19 @@ def create_transaction(
         transaction_date=transaction_date or timezone.now().date(),
         trip=trip, booking=booking, parcel=parcel,
         counterpart_account=counterpart_account,
+        status=status,
         created_by=created_by,
     )
 
-    # Update balances
-    _apply_transaction_balance(txn, sign=+1)
-
-    from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
-    entry = TreasuryAccountingBridge.post_movement(txn)
-    if entry:
-        txn.journal_entry = entry
-        txn.save(update_fields=["journal_entry"])
+    # M26 : une opération en attente n'impacte NI le solde NI la comptabilité tant
+    # qu'elle n'est pas validée. Les ventes/auto (défaut VALIDATED) s'appliquent de suite.
+    if status == Transaction.Status.VALIDATED:
+        _apply_transaction_balance(txn, sign=+1)
+        from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
+        entry = TreasuryAccountingBridge.post_movement(txn)
+        if entry:
+            txn.journal_entry = entry
+            txn.save(update_fields=["journal_entry"])
     return txn
 
 
@@ -406,8 +409,10 @@ def delete_transaction(txn, *, deleted_by):
                 AccountingService.cancel_entry(txn.journal_entry_id, reason="Annulation mouvement")
         except Exception:
             pass
-    # Reverse balance impact
-    _apply_transaction_balance(txn, sign=-1)
+    # M26 : n'extourner le solde que si le mouvement avait été appliqué (validé).
+    # Une opération en attente (ou déjà invalidée) n'a jamais impacté le solde.
+    if txn.status == Transaction.Status.VALIDATED:
+        _apply_transaction_balance(txn, sign=-1)
     txn.soft_delete(user=deleted_by)
 
 
