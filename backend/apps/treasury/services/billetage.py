@@ -26,6 +26,8 @@ def compute_count_total(company, items):
     cash_total = Decimal("0")
     other_total = Decimal("0")
     for row in items or []:
+        if row.get("denomination_id") and row.get("value_type_id"):
+            raise ApplicationError(_("Une ligne ne peut pas être à la fois une coupure et une valeur."))
         if row.get("denomination_id"):
             qty = int(row.get("quantity") or 0)
             if qty < 0:

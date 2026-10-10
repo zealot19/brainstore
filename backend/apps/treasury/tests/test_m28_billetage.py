@@ -63,3 +63,14 @@ def test_value_line_requires_positive_amount():
     company, admin, reg, d1000, bon = _ctx("m28b4@x.com")
     with pytest.raises(ApplicationError):
         compute_count_total(company, [{"value_type_id": str(bon.id), "amount": "0"}])
+
+
+@pytest.mark.django_db
+def test_line_with_both_denomination_and_value_rejected():
+    from apps.treasury.services.billetage import compute_count_total
+    from apps.core.exceptions import ApplicationError
+    company, admin, reg, d1000, bon = _ctx("m28b5@x.com")
+    with pytest.raises(ApplicationError):
+        compute_count_total(company, [
+            {"denomination_id": str(d1000.id), "quantity": 2, "value_type_id": str(bon.id), "amount": "100"}
+        ])
