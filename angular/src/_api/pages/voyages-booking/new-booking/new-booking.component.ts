@@ -182,7 +182,9 @@ export class VbNewBookingComponent implements OnInit {
     // Paiement exact : montant reçu = montant dû (backend : amount_received null ⇒ total).
     const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: null } as BookingCreate;
     this.svc.create(body).subscribe({
-      next: b => this.afterSale(b),
+      // M19 : « Non payé » crée une réservation côté serveur → on la retrouve dans l'onglet Réservations
+      // (pas d'impression de billet pour une réservation non payée).
+      next: b => this.requiresPayment ? this.afterSale(b) : this.router.navigate(['/voyages-booking/reservations']),
       error: e => this.fail(e) });
   }
 
