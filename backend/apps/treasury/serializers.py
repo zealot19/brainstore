@@ -228,9 +228,12 @@ class CashValueTypeSerializer(serializers.ModelSerializer):
 
 
 class CashCountItemSerializer(serializers.ModelSerializer):
+    value_type_label = serializers.CharField(source="value_type.label", read_only=True, default=None)
+
     class Meta:
         model = CashCountItem
-        fields = ["id", "denomination", "quantity", "unit_value", "subtotal"]
+        fields = ["id", "denomination", "value_type", "value_type_label",
+                  "quantity", "unit_value", "subtotal"]
 
 
 class CashCountSerializer(serializers.ModelSerializer):
@@ -239,7 +242,8 @@ class CashCountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CashCount
-        fields = ["id", "kind", "kind_display", "total_amount", "created_at", "items"]
+        fields = ["id", "kind", "kind_display", "total_amount", "cash_total", "other_total",
+                  "created_at", "items"]
 
 
 # ── Transaction ────────────────────────────────────────────────────────────────

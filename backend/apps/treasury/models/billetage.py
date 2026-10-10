@@ -61,7 +61,9 @@ class CashCount(BaseModel):
     cash_session = models.ForeignKey("treasury.CashSession", verbose_name=_("session"),
                                      on_delete=models.CASCADE, related_name="counts")
     kind         = models.CharField(_("type"), max_length=15, choices=Kind.choices)
-    total_amount = models.DecimalField(_("montant compté"), max_digits=14, decimal_places=2, default=0)
+    total_amount = models.DecimalField(_("montant compté"), max_digits=14, decimal_places=2, default=0)  # grand total (espèces + autres)
+    cash_total   = models.DecimalField(_("total espèces"), max_digits=14, decimal_places=2, default=0)
+    other_total  = models.DecimalField(_("total autres valeurs"), max_digits=14, decimal_places=2, default=0)
     counted_by   = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("compté par"),
                                      on_delete=models.PROTECT, related_name="cash_counts")
 
@@ -80,7 +82,9 @@ class CashCountItem(BaseModel):
     cash_count   = models.ForeignKey(CashCount, verbose_name=_("comptage"),
                                      on_delete=models.CASCADE, related_name="items")
     denomination = models.ForeignKey(CurrencyDenomination, verbose_name=_("coupure"),
-                                     on_delete=models.PROTECT, related_name="+")
+                                     on_delete=models.PROTECT, related_name="+", null=True, blank=True)
+    value_type   = models.ForeignKey("treasury.CashValueType", verbose_name=_("type de valeur"),
+                                     on_delete=models.PROTECT, related_name="+", null=True, blank=True)
     quantity     = models.PositiveIntegerField(_("quantité"), default=0)
     unit_value   = models.DecimalField(_("valeur unitaire"), max_digits=12, decimal_places=2)
     subtotal     = models.DecimalField(_("sous-total"), max_digits=14, decimal_places=2, default=0)
