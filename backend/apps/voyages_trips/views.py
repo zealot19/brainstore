@@ -543,6 +543,46 @@ class TripTransbordSelectionView(APIView):
         return success_response(res)
 
 
+from apps.voyages_trips.services.transbordement import transbord_vehicle
+
+
+class VehicleTransbordEligibleView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.trip.view"}
+
+    def get(self, request, vehicle_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        from apps.fleet.models import Vehicle
+        vehicle = Vehicle.objects.filter(id=vehicle_id, company=company, is_deleted=False).first()
+        if not vehicle:
+            return error_response("Véhicule introuvable.", status_code=404)
+        return success_response(selectors.vehicle_transbord_options(company, vehicle))
+
+
+class VehicleTransbordView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "voyage.trip.update"}
+
+    def post(self, request, vehicle_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        from apps.fleet.models import Vehicle
+        from_vehicle = Vehicle.objects.filter(id=vehicle_id, company=company, is_deleted=False).first()
+        to_vehicle = Vehicle.objects.filter(id=request.data.get("to_vehicle_id"),
+                                            company=company, is_deleted=False).first()
+        if not from_vehicle or not to_vehicle:
+            return error_response("Véhicule introuvable.", status_code=404)
+        try:
+            res = transbord_vehicle(company, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
+                                    reason=request.data.get("reason", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(res)
+
+
 def _resolve_crew_agency(agency_id, company_id):
     if not agency_id:
         return None

@@ -86,6 +86,30 @@ def apply_transbord(trip, new_plan, *, overflow_trip=None, user=None):
 
 
 @transaction.atomic
+@transaction.atomic
+def transbord_vehicle(company, *, from_vehicle, to_vehicle, reason, user=None):
+    """M16 — transbordement « par véhicule » : bascule TOUS les voyages à venir de
+    `from_vehicle` vers `to_vehicle` en une opération atomique."""
+    from django.utils import timezone
+    from apps.voyages_trips.models import Trip
+    if not (reason or "").strip():
+        raise ApplicationError(_("Le motif du transbordement est obligatoire."))
+    trips = list(Trip.objects.filter(company=company, vehicle=from_vehicle, is_deleted=False,
+                                     status__in=["pending", "departed"],
+                                     scheduled_departure__gte=timezone.now())
+                 .order_by("scheduled_departure"))
+    if not trips:
+        raise ApplicationError(_("Aucun voyage à venir pour ce véhicule."))
+    results = []
+    totals = {"passengers_moved": 0, "passengers_overflow": 0, "parcels_moved": 0, "baggage_moved": 0}
+    for t in trips:
+        r = transbord_trip(t, to_vehicle, user=user, reason=reason)   # lève → rollback global
+        results.append(r)
+        for k in totals:
+            totals[k] += r.get(k, 0)
+    return {"trips": [str(t.id) for t in trips], "transbordements": results, **totals}
+
+
 def transbord_trip(trip, to_vehicle, *, overflow_trip=None, user=None, note="", reason=""):
     from apps.voyages_trips.models import Transbordement
     from apps.voyages_trips.selectors.eligibility import (

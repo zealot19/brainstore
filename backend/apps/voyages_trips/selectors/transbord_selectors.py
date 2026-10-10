@@ -30,6 +30,28 @@ def transbord_options(company, trip):
     return {"vehicles": vehicles, "overflow_trips": overflow, "sold_count": sold_count}
 
 
+def vehicle_transbord_options(company, vehicle):
+    """M16 — voyages à venir d'un véhicule + véhicules cibles candidats (par véhicule)."""
+    from django.utils import timezone
+    trips = (Trip.objects.filter(company=company, vehicle=vehicle, is_deleted=False,
+                                 status__in=["pending", "departed"],
+                                 scheduled_departure__gte=timezone.now())
+             .order_by("scheduled_departure").select_related("route"))
+    trip_rows = [{"id": str(t.id), "number": t.number, "code": t.code,
+                  "scheduled_departure": t.scheduled_departure,
+                  "sold": t.tickets.filter(is_deleted=False, status__in=["sold", "boarded"]).count()}
+                 for t in trips]
+    from apps.fleet.models import Vehicle
+    targets = []
+    for v in (Vehicle.objects
+              .filter(company=company, is_deleted=False, is_active=True).exclude(id=vehicle.id)):
+        plan = active_seating_plan(v, None)
+        targets.append({"id": str(v.id), "license_plate": v.license_plate,
+                        "model_name": getattr(getattr(v, "model", None), "name", "") or "",
+                        "seats": _plan_capacity(plan)})
+    return {"trips": trip_rows, "target_vehicles": targets}
+
+
 def trip_transbordements(trip):
     return trip.transbordements.filter(is_deleted=False).select_related(
         "from_vehicle", "to_vehicle", "overflow_trip").order_by("-created_at")
