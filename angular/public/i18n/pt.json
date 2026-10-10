@@ -2849,5 +2849,22 @@
   },
   "config": {
     "coming_soon": "Em breve"
+  },
+  "voyages": {
+    "transbord": {
+      "title": "Transbordo",
+      "f_reason": "Motivo",
+      "col_reason": "Motivo",
+      "by_vehicle": "Por veículo",
+      "by_vehicle_btn": "Transbordar o veículo",
+      "target_vehicle": "Veículo destino",
+      "impacted_trips": "Viagens afetadas",
+      "general": "Geral",
+      "source_trip": "Viagem origem",
+      "dest_trip": "Viagem destino",
+      "execute": "Transbordar",
+      "no_trips": "Sem viagem.",
+      "history": "Histórico"
+    }
   }
 }

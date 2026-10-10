@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { VOYAGES } from '../../config/api.config';
 import { Trip, TripCrew, TripSeat, TripStop, EligibleVehicle } from '../../models/voyages.models';
 
@@ -55,9 +56,11 @@ export class TripService {
                                               sold_count: number }> {
     return this.http.get<any>(VOYAGES.transbordEligible(id));
   }
-  transbord(id: string, body: { vehicle_id: string; overflow_trip_id?: string; note?: string }): Observable<any> {
+  transbord(id: string, body: { vehicle_id: string; overflow_trip_id?: string; note?: string; reason?: string }): Observable<any> {
     return this.http.post<any>(VOYAGES.transbord(id), body);
   }
+  transbordVehicleEligible(vehicleId: string): Observable<any> { return this.http.get<any>(VOYAGES.transbordVehicleEligible(vehicleId)).pipe(map((r: any) => r.data ?? r)); }
+  transbordVehicle(vehicleId: string, body: { to_vehicle_id: string; reason: string }): Observable<any> { return this.http.post<any>(VOYAGES.transbordVehicle(vehicleId), body).pipe(map((r: any) => r.data ?? r)); }
   transbordHistory(id: string): Observable<any[]> { return this.http.get<any[]>(VOYAGES.transbordHistory(id)); }
 
   selectionOptions(id: string): Observable<{
@@ -70,7 +73,7 @@ export class TripService {
     return this.http.get<any>(VOYAGES.transbordSelectionOptions(id));
   }
   transbordSelection(id: string, body: { ticket_ids: string[]; parcel_ids: string[]; baggage_ids: string[];
-                                         dest_trip_id?: string; dest_vehicle_id?: string; note?: string }): Observable<any> {
+                                         dest_trip_id?: string; dest_vehicle_id?: string; note?: string; reason?: string }): Observable<any> {
     return this.http.post<any>(VOYAGES.transbordSelection(id), body);
   }
 }

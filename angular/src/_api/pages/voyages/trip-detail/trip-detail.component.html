@@ -84,6 +84,7 @@
                   {{ h.from_vehicle || '—' }} → <strong>{{ h.to_vehicle }}</strong>
                   · {{ h.passengers_moved }} {{ 'trips.detail.passengers_moved' | transloco }}
                   @if (h.passengers_overflow) { · {{ h.passengers_overflow }} {{ 'trips.detail.overflowed' | transloco }} {{ h.overflow_trip }} ({{ h.baggage_moved }} {{ 'trips.detail.baggage_moved' | transloco }}) }
+                  @if (h.reason) { · <em>{{ 'voyages.transbord.col_reason' | transloco }}: {{ h.reason }}</em> }
                   <span class="text-muted">— {{ h.created_at | date:'short' }}</span>
                 </li>
               }
@@ -117,6 +118,8 @@
                     </select>
                   </div>
                 }
+                <div class="mb-2"><label class="form-label">{{ 'voyages.transbord.f_reason' | transloco }} <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="tbReason" /></div>
                 <div class="mb-2"><label class="form-label">{{ 'trips.detail.note' | transloco }}</label>
                   <textarea class="form-control" rows="2" [(ngModel)]="tbNote"></textarea></div>
               </div>
@@ -187,6 +190,8 @@
                     @for (v of selVehicles; track v.id) { <option [value]="v.id">{{ v.license_plate }} — {{ v.model_name }} ({{ v.seats }} {{ 'trips.detail.seats_word' | transloco }})</option> }
                   </select>
                 }
+                <div class="mt-3"><label class="form-label">{{ 'voyages.transbord.f_reason' | transloco }} <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="selReason" /></div>
                 <div class="mt-3"><label class="form-label">{{ 'trips.detail.note' | transloco }}</label>
                   <textarea class="form-control" rows="2" [(ngModel)]="selNote"></textarea></div>
               </div>
