@@ -30,6 +30,26 @@ class CurrencyDenomination(BaseModel):
         return f"{self.value} {self.currency_id}"
 
 
+class CashValueType(BaseModel):
+    """Type de valeur non-espèces saisissable au billetage (bon de caisse, monnaie électronique…)."""
+
+    company       = models.ForeignKey("system_config.Company", verbose_name=_("institution"),
+                                       on_delete=models.CASCADE, related_name="cash_value_types")
+    code          = models.CharField(_("code"), max_length=20)
+    label         = models.CharField(_("libellé"), max_length=100)
+    is_active     = models.BooleanField(_("actif"), default=True)
+    display_order = models.PositiveIntegerField(_("ordre d'affichage"), default=0)
+
+    class Meta(BaseModel.Meta):
+        verbose_name        = _("type de valeur")
+        verbose_name_plural = _("types de valeur")
+        unique_together     = [("company", "code")]
+        ordering            = ["display_order", "label"]
+
+    def __str__(self):
+        return self.label
+
+
 class CashCount(BaseModel):
     """Comptage physique (billetage) rattaché à une session de caisse."""
 

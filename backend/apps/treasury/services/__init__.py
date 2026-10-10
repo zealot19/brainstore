@@ -7,7 +7,7 @@ from .services import (
     create_transaction, delete_transaction,
     create_transfer,
 )
-from .seed import seed_treasury_mapping, seed_payment_methods, seed_denominations
+from .seed import seed_treasury_mapping, seed_payment_methods, seed_denominations, seed_cash_value_types
 from .booking_sales import record_booking_payment
 from .consignment_sales import record_parcel_payment, record_baggage_payment, record_parcel_delivery
 from .trip_expense_sales import record_trip_expense
@@ -28,6 +28,7 @@ __all__ = [
     "schedule_session", "open_scheduled_session",
     "suspend_session", "resume_session", "extend_session",
     "seed_denominations",
+    "seed_cash_value_types",
     "create_transaction", "delete_transaction",
     "create_transfer",
     "seed_treasury_mapping", "seed_payment_methods",

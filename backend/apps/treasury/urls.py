@@ -33,6 +33,8 @@ urlpatterns = [
     # ── Coupures monétaires (billetage) ──────────────────────────────────────────
     path("denominations/",           views.DenominationListView.as_view(),   name="denomination-list"),
     path("denominations/<uuid:pk>/", views.DenominationDetailView.as_view(), name="denomination-detail"),
+    path("value-types/",             views.CashValueTypeListView.as_view(),   name="value-type-list"),
+    path("value-types/<uuid:pk>/",   views.CashValueTypeDetailView.as_view(), name="value-type-detail"),
 
     # ── Transactions ───────────────────────────────────────────────────────────
     path("transactions/",               views.TransactionListView.as_view(),   name="transaction-list"),

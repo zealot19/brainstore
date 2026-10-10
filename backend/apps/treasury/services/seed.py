@@ -61,6 +61,19 @@ _XAF_DENOMINATIONS = [
 ]
 
 
+def seed_cash_value_types(company, created_by=None) -> int:
+    """Types de valeur billetage par défaut (bon de caisse, monnaie électronique, autre)."""
+    from apps.treasury.models import CashValueType
+    rows = [("BON", "Bon de caisse", 1), ("ELEC", "Monnaie électronique", 2), ("AUTRE", "Autre", 3)]
+    created = 0
+    for code, label, order in rows:
+        _, was_created = CashValueType.objects.get_or_create(
+            company=company, code=code,
+            defaults={"label": label, "display_order": order, "created_by": created_by})
+        created += int(was_created)
+    return created
+
+
 def seed_denominations(company, created_by=None) -> int:
     """Coupures XAF par défaut pour une nouvelle institution (éditable ensuite)."""
     from apps.core.models import Currency
