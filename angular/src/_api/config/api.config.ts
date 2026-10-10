@@ -474,6 +474,7 @@ export const TREASURY = {
   valueType:  (id: string) => `${TRZ}/value-types/${id}/`,
   operationTypes: `${TRZ}/operation-types/`,
   operationType:  (id: string) => `${TRZ}/operation-types/${id}/`,
+  sessionStop: (id: string) => `${TRZ}/sessions/${id}/stop/`,
   sessionExplanations: (sid: string) => `${TRZ}/sessions/${sid}/explanations/`,
   explanationRespond:  (id: string) => `${TRZ}/explanations/${id}/respond/`,
   explanationDecide:   (id: string) => `${TRZ}/explanations/${id}/decide/`,
