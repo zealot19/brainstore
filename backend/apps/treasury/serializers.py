@@ -2,7 +2,11 @@ from decimal import Decimal
 from rest_framework import serializers
 from apps.treasury.models import (CashRegister, BankAccount, CashSession, Transaction, Transfer,
                                   CurrencyDenomination, CashValueType, CashCount, CashCountItem,
-                                  OperationType)
+                                  OperationType, SessionExplanationRequest)
+
+
+def _uname(u):
+    return (u.get_full_name() or u.username) if u else None
 
 
 # ── Cash register ──────────────────────────────────────────────────────────────
@@ -235,6 +239,26 @@ class OperationTypeSerializer(serializers.ModelSerializer):
         model = OperationType
         fields = ["id", "code", "label", "sens", "sens_display", "is_active", "display_order",
                   "created_at", "updated_at"]
+
+
+class SessionExplanationRequestSerializer(serializers.ModelSerializer):
+    status_display   = serializers.CharField(source="get_status_display", read_only=True)
+    decision_display = serializers.CharField(source="get_decision_display", read_only=True, default=None)
+    requested_by_name = serializers.SerializerMethodField()
+    responded_by_name = serializers.SerializerMethodField()
+    decided_by_name   = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SessionExplanationRequest
+        fields = ["id", "cash_session", "status", "status_display",
+                  "request_note", "requested_by_name", "requested_at",
+                  "response_note", "responded_by_name", "responded_at",
+                  "decision", "decision_display", "decision_note", "decided_by_name", "decided_at",
+                  "created_at"]
+
+    def get_requested_by_name(self, obj): return _uname(obj.requested_by)
+    def get_responded_by_name(self, obj): return _uname(obj.responded_by)
+    def get_decided_by_name(self, obj):   return _uname(obj.decided_by)
 
 
 class CashCountItemSerializer(serializers.ModelSerializer):
