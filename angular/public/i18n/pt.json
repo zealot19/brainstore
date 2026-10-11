@@ -470,6 +470,20 @@
       "full": "Viagem completa",
       "quota_reached": "Quota de reserva atingida",
       "none": "Nenhuma viagem programada para estes critérios."
+    },
+    "cancelled": {
+      "title": "Bilhetes anulados",
+      "from": "De",
+      "to": "Até",
+      "filter": "Filtrar",
+      "col_ref": "Referência",
+      "col_passenger": "Passageiro",
+      "col_refund": "Reembolsado",
+      "col_by": "Anulado por",
+      "col_date": "Data",
+      "col_reason": "Motivo",
+      "voucher": "Comprovativo de anulação",
+      "empty": "Sem anulação."
     }
   },
   "treasury": {

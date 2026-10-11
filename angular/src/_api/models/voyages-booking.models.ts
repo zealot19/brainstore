@@ -39,6 +39,7 @@ export interface Booking {
   amount_due: string; amount_paid: string; amount_received: string; change_due: string;
   payment_method: string; channel: string; notes: string; hold_until: string | null;
   created_at: string; updated_at: string; tickets: Ticket[];
+  cancellation_reason?: string; cancelled_at?: string | null; cancelled_by_name?: string | null; refund_amount?: string;
 }
 
 export interface LoyaltyAccount { id: string; passenger: string; points_balance: number; lifetime_points: number; }

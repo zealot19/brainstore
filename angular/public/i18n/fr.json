@@ -470,6 +470,20 @@
       "full": "Voyage complet",
       "quota_reached": "Quota de réservation atteint",
       "none": "Aucun voyage programmé pour ces critères."
+    },
+    "cancelled": {
+      "title": "Tickets annulés",
+      "from": "Du",
+      "to": "Au",
+      "filter": "Filtrer",
+      "col_ref": "Référence",
+      "col_passenger": "Passager",
+      "col_refund": "Remboursé",
+      "col_by": "Annulé par",
+      "col_date": "Date",
+      "col_reason": "Motif",
+      "voucher": "Bon d'annulation",
+      "empty": "Aucune annulation."
     }
   },
   "treasury": {
