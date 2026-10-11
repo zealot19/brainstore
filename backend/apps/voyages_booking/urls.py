@@ -29,4 +29,7 @@ urlpatterns = [
     path("trips/<uuid:trip_id>/roadmap/pdf/", v.TripRoadmapPdfView.as_view()),
     path("trips/<uuid:trip_id>/board-all/", v.TripBoardAllView.as_view()),
     path("tickets/<uuid:pk>/board/", v.TicketBoardView.as_view()),
+    path("tickets/<uuid:pk>/report/", v.TicketReportView.as_view()),
+    path("tickets/<uuid:pk>/regularize/", v.TicketRegularizeView.as_view()),
+    path("adjustments/", v.AdjustmentListView.as_view()),
 ]

@@ -705,3 +705,75 @@ class BookingSeriesView(APIView):
             days = 14
         return success_response(get_booking_series(request.user.company_id, days,
                                                    agency_ids=user_agency_ids(request.user)))
+
+
+def _ticket_for(request, pk):
+    return Ticket.objects.filter(is_deleted=False, booking__company=request.user.company, id=pk).first()
+
+
+class TicketReportView(APIView):
+    """M21 — report d'un billet vers un autre voyage de la même route."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.create'}
+
+    def post(self, request, pk):
+        t = _ticket_for(request, pk)
+        if not t:
+            return error_response("Billet introuvable.", status_code=404)
+        new_trip = _trip(request.user.company, request.data.get("new_trip_id"))
+        if not new_trip:
+            return error_response("Voyage cible introuvable.", status_code=404)
+        try:
+            services.report_ticket(t, new_trip=new_trip, new_seat_id=request.data.get("new_seat_id"),
+                                   reason=request.data.get("reason", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.TicketRead(t).data)
+
+
+class TicketRegularizeView(APIView):
+    """M21 — régularisation d'un billet (surclassement / changement de destination)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.booking.create'}
+
+    def post(self, request, pk):
+        t = _ticket_for(request, pk)
+        if not t:
+            return error_response("Billet introuvable.", status_code=404)
+        new_fare_class = None
+        fc_id = request.data.get("new_fare_class_id")
+        if fc_id:
+            from apps.voyages_config.models import FareClass
+            new_fare_class = FareClass.objects.filter(is_deleted=False, company=request.user.company, id=fc_id).first()
+            if not new_fare_class:
+                return error_response("Classe tarifaire introuvable.", status_code=404)
+        try:
+            services.regularize_ticket(t, new_fare_class=new_fare_class,
+                                       new_destination_id=request.data.get("new_destination_id"),
+                                       payment_method=request.data.get("payment_method", ""),
+                                       reason=request.data.get("reason", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.TicketRead(t).data)
+
+
+class AdjustmentListView(APIView):
+    """M21 — historique des reports / régularisations."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.ticket.view'}
+
+    def get(self, request):
+        from apps.voyages_booking.models import TicketAdjustment
+        qs = TicketAdjustment.objects.filter(is_deleted=False, company=request.user.company)
+        q = request.query_params
+        if q.get("ticket"):
+            qs = qs.filter(ticket_id=q["ticket"])
+        if q.get("booking"):
+            qs = qs.filter(booking_id=q["booking"])
+        if q.get("kind"):
+            qs = qs.filter(kind=q["kind"])
+        if q.get("date_from"):
+            qs = qs.filter(created_at__date__gte=q["date_from"])
+        if q.get("date_to"):
+            qs = qs.filter(created_at__date__lte=q["date_to"])
+        return success_response(S.TicketAdjustmentSerializer(qs, many=True).data)

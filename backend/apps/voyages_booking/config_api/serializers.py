@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.voyages_booking.models import Passenger, Booking, Ticket, LoyaltyAccount, LoyaltyMovement
+from apps.voyages_booking.models import Passenger, Booking, Ticket, LoyaltyAccount, LoyaltyMovement, TicketAdjustment
 
 
 class PassengerRead(serializers.ModelSerializer):
@@ -167,3 +167,35 @@ class LoyaltyAccountRead(serializers.ModelSerializer):
     class Meta:
         model = LoyaltyAccount
         fields = ["id", "passenger", "points_balance", "lifetime_points"]
+
+
+class TicketAdjustmentSerializer(serializers.ModelSerializer):
+    kind_display = serializers.CharField(source="get_kind_display", read_only=True)
+    from_trip_number = serializers.SerializerMethodField()
+    to_trip_number = serializers.SerializerMethodField()
+    from_fare_class_name = serializers.CharField(source="from_fare_class.name", read_only=True, default=None)
+    to_fare_class_name = serializers.CharField(source="to_fare_class.name", read_only=True, default=None)
+    from_destination_name = serializers.CharField(source="from_destination.name", read_only=True, default=None)
+    to_destination_name = serializers.CharField(source="to_destination.name", read_only=True, default=None)
+    created_by_name = serializers.SerializerMethodField()
+
+    def _trip_number(self, trip):
+        return (trip.number or str(trip)) if trip else None
+
+    def get_from_trip_number(self, obj):
+        return self._trip_number(obj.from_trip)
+
+    def get_to_trip_number(self, obj):
+        return self._trip_number(obj.to_trip)
+
+    def get_created_by_name(self, obj):
+        u = obj.created_by
+        return (u.get_full_name() or u.username) if u else None
+
+    class Meta:
+        model = TicketAdjustment
+        fields = ["id", "ticket", "booking", "kind", "kind_display",
+                  "from_trip", "from_trip_number", "to_trip", "to_trip_number",
+                  "from_fare_class", "from_fare_class_name", "to_fare_class", "to_fare_class_name",
+                  "from_destination", "from_destination_name", "to_destination", "to_destination_name",
+                  "price_difference", "reason", "created_by_name", "created_at"]
