@@ -45,7 +45,9 @@ export class BookingService {
   create(body: BookingCreate): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookings, body); }
   reserve(body: any): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.reservations, body); }
   pay(id: string, body: { payment_method?: string; amount_received?: number | null }): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingPay(id), body); }
-  cancel(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingCancel(id), {}); }
+  cancel(id: string, reason: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingCancel(id), { cancellation_reason: reason }); }
+  cancellationVoucher(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_BOOKING.bookingCancellationVoucher(id)); }
+  cancelledBookings(params: Record<string, string>): Observable<Booking[]> { return this.http.get<Booking[]>(VOYAGES_BOOKING.bookingsCancelled, { params }); }
   noShow(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingNoShow(id), {}); }
   board(ticketId: string): Observable<Ticket> { return this.http.post<Ticket>(VOYAGES_BOOKING.ticketBoard(ticketId), {}); }
 }

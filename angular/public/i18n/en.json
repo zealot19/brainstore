@@ -470,6 +470,20 @@
       "full": "Trip full",
       "quota_reached": "Reservation quota reached",
       "none": "No trip scheduled for these criteria."
+    },
+    "cancelled": {
+      "title": "Cancelled tickets",
+      "from": "From",
+      "to": "To",
+      "filter": "Filter",
+      "col_ref": "Reference",
+      "col_passenger": "Passenger",
+      "col_refund": "Refunded",
+      "col_by": "Cancelled by",
+      "col_date": "Date",
+      "col_reason": "Reason",
+      "voucher": "Cancellation voucher",
+      "empty": "No cancellation."
     }
   },
   "treasury": {

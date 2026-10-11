@@ -64,8 +64,9 @@ export class VbReservationsComponent implements OnInit {
   }
 
   cancel(b: Booking): void {
-    if (!confirm('Annuler cette réservation ? Les sièges seront libérés.')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Annulation impossible.') });
+    const reason = (prompt("Motif d'annulation (obligatoire) :") || '').trim();
+    if (!reason) return;
+    this.svc.cancel(b.id, reason).subscribe({ next: () => this.load(), error: e => this.toast.error(e?.error?.detail ?? 'Annulation impossible.') });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 }

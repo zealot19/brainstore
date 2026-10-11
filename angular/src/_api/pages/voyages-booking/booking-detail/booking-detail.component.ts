@@ -43,8 +43,10 @@ export class VbBookingDetailComponent implements OnInit {
       error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   cancel(): void {
-    if (!this.booking || !confirm('Annuler cette réservation ?')) return;
-    this.svc.cancel(this.booking.id).subscribe({ next: () => this.load(this.booking!.id), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+    if (!this.booking) return;
+    const reason = (prompt("Motif d'annulation (obligatoire) :") || '').trim();
+    if (!reason) return;
+    this.svc.cancel(this.booking.id, reason).subscribe({ next: () => this.load(this.booking!.id), error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
   }
   back(): void { this.router.navigate(['/voyages-booking/bookings']); }
   goAssignReturn(): void { this.router.navigate(['/voyages-booking/open-returns']); }

@@ -84,14 +84,20 @@ class BookingRead(serializers.ModelSerializer):
     buyer_name = serializers.CharField(source="buyer.full_name", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     trip_type_display = serializers.CharField(source="get_trip_type_display", read_only=True)
+    cancelled_by_name = serializers.SerializerMethodField()
     tickets = TicketRead(many=True, read_only=True)
+
+    def get_cancelled_by_name(self, obj):
+        u = obj.cancelled_by
+        return (u.get_full_name() or u.username) if u else None
 
     class Meta:
         model = Booking
         fields = ["id", "reference", "status", "status_display", "trip_type", "trip_type_display",
                   "outbound_trip", "return_trip", "return_open", "buyer", "buyer_name",
                   "amount_due", "amount_paid", "amount_received", "change_due", "payment_method",
-                  "channel", "notes", "hold_until", "created_at", "updated_at", "tickets"]
+                  "channel", "notes", "hold_until", "created_at", "updated_at", "tickets",
+                  "cancellation_reason", "cancelled_at", "cancelled_by_name", "refund_amount"]
 
 
 class BookingItemSerializer(serializers.Serializer):

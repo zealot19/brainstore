@@ -469,6 +469,7 @@ export const routes={
   vbBookings:     '/voyages-booking/bookings',
   vbBookingNew:   '/voyages-booking/bookings/new',
   vbReservations: '/voyages-booking/reservations',
+  vbCancelled: '/voyages-booking/cancelled',
   vbReservationNew: '/voyages-booking/reservations/new',
   vbOpenReturns:  '/voyages-booking/open-returns',
 

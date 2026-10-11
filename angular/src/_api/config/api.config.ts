@@ -373,6 +373,8 @@ export const VOYAGES_BOOKING = {
   bookingDuplicata: (id: string) => `${VB}/bookings/${id}/duplicata/`,
   bookingAssignReturn: (id: string) => `${VB}/bookings/${id}/assign-return/`,
   bookingCancel: (id: string) => `${VB}/bookings/${id}/cancel/`,
+  bookingCancellationVoucher: (id: string) => `${VB}/bookings/${id}/cancellation-voucher/`,
+  bookingsCancelled: `${VB}/bookings/cancelled/`,
   bookingNoShow: (id: string) => `${VB}/bookings/${id}/no-show/`,
   ticketBoard: (id: string) => `${VB}/tickets/${id}/board/`,
   tripRoadmap: (tripId: string) => `${VB}/trips/${tripId}/roadmap/`,
