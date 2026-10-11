@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { VOYAGES } from '../../config/api.config';
-import { Trip, TripCrew, TripSeat, TripStop, EligibleVehicle } from '../../models/voyages.models';
+import { Trip, TripCrew, TripSeat, TripStop, EligibleVehicle, TripResult } from '../../models/voyages.models';
 
 @Injectable({ providedIn: 'root' })
 export class TripService {
@@ -63,6 +63,7 @@ export class TripService {
   transbordVehicle(vehicleId: string, body: { to_vehicle_id: string; reason: string }): Observable<any> { return this.http.post<any>(VOYAGES.transbordVehicle(vehicleId), body).pipe(map((r: any) => r.data ?? r)); }
   transbordHistory(id: string): Observable<any[]> { return this.http.get<any[]>(VOYAGES.transbordHistory(id)); }
   tripExpenses(id: string): Observable<any[]> { return this.http.get<any>(VOYAGES.tripExpenses(id)).pipe(map((r: any) => r.results ?? r.data ?? r)); }
+  tripResult(id: string): Observable<TripResult> { return this.http.get<TripResult>(VOYAGES.tripResult(id)); }
 
   selectionOptions(id: string): Observable<{
     tickets: { id: string; seat: string; passenger_name: string }[];

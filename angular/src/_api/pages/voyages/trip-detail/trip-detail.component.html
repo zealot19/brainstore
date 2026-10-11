@@ -234,6 +234,26 @@
         }
       </div></div>
 
+      <!-- Résultat du voyage (M15) -->
+      @if (result) {
+        <div class="card mb-3"><div class="card-header"><h6 class="mb-0">{{ 'trips.detail.result.title' | transloco }}</h6></div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush mb-2">
+              <li class="list-group-item d-flex justify-content-between px-0"><span>{{ 'trips.detail.result.tickets' | transloco }}</span><strong>{{ result.recettes.tickets | number:'1.0-0' }}</strong></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>{{ 'trips.detail.result.colis_vente' | transloco }}</span><strong>{{ result.recettes.colis_vente | number:'1.0-0' }}</strong></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>{{ 'trips.detail.result.colis_transit' | transloco }}</span><strong>{{ result.recettes.colis_transit | number:'1.0-0' }}</strong></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>{{ 'trips.detail.result.bagages' | transloco }}</span><strong>{{ result.recettes.bagages | number:'1.0-0' }}</strong></li>
+              <li class="list-group-item d-flex justify-content-between px-0 fw-semibold"><span>{{ 'trips.detail.result.recettes_total' | transloco }}</span><strong>{{ result.recettes.total | number:'1.0-0' }} XAF</strong></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>{{ 'trips.detail.result.depenses' | transloco }}</span><strong class="text-danger">− {{ result.depenses_total | number:'1.0-0' }} XAF</strong></li>
+            </ul>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">{{ 'trips.detail.result.resultat' | transloco }}</span>
+              <span class="badge fs-6" [ngClass]="(+result.resultat >= 0) ? 'bg-success' : 'bg-danger'">{{ result.resultat | number:'1.0-0' }} XAF</span>
+            </div>
+          </div>
+        </div>
+      }
+
     </div>
 
     <div class="col-lg-8">

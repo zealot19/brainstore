@@ -315,6 +315,7 @@ export const VOYAGES = {
   crewDoc: (id: string, attId: string) => `${VT}/crew-members/${id}/documents/${attId}/`,
   tripExpenses: (id: string) => `${VT}/${id}/expenses/`,
   tripExpense: (id: string, eid: string) => `${VT}/${id}/expenses/${eid}/`,
+  tripResult: (id: string) => `${VT}/${id}/result/`,
   tripExpenseDisburse: (id: string, eid: string) => `${VT}/${id}/expenses/${eid}/disburse/`,
   seats: (id: string) => `${VT}/${id}/seats/`,
   seatsBlock: (id: string) => `${VT}/${id}/seats/block/`, seatsUnblock: (id: string) => `${VT}/${id}/seats/unblock/`,
