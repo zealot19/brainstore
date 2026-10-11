@@ -8,7 +8,7 @@ from .services import (
     create_transfer,
 )
 from .seed import seed_treasury_mapping, seed_payment_methods, seed_denominations, seed_cash_value_types, seed_operation_types
-from .booking_sales import record_booking_payment
+from .booking_sales import record_booking_payment, record_adjustment_income
 from .consignment_sales import record_parcel_payment, record_baggage_payment, record_parcel_delivery
 from .trip_expense_sales import record_trip_expense
 from .general_expense_sales import record_general_expense
@@ -36,7 +36,7 @@ __all__ = [
     "create_transaction", "delete_transaction",
     "create_transfer",
     "seed_treasury_mapping", "seed_payment_methods",
-    "record_booking_payment",
+    "record_booking_payment", "record_adjustment_income",
     "record_parcel_payment", "record_baggage_payment", "record_parcel_delivery",
     "record_trip_expense",
     "record_general_expense", "resolve_disbursement_session",
