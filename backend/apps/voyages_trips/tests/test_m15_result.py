@@ -43,6 +43,8 @@ def _setup():
     other = _trip(5)
     Fare.objects.create(company=company, route=route, origin_point=a, destination_point=b,
                         fare_class=eco, trip_type="one_way", amount=Decimal("15000"))
+    Fare.objects.create(company=company, route=route, origin_point=a, destination_point=b,
+                        fare_class=eco, trip_type="round_trip", amount=Decimal("27000"))
     reg = create_cash_register(company=company, name="C1", created_by=admin)
     session = open_session(company=company, cash_register=reg, created_by=admin)
 
@@ -81,6 +83,15 @@ def _setup():
                                          recipient_name="R", recipient_phone="7")
     _income(Transaction.Category.PARCEL_SHIPPING, 9999, voyages_parcel=other_parcel)
 
+    # Bruit : une recette billets PENDING (non validée) rattachée au voyage courant → exclue
+    pend = create_transaction(company=company, transaction_type=Transaction.Type.INCOME,
+                              category=Transaction.Category.TICKET_SALES, account_type=Transaction.AccountType.CASH,
+                              cash_session=session, amount=Decimal("8000"), payment_mode="cash",
+                              created_by=admin, status=Transaction.Status.PENDING)
+    from apps.voyages_booking.models import Booking as _B
+    pend.voyage_booking = _B.objects.filter(outbound_trip=trip).first()
+    pend.save()
+
     # Dépenses : une décaissée (compte), une planifiée (exclue)
     et = _expense_type(company)
     TripExpense.objects.create(trip=trip, expense_type=et, amount=Decimal("3000"), status="paid")
@@ -114,3 +125,25 @@ def test_trip_result_other_trip_empty():
     assert r["recettes"]["bagages"] == Decimal("0")
     assert r["depenses_total"] == Decimal("0")
     assert r["resultat"] == Decimal("9999")
+
+
+@pytest.mark.django_db
+def test_round_trip_income_attributed_to_outbound_not_return():
+    """A/R : la recette billets est encaissée sur l'aller, jamais sur le retour."""
+    from apps.voyages_trips.selectors import trip_result
+    from apps.voyages_booking.services.booking_services import create_booking
+    g = _setup()
+    trip, other = g["trip"], g["other"]
+    before_return = trip_result(other)["recettes"]["tickets"]
+    before_outbound = trip_result(trip)["recettes"]["tickets"]
+    oseat = trip.seats.filter(status="available").order_by("column").first()
+    rseat = other.seats.filter(status="available").order_by("column").first()
+    create_booking(g["company"], trip_type="round_trip", outbound_trip=trip, return_trip=other,
+                   buyer_spec={"name": "AR", "phone": "6"},
+                   items=[{"passenger": {"name": "AR", "phone": "6"}, "destination_point_id": None,
+                           "outbound_seat_id": str(oseat.id), "return_seat_id": str(rseat.id)}],
+                   payment_method="cash", user=g["admin"])
+    # Le retour n'encaisse aucune recette billets supplémentaire…
+    assert trip_result(other)["recettes"]["tickets"] == before_return
+    # …et le surcroît A/R s'impute bien sur l'aller.
+    assert trip_result(trip)["recettes"]["tickets"] > before_outbound
