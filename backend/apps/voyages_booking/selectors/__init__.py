@@ -82,6 +82,23 @@ def trip_destinations(trip):
     return out
 
 
+def list_cancelled_bookings(company, *, date_from=None, date_to=None, agency_id=None,
+                            trip_id=None, cashier_id=None, user=None):
+    """M22 — réservations annulées, filtrables (date d'annulation, agence, voyage, caissier)."""
+    qs = (Booking.objects.filter(is_deleted=False, company=company, status=Booking.Status.CANCELLED)
+          .select_related("outbound_trip", "return_trip", "buyer", "cancelled_by")
+          .order_by("-cancelled_at"))
+    qs = scope_by_agency(qs, user_agency_ids(user), "agency_id")
+    if agency_id:
+        qs = qs.filter(agency_id=agency_id)
+    if trip_id:
+        qs = qs.filter(Q(outbound_trip_id=trip_id) | Q(return_trip_id=trip_id))
+    if cashier_id:
+        qs = qs.filter(cancelled_by_id=cashier_id)
+    qs = apply_date_range(qs, "cancelled_at", date_from, date_to)
+    return qs
+
+
 def list_bookings(company, status=None, trip_id=None, q=None,
                   trip_type=None, channel=None, date_field=None, date_from=None, date_to=None,
                   user=None, include_archived=False):

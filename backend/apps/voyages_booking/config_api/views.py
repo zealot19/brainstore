@@ -554,6 +554,64 @@ def render_booking_tickets_html(request, b, *, duplicata=False):
     return ticket_render.render_document(pages, tpl=tpl, duplicata=duplicata)
 
 
+def render_cancellation_voucher_html(request, b):
+    """Bon d'annulation (M22) : document HTML imprimable — réf, billets, motif,
+    montant remboursé, auteur, date d'annulation."""
+    from django.utils import timezone
+    from django.utils.html import escape
+    company = request.user.company
+    when = timezone.localtime(b.cancelled_at).strftime("%d/%m/%Y %H:%M") if b.cancelled_at else ""
+    agent = (b.cancelled_by.get_full_name() or b.cancelled_by.username) if b.cancelled_by_id else ""
+    rows = ""
+    for t in b.tickets.filter(is_deleted=False).order_by("direction"):
+        trip = t.trip if t.trip_id else None
+        rows += (f"<tr><td>{escape(t.number or '')}</td>"
+                 f"<td>{escape(t.passenger.full_name if t.passenger_id else '')}</td>"
+                 f"<td>{escape(trip.number if trip else '')}</td>"
+                 f"<td>{escape(t.trip_seat.seat_number if t.trip_seat_id else '')}</td></tr>")
+    return (
+        "<html><head><meta charset='utf-8'><style>"
+        "body{font-family:sans-serif;font-size:13px;color:#222;padding:16px}"
+        "h2{margin:0 0 4px}table{width:100%;border-collapse:collapse;margin:10px 0}"
+        "th,td{border:1px solid #ccc;padding:4px 6px;text-align:left;font-size:12px}"
+        ".k{color:#666}.amt{font-size:16px;font-weight:700}</style></head><body>"
+        f"<h2>{escape(company.name)}</h2>"
+        f"<h3>Bon d'annulation — {escape(b.reference)}</h3>"
+        f"<p><span class='k'>Date d'annulation :</span> {escape(when)} &nbsp; "
+        f"<span class='k'>Par :</span> {escape(agent)}</p>"
+        f"<p><span class='k'>Motif :</span> {escape(b.cancellation_reason or '')}</p>"
+        "<table><thead><tr><th>Billet</th><th>Passager</th><th>Voyage</th><th>Siège</th></tr></thead>"
+        f"<tbody>{rows}</tbody></table>"
+        f"<p class='amt'>Montant remboursé : {b.refund_amount:.0f} XAF</p>"
+        "</body></html>")
+
+
+class BookingCancellationVoucherView(APIView):
+    """Bon d'annulation (HTML imprimable) d'une réservation annulée (M22)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.ticket.view'}
+
+    def get(self, request, pk):
+        b = selectors.booking_detail(request.user.company, pk, request.user)
+        if not b:
+            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response({"html": render_cancellation_voucher_html(request, b)})
+
+
+class CancelledBookingsView(APIView):
+    """Liste filtrable des réservations annulées (M22)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.booking.cancel'}
+
+    def get(self, request):
+        p = request.query_params
+        rows = selectors.list_cancelled_bookings(
+            request.user.company, date_from=p.get("date_from"), date_to=p.get("date_to"),
+            agency_id=p.get("agency"), trip_id=p.get("trip"), cashier_id=p.get("cashier"),
+            user=request.user)
+        return success_response(S.BookingRead(rows, many=True).data)
+
+
 class BookingRenderTicketsView(APIView):
     """HTML des billets d'une réservation (impression). Régi par ticket.print :
     l'impression automatique à la vente doit fonctionner pour le guichetier

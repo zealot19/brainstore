@@ -15,6 +15,8 @@ urlpatterns = [
     path("bookings/", v.BookingListView.as_view()),
     path("reservations/", v.ReservationCreateView.as_view()),
     path("bookings/open-returns/", v.OpenReturnsView.as_view()),
+    path("bookings/cancelled/", v.CancelledBookingsView.as_view()),
+    path("bookings/<uuid:pk>/cancellation-voucher/", v.BookingCancellationVoucherView.as_view()),
     path("bookings/<uuid:pk>/pay/", v.BookingPayView.as_view()),
     path("bookings/<uuid:pk>/", v.BookingDetailView.as_view()),
     path("bookings/<uuid:pk>/print/", v.BookingPrintView.as_view()),
