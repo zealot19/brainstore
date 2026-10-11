@@ -157,23 +157,14 @@ export const FLEET = {
   vehicleOdometer:    (id: string) => `${API_BASE}/fleet/vehicles/${id}/odometer/`,
   vehicleStats:       (id: string) => `${API_BASE}/fleet/vehicles/${id}/stats/`,
   vehicleFuelLogs:    (id: string) => `${API_BASE}/fleet/vehicles/${id}/fuel-logs/`,
-  vehicleServices:    (id: string) => `${API_BASE}/fleet/vehicles/${id}/services/`,
   vehicleContracts:   (id: string) => `${API_BASE}/fleet/vehicles/${id}/contracts/`,
   vehicleDocuments:   (id: string) => `${API_BASE}/fleet/vehicles/${id}/documents/`,
   vehicleAssignments: (id: string) => `${API_BASE}/fleet/vehicles/${id}/assignments/`,
-  vehicleAccidents:   (id: string) => `${API_BASE}/fleet/vehicles/${id}/accidents/`,
 
   // Carburant
   fuelLog: (id: string) => `${API_BASE}/fleet/fuel-logs/${id}/`,
 
-  // Services / interventions
-  services:         `${API_BASE}/fleet/services/`,
-  service:          (id: string) => `${API_BASE}/fleet/services/${id}/`,
-  serviceStart:     (id: string) => `${API_BASE}/fleet/services/${id}/start/`,
-  serviceComplete:  (id: string) => `${API_BASE}/fleet/services/${id}/complete/`,
-  serviceCancel:    (id: string) => `${API_BASE}/fleet/services/${id}/cancel/`,
-  serviceAttachments: (id: string) => `${API_BASE}/fleet/services/${id}/attachments/`,
-  serviceAttachment:  (id: string, attId: string) => `${API_BASE}/fleet/services/${id}/attachments/${attId}/`,
+  // M06 : Garage (services/interventions) retiré de l'UI/API.
 
   // Contrats & Documents
   contracts:        `${API_BASE}/fleet/contracts/`,
@@ -189,9 +180,7 @@ export const FLEET = {
   assignmentComplete: (id: string) => `${API_BASE}/fleet/assignments/${id}/complete/`,
   assignmentCancel:   (id: string) => `${API_BASE}/fleet/assignments/${id}/cancel/`,
 
-  // Accidents
-  accidents:      `${API_BASE}/fleet/accidents/`,
-  accident:       (id: string) => `${API_BASE}/fleet/accidents/${id}/`,
+  // M06 : Accidents retiré de l'UI/API.
 
   // Parkings
   parking:        `${API_BASE}/fleet/parking/`,
