@@ -790,6 +790,21 @@ class TripExpenseDisburseView(APIView):
         return success_response(S.TripExpenseSerializer(exp).data)
 
 
+class TripResultView(APIView):
+    """M15 — recettes / dépenses / résultat d'un voyage."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "voyage.trip.view"}
+
+    def get(self, request, trip_id):
+        company, err = _scope(request)
+        if err:
+            return err
+        trip = selectors.get_trip(company, trip_id)
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        return success_response(selectors.trip_result(trip))
+
+
 class TripStatsView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "voyage.trip.view"}
