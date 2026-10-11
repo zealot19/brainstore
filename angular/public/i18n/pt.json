@@ -1357,6 +1357,7 @@
       "pdf_baggage": "Manifesto de bagagens"
     },
     "detail": {
+      "result": { "title": "Resultado da viagem", "tickets": "Venda de bilhetes", "colis_vente": "Venda de encomendas", "colis_transit": "Trânsito de encomendas", "bagages": "Trânsito de bagagens", "recettes_total": "Total de receitas", "depenses": "Despesas desembolsadas", "resultat": "Resultado" },
       "submit": "Submeter",
       "depart": "Partida",
       "suspend": "Suspender",

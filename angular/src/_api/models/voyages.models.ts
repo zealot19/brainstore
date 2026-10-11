@@ -50,6 +50,12 @@ export interface EligibleVehicle {
   model_name: string;
 }
 
+export interface TripResult {
+  recettes: { tickets: string; colis_vente: string; colis_transit: string; bagages: string; total: string };
+  depenses_total: string;
+  resultat: string;
+}
+
 export interface Trip {
   id: string;
   number: string;

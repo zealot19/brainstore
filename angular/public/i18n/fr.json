@@ -1357,6 +1357,7 @@
       "pdf_baggage": "Bordereau bagages"
     },
     "detail": {
+      "result": { "title": "Résultat du voyage", "tickets": "Vente de tickets", "colis_vente": "Vente de colis", "colis_transit": "Transit des colis", "bagages": "Transit des bagages", "recettes_total": "Total recettes", "depenses": "Dépenses décaissées", "resultat": "Résultat" },
       "submit": "Soumettre",
       "depart": "Départ",
       "suspend": "Suspendre",

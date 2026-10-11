@@ -1357,6 +1357,7 @@
       "pdf_baggage": "Baggage manifest"
     },
     "detail": {
+      "result": { "title": "Trip result", "tickets": "Ticket sales", "colis_vente": "Parcel sales", "colis_transit": "Parcel transit", "bagages": "Baggage transit", "recettes_total": "Total revenue", "depenses": "Disbursed expenses", "resultat": "Result" },
       "submit": "Submit",
       "depart": "Depart",
       "suspend": "Suspend",

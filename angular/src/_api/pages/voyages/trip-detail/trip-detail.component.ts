@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TripService } from '../../../services/voyages/trip.service';
 import { CrewMemberService } from '../../../services/voyages/crew-member.service';
-import { Trip, TripSeat, TripCrew, EligibleVehicle } from '../../../models/voyages.models';
+import { Trip, TripSeat, TripCrew, EligibleVehicle, TripResult } from '../../../models/voyages.models';
 import { CrewMember } from '../../../models/crew.models';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
@@ -45,6 +45,8 @@ export class VoyagesTripDetailComponent implements OnInit {
   selDestKind: 'trip' | 'vehicle' = 'trip'; selDestTrip = ''; selDestVehicle = '';
   selNote = ''; selReason = ''; selError = ''; selBusy = false;
 
+  result: TripResult | null = null;
+
   constructor(private svc: TripService, private crewSvc: CrewMemberService,
               private route: ActivatedRoute, private router: Router) {}
 
@@ -62,6 +64,7 @@ export class VoyagesTripDetailComponent implements OnInit {
         this.loadSeats();
         this.loadTbHistory();
         this.svc.tripExpenses(this.id).subscribe(e => this.pendingExpenses = (e || []).filter((x: any) => x.status === 'planned'));
+        this.svc.tripResult(this.id).subscribe({ next: r => this.result = r, error: () => this.result = null });
         // Toujours charger les véhicules éligibles : on peut (ré)affecter même si un
         // véhicule est déjà assigné (changement d'affectation, comme l'équipage).
         if (!this.vehicleLocked) this.svc.eligibleVehicles(this.id).subscribe(v => this.eligible = v);
