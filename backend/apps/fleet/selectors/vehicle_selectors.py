@@ -153,7 +153,6 @@ def get_vehicle_stats(vehicle_id, company_id):
         total_contract_cost=Sum("recurring_costs__amount"),
     )
     assignment_count = vehicle.assignments.filter(is_deleted=False).count()
-    accident_count = vehicle.accidents.filter(is_deleted=False).count()
 
     return {
         "vehicle_id": str(vehicle.id),
@@ -173,7 +172,6 @@ def get_vehicle_stats(vehicle_id, company_id):
             "total_cost": contract_agg["total_contract_cost"] or 0,
         },
         "assignments": assignment_count,
-        "accidents": accident_count,
         "tco": (
             (fuel_agg["total_fuel_cost"] or 0)
             + (maintenance_agg["total_maintenance_cost"] or 0)

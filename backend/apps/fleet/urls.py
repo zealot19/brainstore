@@ -63,23 +63,14 @@ urlpatterns = [
     path("vehicles/<uuid:vehicle_id>/odometer/",   views.VehicleOdometerView.as_view()),
     path("vehicles/<uuid:vehicle_id>/stats/",      views.VehicleStatsView.as_view()),
     path("vehicles/<uuid:vehicle_id>/fuel-logs/",  views.VehicleFuelLogListView.as_view()),
-    path("vehicles/<uuid:vehicle_id>/services/",   views.VehicleServiceListView.as_view()),
     path("vehicles/<uuid:vehicle_id>/contracts/",  views.VehicleContractListView.as_view()),
     path("vehicles/<uuid:vehicle_id>/documents/",  views.VehicleDocumentListView.as_view()),
     path("vehicles/<uuid:vehicle_id>/assignments/", views.VehicleAssignmentListView.as_view()),
-    path("vehicles/<uuid:vehicle_id>/accidents/",  views.VehicleAccidentListView.as_view()),
 
     # ── Carburant ─────────────────────────────────────────────────────────────
     path("fuel-logs/<uuid:log_id>/", views.FuelLogDetailView.as_view()),
 
-    # ── Services / interventions ──────────────────────────────────────────────
-    path("services/",                          views.ServiceListView.as_view()),
-    path("services/<uuid:service_id>/",        views.ServiceDetailView.as_view()),
-    path("services/<uuid:service_id>/start/",  views.ServiceStartView.as_view()),
-    path("services/<uuid:service_id>/complete/", views.ServiceCompleteView.as_view()),
-    path("services/<uuid:service_id>/cancel/", views.ServiceCancelView.as_view()),
-    path("services/<uuid:service_id>/attachments/", views.ServiceAttachmentListView.as_view()),
-    path("services/<uuid:service_id>/attachments/<uuid:att_id>/", views.ServiceAttachmentDetailView.as_view()),
+    # M06 : Garage (services/interventions) retiré de l'UI/API — modèles conservés.
 
     # ── Contrats ──────────────────────────────────────────────────────────────
     path("contracts/",                            views.ContractListView.as_view()),
@@ -97,9 +88,7 @@ urlpatterns = [
     path("assignments/<uuid:assignment_id>/complete/", views.AssignmentCompleteView.as_view()),
     path("assignments/<uuid:assignment_id>/cancel/",   views.AssignmentCancelView.as_view()),
 
-    # ── Accidents ─────────────────────────────────────────────────────────────
-    path("accidents/",                          views.AccidentListView.as_view()),
-    path("accidents/<uuid:accident_id>/",       views.AccidentDetailView.as_view()),
+    # M06 : Accidents retiré de l'UI/API — modèle conservé.
 
     # ── Tableau de bord flotte ────────────────────────────────────────────────
     path("alerts/", views.FleetAlertsView.as_view()),

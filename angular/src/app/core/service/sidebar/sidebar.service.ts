@@ -218,17 +218,6 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Entretien & conformité',
-          hasSubRoute: true,
-          showSubRoute: false,
-          icon2: 'tool',
-          base: 'fleet-maintenance',
-          subMenus: [
-            { menuValue: 'Garage',    route: routes.fleetServices,  base: 'services',  permission: 'fleet.maintenance.view' },
-            { menuValue: 'Accidents', route: routes.fleetAccidents, base: 'accidents', permission: 'fleet.accident.view' },
-          ],
-        },
-        {
           menuValue: 'Personnel naviguant',
           hasSubRoute: false,
           showSubRoute: false,

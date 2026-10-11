@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import (
     VehicleBrand, VehicleModel, ExternalDriver, Vehicle,
-    OdometerLog, FuelLog, Service,
-    Contract, RecurringCost, VehicleDocument, Assignment, Accident,
+    OdometerLog, FuelLog,
+    Contract, RecurringCost, VehicleDocument, Assignment,
 )
 
 
@@ -48,13 +48,6 @@ class FuelLogAdmin(admin.ModelAdmin):
     raw_id_fields = ["vehicle"]
 
 
-@admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "intervention_type", "status", "planned_date", "cost"]
-    list_filter = ["status"]
-    raw_id_fields = ["vehicle", "intervention_type", "supplier", "driver"]
-
-
 @admin.register(Contract)
 class ContractAdmin(admin.ModelAdmin):
     list_display = ["name", "vehicle", "intervention_type", "status", "end_date"]
@@ -80,10 +73,3 @@ class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["vehicle", "destination", "status", "planned_departure", "driver_name"]
     list_filter = ["status", "company"]
     raw_id_fields = ["vehicle", "internal_driver", "external_driver"]
-
-
-@admin.register(Accident)
-class AccidentAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "trip", "date", "severity", "at_fault"]
-    list_filter = ["severity", "at_fault"]
-    raw_id_fields = ["vehicle", "trip"]
