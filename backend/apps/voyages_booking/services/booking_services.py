@@ -260,11 +260,13 @@ def assign_return(booking, return_trip, *, items, user):
 
 
 @transaction.atomic
-def cancel_booking(booking, *, user):
+def cancel_booking(booking, *, user, reason=""):
     if booking.status == Booking.Status.CANCELLED:
         return booking
     if booking.status == Booking.Status.BOARDED:
         raise ApplicationError(_("Une réservation embarquée ne peut pas être annulée."))
+    if not (reason or "").strip():
+        raise ApplicationError(_("Le motif d'annulation est obligatoire."))
     for t in booking.tickets.filter(is_deleted=False):
         seat = t.trip_seat
         seat.status = TripSeat.Status.AVAILABLE
@@ -289,11 +291,20 @@ def cancel_booking(booking, *, user):
     for bag in Baggage.objects.filter(ticket__booking=booking, is_deleted=False).exclude(status="cancelled"):
         cancel_baggage(bag, user=user, _skip_refund=True)
         bag_total += bag.amount_received or Decimal("0")
-    refund_on_cancel(booking.company, amount_paid=(booking.amount_paid or Decimal("0")),
+    tkt_refund = refund_on_cancel(booking.company, amount_paid=(booking.amount_paid or Decimal("0")),
                      user=user, description=f"Remboursement réservation {booking.reference}", kind="ticket")
+    bag_refund = None
     if bag_total > 0:
-        refund_on_cancel(booking.company, amount_paid=bag_total, user=user,
+        bag_refund = refund_on_cancel(booking.company, amount_paid=bag_total, user=user,
                          description=f"Remboursement bagages réservation {booking.reference}", kind="bagage")
+    # M22 : motif + montant effectivement remboursé + traçabilité.
+    refund_total = (tkt_refund.amount if tkt_refund else Decimal("0")) + (bag_refund.amount if bag_refund else Decimal("0"))
+    booking.cancellation_reason = reason
+    booking.cancelled_at = timezone.now()
+    booking.cancelled_by = user
+    booking.refund_amount = refund_total
+    booking.save(update_fields=["cancellation_reason", "cancelled_at", "cancelled_by",
+                                "refund_amount", "updated_by", "updated_at"])
     return booking
 
 

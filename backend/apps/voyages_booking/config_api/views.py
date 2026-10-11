@@ -266,7 +266,10 @@ class BookingDetailView(APIView):
         b = selectors.booking_detail(request.user.company, pk, request.user)
         if not b:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
-        services.cancel_booking(b, user=request.user)
+        try:
+            services.cancel_booking(b, user=request.user, reason=request.data.get("cancellation_reason", ""))
+        except ApplicationError as e:
+            return error_response(str(e))
         return success_response(S.BookingRead(b).data)
 
 
@@ -278,7 +281,10 @@ class BookingCancelView(APIView):
         b = selectors.booking_detail(request.user.company, pk, request.user)
         if not b:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
-        services.cancel_booking(b, user=request.user)
+        try:
+            services.cancel_booking(b, user=request.user, reason=request.data.get("cancellation_reason", ""))
+        except ApplicationError as e:
+            return error_response(str(e))
         return success_response(S.BookingRead(b).data)
 
 

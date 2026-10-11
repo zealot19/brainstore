@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel
@@ -42,6 +43,12 @@ class Booking(BaseModel):
     return_open     = models.BooleanField(_("retour ouvert"), default=False)
     hold_until      = models.DateTimeField(_("réservé jusqu'à"), null=True, blank=True)
     notes           = models.TextField(_("notes"), blank=True)
+    # M22 — annulation
+    cancellation_reason = models.CharField(_("motif d'annulation"), max_length=255, blank=True)
+    cancelled_at    = models.DateTimeField(_("annulée le"), null=True, blank=True)
+    cancelled_by    = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("annulée par"),
+                                         on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    refund_amount   = models.DecimalField(_("montant remboursé"), max_digits=12, decimal_places=2, default=0)
 
     class Meta(BaseModel.Meta):
         verbose_name = _("réservation")
