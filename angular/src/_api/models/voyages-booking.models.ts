@@ -73,3 +73,16 @@ export interface TripAvailability {
   max_reservations: number | null;
   reservations_possible: number | null;
 }
+
+export interface TicketAdjustment {
+  id: string; ticket: string; booking: string;
+  kind: 'report' | 'regularisation'; kind_display: string;
+  from_trip: string | null; from_trip_number: string | null;
+  to_trip: string | null; to_trip_number: string | null;
+  from_fare_class: string | null; from_fare_class_name: string | null;
+  to_fare_class: string | null; to_fare_class_name: string | null;
+  from_destination: string | null; from_destination_name: string | null;
+  to_destination: string | null; to_destination_name: string | null;
+  price_difference: string; reason: string;
+  created_by_name: string | null; created_at: string;
+}

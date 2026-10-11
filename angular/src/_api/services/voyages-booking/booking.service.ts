@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VOYAGES_BOOKING } from '../../config/api.config';
-import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate, AssignReturn, TripAvailability } from '../../models/voyages-booking.models';
+import { Booking, TripOption, TripDestination, SeatCell, Ticket, BookingCreate, AssignReturn, TripAvailability, TicketAdjustment } from '../../models/voyages-booking.models';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -50,4 +50,15 @@ export class BookingService {
   cancelledBookings(params: Record<string, string>): Observable<Booking[]> { return this.http.get<Booking[]>(VOYAGES_BOOKING.bookingsCancelled, { params }); }
   noShow(id: string): Observable<Booking> { return this.http.post<Booking>(VOYAGES_BOOKING.bookingNoShow(id), {}); }
   board(ticketId: string): Observable<Ticket> { return this.http.post<Ticket>(VOYAGES_BOOKING.ticketBoard(ticketId), {}); }
+  reportTicket(id: string, body: { new_trip_id: string; new_seat_id?: string | null; reason?: string }): Observable<Ticket> {
+    return this.http.post<Ticket>(VOYAGES_BOOKING.ticketReport(id), body);
+  }
+  regularizeTicket(id: string, body: { new_fare_class_id?: string | null; new_destination_id?: string | null; payment_method?: string; reason?: string }): Observable<Ticket> {
+    return this.http.post<Ticket>(VOYAGES_BOOKING.ticketRegularize(id), body);
+  }
+  adjustments(params: { ticket?: string; booking?: string; kind?: string; date_from?: string; date_to?: string } = {}): Observable<TicketAdjustment[]> {
+    let p = new HttpParams();
+    Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
+    return this.http.get<TicketAdjustment[]>(VOYAGES_BOOKING.adjustments, { params: p });
+  }
 }

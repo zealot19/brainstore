@@ -69,12 +69,118 @@
             <td><span class="badge {{ statusClass(t.status) }}">{{ t.status_display }}</span></td>
             <td class="action-table-data">
               @if (t.status === 'sold') {
-                <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.booking.board'" (click)="board(t.id)" [title]="'booking.detail.board' | transloco"><i class="ti ti-user-check me-1"></i>{{ 'booking.detail.board' | transloco }}</a>
+                <div class="d-inline-flex gap-1">
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-success" *hasPermission="'ticketing.booking.board'" (click)="board(t.id)" [title]="'booking.detail.board' | transloco"><i class="ti ti-user-check me-1"></i>{{ 'booking.detail.board' | transloco }}</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.booking.create'" (click)="openReport(t)" [title]="'booking.adjust.report' | transloco"><i class="ti ti-calendar-event me-1"></i>{{ 'booking.adjust.report' | transloco }}</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-warning" *hasPermission="'ticketing.booking.create'" (click)="openRegularize(t)" [title]="'booking.adjust.regularize' | transloco"><i class="ti ti-arrow-up me-1"></i>{{ 'booking.adjust.regularize' | transloco }}</a>
+                </div>
               } @else { <span class="text-muted small">—</span> }
             </td>
           </tr>
         } @empty { <tr><td colspan="8" class="text-center py-4 text-muted">{{ 'booking.detail.empty_tickets' | transloco }}</td></tr> }
       </tbody>
     </table></div></div>
+  </div>
+
+  <!-- Historique des ajustements -->
+  @if (adjustments.length) {
+    <div class="card mt-3"><div class="card-header"><h5 class="mb-0">{{ 'booking.adjust.history' | transloco }}</h5></div>
+      <div class="card-body p-0"><div class="table-responsive"><table class="table datanew">
+        <thead class="thead-light"><tr>
+          <th>{{ 'booking.adjust.c_kind' | transloco }}</th><th>{{ 'booking.adjust.c_from' | transloco }}</th>
+          <th>{{ 'booking.adjust.c_to' | transloco }}</th><th>{{ 'booking.adjust.c_diff' | transloco }}</th>
+          <th>{{ 'booking.adjust.c_reason' | transloco }}</th><th>{{ 'booking.adjust.c_author' | transloco }}</th><th>{{ 'booking.adjust.c_date' | transloco }}</th>
+        </tr></thead>
+        <tbody>
+          @for (a of adjustments; track a.id) {
+            <tr>
+              <td><span class="badge" [class.bg-primary]="a.kind === 'report'" [class.bg-warning]="a.kind === 'regularisation'">{{ a.kind_display }}</span></td>
+              <td>{{ a.from_trip_number || a.from_fare_class_name || a.from_destination_name || '—' }}</td>
+              <td>{{ a.to_trip_number || a.to_fare_class_name || a.to_destination_name || '—' }}</td>
+              <td>{{ a.price_difference | number:'1.0-0' }} XAF</td>
+              <td>{{ a.reason || '—' }}</td>
+              <td>{{ a.created_by_name || '—' }}</td>
+              <td>{{ a.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table></div></div>
+    </div>
+  }
+}
+
+<!-- Modale Report -->
+@if (reportFor) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">{{ 'booking.adjust.report_title' | transloco }}</h5><button type="button" class="btn-close" (click)="closeReport()"></button></div>
+      <div class="modal-body">
+        <p class="text-muted small">{{ 'booking.adjust.report_hint' | transloco }}</p>
+        <div class="mb-3">
+          <label class="form-label">{{ 'booking.adjust.new_trip' | transloco }}</label>
+          <select class="form-select" [(ngModel)]="rpTrip" (ngModelChange)="onReportTripChange()">
+            <option value="">—</option>
+            @for (o of reportTrips; track o.id) { <option [value]="o.id">{{ o.number }} · {{ o.route_code }} · {{ o.scheduled_departure | date:'dd/MM HH:mm' }}</option> }
+          </select>
+        </div>
+        @if (reportSeats.length) {
+          <div class="mb-3">
+            <label class="form-label">{{ 'booking.adjust.new_seat' | transloco }}</label>
+            <select class="form-select" [(ngModel)]="rpSeat">
+              <option value="">{{ 'booking.adjust.seat_auto' | transloco }}</option>
+              @for (s of reportSeats; track s.id) { <option [value]="s.id">{{ s.seat_number }}</option> }
+            </select>
+          </div>
+        }
+        <div class="mb-2">
+          <label class="form-label">{{ 'booking.adjust.reason' | transloco }}</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="rpReason"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="closeReport()">{{ 'shared.actions.cancel' | transloco }}</button>
+        <button class="btn btn-primary" [disabled]="!rpTrip || !rpReason.trim()" (click)="submitReport()">{{ 'booking.adjust.confirm_report' | transloco }}</button>
+      </div>
+    </div></div>
+  </div>
+}
+
+<!-- Modale Régularisation -->
+@if (regFor) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">{{ 'booking.adjust.regularize_title' | transloco }}</h5><button type="button" class="btn-close" (click)="closeRegularize()"></button></div>
+      <div class="modal-body">
+        <p class="text-muted small">{{ 'booking.adjust.regularize_hint' | transloco }}</p>
+        <div class="mb-3">
+          <label class="form-label">{{ 'booking.adjust.new_class' | transloco }}</label>
+          <select class="form-select" [(ngModel)]="rgClass">
+            <option value="">{{ 'booking.adjust.unchanged' | transloco }}</option>
+            @for (fc of availableClasses; track fc.id) { <option [value]="fc.id">{{ fc.name }}</option> }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ 'booking.adjust.new_dest' | transloco }}</label>
+          <select class="form-select" [(ngModel)]="rgDest">
+            <option value="">{{ 'booking.adjust.unchanged' | transloco }}</option>
+            @for (d of regDestinations; track d.id) { <option [value]="d.id">{{ d.name }}</option> }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ 'booking.adjust.payment' | transloco }}</label>
+          <select class="form-select" [(ngModel)]="rgPay">
+            @for (pm of payMethods; track pm.id) { <option [value]="pm.code">{{ pm.name }}</option> }
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">{{ 'booking.adjust.reason' | transloco }}</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="rgReason"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="closeRegularize()">{{ 'shared.actions.cancel' | transloco }}</button>
+        <button class="btn btn-warning" [disabled]="!rgReason.trim()" (click)="submitRegularize()">{{ 'booking.adjust.confirm_regularize' | transloco }}</button>
+      </div>
+    </div></div>
   </div>
 }
