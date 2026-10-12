@@ -186,6 +186,21 @@ export class TrzSessionsComponent implements OnInit {
   // Écart saisi APRÈS clôture (le motif n'est plus demandé avant validation).
   ecartSession: CashSession | null = null; ecartReason = ''; ecartNote = '';
 
+  /** Message lisible depuis une erreur HTTP (gère les détails de validation DRF, évite « [object Object] »). */
+  private errText(e: any): string {
+    if (e?.error?.detail) return e.error.detail;
+    const err = e?.error?.error ?? e?.error ?? {};
+    const details = err?.details;
+    if (details && typeof details === 'object') {
+      const flat = (v: any): string => Array.isArray(v)
+        ? v.map(flat).join(' ')
+        : (v && typeof v === 'object' ? Object.values(v).map(flat).join(' ') : String(v));
+      const parts = Object.entries(details).map(([k, v]) => `${k}: ${flat(v)}`);
+      if (parts.length) return parts.join(' · ');
+    }
+    return err?.message ?? "L'opération a échoué.";
+  }
+
   submitClose(): void {
     if (this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
     const payload: Record<string, unknown> = {};
@@ -200,7 +215,7 @@ export class TrzSessionsComponent implements OnInit {
           this.ecartSession = s; this.ecartReason = ''; this.ecartNote = '';
         }
       },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
+      error: e => { this.saving = false; this.errorMsg = this.errText(e); } });
   }
 
   closeEcart(): void { this.ecartSession = null; }
