@@ -377,7 +377,9 @@ def create_transaction(
         if scoped and not is_cash_manager(created_by, cash_session.cash_register):
             from apps.admin_rbac.selectors.user_role_selectors import has_permission
             chef = has_permission(created_by, "treasury.session.manage", company.id)
-            if not (chef and cash_session.cash_register.agency_id == _agency):
+            reg_agency = cash_session.cash_register.agency_id
+            same_agency = _agency is not None and reg_agency is not None and str(reg_agency) == str(_agency)
+            if not (chef and same_agency):
                 raise ApplicationError(_("Vous n'êtes pas autorisé à opérer sur cette caisse."))
     elif account_type == Transaction.AccountType.BANK:
         if not bank_account:
