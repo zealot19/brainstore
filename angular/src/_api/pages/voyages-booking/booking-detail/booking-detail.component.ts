@@ -11,11 +11,12 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
+import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
 
 @Component({
   selector: 'app-vb-booking-detail',
   templateUrl: './booking-detail.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, TranslocoModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, TranslocoModule, CaisseSelectComponent],
 })
 export class VbBookingDetailComponent implements OnInit {
   private toast = inject(ToastService);
@@ -36,7 +37,7 @@ export class VbBookingDetailComponent implements OnInit {
   fareClasses: FareClass[] = [];
   regDestinations: TripDestination[] = [];
   payMethods: any[] = [];
-  rgClass = ''; rgDest = ''; rgPay = 'cash'; rgReason = '';
+  rgClass = ''; rgDest = ''; rgPay = 'cash'; rgReason = ''; rgCaisse: string | null = null;
 
   constructor(private svc: BookingService, private route: ActivatedRoute, private router: Router) {}
   ngOnInit(): void {
@@ -103,7 +104,7 @@ export class VbBookingDetailComponent implements OnInit {
 
   // ---- Régularisation ----
   openRegularize(t: Ticket): void {
-    this.regFor = t; this.rgClass = ''; this.rgDest = ''; this.rgPay = 'cash'; this.rgReason = ''; this.regDestinations = [];
+    this.regFor = t; this.rgClass = ''; this.rgDest = ''; this.rgPay = 'cash'; this.rgReason = ''; this.rgCaisse = null; this.regDestinations = [];
     if (this.fareClasses.length) {
       this.applyClassFilter(t);
     } else {
@@ -124,7 +125,7 @@ export class VbBookingDetailComponent implements OnInit {
     if (!this.rgClass && !this.rgDest) { this.toast.error('Choisissez une classe ou une destination.'); return; }
     this.svc.regularizeTicket(this.regFor.id, {
       new_fare_class_id: this.rgClass || null, new_destination_id: this.rgDest || null,
-      payment_method: this.rgPay, reason: this.rgReason.trim(),
+      payment_method: this.rgPay, reason: this.rgReason.trim(), cash_register_id: this.rgCaisse,
     }).subscribe({ next: () => { this.closeRegularize(); this.booking && this.load(this.booking.id); },
       error: e => this.toast.error(e?.error?.detail ?? "La régularisation a échoué.") });
   }

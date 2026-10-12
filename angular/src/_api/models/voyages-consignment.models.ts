@@ -55,6 +55,7 @@ export interface ParcelCreate {
   recipient_address?: string; recipient_id_number?: string; description?: string;
   weight_kg?: number | null; quantity?: number;
   declared_value?: number | null; amount_due: number; amount_received?: number | null; payment_method?: string;
+  cash_register_id?: string | null;
 }
 
 export interface ParcelReceive { received_pieces?: number | null; missing_pieces?: number; damaged_pieces?: number; }
@@ -66,4 +67,5 @@ export interface BaggageCreate {
   consignment_type_id?: string | null; description?: string;
   weight_kg?: number | null; quantity?: number; declared_value?: number;
   amount_due?: number; amount_received?: number | null; payment_method?: string;
+  cash_register_id?: string | null;
 }

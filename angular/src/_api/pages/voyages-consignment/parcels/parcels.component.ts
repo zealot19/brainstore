@@ -21,11 +21,12 @@ import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
+import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
 
 @Component({
   selector: 'app-vcg-parcels',
   templateUrl: './parcels.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, ClientFieldsComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, ClientFieldsComponent, TranslocoModule, CaisseSelectComponent],
 })
 export class VcgParcelsComponent implements OnInit {
   private toast = inject(ToastService);
@@ -59,6 +60,7 @@ export class VcgParcelsComponent implements OnInit {
 
   // Client expéditeur (création) — piloté par le fieldset partagé app-client-fields
   senderClient: PassengerSpec = { id_type: 'cni' };
+  cashRegisterId: string | null = null;
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -158,6 +160,7 @@ export class VcgParcelsComponent implements OnInit {
       sender_name: this.senderClient.name, sender_phone: this.senderClient.phone,
       sender_civility: this.senderClient.civility, sender_id_type: this.senderClient.id_type,
       sender_id_number: this.senderClient.id_number,
+      cash_register_id: this.cashRegisterId,
     };
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(createBody);
     req.subscribe({

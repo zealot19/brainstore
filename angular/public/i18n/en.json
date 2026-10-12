@@ -841,6 +841,7 @@
       "counted_total": "Counted total",
       "use_billetage": "Count by denomination"
     },
+    "caisse_select": { "label": "Cash register", "auto": "— Automatic (my register) —", "closed": "closed", "locked_hint": "Register fixed to yours." },
     "ecart": {
       "title": "Cash discrepancy",
       "later": "Later",

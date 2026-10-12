@@ -20,6 +20,9 @@ export class SessionService {
   myActive(): Observable<CashSession | null> { return this.http.get<any>(TREASURY.sessionMyActive).pipe(map(r => (r?.data ?? r) || null)); }
   close(id: string, data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionClose(id), data); }
   justifyEcart(id: string, data: { justification_reason: string; justification_note: string }): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionJustifyEcart(id), data); }
+  selectableRegisters(): Observable<{ registers: { id: string; name: string; agency_name: string | null; has_open_session: boolean }[]; can_select: boolean; default_id: string | null }> {
+    return this.http.get<any>(TREASURY.selectableRegisters).pipe(map(r => r.data ?? r));
+  }
 
   schedule(data: Record<string, unknown>): Observable<CashSession> { return this.http.post<CashSession>(TREASURY.sessionSchedule, data); }
   guichetiers(registerId: string): Observable<Guichetier[]> {

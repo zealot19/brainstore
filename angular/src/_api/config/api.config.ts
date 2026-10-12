@@ -438,6 +438,7 @@ export const TREASURY = {
   sessions:     `${TRZ}/sessions/`,       session:      (id: string) => `${TRZ}/sessions/${id}/`,
   sessionOpen:  `${TRZ}/sessions/open/`,  sessionClose: (id: string) => `${TRZ}/sessions/${id}/close/`,
   sessionJustifyEcart: (id: string) => `${TRZ}/sessions/${id}/justify-ecart/`,
+  selectableRegisters: `${TRZ}/selectable-registers/`,
   sessionMyActive:    `${TRZ}/sessions/my-active/`,
   sessionSchedule:    `${TRZ}/sessions/schedule/`,
   sessionGuichetiers: `${TRZ}/sessions/guichetiers/`,

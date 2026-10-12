@@ -59,6 +59,7 @@ export interface BookingCreate {
   trip_type: 'one_way' | 'round_trip'; outbound_trip_id: string; return_trip_id?: string | null;
   buyer: PassengerSpec; items: BookingItem[];
   payment_method?: string; amount_received?: number | null; return_open?: boolean;
+  cash_register_id?: string | null;
 }
 
 export interface AssignReturnItem { outbound_ticket_id: string; return_seat_id: string; }
