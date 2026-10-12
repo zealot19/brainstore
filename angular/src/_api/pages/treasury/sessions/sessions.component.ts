@@ -183,15 +183,32 @@ export class TrzSessionsComponent implements OnInit {
   }
   get closingIsGuichet(): boolean { return this.closingSession?.register_kind === 'guichet'; }
   get destinationRegisters(): CashRegister[] { return this.registers.filter(r => r.id !== this.closingSession?.cash_register); }
+  // Écart saisi APRÈS clôture (le motif n'est plus demandé avant validation).
+  ecartSession: CashSession | null = null; ecartReason = ''; ecartNote = '';
+
   submitClose(): void {
     if (this.saving || !this.closingId) return; this.saving = true; this.errorMsg = '';
-    const payload: Record<string, unknown> = { justification_reason: this.closeReason, justification_note: this.closeNote };
+    const payload: Record<string, unknown> = {};
     if (this.closeBilletage) payload['closing_count'] = this.toItems(this.closeQty);
     else payload['closing_balance'] = this.closeManual;
     if (this.closingIsGuichet) payload['destination_cash_register_id'] = this.closeDestId;
     this.svc.close(this.closingId, payload).subscribe({
-      next: () => { this.saving = false; this.load(); this.toast.success('Session clôturée.'); this.close('trz-close-modal'); },
+      next: (s: CashSession) => {
+        this.saving = false; this.load(); this.toast.success('Session clôturée.'); this.close('trz-close-modal');
+        // Un écart constaté : on demande le motif/note APRÈS validation.
+        if (s && s.difference != null && +s.difference !== 0) {
+          this.ecartSession = s; this.ecartReason = ''; this.ecartNote = '';
+        }
+      },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; } });
+  }
+
+  closeEcart(): void { this.ecartSession = null; }
+  submitEcart(): void {
+    if (!this.ecartSession || !this.ecartReason) return;
+    this.svc.justifyEcart(this.ecartSession.id, { justification_reason: this.ecartReason, justification_note: this.ecartNote.trim() })
+      .subscribe({ next: () => { this.ecartSession = null; this.load(); this.toast.success('Écart justifié.'); },
+        error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
   }
 
   // ── Prolonger ──

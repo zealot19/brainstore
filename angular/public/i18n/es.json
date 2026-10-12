@@ -648,6 +648,9 @@
       "close_destination_hint": "El efectivo contado se transferirá allí; la ventanilla queda a 0.",
       "cash_total": "Total efectivo",
       "other_values": "Otros valores",
+      "sec_billets": "Billetes",
+      "sec_bons": "Bonos de caja",
+      "no_bons": "Ningún bono de caja configurado.",
       "grand_total": "Total general",
       "stop_btn": "Detener mi sesión"
     },
@@ -839,6 +842,8 @@
       "use_billetage": "Contar por denominación"
     },
     "ecart": {
+      "title": "Diferencia de caja",
+      "later": "Más tarde",
       "hint": "Si hay diferencia, indique el motivo (obligatorio).",
       "reason": "Motivo de la diferencia",
       "no_reason": "— Ninguno (sin diferencia) —",

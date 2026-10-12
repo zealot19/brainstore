@@ -112,34 +112,43 @@
 </div></div></div>
 
 <!-- Clôturer (billetage) -->
-<div class="modal fade" id="trz-close-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+<div class="modal fade" id="trz-close-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-xl"><div class="modal-content">
   <div class="modal-header"><h5 class="modal-title">{{ 'treasury.session.close_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="form-check form-switch mb-2"><input type="checkbox" class="form-check-input" id="close-bill" [(ngModel)]="closeBilletage" /><label class="form-check-label" for="close-bill">{{ 'treasury.denom.use_billetage' | transloco }}</label></div>
     @if (closeBilletage) {
-      <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
-        <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
-        <tbody>@for (d of denoms; track d.id) {
-          <tr><td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
-          <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeQty[d.id]" /></td>
-          <td class="text-end">{{ (+d.value) * (closeQty[d.id] || 0) }}</td></tr>
-        }</tbody>
-        <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.session.cash_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
-      </table></div>
-      @if (valueTypes.length) {
-        <div class="mb-1 fw-medium small text-muted">{{ 'treasury.session.other_values' | transloco }}</div>
-        <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
-          <tbody>@for (v of valueTypes; track v.id) {
-            <tr><td>{{ v.label }}</td>
-            <td style="width:160px"><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeAmounts[v.id]" /></td></tr>
-          }</tbody>
-          <tfoot>
-            <tr><td>{{ 'treasury.session.other_values' | transloco }}</td><td class="text-end">{{ otherTotal }}</td></tr>
-            <tr class="fw-bold"><td>{{ 'treasury.session.grand_total' | transloco }}</td><td class="text-end">{{ grandTotal }}</td></tr>
-          </tfoot>
-        </table></div>
-      }
+      <div class="row">
+        <!-- Billets (gauche) -->
+        <div class="col-md-6">
+          <div class="fw-semibold mb-1">{{ 'treasury.session.sec_billets' | transloco }}</div>
+          <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+            <thead class="thead-light"><tr><th>{{ 'treasury.denom.col_value' | transloco }}</th><th style="width:110px">{{ 'treasury.denom.qty' | transloco }}</th><th class="text-end">{{ 'treasury.denom.subtotal' | transloco }}</th></tr></thead>
+            <tbody>@for (d of denoms; track d.id) {
+              <tr><td>{{ d.value }} <span class="text-muted small">{{ d.kind_display }}</span></td>
+              <td><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeQty[d.id]" /></td>
+              <td class="text-end">{{ (+d.value) * (closeQty[d.id] || 0) }}</td></tr>
+            }</tbody>
+            <tfoot><tr class="fw-bold"><td colspan="2">{{ 'treasury.session.cash_total' | transloco }}</td><td class="text-end">{{ closeTotal }}</td></tr></tfoot>
+          </table></div>
+        </div>
+        <!-- Bons de caisse (droite) -->
+        <div class="col-md-6">
+          <div class="fw-semibold mb-1">{{ 'treasury.session.sec_bons' | transloco }}</div>
+          @if (valueTypes.length) {
+            <div class="table-responsive mb-2"><table class="table table-sm align-middle mb-1">
+              <tbody>@for (v of valueTypes; track v.id) {
+                <tr><td>{{ v.label }}</td>
+                <td style="width:160px"><input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="closeAmounts[v.id]" /></td></tr>
+              }</tbody>
+              <tfoot>
+                <tr><td>{{ 'treasury.session.other_values' | transloco }}</td><td class="text-end">{{ otherTotal }}</td></tr>
+                <tr class="fw-bold"><td>{{ 'treasury.session.grand_total' | transloco }}</td><td class="text-end">{{ grandTotal }}</td></tr>
+              </tfoot>
+            </table></div>
+          } @else { <p class="text-muted small">{{ 'treasury.session.no_bons' | transloco }}</p> }
+        </div>
+      </div>
     } @else {
       <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_counted' | transloco }}</label><input type="number" class="form-control" [(ngModel)]="closeManual" /></div>
     }
@@ -152,17 +161,34 @@
         <small class="text-muted">{{ 'treasury.session.close_destination_hint' | transloco }}</small>
       </div>
     }
-    <hr />
-    <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
-    <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }}</label>
-      <select class="form-select" [(ngModel)]="closeReason">
-        <option value="">{{ 'treasury.ecart.no_reason' | transloco }}</option>
-        @for (r of ecartReasons; track r) { <option [value]="r">{{ 'treasury.ecart.r_' + r | transloco }}</option> }
-      </select>
-    </div>
-    <div class="mb-3"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="closeNote" /></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="button" class="btn btn-primary" [disabled]="saving || (closingIsGuichet && !closeDestId)" (click)="submitClose()">{{ 'treasury.session.close_btn' | transloco }}</button></div>
 </div></div></div>
+
+<!-- Écart de caisse : motif/note saisis APRÈS clôture -->
+@if (ecartSession) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">{{ 'treasury.ecart.title' | transloco }}</h5><button type="button" class="btn-close" (click)="closeEcart()"></button></div>
+      <div class="modal-body">
+        <div class="alert" [class.alert-danger]="+(ecartSession.difference || 0) < 0" [class.alert-success]="+(ecartSession.difference || 0) > 0">
+          {{ 'treasury.report.ecart' | transloco }} : <b>{{ (ecartSession.difference || 0) | number:'1.0-0' }} XAF</b>
+        </div>
+        <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
+        <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }} <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="ecartReason">
+            <option value="">{{ 'treasury.ecart.no_reason' | transloco }}</option>
+            @for (r of ecartReasons; track r) { <option [value]="r">{{ 'treasury.ecart.r_' + r | transloco }}</option> }
+          </select>
+        </div>
+        <div class="mb-1"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="ecartNote" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeEcart()">{{ 'treasury.ecart.later' | transloco }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="!ecartReason" (click)="submitEcart()">{{ 'shared.actions.save' | transloco }}</button>
+      </div>
+    </div></div>
+  </div>
+}
 
 <!-- Rapport de session -->
 <div class="modal fade" id="trz-report-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-xl"><div class="modal-content">

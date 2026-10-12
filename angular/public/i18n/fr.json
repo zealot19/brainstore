@@ -648,6 +648,9 @@
       "close_destination_hint": "L'espèce comptée y sera transférée ; le guichet finira à 0 FCFA.",
       "cash_total": "Total espèces",
       "other_values": "Autres valeurs",
+      "sec_billets": "Billets",
+      "sec_bons": "Bons de caisse",
+      "no_bons": "Aucun bon de caisse configuré.",
       "grand_total": "Total général",
       "stop_btn": "Arrêter ma session"
     },
@@ -839,6 +842,8 @@
       "use_billetage": "Compter par billetage"
     },
     "ecart": {
+      "title": "Écart de caisse",
+      "later": "Plus tard",
       "hint": "En cas d’écart, indiquez le motif (obligatoire).",
       "reason": "Motif d’écart",
       "no_reason": "— Aucun (pas d’écart) —",

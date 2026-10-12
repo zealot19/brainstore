@@ -648,6 +648,9 @@
       "close_destination_hint": "O numerário contado será transferido para lá; o guichê fica a 0.",
       "cash_total": "Total em numerário",
       "other_values": "Outros valores",
+      "sec_billets": "Notas",
+      "sec_bons": "Vales de caixa",
+      "no_bons": "Nenhum vale de caixa configurado.",
       "grand_total": "Total geral",
       "stop_btn": "Parar a minha sessão"
     },
@@ -839,6 +842,8 @@
       "use_billetage": "Contar por denominação"
     },
     "ecart": {
+      "title": "Diferença de caixa",
+      "later": "Mais tarde",
       "hint": "Em caso de diferença, indique o motivo (obrigatório).",
       "reason": "Motivo da diferença",
       "no_reason": "— Nenhum (sem diferença) —",

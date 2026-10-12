@@ -648,6 +648,9 @@
       "close_destination_hint": "The counted cash will be transferred there; the counter ends at 0.",
       "cash_total": "Cash total",
       "other_values": "Other values",
+      "sec_billets": "Notes",
+      "sec_bons": "Cash vouchers",
+      "no_bons": "No cash voucher configured.",
       "grand_total": "Grand total",
       "stop_btn": "Stop my session"
     },
@@ -839,6 +842,8 @@
       "use_billetage": "Count by denomination"
     },
     "ecart": {
+      "title": "Cash discrepancy",
+      "later": "Later",
       "hint": "If there is a discrepancy, give the reason (required).",
       "reason": "Discrepancy reason",
       "no_reason": "— None (no discrepancy) —",
