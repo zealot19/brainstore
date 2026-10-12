@@ -45,6 +45,11 @@ export class VcgParcelsComponent implements OnInit {
   editId: string | null = null;
   selected = new Set<string>();
 
+  // M25 — expéditions partielles
+  shipTarget: Parcel | null = null;
+  shipments: import('../../../models/voyages-consignment.models').ParcelShipment[] = [];
+  shipTripId = ''; shipQty = 1; shipNote = ''; shipBusy = false;
+
   paymentMethods: any[] = [];
   constructor(private svc: ParcelService, private spSvc: ServicePointService,
               private ctSvc: ConsignmentTypeService, private cnSvc: ConsignmentNatureService,
@@ -196,4 +201,35 @@ export class VcgParcelsComponent implements OnInit {
       error: () => {},
     });
   }
+
+  // ── M25 : expéditions ───────────────────────────────────────────────────────
+  openShipments(p: Parcel): void {
+    this.shipTarget = p; this.shipTripId = ''; this.shipQty = 1; this.shipNote = '';
+    this.loadShipments();
+  }
+  private loadShipments(): void {
+    if (!this.shipTarget) return;
+    this.svc.get(this.shipTarget.id).subscribe({ next: d => this.shipTarget = d, error: () => {} });
+    this.svc.shipments(this.shipTarget.id).subscribe({ next: s => this.shipments = s, error: () => this.shipments = [] });
+  }
+  closeShipments(): void { this.shipTarget = null; this.shipments = []; }
+  get shipRemaining(): number {
+    return this.shipTarget?.remaining_pieces ?? ((this.shipTarget?.quantity ?? 0) - (this.shipTarget?.shipped_pieces ?? 0));
+  }
+  createShipment(): void {
+    if (!this.shipTarget || !this.shipTripId || this.shipQty < 1) return;
+    this.shipBusy = true;
+    this.svc.createShipment(this.shipTarget.id, { trip_id: this.shipTripId, quantity: this.shipQty, note: this.shipNote.trim() })
+      .subscribe({ next: () => { this.shipBusy = false; this.shipTripId = ''; this.shipQty = 1; this.shipNote = ''; this.loadShipments(); this.reload(); },
+        error: e => { this.shipBusy = false; this.toast.error(e?.error?.detail ?? "La création de l'expédition a échoué."); } });
+  }
+  private shipAction(obs: any): void {
+    obs.subscribe({ next: () => { this.loadShipments(); this.reload(); },
+      error: (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué.") });
+  }
+  validateShip(s: any): void { this.shipAction(this.svc.validateShipment(s.id)); }
+  loadShip(s: any): void { this.shipAction(this.svc.loadShipment(s.id)); }
+  dispatchShip(s: any): void { this.shipAction(this.svc.dispatchShipment(s.id)); }
+  arriveShip(s: any): void { this.shipAction(this.svc.arriveShipment(s.id)); }
+  cancelShip(s: any): void { if (confirm('Annuler cette expédition ?')) this.shipAction(this.svc.cancelShipment(s.id)); }
 }

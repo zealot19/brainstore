@@ -84,6 +84,7 @@
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" [title]="'cons.parcels.act_receipt_title' | transloco"><i class="ti ti-printer me-1"></i>{{ 'cons.parcels.act_receipt' | transloco }}</a>
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a> }
                 @if (p.status === 'available_for_pickup') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" [title]="'cons.parcels.act_deliver' | transloco"><i class="ti ti-package-export me-1"></i>{{ 'cons.parcels.act_deliver' | transloco }}</a> }
+                @if (p.status !== 'picked_up' && p.status !== 'cancelled' && p.status !== 'available_for_pickup') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-info me-1" *hasPermission="'ticketing.parcel.manage'" (click)="openShipments(p)" [title]="'cons.shipment.title' | transloco"><i class="ti ti-truck-delivery me-1"></i>{{ 'cons.shipment.act' | transloco }}</a> }
                 @if (p.status === 'registered' || p.status === 'ready_for_travel') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a> }
               </div></td>
             </tr>
@@ -223,3 +224,70 @@
     }
   </div>
 </div></div></div>
+
+<!-- M25 : Expéditions partielles -->
+@if (shipTarget) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+    <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ 'cons.shipment.title' | transloco }} — {{ shipTarget.reference }}</h5>
+        <button type="button" class="btn-close" (click)="closeShipments()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <span class="badge bg-primary me-1">{{ 'cons.shipment.total' | transloco }}: {{ shipTarget.quantity }}</span>
+          <span class="badge bg-success me-1">{{ 'cons.shipment.shipped' | transloco }}: {{ shipTarget.shipped_pieces ?? 0 }}</span>
+          <span class="badge bg-secondary">{{ 'cons.shipment.remaining' | transloco }}: {{ shipRemaining }}</span>
+        </div>
+
+        @if (shipRemaining > 0) {
+          <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-6"><label class="form-label mb-1">{{ 'cons.shipment.trip' | transloco }}</label>
+              <select class="form-select" [(ngModel)]="shipTripId">
+                <option value="">{{ 'cons.common.opt_choose' | transloco }}</option>
+                @for (t of trips; track t.id) { <option [value]="t.id">{{ t.number || t.code }}</option> }
+              </select>
+            </div>
+            <div class="col-md-3"><label class="form-label mb-1">{{ 'cons.shipment.qty' | transloco }}</label>
+              <input type="number" class="form-control" min="1" [max]="shipRemaining" [(ngModel)]="shipQty" />
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary w-100" [disabled]="shipBusy || !shipTripId || shipQty < 1 || shipQty > shipRemaining" (click)="createShipment()">
+                <i class="ti ti-plus me-1"></i>{{ 'cons.shipment.new' | transloco }}
+              </button>
+            </div>
+            <div class="col-12"><input type="text" class="form-control form-control-sm" [placeholder]="'cons.shipment.note' | transloco" [(ngModel)]="shipNote" /></div>
+          </div>
+        }
+
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead class="thead-light"><tr>
+              <th>{{ 'cons.shipment.qty' | transloco }}</th><th>{{ 'cons.shipment.trip' | transloco }}</th>
+              <th>{{ 'cons.common.col_status' | transloco }}</th><th>{{ 'cons.shipment.validated_by' | transloco }}</th>
+              <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
+            </tr></thead>
+            <tbody>
+              @for (s of shipments; track s.id) {
+                <tr>
+                  <td class="fw-medium">{{ s.quantity }} @if (s.is_primary) { <span class="badge bg-info ms-1">{{ 'cons.shipment.primary' | transloco }}</span> }</td>
+                  <td>{{ s.trip_number || s.trip_route_code || '—' }}</td>
+                  <td><span class="badge bg-light text-dark">{{ s.status_display }}</span></td>
+                  <td>{{ s.validated_by_name || '—' }}<br><small class="text-muted">{{ s.validated_at | date:'short' }}</small></td>
+                  <td class="text-nowrap">
+                    @if (s.status === 'draft') { <a href="javascript:void(0);" class="btn btn-xs btn-outline-success me-1" (click)="validateShip(s)">{{ 'cons.shipment.validate' | transloco }}</a> }
+                    @if (s.status === 'validated') { <a href="javascript:void(0);" class="btn btn-xs btn-outline-secondary me-1" (click)="loadShip(s)">{{ 'cons.shipment.load' | transloco }}</a> }
+                    @if (s.status === 'validated' || s.status === 'loaded') { <a href="javascript:void(0);" class="btn btn-xs btn-outline-primary me-1" (click)="dispatchShip(s)">{{ 'cons.shipment.dispatch' | transloco }}</a> }
+                    @if (s.status === 'in_transit') { <a href="javascript:void(0);" class="btn btn-xs btn-outline-info me-1" (click)="arriveShip(s)">{{ 'cons.shipment.arrive' | transloco }}</a> }
+                    @if (s.status !== 'arrived' && s.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-xs btn-outline-danger" (click)="cancelShip(s)"><i class="ti ti-x"></i></a> }
+                  </td>
+                </tr>
+              } @empty { <tr><td colspan="5" class="text-center py-3 text-muted">{{ 'cons.shipment.empty' | transloco }}</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-light" (click)="closeShipments()">{{ 'shared.actions.close' | transloco }}</button></div>
+    </div></div>
+  </div>
+}

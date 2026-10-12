@@ -193,8 +193,8 @@ def receive_parcel(parcel, *, received_pieces=None, missing_pieces=0, damaged_pi
     """Réception à l'agence de destination : pièces reçues / manquantes / avariées
     -> disponible pour retrait."""
     _assert_destination_agency(parcel, user)
-    if parcel.status not in (Parcel.Status.ARRIVED, Parcel.Status.IN_TRANSIT):
-        raise ApplicationError(_("Seul un colis arrivé peut être réceptionné."))
+    if parcel.status != Parcel.Status.ARRIVED:
+        raise ApplicationError(_("Seul un colis dont toutes les pièces sont arrivées peut être réceptionné."))
     total = parcel.quantity
     received = total if received_pieces is None else int(received_pieces)
     missing = int(missing_pieces or 0)

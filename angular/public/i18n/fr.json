@@ -2117,6 +2117,12 @@
     }
   },
   "cons": {
+    "shipment": {
+      "title": "Expéditions", "act": "Expéditions", "total": "Total", "shipped": "Expédié", "remaining": "Restant",
+      "trip": "Voyage", "qty": "Quantité", "new": "Nouvelle expédition", "note": "Note (facultatif)",
+      "validate": "Valider", "load": "Charger", "dispatch": "Expédier", "arrive": "Arrivée",
+      "validated_by": "Validée par", "primary": "Primaire", "empty": "Aucune expédition."
+    },
     "common": {
       "selected": "sélectionné(s)",
       "opt_all_statuses": "Tous les statuts",

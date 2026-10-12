@@ -531,3 +531,70 @@ class ParcelStatsView(APIView):
         if not request.user.company_id:
             return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
         return success_response(get_parcel_stats(request.user.company_id))
+
+
+# ── M25 : expéditions partielles ──────────────────────────────────────────────
+class ParcelShipmentListView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.manage'}
+
+    def get(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
+        if not p:
+            return error_response("Colis introuvable.", status_code=404)
+        qs = p.shipments.filter(is_deleted=False)
+        return success_response(S.ParcelShipmentSerializer(qs, many=True).data)
+
+    def post(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
+        if not p:
+            return error_response("Colis introuvable.", status_code=404)
+        trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
+                                   id=request.data.get("trip_id")).first()
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        try:
+            s = services.create_shipment(p, trip=trip, quantity=request.data.get("quantity"),
+                                         note=request.data.get("note", ""), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(S.ParcelShipmentSerializer(s).data)
+
+
+class _ShipmentActionView(APIView):
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage', 'DELETE': 'ticketing.parcel.manage'}
+    service_fn = None
+
+    def _get(self, request, pk):
+        from apps.voyages_consignment.models import ParcelShipment
+        return ParcelShipment.objects.filter(is_deleted=False, parcel__company=request.user.company,
+                                             id=pk).select_related("parcel", "trip").first()
+
+    def post(self, request, pk):
+        s = self._get(request, pk)
+        if not s:
+            return error_response("Expédition introuvable.", status_code=404)
+        try:
+            s = type(self).service_fn(s, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelShipmentSerializer(s).data)
+
+
+class ShipmentValidateView(_ShipmentActionView): service_fn = staticmethod(services.validate_shipment)
+class ShipmentLoadView(_ShipmentActionView):     service_fn = staticmethod(services.load_shipment)
+class ShipmentDispatchView(_ShipmentActionView): service_fn = staticmethod(services.dispatch_shipment)
+class ShipmentArriveView(_ShipmentActionView):   service_fn = staticmethod(services.arrive_shipment)
+
+
+class ShipmentCancelView(_ShipmentActionView):
+    def delete(self, request, pk):
+        s = self._get(request, pk)
+        if not s:
+            return error_response("Expédition introuvable.", status_code=404)
+        try:
+            services.cancel_shipment(s, user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return no_content_response()

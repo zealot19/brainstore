@@ -84,6 +84,16 @@ class Parcel(BaseModel):
     def __str__(self):
         return self.reference or str(self.id)
 
+    @property
+    def shipped_pieces(self):
+        from apps.voyages_consignment.models import ParcelShipment
+        return (self.shipments.filter(is_deleted=False, status__in=ParcelShipment.COUNTED)
+                .aggregate(s=models.Sum("quantity"))["s"] or 0)
+
+    @property
+    def remaining_pieces(self):
+        return self.quantity - self.shipped_pieces
+
 
 class ParcelEvent(BaseModel):
     class Kind(models.TextChoices):

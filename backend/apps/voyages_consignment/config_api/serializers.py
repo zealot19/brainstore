@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.voyages_consignment.models import Parcel, ParcelEvent, Baggage
+from apps.voyages_consignment.models import Parcel, ParcelEvent, Baggage, ParcelShipment
 
 
 class _EmptyNormalizeMixin:
@@ -35,8 +35,29 @@ class ParcelEventRead(serializers.ModelSerializer):
         fields = ["id", "kind", "kind_display", "trip", "note", "created_at"]
 
 
+class ParcelShipmentSerializer(serializers.ModelSerializer):
+    status_display    = serializers.CharField(source="get_status_display", read_only=True)
+    trip_number       = serializers.CharField(source="trip.number", read_only=True, default=None)
+    trip_route_code   = serializers.CharField(source="trip.route.code", read_only=True, default=None)
+    trip_departure    = serializers.DateTimeField(source="trip.scheduled_departure", read_only=True, default=None)
+    validated_by_name = serializers.SerializerMethodField()
+
+    def get_validated_by_name(self, obj):
+        u = obj.validated_by
+        return (u.get_full_name() or u.username) if u else None
+
+    class Meta:
+        model = ParcelShipment
+        fields = ["id", "parcel", "quantity", "trip", "trip_number", "trip_route_code", "trip_departure",
+                  "status", "status_display", "is_primary", "validated_by_name", "validated_at",
+                  "loaded_at", "dispatched_at", "arrived_at", "note", "created_at"]
+
+
 class ParcelRead(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    shipped_pieces   = serializers.IntegerField(read_only=True)
+    remaining_pieces = serializers.IntegerField(read_only=True)
+    shipments        = ParcelShipmentSerializer(many=True, read_only=True)
     origin_point_name = serializers.CharField(source="origin_point.name", read_only=True, default=None)
     destination_point_name = serializers.CharField(source="destination_point.name", read_only=True, default=None)
     consignment_type_label = serializers.CharField(source="consignment_type.label", read_only=True, default=None)
@@ -61,7 +82,8 @@ class ParcelRead(serializers.ModelSerializer):
                   "picked_up_at", "picked_up_by", "picked_up_phone", "picked_up_id_number",
                   "picked_up_kind", "notes",
                   "delivery_amount", "delivery_address", "delivery_payment_method", "delivered_home_at",
-                  "created_at", "updated_at", "events"]
+                  "created_at", "updated_at", "events",
+                  "shipped_pieces", "remaining_pieces", "shipments"]
 
 
 class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
