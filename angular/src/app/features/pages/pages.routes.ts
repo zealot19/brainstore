@@ -35,9 +35,6 @@ export const Pages_routes: Routes = [
                 { path: 'fuel-types',         loadComponent: () => import('../../../_api/pages/fleet-config/fuel-types/fuel-types.component').then(m => m.FcFuelTypesComponent) },
                 { path: 'transmissions',      loadComponent: () => import('../../../_api/pages/fleet-config/transmissions/transmissions.component').then(m => m.FcTransmissionsComponent) },
                 { path: 'traction-types',     loadComponent: () => import('../../../_api/pages/fleet-config/traction-types/traction-types.component').then(m => m.FcTractionTypesComponent) },
-                { path: 'unit-categories',    loadComponent: () => import('../../../_api/pages/fleet-config/unit-categories/unit-categories.component').then(m => m.FcUnitCategoriesComponent) },
-                { path: 'units',              loadComponent: () => import('../../../_api/pages/fleet-config/units/units.component').then(m => m.FcUnitsComponent) },
-                { path: 'periods',            loadComponent: () => import('../../../_api/pages/fleet-config/periods/periods.component').then(m => m.FcPeriodsComponent) },
                 { path: 'document-types',     loadComponent: () => import('../../../_api/pages/fleet-config/document-types/document-types.component').then(m => m.FcDocumentTypesComponent) },
                 { path: 'tags',               loadComponent: () => import('../../../_api/pages/fleet-config/tags/tags.component').then(m => m.FcTagsComponent) },
                 { path: 'intervention-types', loadComponent: () => import('../../../_api/pages/fleet-config/intervention-types/intervention-types.component').then(m => m.FcInterventionTypesComponent) },
@@ -113,15 +110,6 @@ export const Pages_routes: Routes = [
                 { path: 'settings',            loadComponent: () => import('../../../_api/pages/voyages-config/settings/settings.component').then(m => m.VcSettingsComponent) },
                 { path: 'ticket-template',     loadComponent: () => import('../../../_api/pages/voyages-config/ticket-template/ticket-template.component').then(m => m.VcTicketTemplateComponent) },
                 { path: 'fares',               loadComponent: () => import('../../../_api/pages/voyages-pricing/fares/fares.component').then(m => m.VcFaresComponent) },
-              ],
-            },
-            // ── Config à venir (stubs M01) : écrans réels livrés par M11/M26/M27/M28 ──
-            {
-              path: 'configuration',
-              children: [
-                { path: 'types-caisse',    loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de caisse' } },
-                { path: 'types-operation', loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: "Types d'opération" } },
-                { path: 'types-valeurs',   loadComponent: () => import('../../../_api/pages/configuration/coming-soon/config-coming-soon.component').then(m => m.ConfigComingSoonComponent), data: { title: 'Types de valeurs' } },
               ],
             },
             // ── MODULE : Gestion Voyages ──────────────────────────────────────────────
