@@ -171,7 +171,8 @@ class BookingListView(APIView):
             booking = services.create_booking(
                 company, trip_type=d["trip_type"], outbound_trip=outbound, return_trip=return_trip,
                 buyer_spec=d["buyer"], items=d["items"], payment_method=d["payment_method"],
-                amount_received=d["amount_received"], return_open=d["return_open"], user=request.user)
+                amount_received=d["amount_received"], return_open=d["return_open"], user=request.user,
+                cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.BookingRead(booking).data)
@@ -215,7 +216,8 @@ class BookingPayView(APIView):
         d = payload.validated_data
         try:
             b = services.pay_reservation(b, payment_method=d["payment_method"],
-                                         amount_received=d["amount_received"], user=request.user)
+                                         amount_received=d["amount_received"], user=request.user,
+                                         cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.BookingRead(b).data)
@@ -751,7 +753,8 @@ class TicketRegularizeView(APIView):
             services.regularize_ticket(t, new_fare_class=new_fare_class,
                                        new_destination_id=request.data.get("new_destination_id"),
                                        payment_method=request.data.get("payment_method", ""),
-                                       reason=request.data.get("reason", ""), user=request.user)
+                                       reason=request.data.get("reason", ""), user=request.user,
+                                       cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.TicketRead(t).data)

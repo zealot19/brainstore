@@ -20,7 +20,21 @@ def _normalize_payment(payment_method):
     return "cash", True
 
 
-def _record_income(company, *, booking, amount, payment_method, user, description):
+def _resolve_cash_session(company, user, cash_register_id):
+    """Session de caisse à créditer : caisse choisie (ouverte) ou auto-résolution de l'utilisateur."""
+    if cash_register_id:
+        from apps.treasury.selectors import get_open_session_for_register
+        session = get_open_session_for_register(cash_register_id, company.id)
+        if not session:
+            raise ApplicationError(_("La caisse choisie n'a pas de session ouverte."))
+        return session
+    session = get_open_session_for_user(company.id, user)
+    if not session:
+        raise ApplicationError(_("Ouvrez d'abord votre session de caisse pour encaisser une vente au comptant."))
+    return session
+
+
+def _record_income(company, *, booking, amount, payment_method, user, description, cash_register_id=None):
     """Noyau commun d'encaissement d'un revenu de billetterie au guichet (non-bloquant hors espèces)."""
     from apps.treasury.services.payment_resolution import resolve_payment, resolve_mode
     pm = resolve_payment(company, payment_method)
@@ -32,9 +46,7 @@ def _record_income(company, *, booking, amount, payment_method, user, descriptio
                   description=description, created_by=user)
 
     if is_cash:
-        session = get_open_session_for_user(company.id, user)
-        if not session:
-            raise ApplicationError(_("Ouvrez d'abord votre session de caisse pour encaisser une vente au comptant."))
+        session = _resolve_cash_session(company, user, cash_register_id)
         txn = create_transaction(account_type=Transaction.AccountType.CASH, cash_session=session, **common)
     else:
         banks = list(BankAccount.objects.filter(company=company, is_deleted=False, is_active=True))
@@ -48,7 +60,7 @@ def _record_income(company, *, booking, amount, payment_method, user, descriptio
     return txn
 
 
-def record_booking_payment(company, *, booking, amount, payment_method, user):
+def record_booking_payment(company, *, booking, amount, payment_method, user, cash_register_id=None):
     """Crée le mouvement de trésorerie d'une vente de billets au guichet (non-bloquant hors espèces)."""
     amount = Decimal(str(amount or 0))
     if amount <= 0:
@@ -57,10 +69,10 @@ def record_booking_payment(company, *, booking, amount, payment_method, user):
         return None  # idempotent
     ref = getattr(booking, "reference", "") or ""
     return _record_income(company, booking=booking, amount=amount, payment_method=payment_method,
-                          user=user, description=f"Vente {ref}".strip())
+                          user=user, description=f"Vente {ref}".strip(), cash_register_id=cash_register_id)
 
 
-def record_adjustment_income(company, *, booking, amount, payment_method, user):
+def record_adjustment_income(company, *, booking, amount, payment_method, user, cash_register_id=None):
     """Encaisse le surcoût d'une régularisation de billet (M21). Pas d'idempotence par booking :
     la vente initiale a déjà son mouvement, ce surcoût est un encaissement distinct."""
     amount = Decimal(str(amount or 0))
@@ -68,4 +80,4 @@ def record_adjustment_income(company, *, booking, amount, payment_method, user):
         return None
     ref = getattr(booking, "reference", "") or ""
     return _record_income(company, booking=booking, amount=amount, payment_method=payment_method,
-                          user=user, description=f"Régularisation {ref}".strip())
+                          user=user, description=f"Régularisation {ref}".strip(), cash_register_id=cash_register_id)

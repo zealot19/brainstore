@@ -841,6 +841,7 @@
       "counted_total": "Total compté",
       "use_billetage": "Compter par billetage"
     },
+    "caisse_select": { "label": "Caisse", "auto": "— Automatique (ma caisse) —", "closed": "fermée", "locked_hint": "Caisse fixée à la vôtre." },
     "ecart": {
       "title": "Écart de caisse",
       "later": "Plus tard",

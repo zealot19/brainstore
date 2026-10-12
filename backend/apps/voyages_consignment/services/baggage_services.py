@@ -27,7 +27,7 @@ def _free_allowance(company):
 def add_baggage(company, *, trip, ticket=None, consignment_type=None, description="", weight_kg=None,
                 quantity=1, declared_value=1, sender_name="", sender_phone="", civility="",
                 id_type="", id_number="", birth_date=None, email="",
-                amount_due=0, amount_received=None, payment_method="", user):
+                amount_due=0, amount_received=None, payment_method="", user, cash_register_id=None):
     """Enregistrer un bagage sur un voyage. Le passager (billet) est facultatif :
     s'il est absent, l'expéditeur est identifié par les champs d'identité."""
     if trip is None:
@@ -70,7 +70,8 @@ def add_baggage(company, *, trip, ticket=None, consignment_type=None, descriptio
         payment_method=payment_method or "", paid_at=timezone.now() if due > 0 else None,
         status=Baggage.Status.CHECKED_IN, created_by=user)
     from apps.treasury.services import record_baggage_payment
-    record_baggage_payment(company, baggage=baggage, amount=due, payment_method=payment_method, user=user)
+    record_baggage_payment(company, baggage=baggage, amount=due, payment_method=payment_method, user=user,
+                           cash_register_id=cash_register_id)
     return baggage
 
 

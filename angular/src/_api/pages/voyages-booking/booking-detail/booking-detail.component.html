@@ -172,6 +172,7 @@
             @for (pm of payMethods; track pm.id) { <option [value]="pm.code">{{ pm.name }}</option> }
           </select>
         </div>
+        <div class="mb-3"><app-caisse-select [(value)]="rgCaisse"></app-caisse-select></div>
         <div class="mb-2">
           <label class="form-label">{{ 'booking.adjust.reason' | transloco }}</label>
           <textarea class="form-control" rows="2" [(ngModel)]="rgReason"></textarea>

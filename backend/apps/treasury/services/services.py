@@ -370,11 +370,17 @@ def create_transaction(
             raise ApplicationError(_("A cash session is required for cash transactions."))
         if cash_session.status != CashSession.Status.OPEN:
             raise ApplicationError(_("The cash session is closed."))
-        # Tout gestionnaire de la caisse (ou un admin) peut opérer sur sa session ouverte.
+        # Gestionnaire de la caisse OU chef d'agence (treasury.session.manage) sur une caisse
+        # de son agence OU admin : tous peuvent opérer sur la session ouverte.
         from apps.treasury.scoping import register_agency_scope
         scoped, _agency = register_agency_scope(created_by)
         if scoped and not is_cash_manager(created_by, cash_session.cash_register):
-            raise ApplicationError(_("Vous n'êtes pas gestionnaire de cette caisse."))
+            from apps.admin_rbac.selectors.user_role_selectors import has_permission
+            chef = has_permission(created_by, "treasury.session.manage", company.id)
+            reg_agency = cash_session.cash_register.agency_id
+            same_agency = _agency is not None and reg_agency is not None and str(reg_agency) == str(_agency)
+            if not (chef and same_agency):
+                raise ApplicationError(_("Vous n'êtes pas autorisé à opérer sur cette caisse."))
     elif account_type == Transaction.AccountType.BANK:
         if not bank_account:
             raise ApplicationError(_("Un compte bancaire est requis pour un règlement par banque."))

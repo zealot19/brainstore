@@ -90,7 +90,7 @@ def _hold_seat(seat, booking, hold_until, user):
 
 
 @transaction.atomic
-def pay_reservation(booking, *, payment_method, amount_received=None, user=None):
+def pay_reservation(booking, *, payment_method, amount_received=None, user=None, cash_register_id=None):
     """Convertit une réservation en vente : billets vendus, sièges vendus, encaissement."""
     if booking.status != Booking.Status.RESERVED:
         raise ApplicationError(_("Seule une réservation non payée peut être encaissée."))
@@ -129,7 +129,8 @@ def pay_reservation(booking, *, payment_method, amount_received=None, user=None)
     from apps.voyages_booking.services import loyalty_services
     loyalty_services.accrue(booking, user=user)
     from apps.treasury.services import record_booking_payment
-    record_booking_payment(booking.company, booking=booking, amount=total, payment_method=payment_method, user=user)
+    record_booking_payment(booking.company, booking=booking, amount=total, payment_method=payment_method, user=user,
+                           cash_register_id=cash_register_id)
     return booking
 
 

@@ -127,7 +127,7 @@ def _price(company, trip, destination_point, trip_type):
 @transaction.atomic
 def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec, items,
                    payment_method="", amount_received=None, return_open=False,
-                   channel=Booking.Channel.COUNTER, user=None):
+                   channel=Booking.Channel.COUNTER, user=None, cash_register_id=None):
     """Create a fully-paid booking in a single step (no hold/confirm phase).
 
     items: [{"passenger": <spec>, "destination_point_id": UUID|None,
@@ -217,7 +217,8 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     loyalty_services.accrue(booking, user=user)
 
     from apps.treasury.services import record_booking_payment
-    record_booking_payment(company, booking=booking, amount=total, payment_method=payment_method, user=user)
+    record_booking_payment(company, booking=booking, amount=total, payment_method=payment_method, user=user,
+                           cash_register_id=cash_register_id)
     return booking
 
 

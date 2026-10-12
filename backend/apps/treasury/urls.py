@@ -24,6 +24,7 @@ urlpatterns = [
     path("sessions/<uuid:session_id>/open/",   views.OpenScheduledSessionView.as_view(), name="session-open-scheduled"),
     path("sessions/<uuid:session_id>/close/",  views.CloseSessionView.as_view(),    name="session-close"),
     path("sessions/<uuid:session_id>/justify-ecart/", views.JustifyEcartView.as_view(), name="session-justify-ecart"),
+    path("selectable-registers/", views.CashRegisterSelectView.as_view(), name="selectable-registers"),
     path("sessions/<uuid:session_id>/suspend/",views.SuspendSessionView.as_view(),  name="session-suspend"),
     path("sessions/<uuid:session_id>/resume/", views.ResumeSessionView.as_view(),   name="session-resume"),
     path("sessions/<uuid:session_id>/stop/",   views.SessionStopView.as_view(),     name="session-stop"),

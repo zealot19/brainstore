@@ -53,7 +53,7 @@ export class BookingService {
   reportTicket(id: string, body: { new_trip_id: string; new_seat_id?: string | null; reason?: string }): Observable<Ticket> {
     return this.http.post<Ticket>(VOYAGES_BOOKING.ticketReport(id), body);
   }
-  regularizeTicket(id: string, body: { new_fare_class_id?: string | null; new_destination_id?: string | null; payment_method?: string; reason?: string }): Observable<Ticket> {
+  regularizeTicket(id: string, body: { new_fare_class_id?: string | null; new_destination_id?: string | null; payment_method?: string; reason?: string; cash_register_id?: string | null }): Observable<Ticket> {
     return this.http.post<Ticket>(VOYAGES_BOOKING.ticketRegularize(id), body);
   }
   adjustments(params: { ticket?: string; booking?: string; kind?: string; date_from?: string; date_to?: string } = {}): Observable<TicketAdjustment[]> {

@@ -38,7 +38,7 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
                     recipient_address="", recipient_id_number="", description="", weight_kg=None,
                     quantity=1, declared_value=None, amount_due, amount_received=None,
                     payment_method="", sender_civility="", sender_id_type="cni",
-                    sender_id_number="", user):
+                    sender_id_number="", user, cash_register_id=None):
     if origin_point.id == destination_point.id:
         raise ApplicationError(_("Le point de départ et le point d'arrivée doivent différer."))
     if destination_point.agency_id is None:
@@ -74,7 +74,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
     _event(parcel, ParcelEvent.Kind.READY, from_status=Parcel.Status.REGISTERED,
            to_status=Parcel.Status.READY_FOR_TRAVEL, user=user)
     from apps.treasury.services import record_parcel_payment
-    record_parcel_payment(company, parcel=parcel, amount=due, payment_method=payment_method, user=user)
+    record_parcel_payment(company, parcel=parcel, amount=due, payment_method=payment_method, user=user,
+                          cash_register_id=cash_register_id)
     return parcel
 
 
@@ -276,7 +277,7 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
 
 @transaction.atomic
 def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment_method="",
-                        delivered_to="", delivered_to_id="", user):
+                        delivered_to="", delivered_to_id="", user, cash_register_id=None):
     """Livraison à domicile : clôt le colis et encaisse les frais de livraison (recettes).
     `delivered_to`/`delivered_to_id` = nom et pièce de la personne ayant reçu le colis,
     enregistrés dans picked_up_by / picked_up_id_number (« livré à » / « pièce présentée »)."""
@@ -302,7 +303,7 @@ def deliver_parcel_home(parcel, *, delivery_amount, delivery_address="", payment
            note=f"Livré à domicile · {delivery_address}".strip(" ·"))
     from apps.treasury.services import record_parcel_delivery
     record_parcel_delivery(parcel.company, parcel=parcel, amount=amount,
-                           payment_method=payment_method, user=user)
+                           payment_method=payment_method, user=user, cash_register_id=cash_register_id)
     return parcel
 
 

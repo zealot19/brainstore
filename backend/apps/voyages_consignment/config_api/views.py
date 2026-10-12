@@ -68,7 +68,8 @@ class ParcelListView(APIView):
                 recipient_address=d["recipient_address"], description=d["description"],
                 weight_kg=d["weight_kg"], quantity=d["quantity"], declared_value=d["declared_value"],
                 amount_due=d["amount_due"], amount_received=d["amount_received"],
-                payment_method=d["payment_method"], user=request.user)
+                payment_method=d["payment_method"], user=request.user,
+                cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.ParcelRead(parcel).data)
@@ -264,7 +265,7 @@ class ParcelDeliverHomeView(APIView):
                 payment_method=payload.validated_data["payment_method"],
                 delivered_to=payload.validated_data["delivered_to"],
                 delivered_to_id=payload.validated_data["delivered_to_id"],
-                user=request.user)
+                user=request.user, cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(S.ParcelRead(p).data)
@@ -330,7 +331,8 @@ class BaggageListView(APIView):
                 sender_name=d["sender_name"], sender_phone=d["sender_phone"], civility=d["civility"],
                 id_type=d["id_type"], id_number=d["id_number"], birth_date=d["birth_date"], email=d["email"],
                 amount_due=d["amount_due"], amount_received=d["amount_received"],
-                payment_method=d["payment_method"], user=request.user)
+                payment_method=d["payment_method"], user=request.user,
+                cash_register_id=request.data.get("cash_register_id"))
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(S.BaggageRead(bag).data)

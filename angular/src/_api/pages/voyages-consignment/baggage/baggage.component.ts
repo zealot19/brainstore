@@ -19,11 +19,12 @@ import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
+import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
 
 @Component({
   selector: 'app-vcg-baggage',
   templateUrl: './baggage.component.html',
-  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, PaginatePipe, TablePaginatorComponent, HasPermissionDirective, CommonModule, FormsModule, ReactiveFormsModule, InfoBannerComponent, SearchableSelectComponent, TranslocoModule, CaisseSelectComponent],
 })
 export class VcgBaggageComponent implements OnInit {
   private toast = inject(ToastService);
@@ -36,6 +37,7 @@ export class VcgBaggageComponent implements OnInit {
   ticketOptions: { id: string; label: string; name: string; phone: string; id_number: string }[] = [];
   editOwner: { name: string; phone: string; id_number: string } | null = null;
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
+  cashRegisterId: string | null = null;
   selected = new Set<string>();
   deliverTarget: Baggage | null = null; deliverComment = '';
 
@@ -148,6 +150,7 @@ export class VcgBaggageComponent implements OnInit {
     const v = this.form.getRawValue() as any;
     // M23 : le propriétaire est le passager du billet (snapshot côté backend) — rien à envoyer ici.
     this.saving = true; this.errorMsg = '';
+    if (!this.isEdit) v.cash_register_id = this.cashRegisterId;
     const req = this.isEdit ? this.svc.edit(this.editId!, v as BaggageCreate) : this.svc.create(v as BaggageCreate);
     req.subscribe({
       next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('baggage-modal'); },

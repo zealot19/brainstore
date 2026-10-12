@@ -841,6 +841,7 @@
       "counted_total": "Total contado",
       "use_billetage": "Contar por denominação"
     },
+    "caisse_select": { "label": "Caixa", "auto": "— Automático (minha caixa) —", "closed": "fechada", "locked_hint": "Caixa fixada na sua." },
     "ecart": {
       "title": "Diferença de caixa",
       "later": "Mais tarde",

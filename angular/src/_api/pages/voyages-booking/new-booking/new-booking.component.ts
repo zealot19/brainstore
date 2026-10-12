@@ -16,11 +16,12 @@ import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { printHtml } from '../../../../app/shared/print/print.util';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
+import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
 
 @Component({
   selector: 'app-vb-new-booking',
   templateUrl: './new-booking.component.html',
-  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, ClientFieldsComponent, TranslocoModule],
+  imports: [SearchableSelectDirective, HasPermissionDirective, CommonModule, FormsModule, ClientFieldsComponent, TranslocoModule, CaisseSelectComponent],
 })
 export class VbNewBookingComponent implements OnInit {
   tripType: 'one_way' | 'round_trip' = 'one_way';
@@ -44,7 +45,7 @@ export class VbNewBookingComponent implements OnInit {
   buyer: PassengerSpec = { name: '', phone: '', id_type: 'cni', id_number: '' };
 
   // Paiement / Réservation
-  paymentMethod = ''; amountReceived: number | null = null;
+  paymentMethod = ''; amountReceived: number | null = null; cashRegisterId: string | null = null;
   isReservation = false; holdUntil = '';
   saving = false; errorMsg = '';
 
@@ -180,7 +181,7 @@ export class VbNewBookingComponent implements OnInit {
       return;
     }
     // Paiement exact : montant reçu = montant dû (backend : amount_received null ⇒ total).
-    const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: null } as BookingCreate;
+    const body: BookingCreate = { ...common, payment_method: this.paymentMethod, amount_received: null, cash_register_id: this.cashRegisterId } as BookingCreate;
     this.svc.create(body).subscribe({
       // M19 : « Non payé » crée une réservation côté serveur → on la retrouve dans l'onglet Réservations
       // (pas d'impression de billet pour une réservation non payée).

@@ -8,7 +8,7 @@ from apps.treasury.services.booking_sales import _normalize_payment
 
 
 def _record_consignment_payment(company, *, amount, payment_method, user,
-                                category, description, link_field, link_obj):
+                                category, description, link_field, link_obj, cash_register_id=None):
     """Crée le mouvement de trésorerie d'un encaissement colis/bagage.
 
     Même logique que record_booking_payment : idempotent, espèces = session de caisse
@@ -31,9 +31,8 @@ def _record_consignment_payment(company, *, amount, payment_method, user,
                   description=description, created_by=user)
 
     if is_cash:
-        session = get_open_session_for_user(company.id, user)
-        if not session:
-            raise ApplicationError(_("Ouvrez d'abord votre session de caisse pour encaisser au comptant."))
+        from apps.treasury.services.booking_sales import _resolve_cash_session
+        session = _resolve_cash_session(company, user, cash_register_id)
         txn = create_transaction(account_type=Transaction.AccountType.CASH, cash_session=session, **common)
     else:
         banks = list(BankAccount.objects.filter(company=company, is_deleted=False, is_active=True))
@@ -47,18 +46,18 @@ def _record_consignment_payment(company, *, amount, payment_method, user,
     return txn
 
 
-def record_parcel_payment(company, *, parcel, amount, payment_method, user):
+def record_parcel_payment(company, *, parcel, amount, payment_method, user, cash_register_id=None):
     """Mouvement de trésorerie pour l'enregistrement d'un colis (catégorie parcel_shipping)."""
     ref = getattr(parcel, "reference", "") or ""
     return _record_consignment_payment(
         company, amount=amount, payment_method=payment_method, user=user,
         category=Transaction.Category.PARCEL_SHIPPING,
         description=f"Colis {ref}".strip(),
-        link_field="voyages_parcel", link_obj=parcel,
+        link_field="voyages_parcel", link_obj=parcel, cash_register_id=cash_register_id,
     )
 
 
-def record_parcel_delivery(company, *, parcel, amount, payment_method, user):
+def record_parcel_delivery(company, *, parcel, amount, payment_method, user, cash_register_id=None):
     """Mouvement de trésorerie pour une livraison à domicile (catégorie parcel_delivery).
 
     Pas de lien voyages_parcel (link_obj=None) : l'expédition occupe déjà ce lien.
@@ -69,16 +68,16 @@ def record_parcel_delivery(company, *, parcel, amount, payment_method, user):
         company, amount=amount, payment_method=payment_method, user=user,
         category=Transaction.Category.PARCEL_DELIVERY,
         description=f"Livraison {ref}".strip(),
-        link_field="voyages_parcel", link_obj=None,
+        link_field="voyages_parcel", link_obj=None, cash_register_id=cash_register_id,
     )
 
 
-def record_baggage_payment(company, *, baggage, amount, payment_method, user):
+def record_baggage_payment(company, *, baggage, amount, payment_method, user, cash_register_id=None):
     """Mouvement de trésorerie pour l'enregistrement d'un bagage (catégorie baggage)."""
     ref = getattr(baggage, "tag_number", "") or ""
     return _record_consignment_payment(
         company, amount=amount, payment_method=payment_method, user=user,
         category=Transaction.Category.BAGGAGE,
         description=f"Bagage {ref}".strip(),
-        link_field="voyages_baggage", link_obj=baggage,
+        link_field="voyages_baggage", link_obj=baggage, cash_register_id=cash_register_id,
     )
