@@ -93,7 +93,6 @@ export class FleetVehiclesComponent implements OnInit {
       owner_partner_id: [null],
       partner_pct_ticket: [0], partner_pct_parcel: [0], partner_pct_baggage: [0],
       initial_odometer: [0],
-      notes:         [''],
     });
     this.editForm = this.fb.group({
       code:          ['', Validators.required],

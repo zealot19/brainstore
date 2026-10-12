@@ -272,21 +272,13 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">{{ 'fleet.veh.f_tank' | transloco }}</label>
-              <input formControlName="tank_capacity_liters" type="number" min="0" class="form-control" placeholder="60" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-4 mb-3">
               <label class="form-label">{{ 'fleet.veh.f_initial_odometer' | transloco }}</label>
               <input formControlName="initial_odometer" type="number" min="0" class="form-control" placeholder="0" />
             </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">{{ 'fleet.common.notes' | transloco }}</label>
-            <textarea formControlName="notes" class="form-control" rows="2"></textarea>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'fleet.veh.f_tank' | transloco }}</label>
+              <input formControlName="tank_capacity_liters" type="number" min="0" class="form-control" placeholder="60" />
+            </div>
           </div>
         </div>
         <div class="modal-footer">
