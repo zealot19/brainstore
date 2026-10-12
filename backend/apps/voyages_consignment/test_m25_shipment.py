@@ -99,6 +99,24 @@ def test_primary_trip_and_full_lifecycle():
 
 
 @pytest.mark.django_db
+def test_cancel_primary_reassigns_primary_trip():
+    from apps.voyages_consignment.services import create_shipment, validate_shipment, cancel_shipment
+    g = _setup("m25e@x.com")
+    p = g["parcel"]
+    s1 = create_shipment(p, trip=g["trip1"], quantity=4, user=g["admin"])
+    validate_shipment(s1, user=g["admin"])
+    s2 = create_shipment(p, trip=g["trip2"], quantity=3, user=g["admin"])
+    validate_shipment(s2, user=g["admin"])
+    p.refresh_from_db()
+    assert p.trip_id == g["trip1"].id       # primaire = s1
+    cancel_shipment(s1, user=g["admin"])
+    p.refresh_from_db()
+    s2.refresh_from_db()
+    assert s2.is_primary and p.trip_id == g["trip2"].id   # ré-élection vers s2
+    assert p.shipped_pieces == 3            # s1 annulée ne compte plus
+
+
+@pytest.mark.django_db
 def test_receive_blocked_until_all_arrived():
     from apps.voyages_consignment.services import create_shipment, validate_shipment
     from apps.voyages_consignment.services.parcel_services import receive_parcel
