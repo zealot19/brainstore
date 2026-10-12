@@ -115,8 +115,12 @@ def selectable_cash_registers(user, company):
         "has_open_session": get_open_session_for_register(r.id, company.id) is not None,
     } for r in qs.select_related("agency").order_by("name")]
     cur = get_open_session_for_user(company.id, user)
-    return {"registers": registers, "can_select": bool(chef),
-            "default_id": cur.cash_register_id if cur else None}
+    default_id = cur.cash_register_id if cur else None
+    # Utilisateur verrouillé (guichetier/autre) sans session ouverte : afficher quand même
+    # le nom de SA caisse (gérée/assignée) dans le sélecteur.
+    if default_id is None and not chef and registers:
+        default_id = registers[0]["id"]
+    return {"registers": registers, "can_select": bool(chef), "default_id": default_id}
 
 
 def list_sessions(company_id, *, register_id=None, status=None,
