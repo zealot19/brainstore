@@ -13,7 +13,7 @@ interface SelectableRegister { id: string; name: string; agency_name: string | n
   template: `
     <label class="form-label">{{ 'treasury.caisse_select.label' | transloco }}</label>
     <select class="form-select" [ngModel]="value" (ngModelChange)="onChange($event)" [disabled]="!canSelect">
-      <option [ngValue]="null">{{ 'treasury.caisse_select.auto' | transloco }}</option>
+      @if (canSelect) { <option [ngValue]="null">{{ 'treasury.caisse_select.auto' | transloco }}</option> }
       @for (r of registers; track r.id) {
         <option [ngValue]="r.id">{{ r.name }}@if (!r.has_open_session) { — {{ 'treasury.caisse_select.closed' | transloco }} }</option>
       }

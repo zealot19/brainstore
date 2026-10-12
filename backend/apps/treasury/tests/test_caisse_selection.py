@@ -86,17 +86,25 @@ def test_chef_refused_other_agency_caisse():
 
 
 @pytest.mark.django_db
-def test_guichetier_cannot_select():
+def test_guichetier_locked_but_sees_own_caisse_name():
     from apps.treasury.selectors import selectable_cash_registers
+    from apps.treasury.services import create_cash_register
     from apps.users.services.user_services import create_user
     from apps.system_config.services import create_company
     company, setup = create_company(name="GuiCo", admin_email="gui@x.com", admin_first_name="A", admin_last_name="B")
     admin = User.objects.get(email="gui@x.com")
+    hq = setup["hq_agency_id"]
     guichetier, _ = create_user(created_by=admin, company=company, email="g@x.com",
                                 first_name="G", last_name="U", is_institution_admin=False,
-                                default_agency_id=setup["hq_agency_id"], agency_ids=[setup["hq_agency_id"]])
+                                default_agency_id=hq, agency_ids=[hq])
+    # Guichetier gestionnaire de sa caisse (pas de session ouverte pour autant).
+    reg = create_cash_register(company=company, name="Guichet 1", agency_id=hq,
+                               manager_ids=[guichetier.id], created_by=admin)
     out = selectable_cash_registers(guichetier, company)
     assert out["can_select"] is False
+    # Sa caisse est listée et pré-sélectionnée -> le nom s'affiche dans la boîte (verrouillée).
+    assert str(out["default_id"]) == str(reg.id)
+    assert any(r["id"] == reg.id for r in out["registers"])
 
 
 @pytest.mark.django_db
