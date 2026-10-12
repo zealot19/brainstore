@@ -69,6 +69,25 @@ au-delà du restant, et on conserve l'historique complet des validations.
 
 ## Règles
 
+- **Couverture du trajet (choix du voyage)** : une expédition ne peut être
+  créée sur un voyage que si **le trajet (départ → destination) du colis est
+  desservi par la route du voyage** — c.-à-d. que `origin_point` **et**
+  `destination_point` du colis figurent tous deux dans les points ordonnés de la
+  route, l'origine **avant** la destination. Sinon `ApplicationError`
+  (« Ce voyage ne dessert pas le trajet du colis »). C'est la condition même
+  pour pouvoir expédier le colis sur ce voyage. Réutiliser
+  `apps.voyages_pricing.selectors.fare_selectors.route_points(route)` qui renvoie
+  `[origine, *escales, destination]` ; helper :
+
+  ```python
+  def _route_covers(route, from_point, to_point):
+      ids = [p.id for p in route_points(route)]
+      if from_point.id not in ids or to_point.id not in ids:
+          return False
+      return ids.index(from_point.id) < ids.index(to_point.id)
+  ```
+
+  Contrôle appliqué à `create_shipment` (et au raccourci legacy `assign_to_trip`).
 - **Blocage sur-expédition** : créer une expédition de `q` pièces exige
   `q ≤ remaining_pieces` ; sinon `ApplicationError`.
 - **Capacité voyage** : la vérification existante (`VoyagesSettings`
@@ -91,7 +110,7 @@ au-delà du restant, et on conserve l'historique complet des validations.
   l'existant — non, sur ParcelShipment). Aucune suppression de champ Parcel.
 - **Services** `services/shipment_services.py` :
   - `create_shipment(parcel, *, trip, quantity, note="", user)` → `draft`
-    (contrôle restant + capacité).
+    (contrôle **couverture du trajet** + restant + capacité).
   - `validate_shipment(shipment, *, user)` → `validated` (auteur/date ;
     `is_primary` + `parcel.trip` si première).
   - `load_shipment`, `dispatch_shipment`, `arrive_shipment` → jalons + recalcul
@@ -131,7 +150,9 @@ au-delà du restant, et on conserve l'historique complet des validations.
 
 ## Isolation / tests
 
-- `create_shipment` : refuse `q > remaining` ; capacité voyage respectée.
+- `create_shipment` : refuse un voyage dont la route **ne couvre pas**
+  `origin_point → destination_point` du colis (ni l'un ni l'autre absent, ni
+  destination avant origine) ; refuse `q > remaining` ; capacité voyage respectée.
 - `validate_shipment` : 1ʳᵉ validée pose `is_primary` + `parcel.trip` ; suivantes non.
 - Cycle complet 2 expéditions sur 2 voyages : `shipped/remaining` corrects ;
   `parcel.status` passe à `arrived` seulement quand **tout** est arrivé ;
