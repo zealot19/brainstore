@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { VOYAGES_CONSIGNMENT } from '../../config/api.config';
-import { Parcel, ParcelCreate, ParcelReceive, Manifest } from '../../models/voyages-consignment.models';
+import { Parcel, ParcelCreate, ParcelReceive, Manifest, ParcelShipment } from '../../models/voyages-consignment.models';
 
 @Injectable({ providedIn: 'root' })
 export class ParcelService {
@@ -41,4 +41,13 @@ export class ParcelService {
   }
   manifest(tripId: string): Observable<Manifest> { return this.http.get<any>(VOYAGES_CONSIGNMENT.manifest(tripId)).pipe(map(r => r.data ?? r)); }
   receipt(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.parcelReceipt(id)); }
+
+  // M25 — expéditions partielles
+  shipments(id: string): Observable<ParcelShipment[]> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelShipments(id)).pipe(map(r => r.data ?? r)); }
+  createShipment(id: string, body: { trip_id: string; quantity: number; note?: string }): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelShipments(id), body).pipe(map(r => r.data ?? r)); }
+  validateShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentValidate(sid), {}).pipe(map(r => r.data ?? r)); }
+  loadShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentLoad(sid), {}).pipe(map(r => r.data ?? r)); }
+  dispatchShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentDispatch(sid), {}).pipe(map(r => r.data ?? r)); }
+  arriveShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentArrive(sid), {}).pipe(map(r => r.data ?? r)); }
+  cancelShipment(sid: string): Observable<unknown> { return this.http.delete(VOYAGES_CONSIGNMENT.shipmentCancel(sid)); }
 }
