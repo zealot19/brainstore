@@ -172,10 +172,8 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     expected = principale_available_cash(session)
     difference = closing_balance - expected
 
-    # Un écart doit être justifié (motif obligatoire).
-    if difference != 0 and not justification_reason:
-        raise ApplicationError(_("Un écart de caisse a été constaté : un motif est obligatoire."))
-
+    # M : l'écart ne bloque plus la clôture. Le motif/note se saisit APRÈS validation
+    # (justify_session_ecart) sur une session déjà clôturée présentant un écart.
     session.closing_balance  = closing_balance
     session.expected_closing = expected
     session.difference       = difference
@@ -211,6 +209,22 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
 
     from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
     TreasuryAccountingBridge.post_session_difference(session)
+    return session
+
+
+@transaction.atomic
+def justify_session_ecart(session, *, reason, note="", updated_by):
+    """Saisie du motif/note d'un écart APRÈS clôture (le montant est déjà comptabilisé)."""
+    if session.status != CashSession.Status.CLOSED:
+        raise ApplicationError(_("Seule une session clôturée peut recevoir une justification d'écart."))
+    if session.difference is None or session.difference == 0:
+        raise ApplicationError(_("Aucun écart de caisse à justifier sur cette session."))
+    if not reason:
+        raise ApplicationError(_("Le motif de l'écart est obligatoire."))
+    session.justification_reason = reason
+    session.justification_note = note
+    session.updated_by = updated_by
+    session.save(update_fields=["justification_reason", "justification_note", "updated_by", "updated_at"])
     return session
 
 

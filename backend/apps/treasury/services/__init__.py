@@ -1,7 +1,7 @@
 from .services import (
     create_cash_register, update_cash_register, delete_cash_register,
     create_bank_account, update_bank_account, delete_bank_account,
-    open_session, close_session,
+    open_session, close_session, justify_session_ecart,
     schedule_session, open_scheduled_session,
     suspend_session, resume_session, stop_session, extend_session,
     create_transaction, delete_transaction,
@@ -28,7 +28,7 @@ __all__ = [
     "raise_explanation", "respond_explanation", "decide_explanation",
     "create_cash_register", "update_cash_register", "delete_cash_register",
     "create_bank_account", "update_bank_account", "delete_bank_account",
-    "open_session", "close_session",
+    "open_session", "close_session", "justify_session_ecart",
     "schedule_session", "open_scheduled_session",
     "suspend_session", "resume_session", "stop_session", "extend_session",
     "seed_denominations",

@@ -257,39 +257,6 @@
     </div>
 
     <div class="col-lg-8">
-      <!-- Seat map -->
-      <div class="card mb-3"><div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">{{ 'trips.detail.seatmap' | transloco }}</h6>
-        <span class="small fw-semibold">{{ 'trips.detail.available' | transloco }} : {{ availableCount }}/{{ sellableTotal }}</span>
-      </div><div class="card-body">
-        @if (seats.length === 0) { <p class="text-muted mb-0">{{ 'trips.detail.no_seats' | transloco }}</p> }
-        @else {
-          <div class="seatmap-legend mb-2">
-            <span class="seat seat-available">A</span> {{ 'trips.detail.leg_available' | transloco }}
-            <span class="seat seat-blocked">B</span> {{ 'trips.detail.leg_blocked' | transloco }}
-            <span class="seat seat-held">H</span> {{ 'trips.detail.leg_held' | transloco }}
-            <span class="seat seat-sold">V</span> {{ 'trips.detail.leg_sold' | transloco }}
-          </div>
-          <div class="seatmap">
-            @for (r of rowsArr; track r) {
-              <div class="seatmap-row">
-                @for (c of colsArr; track c) {
-                  @let s = seatAt(r, c);
-                  <div class="seat"
-                       [class.seat-empty]="!s"
-                       [class.seat-available]="s?.status === 'available'"
-                       [class.seat-blocked]="s?.status === 'blocked'"
-                       [class.seat-held]="s?.status === 'held'"
-                       [class.seat-sold]="s?.status === 'sold'"
-                       *hasPermission="'voyage.trip.update'" (click)="toggleSeat(s)">{{ s?.seat_number || '' }}</div>
-                }
-              </div>
-            }
-          </div>
-          <p class="text-muted small mt-2 mb-0">{{ 'trips.detail.seat_hint' | transloco }}</p>
-        }
-      </div></div>
-
       <!-- Escales -->
       <div class="card"><div class="card-header"><h6 class="mb-0">{{ 'trips.detail.stops' | transloco }}</h6></div><div class="card-body p-0">
         <table class="table mb-0"><thead class="thead-light"><tr><th>{{ 'trips.detail.stop_order' | transloco }}</th><th>{{ 'trips.detail.stop_sp' | transloco }}</th><th>{{ 'trips.detail.stop_arrival' | transloco }}</th></tr></thead>

@@ -301,6 +301,28 @@ class CloseSessionView(APIView):
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
 
 
+class JustifyEcartView(APIView):
+    """Saisie du motif/note d'un écart APRÈS clôture (session déjà clôturée avec écart)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"POST": "treasury.session.manage"}
+
+    def post(self, request, session_id):
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            session = services.justify_session_ecart(
+                session,
+                reason=request.data.get("justification_reason", ""),
+                note=request.data.get("justification_note", ""),
+                updated_by=request.user,
+            )
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
 class GuichetierListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "treasury.session.manage"}
