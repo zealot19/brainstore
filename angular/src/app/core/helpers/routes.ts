@@ -386,9 +386,6 @@ export const routes={
   fcFuelTypes:         '/fleet-config/fuel-types',
   fcTransmissions:     '/fleet-config/transmissions',
   fcTractionTypes:     '/fleet-config/traction-types',
-  fcUnitCategories:    '/fleet-config/unit-categories',
-  fcUnits:             '/fleet-config/units',
-  fcPeriods:           '/fleet-config/periods',
   fcDocumentTypes:     '/fleet-config/document-types',
   fcTags:              '/fleet-config/tags',
   fcInterventionTypes: '/fleet-config/intervention-types',
@@ -444,10 +441,6 @@ export const routes={
   vcTicketTemplate:     '/voyages-config/ticket-template',
   admDocuments:         '/admin/documents',
 
-  // Config à venir (stubs M01 → écrans réels en M11/M26/M27/M28)
-  cfgTypesCaisse:    '/configuration/types-caisse',
-  cfgTypesOperation: '/configuration/types-operation',
-  cfgTypesValeurs:   '/configuration/types-valeurs',
   vcFares:              '/voyages-config/fares',
   vcCrewMemberTypes:    '/voyages-config/crew-member-types',
   vcVoyageTypes:        '/voyages-config/voyage-types',
