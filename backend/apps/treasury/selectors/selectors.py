@@ -78,6 +78,47 @@ def get_active_session(register_id, company_id):
             .first())
 
 
+def get_open_session_for_register(register_id, company_id):
+    """Session OUVERTE (pas suspendue) d'une caisse — celle qui peut encaisser."""
+    return (CashSession.objects
+            .filter(cash_register_id=register_id, company_id=company_id,
+                    status=CashSession.Status.OPEN, is_deleted=False)
+            .first())
+
+
+def selectable_cash_registers(user, company):
+    """Caisses sélectionnables à l'encaissement (sélecteur « Caisse » des ventes)."""
+    from apps.treasury.models import CashRegister
+    from apps.treasury.services.services import _is_admin
+    from apps.treasury.scoping import register_agency_scope
+    from apps.admin_rbac.selectors.user_role_selectors import has_permission
+
+    is_admin = _is_admin(user)
+    chef = is_admin or has_permission(user, "treasury.session.manage", company.id)
+    scoped, agency_id = register_agency_scope(user)
+
+    base = CashRegister.objects.filter(company=company, is_deleted=False)
+    if is_admin:
+        qs = base
+    elif chef and agency_id:
+        qs = base.filter(agency_id=agency_id)
+    else:
+        cur = get_open_session_for_user(company.id, user)
+        ids = set(base.filter(managers=user).values_list("id", flat=True))
+        if cur:
+            ids.add(cur.cash_register_id)
+        qs = base.filter(id__in=ids)
+
+    registers = [{
+        "id": r.id, "name": r.name,
+        "agency_id": r.agency_id, "agency_name": r.agency.name if r.agency_id else None,
+        "has_open_session": get_open_session_for_register(r.id, company.id) is not None,
+    } for r in qs.select_related("agency").order_by("name")]
+    cur = get_open_session_for_user(company.id, user)
+    return {"registers": registers, "can_select": bool(chef),
+            "default_id": cur.cash_register_id if cur else None}
+
+
 def list_sessions(company_id, *, register_id=None, status=None,
                   date_from=None, date_to=None, agency_scope=None):
     qs = (CashSession.objects

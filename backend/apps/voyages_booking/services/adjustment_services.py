@@ -46,7 +46,7 @@ def report_ticket(ticket, *, new_trip, new_seat_id=None, reason="", user=None):
 
 @transaction.atomic
 def regularize_ticket(ticket, *, new_fare_class=None, new_destination_id=None,
-                      payment_method="", reason="", user=None):
+                      payment_method="", reason="", user=None, cash_register_id=None):
     _assert_sold(ticket)
     booking = ticket.booking
     company = booking.company
@@ -67,7 +67,8 @@ def regularize_ticket(ticket, *, new_fare_class=None, new_destination_id=None,
     from_dest = ticket.destination_point
     if diff > 0:
         from apps.treasury.services import record_adjustment_income
-        record_adjustment_income(company, booking=booking, amount=diff, payment_method=payment_method, user=user)
+        record_adjustment_income(company, booking=booking, amount=diff, payment_method=payment_method, user=user,
+                                 cash_register_id=cash_register_id)
         booking.amount_due = (booking.amount_due or Decimal("0")) + diff
         booking.amount_paid = (booking.amount_paid or Decimal("0")) + diff
         booking.updated_by = user

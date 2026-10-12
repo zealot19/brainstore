@@ -323,6 +323,15 @@ class JustifyEcartView(APIView):
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
 
 
+class CashRegisterSelectView(APIView):
+    """Caisses sélectionnables à l'encaissement (sélecteur « Caisse » des ventes)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        company = _company(request)
+        return Response(selectors.selectable_cash_registers(request.user, company))
+
+
 class GuichetierListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "treasury.session.manage"}
