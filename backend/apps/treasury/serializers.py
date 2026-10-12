@@ -188,8 +188,24 @@ class GuichetierSerializer(serializers.Serializer):
 
 
 class CountItemInputSerializer(serializers.Serializer):
-    denomination_id = serializers.UUIDField()
-    quantity        = serializers.IntegerField(min_value=0)
+    """Ligne de billetage : soit une coupure (denomination_id + quantity),
+    soit une valeur / bon de caisse (value_type_id + amount) — M28."""
+    denomination_id = serializers.UUIDField(required=False)
+    quantity        = serializers.IntegerField(min_value=0, required=False)
+    value_type_id   = serializers.UUIDField(required=False)
+    amount          = serializers.DecimalField(max_digits=14, decimal_places=2, min_value=Decimal("0"), required=False)
+
+    def validate(self, data):
+        has_denom = data.get("denomination_id") is not None
+        has_value = data.get("value_type_id") is not None
+        if has_denom == has_value:
+            raise serializers.ValidationError(
+                "Fournir soit (denomination_id, quantity), soit (value_type_id, amount).")
+        if has_denom and data.get("quantity") is None:
+            raise serializers.ValidationError({"quantity": "Requis pour une coupure."})
+        if has_value and data.get("amount") is None:
+            raise serializers.ValidationError({"amount": "Requis pour une valeur."})
+        return data
 
 
 class OpenSessionSerializer(serializers.Serializer):
