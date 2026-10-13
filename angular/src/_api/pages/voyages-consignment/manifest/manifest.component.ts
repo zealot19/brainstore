@@ -32,6 +32,7 @@ export class VcgManifestComponent implements OnInit {
   ready: Parcel[] = []; assigned: Parcel[] = [];
   totals = { count: 0, weight: 0 };
   selReady = new Set<string>();
+  selAssigned = new Set<string>();
 
   constructor(private parcels: ParcelService, private tripSvc: TripService,
               private roadmap: RoadmapService, private routeSvc: RouteService,
@@ -73,6 +74,7 @@ export class VcgManifestComponent implements OnInit {
 
   refresh(): void {
     this.selReady.clear();
+    this.selAssigned.clear();
     const st = this.selectedTrip;
     // Pool « à expédier » restreint à la destination du voyage sélectionné (ou au filtre destination).
     const destination = st?.destination || this.fDest || undefined;
@@ -108,8 +110,24 @@ export class VcgManifestComponent implements OnInit {
   }
   unassign(p: Parcel): void { this.parcels.unassign(p.id).subscribe({ next: () => this.refresh(), error: this.err }); }
 
+  // Table de droite (colis affectés) : expédier un, une sélection, ou tout.
+  dispatchable(p: Parcel): boolean { return p.status === 'ready_for_travel' || p.status === 'loaded'; }
+  get dispatchables(): Parcel[] { return this.assigned.filter(p => this.dispatchable(p)); }
+  isSelA(id: string): boolean { return this.selAssigned.has(id); }
+  toggleA(id: string): void { this.selAssigned.has(id) ? this.selAssigned.delete(id) : this.selAssigned.add(id); }
+  get allAssignedSel(): boolean { return this.dispatchables.length > 0 && this.dispatchables.every(p => this.selAssigned.has(p.id)); }
+  toggleAllAssigned(): void { if (this.allAssignedSel) this.selAssigned.clear(); else this.dispatchables.forEach(p => this.selAssigned.add(p.id)); }
+
+  dispatchOne(p: Parcel): void {
+    this.parcels.dispatch(p.id).subscribe({ next: () => { this.toast.success('Colis expédié.'); this.refresh(); }, error: this.err });
+  }
+  dispatchAssignedSelected(): void {
+    if (!this.selAssigned.size) { this.toast.error('Aucun colis sélectionné.'); return; }
+    this.parcels.bulk([...this.selAssigned], 'dispatch').subscribe({ next: () => { this.toast.success('Colis expédiés.'); this.refresh(); }, error: this.err });
+  }
+
   dispatchTrip(): void {
-    const ids = this.assigned.filter(p => p.status === 'ready_for_travel' || p.status === 'loaded').map(p => p.id);
+    const ids = this.dispatchables.map(p => p.id);
     if (!ids.length) { this.toast.error('Aucun colis à expédier.'); return; }
     this.parcels.bulk(ids, 'dispatch').subscribe({ next: () => { this.toast.success('Colis expédiés.'); this.refresh(); }, error: this.err });
   }

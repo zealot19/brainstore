@@ -2126,7 +2126,7 @@
     "shipment": {
       "title": "Shipments", "act": "Shipments", "total": "Total", "shipped": "Shipped", "remaining": "Remaining",
       "trip": "Trip", "qty": "Quantity", "new": "New shipment", "note": "Note (optional)",
-      "validate": "Validate", "load": "Load", "dispatch": "Dispatch", "arrive": "Arrived",
+      "validate": "Validate", "load": "Load", "dispatch_one": "Dispatch", "dispatch_selection": "Dispatch selection", "dispatch_all": "Dispatch all", "dispatch": "Dispatch", "arrive": "Arrived",
       "validated_by": "Validated by", "primary": "Primary", "empty": "No shipment."
     },
     "common": {

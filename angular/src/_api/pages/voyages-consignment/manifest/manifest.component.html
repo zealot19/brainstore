@@ -58,9 +58,9 @@
           @if (mode === 'sans' && selReady.size) { <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch' | transloco }} ({{ selReady.size }})</button> }
         </div>
       </div>
-        <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 small">
+        <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
           <thead class="thead-light"><tr>
-            <th style="width:30px"><input type="checkbox" class="form-check-input" [checked]="allReadySel" (change)="toggleAllReady()" [disabled]="!ready.length" /></th>
+            <th style="width:28px"><input type="checkbox" class="form-check-input" [checked]="allReadySel" (change)="toggleAllReady()" [disabled]="!ready.length" /></th>
             <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
             <th>{{ 'cons.livraison.sender' | transloco }}</th>
             <th>{{ 'cons.common.col_recipient' | transloco }}</th>
@@ -93,11 +93,13 @@
           <h6 class="mb-0">{{ 'cons.expedition.onboard' | transloco }} <small class="text-muted">· {{ totals.count }} · {{ totals.weight }} kg</small></h6>
           <div>
             <button class="btn btn-sm btn-outline-secondary me-1" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
-            <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="dispatchTrip()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch' | transloco }}</button>
+            @if (selAssigned.size) { <button class="btn btn-sm btn-danger me-1" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchAssignedSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch_selection' | transloco }} ({{ selAssigned.size }})</button> }
+            <button class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId || !dispatchables.length" (click)="dispatchTrip()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch_all' | transloco }}</button>
           </div>
         </div>
-          <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 small">
+          <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
             <thead class="thead-light"><tr>
+              <th style="width:28px"><input type="checkbox" class="form-check-input" [checked]="allAssignedSel" (change)="toggleAllAssigned()" [disabled]="!dispatchables.length" /></th>
               <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
               <th>{{ 'cons.common.col_recipient' | transloco }}</th>
               <th>{{ 'cons.livraison.contents' | transloco }}</th>
@@ -107,14 +109,18 @@
             <tbody>
               @for (p of assigned; track p.id) {
                 <tr>
+                  <td>@if (dispatchable(p)) { <input type="checkbox" class="form-check-input" [checked]="isSelA(p.id)" (change)="toggleA(p.id)" /> }</td>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
                   <td>{{ p.description || '—' }}<br><small class="text-muted">{{ p.quantity }} {{ 'cons.common.pieces' | transloco }}</small></td>
                   <td class="text-end">{{ p.weight_kg || '—' }}</td>
                   <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
-                  <td class="text-end">@if (p.status === 'ready_for_travel' || p.status === 'loaded') { <button class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unassign(p)"><i class="ti ti-arrow-left me-1"></i>{{ 'cons.manifest.remove' | transloco }}</button> }</td>
+                  <td class="text-end">@if (dispatchable(p)) {
+                    <button class="btn btn-sm btn-danger me-1" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchOne(p)" [title]="'cons.expedition.dispatch_one' | transloco"><i class="ti ti-send"></i></button>
+                    <button class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unassign(p)" [title]="'cons.manifest.remove' | transloco"><i class="ti ti-arrow-left"></i></button>
+                  }</td>
                 </tr>
-              } @empty { <tr><td colspan="6" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
+              } @empty { <tr><td colspan="7" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>
