@@ -95,7 +95,9 @@ def test_primary_trip_and_full_lifecycle():
     assert p.status == Parcel.Status.IN_TRANSIT   # pas encore tout arrivé
     arrive_shipment(s2, user=g["admin"])
     p.refresh_from_db()
-    assert p.status == Parcel.Status.ARRIVED      # tout arrivé
+    # Nouveau modèle : tant que rien n'est réceptionné, le colis reste « en transit »
+    # (l'état « arrivé » global a été remplacé par la réception par expédition).
+    assert p.status == Parcel.Status.IN_TRANSIT
 
 
 @pytest.mark.django_db
