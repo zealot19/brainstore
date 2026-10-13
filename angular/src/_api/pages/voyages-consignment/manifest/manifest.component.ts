@@ -14,12 +14,13 @@ import { Route, ServicePoint, TimeSlot } from '../../../models/voyages-config.mo
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-vcg-manifest',
   templateUrl: './manifest.component.html',
-  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule],
+  imports: [HasPermissionDirective, CommonModule, FormsModule, InfoBannerComponent, TranslocoModule, SearchableSelectDirective],
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
