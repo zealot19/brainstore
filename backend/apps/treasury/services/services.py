@@ -259,11 +259,19 @@ def schedule_session(*, company, cash_register, assigned_to=None, scheduled_star
 
 @transaction.atomic
 def open_scheduled_session(session, *, opening_balance=None, updated_by):
-    """Ouvre une session planifiée (DRAFT → OPEN). Réservé aux gestionnaires de la caisse
-    (ou admin). Pas de billetage à l'ouverture."""
+    """Ouvre une session planifiée (DRAFT → OPEN).
+
+    Le guichetier ASSIGNÉ ouvre lui-même sa session (depuis l'en-tête) ; le
+    gestionnaire (treasury.session.manage) ou l'admin peut ouvrir n'importe quelle
+    session planifiée de son agence. Pas de billetage à l'ouverture."""
     from apps.treasury.selectors import get_active_session
+    from apps.admin_rbac.selectors.user_role_selectors import has_permission
     if session.status != CashSession.Status.DRAFT:
         raise ApplicationError(_("Seule une session planifiée peut être ouverte."))
+    # Un non-gestionnaire (guichetier) ne peut ouvrir que SA session assignée.
+    is_mgr = _is_admin(updated_by) or has_permission(updated_by, "treasury.session.manage", session.company_id)
+    if not is_mgr and session.assigned_to_id != getattr(updated_by, "id", None):
+        raise ApplicationError(_("Seul le guichetier assigné peut ouvrir cette session."))
     from apps.treasury.scoping import register_agency_scope
     scoped, agency_id = register_agency_scope(updated_by)
     if scoped and session.cash_register.agency_id and session.cash_register.agency_id != agency_id:
@@ -272,7 +280,10 @@ def open_scheduled_session(session, *, opening_balance=None, updated_by):
     CashRegister.objects.select_for_update().get(id=session.cash_register_id)
     if get_active_session(session.cash_register_id, session.company_id):
         raise ApplicationError(_("Une session est déjà active sur cette caisse."))
-    session.opening_balance = opening_balance if opening_balance is not None else 0
+    # Fond par défaut = montant trouvé en caisse (report de la dernière clôture).
+    if opening_balance is None:
+        opening_balance = session.cash_register.current_balance or 0
+    session.opening_balance = opening_balance
     session.opened_by = updated_by
     session.opened_at = timezone.now()
     session.status = CashSession.Status.OPEN

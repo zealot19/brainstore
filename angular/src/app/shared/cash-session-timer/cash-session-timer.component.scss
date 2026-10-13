@@ -23,3 +23,11 @@
   cursor: pointer;
 }
 .cst-billetage:hover { filter: brightness(0.97); }
+
+/* Ouvrir la session planifiée — chip d'action (bleu). */
+.cst-open {
+  background: var(--bs-primary-bg-subtle, #cfe2ff);
+  color: var(--bs-primary-text-emphasis, #084298);
+  cursor: pointer;
+}
+.cst-open:hover { filter: brightness(0.97); }

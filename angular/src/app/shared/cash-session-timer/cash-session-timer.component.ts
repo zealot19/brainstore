@@ -26,6 +26,7 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   private tickId?: ReturnType<typeof setInterval>;
   private pollId?: ReturnType<typeof setInterval>;
   private billetageModalEl?: HTMLElement;
+  private openModalEl?: HTMLElement;
 
   // Billetage de fin de poste
   denoms: any[] = [];
@@ -33,6 +34,10 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   valueTypes: any[] = [];                 // M28 : autres valeurs (bons, monnaie électronique…)
   bamt: Record<string, number> = {};
   billetageLoading = false; billetageSaving = false; billetageErr = ''; billetageDone = false;
+
+  // Ouverture de la session planifiée par le guichetier assigné
+  openBalance: number | null = null;
+  openSaving = false; openErr = '';
 
   ngOnInit(): void {
     this.refresh();
@@ -47,11 +52,17 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
       document.body.appendChild(el);
       this.billetageModalEl = el;
     }
+    const op = document.getElementById('cst-open-modal');
+    if (op && op.parentElement !== document.body) {
+      document.body.appendChild(op);
+      this.openModalEl = op;
+    }
   }
   ngOnDestroy(): void {
     clearInterval(this.tickId);
     clearInterval(this.pollId);
     this.billetageModalEl?.remove();
+    this.openModalEl?.remove();
   }
 
   refresh(): void {
@@ -67,12 +78,36 @@ export class CashSessionTimerComponent implements OnInit, AfterViewInit, OnDestr
   get showCountdown(): boolean { return !!this.session && this.endMs != null && this.remainingMs > 0; }
   /** Fin de poste : la session est ouverte et l'heure de fin prévue est dépassée. */
   get showBilletage(): boolean { return !!this.session?.needs_billetage; }
+  /** Session planifiée (DRAFT) assignée au guichetier, prête à être ouverte. */
+  get showOpen(): boolean { return !!this.session?.needs_open; }
   get countdown(): string {
     let s = Math.max(0, Math.floor(this.remainingMs / 1000));
     const h = Math.floor(s / 3600); s -= h * 3600;
     const m = Math.floor(s / 60); s -= m * 60;
     const p = (n: number) => n.toString().padStart(2, '0');
     return `${p(h)}:${p(m)}:${p(s)}`;
+  }
+
+  // ── Ouverture de la session planifiée ───────────────────────────────────────
+  openOpen(): void {
+    this.openErr = '';
+    // Fond proposé = montant trouvé en caisse (report de la dernière clôture).
+    this.openBalance = this.session?.suggested_opening_balance != null
+      ? +this.session.suggested_opening_balance : 0;
+  }
+  confirmOpen(): void {
+    if (!this.session || this.openSaving) return;
+    this.openSaving = true; this.openErr = '';
+    this.svc.openScheduled(this.session.id, { opening_balance: this.openBalance ?? 0 }).subscribe({
+      next: () => {
+        this.openSaving = false;
+        document.getElementById('cst-open-modal')?.querySelector('[data-bs-dismiss="modal"]')
+          ?.dispatchEvent(new MouseEvent('click'));
+        this.refresh();
+      },
+      error: e => { this.openSaving = false;
+        this.openErr = e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué."; },
+    });
   }
 
   // ── Billetage ──────────────────────────────────────────────────────────────
