@@ -102,6 +102,12 @@ export class TrzSessionsComponent implements OnInit {
     this.openForm = this.fb.group({
       cash_register_id: [null, Validators.required], name: [''], opening_balance: [0],
     });
+    // Fond d'ouverture pré-rempli avec le montant trouvé en caisse (report de la caisse
+    // choisie) : on n'ouvre jamais à 0 par défaut une caisse qui garde des espèces.
+    this.openForm.get('cash_register_id')!.valueChanges.subscribe((id: string | null) => {
+      const reg = this.registers.find(r => r.id === id);
+      this.openForm.get('opening_balance')!.setValue(reg ? +(reg.current_balance || 0) : 0);
+    });
     this.scheduleForm = this.fb.group({
       cash_register_id: [null, Validators.required],
       name: [''], scheduled_start: ['', Validators.required], scheduled_end: [''],

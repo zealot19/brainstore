@@ -128,9 +128,12 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
     if existing:
         raise ApplicationError(
             _("Une session est déjà ouverte pour {register}.").format(register=cash_register.name))
-    # Fonds initial : montant saisi (souvent 0 ; approvisionné ensuite par transfert).
+    # Fond initial : montant saisi ; à défaut, le report = montant trouvé en caisse
+    # (current_balance), comme à l'ouverture d'une session planifiée. Ne JAMAIS retomber
+    # à 0 par défaut sur une caisse qui garde des espèces entre deux sessions, sinon la
+    # clôture suivante affiche un écart fantôme égal au solde reporté.
     # Pas de billetage à l'ouverture — le billetage est une opération de fin de session.
-    balance = opening_balance if opening_balance is not None else 0
+    balance = opening_balance if opening_balance is not None else (cash_register.current_balance or 0)
     return CashSession.objects.create(
         company=company, cash_register=cash_register,
         opened_by=created_by, opening_balance=balance, name=name,
@@ -269,6 +272,15 @@ def _reverse_closure_financials(session, *, updated_by):
     reg.save(update_fields=["current_balance"])
 
 
+def _assert_no_active_session(session):
+    """(Dé)valider une ancienne clôture recalcule/écrase le solde de SA caisse : interdit
+    tant qu'une session plus récente est active dessus (sinon on corrompt son solde)."""
+    from apps.treasury.selectors import get_active_session
+    if get_active_session(session.cash_register_id, session.company_id):
+        raise ApplicationError(
+            _("Une session est active sur cette caisse : clôturez-la avant de (dé)valider."))
+
+
 @transaction.atomic
 def validate_closure(session, *, updated_by):
     """Revalide une clôture dévalidée (ré-engage transfert + comptabilité). Admin."""
@@ -276,6 +288,7 @@ def validate_closure(session, *, updated_by):
         raise ApplicationError(_("Seule une session clôturée peut être validée."))
     if session.closure_validated:
         raise ApplicationError(_("Cette clôture est déjà validée."))
+    _assert_no_active_session(session)
     _apply_closure_financials(session, updated_by=updated_by)
     session.closure_validated = True
     session.validated_at = timezone.now()
@@ -294,6 +307,7 @@ def unvalidate_closure(session, *, updated_by):
         raise ApplicationError(_("Seule une session clôturée peut être dévalidée."))
     if not session.closure_validated:
         raise ApplicationError(_("Cette clôture n'est pas validée."))
+    _assert_no_active_session(session)
     _reverse_closure_financials(session, updated_by=updated_by)
     session.closure_validated = False
     session.validated_at = None

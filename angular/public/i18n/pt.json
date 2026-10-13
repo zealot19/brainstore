@@ -623,6 +623,7 @@
       "unvalidate_btn": "Desvalidar",
       "reopen_btn": "Reabrir",
       "not_validated": "Não validada",
+      "opening_carryover_hint": "Pré-preenchido com o dinheiro encontrado na caixa (saldo transportado).",
       "empty": "Sem sessões.",
       "f_opening_hint": "(por defeito: saldo atual da caixa)",
       "open_submit": "Abrir",

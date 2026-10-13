@@ -623,6 +623,7 @@
       "unvalidate_btn": "Dévalider",
       "reopen_btn": "Rouvrir",
       "not_validated": "Non validée",
+      "opening_carryover_hint": "Pré-rempli avec le montant trouvé en caisse (report).",
       "empty": "Aucune session.",
       "f_opening_hint": "(par défaut : solde actuel de la caisse)",
       "open_submit": "Ouvrir",
