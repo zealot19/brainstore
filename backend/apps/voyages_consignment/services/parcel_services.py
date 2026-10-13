@@ -241,8 +241,13 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
       aussi le destinataire du colis.
     """
     _assert_destination_agency(parcel, user)
-    if parcel.status != Parcel.Status.AVAILABLE_FOR_PICKUP:
-        raise ApplicationError(_("Seul un colis disponible peut être retiré."))
+    avail = (parcel.received_pieces or 0) - (parcel.picked_up_pieces or 0)
+    # Flux colis entier (sans suivi par pièce) : un colis marqué disponible rend
+    # tout le reste retirable.
+    if avail <= 0 and parcel.status == Parcel.Status.AVAILABLE_FOR_PICKUP:
+        avail = parcel.quantity - (parcel.picked_up_pieces or 0)
+    if avail <= 0:
+        raise ApplicationError(_("Aucune pièce disponible au retrait."))
 
     has_recipient = bool(parcel.recipient_name)
     if has_recipient:
@@ -260,7 +265,9 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
             parcel.recipient_phone = picked_up_phone
             parcel.recipient_id_number = picked_up_id_number
 
-    parcel.status = Parcel.Status.PICKED_UP
+    # Retrait incrémental : on retire les pièces actuellement disponibles.
+    prev = parcel.status
+    parcel.picked_up_pieces = (parcel.picked_up_pieces or 0) + avail
     parcel.picked_up_by = picked_up_by
     parcel.picked_up_phone = picked_up_phone or ""
     parcel.picked_up_id_number = picked_up_id_number or ""
@@ -268,10 +275,12 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
     parcel.picked_up_at = timezone.now()
     parcel.updated_by = user
     parcel.save()
+    from apps.voyages_consignment.services.shipment_services import recompute_parcel_state
+    recompute_parcel_state(parcel)
     who = "mandataire" if kind == Parcel.PickupKind.MANDATAIRE else "destinataire"
-    note = f"{picked_up_by} ({who})" + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
-    _event(parcel, ParcelEvent.Kind.PICKED_UP, from_status=Parcel.Status.AVAILABLE_FOR_PICKUP,
-           to_status=Parcel.Status.PICKED_UP, user=user, note=note)
+    note = f"{picked_up_by} ({who}) — {avail} pièce(s)" + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
+    _event(parcel, ParcelEvent.Kind.PICKED_UP, from_status=prev,
+           to_status=parcel.status, user=user, note=note)
     return parcel
 
 
@@ -345,5 +354,13 @@ def dispatch_parcels_for_trip(trip, *, user):
 
 @transaction.atomic
 def arrive_parcels_for_trip(trip, *, user):
-    qs = trip.parcels.filter(status=Parcel.Status.IN_TRANSIT)
-    return [mark_arrived(p, user=user) for p in qs]
+    """Arrivée du voyage : marque arrivées les EXPÉDITIONS en transit de ce voyage,
+    plus les colis entiers (legacy, sans expédition) affectés au voyage."""
+    from apps.voyages_consignment.models import ParcelShipment
+    from apps.voyages_consignment.services.shipment_services import arrive_shipment
+    results = [arrive_shipment(s, user=user) for s in
+               ParcelShipment.objects.filter(trip=trip, is_deleted=False,
+                                             status=ParcelShipment.Status.IN_TRANSIT)]
+    results += [mark_arrived(p, user=user) for p in
+                trip.parcels.filter(status=Parcel.Status.IN_TRANSIT, shipments__isnull=True)]
+    return results

@@ -72,10 +72,18 @@ def pending_for_trip(company, route_id=None, user=None):
 
 
 def ready_parcels(company, destination_point=None, user=None):
-    """Colis prêts, sans voyage — pool « à expédier » de l'Expédition."""
-    qs = (Parcel.objects.filter(is_deleted=False, company=company,
-                                status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
+    """Pool « à expédier » : colis encore expédiables (restant > 0)."""
+    from django.db.models import Sum, F, Value, Q as _Q
+    from django.db.models.functions import Coalesce
+    from apps.voyages_consignment.models import ParcelShipment
+    shipped = Coalesce(Sum("shipments__quantity",
+                           filter=_Q(shipments__is_deleted=False,
+                                     shipments__status__in=ParcelShipment.COUNTED)), Value(0))
+    qs = (Parcel.objects.filter(is_deleted=False, company=company)
+          .exclude(status__in=[Parcel.Status.PICKED_UP, Parcel.Status.CANCELLED,
+                               Parcel.Status.AVAILABLE_FOR_PICKUP])
           .filter(_parcel_visibility_q(user))
+          .annotate(_shipped=shipped).filter(quantity__gt=F("_shipped"))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("-created_at"))
     if destination_point:

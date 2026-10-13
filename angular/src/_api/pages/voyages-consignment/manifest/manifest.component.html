@@ -49,78 +49,62 @@
   }
 
   <div class="row">
-    <!-- Pool : colis prêts -->
-    <div class="col-lg-6 mb-3">
+    <!-- Pool : colis à expédier (restant > 0) -->
+    <div class="col-lg-7 mb-3">
       <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between py-2">
         <h6 class="mb-0">{{ 'cons.expedition.ready_pool' | transloco }} <small class="text-muted">({{ ready.length }})</small></h6>
         <div>
-          @if (mode === 'voyage' && selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" (click)="assignSelected()"><i class="ti ti-arrow-right me-1"></i>{{ 'cons.expedition.assign' | transloco }} ({{ selReady.size }})</button> }
-          @if (mode === 'sans' && selReady.size) { <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch' | transloco }} ({{ selReady.size }})</button> }
+          @if (mode === 'voyage' && selReady.size) { <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_selection' | transloco }} ({{ selReady.size }})</button> }
         </div>
       </div>
         <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
           <thead class="thead-light"><tr>
             <th style="width:28px"><input type="checkbox" class="form-check-input" [checked]="allReadySel" (change)="toggleAllReady()" [disabled]="!ready.length" /></th>
             <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
-            <th>{{ 'cons.livraison.sender' | transloco }}</th>
             <th>{{ 'cons.common.col_recipient' | transloco }}</th>
-            <th>{{ 'cons.livraison.contents' | transloco }}</th>
-            <th class="text-end">{{ 'cons.livraison.weight' | transloco }}</th>
             <th>{{ 'cons.expedition.f_dest' | transloco }}</th>
+            <th class="text-center">{{ 'cons.expedition.remaining' | transloco }}</th>
+            <th style="width:90px">{{ 'cons.expedition.qty' | transloco }}</th>
             <th class="no-sort"></th></tr></thead>
           <tbody>
             @for (p of ready; track p.id) {
               <tr>
                 <td><input type="checkbox" class="form-check-input" [checked]="isSel(p.id)" (change)="toggle(p.id)" /></td>
                 <td class="fw-medium">{{ p.reference }}</td>
-                <td>{{ p.sender_name }}<br><small class="text-muted">{{ p.sender_phone }}</small></td>
                 <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
-                <td>{{ p.description || '—' }}<br><small class="text-muted">{{ p.quantity }} {{ 'cons.common.pieces' | transloco }}</small></td>
-                <td class="text-end">{{ p.weight_kg || '—' }}</td>
                 <td>{{ p.destination_point_name }}</td>
-                <td class="text-end">@if (mode === 'voyage') { <button class="btn btn-sm btn-outline-primary" *hasPermission="'ticketing.parcel.manage'" (click)="assign(p)"><i class="ti ti-arrow-right me-1"></i>{{ 'cons.expedition.assign' | transloco }}</button> }</td>
+                <td class="text-center">{{ rem(p) }} / {{ p.quantity }}</td>
+                <td><input type="number" class="form-control form-control-sm" min="1" [max]="rem(p)" [(ngModel)]="shipQty[p.id]" /></td>
+                <td class="text-end">@if (mode === 'voyage') { <button class="btn btn-sm btn-danger" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipOne(p)" [title]="'cons.expedition.ship_n' | transloco"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_n' | transloco }}</button> }</td>
               </tr>
-            } @empty { <tr><td colspan="8" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_ready' | transloco }}</td></tr> }
+            } @empty { <tr><td colspan="7" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_ready' | transloco }}</td></tr> }
           </tbody>
         </table></div></div>
       </div>
     </div>
 
-    <!-- Colis du voyage -->
+    <!-- Colis déjà sur le voyage (lecture seule) -->
     @if (mode === 'voyage') {
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-5 mb-3">
         <div class="card"><div class="card-header d-flex align-items-center justify-content-between py-2">
           <h6 class="mb-0">{{ 'cons.expedition.onboard' | transloco }} <small class="text-muted">· {{ totals.count }} · {{ totals.weight }} kg</small></h6>
-          <div>
-            <button class="btn btn-sm btn-outline-secondary me-1" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
-            @if (selAssigned.size) { <button class="btn btn-sm btn-danger me-1" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchAssignedSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch_selection' | transloco }} ({{ selAssigned.size }})</button> }
-            <button class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId || !dispatchables.length" (click)="dispatchTrip()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.dispatch_all' | transloco }}</button>
-          </div>
+          <button class="btn btn-sm btn-outline-secondary" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
         </div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
             <thead class="thead-light"><tr>
-              <th style="width:28px"><input type="checkbox" class="form-check-input" [checked]="allAssignedSel" (change)="toggleAllAssigned()" [disabled]="!dispatchables.length" /></th>
               <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
               <th>{{ 'cons.common.col_recipient' | transloco }}</th>
-              <th>{{ 'cons.livraison.contents' | transloco }}</th>
-              <th class="text-end">{{ 'cons.livraison.weight' | transloco }}</th>
-              <th>{{ 'cons.common.col_status' | transloco }}</th>
-              <th class="no-sort"></th></tr></thead>
+              <th class="text-center">{{ 'cons.common.pieces' | transloco }}</th>
+              <th>{{ 'cons.common.col_status' | transloco }}</th></tr></thead>
             <tbody>
               @for (p of assigned; track p.id) {
                 <tr>
-                  <td>@if (dispatchable(p)) { <input type="checkbox" class="form-check-input" [checked]="isSelA(p.id)" (change)="toggleA(p.id)" /> }</td>
                   <td class="fw-medium">{{ p.reference }}</td>
                   <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
-                  <td>{{ p.description || '—' }}<br><small class="text-muted">{{ p.quantity }} {{ 'cons.common.pieces' | transloco }}</small></td>
-                  <td class="text-end">{{ p.weight_kg || '—' }}</td>
+                  <td class="text-center">{{ p.shipped_pieces ?? p.quantity }} / {{ p.quantity }}</td>
                   <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
-                  <td class="text-end">@if (dispatchable(p)) {
-                    <button class="btn btn-sm btn-danger me-1" *hasPermission="'ticketing.parcel.manage'" (click)="dispatchOne(p)" [title]="'cons.expedition.dispatch_one' | transloco"><i class="ti ti-send"></i></button>
-                    <button class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" (click)="unassign(p)" [title]="'cons.manifest.remove' | transloco"><i class="ti ti-arrow-left"></i></button>
-                  }</td>
                 </tr>
-              } @empty { <tr><td colspan="7" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
+              } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>

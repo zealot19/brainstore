@@ -33,18 +33,22 @@ def _capacity_ok(trip, company, adding_weight):
 
 
 def recompute_parcel_state(parcel):
-    """Avance parcel.status depuis l'état agrégé des expéditions (M25)."""
+    """Statut du colis dérivé de l'état agrégé des expéditions + du cumul retiré."""
+    if parcel.status == Parcel.Status.CANCELLED:
+        return parcel
     live = list(parcel.shipments.filter(is_deleted=False).exclude(status=ParcelShipment.Status.CANCELLED))
     counted = [s for s in live if s.status in ParcelShipment.COUNTED]
-    shipped = sum(s.quantity for s in counted)
-    if parcel.status in (Parcel.Status.AVAILABLE_FOR_PICKUP, Parcel.Status.PICKED_UP, Parcel.Status.CANCELLED):
-        return parcel  # phases post-réception figées
-    if counted and shipped >= parcel.quantity and all(s.status == ParcelShipment.Status.ARRIVED for s in counted):
-        parcel.status = Parcel.Status.ARRIVED
-    elif any(s.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED) for s in counted):
+    received = parcel.received_pieces or 0
+    picked = parcel.picked_up_pieces or 0
+    missing = parcel.missing_pieces or 0
+    available = received - picked
+    if parcel.quantity and (picked + missing) >= parcel.quantity:
+        parcel.status = Parcel.Status.PICKED_UP
+    elif available > 0:
+        parcel.status = Parcel.Status.AVAILABLE_FOR_PICKUP
+    elif any(s.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED,
+                          ParcelShipment.Status.RECEIVED) for s in counted):
         parcel.status = Parcel.Status.IN_TRANSIT
-    elif any(s.status == ParcelShipment.Status.LOADED for s in counted):
-        parcel.status = Parcel.Status.LOADED
     else:
         parcel.status = Parcel.Status.READY_FOR_TRAVEL
     parcel.save(update_fields=["status", "updated_at"])
@@ -139,5 +143,60 @@ def cancel_shipment(shipment, *, user=None):
             nxt.is_primary = True
             nxt.save(update_fields=["is_primary", "updated_at"])
         parcel.save(update_fields=["trip", "updated_at"])
+    recompute_parcel_state(parcel)
+    return shipment
+
+
+@transaction.atomic
+def ship_pieces(parcel, *, trip, quantity=None, note="", user=None):
+    """Expédier N pièces (défaut = restant) sur un voyage, en un geste :
+    crée l'expédition, la valide et la met en transit."""
+    qty = parcel.remaining_pieces if quantity is None else int(quantity)
+    s = create_shipment(parcel, trip=trip, quantity=qty, note=note, user=user)
+    validate_shipment(s, user=user)
+    dispatch_shipment(s, user=user)
+    return s
+
+
+@transaction.atomic
+def receive_shipment(shipment, *, received_pieces=None, missing_pieces=0, damaged_pieces=0, user=None):
+    """Réception d'une expédition arrivée (par lot). Seule l'agence de destination.
+    Ré-agrège les pièces reçues/manquantes/avariées sur le colis (affichage + base du retrait)."""
+    from django.db.models import Sum
+    from apps.voyages_consignment.services.parcel_services import _assert_destination_agency
+    parcel = shipment.parcel
+    _assert_destination_agency(parcel, user)
+    if shipment.status != ParcelShipment.Status.ARRIVED:
+        raise ApplicationError(_("Seule une expédition arrivée peut être réceptionnée."))
+    total = shipment.quantity
+    received = total if received_pieces is None else int(received_pieces)
+    missing = int(missing_pieces or 0)
+    damaged = int(damaged_pieces or 0)
+    if received < 0 or missing < 0 or damaged < 0:
+        raise ApplicationError(_("Les quantités ne peuvent pas être négatives."))
+    if received > total:
+        raise ApplicationError(_("Pièces reçues supérieures aux pièces expédiées."))
+    if received + missing > total:
+        raise ApplicationError(_("Reçues + manquantes dépassent les pièces expédiées."))
+    if damaged > received:
+        raise ApplicationError(_("Les pièces avariées ne peuvent pas dépasser les pièces reçues."))
+    shipment.received_pieces = received
+    shipment.missing_pieces = missing
+    shipment.damaged_pieces = damaged
+    shipment.status = ParcelShipment.Status.RECEIVED
+    shipment.received_at = timezone.now()
+    shipment.updated_by = user
+    shipment.save(update_fields=["received_pieces", "missing_pieces", "damaged_pieces",
+                                 "status", "received_at", "updated_by", "updated_at"])
+    agg = (parcel.shipments.filter(is_deleted=False, status=ParcelShipment.Status.RECEIVED)
+           .aggregate(r=Sum("received_pieces"), m=Sum("missing_pieces"), d=Sum("damaged_pieces")))
+    parcel.received_pieces = agg["r"] or 0
+    parcel.missing_pieces = agg["m"] or 0
+    parcel.damaged_pieces = agg["d"] or 0
+    if not parcel.available_at:
+        parcel.available_at = timezone.now()
+    parcel.updated_by = user
+    parcel.save(update_fields=["received_pieces", "missing_pieces", "damaged_pieces",
+                               "available_at", "updated_by", "updated_at"])
     recompute_parcel_state(parcel)
     return shipment

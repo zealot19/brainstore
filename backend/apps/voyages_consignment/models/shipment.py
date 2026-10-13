@@ -12,6 +12,7 @@ class ParcelShipment(BaseModel):
         LOADED     = "loaded",     _("Chargée")
         IN_TRANSIT = "in_transit", _("En transit")
         ARRIVED    = "arrived",    _("Arrivée")
+        RECEIVED   = "received",   _("Réceptionnée")
         CANCELLED  = "cancelled",  _("Annulée")
 
     parcel = models.ForeignKey("voyages_consignment.Parcel", verbose_name=_("colis"),
@@ -27,10 +28,14 @@ class ParcelShipment(BaseModel):
     loaded_at     = models.DateTimeField(_("chargée le"), null=True, blank=True)
     dispatched_at = models.DateTimeField(_("expédiée le"), null=True, blank=True)
     arrived_at    = models.DateTimeField(_("arrivée le"), null=True, blank=True)
+    received_pieces = models.PositiveSmallIntegerField(_("pièces reçues"), default=0)
+    missing_pieces  = models.PositiveSmallIntegerField(_("pièces manquantes"), default=0)
+    damaged_pieces  = models.PositiveSmallIntegerField(_("pièces avariées"), default=0)
+    received_at     = models.DateTimeField(_("réceptionnée le"), null=True, blank=True)
     note = models.CharField(_("note"), max_length=255, blank=True)
 
     # Statuts qui comptent comme « pièces engagées / expédiées ».
-    COUNTED = ("validated", "loaded", "in_transit", "arrived")
+    COUNTED = ("validated", "loaded", "in_transit", "arrived", "received")
 
     class Meta(BaseModel.Meta):
         verbose_name = _("expédition")

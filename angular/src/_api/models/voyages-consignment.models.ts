@@ -21,15 +21,17 @@ export interface Parcel {
   picked_up_at: string | null; picked_up_by: string; picked_up_id_number: string; notes: string;
   delivery_amount?: number; delivery_address?: string; delivery_payment_method?: string; delivered_home_at?: string | null;
   created_at: string; updated_at: string; events: ParcelEvent[];
-  shipped_pieces?: number; remaining_pieces?: number; shipments?: ParcelShipment[];
+  shipped_pieces?: number; remaining_pieces?: number; picked_up_pieces?: number; shipments?: ParcelShipment[];
 }
 
 export interface ParcelShipment {
   id: string; parcel: string; quantity: number;
+  parcel_reference?: string | null; parcel_recipient?: string | null; parcel_destination?: string | null;
   trip: string | null; trip_number: string | null; trip_route_code: string | null; trip_departure: string | null;
   status: string; status_display: string; is_primary: boolean;
   validated_by_name: string | null; validated_at: string | null;
   loaded_at: string | null; dispatched_at: string | null; arrived_at: string | null;
+  received_pieces: number; missing_pieces: number; damaged_pieces: number; received_at: string | null;
   note: string; created_at: string;
 }
 

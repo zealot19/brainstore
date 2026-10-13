@@ -600,3 +600,54 @@ class ShipmentCancelView(_ShipmentActionView):
         except ApplicationError as e:
             return error_response(str(e))
         return no_content_response()
+
+
+class ArrivedShipmentListView(APIView):
+    """Expéditions arrivées (à réceptionner) — écran Réception."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
+
+    def get(self, request):
+        from apps.voyages_consignment.models import ParcelShipment
+        qs = (ParcelShipment.objects
+              .filter(is_deleted=False, parcel__company=request.user.company,
+                      status=ParcelShipment.Status.ARRIVED)
+              .select_related("parcel", "parcel__destination_point", "trip", "trip__route")
+              .order_by("arrived_at"))
+        return success_response(S.ParcelShipmentSerializer(qs, many=True).data)
+
+
+class ParcelShipView(APIView):
+    """Expédier N pièces d'un colis sur un voyage en un geste (défaut = restant)."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'POST': 'ticketing.parcel.manage'}
+
+    def post(self, request, pk):
+        p = selectors.parcel_detail(request.user.company, pk, request.user)
+        if not p:
+            return error_response("Colis introuvable.", status_code=404)
+        trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
+                                   id=request.data.get("trip_id")).first()
+        if not trip:
+            return error_response("Voyage introuvable.", status_code=404)
+        try:
+            s = services.ship_pieces(p, trip=trip, quantity=request.data.get("quantity"), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return created_response(S.ParcelShipmentSerializer(s).data)
+
+
+class ShipmentReceiveView(_ShipmentActionView):
+    """Réceptionner une expédition arrivée (reçues/manquantes/avariées)."""
+    def post(self, request, pk):
+        s = self._get(request, pk)
+        if not s:
+            return error_response("Expédition introuvable.", status_code=404)
+        try:
+            s = services.receive_shipment(
+                s, received_pieces=request.data.get("received_pieces"),
+                missing_pieces=request.data.get("missing_pieces", 0),
+                damaged_pieces=request.data.get("damaged_pieces", 0), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelShipmentSerializer(s).data)
