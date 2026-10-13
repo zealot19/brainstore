@@ -54,6 +54,8 @@ export interface CashSession {
   needs_billetage?: boolean;
   needs_open?: boolean;
   suggested_opening_balance?: string | null;
+  closure_validated?: boolean;
+  validated_at?: string | null;
 }
 export interface Transaction {
   id: string; reference: string;

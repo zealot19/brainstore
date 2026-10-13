@@ -299,7 +299,6 @@ class CloseSessionView(APIView):
                 session,
                 closing_balance=ser.validated_data.get("closing_balance"),
                 closing_count=ser.validated_data.get("closing_count") or [],
-                justification_reason=ser.validated_data.get("justification_reason", ""),
                 justification_note=ser.validated_data.get("justification_note", ""),
                 notes=ser.validated_data.get("notes", ""),
                 destination_cash_register_id=ser.validated_data.get("destination_cash_register_id"),
@@ -311,7 +310,7 @@ class CloseSessionView(APIView):
 
 
 class JustifyEcartView(APIView):
-    """Saisie du motif/note d'un écart APRÈS clôture (session déjà clôturée avec écart)."""
+    """Saisie de la NOTE d'un écart APRÈS clôture (le motif n'est plus demandé)."""
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"POST": "treasury.session.manage"}
 
@@ -323,13 +322,50 @@ class JustifyEcartView(APIView):
         try:
             session = services.justify_session_ecart(
                 session,
-                reason=request.data.get("justification_reason", ""),
                 note=request.data.get("justification_note", ""),
                 updated_by=request.user,
             )
         except ApplicationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+def _is_admin_user(user):
+    """Admin d'institution ou super admin : seul habilité à (dé)valider / rouvrir une clôture."""
+    return bool(getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False))
+
+
+class _AdminClosureActionView(APIView):
+    """Action de clôture réservée à l'admin (valider / dévalider / rouvrir)."""
+    permission_classes = [IsAuthenticated]
+    service_fn = None
+
+    def post(self, request, session_id):
+        if not _is_admin_user(request.user):
+            return error_response("Action réservée à l'administrateur.",
+                                  status_code=status.HTTP_403_FORBIDDEN)
+        company = _company(request)
+        session = selectors.get_session(session_id, company.id)
+        if not session:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            fn = getattr(services, self.service_fn)
+            fn(session, updated_by=request.user)
+        except ApplicationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(CashSessionReadSerializer(selectors.get_session(session.id, company.id)).data)
+
+
+class ValidateClosureView(_AdminClosureActionView):
+    service_fn = "validate_closure"
+
+
+class UnvalidateClosureView(_AdminClosureActionView):
+    service_fn = "unvalidate_closure"
+
+
+class ReopenSessionView(_AdminClosureActionView):
+    service_fn = "reopen_session"
 
 
 class CashRegisterSelectView(APIView):

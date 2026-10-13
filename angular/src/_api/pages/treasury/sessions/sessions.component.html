@@ -39,7 +39,7 @@
                 @if (s.scheduled_start) { {{ s.scheduled_start | date:'dd/MM HH:mm' }} → {{ s.scheduled_end ? (s.scheduled_end | date:'dd/MM HH:mm') : '…' }} }
                 @else { <span class="text-muted">—</span> }
               </td>
-              <td><span class="badge {{ statusCss(s.status) }}">{{ s.status_display }}</span></td>
+              <td><span class="badge {{ statusCss(s.status) }}">{{ s.status_display }}</span>@if (s.status === 'closed' && !s.closure_validated) { <span class="badge bg-warning text-dark ms-1">{{ 'treasury.session.not_validated' | transloco }}</span> }</td>
               <td>{{ s.opening_balance ?? '—' }}</td>
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center flex-wrap gap-1">
                 @if (s.status === 'draft' && canOpenDraft(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-open-scheduled-modal" *hasPermission="'treasury.session.manage'" (click)="openOpenScheduled(s)"><i class="ti ti-lock-open me-1"></i>{{ 'treasury.session.open_scheduled_btn' | transloco }}</a> }
@@ -49,6 +49,13 @@
                 @if (canStop(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" *hasPermission="'treasury.session.operate'" (click)="stopSession(s)"><i class="ti ti-player-stop me-1"></i>{{ 'treasury.session.stop_btn' | transloco }}</a> }
                 @if ((s.status === 'open' || s.status === 'suspended' || s.status === 'stopped') && canClose(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-close-modal" (click)="openClose(s)"><i class="ti ti-lock me-1"></i>{{ 'treasury.session.close_btn' | transloco }}</a> }
                 @if (s.status === 'closed') { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-report-modal" (click)="openReport(s)"><i class="ti ti-file-text me-1"></i>{{ 'treasury.session.report' | transloco }}</a> }
+                @if (s.status === 'closed' && isAdmin && !s.closure_validated) {
+                  <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded text-success" (click)="validateClosure(s)"><i class="ti ti-circle-check me-1"></i>{{ 'treasury.session.validate_btn' | transloco }}</a>
+                  <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" (click)="reopenSession(s)"><i class="ti ti-lock-open me-1"></i>{{ 'treasury.session.reopen_btn' | transloco }}</a>
+                }
+                @if (s.status === 'closed' && isAdmin && s.closure_validated) {
+                  <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded text-danger" (click)="unvalidateClosure(s)"><i class="ti ti-circle-x me-1"></i>{{ 'treasury.session.unvalidate_btn' | transloco }}</a>
+                }
                 @if (hasEcart(s)) { <a href="javascript:void(0);" class="p-2 d-flex align-items-center border rounded" data-bs-toggle="modal" data-bs-target="#trz-expl-modal" (click)="openExpl(s)"><i class="ti ti-message-circle me-1"></i>{{ 'treasury.explanation.btn' | transloco }}</a> }
               </div></td>
             </tr>
@@ -174,17 +181,11 @@
           {{ 'treasury.report.ecart' | transloco }} : <b>{{ (ecartSession.difference || 0) | number:'1.0-0' }} XAF</b>
         </div>
         <p class="text-muted small mb-2">{{ 'treasury.ecart.hint' | transloco }}</p>
-        <div class="mb-2"><label class="form-label">{{ 'treasury.ecart.reason' | transloco }} <span class="text-danger">*</span></label>
-          <select class="form-select" [(ngModel)]="ecartReason">
-            <option value="">{{ 'treasury.ecart.no_reason' | transloco }}</option>
-            @for (r of ecartReasons; track r) { <option [value]="r">{{ 'treasury.ecart.r_' + r | transloco }}</option> }
-          </select>
-        </div>
         <div class="mb-1"><label class="form-label">{{ 'treasury.ecart.note' | transloco }}</label><input type="text" class="form-control" [(ngModel)]="ecartNote" /></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-light" (click)="closeEcart()">{{ 'treasury.ecart.later' | transloco }}</button>
-        <button type="button" class="btn btn-primary" [disabled]="!ecartReason" (click)="submitEcart()">{{ 'shared.actions.save' | transloco }}</button>
+        <button type="button" class="btn btn-primary" (click)="submitEcart()">{{ 'shared.actions.save' | transloco }}</button>
       </div>
     </div></div>
   </div>
