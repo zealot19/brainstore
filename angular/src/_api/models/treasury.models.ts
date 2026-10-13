@@ -52,6 +52,8 @@ export interface CashSession {
   opened_at: string | null; closed_at: string | null; notes: string;
   current_balance?: string | null;
   needs_billetage?: boolean;
+  needs_open?: boolean;
+  suggested_opening_balance?: string | null;
 }
 export interface Transaction {
   id: string; reference: string;

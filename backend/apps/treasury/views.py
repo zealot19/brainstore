@@ -230,19 +230,28 @@ class MyActiveSessionView(APIView):
         # La session reste visible même après l'heure de fin prévue : c'est là que le
         # guichetier fait son billetage (les ventes, elles, sont bloquées à part par
         # get_open_session_for_user). Le fanion needs_billetage pilote le bouton.
-        session = (CashSession.objects
-                   .filter(assigned_to=request.user, company_id=company.id,
-                           status=CashSession.Status.OPEN, is_deleted=False)
-                   .order_by("-opened_at").first())
+        base = CashSession.objects.filter(
+            assigned_to=request.user, company_id=company.id, is_deleted=False)
+        # Priorité à la session OUVERTE (poste en cours) ; à défaut, la session PLANIFIÉE
+        # (DRAFT) qui lui est assignée : le guichetier l'ouvre lui-même depuis l'en-tête.
+        session = (base.filter(status=CashSession.Status.OPEN).order_by("-opened_at").first()
+                   or base.filter(status=CashSession.Status.DRAFT)
+                          .order_by("scheduled_start", "-created_at").first())
         if not session:
             return Response({"data": None})
         data = CashSessionReadSerializer(session).data
-        # Solde théorique « maintenant » (fond + recettes − dépenses + transferts),
-        # affiché à côté du minuteur dans l'en-tête.
-        from apps.treasury.services.expense_shared import principale_available_cash
-        data["current_balance"] = str(principale_available_cash(session))
-        # Fin de poste : session ouverte dont l'heure de fin prévue est dépassée → billetage.
-        data["needs_billetage"] = bool(session.scheduled_end and session.scheduled_end <= now)
+        if session.status == CashSession.Status.DRAFT:
+            # Session planifiée à ouvrir : on propose le fond = montant trouvé en caisse
+            # (report de la dernière clôture). Le bouton « Ouvrir la session » le pilote.
+            data["needs_open"] = True
+            data["suggested_opening_balance"] = str(session.cash_register.current_balance or 0)
+        else:
+            # Solde théorique « maintenant » (fond + recettes − dépenses + transferts),
+            # affiché à côté du minuteur dans l'en-tête.
+            from apps.treasury.services.expense_shared import principale_available_cash
+            data["current_balance"] = str(principale_available_cash(session))
+            # Fin de poste : session ouverte dont l'heure de fin prévue est dépassée → billetage.
+            data["needs_billetage"] = bool(session.scheduled_end and session.scheduled_end <= now)
         return Response({"data": data})
 
 
@@ -377,8 +386,10 @@ class ScheduleSessionView(APIView):
 
 
 class OpenScheduledSessionView(APIView):
+    # Le guichetier assigné ouvre lui-même sa session planifiée (droit « operate »,
+    # qu'a aussi le chef d'agence). Le service borne ensuite à l'assignation/agence.
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"POST": "treasury.session.manage"}
+    permission_map = {"POST": "treasury.session.operate"}
 
     def post(self, request, session_id):
         company = _company(request)
