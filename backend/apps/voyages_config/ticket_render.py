@@ -6,6 +6,12 @@ from apps.voyages_config.models import TicketTemplate
 
 _TOKEN_RE = re.compile(r"{{\s*([a-zA-Z0-9_]+)\s*}}")
 
+# Canevas de référence du gabarit généré (le dessin — polices en pt, marges en mm —
+# est calibré pour cette taille). Le billet est ensuite mis à l'échelle pour TENIR dans
+# la taille définie (ticket_width_mm × ticket_height_mm), sans débordement ni rognage.
+REF_W = 203.0
+REF_H = 82.55
+
 # Tokens dynamiques disponibles en mode HTML avance
 TOKENS = [
     "company_name", "company_slogan", "company_logo_url", "company_phone",
@@ -106,8 +112,8 @@ def build_recto(tpl, tokens, *, logo_url="", bg_url=""):
         f("IMPRIME LE", tokens.get("printed_date", "")),
         f("EXPIRE LE", tokens.get("expiration_date", "")),
     ])
-    w = tpl.ticket_width_mm or 203
-    h = tpl.ticket_height_mm or 82.55
+    w = REF_W
+    h = REF_H
     return f"""<style>
   .tk{{--ink:{tpl.color_ink};--accent:{tpl.color_accent};--band:{tpl.color_band};--muted:#6b6b6b;
       position:relative;width:{w}mm;height:{h}mm;box-sizing:border-box;display:flex;
@@ -164,8 +170,8 @@ def build_verso(tpl):
             f"<div class='ag'><div class='ag-name'>{e(name)}</div>"
             f"<div class='ag-loc'>{e(loc)}</div><div class='ag-tel'>{e(phone)}</div></div>")
     ags = "".join(cards) or f"<div class='ag'><div class='ag-loc'>{e(tpl.address)}</div></div>"
-    w = tpl.ticket_width_mm or 203
-    h = tpl.ticket_height_mm or 82.55
+    w = REF_W
+    h = REF_H
     return f"""<style>
   .tkv{{display:flex;width:{w}mm;height:{h}mm;box-sizing:border-box;
        font-family:Arial,Helvetica,sans-serif;color:{tpl.color_ink};font-size:7pt;line-height:1.3}}
@@ -192,9 +198,23 @@ def build_verso(tpl):
 </div>"""
 
 
+def _fit_wrap(inner, w, h):
+    """Enveloppe une face (dessinée au canevas de référence) et la met à l'échelle pour
+    TENIR entièrement dans la taille définie w×h (échelle uniforme, centrée, rien n'est
+    rogné ni déformé). k=1 quand la taille définie = la référence (aucun changement)."""
+    k = min(float(w) / REF_W, float(h) / REF_H)
+    return (
+        f'<div style="position:relative;width:{w}mm;height:{h}mm;overflow:hidden">'
+        f'<div style="position:absolute;top:50%;left:50%;width:{REF_W}mm;height:{REF_H}mm;'
+        f'transform:translate(-50%,-50%) scale({k:.4f});transform-origin:center center">'
+        f'{inner}</div></div>'
+    )
+
+
 def build_ticket_pages(tpl, tokens, *, request=None):
     """Renvoie la liste des faces HTML pour un billet (gabarit ou HTML avance)."""
     if tpl.custom_html:
+        # HTML avancé : l'auteur maîtrise sa mise en page, on ne met pas à l'échelle.
         pages = [render(tpl.html_recto, tokens)]
         if (tpl.html_verso or "").strip():
             pages.append(render(tpl.html_verso, tokens))
@@ -203,9 +223,11 @@ def build_ticket_pages(tpl, tokens, *, request=None):
         tokens = dict(tokens, qr_code=qr_svg(tokens))
     logo_url = _abs(request, tpl.logo)
     bg_url = _abs(request, tpl.background_logo)
-    pages = [build_recto(tpl, tokens, logo_url=logo_url, bg_url=bg_url)]
+    w = tpl.ticket_width_mm or REF_W
+    h = tpl.ticket_height_mm or REF_H
+    pages = [_fit_wrap(build_recto(tpl, tokens, logo_url=logo_url, bg_url=bg_url), w, h)]
     if tpl.show_verso:
-        pages.append(build_verso(tpl))
+        pages.append(_fit_wrap(build_verso(tpl), w, h))
     return pages
 
 

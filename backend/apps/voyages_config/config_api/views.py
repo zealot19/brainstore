@@ -721,5 +721,5 @@ class TicketTemplatePreviewView(APIView):
             setattr(obj, k, v)
         tokens = ticket_render.sample_tokens()
         pages = ticket_render.build_ticket_pages(obj, tokens, request=request)
-        return success_response({"html": ticket_render.render_document(pages),
+        return success_response({"html": ticket_render.render_document(pages, tpl=obj),
                                  "tokens": ticket_render.TOKENS})
