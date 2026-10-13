@@ -2126,7 +2126,7 @@
     "shipment": {
       "title": "Expediciones", "act": "Expediciones", "total": "Total", "shipped": "Expedido", "remaining": "Restante",
       "trip": "Viaje", "qty": "Cantidad", "new": "Nueva expedición", "note": "Nota (opcional)",
-      "validate": "Validar", "load": "Cargar", "dispatch": "Expedir", "arrive": "Llegada",
+      "validate": "Validar", "load": "Cargar", "dispatch_one": "Expedir", "dispatch_selection": "Expedir la selección", "dispatch_all": "Expedir todo", "dispatch": "Expedir", "arrive": "Llegada",
       "validated_by": "Validado por", "primary": "Principal", "empty": "Sin expediciones."
     },
     "common": {
