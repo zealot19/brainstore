@@ -79,6 +79,22 @@ def test_unvalidate_then_validate_roundtrip():
 
 
 @pytest.mark.django_db
+def test_sweep_transfer_linked_by_fk_and_reversed():
+    """#4 — Le balayage est relié à la session par un FK explicite (closing_transfer) ;
+    la dévalidation l'extourne via ce lien (pas via le libellé) puis le détache."""
+    from apps.treasury.services import unvalidate_closure
+    from apps.treasury.models import Transfer
+    company, admin, guichet, coffre = _setup()
+    s = _close_guichet(company, admin, guichet, coffre)
+    assert s.closing_transfer_id is not None            # lien explicite au transfert de balayage
+    tr_id = s.closing_transfer_id
+    s = unvalidate_closure(s, updated_by=admin)
+    s.refresh_from_db()
+    assert s.closing_transfer_id is None                # détaché après extourne
+    assert Transfer.objects.filter(id=tr_id).first() is None   # balayage extourné (soft-deleted)
+
+
+@pytest.mark.django_db
 def test_reopen_requires_unvalidate_first_then_opens():
     from apps.core.exceptions import ApplicationError
     from apps.treasury.services import unvalidate_closure, reopen_session
