@@ -78,6 +78,7 @@
     <div class="mb-3"><label class="form-label">{{ 'treasury.session.f_name' | transloco }}</label><input formControlName="name" type="text" class="form-control" [placeholder]="'treasury.session.f_name_hint' | transloco" /></div>
     <div class="mb-3"><label class="form-label">{{ 'treasury.common.opening_balance' | transloco }}</label>
       <input formControlName="opening_balance" type="number" class="form-control" />
+      <small class="text-muted">{{ 'treasury.session.opening_carryover_hint' | transloco }}</small>
       <small class="text-muted d-block mt-1">{{ 'treasury.session.opening_hint' | transloco }}</small></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="openForm.invalid || saving">{{ 'treasury.session.open_submit' | transloco }}</button></div></form>
 </div></div></div>

@@ -94,6 +94,35 @@ def test_reopen_requires_unvalidate_first_then_opens():
 
 
 @pytest.mark.django_db
+def test_open_session_defaults_opening_to_caisse_carryover():
+    """#1 — Ouvrir sans fond précisé reprend le montant trouvé en caisse (report), jamais 0
+    par défaut (sinon écart fantôme à la clôture). Un fond explicite reste respecté."""
+    from apps.treasury.models import CashRegister
+    from apps.treasury.services import open_session
+    company, admin, guichet, coffre = _setup()
+    reg = CashRegister.objects.get(id=coffre.id)
+    reg.current_balance = Decimal("30000"); reg.save(update_fields=["current_balance"])
+    s = open_session(company=company, cash_register=reg, created_by=admin)   # pas de fond fourni
+    assert s.opening_balance == Decimal("30000")
+    s.status = "closed"; s.save(update_fields=["status"])                    # libère la caisse
+    s2 = open_session(company=company, cash_register=reg, opening_balance=Decimal("0"), created_by=admin)
+    assert s2.opening_balance == Decimal("0")                                # fond explicite respecté
+
+
+@pytest.mark.django_db
+def test_unvalidate_blocked_when_newer_session_active():
+    """#2 — (Dé)valider une ancienne clôture écrase le solde de sa caisse : interdit tant
+    qu'une session plus récente est active dessus."""
+    from apps.core.exceptions import ApplicationError
+    from apps.treasury.services import unvalidate_closure, open_session
+    company, admin, guichet, coffre = _setup()
+    s = _close_guichet(company, admin, guichet, coffre)      # clôturée + validée, guichet à 0
+    open_session(company=company, cash_register=guichet, opening_balance=Decimal("0"), created_by=admin)
+    with pytest.raises(ApplicationError):
+        unvalidate_closure(s, updated_by=admin)
+
+
+@pytest.mark.django_db
 def test_closure_actions_admin_only_via_api():
     from rest_framework.test import APIClient
     from apps.users.services.user_services import create_user

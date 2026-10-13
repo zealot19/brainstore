@@ -623,6 +623,7 @@
       "unvalidate_btn": "Unvalidate",
       "reopen_btn": "Reopen",
       "not_validated": "Not validated",
+      "opening_carryover_hint": "Pre-filled with the cash found in the register (carry-over).",
       "empty": "No sessions.",
       "f_opening_hint": "(default: register's current balance)",
       "open_submit": "Open",
