@@ -68,7 +68,7 @@ def test_session_shortage_posts_debit_658_credit_571():
     create_transaction(company=company, transaction_type="income", category="ticket_sales",
                        account_type="cash", amount=Decimal("15000"), payment_mode="cash",
                        cash_session=sess, created_by=admin)
-    close_session(sess, closing_balance=Decimal("14000"), justification_reason="comptage", updated_by=admin)  # manquant de 1000
+    close_session(sess, closing_balance=Decimal("14000"), updated_by=admin)  # manquant de 1000
     diff = JournalEntry.objects.filter(company=company, source_model="treasury.CashSession").first()
     assert diff is not None
     ln = _lines(diff)

@@ -38,7 +38,7 @@ def test_close_with_billetage_computes_ecart():
         {"denomination_id": str(_den(company, 2000).id), "quantity": 2},   # 4 000
         {"denomination_id": str(_den(company, 500).id),  "quantity": 1},   #   500
     ]
-    session = close_session(session, closing_count=items, justification_reason="comptage", updated_by=admin)
+    session = close_session(session, closing_count=items, updated_by=admin)
     assert session.closing_balance == Decimal("9500")
     assert session.expected_closing == Decimal("10000")
     assert session.difference == Decimal("-500")
@@ -78,8 +78,7 @@ def test_api_open_plain_then_close_with_billetage():
     sid = (r.json().get("data") or r.json())["id"]
     # Clôture avec billetage.
     r = c.post(f"/api/v1/treasury/sessions/{sid}/close/",
-               {"closing_count": [{"denomination_id": str(_den(company, 10000).id), "quantity": 2}],
-                "justification_reason": "comptage"},
+               {"closing_count": [{"denomination_id": str(_den(company, 10000).id), "quantity": 2}]},
                format="json")
     assert r.status_code in (200, 201), r.content
     r = c.get(f"/api/v1/treasury/sessions/{sid}/counts/")

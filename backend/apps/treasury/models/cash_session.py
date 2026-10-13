@@ -61,6 +61,17 @@ class CashSession(BaseModel):
     justification_note   = models.CharField(_("précision sur l'écart"), max_length=255, blank=True)
     notes     = models.TextField(_("notes"), blank=True)
 
+    # Validation de la clôture : la clôture engage l'écriture (transfert + comptabilité).
+    # Un admin peut la DÉVALIDER (extourne/annulation) puis la REVALIDER, ou rouvrir la
+    # session pour tout réajuster. closing_destination mémorise la caisse de balayage d'un
+    # guichet pour pouvoir ré-appliquer le transfert à la revalidation.
+    closure_validated  = models.BooleanField(_("clôture validée"), default=False)
+    closing_destination = models.ForeignKey("treasury.CashRegister", verbose_name=_("caisse de balayage"),
+                                             on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    validated_at = models.DateTimeField(_("validée le"), null=True, blank=True)
+    validated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("validée par"),
+                                      on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+
     @property
     def ecart_status(self):
         if self.difference is None:

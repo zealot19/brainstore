@@ -27,7 +27,7 @@ def _open(company, admin, g, reg, opening):
 
 @pytest.mark.django_db
 def test_ecart_justified_after_close():
-    """La clôture n'exige plus de motif ; l'écart se justifie APRÈS validation."""
+    """La clôture n'exige plus de motif ; l'écart se note (texte libre) APRÈS clôture."""
     from apps.treasury.services import close_session, justify_session_ecart
     company, admin, g, reg = _setup()
     s = _open(company, admin, g, reg, Decimal("10000"))
@@ -35,27 +35,22 @@ def test_ecart_justified_after_close():
     s = close_session(s, closing_balance=Decimal("9500"), updated_by=g)
     assert s.difference == Decimal("-500")
     assert s.ecart_status == "shortage"
-    assert s.justification_reason == ""        # pas encore justifié
-    # Justification APRÈS clôture.
-    s = justify_session_ecart(s, reason="comptage", note="mal compté", updated_by=admin)
-    assert s.justification_reason == "comptage"
+    assert s.justification_note == ""          # pas encore noté
+    # Note libre APRÈS clôture (plus de motif d'écart).
+    s = justify_session_ecart(s, note="mal compté", updated_by=admin)
     assert s.justification_note == "mal compté"
+    assert s.justification_reason == ""        # le motif n'est plus utilisé
 
 
 @pytest.mark.django_db
-def test_justify_requires_reason_and_ecart():
+def test_justify_requires_an_ecart():
     from apps.treasury.services import close_session, justify_session_ecart
     company, admin, g, reg = _setup()
-    # Session équilibrée : rien à justifier.
+    # Session équilibrée : rien à justifier (pas d'écart).
     s = _open(company, admin, g, reg, Decimal("10000"))
     s = close_session(s, closing_balance=Decimal("10000"), updated_by=g)
     with pytest.raises(ApplicationError):
-        justify_session_ecart(s, reason="comptage", updated_by=admin)
-    # Session avec écart mais motif vide -> erreur.
-    s2 = _open(company, admin, g, reg, Decimal("10000"))
-    s2 = close_session(s2, closing_balance=Decimal("9500"), updated_by=g)
-    with pytest.raises(ApplicationError):
-        justify_session_ecart(s2, reason="", updated_by=admin)
+        justify_session_ecart(s, note="peu importe", updated_by=admin)
 
 
 @pytest.mark.django_db

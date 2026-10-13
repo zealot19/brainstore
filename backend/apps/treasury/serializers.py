@@ -147,6 +147,7 @@ class CashSessionReadSerializer(serializers.ModelSerializer):
             "opening_balance", "closing_balance",
             "expected_closing", "difference", "ecart_status",
             "justification_reason", "justification_reason_display", "justification_note",
+            "closure_validated", "validated_at",
             "assigned_to", "assigned_to_name",
             "scheduled_start", "scheduled_end",
             "opened_by", "opened_by_name", "closed_by_name",
@@ -225,8 +226,6 @@ class CloseSessionSerializer(serializers.Serializer):
     closing_balance = serializers.DecimalField(max_digits=12, decimal_places=2,
                                                required=False, allow_null=True)
     closing_count   = CountItemInputSerializer(many=True, required=False, default=list)
-    justification_reason = serializers.ChoiceField(
-        choices=CashSession.EcartReason.choices, required=False, allow_blank=True, default="")
     justification_note   = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
     notes           = serializers.CharField(required=False, allow_blank=True, default="")
     destination_cash_register_id = serializers.UUIDField(required=False, allow_null=True, default=None)

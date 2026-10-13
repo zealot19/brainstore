@@ -40,7 +40,6 @@ export class TrzSessionsComponent implements OnInit {
   closeBilletage = true; closeQty: Record<string, number> = {}; closeManual: number | null = null;
   closeAmounts: Record<string, number> = {};   // M28 : montants des autres valeurs par type
   closeReason = ''; closeNote = '';
-  readonly ecartReasons = ['rendu', 'encaissement', 'depense', 'comptage', 'perte', 'autre'];
 
   // Rapport de session
   reportData: any = null;
@@ -184,7 +183,7 @@ export class TrzSessionsComponent implements OnInit {
   get closingIsGuichet(): boolean { return this.closingSession?.register_kind === 'guichet'; }
   get destinationRegisters(): CashRegister[] { return this.registers.filter(r => r.id !== this.closingSession?.cash_register); }
   // Écart saisi APRÈS clôture (le motif n'est plus demandé avant validation).
-  ecartSession: CashSession | null = null; ecartReason = ''; ecartNote = '';
+  ecartSession: CashSession | null = null; ecartNote = '';
 
   /** Message lisible depuis une erreur HTTP (gère les détails de validation DRF, évite « [object Object] »). */
   private errText(e: any): string {
@@ -212,7 +211,7 @@ export class TrzSessionsComponent implements OnInit {
         this.saving = false; this.load(); this.toast.success('Session clôturée.'); this.close('trz-close-modal');
         // Un écart constaté : on demande le motif/note APRÈS validation.
         if (s && s.difference != null && +s.difference !== 0) {
-          this.ecartSession = s; this.ecartReason = ''; this.ecartNote = '';
+          this.ecartSession = s; this.ecartNote = '';
         }
       },
       error: e => { this.saving = false; this.errorMsg = this.errText(e); } });
@@ -220,10 +219,21 @@ export class TrzSessionsComponent implements OnInit {
 
   closeEcart(): void { this.ecartSession = null; }
   submitEcart(): void {
-    if (!this.ecartSession || !this.ecartReason) return;
-    this.svc.justifyEcart(this.ecartSession.id, { justification_reason: this.ecartReason, justification_note: this.ecartNote.trim() })
-      .subscribe({ next: () => { this.ecartSession = null; this.load(); this.toast.success('Écart justifié.'); },
+    if (!this.ecartSession) return;
+    this.svc.justifyEcart(this.ecartSession.id, { justification_note: this.ecartNote.trim() })
+      .subscribe({ next: () => { this.ecartSession = null; this.load(); this.toast.success('Écart noté.'); },
         error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
+  }
+
+  // ── Validation de clôture (admin) : (dé)valider l'écriture, ou rouvrir pour réajuster ──
+  validateClosure(s: CashSession): void { this.act(this.svc.validate(s.id)); }
+  unvalidateClosure(s: CashSession): void {
+    if (!confirm('Dévalider cette clôture ? Le transfert et les écritures comptables seront extournés.')) return;
+    this.act(this.svc.unvalidate(s.id));
+  }
+  reopenSession(s: CashSession): void {
+    if (!confirm('Rouvrir cette session clôturée pour la réajuster ?')) return;
+    this.act(this.svc.reopen(s.id));
   }
 
   // ── Prolonger ──

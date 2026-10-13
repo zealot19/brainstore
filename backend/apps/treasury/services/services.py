@@ -141,7 +141,7 @@ def open_session(*, company, cash_register, opening_balance=None, name="", notes
 
 @transaction.atomic
 def close_session(session, *, closing_balance=None, notes="", closing_count=None,
-                  justification_reason="", justification_note="",
+                  justification_note="",
                   destination_cash_register_id=None, updated_by):
     from apps.treasury.services.billetage import compute_count_total, record_count
     if session.status not in (CashSession.Status.OPEN, CashSession.Status.SUSPENDED,
@@ -172,59 +172,180 @@ def close_session(session, *, closing_balance=None, notes="", closing_count=None
     expected = principale_available_cash(session)
     difference = closing_balance - expected
 
-    # M : l'écart ne bloque plus la clôture. Le motif/note se saisit APRÈS validation
-    # (justify_session_ecart) sur une session déjà clôturée présentant un écart.
-    session.closing_balance  = closing_balance
-    session.expected_closing = expected
-    session.difference       = difference
-    session.justification_reason = justification_reason if difference != 0 else ""
-    session.justification_note   = justification_note if difference != 0 else ""
-    session.closed_at        = timezone.now()
-    session.closed_by        = updated_by
-    session.status           = CashSession.Status.CLOSED
-    if notes:
-        session.notes = notes
-    session.updated_by = updated_by
-    session.save()
-
-    # Update register balance to actual closing
+    # Caisse de balayage d'un guichet : mémorisée sur la session pour pouvoir RÉ-APPLIQUER
+    # le transfert à la revalidation (après une dévalidation). Guichet avec espèces > 0.
     reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
-    reg.current_balance = closing_balance
-    reg.save(update_fields=["current_balance"])
-
-    # Clôture d'un guichet : l'espèce comptée est transférée vers une caisse de
-    # destination choisie par le chef d'agence ; le guichet finit à 0F.
+    dest = None
     if reg.kind == CashRegister.Kind.GUICHET and closing_balance > 0:
         dest = (CashRegister.objects
                 .filter(company=session.company, id=destination_cash_register_id, is_deleted=False)
                 .exclude(id=session.cash_register_id).first())
         if not dest:
             raise ApplicationError(_("Choisissez une caisse de destination valide pour la clôture du guichet."))
-        create_transfer(company=session.company, amount=closing_balance,
-                        from_cash_register=reg, to_cash_register=dest,
-                        description=f"Clôture guichet — session {session.id}", created_by=updated_by)
+
+    # M : l'écart ne bloque plus la clôture. Le motif n'est plus demandé : seule une NOTE
+    # libre est conservée (saisie APRÈS clôture via justify_session_ecart si écart).
+    session.closing_balance  = closing_balance
+    session.expected_closing = expected
+    session.difference       = difference
+    session.justification_note = justification_note if difference != 0 else ""
+    session.justification_reason = ""
+    session.closed_at        = timezone.now()
+    session.closed_by        = updated_by
+    session.status           = CashSession.Status.CLOSED
+    session.closing_destination = dest
+    if notes:
+        session.notes = notes
+    session.updated_by = updated_by
 
     if closing_count:
         record_count(session, kind="closing", items=closing_count, user=updated_by)
 
+    # La clôture engage immédiatement l'écriture (comportement historique). Un admin
+    # pourra ensuite DÉVALIDER (extourne) puis REVALIDER, ou rouvrir pour réajuster.
+    _apply_closure_financials(session, reg=reg, updated_by=updated_by)
+    session.closure_validated = True
+    session.validated_at = timezone.now()
+    session.validated_by = updated_by
+    session.save()
+    return session
+
+
+def _apply_closure_financials(session, *, reg=None, updated_by):
+    """Engage l'écriture financière d'une clôture : solde de la caisse = montant compté,
+    transfert de balayage d'un guichet vers sa caisse de destination, écriture d'écart.
+    Partagé par close_session (clôture initiale) et validate_closure (revalidation)."""
+    if reg is None:
+        reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
+    reg.current_balance = session.closing_balance
+    reg.save(update_fields=["current_balance"])
+    if reg.kind == CashRegister.Kind.GUICHET and (session.closing_balance or 0) > 0:
+        dest = session.closing_destination
+        if not dest:
+            raise ApplicationError(_("Caisse de balayage introuvable pour (re)valider la clôture du guichet."))
+        create_transfer(company=session.company, amount=session.closing_balance,
+                        from_cash_register=reg, to_cash_register=dest,
+                        description=f"Clôture guichet — session {session.id}", created_by=updated_by)
     from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
     TreasuryAccountingBridge.post_session_difference(session)
+
+
+def _find_close_transfer(session):
+    """Transfert de balayage vivant (non supprimé) créé par la clôture de cette session."""
+    from apps.treasury.models import Transfer
+    return (Transfer.objects
+            .filter(company_id=session.company_id, from_cash_register_id=session.cash_register_id,
+                    is_deleted=False, description__contains=f"session {session.id}")
+            .first())
+
+
+def _cancel_source_entries(company_id, source_model, source_id, *, user):
+    """Extourne (annule) toute pièce comptable validée rattachée à une source donnée."""
+    from apps.accounting.models import JournalEntry
+    from apps.accounting.services import AccountingService
+    for e in list(JournalEntry.objects.filter(company_id=company_id, source_model=source_model,
+                                               source_id=source_id, state="posted", is_deleted=False)):
+        AccountingService.cancel_entry(e.id, reason=str(_("Dévalidation clôture")), cancelled_by=user)
+
+
+def _reverse_closure_financials(session, *, updated_by):
+    """Annule l'écriture financière d'une clôture : extourne le transfert de balayage
+    (restaure les soldes), extourne l'écriture d'écart, recalcule le solde « live »."""
+    from apps.treasury.services.expense_shared import principale_available_cash
+    tr = _find_close_transfer(session)
+    if tr:
+        if tr.to_cash_register_id:
+            dest = CashRegister.objects.select_for_update().get(id=tr.to_cash_register_id)
+            if (dest.current_balance or 0) < tr.amount:
+                raise ApplicationError(
+                    _("Impossible de dévalider : la caisse destinataire a déjà utilisé les fonds transférés."))
+            dest.current_balance -= tr.amount
+            dest.save(update_fields=["current_balance"])
+        _cancel_source_entries(session.company_id, "treasury.Transfer", tr.id, user=updated_by)
+        tr.soft_delete(user=updated_by)
+    _cancel_source_entries(session.company_id, "treasury.CashSession", session.id, user=updated_by)
+    reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
+    reg.current_balance = principale_available_cash(session)
+    reg.save(update_fields=["current_balance"])
+
+
+@transaction.atomic
+def validate_closure(session, *, updated_by):
+    """Revalide une clôture dévalidée (ré-engage transfert + comptabilité). Admin."""
+    if session.status != CashSession.Status.CLOSED:
+        raise ApplicationError(_("Seule une session clôturée peut être validée."))
+    if session.closure_validated:
+        raise ApplicationError(_("Cette clôture est déjà validée."))
+    _apply_closure_financials(session, updated_by=updated_by)
+    session.closure_validated = True
+    session.validated_at = timezone.now()
+    session.validated_by = updated_by
+    session.updated_by = updated_by
+    session.save(update_fields=["closure_validated", "validated_at", "validated_by",
+                                "updated_by", "updated_at"])
     return session
 
 
 @transaction.atomic
-def justify_session_ecart(session, *, reason, note="", updated_by):
-    """Saisie du motif/note d'un écart APRÈS clôture (le montant est déjà comptabilisé)."""
+def unvalidate_closure(session, *, updated_by):
+    """Dévalide une clôture (extourne l'écriture financière). La session reste CLÔTURÉE,
+    prête à être rouverte pour réajustement ou revalidée. Admin."""
     if session.status != CashSession.Status.CLOSED:
-        raise ApplicationError(_("Seule une session clôturée peut recevoir une justification d'écart."))
+        raise ApplicationError(_("Seule une session clôturée peut être dévalidée."))
+    if not session.closure_validated:
+        raise ApplicationError(_("Cette clôture n'est pas validée."))
+    _reverse_closure_financials(session, updated_by=updated_by)
+    session.closure_validated = False
+    session.validated_at = None
+    session.validated_by = None
+    session.updated_by = updated_by
+    session.save(update_fields=["closure_validated", "validated_at", "validated_by",
+                                "updated_by", "updated_at"])
+    return session
+
+
+@transaction.atomic
+def reopen_session(session, *, updated_by):
+    """Rouvre une session clôturée NON validée (CLÔTURÉE → OUVERTE) pour tout réajuster.
+    Il faut d'abord dévalider une clôture validée. Admin."""
+    from apps.treasury.selectors import get_active_session
+    from apps.treasury.services.expense_shared import principale_available_cash
+    if session.status != CashSession.Status.CLOSED:
+        raise ApplicationError(_("Seule une session clôturée peut être rouverte."))
+    if session.closure_validated:
+        raise ApplicationError(_("Dévalidez d'abord la clôture avant de rouvrir la session."))
+    if get_active_session(session.cash_register_id, session.company_id):
+        raise ApplicationError(_("Une session est déjà active sur cette caisse."))
+    for c in session.counts.filter(kind="closing", is_deleted=False):
+        c.soft_delete(user=updated_by)
+    session.closing_balance = None
+    session.expected_closing = None
+    session.difference = None
+    session.justification_note = ""
+    session.justification_reason = ""
+    session.closing_destination = None
+    session.closed_at = None
+    session.closed_by = None
+    session.status = CashSession.Status.OPEN
+    session.updated_by = updated_by
+    session.save()
+    reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
+    reg.current_balance = principale_available_cash(session)
+    reg.save(update_fields=["current_balance"])
+    return session
+
+
+@transaction.atomic
+def justify_session_ecart(session, *, note="", updated_by):
+    """Saisie de la NOTE d'un écart APRÈS clôture (le motif d'écart n'est plus demandé)."""
+    if session.status != CashSession.Status.CLOSED:
+        raise ApplicationError(_("Seule une session clôturée peut recevoir une note d'écart."))
     if session.difference is None or session.difference == 0:
         raise ApplicationError(_("Aucun écart de caisse à justifier sur cette session."))
-    if not reason:
-        raise ApplicationError(_("Le motif de l'écart est obligatoire."))
-    session.justification_reason = reason
     session.justification_note = note
+    session.justification_reason = ""
     session.updated_by = updated_by
-    session.save(update_fields=["justification_reason", "justification_note", "updated_by", "updated_at"])
+    session.save(update_fields=["justification_note", "justification_reason", "updated_by", "updated_at"])
     return session
 
 
