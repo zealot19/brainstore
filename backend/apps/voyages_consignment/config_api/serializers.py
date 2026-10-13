@@ -50,7 +50,9 @@ class ParcelShipmentSerializer(serializers.ModelSerializer):
         model = ParcelShipment
         fields = ["id", "parcel", "quantity", "trip", "trip_number", "trip_route_code", "trip_departure",
                   "status", "status_display", "is_primary", "validated_by_name", "validated_at",
-                  "loaded_at", "dispatched_at", "arrived_at", "note", "created_at"]
+                  "loaded_at", "dispatched_at", "arrived_at",
+                  "received_pieces", "missing_pieces", "damaged_pieces", "received_at",
+                  "note", "created_at"]
 
 
 class ParcelRead(serializers.ModelSerializer):
@@ -83,7 +85,7 @@ class ParcelRead(serializers.ModelSerializer):
                   "picked_up_kind", "notes",
                   "delivery_amount", "delivery_address", "delivery_payment_method", "delivered_home_at",
                   "created_at", "updated_at", "events",
-                  "shipped_pieces", "remaining_pieces", "shipments"]
+                  "shipped_pieces", "remaining_pieces", "picked_up_pieces", "shipments"]
 
 
 class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):

@@ -47,6 +47,7 @@ class Parcel(BaseModel):
     received_pieces   = models.PositiveSmallIntegerField(_("pièces reçues"), default=0)
     missing_pieces    = models.PositiveSmallIntegerField(_("pièces manquantes"), default=0)
     damaged_pieces    = models.PositiveSmallIntegerField(_("pièces avariées"), default=0)
+    picked_up_pieces  = models.PositiveSmallIntegerField(_("pièces retirées"), default=0)
     declared_value    = models.DecimalField(_("valeur déclarée"), max_digits=12, decimal_places=2, null=True, blank=True)
     amount_due        = models.DecimalField(_("montant dû"), max_digits=12, decimal_places=2, default=0)
     amount_received   = models.DecimalField(_("montant encaissé"), max_digits=12, decimal_places=2, default=0)
