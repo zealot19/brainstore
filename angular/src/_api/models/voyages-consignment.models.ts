@@ -26,6 +26,7 @@ export interface Parcel {
 
 export interface ParcelShipment {
   id: string; parcel: string; quantity: number;
+  parcel_reference?: string | null; parcel_recipient?: string | null; parcel_destination?: string | null;
   trip: string | null; trip_number: string | null; trip_route_code: string | null; trip_departure: string | null;
   status: string; status_display: string; is_primary: boolean;
   validated_by_name: string | null; validated_at: string | null;

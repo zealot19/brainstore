@@ -602,6 +602,21 @@ class ShipmentCancelView(_ShipmentActionView):
         return no_content_response()
 
 
+class ArrivedShipmentListView(APIView):
+    """Expéditions arrivées (à réceptionner) — écran Réception."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view'}
+
+    def get(self, request):
+        from apps.voyages_consignment.models import ParcelShipment
+        qs = (ParcelShipment.objects
+              .filter(is_deleted=False, parcel__company=request.user.company,
+                      status=ParcelShipment.Status.ARRIVED)
+              .select_related("parcel", "parcel__destination_point", "trip", "trip__route")
+              .order_by("arrived_at"))
+        return success_response(S.ParcelShipmentSerializer(qs, many=True).data)
+
+
 class ParcelShipView(APIView):
     """Expédier N pièces d'un colis sur un voyage en un geste (défaut = restant)."""
     permission_classes = [IsAuthenticated, HasModulePermission]

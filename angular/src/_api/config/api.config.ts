@@ -396,6 +396,7 @@ export const VOYAGES_CONSIGNMENT = {
   parcelShipments:  (id: string) => `${VCG}/parcels/${id}/shipments/`,
   parcelShip:       (id: string) => `${VCG}/parcels/${id}/ship/`,
   shipmentReceive:  (id: string) => `${VCG}/shipments/${id}/receive/`,
+  shipmentsArrived: `${VCG}/shipments/arrived/`,
   shipmentValidate: (id: string) => `${VCG}/shipments/${id}/validate/`,
   shipmentLoad:     (id: string) => `${VCG}/shipments/${id}/load/`,
   shipmentDispatch: (id: string) => `${VCG}/shipments/${id}/dispatch/`,

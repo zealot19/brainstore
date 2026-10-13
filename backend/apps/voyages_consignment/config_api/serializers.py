@@ -41,6 +41,9 @@ class ParcelShipmentSerializer(serializers.ModelSerializer):
     trip_route_code   = serializers.CharField(source="trip.route.code", read_only=True, default=None)
     trip_departure    = serializers.DateTimeField(source="trip.scheduled_departure", read_only=True, default=None)
     validated_by_name = serializers.SerializerMethodField()
+    parcel_reference   = serializers.CharField(source="parcel.reference", read_only=True, default=None)
+    parcel_recipient   = serializers.CharField(source="parcel.recipient_name", read_only=True, default=None)
+    parcel_destination = serializers.CharField(source="parcel.destination_point.name", read_only=True, default=None)
 
     def get_validated_by_name(self, obj):
         u = obj.validated_by
@@ -48,7 +51,8 @@ class ParcelShipmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ParcelShipment
-        fields = ["id", "parcel", "quantity", "trip", "trip_number", "trip_route_code", "trip_departure",
+        fields = ["id", "parcel", "parcel_reference", "parcel_recipient", "parcel_destination",
+                  "quantity", "trip", "trip_number", "trip_route_code", "trip_departure",
                   "status", "status_display", "is_primary", "validated_by_name", "validated_at",
                   "loaded_at", "dispatched_at", "arrived_at",
                   "received_pieces", "missing_pieces", "damaged_pieces", "received_at",

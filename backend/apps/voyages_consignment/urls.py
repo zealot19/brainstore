@@ -22,6 +22,7 @@ urlpatterns = [
     path("parcels/<uuid:pk>/shipments/", v.ParcelShipmentListView.as_view()),
     path("parcels/<uuid:pk>/ship/", v.ParcelShipView.as_view()),
     path("shipments/<uuid:pk>/receive/", v.ShipmentReceiveView.as_view()),
+    path("shipments/arrived/", v.ArrivedShipmentListView.as_view()),
     path("shipments/<uuid:pk>/validate/", v.ShipmentValidateView.as_view()),
     path("shipments/<uuid:pk>/load/",     v.ShipmentLoadView.as_view()),
     path("shipments/<uuid:pk>/dispatch/", v.ShipmentDispatchView.as_view()),
