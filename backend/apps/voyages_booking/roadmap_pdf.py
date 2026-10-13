@@ -65,12 +65,13 @@ def _colis_body(data):
     tbl = (
         '<h2>Colis (' + str(len(data["parcels"])) + ')</h2>'
         '<table><thead><tr><th>Référence</th><th>Expéditeur</th><th>Destinataire</th>'
-        '<th>Description</th><th>Pièces</th></tr></thead><tbody>'
+        '<th>Description</th><th>Envoyé / Total</th></tr></thead><tbody>'
         + _rows(data["parcels"],
                 lambda c: [_e(c["reference"]),
                            f'{_e(c["sender_name"])}<br><small>{_e(c["sender_phone"])}</small>',
                            f'{_e(c["recipient_name"])}<br><small>{_e(c["recipient_phone"])}</small>',
-                           _e(c["description"]) or "—", _e(c["quantity"])],
+                           _e(c["description"]) or "—",
+                           f'{_e(c.get("sent", c["quantity"]))} / {_e(c["quantity"])}'],
                 5, "Aucun colis chargé.")
         + '</tbody></table>'
     )

@@ -94,7 +94,7 @@ export class VcgManifestComponent implements OnInit {
 
   statusClass(s: string): string {
     return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
-             in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
+             partial_transit: 'bg-warning', in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
              picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
   private err = (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.");

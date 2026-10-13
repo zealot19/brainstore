@@ -8,6 +8,7 @@ class Parcel(BaseModel):
         REGISTERED           = "registered",           _("Enregistré")
         READY_FOR_TRAVEL     = "ready_for_travel",     _("Prêt à expédier")
         LOADED               = "loaded",               _("Chargé")
+        PARTIAL_TRANSIT      = "partial_transit",      _("Partiellement expédié")
         IN_TRANSIT           = "in_transit",           _("En transit")
         ARRIVED              = "arrived",               _("Arrivé")
         AVAILABLE_FOR_PICKUP = "available_for_pickup", _("Disponible pour retrait")
