@@ -50,4 +50,6 @@ export class ParcelService {
   dispatchShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentDispatch(sid), {}).pipe(map(r => r.data ?? r)); }
   arriveShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentArrive(sid), {}).pipe(map(r => r.data ?? r)); }
   cancelShipment(sid: string): Observable<unknown> { return this.http.delete(VOYAGES_CONSIGNMENT.shipmentCancel(sid)); }
+  ship(id: string, body: { trip_id: string; quantity?: number }): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelShip(id), body).pipe(map(r => r.data ?? r)); }
+  receiveShipment(sid: string, body: { received_pieces?: number; missing_pieces?: number; damaged_pieces?: number }): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentReceive(sid), body).pipe(map(r => r.data ?? r)); }
 }
