@@ -68,6 +68,10 @@ class CashSession(BaseModel):
     closure_validated  = models.BooleanField(_("clôture validée"), default=False)
     closing_destination = models.ForeignKey("treasury.CashRegister", verbose_name=_("caisse de balayage"),
                                              on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    # Lien EXPLICITE vers le transfert de balayage généré à la (re)validation, pour pouvoir
+    # l'extourner de façon fiable à la dévalidation (sans se fier au libellé du transfert).
+    closing_transfer = models.ForeignKey("treasury.Transfer", verbose_name=_("transfert de balayage"),
+                                          on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     validated_at = models.DateTimeField(_("validée le"), null=True, blank=True)
     validated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("validée par"),
                                       on_delete=models.SET_NULL, null=True, blank=True, related_name="+")

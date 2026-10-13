@@ -226,16 +226,24 @@ def _apply_closure_financials(session, *, reg=None, updated_by):
         dest = session.closing_destination
         if not dest:
             raise ApplicationError(_("Caisse de balayage introuvable pour (re)valider la clôture du guichet."))
-        create_transfer(company=session.company, amount=session.closing_balance,
-                        from_cash_register=reg, to_cash_register=dest,
-                        description=f"Clôture guichet — session {session.id}", created_by=updated_by)
+        tr = create_transfer(company=session.company, amount=session.closing_balance,
+                             from_cash_register=reg, to_cash_register=dest,
+                             description=f"Clôture guichet — session {session.id}", created_by=updated_by)
+        # Lien explicite → extourne fiable à la dévalidation (persisté hors update_fields).
+        session.closing_transfer = tr
+        CashSession.objects.filter(pk=session.pk).update(closing_transfer=tr)
     from apps.treasury.services.accounting_bridge import TreasuryAccountingBridge
     TreasuryAccountingBridge.post_session_difference(session)
 
 
 def _find_close_transfer(session):
-    """Transfert de balayage vivant (non supprimé) créé par la clôture de cette session."""
+    """Transfert de balayage vivant (non supprimé) de cette clôture : via le lien explicite,
+    avec repli par libellé pour les clôtures antérieures au champ closing_transfer."""
     from apps.treasury.models import Transfer
+    if session.closing_transfer_id:
+        tr = Transfer.objects.filter(id=session.closing_transfer_id, is_deleted=False).first()
+        if tr:
+            return tr
     return (Transfer.objects
             .filter(company_id=session.company_id, from_cash_register_id=session.cash_register_id,
                     is_deleted=False, description__contains=f"session {session.id}")
@@ -266,6 +274,8 @@ def _reverse_closure_financials(session, *, updated_by):
             dest.save(update_fields=["current_balance"])
         _cancel_source_entries(session.company_id, "treasury.Transfer", tr.id, user=updated_by)
         tr.soft_delete(user=updated_by)
+        session.closing_transfer = None
+        CashSession.objects.filter(pk=session.pk).update(closing_transfer=None)
     _cancel_source_entries(session.company_id, "treasury.CashSession", session.id, user=updated_by)
     reg = CashRegister.objects.select_for_update().get(id=session.cash_register_id)
     reg.current_balance = principale_available_cash(session)
@@ -338,6 +348,7 @@ def reopen_session(session, *, updated_by):
     session.justification_note = ""
     session.justification_reason = ""
     session.closing_destination = None
+    session.closing_transfer = None
     session.closed_at = None
     session.closed_by = None
     session.status = CashSession.Status.OPEN

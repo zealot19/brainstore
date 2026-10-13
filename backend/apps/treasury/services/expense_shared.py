@@ -7,9 +7,11 @@ from apps.core.exceptions import ApplicationError
 def principale_available_cash(session):
     """Trésorerie réelle « maintenant » d'une session de caisse.
 
-    current_balance n'est pas mis à jour par les ventes/dépenses pendant une session
-    ouverte : on recalcule à partir du fond + grand livre de la session + transferts
-    de la caisse depuis l'ouverture.
+    Source de vérité « par session » : fond d'ouverture + grand livre VALIDÉ de la session
+    + transferts de la caisse depuis l'ouverture. (CashRegister.current_balance est, lui, un
+    cumul GLOBAL par caisse — mis à jour au fil des mouvements validés, des transferts et de
+    la clôture ; il peut diverger si une session est ouverte avec un fond ne correspondant
+    pas au report réel, d'où ce recalcul dédié par session.)
     """
     from apps.treasury.models import Transaction, Transfer
     reg_id = session.cash_register_id
