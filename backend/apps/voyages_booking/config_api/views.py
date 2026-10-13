@@ -398,10 +398,18 @@ def build_roadmap_data(trip, request):
         "passenger_name": (b.ticket.passenger.full_name if b.ticket_id and b.ticket.passenger_id else ""),
         "description": b.description, "weight_kg": b.weight_kg, "quantity": b.quantity,
     } for b in manifest["baggage"]]
+    from django.db.models import Sum as _Sum
+    from apps.voyages_consignment.models import ParcelShipment as _PShip
+
+    def _sent_on_trip(p):
+        s = (_PShip.objects.filter(parcel=p, trip=trip, is_deleted=False, status__in=_PShip.COUNTED)
+             .aggregate(s=_Sum("quantity"))["s"])
+        return s if s is not None else p.quantity  # colis entier (legacy, sans expédition)
+
     parcels = [{
         "reference": p.reference, "sender_name": p.sender_name, "sender_phone": p.sender_phone,
         "recipient_name": p.recipient_name, "recipient_phone": p.recipient_phone,
-        "description": p.description, "quantity": p.quantity,
+        "description": p.description, "quantity": p.quantity, "sent": _sent_on_trip(p),
     } for p in manifest["parcels"]]
 
     crew = [{"role_display": (c.member.member_type.name if (c.member_id and c.member.member_type_id) else ""),

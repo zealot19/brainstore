@@ -57,6 +57,20 @@ def test_ship_two_partials_tracks_remaining():
 
 
 @pytest.mark.django_db
+def test_partial_transit_status():
+    from apps.voyages_consignment.services import ship_pieces
+    from apps.voyages_consignment.models import Parcel
+    g = _setup("pe5@x.com")
+    p = g["parcel"]
+    ship_pieces(p, trip=g["trip1"], quantity=6, user=g["admin"])
+    p.refresh_from_db()
+    assert p.status == Parcel.Status.PARTIAL_TRANSIT   # 6/10 → à moitié envoyé
+    ship_pieces(p, trip=g["trip2"], quantity=4, user=g["admin"])
+    p.refresh_from_db()
+    assert p.status == Parcel.Status.IN_TRANSIT        # 10/10 → tout parti
+
+
+@pytest.mark.django_db
 def test_ship_rejects_off_route_and_over_remaining():
     from apps.voyages_consignment.services import ship_pieces
     from apps.core.exceptions import ApplicationError

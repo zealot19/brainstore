@@ -38,6 +38,9 @@ def recompute_parcel_state(parcel):
         return parcel
     live = list(parcel.shipments.filter(is_deleted=False).exclude(status=ParcelShipment.Status.CANCELLED))
     counted = [s for s in live if s.status in ParcelShipment.COUNTED]
+    shipped = sum(s.quantity for s in counted)
+    moving = any(s.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED,
+                              ParcelShipment.Status.RECEIVED) for s in counted)
     received = parcel.received_pieces or 0
     picked = parcel.picked_up_pieces or 0
     missing = parcel.missing_pieces or 0
@@ -46,8 +49,10 @@ def recompute_parcel_state(parcel):
         parcel.status = Parcel.Status.PICKED_UP
     elif available > 0:
         parcel.status = Parcel.Status.AVAILABLE_FOR_PICKUP
-    elif any(s.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED,
-                          ParcelShipment.Status.RECEIVED) for s in counted):
+    elif moving and shipped < parcel.quantity:
+        # Une partie seulement a été expédiée : colis « à moitié envoyé ».
+        parcel.status = Parcel.Status.PARTIAL_TRANSIT
+    elif moving:
         parcel.status = Parcel.Status.IN_TRANSIT
     else:
         parcel.status = Parcel.Status.READY_FOR_TRAVEL
