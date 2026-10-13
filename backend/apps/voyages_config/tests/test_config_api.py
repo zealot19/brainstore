@@ -30,6 +30,24 @@ def test_render_document_uses_template_size():
     assert "203" in doc and "82.55" in doc and "landscape" in doc
 
 
+def test_generated_ticket_scales_to_fit_defined_size():
+    """Le gabarit généré est dessiné au canevas de référence puis mis à l'échelle pour
+    tenir dans la taille définie : plus petit → scale < 1 ; taille de référence → scale 1."""
+    t = TicketTemplate()
+    t.ticket_width_mm = Decimal("101.5")   # moitié de la référence 203
+    t.ticket_height_mm = Decimal("41.275")
+    pages = ticket_render.build_ticket_pages(t, ticket_render.sample_tokens())
+    recto = pages[0]
+    assert "width:101.5mm" in recto                 # la face tient dans la taille définie
+    assert "203.0mm" in recto                       # dessinée au canevas de référence
+    assert "scale(0.5000)" in recto                 # réduite pour tenir
+
+    # À la taille de référence : échelle neutre (aucun changement d'aspect).
+    d = TicketTemplate()
+    p0 = ticket_render.build_ticket_pages(d, ticket_render.sample_tokens())[0]
+    assert "scale(1.0000)" in p0
+
+
 import pytest
 from rest_framework.test import APIRequestFactory, force_authenticate
 from apps.authentication.models import User
