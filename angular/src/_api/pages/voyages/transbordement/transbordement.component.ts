@@ -5,12 +5,13 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { TripService } from '../../../services/voyages/trip.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
+import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 
 @Component({
   selector: 'app-vt-transbordement',
   standalone: true,
   templateUrl: './transbordement.component.html',
-  imports: [CommonModule, FormsModule, TranslocoModule],
+  imports: [CommonModule, FormsModule, TranslocoModule, SearchableSelectDirective],
 })
 export class VtTransbordementComponent implements OnInit {
   private trips = inject(TripService);
@@ -33,6 +34,8 @@ export class VtTransbordementComponent implements OnInit {
 
   ngOnInit(): void {
     this.vehicles.list({ is_active: true }).subscribe({ next: d => this.vehicleList = d as any });
+    // Voyages source : liste respectant l'archivage (backend). Les <select> sont rendus
+    // recherchables par SearchableSelectDirective.
     this.trips.list({}).subscribe({ next: (d: any) => this.tripList = d.results ?? d.data ?? d });
   }
 

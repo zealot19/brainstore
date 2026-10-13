@@ -53,3 +53,34 @@ def test_transbord_trip_stores_reason():
     assert tb.reason == "panne moteur"
     trip.refresh_from_db()
     assert trip.vehicle_id == v2.id
+
+
+@pytest.mark.django_db
+def test_selection_options_dest_trips_follow_archive_window():
+    """Les voyages de destination proposés au transbordement respectent la fenêtre
+    d'archivage : un voyage daté hors fenêtre n'est pas proposé."""
+    from apps.voyages_trips.services.trip_services import create_trip, submit_trip
+    from apps.voyages_trips.models import Trip
+    from apps.voyages_trips.selectors.transbord_selectors import selection_options
+    from apps.system_config.services.archiving import set_archive_window_days
+    company, admin, trip, v1, v2 = _setup("tbmarch@x.com")
+    route, fc, plan = trip.route, trip.fare_class, trip.seating_plan
+    now = timezone.now()
+    recent = create_trip(company=company, route=route, fare_class=fc,
+                         scheduled_departure=now + timedelta(days=2),
+                         scheduled_arrival=now + timedelta(days=2, hours=4),
+                         seating_plan=plan, vehicle=v2, user=admin)
+    submit_trip(recent, user=admin)
+    old = create_trip(company=company, route=route, fare_class=fc,
+                      scheduled_departure=now + timedelta(days=3),
+                      scheduled_arrival=now + timedelta(days=3, hours=4),
+                      seating_plan=plan, vehicle=v2, user=admin)
+    submit_trip(old, user=admin)
+    # Antidater « old » hors fenêtre (sans repasser par la validation métier).
+    Trip.objects.filter(id=old.id).update(
+        scheduled_departure=now - timedelta(days=30),
+        scheduled_arrival=now - timedelta(days=30) + timedelta(hours=4))
+    set_archive_window_days(company.id, 7)
+    ids = {d["id"] for d in selection_options(company, trip)["dest_trips"]}
+    assert str(recent.id) in ids          # dans la fenêtre → proposé
+    assert str(old.id) not in ids         # hors fenêtre → exclu

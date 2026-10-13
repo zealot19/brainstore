@@ -77,8 +77,13 @@ def selection_options(company, trip):
     } for b in Baggage.objects.filter(is_deleted=False, company=company, trip=trip).select_related("ticket__passenger")]
 
     dest_trips = []
-    for t in (Trip.objects.filter(company=company, is_deleted=False, route_id=trip.route_id,
-                                  status__in=["draft", "pending"]).exclude(id=trip.id)):
+    from apps.system_config.selectors.archiving import apply_archive_window
+    dest_qs = (Trip.objects.filter(company=company, is_deleted=False, route_id=trip.route_id,
+                                   status__in=["draft", "pending"]).exclude(id=trip.id))
+    # Règle d'archivage : ne pas proposer de voyages hors fenêtre de visibilité.
+    dest_qs = apply_archive_window(dest_qs, date_field="scheduled_departure",
+                                   company_id=company.id, include_archived=False)
+    for t in dest_qs:
         free = t.seats.filter(status=TripSeat.Status.AVAILABLE).count()
         dest_trips.append({"id": str(t.id), "number": t.number, "code": t.code, "free_seats": free})
 
