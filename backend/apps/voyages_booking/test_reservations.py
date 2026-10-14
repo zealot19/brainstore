@@ -24,6 +24,17 @@ def _reserve(company, admin, trip, hold_until):
 
 
 @pytest.mark.django_db
+def test_booking_reference_uses_same_model_as_voyage_colis():
+    """La référence de réservation suit le modèle voyage/colis/billet : DEP-ARR-AAAAMMJJ-NNN."""
+    import re
+    company, admin, trip = _setup()
+    b = _reserve(company, admin, trip, timezone.now() + timedelta(hours=2))
+    pat = re.compile(r"^[^-]+-[^-]+-\d{8}-\d{3}$")
+    assert pat.match(b.reference), b.reference        # réservation
+    assert pat.match(b.tickets.get().number)          # billet (même modèle)
+
+
+@pytest.mark.django_db
 def test_reservation_holds_seat_unpaid():
     from apps.voyages_trips.models import TripSeat
     company, admin, trip = _setup()
