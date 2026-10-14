@@ -67,6 +67,8 @@ urlpatterns = [
 
     # ── Config manifestes (en-tête / pied des bordereaux) ───────────────────────
     path("manifest-template/", v.ManifestTemplateView.as_view()),
+    # ── Formats (tailles) des documents ─────────────────────────────────────────
+    path("document-formats/", v.DocumentFormatsView.as_view()),
     # ── Config billets (modèle de billet HTML) ──────────────────────────────────
     path("ticket-template/", v.TicketTemplateView.as_view()),
     path("ticket-template/reset/", v.TicketTemplateResetView.as_view()),

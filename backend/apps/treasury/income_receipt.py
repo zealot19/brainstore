@@ -20,8 +20,10 @@ def render_income_receipt(*, company, ref, date, source_label, party, amount,
                           created_by=None, kind_label="Recette") -> bytes:
     from weasyprint import HTML
     from apps.voyages_config.doc_template import resolve_doc_template
+    from apps.voyages_config.doc_format import resolve_doc_format, page_size_css
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
     tpl = resolve_doc_template(company)
+    _size = page_size_css(*resolve_doc_format(company, "recu_recette"))
     rows = [
         ("Source", _e(source_label) or "—"),
         ("Client / Tiers", _e(party) or "—"),
@@ -33,7 +35,7 @@ def render_income_receipt(*, company, ref, date, source_label, party, amount,
     ]
     body = "".join(f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>' for k, v in rows)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A5 landscape; margin: 12mm; }}
+      @page {{ size: {_size}; margin: 12mm; }}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 11px; color:#111; }}
       .co-name {{ font-weight:bold; font-size:14px; }}
       h1 {{ font-size:16px; margin:12px 0 2px; text-transform:uppercase; color:#0068B8; }}

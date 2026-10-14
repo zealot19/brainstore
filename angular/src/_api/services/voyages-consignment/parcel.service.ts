@@ -41,6 +41,7 @@ export class ParcelService {
   }
   manifest(tripId: string): Observable<Manifest> { return this.http.get<any>(VOYAGES_CONSIGNMENT.manifest(tripId)).pipe(map(r => r.data ?? r)); }
   receipt(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.parcelReceipt(id)); }
+  label(id: string): Observable<{ html: string }> { return this.http.get<{ html: string }>(VOYAGES_CONSIGNMENT.parcelLabel(id)); }
 
   // M25 — expéditions partielles
   shipments(id: string): Observable<ParcelShipment[]> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelShipments(id)).pipe(map(r => r.data ?? r)); }

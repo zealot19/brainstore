@@ -20,8 +20,10 @@ def render_expense_voucher(*, company, ref, date, type_name, label, amount,
                            created_by=None, disbursed_by=None, kind_label="Dépense") -> bytes:
     from weasyprint import HTML
     from apps.voyages_config.doc_template import resolve_doc_template
+    from apps.voyages_config.doc_format import resolve_doc_format, page_size_css
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
     tpl = resolve_doc_template(company)
+    _size = page_size_css(*resolve_doc_format(company, "bon_depense"))
     rows = [
         ("Type", _e(type_name)),
         ("Libellé", _e(label)),
@@ -34,7 +36,7 @@ def render_expense_voucher(*, company, ref, date, type_name, label, amount,
     ]
     body = "".join(f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>' for k, v in rows)
     html = f"""<html><head><meta charset="utf-8"><style>
-      @page {{ size: A5 landscape; margin: 12mm; }}
+      @page {{ size: {_size}; margin: 12mm; }}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 11px; color:#111; }}
       .head {{ display:flex; gap:12px; border-bottom:2px solid #0068B8; padding-bottom:6px; }}
       .co-name {{ font-weight:bold; font-size:14px; }}

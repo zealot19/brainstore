@@ -690,6 +690,46 @@ class ManifestTemplateView(APIView):
         return success_response(payload.data)
 
 
+class DocumentFormatsView(APIView):
+    """Tailles (formats papier) des documents, réglables par institution.
+    GET -> liste de {code, label, width_mm, height_mm} ; PUT -> upsert en lot."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "PUT": "transport.config.manage"}
+
+    def get(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        from apps.voyages_config.doc_format import DOC_DEFS, resolve_doc_format
+        items = []
+        for code, label, _w, _h in DOC_DEFS:
+            w, h = resolve_doc_format(company, code)
+            items.append({"code": code, "label": label, "width_mm": w, "height_mm": h})
+        return success_response(items)
+
+    def put(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        from apps.voyages_config.models import DocumentFormat
+        from apps.voyages_config.doc_format import DEFAULT_FORMATS
+        rows = request.data if isinstance(request.data, list) else request.data.get("items", [])
+        valid = set(DEFAULT_FORMATS)
+        for r in rows:
+            code = r.get("code")
+            if code not in valid:
+                continue
+            try:
+                w = float(r.get("width_mm")); h = float(r.get("height_mm"))
+            except (TypeError, ValueError):
+                return error_response("Dimensions invalides.")
+            if w <= 0 or h < 0:
+                return error_response("La largeur doit être positive et la hauteur ≥ 0 (0 = auto).")
+            DocumentFormat.objects.update_or_create(
+                company=company, code=code, defaults={"width_mm": w, "height_mm": h})
+        return self.get(request)
+
+
 class TicketTemplateResetView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}

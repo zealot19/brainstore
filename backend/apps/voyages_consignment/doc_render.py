@@ -50,33 +50,36 @@ def _trajet(baggage):
     return _html.escape(code or ""), _html.escape(dest or "")
 
 
-_STYLE_80 = """<style>
-  @page{size:80mm auto;margin:3mm}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111;font-size:9pt;width:74mm}
-  .doc{width:74mm}
-  .hdr{display:flex;gap:2mm;align-items:center;text-align:center;flex-direction:column;margin-bottom:2mm}
-  .hdr .co b{font-size:11pt}
-  .hdr .ids{font-size:7pt;line-height:1.2}
-  .hdr .agency{font-weight:700;margin-top:1mm}
-  h2{text-align:center;font-size:10pt;margin:2mm 0;border-top:1px solid #111;border-bottom:1px solid #111;padding:1mm 0}
-  .box{border:1px solid #111;padding:1.5mm;margin-bottom:1.5mm}
-  .box b{font-weight:700}
-  .terms{font-size:8pt;margin:1.5mm 0}
-  .sign{display:flex;justify-content:space-between;border:1px solid #111;padding:1mm;font-weight:700;font-size:8pt}
-  .sign div{width:48%;min-height:12mm}
-  .foot{font-size:7pt;font-style:italic;margin-top:1mm}
-  .cutline{border-top:1px dashed #111;margin:3mm 0;text-align:center;font-size:7pt;color:#777}
+def _style_80(width_mm=80.0, height_mm=0.0):
+    from apps.voyages_config.doc_format import page_size_css
+    inner_w = max(20.0, float(width_mm) - 6.0)   # largeur utile = format − marges 3 mm
+    return f"""<style>
+  @page{{size:{page_size_css(width_mm, height_mm)};margin:3mm}}
+  *{{box-sizing:border-box}}
+  body{{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111;font-size:9pt;width:{inner_w:g}mm}}
+  .doc{{width:{inner_w:g}mm}}
+  .hdr{{display:flex;gap:2mm;align-items:center;text-align:center;flex-direction:column;margin-bottom:2mm}}
+  .hdr .co b{{font-size:11pt}}
+  .hdr .ids{{font-size:7pt;line-height:1.2}}
+  .hdr .agency{{font-weight:700;margin-top:1mm}}
+  h2{{text-align:center;font-size:10pt;margin:2mm 0;border-top:1px solid #111;border-bottom:1px solid #111;padding:1mm 0}}
+  .box{{border:1px solid #111;padding:1.5mm;margin-bottom:1.5mm}}
+  .box b{{font-weight:700}}
+  .terms{{font-size:8pt;margin:1.5mm 0}}
+  .sign{{display:flex;justify-content:space-between;border:1px solid #111;padding:1mm;font-weight:700;font-size:8pt}}
+  .sign div{{width:48%;min-height:12mm}}
+  .foot{{font-size:7pt;font-style:italic;margin-top:1mm}}
+  .cutline{{border-top:1px dashed #111;margin:3mm 0;text-align:center;font-size:7pt;color:#777}}
 </style>"""
 
 
-def render_80mm(inner_html_list):
+def render_80mm(inner_html_list, *, width_mm=80.0, height_mm=0.0):
     body = "".join(inner_html_list)
-    return (f'<!DOCTYPE html><html><head><meta charset="utf-8">{_STYLE_80}'
+    return (f'<!DOCTYPE html><html><head><meta charset="utf-8">{_style_80(width_mm, height_mm)}'
             f'</head><body>{body}</body></html>')
 
 
-def build_parcel_receipt(parcel, tpl, *, agent="", logo_url=""):
+def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, height_mm=0.0):
     e = _html.escape
     agency = _safe(parcel, "origin_point.name", "")
     dest = _safe(parcel, "destination_point.name", "")
@@ -98,7 +101,7 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url=""):
       <div class="terms">{e(tpl.parcel_receipt_terms)}</div>
       <div class="sign"><div>Signature Client</div><div>Signature de l'agent</div></div>
     </div>"""
-    return render_80mm([inner])
+    return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
 
 
 def _baggage_copy(baggage, tpl, *, agent, logo_url):
@@ -122,13 +125,13 @@ def _baggage_copy(baggage, tpl, *, agent, logo_url):
     </div>"""
 
 
-def build_baggage_ticket(baggage, tpl, *, agent="", logo_url=""):
+def build_baggage_ticket(baggage, tpl, *, agent="", logo_url="", width_mm=80.0, height_mm=0.0):
     copy = _baggage_copy(baggage, tpl, agent=agent, logo_url=logo_url)
     cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
-    return render_80mm([copy, cut, copy])
+    return render_80mm([copy, cut, copy], width_mm=width_mm, height_mm=height_mm)
 
 
-def build_baggage_label(baggage, tpl, *, agent=""):
+def build_baggage_label(baggage, tpl, *, agent="", width_mm=80.0, height_mm=0.0):
     e = _html.escape
     trajet, dest = _trajet(baggage)
     name = baggage.owner_name if getattr(baggage, "ticket_id", None) else baggage.sender_name
@@ -145,4 +148,24 @@ def build_baggage_label(baggage, tpl, *, agent=""):
       </div>
       <div class="foot">Imprime le : {_dt()} par {e(agent)}</div>
     </div>"""
-    return render_80mm([inner])
+    return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
+
+
+def build_parcel_label(parcel, tpl, *, agent="", width_mm=80.0, height_mm=0.0):
+    """Étiquette de colis (thermique) : réf, expéditeur/destinataire, destination, qté."""
+    e = _html.escape
+    dest = _safe(parcel, "destination_point.name", "")
+    origin = _safe(parcel, "origin_point.name", "")
+    inner = f"""<div class="doc">
+      <div class="hdr"><div class="co"><b>{e(tpl.brand_name)}</b>
+        <div class="ids">Tel: {e(tpl.phone)}</div></div></div>
+      <div class="box" style="text-align:center;font-size:10pt">
+        <b>Colis N&deg;</b>: {e(parcel.reference)}<br>
+        <b>Exp</b>: {e(parcel.sender_name)}<br>
+        <b>Dest</b>: {e(parcel.recipient_name)} &nbsp; <b>Tel</b>: {e(parcel.recipient_phone)}<br>
+        <b>Trajet</b>: {e(origin)} &rarr; {e(dest)}<br>
+        <b>Qte</b>: {parcel.quantity}
+      </div>
+      <div class="foot">Imprime le : {_dt()} par {e(agent)}</div>
+    </div>"""
+    return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
