@@ -4,15 +4,8 @@
 <app-info-banner [text]="'cons.expedition.info' | transloco"></app-info-banner>
 
 <div class="card"><div class="card-body">
-  <!-- Mode -->
-  <div class="btn-group mb-3">
-    <button class="btn" [class.btn-primary]="mode==='voyage'" [class.btn-outline-primary]="mode!=='voyage'" (click)="setMode('voyage')">{{ 'cons.expedition.mode_voyage' | transloco }}</button>
-    <button class="btn" [class.btn-primary]="mode==='sans'" [class.btn-outline-primary]="mode!=='sans'" (click)="setMode('sans')">{{ 'cons.expedition.mode_sans' | transloco }}</button>
-  </div>
-
   <!-- Bandeau de filtres du voyage (options issues de la config). -->
-  @if (mode === 'voyage') {
-    <div class="row g-2 mb-3">
+  <div class="row g-2 mb-3">
       <div class="col-6 col-md">
         <label class="form-label small mb-1">{{ 'cons.expedition.f_route' | transloco }}</label>
         <select class="form-select" [(ngModel)]="fRoute" (ngModelChange)="onFiltersChange()">
@@ -46,7 +39,6 @@
         </select>
       </div>
     </div>
-  }
 
   <div class="row">
     <!-- Pool : colis à expédier (restant > 0) -->
@@ -54,7 +46,7 @@
       <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between py-2">
         <h6 class="mb-0">{{ 'cons.expedition.ready_pool' | transloco }} <small class="text-muted">({{ ready.length }})</small></h6>
         <div>
-          @if (mode === 'voyage' && selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_selection' | transloco }} ({{ selReady.size }})</button> }
+          @if (selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_selection' | transloco }} ({{ selReady.size }})</button> }
         </div>
       </div>
         <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
@@ -75,7 +67,7 @@
                 <td>{{ p.destination_point_name }}</td>
                 <td class="text-center">{{ rem(p) }} / {{ p.quantity }}</td>
                 <td><input type="number" class="form-control form-control-sm" min="1" [max]="rem(p)" [(ngModel)]="shipQty[p.id]" /></td>
-                <td class="text-end">@if (mode === 'voyage') { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipOne(p)" [title]="'cons.expedition.ship_n' | transloco"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_n' | transloco }}</button> }</td>
+                <td class="text-end"><button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipOne(p)" [title]="'cons.expedition.ship_n' | transloco"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_n' | transloco }}</button></td>
               </tr>
             } @empty { <tr><td colspan="7" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_ready' | transloco }}</td></tr> }
           </tbody>
@@ -84,7 +76,6 @@
     </div>
 
     <!-- Colis déjà sur le voyage (lecture seule) -->
-    @if (mode === 'voyage') {
       <div class="col-lg-5 mb-3">
         <div class="card"><div class="card-header d-flex align-items-center justify-content-between py-2">
           <h6 class="mb-0">{{ 'cons.expedition.onboard' | transloco }} <small class="text-muted">· {{ totals.count }} · {{ totals.weight }} kg</small></h6>
@@ -109,6 +100,5 @@
           </table></div></div>
         </div>
       </div>
-    }
   </div>
 </div></div>
