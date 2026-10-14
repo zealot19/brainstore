@@ -1250,6 +1250,15 @@
       "col_height": "Altura (mm)",
       "height_auto_hint": "0 = altura automática (rolo térmico)"
     },
+    "printermap": {
+      "title": "Mapeamento de impressoras",
+      "hint": "Associe cada documento a uma impressora: o agente de impressão local imprime automaticamente ao guardar. Sem mapeamento, a impressão usa o navegador.",
+      "no_agent": "Nenhum agente de impressão detetado neste servidor. Introduza o nome exato da impressora, ou instale o agente (ver tools/print-helper). Sem agente, imprime pelo navegador.",
+      "col_document": "Documento",
+      "col_printer": "Impressora",
+      "opt_browser": "— Navegador (padrão) —",
+      "ph_name": "Nome exato da impressora do Windows"
+    },
     "vtype": {
       "title": "Tipos de viagem",
       "subtitle": "Partida, Complemento, Adicional",

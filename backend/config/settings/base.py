@@ -273,6 +273,11 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
 ])
 CORS_ALLOW_CREDENTIALS = True
 
+# ── Impression (agent Windows co-localisé à l'instance locale) ──────────────────
+# Vide = pas d'agent → repli sur la boîte d'impression du navigateur. Les instances
+# locales (Docker) le pointent sur l'agent de l'hôte, ex. http://host.docker.internal:9113
+PRINT_HELPER_URL = env("PRINT_HELPER_URL", default="")
+
 # ── Logging ───────────────────────────────────────────────────────────────────
 LOGGING = {
     "version": 1,

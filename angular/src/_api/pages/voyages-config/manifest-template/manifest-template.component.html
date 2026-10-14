@@ -101,3 +101,38 @@
     <span *ngIf="savingFormats" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
   </button>
 </div></div>
+
+<!-- ── Mappage des imprimantes (document → imprimante, impression auto) ───────── -->
+<div class="card mt-4"><div class="card-body">
+  <h5 class="mb-1">{{ 'vcfg.printermap.title' | transloco }}</h5>
+  <p class="text-muted small mb-2">{{ 'vcfg.printermap.hint' | transloco }}</p>
+  @if (!printerMap.helper) {
+    <div class="alert alert-warning py-2 small">{{ 'vcfg.printermap.no_agent' | transloco }}</div>
+  }
+  <div class="table-responsive"><table class="table table-sm align-middle mb-3">
+    <thead class="thead-light"><tr>
+      <th>{{ 'vcfg.printermap.col_document' | transloco }}</th>
+      <th style="width:320px">{{ 'vcfg.printermap.col_printer' | transloco }}</th>
+    </tr></thead>
+    <tbody>
+      @for (d of printerMap.documents; track d.code) {
+        <tr>
+          <td class="fw-medium">{{ d.label }}</td>
+          <td>
+            @if (printerMap.printers.length) {
+              <select class="form-select form-select-sm" [(ngModel)]="d.printer_name">
+                <option value="">{{ 'vcfg.printermap.opt_browser' | transloco }}</option>
+                @for (p of printerMap.printers; track p) { <option [value]="p">{{ p }}</option> }
+              </select>
+            } @else {
+              <input class="form-control form-control-sm" [(ngModel)]="d.printer_name" [placeholder]="'vcfg.printermap.ph_name' | transloco" />
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table></div>
+  <button class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="savePrinterMapping()" [disabled]="savingMap">
+    <span *ngIf="savingMap" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
+  </button>
+</div></div>

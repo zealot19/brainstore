@@ -18,7 +18,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
-import { printHtml } from '../../../../app/shared/print/print.util';
+import { PrintRouterService } from '../../../../app/shared/print/print-router.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
@@ -30,6 +30,7 @@ import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.
 })
 export class VcgParcelsComponent implements OnInit {
   private toast = inject(ToastService);
+  private printRouter = inject(PrintRouterService);
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
@@ -157,9 +158,17 @@ export class VcgParcelsComponent implements OnInit {
       sender_id_number: this.senderClient.id_number,
       cash_register_id: this.cashRegisterId,
     };
+    const wasCreate = !this.isEdit;
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(createBody);
     req.subscribe({
-      next: () => { this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal'); },
+      next: (res: any) => {
+        this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal');
+        // À l'enregistrement : impression auto du reçu + de l'étiquette (× quantité, côté serveur).
+        if (wasCreate && res?.id) {
+          this.printReceipt(res.id);
+          setTimeout(() => this.printLabel(res.id), 1200);
+        }
+      },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
@@ -193,13 +202,7 @@ export class VcgParcelsComponent implements OnInit {
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 
-  printReceipt(id: string): void {
-    this.svc.receipt(id).subscribe({
-      next: r => printHtml(r.html),
-      error: () => {},
-    });
-  }
-  printLabel(id: string): void {
-    this.svc.label(id).subscribe({ next: r => printHtml(r.html), error: () => {} });
-  }
+  // Impression via l'agent (imprimante mappée) avec repli navigateur.
+  printReceipt(id: string): void { this.printRouter.print('recu_colis', id); }
+  printLabel(id: string): void { this.printRouter.print('etiquette_colis', id); }
 }
