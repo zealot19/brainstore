@@ -199,4 +199,7 @@ export class VcgParcelsComponent implements OnInit {
       error: () => {},
     });
   }
+  printLabel(id: string): void {
+    this.svc.label(id).subscribe({ next: r => printHtml(r.html), error: () => {} });
+  }
 }

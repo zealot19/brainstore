@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ManifestTemplateService, ManifestTemplate } from '../../../services/voyages-config/manifest-template.service';
+import { ManifestTemplateService, ManifestTemplate, DocumentFormat } from '../../../services/voyages-config/manifest-template.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -23,7 +23,22 @@ export class VcManifestTemplateComponent implements OnInit {
   logoFile: File | null = null;
   saving = false;
 
-  ngOnInit(): void { this.svc.get().subscribe(t => this.tpl = { ...this.tpl, ...t }); }
+  formats: DocumentFormat[] = [];
+  savingFormats = false;
+
+  ngOnInit(): void {
+    this.svc.get().subscribe(t => this.tpl = { ...this.tpl, ...t });
+    this.svc.formats().subscribe(f => this.formats = f);
+  }
+
+  saveFormats(): void {
+    if (this.savingFormats) return;
+    this.savingFormats = true;
+    this.svc.saveFormats(this.formats).subscribe({
+      next: f => { this.formats = f; this.savingFormats = false; this.toast.success('Tailles enregistrées.'); },
+      error: e => { this.savingFormats = false; this.toast.error(e?.error?.error?.message ?? "L'opération a échoué."); },
+    });
+  }
 
   onLogo(e: Event): void {
     const f = (e.target as HTMLInputElement).files?.[0] ?? null;

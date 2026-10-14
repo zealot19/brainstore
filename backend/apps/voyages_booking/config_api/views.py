@@ -491,8 +491,11 @@ class TripRoadmapPdfView(APIView):
             doc = "voyages"
         data = build_roadmap_data(trip, request)
         tpl = resolve_manifest_template(trip.company, request)
+        from apps.voyages_config.doc_format import resolve_doc_format, page_size_css
+        fmt_code = "bordereau_colis" if doc == "colis" else "bordereau_voyages"
+        page_size = page_size_css(*resolve_doc_format(trip.company, fmt_code))
         try:
-            pdf = render_manifest_pdf(data, doc, tpl)
+            pdf = render_manifest_pdf(data, doc, tpl, page_size=page_size)
         except (ImportError, OSError):
             return error_response(
                 "Génération PDF indisponible : le moteur WeasyPrint n'est pas configuré sur ce serveur "

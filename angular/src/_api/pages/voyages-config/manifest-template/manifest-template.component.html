@@ -76,3 +76,28 @@
 <button class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="save()" [disabled]="saving">
   <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
 </button>
+
+<!-- ── Tailles des documents (format papier par document) ───────────────────── -->
+<div class="card mt-4"><div class="card-body">
+  <h5 class="mb-1">{{ 'vcfg.docsize.title' | transloco }}</h5>
+  <p class="text-muted small mb-3">{{ 'vcfg.docsize.hint' | transloco }}</p>
+  <div class="table-responsive"><table class="table table-sm align-middle mb-3">
+    <thead class="thead-light"><tr>
+      <th>{{ 'vcfg.docsize.col_document' | transloco }}</th>
+      <th style="width:140px">{{ 'vcfg.docsize.col_width' | transloco }}</th>
+      <th style="width:140px">{{ 'vcfg.docsize.col_height' | transloco }}</th>
+    </tr></thead>
+    <tbody>
+      @for (f of formats; track f.code) {
+        <tr>
+          <td class="fw-medium">{{ f.label }}</td>
+          <td><input type="number" min="1" step="0.01" class="form-control form-control-sm" [(ngModel)]="f.width_mm" /></td>
+          <td><input type="number" min="0" step="0.01" class="form-control form-control-sm" [(ngModel)]="f.height_mm" [title]="'vcfg.docsize.height_auto_hint' | transloco" /></td>
+        </tr>
+      }
+    </tbody>
+  </table></div>
+  <button class="btn btn-primary" *hasPermission="'transport.config.manage'" (click)="saveFormats()" [disabled]="savingFormats">
+    <span *ngIf="savingFormats" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}
+  </button>
+</div></div>

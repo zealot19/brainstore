@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { VOYAGES_CONFIG } from '../../config/api.config';
 
 export interface ManifestTemplate {
@@ -10,9 +11,17 @@ export interface ManifestTemplate {
   footer_text: string; footer_show_generated: boolean; footer_show_page_numbers: boolean;
 }
 
+export interface DocumentFormat { code: string; label: string; width_mm: number; height_mm: number; }
+
 @Injectable({ providedIn: 'root' })
 export class ManifestTemplateService {
   constructor(private http: HttpClient) {}
   get(): Observable<ManifestTemplate> { return this.http.get<ManifestTemplate>(VOYAGES_CONFIG.manifestTemplate); }
   save(fd: FormData): Observable<ManifestTemplate> { return this.http.put<ManifestTemplate>(VOYAGES_CONFIG.manifestTemplate, fd); }
+  formats(): Observable<DocumentFormat[]> {
+    return this.http.get<any>(VOYAGES_CONFIG.documentFormats).pipe(map(r => r?.data ?? r));
+  }
+  saveFormats(items: DocumentFormat[]): Observable<DocumentFormat[]> {
+    return this.http.put<any>(VOYAGES_CONFIG.documentFormats, items).pipe(map(r => r?.data ?? r));
+  }
 }

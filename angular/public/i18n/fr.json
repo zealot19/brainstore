@@ -1242,6 +1242,14 @@
       "footer_show_generated": "Afficher « Généré le … »",
       "footer_show_page_numbers": "Afficher les numéros de page"
     },
+    "docsize": {
+      "title": "Tailles des documents",
+      "hint": "Format papier par défaut de chaque document (en mm). Hauteur 0 = automatique (rouleau thermique).",
+      "col_document": "Document",
+      "col_width": "Largeur (mm)",
+      "col_height": "Hauteur (mm)",
+      "height_auto_hint": "0 = hauteur automatique (rouleau thermique)"
+    },
     "vtype": {
       "title": "Types de voyage",
       "subtitle": "Départ, Complément, Additif",
@@ -2260,6 +2268,8 @@
       "act_detail": "Détail",
       "act_receipt": "Reçu",
       "act_receipt_title": "Imprimer le reçu",
+      "act_label": "Étiquette",
+      "act_label_title": "Imprimer l'étiquette du colis",
       "act_deliver": "Retrait",
       "empty": "Aucun colis.",
       "modal_edit": "Modifier le colis",

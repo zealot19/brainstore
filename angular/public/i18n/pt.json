@@ -1242,6 +1242,14 @@
       "footer_show_generated": "Mostrar « Gerado em … »",
       "footer_show_page_numbers": "Mostrar números de página"
     },
+    "docsize": {
+      "title": "Tamanhos dos documentos",
+      "hint": "Formato de papel padrão de cada documento (em mm). Altura 0 = automática (rolo térmico).",
+      "col_document": "Documento",
+      "col_width": "Largura (mm)",
+      "col_height": "Altura (mm)",
+      "height_auto_hint": "0 = altura automática (rolo térmico)"
+    },
     "vtype": {
       "title": "Tipos de viagem",
       "subtitle": "Partida, Complemento, Adicional",
@@ -2260,6 +2268,8 @@
       "act_detail": "Detalhe",
       "act_receipt": "Recibo",
       "act_receipt_title": "Imprimir o recibo",
+      "act_label": "Etiqueta",
+      "act_label_title": "Imprimir a etiqueta da encomenda",
       "act_deliver": "Retirada",
       "empty": "Sem encomendas.",
       "modal_edit": "Editar encomenda",

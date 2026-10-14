@@ -1242,6 +1242,14 @@
       "footer_show_generated": "Show “Generated on …”",
       "footer_show_page_numbers": "Show page numbers"
     },
+    "docsize": {
+      "title": "Document sizes",
+      "hint": "Default paper size for each document (in mm). Height 0 = automatic (thermal roll).",
+      "col_document": "Document",
+      "col_width": "Width (mm)",
+      "col_height": "Height (mm)",
+      "height_auto_hint": "0 = automatic height (thermal roll)"
+    },
     "vtype": {
       "title": "Voyage types",
       "subtitle": "Departure, Supplement, Additional",
@@ -2260,6 +2268,8 @@
       "act_detail": "Details",
       "act_receipt": "Receipt",
       "act_receipt_title": "Print receipt",
+      "act_label": "Label",
+      "act_label_title": "Print the parcel label",
       "act_deliver": "Pickup",
       "empty": "No parcels.",
       "modal_edit": "Edit parcel",
