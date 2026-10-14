@@ -3,8 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
-from apps.core.models import Sequence
-from apps.core.services.sequence_service import next_number, daily_route_ref
+from apps.core.services.sequence_service import daily_route_ref
 from apps.voyages_booking.models import Booking, Ticket, Passenger
 from apps.voyages_booking.services.passenger_services import get_or_create_passenger
 from apps.voyages_booking.services import loyalty_services
@@ -16,10 +15,9 @@ from apps.voyages_pricing.selectors.fare_selectors import resolve_fare, route_po
 _BOOKABLE = ["pending"]
 
 
-def _booking_reference(agency=None):
-    Sequence.objects.get_or_create(
-        code="BOOK", defaults={"name": "Réservations", "prefix": "BOOK", "padding": 5, "reset_yearly": True})
-    return next_number("BOOK", agency=agency)
+def _booking_reference(trip, origin, destination):
+    """Référence réservation, même modèle que voyage/colis/billet : DEP-ARR-AAAAMMJJ-NNN."""
+    return daily_route_ref("BKG", trip.company_id, origin, destination, trip.scheduled_departure)
 
 
 def _ticket_number(trip, origin, destination):
@@ -160,7 +158,7 @@ def create_booking(company, *, trip_type, outbound_trip, return_trip, buyer_spec
     buyer = _resolve_passenger(company, buyer_spec, user)
     booking = Booking.objects.create(
         company=company, agency=outbound_trip.origin.agency,
-        reference=_booking_reference(outbound_trip.origin.agency),
+        reference=_booking_reference(outbound_trip, outbound_trip.origin, outbound_trip.destination),
         status=Booking.Status.CONFIRMED,
         trip_type=trip_type, outbound_trip=outbound_trip,
         return_trip=return_trip if (is_round and not open_return) else None,
