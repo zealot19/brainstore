@@ -1250,6 +1250,15 @@
       "col_height": "Hauteur (mm)",
       "height_auto_hint": "0 = hauteur automatique (rouleau thermique)"
     },
+    "printermap": {
+      "title": "Mappage des imprimantes",
+      "hint": "Associez chaque document à une imprimante : l'agent d'impression local imprime automatiquement à l'enregistrement. Sans mappage, l'impression passe par le navigateur.",
+      "no_agent": "Agent d'impression non détecté sur ce serveur. Saisissez le nom exact de l'imprimante, ou installez l'agent (voir tools/print-helper). Sans agent, l'impression passe par le navigateur.",
+      "col_document": "Document",
+      "col_printer": "Imprimante",
+      "opt_browser": "— Navigateur (par défaut) —",
+      "ph_name": "Nom exact de l'imprimante Windows"
+    },
     "vtype": {
       "title": "Types de voyage",
       "subtitle": "Départ, Complément, Additif",

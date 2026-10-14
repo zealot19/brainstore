@@ -131,16 +131,17 @@ def build_baggage_ticket(baggage, tpl, *, agent="", logo_url="", width_mm=80.0, 
     return render_80mm([copy, cut, copy], width_mm=width_mm, height_mm=height_mm)
 
 
-def build_baggage_label(baggage, tpl, *, agent="", width_mm=80.0, height_mm=0.0):
+def build_baggage_label(baggage, tpl, *, agent="", width_mm=80.0, height_mm=0.0, copies=1):
     e = _html.escape
     trajet, dest = _trajet(baggage)
     name = baggage.owner_name if getattr(baggage, "ticket_id", None) else baggage.sender_name
     payant = "PAYANT" if (baggage.amount_due or 0) > 0 else "GRATUIT"
-    inner = f"""<div class="doc">
+    n = max(1, int(copies or 1))
+    one = lambda i: f"""<div class="doc">
       <div class="hdr"><div class="co"><b>{e(tpl.brand_name)}</b>
         <div class="ids">Tel: {e(tpl.phone)}</div></div></div>
       <div class="box" style="text-align:center;font-size:10pt">
-        <b>Ticket N&deg;</b>: {e(baggage.tag_number)}<br>
+        <b>Ticket N&deg;</b>: {e(baggage.tag_number)} &nbsp; <b>({i}/{n})</b><br>
         <b>Nom</b>: {e(name or "")}<br>
         <b>Tel</b>: {e(baggage.sender_phone)} &nbsp; <b>CNI</b>: {e(baggage.id_number)}<br>
         <b>{payant}</b><br>
@@ -148,19 +149,26 @@ def build_baggage_label(baggage, tpl, *, agent="", width_mm=80.0, height_mm=0.0)
       </div>
       <div class="foot">Imprime le : {_dt()} par {e(agent)}</div>
     </div>"""
-    return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
+    cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
+    blocks = []
+    for i in range(1, n + 1):
+        blocks.append(one(i))
+        if i < n:
+            blocks.append(cut)
+    return render_80mm(blocks, width_mm=width_mm, height_mm=height_mm)
 
 
-def build_parcel_label(parcel, tpl, *, agent="", width_mm=80.0, height_mm=0.0):
-    """Étiquette de colis (thermique) : réf, expéditeur/destinataire, destination, qté."""
+def build_parcel_label(parcel, tpl, *, agent="", width_mm=80.0, height_mm=0.0, copies=1):
+    """Étiquette(s) de colis (thermique). `copies` = nombre d'étiquettes (1 par pièce)."""
     e = _html.escape
     dest = _safe(parcel, "destination_point.name", "")
     origin = _safe(parcel, "origin_point.name", "")
-    inner = f"""<div class="doc">
+    n = max(1, int(copies or 1))
+    one = lambda i: f"""<div class="doc">
       <div class="hdr"><div class="co"><b>{e(tpl.brand_name)}</b>
         <div class="ids">Tel: {e(tpl.phone)}</div></div></div>
       <div class="box" style="text-align:center;font-size:10pt">
-        <b>Colis N&deg;</b>: {e(parcel.reference)}<br>
+        <b>Colis N&deg;</b>: {e(parcel.reference)} &nbsp; <b>({i}/{n})</b><br>
         <b>Exp</b>: {e(parcel.sender_name)}<br>
         <b>Dest</b>: {e(parcel.recipient_name)} &nbsp; <b>Tel</b>: {e(parcel.recipient_phone)}<br>
         <b>Trajet</b>: {e(origin)} &rarr; {e(dest)}<br>
@@ -168,4 +176,10 @@ def build_parcel_label(parcel, tpl, *, agent="", width_mm=80.0, height_mm=0.0):
       </div>
       <div class="foot">Imprime le : {_dt()} par {e(agent)}</div>
     </div>"""
-    return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
+    cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
+    blocks = []
+    for i in range(1, n + 1):
+        blocks.append(one(i))
+        if i < n:
+            blocks.append(cut)
+    return render_80mm(blocks, width_mm=width_mm, height_mm=height_mm)

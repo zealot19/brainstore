@@ -526,7 +526,8 @@ class BaggageLabelView(APIView):
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         w, h = resolve_doc_format(request.user.company, "etiquette_bagage")
-        html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user), width_mm=w, height_mm=h)
+        html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user), width_mm=w, height_mm=h,
+                                              copies=b.quantity or 1)
         return success_response({"html": html})
 
 
@@ -541,7 +542,8 @@ class ParcelLabelView(APIView):
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         w, h = resolve_doc_format(request.user.company, "etiquette_colis")
-        html = doc_render.build_parcel_label(p, tpl, agent=_agent(request.user), width_mm=w, height_mm=h)
+        html = doc_render.build_parcel_label(p, tpl, agent=_agent(request.user), width_mm=w, height_mm=h,
+                                             copies=p.quantity or 1)
         return success_response({"html": html})
 
 

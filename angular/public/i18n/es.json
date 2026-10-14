@@ -1250,6 +1250,15 @@
       "col_height": "Alto (mm)",
       "height_auto_hint": "0 = altura automática (rollo térmico)"
     },
+    "printermap": {
+      "title": "Asignación de impresoras",
+      "hint": "Asigne cada documento a una impresora: el agente de impresión local imprime automáticamente al guardar. Sin asignación, la impresión usa el navegador.",
+      "no_agent": "No se detectó un agente de impresión en este servidor. Escriba el nombre exacto de la impresora, o instale el agente (ver tools/print-helper). Sin agente, se imprime por el navegador.",
+      "col_document": "Documento",
+      "col_printer": "Impresora",
+      "opt_browser": "— Navegador (por defecto) —",
+      "ph_name": "Nombre exacto de la impresora de Windows"
+    },
     "vtype": {
       "title": "Tipos de viaje",
       "subtitle": "Salida, Complemento, Adicional",

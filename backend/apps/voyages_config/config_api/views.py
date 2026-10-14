@@ -730,6 +730,64 @@ class DocumentFormatsView(APIView):
         return self.get(request)
 
 
+class PrinterMappingView(APIView):
+    """Mappage document → imprimante (central par agence) + liste des imprimantes vues par
+    l'agent Windows local. GET -> {documents, printers, helper}; PUT -> upsert."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {"GET": "transport.config.view", "PUT": "transport.config.manage"}
+
+    def get(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        from apps.voyages_config.doc_format import DOC_DEFS
+        from apps.voyages_config.models import PrinterConfig
+        from apps.voyages_config import printing
+        mapped = {pc.doc_code: pc.printer_name for pc in PrinterConfig.objects.filter(company=company)}
+        documents = [{"code": code, "label": label, "printer_name": mapped.get(code, "")}
+                     for code, label, _w, _h in DOC_DEFS]
+        printers = printing.helper_printers()
+        return success_response({"documents": documents, "printers": printers,
+                                 "helper": bool(printing.helper_url())})
+
+    def put(self, request):
+        company, err = resolve_company_or_global(request)
+        if err:
+            return err
+        from apps.voyages_config.doc_format import DEFAULT_FORMATS
+        from apps.voyages_config.models import PrinterConfig
+        rows = request.data if isinstance(request.data, list) else request.data.get("items", [])
+        valid = set(DEFAULT_FORMATS)
+        for r in rows:
+            code = r.get("code")
+            if code not in valid:
+                continue
+            PrinterConfig.objects.update_or_create(
+                company=company, doc_code=code,
+                defaults={"printer_name": (r.get("printer_name") or "").strip()})
+        return self.get(request)
+
+
+class DocumentPrintView(APIView):
+    """Impression serveur d'un document (via l'agent) avec repli navigateur.
+    POST {doc, id} -> {printed: bool, html: str|null}."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        company = getattr(request.user, "company", None)
+        if company is None:
+            return error_response("Aucune institution.", status_code=400)
+        from apps.voyages_config import printing
+        doc = request.data.get("doc")
+        obj_id = request.data.get("id")
+        if not doc or not obj_id:
+            return error_response("Paramètres 'doc' et 'id' requis.")
+        res = printing.print_or_fallback(company, doc, obj_id, request=request)
+        if res.get("error") == "not_found":
+            return error_response("Document introuvable.", status_code=404)
+        return success_response(res)
+
+
 class TicketTemplateResetView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}

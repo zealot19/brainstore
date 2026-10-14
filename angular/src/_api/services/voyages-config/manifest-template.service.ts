@@ -12,6 +12,8 @@ export interface ManifestTemplate {
 }
 
 export interface DocumentFormat { code: string; label: string; width_mm: number; height_mm: number; }
+export interface PrinterMapDoc { code: string; label: string; printer_name: string; }
+export interface PrinterMapping { documents: PrinterMapDoc[]; printers: string[]; helper: boolean; }
 
 @Injectable({ providedIn: 'root' })
 export class ManifestTemplateService {
@@ -23,5 +25,11 @@ export class ManifestTemplateService {
   }
   saveFormats(items: DocumentFormat[]): Observable<DocumentFormat[]> {
     return this.http.put<any>(VOYAGES_CONFIG.documentFormats, items).pipe(map(r => r?.data ?? r));
+  }
+  printerMapping(): Observable<PrinterMapping> {
+    return this.http.get<any>(VOYAGES_CONFIG.printerMapping).pipe(map(r => r?.data ?? r));
+  }
+  savePrinterMapping(items: { code: string; printer_name: string }[]): Observable<PrinterMapping> {
+    return this.http.put<any>(VOYAGES_CONFIG.printerMapping, items).pipe(map(r => r?.data ?? r));
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ManifestTemplateService, ManifestTemplate, DocumentFormat } from '../../../services/voyages-config/manifest-template.service';
+import { ManifestTemplateService, ManifestTemplate, DocumentFormat, PrinterMapping } from '../../../services/voyages-config/manifest-template.service';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -26,9 +26,13 @@ export class VcManifestTemplateComponent implements OnInit {
   formats: DocumentFormat[] = [];
   savingFormats = false;
 
+  printerMap: PrinterMapping = { documents: [], printers: [], helper: false };
+  savingMap = false;
+
   ngOnInit(): void {
     this.svc.get().subscribe(t => this.tpl = { ...this.tpl, ...t });
     this.svc.formats().subscribe(f => this.formats = f);
+    this.svc.printerMapping().subscribe(m => this.printerMap = m);
   }
 
   saveFormats(): void {
@@ -37,6 +41,16 @@ export class VcManifestTemplateComponent implements OnInit {
     this.svc.saveFormats(this.formats).subscribe({
       next: f => { this.formats = f; this.savingFormats = false; this.toast.success('Tailles enregistrées.'); },
       error: e => { this.savingFormats = false; this.toast.error(e?.error?.error?.message ?? "L'opération a échoué."); },
+    });
+  }
+
+  savePrinterMapping(): void {
+    if (this.savingMap) return;
+    this.savingMap = true;
+    const items = this.printerMap.documents.map(d => ({ code: d.code, printer_name: d.printer_name || '' }));
+    this.svc.savePrinterMapping(items).subscribe({
+      next: m => { this.printerMap = m; this.savingMap = false; this.toast.success('Mappage enregistré.'); },
+      error: e => { this.savingMap = false; this.toast.error(e?.error?.error?.message ?? "L'opération a échoué."); },
     });
   }
 

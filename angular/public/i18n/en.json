@@ -1250,6 +1250,15 @@
       "col_height": "Height (mm)",
       "height_auto_hint": "0 = automatic height (thermal roll)"
     },
+    "printermap": {
+      "title": "Printer mapping",
+      "hint": "Assign each document to a printer: the local print agent prints it automatically on save. Without a mapping, printing uses the browser dialog.",
+      "no_agent": "No print agent detected on this server. Enter the exact printer name, or install the agent (see tools/print-helper). Without an agent, printing uses the browser.",
+      "col_document": "Document",
+      "col_printer": "Printer",
+      "opt_browser": "— Browser (default) —",
+      "ph_name": "Exact Windows printer name"
+    },
     "vtype": {
       "title": "Voyage types",
       "subtitle": "Departure, Supplement, Additional",

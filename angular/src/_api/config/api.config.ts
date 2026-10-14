@@ -295,6 +295,8 @@ export const VOYAGES_CONFIG = {
   settings:           `${VC}/settings/`,
   manifestTemplate:      `${VC}/manifest-template/`,
   documentFormats:       `${VC}/document-formats/`,
+  printerMapping:        `${VC}/printer-mapping/`,
+  printDocument:         `${VC}/print/`,
   ticketTemplate:        `${VC}/ticket-template/`,
   ticketTemplateReset:   `${VC}/ticket-template/reset/`,
   ticketTemplatePreview: `${VC}/ticket-template/preview/`,
