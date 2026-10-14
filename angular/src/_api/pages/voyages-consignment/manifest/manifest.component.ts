@@ -26,7 +26,6 @@ export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
   allTrips: Trip[] = [];
   routes: Route[] = []; destinations: ServicePoint[] = []; timeslots: TimeSlot[] = [];
-  mode: 'voyage' | 'sans' = 'voyage';
   // Filtres : options issues de la config (trajets, destinations, plages) ;
   // « Véhicule / Code » identifie directement le voyage (pas de champ Voyage séparé).
   fRoute = ''; fDest = ''; fDay = ''; fTime = ''; tripId = '';
@@ -71,14 +70,12 @@ export class VcgManifestComponent implements OnInit {
     if (!this.tripId && this.filteredTrips.length === 1) this.tripId = this.filteredTrips[0].id;
     this.refresh();
   }
-  setMode(m: 'voyage' | 'sans'): void { this.mode = m; this.tripId = ''; this.refresh(); }
-
   refresh(): void {
     this.selReady.clear();
     const st = this.selectedTrip;
     // Pool « à expédier » restreint à la destination du voyage sélectionné (ou au filtre destination).
     const destination = st?.destination || this.fDest || undefined;
-    this.parcels.expedition({ trip: this.mode === 'voyage' ? this.tripId : undefined, destination }).subscribe(d => {
+    this.parcels.expedition({ trip: this.tripId || undefined, destination }).subscribe(d => {
       this.ready = d.ready ?? []; this.assigned = d.assigned ?? [];
       this.totals = d.totals ?? { count: 0, weight: 0 };
       // Quantité par défaut = restant de chaque colis du pool.
