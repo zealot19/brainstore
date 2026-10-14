@@ -59,6 +59,42 @@ docker compose exec backend python manage.py bootstrap_from_master
 **7. Vérifier la sync** : sur le master, `GET /api/v1/sync/status/` (en admin) doit
 montrer l'agence **en ligne**. Une vente créée en agence remonte après `sync_once`.
 
+## Accès depuis les autres postes (réseau de l'agence)
+Tout passe par **un seul conteneur nginx** sur `WEB_PORT` (défaut **8080**) : il sert
+Angular et relaie `/api` vers le backend. **Même origine → aucun CORS, aucune config par
+poste.** Les guichets ouvrent simplement l'adresse du serveur.
+
+**1. Adresse du serveur.** Récupérer son IP locale :
+- Windows : `ipconfig` → l'IPv4 de la carte réseau (ex. `192.168.1.50`).
+- Linux : `ip a`.
+
+Les autres postes ouvrent alors : **`http://<IP-du-serveur>:8080`**.
+
+**2. Ouvrir le pare-feu** (cause n°1 du « marche sur le serveur, pas ailleurs »). Sur le
+serveur **Windows**, en administrateur :
+```
+netsh advfirewall firewall add rule name="BrainStore ERP 8080" dir=in action=allow protocol=TCP localport=8080
+```
+(Linux/UFW : `sudo ufw allow 8080/tcp`.)
+
+**3. `.env`** — `ALLOWED_HOSTS=*` est déjà prévu (toute IP acceptée). Ajoutez l'adresse
+réellement utilisée aux origines CSRF (admin Django + formulaires) :
+```
+WEB_PORT=8080
+ALLOWED_HOSTS=*
+CSRF_TRUSTED_ORIGINS=http://192.168.1.50:8080,http://localhost:8080
+```
+Puis redémarrer : `docker compose -f docker-compose.local.yml up -d` (ou `docker compose up -d`).
+
+**4. IP stable.** Donnez au serveur une **IP fixe** (ou une réservation DHCP), afin que
+l'adresse ne change pas — sinon les postes devront être reconfigurés.
+
+> **HTTP et cookies.** L'application fonctionne en HTTP sur le LAN (auth par **JWT**).
+> En revanche l'**admin Django** et les flux par cookie peuvent échouer en HTTP si les
+> cookies sont « Secure » → utilisez **HTTPS** pour ces cas. Pour le HTTPS en local :
+> `mkcert` (certif. de confiance locale, gratuit) ou un certificat auto-signé importé sur
+> les postes ; terminez le TLS au niveau de nginx.
+
 ## Mettre à jour (récupérer le dernier code)
 > Gardez agence et master sur le **même code** ; mettez le master à jour d'abord.
 ```bash
