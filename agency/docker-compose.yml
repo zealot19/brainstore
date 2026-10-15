@@ -23,6 +23,9 @@ services:
     image: erp-backend-agency
     restart: unless-stopped
     env_file: .env
+    # Atteindre l'agent d'impression Windows de l'hôte (host.docker.internal:9113) sous WSL.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - media:/src/backend/media
     depends_on:
