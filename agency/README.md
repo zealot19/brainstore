@@ -12,6 +12,10 @@ Sur le **master** (dossier `online-master/`), l'agence doit **exister** :
 **Administration → Agences → Nouvelle agence** (avec un **code**). Notez son **UUID**
 (= `NODE_AGENCY_ID` ci-dessous) et utilisez le **même `SYNC_TOKEN`** que le master.
 
+## Déploiement sur Windows Server (WSL2) — automatisé PowerShell
+Serveur Windows ? Suivez **[WINDOWS-WSL-DEPLOY.md](WINDOWS-WSL-DEPLOY.md)** : installation
+WSL2+Ubuntu, Docker, réseau, agent d'impression et démarrage auto, en commandes PowerShell.
+
 ## Prérequis
 - Un serveur/PC avec **Docker** + **Docker Compose** :
   ```bash
