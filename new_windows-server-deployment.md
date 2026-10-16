@@ -69,8 +69,8 @@ wsl -d Ubuntu -u root -- bash -c "curl -fsSL https://get.docker.com | sh && syst
 
 ## Étape 4 — Récupérer le code dans WSL (rapide : système Linux)
 ```powershell
-# Dépôt privé : mettez un token dans l'URL. Re-run = git pull.
-wsl -d Ubuntu -u root -- bash -c "cd /root && (git clone https://<TOKEN>@github.com/zealot19/brainstore.git brainstore || (cd brainstore && git pull))"
+# Dépôt privé : mettez un token dans l'URL. Re-run = git pull. (git n'est pas dans l'image Ubuntu → on l'installe.)
+wsl -d Ubuntu -u root -- bash -c "apt-get update && apt-get install -y git && cd /root && (git clone https://<TOKEN>@github.com/zealot19/brainstore.git brainstore || (cd brainstore && git pull))"
 ```
 
 ## Étape 5 — Configurer et lancer l'AGENCE
@@ -84,6 +84,9 @@ wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && cp -n .env.examp
 
 # b) build + démarrage
 wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -f docker-compose.local.yml up -d --build"
+
+# Laisser le backend appliquer les migrations au démarrage avant d'enchaîner
+Start-Sleep -Seconds 25
 
 # c) amorcer depuis le master en ligne (tire la config)
 wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -f docker-compose.local.yml exec -T backend python manage.py bootstrap_from_master"
@@ -112,35 +115,50 @@ netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 conne
 ```powershell
 winget install -e --id Python.Python.3.12
 winget install -e --id SumatraPDF.SumatraPDF
+```
+> **Rouvrez une NOUVELLE PowerShell (Admin)** après ces installs : sinon `python` n'est pas encore dans le PATH.
+```powershell
 python -m pip install pywin32
 
-# Copier l'agent (fichier unique) depuis WSL + y déposer SumatraPDF.exe
+# Dossier de l'agent + copie du fichier unique depuis WSL
 New-Item -ItemType Directory -Force C:\brainstore-print | Out-Null
 wsl -d Ubuntu -u root -- bash -c "cp /root/brainstore/tools/print-helper/print_helper.py /mnt/c/brainstore-print/"
-Copy-Item (Get-Command SumatraPDF.exe).Source C:\brainstore-print\SumatraPDF.exe -ErrorAction SilentlyContinue
+
+# Localiser SumatraPDF.exe (winget ne l'ajoute pas au PATH) et le copier à côté de l'agent
+$sumatra = Get-ChildItem "$env:LOCALAPPDATA\SumatraPDF","$env:ProgramFiles\SumatraPDF","${env:ProgramFiles(x86)}\SumatraPDF" `
+  -Filter SumatraPDF.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($sumatra) { Copy-Item $sumatra.FullName C:\brainstore-print\SumatraPDF.exe -Force }
+else { Write-Warning "SumatraPDF.exe introuvable — déposez la version PORTABLE dans C:\brainstore-print\SumatraPDF.exe" }
 [Environment]::SetEnvironmentVariable("SUMATRA_PATH","C:\brainstore-print\SumatraPDF.exe","Machine")
 
-# Test
-python C:\brainstore-print\print_helper.py          # Ctrl+C après
+# Test (la variable Machine n'est pas encore active dans cette session → on la passe à la volée)
+$env:SUMATRA_PATH = "C:\brainstore-print\SumatraPDF.exe"
+python C:\brainstore-print\print_helper.py          # Ctrl+C après le test
 Invoke-RestMethod "http://localhost:9113/printers"   # doit lister les imprimantes Windows
 ```
 
 ## Étape 8 — Démarrage automatique au boot
+> **Important** : les tâches doivent s'exécuter sous **le compte qui a installé WSL** (la
+> distro Ubuntu et les imprimantes réseau sont **par utilisateur** — un compte SYSTEM ne les
+> « voit » pas). On utilise donc ce compte, « exécuter même si l'utilisateur n'est pas connecté »
+> (le mot de passe est demandé).
 ```powershell
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-$settings  = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries
+$cred = Get-Credential   # saisir le compte administrateur qui a installé WSL (DOMAINE\user ou .\user)
+$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries
 
-# (a) WSL + Docker (les conteneurs restart:unless-stopped remontent seuls)
+# (a) WSL + Docker (les conteneurs restart:unless-stopped remontent seuls). 'tail -f /dev/null' garde la distro vivante.
 $wslAction = New-ScheduledTaskAction -Execute "C:\Windows\System32\wsl.exe" `
   -Argument '-d Ubuntu -u root -e sh -c "systemctl start docker || service docker start; tail -f /dev/null"'
 Register-ScheduledTask -TaskName "BrainStore-WSL" -Action $wslAction `
-  -Trigger (New-ScheduledTaskTrigger -AtStartup) -Principal $principal -Settings $settings -Force
+  -Trigger (New-ScheduledTaskTrigger -AtStartup) -RunLevel Highest `
+  -User $cred.UserName -Password $cred.GetNetworkCredential().Password -Settings $settings -Force
 
-# (b) Agent d'impression
+# (b) Agent d'impression (même compte → il voit les imprimantes réseau de l'utilisateur)
 $printAction = New-ScheduledTaskAction -Execute (Get-Command python.exe).Source `
   -Argument "C:\brainstore-print\print_helper.py" -WorkingDirectory "C:\brainstore-print"
 Register-ScheduledTask -TaskName "BrainStore-PrintHelper" -Action $printAction `
-  -Trigger (New-ScheduledTaskTrigger -AtStartup) -Principal $principal -Settings $settings -Force
+  -Trigger (New-ScheduledTaskTrigger -AtStartup) -RunLevel Highest `
+  -User $cred.UserName -Password $cred.GetNetworkCredential().Password -Settings $settings -Force
 ```
 
 ## Étape 9 — Vérification
@@ -164,8 +182,8 @@ wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -
 # Forcer une synchro immédiate
 wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -f docker-compose.local.yml exec -T backend python manage.py sync_once"
 
-# Sauvegarde de la base
-wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -f docker-compose.local.yml exec -T db pg_dump -U erp_agency erp_agency | gzip > /root/erp_agency_\$(date +%F).sql.gz"
+# Sauvegarde de la base (le backtick ` protège le $ pour qu'il soit évalué par bash, pas PowerShell)
+wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && docker compose -f docker-compose.local.yml exec -T db pg_dump -U erp_agency erp_agency | gzip > /root/erp_agency_`$(date +%F).sql.gz"
 
 # Mise à jour (mettre le master à jour d'abord)
 wsl -d Ubuntu -u root -- bash -c "cd /root/brainstore/agency && git pull && docker compose -f docker-compose.local.yml up -d --build"
