@@ -164,3 +164,6 @@ def test_parcel_reference_format_agency_seq_month_year():
     r2 = _parcel_reference(company.id, o)
     assert re.match(r"^DLA/\d{4}/\d{2}/\d{4}$", r1), r1   # CODE/NNNN/MM/AAAA
     assert r1.split("/")[1] == "0001" and r2.split("/")[1] == "0002"   # séquence mensuelle par agence
+    # La clé Sequence doit tenir dans varchar(50) (Postgres l'impose, pas SQLite).
+    from apps.core.models import Sequence
+    assert all(len(s.code) <= 50 for s in Sequence.objects.all())
