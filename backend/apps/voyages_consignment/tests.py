@@ -17,12 +17,12 @@ def test_render_80mm_page_size():
 def test_parcel_receipt_contains_key_fields():
     p = Parcel(reference="COL-00012", sender_name="LONGTIO", sender_phone="678015230",
                recipient_name="MASSOU", recipient_phone="693009981",
-               description="test123456", quantity=1, amount_due=1000, declared_value=1)
+               description="test123456", content="livres", quantity=1, amount_due=1000, declared_value=1)
     p.destination_point = ServicePoint(name="AYOS")
     p.origin_point = ServicePoint(name="BERTOUA")
     html = doc_render.build_parcel_receipt(p, _tpl(), agent="NOUROUDDINE")
     for token in ["COL-00012", "LONGTIO", "MASSOU", "AYOS", "1 000", "NOUROUDDINE",
-                  "Signature Client", "80mm auto"]:
+                  "Client Signature", "Head Office", "48hrs", "80mm auto"]:
         assert token in html, token
 
 
@@ -146,3 +146,21 @@ def test_baggage_permission_gating():
 def test_staff_without_consignment_perm_denied():
     company, admin, staff = _make_staff([])
     assert _status(ParcelListView, "get", staff) == 403
+
+
+@pytest.mark.django_db
+def test_parcel_reference_format_agency_seq_month_year():
+    from apps.voyages_consignment.services.parcel_services import _parcel_reference
+    from apps.system_config.services import create_company
+    from apps.system_config.models import Agency
+    from apps.voyages_config.models import Town, ServicePoint
+    import re
+    company, _ = create_company(name="RefCo", admin_email="ref@x.com",
+                                admin_first_name="A", admin_last_name="B")
+    ag = Agency.objects.create(company=company, name="Douala", code="DLA")
+    town = Town.objects.create(company=company, name="Dla")
+    o = ServicePoint.objects.create(company=company, town=town, code="O", name="O", agency=ag)
+    r1 = _parcel_reference(company.id, o)
+    r2 = _parcel_reference(company.id, o)
+    assert re.match(r"^DLA/\d{4}/\d{2}/\d{4}$", r1), r1   # CODE/NNNN/MM/AAAA
+    assert r1.split("/")[1] == "0001" and r2.split("/")[1] == "0002"   # séquence mensuelle par agence

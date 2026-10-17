@@ -43,13 +43,15 @@ def test_parcel_label_renderer_uses_configured_size():
                               consignment_type=ct, sender_name="E", sender_phone="6",
                               recipient_name="R", recipient_phone="7", quantity=2,
                               status=Parcel.Status.REGISTERED)
+    p.reference = "A/0007/10/2026"
     html = doc_render.build_parcel_label(p, tpl, agent="NUM", width_mm=58, height_mm=40)
-    assert "@page{size:58mm 40mm" in html.replace(" ", "") or "58mm 40mm" in html
-    assert "Colis N" in html and p.reference in html
+    assert "58mm 40mm" in html                      # taille configurée
+    assert "Journey" in html and p.reference in html
+    assert "<svg" in html                           # code-barres présent
     # Étiquette × quantité : 3 pièces -> 3 étiquettes.
     html3 = doc_render.build_parcel_label(p, tpl, agent="NUM", copies=3)
-    assert html3.count("Colis N") == 3
-    assert "(1/3)" in html3 and "(3/3)" in html3
+    assert html3.count("Journey") == 3
+    assert "1/3" in html3 and "3/3" in html3
 
 
 @pytest.mark.django_db
@@ -69,7 +71,7 @@ def test_print_falls_back_when_no_mapping(monkeypatch):
                               recipient_name="R", recipient_phone="7", quantity=1,
                               status=Parcel.Status.REGISTERED)
     res = printing.print_or_fallback(company, "recu_colis", str(p.id))
-    assert res["printed"] is False and res["html"] and "Recu" in res["html"]
+    assert res["printed"] is False and res["html"] and "Client Signature" in res["html"]
 
 
 @pytest.mark.django_db

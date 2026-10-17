@@ -84,7 +84,7 @@ def build_doc_html(company, doc_code, obj_id, request=None):
         if doc_code == "recu_colis":
             return doc_render.build_parcel_receipt(p, tpl, agent=agent, logo_url=logo_url,
                                                    width_mm=w, height_mm=h)
-        return doc_render.build_parcel_label(p, tpl, agent=agent, width_mm=w, height_mm=h,
+        return doc_render.build_parcel_label(p, tpl, agent=agent, logo_url=logo_url, width_mm=w, height_mm=h,
                                              copies=p.quantity or 1)
 
     if doc_code in ("ticket_bagage", "etiquette_bagage"):

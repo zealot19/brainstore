@@ -29,6 +29,7 @@ pyotp==2.9.0
 # Pillow==11.0.0   # décommenter quand la connexion permet le téléchargement (46 Mo source)
 python-slugify==8.0.4
 segno==1.6.6   # génération QR code (billets), pur Python
+python-barcode==0.16.1   # code-barres Code128 SVG (étiquette colis), pur Python
 
 # ── Reporting (PDF/Excel) ──
 weasyprint==63.0
