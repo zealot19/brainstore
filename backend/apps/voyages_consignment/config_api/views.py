@@ -541,9 +541,10 @@ class ParcelLabelView(APIView):
         if not p:
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
+        logo_url = ticket_render._abs(request, tpl.logo)
         w, h = resolve_doc_format(request.user.company, "etiquette_colis")
-        html = doc_render.build_parcel_label(p, tpl, agent=_agent(request.user), width_mm=w, height_mm=h,
-                                             copies=p.quantity or 1)
+        html = doc_render.build_parcel_label(p, tpl, agent=_agent(request.user), logo_url=logo_url,
+                                             width_mm=w, height_mm=h, copies=p.quantity or 1)
         return success_response({"html": html})
 
 

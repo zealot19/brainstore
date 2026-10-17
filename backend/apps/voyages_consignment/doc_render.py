@@ -70,7 +70,50 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .sign div{{width:48%;min-height:12mm}}
   .foot{{font-size:7pt;font-style:italic;margin-top:1mm}}
   .cutline{{border-top:1px dashed #111;margin:3mm 0;text-align:center;font-size:7pt;color:#777}}
+  /* Reçu colis */
+  .rhead{{display:flex;gap:2mm;align-items:center;border-bottom:1px solid #111;padding-bottom:1.5mm;margin-bottom:1.5mm}}
+  .rhead .rlogo img{{max-height:16mm;max-width:34mm;object-fit:contain}}
+  .rhead .rco{{flex:1;text-align:left}}
+  .rhead .rname{{font-weight:800;font-size:11pt;line-height:1.1}}
+  .rhead .rslo{{font-style:italic;font-size:8pt;color:#333}}
+  .rhead .rids{{font-size:7.5pt;line-height:1.3}}
+  .rf{{display:flex;justify-content:space-between;gap:3mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #ccc}}
+  .rf span{{color:#444}}
+  .rf b{{text-align:right}}
+  .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
+  .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #111;padding-top:1mm}}
+  .rnote div{{margin:0.4mm 0}}
+  /* Étiquette colis */
+  .lbl{{text-align:center}}
+  .lbl-logo{{margin-bottom:1.5mm}}
+  .lbl-logo img{{max-height:14mm;max-width:40mm;object-fit:contain}}
+  .lbl-ref{{font-weight:800;font-size:12pt;margin-bottom:1mm}}
+  .lbl-f{{font-size:9pt;text-align:left;margin:0.5mm 0}}
+  .lbl-bc{{margin-top:1.5mm}}
+  .lbl-bc svg{{max-width:70mm;height:auto}}
 </style>"""
+
+
+def _barcode_svg(value):
+    """Code-barres Code128 (SVG inline) de `value`. Chaîne vide si échec/valeur vide."""
+    value = str(value or "").strip()
+    if not value:
+        return ""
+    try:
+        import re
+        from io import BytesIO
+        import barcode
+        from barcode.writer import SVGWriter
+        buf = BytesIO()
+        barcode.get("code128", value, writer=SVGWriter()).write(
+            buf, options={"module_width": 0.35, "module_height": 11.0,
+                          "quiet_zone": 2.0, "write_text": False})
+        svg = buf.getvalue().decode("utf-8")
+        svg = re.sub(r"<\?xml[^>]*\?>", "", svg)
+        svg = re.sub(r"<!DOCTYPE[^>]*>", "", svg)
+        return svg.strip()
+    except Exception:
+        return ""
 
 
 def render_80mm(inner_html_list, *, width_mm=80.0, height_mm=0.0):
@@ -81,25 +124,49 @@ def render_80mm(inner_html_list, *, width_mm=80.0, height_mm=0.0):
 
 def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, height_mm=0.0):
     e = _html.escape
-    agency = _safe(parcel, "origin_point.name", "")
     dest = _safe(parcel, "destination_point.name", "")
-    hdr = company_header(tpl, logo_url=logo_url,
-                         agency_line=(f"Agence de {agency}" if agency else ""))
+    agency_obj = _safe(parcel, "origin_point.agency", None)
+    agency_name = (getattr(agency_obj, "name", "") if agency_obj else "") or _safe(parcel, "origin_point.name", "")
     when = _dt(getattr(parcel, "created_at", None))
-    inner = f"""<div class="doc">
-      {hdr}
-      <h2>Recu d'Expedition N&deg; {e(parcel.reference)}</h2>
-      <div class="box"><b>Exp</b>: {e(parcel.sender_name)}<br><b>Tel</b>: {e(parcel.sender_phone)}</div>
-      <div class="box"><b>Dest</b>: {e(parcel.recipient_name)}<br><b>Tel</b>: {e(parcel.recipient_phone)}</div>
-      <div class="box">
-        <b>Destination</b>: {e(dest)}<br>
-        <b>Colis</b>: {e(parcel.description)}<br>
-        <b>Valeur</b>: {_money(parcel.declared_value)} frs<br>
-        <b>Qte</b>: {parcel.quantity} &nbsp; <b>Montant</b>: {_money(parcel.amount_due)} frs<br>
-        <b>Par</b>: {e(agent)} <b>le</b>: {when}
+    logo = f'<img src="{logo_url}" alt="">' if logo_url else ""
+    head = f"""<div class="rhead">
+      <div class="rlogo">{logo}</div>
+      <div class="rco">
+        <div class="rname">{e(tpl.brand_name)}</div>
+        <div class="rslo">{e(tpl.slogan)}</div>
+        <div class="rids"><b>Head Office</b>: {e(tpl.address)}</div>
+        <div class="rids">{e(agency_name)}</div>
       </div>
-      <div class="terms">{e(tpl.parcel_receipt_terms)}</div>
-      <div class="sign"><div>Signature Client</div><div>Signature de l'agent</div></div>
+    </div>"""
+
+    def rf(k, v):
+        return f'<div class="rf"><span>{k}</span><b>{v}</b></div>'
+
+    fields = "".join([
+        rf("Sending Ticket N&deg;", e(parcel.reference)),
+        rf("Sender Name", e(parcel.sender_name)),
+        rf("Sender Number", e(parcel.sender_phone)),
+        rf("Receiver Name", e(parcel.recipient_name)),
+        rf("Receiver Number", e(parcel.recipient_phone)),
+        rf("Destination", e(dest)),
+        rf("Parcel Description", e(parcel.description) or "&mdash;"),
+        rf("Value", f"{_money(parcel.declared_value)} frs"),
+        rf("Qty", str(parcel.quantity)),
+        rf("Content", e(parcel.content) or "&mdash;"),
+        rf("Amount", f"{_money(parcel.amount_due)} frs"),
+    ])
+    note = (
+        '<div class="rnote"><b>Note:</b>'
+        '<div>- All parcels to be collected within 48hrs after delivery</div>'
+        '<div>- Always declare the true content of your package before its registered</div>'
+        '<div>- Compensation is 50%</div></div>'
+    )
+    inner = f"""<div class="doc">
+      {head}
+      {fields}
+      <div class="rby">By: {e(agent)} &nbsp;&nbsp; on the {when}</div>
+      {note}
+      <div class="sign"><div>Client Signature</div><div>Agent Signature</div></div>
     </div>"""
     return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
 
@@ -158,23 +225,22 @@ def build_baggage_label(baggage, tpl, *, agent="", width_mm=80.0, height_mm=0.0,
     return render_80mm(blocks, width_mm=width_mm, height_mm=height_mm)
 
 
-def build_parcel_label(parcel, tpl, *, agent="", width_mm=80.0, height_mm=0.0, copies=1):
-    """Étiquette(s) de colis (thermique). `copies` = nombre d'étiquettes (1 par pièce)."""
+def build_parcel_label(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, height_mm=0.0, copies=1):
+    """Étiquette(s) de colis (thermique) : logo centré, référence, exp./dest., trajet,
+    code-barres. `copies` = nombre d'étiquettes (1 par pièce)."""
     e = _html.escape
     dest = _safe(parcel, "destination_point.name", "")
     origin = _safe(parcel, "origin_point.name", "")
+    logo = f'<img src="{logo_url}" alt="">' if logo_url else f"<b>{e(tpl.brand_name)}</b>"
+    barcode = _barcode_svg(parcel.reference)
     n = max(1, int(copies or 1))
-    one = lambda i: f"""<div class="doc">
-      <div class="hdr"><div class="co"><b>{e(tpl.brand_name)}</b>
-        <div class="ids">Tel: {e(tpl.phone)}</div></div></div>
-      <div class="box" style="text-align:center;font-size:10pt">
-        <b>Colis N&deg;</b>: {e(parcel.reference)} &nbsp; <b>({i}/{n})</b><br>
-        <b>Exp</b>: {e(parcel.sender_name)}<br>
-        <b>Dest</b>: {e(parcel.recipient_name)} &nbsp; <b>Tel</b>: {e(parcel.recipient_phone)}<br>
-        <b>Trajet</b>: {e(origin)} &rarr; {e(dest)}<br>
-        <b>Qte</b>: {parcel.quantity}
-      </div>
-      <div class="foot">Imprime le : {_dt()} par {e(agent)}</div>
+    one = lambda i: f"""<div class="doc lbl">
+      <div class="lbl-logo">{logo}</div>
+      <div class="lbl-ref">{e(parcel.reference)}{'' if n == 1 else f' &middot; {i}/{n}'}</div>
+      <div class="lbl-f"><b>Sender</b>: {e(parcel.sender_name)}</div>
+      <div class="lbl-f"><b>Receiver</b>: {e(parcel.recipient_name)}</div>
+      <div class="lbl-f"><b>Journey</b>: {e(origin)} &rarr; {e(dest)}</div>
+      <div class="lbl-bc">{barcode}</div>
     </div>"""
     cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
     blocks = []

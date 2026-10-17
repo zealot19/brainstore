@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.exceptions import ApplicationError
 from apps.core.models import Sequence
 from apps.core.agency_scope import agency_allowed
-from apps.core.services.sequence_service import next_number, daily_route_ref
+from apps.core.services.sequence_service import next_number
 from apps.voyages_consignment.models import Parcel, ParcelEvent
 
 _PRE_DEPARTURE = ["draft", "pending"]
@@ -22,9 +22,20 @@ def _assert_destination_agency(parcel, user):
             _("Seule l'agence de destination peut réceptionner ou remettre ce colis."))
 
 
-def _parcel_reference(company_id, origin, destination):
-    """Référence colis, même style que la référence voyage : DEP-ARR-AAAAMMJJ-NNN."""
-    return daily_route_ref("COL", company_id, origin, destination)
+def _parcel_reference(company_id, origin, destination=None, when=None):
+    """Référence colis : CODE-AGENCE-EXPEDITRICE/NNNN/MM/AAAA (séquence mensuelle par agence).
+
+    Ex. DLA/0001/10/2026. Code agence = celui de l'agence du point de départ (à défaut le
+    code du point, sinon 'XX'). La séquence repart par agence + mois."""
+    now = timezone.localtime(when or timezone.now())
+    agency = getattr(origin, "agency", None)
+    agcode = (getattr(agency, "code", "") or getattr(origin, "code", "") or "XX")
+    ym = now.strftime("%Y%m")
+    seq_code = f"COL-{company_id}-{getattr(agency, 'id', None) or 'X'}-{ym}"
+    Sequence.objects.get_or_create(
+        code=seq_code, defaults={"name": f"Colis {agcode} {ym}", "prefix": "", "padding": 4, "reset_yearly": False})
+    n = next_number(seq_code)   # préfixe/année vides -> numéro « 0001 »
+    return f"{agcode}/{n}/{now.strftime('%m')}/{now.strftime('%Y')}"
 
 
 def _event(parcel, kind, *, from_status="", to_status="", trip=None, user=None, note=""):
