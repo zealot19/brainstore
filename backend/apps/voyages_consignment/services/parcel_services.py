@@ -31,7 +31,11 @@ def _parcel_reference(company_id, origin, destination=None, when=None):
     agency = getattr(origin, "agency", None)
     agcode = (getattr(agency, "code", "") or getattr(origin, "code", "") or "XX")
     ym = now.strftime("%Y%m")
-    seq_code = f"COL-{company_id}-{getattr(agency, 'id', None) or 'X'}-{ym}"
+    # Sequence.code fait 50 caractères max : on compacte les UUID (10 hex chacun) pour
+    # garder une clé par société+agence+mois sans dépasser la limite. Ex. COL-ab12cd34ef-9f00112233-202610
+    cid = str(company_id).replace("-", "")[:10]
+    aid = (str(getattr(agency, "id", "") or "").replace("-", "")[:10]) or "X"
+    seq_code = f"COL-{cid}-{aid}-{ym}"
     Sequence.objects.get_or_create(
         code=seq_code, defaults={"name": f"Colis {agcode} {ym}", "prefix": "", "padding": 4, "reset_yearly": False})
     n = next_number(seq_code)   # préfixe/année vides -> numéro « 0001 »
