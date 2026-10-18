@@ -1,0 +1,57 @@
+===========================================================
+  ERP SCIG - COMMENT LANCER L'APPLICATION (Windows)
+===========================================================
+
+POUR DEMARRER :
+  Double-cliquez sur le fichier  start-erp.bat
+
+-----------------------------------------------------------
+PREMIER LANCEMENT (une seule fois)
+-----------------------------------------------------------
+Le programme installe tout seul ce qui manque (Python, Node.js),
+puis il vous demande 3 informations fournies par l'administrateur :
+
+  1. URL du serveur en ligne   (ex: https://master.exemple.com/api/v1)
+  2. Jeton de synchronisation  (SYNC_TOKEN)
+  3. ID de l'agence            (NODE_AGENCY_ID)
+
+Tapez chaque valeur puis appuyez sur Entree.
+Cette etape peut durer quelques minutes (telechargements).
+
+Si une fenetre vous dit de "fermer et relancer" : fermez-la
+et double-cliquez de nouveau sur start-erp.bat. C'est normal
+la premiere fois (installation de Python).
+
+-----------------------------------------------------------
+LANCEMENTS SUIVANTS
+-----------------------------------------------------------
+Double-cliquez simplement sur start-erp.bat.
+L'application demarre directement, sans rien redemander.
+
+-----------------------------------------------------------
+QUAND C'EST PRET
+-----------------------------------------------------------
+Le navigateur s'ouvre tout seul sur :
+
+        http://localhost:4200
+
+Trois fenetres noires "ERP - ..." s'ouvrent :
+  - ERP - API         (le moteur de l'application)
+  - ERP - Sync        (synchronisation avec le serveur en ligne)
+  - ERP - Interface   (l'ecran que vous utilisez)
+
+>>> LAISSEZ CES 3 FENETRES OUVERTES pendant le travail. <<<
+
+-----------------------------------------------------------
+POUR ARRETER
+-----------------------------------------------------------
+Fermez les 3 fenetres "ERP - ...".
+
+-----------------------------------------------------------
+EN CAS DE PROBLEME
+-----------------------------------------------------------
+- "winget introuvable" : demandez l'installation de Python 3.12
+  et Node.js LTS a l'administrateur, puis relancez.
+- La synchronisation ne marche pas : verifiez l'URL, le jeton et
+  l'ID d'agence (fichier backend\.env) avec l'administrateur.
+===========================================================
