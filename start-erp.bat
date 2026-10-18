@@ -49,11 +49,22 @@ where python >nul 2>&1 || ( echo. & echo Python vient d'etre installe mais pas e
 
 REM ---- 3) venv + dependances backend ----
 if not exist "%PY%" (
-  echo [install] Environnement Python + dependances ^(peut prendre quelques minutes^) ...
+  echo [install] Creation de l'environnement Python ...
   python -m venv "%VENV%"
-  "%PY%" -m pip install --upgrade pip
-  "%PY%" -m pip install -r "%BACKEND%\requirements\local.txt"
 )
+if not exist "%VENV%\.deps_ok" (
+  echo [install] Dependances backend ^(peut prendre quelques minutes^) ...
+  "%PY%" -m ensurepip --upgrade >nul 2>&1
+  "%PY%" -m pip --version >nul 2>&1 || (
+    echo [install] pip absent, recuperation de get-pip ...
+    "%PY%" -c "import urllib.request;urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', r'%TEMP%\get-pip.py')"
+    "%PY%" "%TEMP%\get-pip.py"
+    del "%TEMP%\get-pip.py" 2>nul
+  )
+  "%PY%" -m pip install --upgrade pip
+  "%PY%" -m pip install -r "%BACKEND%\requirements\local.txt" && echo ok> "%VENV%\.deps_ok"
+)
+if not exist "%VENV%\.deps_ok" ( echo. & echo [ERREUR] Installation des dependances echouee. Voir les messages ci-dessus. & pause & exit /b 1 )
 
 REM ---- 4) .env : configuration de synchro demandee une seule fois ----
 if not exist "%ENVFILE%" (
