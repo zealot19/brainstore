@@ -18,8 +18,10 @@ set "ENVFILE=%BACKEND%\.env"
 set "UI_PORT=4200"
 set "API_PORT=8000"
 
-REM ---- fenetre de synchro: ce meme fichier relance avec --syncloop ----
+REM ---- modes speciaux (ce meme fichier relance avec un argument) ----
 if /i "%~1"=="--syncloop" goto :syncloop
+if /i "%~1"=="--install-autostart" goto :install
+if /i "%~1"=="--remove-autostart" goto :remove
 
 title ERP SCIG
 echo ================================================
@@ -113,26 +115,35 @@ REM ============================================================
 REM  Demarrage : 3 fenetres - API, Sync, Interface
 REM ============================================================
 echo.
-echo [demarrage] API  -^> http://localhost:%API_PORT%
-start "ERP - API" cmd /k ""%PY%" "%BACKEND%\manage.py" runserver 127.0.0.1:%API_PORT%"
+echo [demarrage] API  -^> port %API_PORT% (toutes interfaces reseau)
+start "ERP - API" cmd /k ""%PY%" "%BACKEND%\manage.py" runserver 0.0.0.0:%API_PORT%"
 
 echo [demarrage] Synchronisation en arriere-plan ^(toutes les 90s^)
 start "ERP - Sync" "%~f0" --syncloop
 
 echo [demarrage] Interface ^(compilation ~30s, le navigateur s'ouvre seul^)
 pushd "%ANGULAR%"
-start "ERP - Interface" cmd /k "set NODE_OPTIONS=--max_old_space_size=4096 && npm start -- --port %UI_PORT% --open"
+start "ERP - Interface" cmd /k "set NODE_OPTIONS=--max_old_space_size=4096 && npm start -- --host 0.0.0.0 --port %UI_PORT% --open"
 popd
+
+REM ---- adresse IP du serveur sur le reseau local (pour les autres PC) ----
+set "LANIP="
+for /f "delims=" %%i in ('powershell -NoProfile -Command "@(Get-NetIPAddress -AddressFamily IPv4 ^| Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' } ^| Sort-Object InterfaceMetric)[0].IPAddress" 2^>nul') do set "LANIP=%%i"
 
 echo.
 echo ================================================
 echo.
-echo    ERP OUVERT :   http://localhost:%UI_PORT%
-echo    API        :   http://localhost:%API_PORT%
-echo    Synchro    :   active
+echo    SUR CE PC       :   http://localhost:%UI_PORT%
+if defined LANIP echo    DEPUIS LE RESEAU:   http://%LANIP%:%UI_PORT%
+echo    API             :   port %API_PORT%
+echo    Synchro         :   active
 echo.
 echo    Laissez les 3 fenetres "ERP - ..." ouvertes.
 echo    Fermez-les pour arreter l'application.
+echo.
+echo    Autres PC : ouvrez http://%LANIP%:%UI_PORT% dans le navigateur.
+echo    (Si un autre PC ne charge pas : lancez une fois ce fichier par
+echo     clic-droit ^> Executer en tant qu'administrateur, option pare-feu.)
 echo.
 echo ================================================
 echo.
@@ -149,3 +160,35 @@ cd /d "%BACKEND%"
 "%PY%" manage.py sync_once
 timeout /t 90 /nobreak >nul
 goto :__sl
+
+REM ============================================================
+REM  --install-autostart : demarrage auto a l'ouverture de session
+REM  + ouverture du pare-feu (lancer en tant qu'administrateur)
+REM ============================================================
+:install
+echo [config] Demarrage automatique a l'ouverture de session ...
+powershell -NoProfile -Command "$w=New-Object -ComObject WScript.Shell; $p=[Environment]::GetFolderPath('Startup')+'\ERP SCIG.lnk'; $s=$w.CreateShortcut($p); $s.TargetPath='%~f0'; $s.WorkingDirectory='%~dp0'; $s.Save()"
+echo [config] Raccourci cree dans le dossier Demarrage.
+echo [config] Ouverture du pare-feu (ports %UI_PORT% et %API_PORT%) ...
+netsh advfirewall firewall delete rule name="ERP UI" >nul 2>&1
+netsh advfirewall firewall delete rule name="ERP API" >nul 2>&1
+netsh advfirewall firewall add rule name="ERP UI" dir=in action=allow protocol=TCP localport=%UI_PORT% >nul 2>&1 && echo   - port %UI_PORT% autorise || echo   - [!] port %UI_PORT% : relancez en tant qu'administrateur
+netsh advfirewall firewall add rule name="ERP API" dir=in action=allow protocol=TCP localport=%API_PORT% >nul 2>&1 && echo   - port %API_PORT% autorise || echo   - [!] port %API_PORT% : relancez en tant qu'administrateur
+echo.
+echo [ok] L'ERP demarrera tout seul a la prochaine ouverture de session.
+echo      Pour l'enlever : start-erp.bat --remove-autostart
+echo.
+pause
+exit /b 0
+
+REM ============================================================
+REM  --remove-autostart : annule le demarrage auto + pare-feu
+REM ============================================================
+:remove
+del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\ERP SCIG.lnk" >nul 2>&1
+netsh advfirewall firewall delete rule name="ERP UI" >nul 2>&1
+netsh advfirewall firewall delete rule name="ERP API" >nul 2>&1
+echo [ok] Demarrage automatique et regles pare-feu supprimes.
+echo.
+pause
+exit /b 0
