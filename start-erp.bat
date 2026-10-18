@@ -121,7 +121,7 @@ start "ERP - Sync" "%~f0" --syncloop
 
 echo [demarrage] Interface ^(compilation ~30s, le navigateur s'ouvre seul^)
 pushd "%ANGULAR%"
-start "ERP - Interface" cmd /k "npm start -- --port %UI_PORT% --open"
+start "ERP - Interface" cmd /k "set NODE_OPTIONS=--max_old_space_size=4096 && npm start -- --port %UI_PORT% --open"
 popd
 
 echo.
