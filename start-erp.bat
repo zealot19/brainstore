@@ -122,7 +122,9 @@ REM  Demarrage : 3 fenetres - API, Sync, Interface
 REM ============================================================
 echo.
 echo [demarrage] API  -^> port %API_PORT% (toutes interfaces reseau)
-start "ERP - API" cmd /k ""%PY%" "%BACKEND%\manage.py" runserver 0.0.0.0:%API_PORT%"
+REM IMPORTANT : se placer dans backend\ pour que runserver utilise le MEME
+REM db.sqlite3 que migrate/sync (chemin SQLite relatif au repertoire courant).
+start "ERP - API" cmd /k "cd /d "%BACKEND%" && "%PY%" manage.py runserver 0.0.0.0:%API_PORT%"
 
 echo [demarrage] Synchronisation en arriere-plan ^(toutes les 90s^)
 start "ERP - Sync" "%~f0" --syncloop
