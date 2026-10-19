@@ -93,13 +93,19 @@ if not exist "%ENVFILE%" (
   echo [ok] Configuration enregistree dans backend\.env
 )
 
-REM ---- 5) base locale + synchro initiale depuis le master ----
-if not exist "%BACKEND%\db.sqlite3" (
-  echo [install] Initialisation de la base ...
-  pushd "%BACKEND%"
-  "%PY%" manage.py migrate --noinput
+REM ---- 5) migrations : TOUJOURS (idempotent : ne fait rien si a jour).
+REM     A executer a chaque demarrage, sinon les nouvelles migrations
+REM     (apres un git pull) ne sont jamais appliquees -> erreurs "no such table".
+echo [base] Application des migrations ...
+pushd "%BACKEND%"
+"%PY%" manage.py migrate --noinput
+popd
+
+REM ---- 5b) synchro initiale depuis le master : une seule fois ----
+if not exist "%VENV%\.bootstrapped" (
   echo [sync] Recuperation initiale depuis le master ...
-  "%PY%" manage.py bootstrap_from_master
+  pushd "%BACKEND%"
+  "%PY%" manage.py bootstrap_from_master && echo ok> "%VENV%\.bootstrapped"
   popd
 )
 
