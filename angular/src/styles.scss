@@ -44,9 +44,8 @@ $template-angular-theme: mat.m2-define-light-theme((color: (primary: $template-a
 // @import '/src/assets/icons/tabler-icons/tabler-icons.min.css';
 
 @import "../src/assets/material/material.scss";
-@import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lightgallery.css");
-@import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-zoom.css");
-@import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-video.css");
+// lightgallery : servi en local via node_modules (voir angular.json "styles"),
+// plus aucun appel au CDN jsdelivr -> fonctionne hors-ligne.
 
 // ── Impression rapport inventaire ─────────────────────────────────────────────
 @media print {

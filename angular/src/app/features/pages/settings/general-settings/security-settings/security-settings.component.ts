@@ -90,12 +90,12 @@ export class SecuritySettingsComponent {
     intlTelInput(input, {
       initialCountry: 'us',
       preferredCountries: ['us', 'gb', 'in'],
-      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js'
+      loadUtils: () => import('intl-tel-input/utils') as any
     }as any);
     intlTelInput(input2, {
       initialCountry: 'us',
       preferredCountries: ['us', 'gb', 'in'],
-      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js'
+      loadUtils: () => import('intl-tel-input/utils') as any
     }as any);
         // Restrict input to numbers, "+", and allowed characters
         input.addEventListener('input', () => {
