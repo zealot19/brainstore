@@ -1,10 +1,9 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.baggage.title' | transloco }}</h4><h6>{{ 'cons.baggage.subtitle' | transloco }}</h6></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.baggage.title' | transloco }}</h4></div></div>
   <div class="page-btn">
     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#baggage-modal" *hasPermission="'ticketing.luggage.manage'" (click)="openCreate()"><i class="ti ti-circle-plus me-2"></i>{{ 'cons.baggage.add' | transloco }}</a>
   </div>
 </div>
-<app-info-banner [text]="'cons.baggage.info' | transloco"></app-info-banner>
 
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -87,7 +86,7 @@
   <div class="modal-header"><h5 class="modal-title">{{ (isEdit ? 'cons.baggage.modal_edit' : 'cons.baggage.add') | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
-    <h6 class="text-muted">{{ 'cons.baggage.sec_trip_pax' | transloco }}</h6>
+    
     <div class="row">
       <div class="col-md-8 mb-3"><label class="form-label">{{ 'cons.common.f_trip' | transloco }} <span class="text-danger">*</span></label>
         <app-searchable-select formControlName="trip_id" [items]="trips" [labelFn]="tripLabel" valueKey="id" [placeholder]="'cons.baggage.opt_choose_trip' | transloco" (ngModelChange)="onTripChange()"></app-searchable-select></div>
@@ -106,7 +105,7 @@
       </div>
     }
 
-    <h6 class="text-muted">{{ 'cons.baggage.sec_baggage' | transloco }}</h6>
+    
     <div class="row">
       <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.baggage.f_type' | transloco }}</label>
         <app-searchable-select formControlName="consignment_type_id" [items]="types" labelKey="label" valueKey="id" placeholder="—"></app-searchable-select></div>
@@ -116,7 +115,7 @@
     </div>
     <div class="mb-3"><label class="form-label">{{ 'cons.common.col_description' | transloco }}</label><input formControlName="description" class="form-control" /></div>
 
-    <h6 class="text-muted">{{ 'cons.common.sec_payment' | transloco }}</h6>
+    
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
         <select formControlName="payment_method" class="form-select">
