@@ -222,7 +222,8 @@ class ConsignmentTypeRead(_ScopeMixin):
 class ConsignmentTypeWrite(serializers.Serializer):
     code = serializers.CharField(max_length=20)
     label = serializers.CharField(max_length=150)
-    nature_id = serializers.UUIDField()
+    # Nature retirée du formulaire : facultative.
+    nature_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     max_weight_kg = serializers.DecimalField(max_digits=8, decimal_places=2, required=False, allow_null=True, default=None)
     max_volume_m3 = serializers.DecimalField(max_digits=8, decimal_places=3, required=False, allow_null=True, default=None)
     applies_to = serializers.ChoiceField(choices=ConsignmentType.AppliesTo.choices,

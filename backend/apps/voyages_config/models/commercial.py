@@ -56,8 +56,10 @@ class ConsignmentType(_CompanyScoped):
 
     code = models.CharField(_("code"), max_length=20)
     label = models.CharField(_("libellé"), max_length=150)
+    # Nature de colis retirée de la configuration et du formulaire : le champ
+    # devient facultatif (modèle conservé pour l'historique/compat).
     nature = models.ForeignKey("voyages_config.ConsignmentNature", verbose_name=_("nature"),
-                               on_delete=models.PROTECT, related_name="types")
+                               on_delete=models.SET_NULL, null=True, blank=True, related_name="types")
     max_weight_kg = models.DecimalField(_("poids max (kg)"), max_digits=8, decimal_places=2, null=True, blank=True)
     max_volume_m3 = models.DecimalField(_("volume max (m³)"), max_digits=8, decimal_places=3, null=True, blank=True)
     applies_to = models.CharField(_("s'applique à"), max_length=8,

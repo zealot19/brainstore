@@ -61,7 +61,6 @@ export class VcgParcelsComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
-      nature_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
       sender_name: [null], sender_phone: [null],   // create: driven by the shared client fieldset (senderClient)
       recipient_name: [''], recipient_phone: [''],
@@ -162,11 +161,18 @@ export class VcgParcelsComponent implements OnInit {
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(createBody);
     req.subscribe({
       next: (res: any) => {
-        this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('parcel-modal');
+        this.saving = false; this.reload(); this.toast.success('Enregistré.');
         // À l'enregistrement : impression auto du reçu + de l'étiquette (× quantité, côté serveur).
         if (wasCreate && res?.id) {
           this.printReceipt(res.id);
           setTimeout(() => this.printLabel(res.id), 1200);
+          // #9 : on reste sur le formulaire « Nouveau colis » avec les mêmes infos
+          // (trajet, type, montant, expéditeur…) ; l'agent n'a qu'à ajuster pour
+          // le client suivant. Le formulaire n'est pas réinitialisé ni fermé.
+          this.editId = null;
+          this.form.enable();
+        } else {
+          this.close('parcel-modal');
         }
       },
       error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });

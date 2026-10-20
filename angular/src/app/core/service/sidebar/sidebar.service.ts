@@ -175,7 +175,6 @@ export class SidebarService {
             { menuValue: 'Tarifs',               route: routes.vcFares,             base: 'fares',               permission: 'transport.fare.view',         module: 'voyage' },
             { menuValue: 'Barème dépenses',      route: routes.vcExpenseSchedules,  base: 'expense-schedules',   permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Fidélité',             route: routes.vcLoyalty,           base: 'loyalty-rules',       permission: 'transport.config.view',       module: 'voyage' },
-            { menuValue: 'Natures de colis',     route: routes.vcConsignmentNatures,base: 'consignment-natures', permission: 'transport.config.view',       module: 'colis'  },
             { menuValue: 'Types de colis',       route: routes.vcConsignmentTypes,  base: 'consignment-types',   permission: 'transport.config.view',       module: 'colis'  },
             { menuValue: 'Caisses',              route: routes.trzRegisters,        base: 'registers',           permission: 'treasury.register.view',      module: 'treasury' },
             { menuValue: 'Types de dépense',     route: routes.vcExpenseTypes,      base: 'expense-types',       permission: 'transport.config.view',       module: 'treasury' },

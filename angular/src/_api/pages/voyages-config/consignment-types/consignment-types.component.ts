@@ -25,7 +25,7 @@ export class VcConsignmentTypesComponent implements OnInit {
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: ConsignmentTypeService, private natureSvc: ConsignmentNatureService, private fb: FormBuilder) {}
   ngOnInit(): void {
-    this.form = this.fb.group({ code: ['', Validators.required], label: ['', Validators.required], nature_id: [null, Validators.required], max_weight_kg: [null], max_volume_m3: [null], applies_to: ['BOTH'], is_active: [true] });
+    this.form = this.fb.group({ code: ['', Validators.required], label: ['', Validators.required], max_weight_kg: [null], max_volume_m3: [null], applies_to: ['BOTH'], is_active: [true] });
     this.natureSvc.list().subscribe(d => this.natures = d);
     this.load();
   }

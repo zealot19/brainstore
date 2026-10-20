@@ -276,7 +276,8 @@ class ConsignmentTypeListView(_ConfigListView):
 
     def _create(self, company, data, user):
         cid = company.id if company else None
-        nature = cfg_lookup(ConsignmentNature, data.pop("nature_id", None), cid)
+        nid = data.pop("nature_id", None)
+        nature = cfg_lookup(ConsignmentNature, nid, cid) if nid else None
         return ConsignmentType.objects.create(company=company, created_by=user, nature=nature, **data)
 
 
@@ -288,7 +289,8 @@ class ConsignmentTypeDetailView(_ConfigDetailView):
 
     def _apply(self, obj, data):
         if "nature_id" in data:
-            obj.nature = cfg_lookup(ConsignmentNature, data.pop("nature_id"), obj.company_id)
+            nid = data.pop("nature_id")
+            obj.nature = cfg_lookup(ConsignmentNature, nid, obj.company_id) if nid else None
         for k, v in data.items():
             setattr(obj, k, v)
 
