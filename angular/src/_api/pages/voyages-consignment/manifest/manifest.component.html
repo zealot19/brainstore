@@ -48,7 +48,7 @@
           @if (selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="loadSelected()"><i class="ti ti-truck-loading me-1"></i>Charger la sélection ({{ selReady.size }})</button> }
         </div>
       </div>
-        <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
+        <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.68rem">
           <thead class="thead-light"><tr>
             <th style="width:28px"><input type="checkbox" class="form-check-input" [checked]="allReadySel" (change)="toggleAllReady()" [disabled]="!ready.length" /></th>
             <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
@@ -83,7 +83,7 @@
             <button class="btn btn-sm btn-outline-secondary" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
           </div>
         </div>
-          <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
+          <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.68rem">
             <thead class="thead-light"><tr>
               <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
               <th>{{ 'cons.common.col_recipient' | transloco }}</th>
