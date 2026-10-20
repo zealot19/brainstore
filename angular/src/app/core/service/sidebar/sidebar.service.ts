@@ -68,9 +68,11 @@ export class SidebarService {
           role: 'institution_admin',
           subMenus: [
             { menuValue: 'Agences',          route: routes.admAgencies,       base: 'agencies' },
-            { menuValue: 'Utilisateurs',     route: routes.adminInstUsers,    base: 'users' },
-            { menuValue: 'Profils',          route: routes.adminInstProfiles, base: 'profiles' },
+            // Ordre de configuration : on cree d'abord les Roles, puis les Profils
+            // (groupes de roles), puis les Utilisateurs (a qui on affecte roles/profils).
             { menuValue: 'Rôles',            route: routes.adminInstRoles,    base: 'roles' },
+            { menuValue: 'Profils',          route: routes.adminInstProfiles, base: 'profiles' },
+            { menuValue: 'Utilisateurs',     route: routes.adminInstUsers,    base: 'users' },
           ],
         },
         {
@@ -267,6 +269,18 @@ export class SidebarService {
           permission: 'ticketing.customer.view',
           subMenus: [],
         },
+      ],
+    },
+    {
+      // Bagages : detache de la Billetterie, section autonome (module 'voyage'
+      // pour ne pas dependre de l'entitlement optionnel Colis).
+      tittle: 'Bagages',
+      module: 'voyage',
+      showAsTab: false,
+      separateRoute: false,
+      hasSubRoute: false,
+      showSubRoute: true,
+      menu: [
         {
           menuValue: 'Bagages',
           hasSubRoute: true,
