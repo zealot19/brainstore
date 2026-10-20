@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # ── Heure serveur (#4) ───────────────────────────────────────────────────
+    path("time/", views.ServerTimeView.as_view(), name="server-time"),
+
     # ── Plans (paths stay as /packages/ for frontend/API compat) ─────────────
     path("packages/",            views.PlanListView.as_view(),        name="package-list"),
     path("packages/<uuid:pk>/",  views.PlanDetailView.as_view(),      name="package-detail"),

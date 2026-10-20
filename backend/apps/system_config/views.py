@@ -28,6 +28,26 @@ from .serializers import (
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# HEURE SERVEUR (#4)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class ServerTimeView(APIView):
+    """Heure du serveur. Permet au frontend de se caler sur l'horloge du serveur
+    même si l'horloge du poste client est fausse."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from django.utils import timezone
+        now = timezone.localtime(timezone.now())
+        return success_response({
+            "epoch_ms": int(now.timestamp() * 1000),
+            "iso": now.isoformat(),
+            "tz": str(timezone.get_current_timezone()),  # ex: Africa/Douala
+            "utc_offset": now.strftime("%z"),            # ex: +0100
+        })
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # PLAN
 # ═══════════════════════════════════════════════════════════════════════════════
 

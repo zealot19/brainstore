@@ -7,6 +7,7 @@ import { HasPermissionDirective } from '../../shared/directives/has-permission.d
 import { HasModuleDirective } from '../../shared/directives/has-module.directive';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { CashSessionTimerComponent } from '../../shared/cash-session-timer/cash-session-timer.component';
+import { ServerClockComponent } from '../../shared/server-clock/server-clock.component';
 import { TranslocoModule } from '@jsverse/transloco';
 import { AppPackageService } from '../../core/service/packages/app-package.service';
 
@@ -14,7 +15,7 @@ import { AppPackageService } from '../../core/service/packages/app-package.servi
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink, CommonModule, HasPermissionDirective, HasModuleDirective, LanguageSwitcherComponent, CashSessionTimerComponent, TranslocoModule],
+  imports: [RouterLink, CommonModule, HasPermissionDirective, HasModuleDirective, LanguageSwitcherComponent, CashSessionTimerComponent, ServerClockComponent, TranslocoModule],
 })
 export class HeaderComponent {
   routes = routes;

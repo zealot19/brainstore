@@ -20,6 +20,7 @@ import { apiUnwrapInterceptor } from '../_api/interceptors/api-unwrap.intercepto
 import { acceptLanguageInterceptor } from '../_api/interceptors/accept-language.interceptor';
 import { licenseInterceptor } from '../_api/interceptors/license.interceptor';
 import { AuthService }          from '../_api/services/auth/auth.service';
+import { ServerTimeService }    from '../_api/services/system/server-time.service';
 import { TranslocoHttpLoader } from './core/i18n/transloco-loader';
 import { TRANSLOCO_APP_CONFIG } from './core/i18n/transloco.config';
 import { LanguageService } from './core/i18n/language.service';
@@ -51,7 +52,8 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         const auth = inject(AuthService);
         const lang = inject(LanguageService);
-        return () => { auth.initSession(); lang.init(); };
+        const serverTime = inject(ServerTimeService);
+        return () => { auth.initSession(); lang.init(); serverTime.init(); };
       },
       multi: true,
     },
