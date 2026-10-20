@@ -16,6 +16,8 @@ import { Passenger, PassengerSpec } from '../../../../models/voyages-booking.mod
 })
 export class ClientFieldsComponent {
   @Input({ required: true }) row!: PassengerSpec;
+  /** Clé i18n du libellé du champ « Nom » (surchargée p.ex. en « Nom de l'expéditeur »). */
+  @Input() nameLabelKey = 'shared.client.name';
   private svc = inject(PassengerService);
   private host = inject(ElementRef<HTMLElement>);
   results: Passenger[] = [];

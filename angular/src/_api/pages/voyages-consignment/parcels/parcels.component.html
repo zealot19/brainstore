@@ -109,7 +109,7 @@
         <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>
     @if (!isEdit) {
-      <app-client-fields [row]="senderClient"></app-client-fields>
+      <app-client-fields [row]="senderClient" nameLabelKey="cons.parcels.f_sender"></app-client-fields>
     } @else {
       <div class="row g-3 mb-3">
         <div class="col-md-6"><label class="form-label">{{ 'cons.parcels.f_sender' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
@@ -122,17 +122,15 @@
       <div class="col-md-4"><label class="form-label">{{ 'cons.parcels.f_recipient_id' | transloco }}</label><input formControlName="recipient_id_number" class="form-control" [placeholder]="'cons.parcels.recipient_id_ph' | transloco" /></div>
     </div>
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_type' | transloco }} <span class="text-danger">*</span></label>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_type' | transloco }} <span class="text-danger">*</span></label>
         <app-searchable-select formControlName="consignment_type_id" [items]="typeOptions" labelKey="label_nature" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_weight' | transloco }}</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_qty' | transloco }}</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.parcels.f_declared' | transloco }}</label><input formControlName="declared_value" type="number" class="form-control" /></div>
     </div>
     <div class="row">
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.common.f_weight' | transloco }}</label><input formControlName="weight_kg" type="number" step="0.001" class="form-control" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_qty' | transloco }}</label><input formControlName="quantity" type="number" min="1" class="form-control" /></div>
-      <div class="col-md-4 mb-3"><label class="form-label">{{ 'cons.parcels.f_declared' | transloco }}</label><input formControlName="declared_value" type="number" class="form-control" /></div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label fs-5 fw-semibold">{{ 'cons.parcels.f_description' | transloco }} <span class="text-danger">*</span></label><input formControlName="description" class="form-control form-control-lg" /></div>
-      <div class="col-md-6 mb-3"><label class="form-label fs-5 fw-semibold">{{ 'cons.parcels.f_content' | transloco }} <span class="text-danger">*</span></label><input formControlName="content" class="form-control form-control-lg" /></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_description' | transloco }} <span class="text-danger">*</span></label><textarea formControlName="description" class="form-control" rows="3"></textarea></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_content' | transloco }} <span class="text-danger">*</span></label><textarea formControlName="content" class="form-control" rows="3"></textarea></div>
     </div>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.f_payment_method' | transloco }}</label>
