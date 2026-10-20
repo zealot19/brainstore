@@ -10,6 +10,7 @@ import { TimeSlotService } from '../../../services/voyages-config/time-slot.serv
 import { printBlob } from '../../../../app/shared/print/print.util';
 import { Parcel, ParcelShipment } from '../../../models/voyages-consignment.models';
 import { AuthService } from '../../../services/auth/auth.service';
+import { PrintRouterService } from '../../../../app/shared/print/print-router.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, ServicePoint, TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -26,6 +27,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
   private auth = inject(AuthService);
+  private printRouter = inject(PrintRouterService);
   allTrips: Trip[] = [];
   routes: Route[] = []; destinations: ServicePoint[] = []; timeslots: TimeSlot[] = [];
   // Filtres : options issues de la config (trajets, destinations, plages) ;
@@ -157,9 +159,7 @@ export class VcgManifestComponent implements OnInit {
   }
   printManifest(): void {
     if (!this.tripId) return;
-    this.roadmap.pdf(this.tripId, 'colis').subscribe({
-      next: blob => printBlob(blob),
-      error: () => this.toast.error("Génération PDF indisponible sur ce serveur."),
-    });
+    // #2 : impression HTML via l'agent/navigateur (ne dépend pas de WeasyPrint).
+    this.printRouter.print('bordereau_colis', this.tripId);
   }
 }

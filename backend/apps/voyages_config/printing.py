@@ -100,6 +100,17 @@ def build_doc_html(company, doc_code, obj_id, request=None):
                                                    width_mm=w, height_mm=h)
         return doc_render.build_baggage_label(b, tpl, agent=agent, width_mm=w, height_mm=h,
                                               copies=b.quantity or 1)
+
+    if doc_code == "bordereau_colis":
+        # Bordereau colis d'un voyage, en HTML (impression navigateur) — évite la
+        # dépendance WeasyPrint côté serveur (#2 : le PDF échouait sans WeasyPrint).
+        from apps.voyages_trips.models import Trip
+        from apps.voyages_booking.config_api.views import build_roadmap_data
+        from apps.voyages_booking.roadmap_pdf import render_roadmap_html
+        trip = Trip.objects.filter(company=company, id=obj_id, is_deleted=False).first()
+        if not trip:
+            return None
+        return render_roadmap_html(build_roadmap_data(trip, request), "colis")
     return None
 
 

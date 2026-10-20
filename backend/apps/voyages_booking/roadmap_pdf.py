@@ -78,11 +78,12 @@ def _colis_body(data):
     return _doc_header(data, "Bordereau Colis") + tbl
 
 
-def render_roadmap_pdf(data: dict, doc: str) -> bytes:
-    from weasyprint import HTML
+def render_roadmap_html(data: dict, doc: str) -> str:
+    """Document HTML du bordereau (sert au PDF WeasyPrint ET à l'impression
+    navigateur quand WeasyPrint n'est pas disponible côté serveur)."""
     body = _colis_body(data) if doc == "colis" else _voyages_body(data)
     run = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
-    html = f"""<html><head><meta charset="utf-8"><style>
+    return f"""<html><head><meta charset="utf-8"><style>
       @page {{ size: A4 landscape; margin: 12mm 10mm; }}
       body {{ font-family: DejaVu Sans, sans-serif; font-size: 10px; color:#111; }}
       .head {{ display:flex; gap:12px; border-bottom:1px solid #222; padding-bottom:6px; }}
@@ -102,4 +103,8 @@ def render_roadmap_pdf(data: dict, doc: str) -> bytes:
       {body}
       <div class="foot">Généré le {run}</div>
     </body></html>"""
-    return HTML(string=html).write_pdf()
+
+
+def render_roadmap_pdf(data: dict, doc: str) -> bytes:
+    from weasyprint import HTML
+    return HTML(string=render_roadmap_html(data, doc)).write_pdf()
