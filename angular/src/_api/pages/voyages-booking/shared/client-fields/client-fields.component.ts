@@ -20,6 +20,8 @@ export class ClientFieldsComponent {
   @Input() nameLabelKey = 'shared.client.name';
   /** Affiche un astérisque « requis » sur le libellé du champ « Nom ». */
   @Input() nameRequired = false;
+  /** Affiche un astérisque « requis » sur le libellé du champ « Téléphone ». */
+  @Input() phoneRequired = false;
   private svc = inject(PassengerService);
   private host = inject(ElementRef<HTMLElement>);
   results: Passenger[] = [];

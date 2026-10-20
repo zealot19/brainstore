@@ -16,7 +16,7 @@
     }
   </div>
   <div class="col-md-2">
-    <label class="form-label">{{ 'shared.client.phone' | transloco }}</label>
+    <label class="form-label">{{ 'shared.client.phone' | transloco }}@if (phoneRequired) { <span class="text-danger">*</span> }</label>
     <input class="form-control" [(ngModel)]="row.phone" />
   </div>
   <div class="col-md-2">

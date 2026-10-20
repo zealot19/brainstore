@@ -108,7 +108,7 @@
         <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>
     @if (!isEdit) {
-      <app-client-fields [row]="senderClient" nameLabelKey="cons.parcels.f_sender" [nameRequired]="true"></app-client-fields>
+      <app-client-fields [row]="senderClient" nameLabelKey="cons.parcels.f_sender" [nameRequired]="true" [phoneRequired]="true"></app-client-fields>
     } @else {
       <div class="row g-3 mb-3">
         <div class="col-md-6"><label class="form-label">{{ 'cons.parcels.f_sender' | transloco }} <span class="text-danger">*</span></label><input formControlName="sender_name" class="form-control" /></div>
