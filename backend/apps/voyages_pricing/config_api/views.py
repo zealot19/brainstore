@@ -12,7 +12,7 @@ from .common import scope_company_id, resolve_company_or_global, scoped_qs, cfg_
 
 class FareListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'transport.fare.view', 'POST': 'transport.fare.manage'}
+    permission_map = {'GET': 'transport.fare.view', 'POST': 'transport.fare.create'}
 
     def get(self, request):
         qs = (scoped_qs(Fare, scope_company_id(request))
@@ -54,7 +54,7 @@ class FareListView(APIView):
 
 class FareDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'transport.fare.view', 'PATCH': 'transport.fare.manage', 'PUT': 'transport.fare.manage', 'DELETE': 'transport.fare.manage'}
+    permission_map = {'GET': 'transport.fare.view', 'PATCH': 'transport.fare.update', 'PUT': 'transport.fare.update', 'DELETE': 'transport.fare.delete'}
 
     def _get(self, request, pk):
         return scoped_qs(Fare, scope_company_id(request)).filter(id=pk).first()

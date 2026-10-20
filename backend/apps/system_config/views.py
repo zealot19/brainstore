@@ -283,7 +283,7 @@ def _get_company_id(request, pk=None):
 class AgencyListView(APIView):
     """GET /system/agencies/?company=<id> ou via middleware tenant."""
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "system.agency.view", "POST": "system.agency.manage"}
+    permission_map = {"GET": "system.agency.view", "POST": "system.agency.create"}
 
     def get(self, request):
         company_id = request.query_params.get("company") or _get_company_id(request)
@@ -336,8 +336,8 @@ class AgencyListView(APIView):
 class AgencyDetailView(APIView):
     """GET/PATCH/DELETE /system/agencies/<id>/"""
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "system.agency.view", "PATCH": "system.agency.manage",
-                      "PUT": "system.agency.manage", "DELETE": "system.agency.manage"}
+    permission_map = {"GET": "system.agency.view", "PATCH": "system.agency.update",
+                      "PUT": "system.agency.update", "DELETE": "system.agency.delete"}
 
     def _get(self, pk, request):
         company_id = request.query_params.get("company") or _get_company_id(request)

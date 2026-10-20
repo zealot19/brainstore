@@ -233,7 +233,7 @@ LoyaltyRuleBulkDeleteView = _bulk(LoyaltyRule)
 # ── ServicePoint (FK: town) ───────────────────────────────────────────────────
 class ServicePointListView(_ConfigListView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.manage", "PATCH": "transport.terminal.manage", "PUT": "transport.terminal.manage", "DELETE": "transport.terminal.manage"}
+    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.create", "PATCH": "transport.terminal.update", "PUT": "transport.terminal.update", "DELETE": "transport.terminal.delete"}
     model = ServicePoint
     read = S.ServicePointRead
     write = S.ServicePointWrite
@@ -248,7 +248,7 @@ class ServicePointListView(_ConfigListView):
 
 class ServicePointDetailView(_ConfigDetailView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.manage", "PATCH": "transport.terminal.manage", "PUT": "transport.terminal.manage", "DELETE": "transport.terminal.manage"}
+    permission_map = {"GET": "transport.terminal.view", "POST": "transport.terminal.create", "PATCH": "transport.terminal.update", "PUT": "transport.terminal.update", "DELETE": "transport.terminal.delete"}
     model = ServicePoint
     read = S.ServicePointRead
     write = S.ServicePointWrite
@@ -298,7 +298,7 @@ ConsignmentTypeBulkDeleteView = _bulk(ConsignmentType)
 
 class RouteListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.create", "PATCH": "transport.route.update", "PUT": "transport.route.update", "DELETE": "transport.route.delete"}
 
     def get(self, request):
         qs = (scoped_qs(Route, scope_company_id(request))
@@ -336,7 +336,7 @@ class RouteListView(APIView):
 
 class RouteDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.create", "PATCH": "transport.route.update", "PUT": "transport.route.update", "DELETE": "transport.route.delete"}
 
     def _get(self, request, pk):
         return (scoped_qs(Route, scope_company_id(request))
@@ -389,7 +389,7 @@ class RouteDetailView(APIView):
 
 class RouteStopListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.create", "PATCH": "transport.route.update", "PUT": "transport.route.update", "DELETE": "transport.route.delete"}
 
     def _route(self, request, route_id):
         return scoped_qs(Route, scope_company_id(request)).filter(id=route_id).first()
@@ -448,7 +448,7 @@ class RouteStopListView(APIView):
 
 class RouteStopDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "transport.route.view", "POST": "transport.route.manage", "PATCH": "transport.route.manage", "PUT": "transport.route.manage", "DELETE": "transport.route.manage"}
+    permission_map = {"GET": "transport.route.view", "POST": "transport.route.create", "PATCH": "transport.route.update", "PUT": "transport.route.update", "DELETE": "transport.route.delete"}
 
     def _get(self, request, route_id, stop_id):
         route = scoped_qs(Route, scope_company_id(request)).filter(id=route_id).first()

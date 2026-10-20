@@ -21,7 +21,7 @@ def _cfg(model, company_id, pk):
 
 class ParcelListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.manage'}
+    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.create'}
 
     def get(self, request):
         qs = selectors.list_parcels(
@@ -77,7 +77,7 @@ class ParcelListView(APIView):
 
 class ParcelDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.parcel.view', 'PATCH': 'ticketing.parcel.manage', 'PUT': 'ticketing.parcel.manage', 'DELETE': 'ticketing.parcel.manage'}
+    permission_map = {'GET': 'ticketing.parcel.view', 'PATCH': 'ticketing.parcel.update', 'PUT': 'ticketing.parcel.update', 'DELETE': 'ticketing.parcel.delete'}
 
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
@@ -288,7 +288,7 @@ class ParcelCancelView(APIView):
 
 class BaggageListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.luggage.view', 'POST': 'ticketing.luggage.manage'}
+    permission_map = {'GET': 'ticketing.luggage.view', 'POST': 'ticketing.luggage.create'}
 
     def get(self, request):
         qs = selectors.list_baggage(
@@ -340,7 +340,7 @@ class BaggageListView(APIView):
 
 class BaggageDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.luggage.view', 'PATCH': 'ticketing.luggage.manage', 'PUT': 'ticketing.luggage.manage', 'DELETE': 'ticketing.luggage.manage'}
+    permission_map = {'GET': 'ticketing.luggage.view', 'PATCH': 'ticketing.luggage.update', 'PUT': 'ticketing.luggage.update', 'DELETE': 'ticketing.luggage.delete'}
 
     def _get(self, request, pk):
         return Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
@@ -562,7 +562,7 @@ class ParcelStatsView(APIView):
 # ── M25 : expéditions partielles ──────────────────────────────────────────────
 class ParcelShipmentListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.manage'}
+    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.create'}
 
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)

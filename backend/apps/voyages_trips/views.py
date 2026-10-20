@@ -236,7 +236,7 @@ class TripAssignVehicleView(APIView):
 
 class TripCrewView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'voyage.crew.view', 'POST': 'voyage.crew.manage'}
+    permission_map = {'GET': 'voyage.crew.view', 'POST': 'voyage.crew.create'}
 
     def get(self, request, trip_id):
         company, err = _scope(request)
@@ -592,7 +592,7 @@ def _resolve_crew_agency(agency_id, company_id):
 
 class CrewMemberListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.manage"}
+    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.create"}
 
     def get(self, request):
         cid = request.user.company_id
@@ -620,7 +620,7 @@ class CrewMemberListView(APIView):
 
 class CrewMemberDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "voyage.crew.view", "PATCH": "voyage.crew.manage", "DELETE": "voyage.crew.manage"}
+    permission_map = {"GET": "voyage.crew.view", "PATCH": "voyage.crew.update", "DELETE": "voyage.crew.delete"}
 
     def _get(self, request, pk):
         return CrewMember.objects.filter(is_deleted=False, company_id=request.user.company_id, id=pk).first()
@@ -667,7 +667,7 @@ class CrewMemberDetailView(APIView):
 
 class CrewDocumentListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.manage"}
+    permission_map = {"GET": "voyage.crew.view", "POST": "voyage.crew.create"}
 
     def _member(self, request, pk):
         return CrewMember.objects.filter(is_deleted=False, company_id=request.user.company_id, id=pk).first()
@@ -722,7 +722,7 @@ class CrewDocumentDetailView(APIView):
 
 class TripExpenseListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "voyage.expense.view", "POST": "voyage.expense.manage"}
+    permission_map = {"GET": "voyage.expense.view", "POST": "voyage.expense.create"}
 
     def get(self, request, trip_id):
         qs = TripExpense.objects.filter(trip_id=trip_id, is_deleted=False).select_related("expense_type")
@@ -737,8 +737,8 @@ class TripExpenseListView(APIView):
 
 class TripExpenseDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "voyage.expense.view", "PATCH": "voyage.expense.manage",
-                      "DELETE": "voyage.expense.manage"}
+    permission_map = {"GET": "voyage.expense.view", "PATCH": "voyage.expense.update",
+                      "DELETE": "voyage.expense.delete"}
 
     def _get(self, trip_id, pk):
         return TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).first()

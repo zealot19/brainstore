@@ -12,7 +12,7 @@ from .common import scope_company_id, resolve_company_or_global
 
 class PassengerListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.customer.view', 'POST': 'ticketing.customer.manage'}
+    permission_map = {'GET': 'ticketing.customer.view', 'POST': 'ticketing.customer.create'}
 
     def get(self, request):
         qs = selectors.find_passengers(request.user.company, request.query_params.get("q"))
@@ -32,7 +32,7 @@ class PassengerListView(APIView):
 
 class PassengerDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {'GET': 'ticketing.customer.view', 'PATCH': 'ticketing.customer.manage', 'PUT': 'ticketing.customer.manage', 'DELETE': 'ticketing.customer.manage'}
+    permission_map = {'GET': 'ticketing.customer.view', 'PATCH': 'ticketing.customer.update', 'PUT': 'ticketing.customer.update', 'DELETE': 'ticketing.customer.delete'}
 
     def _get(self, request, pk):
         return Passenger.objects.filter(is_deleted=False, company_id=scope_company_id(request), id=pk).first()

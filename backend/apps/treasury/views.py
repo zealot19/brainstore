@@ -63,7 +63,7 @@ class TreasurySeriesView(APIView):
 
 class CashRegisterListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.register.view", "POST": "treasury.register.manage"}
+    permission_map = {"GET": "treasury.register.view", "POST": "treasury.register.create"}
 
     def get(self, request):
         qs = selectors.list_cash_registers(
@@ -104,7 +104,7 @@ class CashRegisterListView(APIView):
 
 class CashRegisterDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.register.view", "PATCH": "treasury.register.manage", "DELETE": "treasury.register.manage"}
+    permission_map = {"GET": "treasury.register.view", "PATCH": "treasury.register.update", "DELETE": "treasury.register.delete"}
 
     def _get(self, request, register_id):
         return selectors.get_cash_register(register_id, _company(request).id)
@@ -139,7 +139,7 @@ class CashRegisterDetailView(APIView):
 
 class BankAccountListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.bank.view", "POST": "treasury.bank.manage"}
+    permission_map = {"GET": "treasury.bank.view", "POST": "treasury.bank.create"}
 
     def get(self, request):
         qs = selectors.list_bank_accounts(
@@ -160,7 +160,7 @@ class BankAccountListView(APIView):
 
 class BankAccountDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.bank.view", "PATCH": "treasury.bank.manage", "DELETE": "treasury.bank.manage"}
+    permission_map = {"GET": "treasury.bank.view", "PATCH": "treasury.bank.update", "DELETE": "treasury.bank.delete"}
 
     def _get(self, request, account_id):
         return selectors.get_bank_account(account_id, _company(request).id)
@@ -582,7 +582,7 @@ class CashSessionDetailView(APIView):
 
 class TransactionListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.transaction.view", "POST": "treasury.transaction.manage"}
+    permission_map = {"GET": "treasury.transaction.view", "POST": "treasury.transaction.create"}
 
     def get(self, request):
         params = request.query_params
@@ -640,7 +640,7 @@ class TransactionListView(APIView):
 
 class TransactionDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.transaction.view", "DELETE": "treasury.transaction.manage"}
+    permission_map = {"GET": "treasury.transaction.view", "DELETE": "treasury.transaction.delete"}
 
     def get(self, request, txn_id):
         obj = selectors.get_transaction(txn_id, _company(request).id)
@@ -706,7 +706,7 @@ class OperationModifyView(_OperationActionView):     action = "modify"
 
 class TransferListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.transfer.view", "POST": "treasury.transfer.manage"}
+    permission_map = {"GET": "treasury.transfer.view", "POST": "treasury.transfer.create"}
 
     def get(self, request):
         params = request.query_params
@@ -778,7 +778,7 @@ from apps.treasury.serializers import (  # noqa: E402
 
 class GeneralExpenseListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.expense.view", "POST": "treasury.expense.manage"}
+    permission_map = {"GET": "treasury.expense.view", "POST": "treasury.expense.create"}
 
     def get(self, request):
         p = request.query_params
@@ -820,8 +820,8 @@ class GeneralExpenseListView(APIView):
 
 class GeneralExpenseDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.expense.view", "PATCH": "treasury.expense.manage",
-                      "DELETE": "treasury.expense.manage"}
+    permission_map = {"GET": "treasury.expense.view", "PATCH": "treasury.expense.update",
+                      "DELETE": "treasury.expense.delete"}
 
     def _obj(self, request, pk):
         from apps.treasury.models import GeneralExpense
@@ -990,7 +990,7 @@ class _IncomeListBase(APIView):
 
 class IncomeVoyageListView(_IncomeListBase):
     category = Transaction.Category.TICKET_SALES
-    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.manage"}
+    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.create"}
 
     def post(self, request):
         ser = VoyageIncomeWriteSerializer(data=request.data)
@@ -1031,7 +1031,7 @@ class IncomeDeliveryListView(_IncomeListBase):
 
 class IncomeOtherListView(_IncomeListBase):
     category = Transaction.Category.OTHER_INCOME
-    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.manage"}
+    permission_map = {"GET": "treasury.income.view", "POST": "treasury.income.create"}
 
     def post(self, request):
         ser = OtherIncomeWriteSerializer(data=request.data)
@@ -1106,7 +1106,7 @@ from django.utils.text import slugify  # noqa: E402
 
 class PaymentMethodListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.paymentmethod.view", "POST": "treasury.paymentmethod.manage"}
+    permission_map = {"GET": "treasury.paymentmethod.view", "POST": "treasury.paymentmethod.create"}
 
     def get(self, request):
         from apps.treasury.models import PaymentMethod
@@ -1133,8 +1133,8 @@ class PaymentMethodListView(APIView):
 
 class PaymentMethodDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.paymentmethod.view", "PATCH": "treasury.paymentmethod.manage",
-                      "DELETE": "treasury.paymentmethod.manage"}
+    permission_map = {"GET": "treasury.paymentmethod.view", "PATCH": "treasury.paymentmethod.update",
+                      "DELETE": "treasury.paymentmethod.delete"}
 
     def _obj(self, request, pk):
         from apps.treasury.models import PaymentMethod

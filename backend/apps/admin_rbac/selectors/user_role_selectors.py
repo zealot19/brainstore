@@ -48,12 +48,21 @@ def get_user_permissions(user, company_id=None) -> set:
 
     all_role_ids = set(list(direct_role_ids) + list(profile_role_ids))
 
-    codes = Permission.objects.filter(
+    codes = set(Permission.objects.filter(
         is_deleted=False,
         rolepermission__role_id__in=all_role_ids,
-    ).values_list("code", flat=True)
+    ).values_list("code", flat=True))
 
-    return set(codes)
+    # Umbrella RBAC fin : détenir "<module>.<ressource>.manage" (Gérer) accorde
+    # implicitement les actions fines create / update / delete. Ainsi les rôles
+    # existants (et le gating frontend qui teste encore `.manage`) continuent de
+    # fonctionner, tandis qu'un admin peut aussi n'accorder que `.create` seul.
+    for c in list(codes):
+        if c.endswith(".manage"):
+            base = c[: -len(".manage")]
+            codes.update((f"{base}.create", f"{base}.update", f"{base}.delete"))
+
+    return codes
 
 
 def has_permission(user, code: str, company_id=None) -> bool:

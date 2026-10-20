@@ -17,7 +17,7 @@ def _company(request):
 
 class AccountListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.account.view", "POST": "accounting.account.manage"}
+    permission_map = {"GET": "accounting.account.view", "POST": "accounting.account.create"}
 
     def get(self, request):
         qs = Account.objects.filter(is_deleted=False, company_id=_company(request))
@@ -43,8 +43,8 @@ class AccountListView(APIView):
 
 class AccountDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.account.view", "PATCH": "accounting.account.manage",
-                      "PUT": "accounting.account.manage", "DELETE": "accounting.account.manage"}
+    permission_map = {"GET": "accounting.account.view", "PATCH": "accounting.account.update",
+                      "PUT": "accounting.account.update", "DELETE": "accounting.account.delete"}
 
     def _get(self, request, pk):
         return Account.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
@@ -78,7 +78,7 @@ class AccountDetailView(APIView):
 
 class JournalListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.journal.view", "POST": "accounting.journal.manage"}
+    permission_map = {"GET": "accounting.journal.view", "POST": "accounting.journal.create"}
 
     def get(self, request):
         qs = Journal.objects.filter(is_deleted=False, company_id=_company(request)).order_by("code")
@@ -96,8 +96,8 @@ class JournalListView(APIView):
 
 class JournalDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.journal.view", "PATCH": "accounting.journal.manage",
-                      "PUT": "accounting.journal.manage", "DELETE": "accounting.journal.manage"}
+    permission_map = {"GET": "accounting.journal.view", "PATCH": "accounting.journal.update",
+                      "PUT": "accounting.journal.update", "DELETE": "accounting.journal.delete"}
 
     def _get(self, request, pk):
         return Journal.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()
@@ -122,7 +122,7 @@ class JournalDetailView(APIView):
 
 class FiscalYearListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.fiscalyear.view", "POST": "accounting.fiscalyear.manage"}
+    permission_map = {"GET": "accounting.fiscalyear.view", "POST": "accounting.fiscalyear.create"}
 
     def get(self, request):
         qs = FiscalYear.objects.filter(is_deleted=False, company_id=_company(request))
@@ -138,7 +138,7 @@ class FiscalYearListView(APIView):
 
 class PeriodListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.period.view", "POST": "accounting.period.manage"}
+    permission_map = {"GET": "accounting.period.view", "POST": "accounting.period.create"}
 
     def get(self, request):
         qs = AccountingPeriod.objects.filter(is_deleted=False, company_id=_company(request))
@@ -173,7 +173,7 @@ class PeriodCloseView(APIView):
 
 class PartnerListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.partner.view", "POST": "accounting.partner.manage"}
+    permission_map = {"GET": "accounting.partner.view", "POST": "accounting.partner.create"}
 
     def get(self, request):
         qs = Partner.objects.filter(is_deleted=False, company_id=_company(request))
@@ -196,7 +196,7 @@ class PartnerListView(APIView):
 
 class PartnerDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "accounting.partner.view", "PATCH": "accounting.partner.manage", "DELETE": "accounting.partner.manage"}
+    permission_map = {"GET": "accounting.partner.view", "PATCH": "accounting.partner.update", "DELETE": "accounting.partner.delete"}
 
     def _get(self, request, pk):
         return Partner.objects.filter(is_deleted=False, company_id=_company(request), id=pk).first()

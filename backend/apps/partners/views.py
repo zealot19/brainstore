@@ -15,7 +15,7 @@ def _company(request):
 
 class PartnerListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.partner.view", "POST": "treasury.partner.manage"}
+    permission_map = {"GET": "treasury.partner.view", "POST": "treasury.partner.create"}
 
     def get(self, request):
         qs = Partner.objects.filter(company=_company(request), is_deleted=False)
@@ -36,8 +36,8 @@ class PartnerListView(APIView):
 
 class PartnerDetailView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
-    permission_map = {"GET": "treasury.partner.view", "PATCH": "treasury.partner.manage",
-                      "DELETE": "treasury.partner.manage"}
+    permission_map = {"GET": "treasury.partner.view", "PATCH": "treasury.partner.update",
+                      "DELETE": "treasury.partner.delete"}
 
     def _obj(self, request, pk):
         return Partner.objects.filter(company=_company(request), id=pk, is_deleted=False).first()
