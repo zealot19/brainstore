@@ -56,6 +56,7 @@ class ParcelListView(APIView):
             date_to=request.query_params.get("date_to"),
             delivered_home=request.query_params.get("delivered_home"),
             delivery_payment_method=request.query_params.get("delivery_payment_method"),
+            scope=request.query_params.get("scope") or "sent",
             user=request.user, include_archived=wants_archived(request))
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(qs, request)
@@ -88,6 +89,7 @@ class ParcelListView(APIView):
                 sender_civility=d["sender_civility"], sender_id_type=d["sender_id_type"],
                 sender_id_number=d["sender_id_number"],
                 recipient_name=d["recipient_name"], recipient_phone=d["recipient_phone"],
+                recipient_id_number=d["recipient_id_number"],
                 recipient_address=d["recipient_address"], description=d["description"],
                 weight_kg=d["weight_kg"], quantity=d["quantity"], declared_value=d["declared_value"],
                 amount_due=d["amount_due"], amount_received=d["amount_received"],

@@ -30,7 +30,7 @@ def _register(ctx):
         "nature_id": str(ctx["nature"].id),
         "content": "Objets divers",
         "sender_name": "Exp", "sender_phone": "600",
-        "recipient_name": "Dest", "recipient_phone": "601",
+        "recipient_name": "Dest", "recipient_phone": "601", "recipient_id_number": "CNI-D",
         "description": "Colis test", "amount_due": "0",
     }, format="json")
 

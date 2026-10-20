@@ -45,7 +45,8 @@ def _user(admin, company, email, agency):
 def _parcel(company, sp_a, sp_b, ct, status=Parcel.Status.AVAILABLE_FOR_PICKUP, **kw):
     defaults = dict(company=company, agency=sp_a.agency, reference="COL/1", status=status,
                     origin_point=sp_a, destination_point=sp_b, consignment_type=ct,
-                    sender_name="S", sender_phone="1", recipient_name="R", recipient_phone="2")
+                    sender_name="S", sender_phone="1", recipient_name="R", recipient_phone="2",
+                    recipient_id_number="CNI-R")
     defaults.update(kw)
     return Parcel.objects.create(**defaults)
 

@@ -272,21 +272,30 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
     if avail <= 0:
         raise ApplicationError(_("Aucune pièce disponible au retrait."))
 
-    has_recipient = bool(parcel.recipient_name)
-    if has_recipient:
-        picked_up_by = picked_up_by or parcel.recipient_name
-        picked_up_phone = picked_up_phone or parcel.recipient_phone
-        kind = Parcel.PickupKind.DESTINATAIRE
+    # #12 : CNI obligatoire pour tracer qui retire le colis.
+    kind = picked_up_kind or Parcel.PickupKind.DESTINATAIRE
+    if kind == Parcel.PickupKind.DESTINATAIRE:
+        # Retrait par le destinataire : nom + CNI requis. S'ils sont déjà connus
+        # (saisis à la création) on valide simplement ; sinon on les saisit ici.
+        name = (picked_up_by or parcel.recipient_name or "").strip()
+        phone = (picked_up_phone or parcel.recipient_phone or "").strip()
+        cni = (picked_up_id_number or parcel.recipient_id_number or "").strip()
+        if not name:
+            raise ApplicationError(_("Nom du destinataire requis."))
+        if not cni:
+            raise ApplicationError(_("La pièce (CNI) du destinataire est obligatoire."))
+        parcel.recipient_name = name
+        parcel.recipient_phone = phone
+        parcel.recipient_id_number = cni
+        picked_up_by, picked_up_phone, picked_up_id_number = name, phone, cni
+    elif kind == Parcel.PickupKind.MANDATAIRE:
+        # Retrait par un mandataire : nom + CNI obligatoires.
+        picked_up_by = (picked_up_by or "").strip()
+        picked_up_id_number = (picked_up_id_number or "").strip()
+        if not (picked_up_by and picked_up_id_number):
+            raise ApplicationError(_("Nom et pièce (CNI) du mandataire sont obligatoires."))
     else:
-        if not (picked_up_by and picked_up_phone and picked_up_id_number):
-            raise ApplicationError(_("Nom, téléphone et pièce sont requis pour le retrait."))
-        if picked_up_kind not in (Parcel.PickupKind.DESTINATAIRE, Parcel.PickupKind.MANDATAIRE):
-            raise ApplicationError(_("Précisez si le retrait est fait par le destinataire ou un mandataire."))
-        kind = picked_up_kind
-        if kind == Parcel.PickupKind.DESTINATAIRE:
-            parcel.recipient_name = picked_up_by
-            parcel.recipient_phone = picked_up_phone
-            parcel.recipient_id_number = picked_up_id_number
+        raise ApplicationError(_("Précisez si le retrait est fait par le destinataire ou un mandataire."))
 
     # Retrait incrémental : on retire les pièces actuellement disponibles.
     prev = parcel.status

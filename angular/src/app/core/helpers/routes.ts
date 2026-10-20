@@ -469,6 +469,7 @@ export const routes={
   vcgReception: '/voyages-consignment/reception',
   vcgManifest:  '/voyages-consignment/manifest',
   vcgLivraison: '/voyages-consignment/livraison',
+  vcgPickup:    '/voyages-consignment/pickup',
   vcgBaggage:   '/voyages-consignment/baggage',
   vcgBaggageRetrait: '/voyages-consignment/baggage-retrait',
 

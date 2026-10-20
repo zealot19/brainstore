@@ -33,7 +33,7 @@ def colis_ctx(db):
             company=c.company, origin_point=c.origin,
             destination_point=c.dest_terminal if destination_terminal else c.dest_agency,
             consignment_type=c.ctype, sender_name="Exp", sender_phone="600",
-            recipient_name="Dest", recipient_phone="601", amount_due=0, user=c.user)
+            recipient_name="Dest", recipient_phone="601", recipient_id_number="CNI-D", amount_due=0, user=c.user)
 
     c.register_kwargs = register_kwargs
     return c

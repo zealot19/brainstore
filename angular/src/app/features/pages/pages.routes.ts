@@ -147,6 +147,7 @@ export const Pages_routes: Routes = [
                 { path: 'reception', loadComponent: () => import('../../../_api/pages/voyages-consignment/reception/reception.component').then(m => m.VcgReceptionComponent) },
                 { path: 'manifest',  loadComponent: () => import('../../../_api/pages/voyages-consignment/manifest/manifest.component').then(m => m.VcgManifestComponent) },
                 { path: 'livraison', loadComponent: () => import('../../../_api/pages/voyages-consignment/livraison/livraison.component').then(m => m.VcgLivraisonComponent) },
+                { path: 'pickup',    loadComponent: () => import('../../../_api/pages/voyages-consignment/pickup/pickup.component').then(m => m.VcgPickupComponent) },
                 { path: 'baggage',  loadComponent: () => import('../../../_api/pages/voyages-consignment/baggage/baggage.component').then(m => m.VcgBaggageComponent) },
                 { path: 'baggage-retrait', loadComponent: () => import('../../../_api/pages/voyages-consignment/baggage-retrait/baggage-retrait.component').then(m => m.VcgBaggageRetraitComponent) },
               ],

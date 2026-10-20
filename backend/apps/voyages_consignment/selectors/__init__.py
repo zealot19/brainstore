@@ -23,13 +23,21 @@ def _parcel_sent_q(user):
     return scope_by_agency_q(user_agency_ids(user), "agency_id")
 
 
+def _parcel_dest_q(user):
+    # Vues « destination » (Réception / Livraison / Retrait) : agence de destination.
+    return scope_by_agency_q(user_agency_ids(user), "destination_point__agency_id")
+
+
 def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
                  origin_point=None, destination_point=None,
                  date_field=None, date_from=None, date_to=None,
                  delivered_home=None, delivery_payment_method=None, user=None,
-                 include_archived=False):
+                 include_archived=False, scope="sent"):
+    # scope="sent" (défaut) => agence d'origine (Tout Afficher / envois) ;
+    # scope="destination" => agence de destination (Livraison / Retrait).
+    scope_q = _parcel_dest_q(user) if scope == "destination" else _parcel_sent_q(user)
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
-          .filter(_parcel_sent_q(user))
+          .filter(scope_q)
           .select_related("origin_point", "destination_point", "trip", "trip__route",
                           "trip__vehicle", "consignment_type")
           .order_by("-created_at"))

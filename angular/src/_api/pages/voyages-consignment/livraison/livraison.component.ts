@@ -50,6 +50,7 @@ export class VcgLivraisonComponent implements OnInit {
       q: this.q || undefined, origin_point: this.originFilter || undefined,
       destination_point: this.destFilter || undefined,
       date_from: this.dateFrom || undefined, date_to: this.dateTo || undefined,
+      scope: 'destination',   // livraison = agence de destination (cf. #3)
     };
     const params = this.tab === 'delivered'
       ? { ...base, delivered_home: '1', date_field: 'delivered', delivery_payment_method: this.payFilter || undefined }

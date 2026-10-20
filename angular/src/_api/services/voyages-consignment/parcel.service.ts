@@ -13,7 +13,7 @@ export class ParcelService {
                  origin_point?: string; destination_point?: string;
                  date_field?: string; date_from?: string; date_to?: string;
                  delivered_home?: string; delivery_payment_method?: string;
-                 include_archived?: number } = {}): Observable<Parcel[]> {
+                 scope?: string; include_archived?: number } = {}): Observable<Parcel[]> {
     let p = new HttpParams().set('page_size', '500');
     Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<any>(VOYAGES_CONSIGNMENT.parcels, { params: p }).pipe(map(r => r.results ?? r.data ?? r));

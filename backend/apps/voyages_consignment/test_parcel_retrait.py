@@ -33,8 +33,8 @@ def _parcel(company, **kw):
 def test_pickup_with_recipient_preset_confirms():
     from apps.voyages_consignment.services.parcel_services import pickup_parcel
     company, admin = _company()
-    p = _parcel(company, recipient_name="Bob", recipient_phone="690")
-    pickup_parcel(p, user=admin)
+    p = _parcel(company, recipient_name="Bob", recipient_phone="690", recipient_id_number="CNI-BOB")
+    pickup_parcel(p, user=admin)   # CNI déjà au dossier -> simple validation
     p.refresh_from_db()
     assert p.status == Parcel.Status.PICKED_UP
     assert p.picked_up_by == "Bob"

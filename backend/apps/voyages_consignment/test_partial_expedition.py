@@ -40,7 +40,7 @@ def _setup(email="pe@x.com"):
     parcel = Parcel.objects.create(company=company, status=Parcel.Status.READY_FOR_TRAVEL,
                                    origin_point=a, destination_point=b, consignment_type=ctype,
                                    trip=None, sender_name="E", sender_phone="6",
-                                   recipient_name="R", recipient_phone="7", quantity=10)
+                                   recipient_name="R", recipient_phone="7", recipient_id_number="CNI-R", quantity=10)
     return dict(company=company, admin=admin, parcel=parcel, trip1=trip1, trip2=trip2, trip_bad=trip_bad)
 
 
