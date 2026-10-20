@@ -70,25 +70,26 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .sign div{{width:48%;min-height:12mm}}
   .foot{{font-size:7pt;font-style:italic;margin-top:1mm}}
   .cutline{{border-top:1px dashed #111;margin:3mm 0;text-align:center;font-size:7pt;color:#777}}
-  /* Reçu colis */
-  .rhead{{display:flex;gap:2mm;align-items:center;border-bottom:1px solid #111;padding-bottom:1.5mm;margin-bottom:1.5mm}}
-  .rhead .rlogo img{{max-height:16mm;max-width:34mm;object-fit:contain}}
-  .rhead .rco{{flex:1;text-align:left}}
-  .rhead .rname{{font-weight:800;font-size:11pt;line-height:1.1}}
-  .rhead .rslo{{font-style:italic;font-size:8pt;color:#333}}
-  .rhead .rids{{font-size:7.5pt;line-height:1.3}}
-  .rf{{display:flex;justify-content:space-between;gap:3mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #ccc}}
-  .rf span{{color:#444}}
+  /* Reçu colis — logo à gauche, infos société à droite (centrées), plus compact */
+  .rhead{{display:flex;gap:2mm;align-items:center;border-bottom:1px solid #000;padding-bottom:1.5mm;margin-bottom:1.5mm}}
+  .rhead .rlogo img{{max-height:12mm;max-width:26mm;object-fit:contain}}
+  .rhead .rco{{flex:1;text-align:center}}
+  .rhead .rname{{font-weight:800;font-size:9pt;line-height:1.1}}
+  .rhead .rslo{{font-style:italic;font-size:7pt}}
+  .rhead .rids{{font-size:7pt;line-height:1.3}}
+  .rf{{display:flex;justify-content:space-between;gap:3mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
   .rf b{{text-align:right}}
   .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
-  .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #111;padding-top:1mm}}
+  .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #000;padding-top:1mm}}
   .rnote div{{margin:0.4mm 0}}
+  /* Tout le texte du reçu en gras et en noir (#4) */
+  .rcpt,.rcpt *{{color:#000;font-weight:700}}
   /* Étiquette colis */
   .lbl{{text-align:center}}
   .lbl-logo{{margin-bottom:1.5mm}}
   .lbl-logo img{{max-height:14mm;max-width:40mm;object-fit:contain}}
-  .lbl-ref{{font-weight:800;font-size:12pt;margin-bottom:1mm}}
-  .lbl-f{{font-size:9pt;text-align:left;margin:0.5mm 0}}
+  .lbl-ref{{font-weight:800;font-size:18pt;margin-bottom:1.5mm}}
+  .lbl-f{{font-size:14pt;font-weight:700;text-align:left;margin:1mm 0}}
   .lbl-bc{{margin-top:1.5mm}}
   .lbl-bc svg{{max-width:70mm;height:auto}}
 </style>"""
@@ -125,8 +126,6 @@ def render_80mm(inner_html_list, *, width_mm=80.0, height_mm=0.0):
 def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, height_mm=0.0):
     e = _html.escape
     dest = _safe(parcel, "destination_point.name", "")
-    agency_obj = _safe(parcel, "origin_point.agency", None)
-    agency_name = (getattr(agency_obj, "name", "") if agency_obj else "") or _safe(parcel, "origin_point.name", "")
     when = _dt(getattr(parcel, "created_at", None))
     logo = f'<img src="{logo_url}" alt="">' if logo_url else ""
     head = f"""<div class="rhead">
@@ -135,7 +134,6 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         <div class="rname">{e(tpl.brand_name)}</div>
         <div class="rslo">{e(tpl.slogan)}</div>
         <div class="rids"><b>Head Office</b>: {e(tpl.address)}</div>
-        <div class="rids">{e(agency_name)}</div>
       </div>
     </div>"""
 
@@ -161,7 +159,7 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         '<div>- Always declare the true content of your package before its registered</div>'
         '<div>- Compensation is 50%</div></div>'
     )
-    inner = f"""<div class="doc">
+    inner = f"""<div class="doc rcpt">
       {head}
       {fields}
       <div class="rby">By: {e(agent)} &nbsp;&nbsp; on the {when}</div>
@@ -230,7 +228,6 @@ def build_parcel_label(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, hei
     code-barres. `copies` = nombre d'étiquettes (1 par pièce)."""
     e = _html.escape
     dest = _safe(parcel, "destination_point.name", "")
-    origin = _safe(parcel, "origin_point.name", "")
     logo = f'<img src="{logo_url}" alt="">' if logo_url else f"<b>{e(tpl.brand_name)}</b>"
     barcode = _barcode_svg(parcel.reference)
     n = max(1, int(copies or 1))
@@ -239,7 +236,7 @@ def build_parcel_label(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, hei
       <div class="lbl-ref">{e(parcel.reference)}{'' if n == 1 else f' &middot; {i}/{n}'}</div>
       <div class="lbl-f"><b>Sender</b>: {e(parcel.sender_name)}</div>
       <div class="lbl-f"><b>Receiver</b>: {e(parcel.recipient_name)}</div>
-      <div class="lbl-f"><b>Journey</b>: {e(origin)} &rarr; {e(dest)}</div>
+      <div class="lbl-f"><b>Destination</b>: {e(dest)}</div>
       <div class="lbl-bc">{barcode}</div>
     </div>"""
     cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
