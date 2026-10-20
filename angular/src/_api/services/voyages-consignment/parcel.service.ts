@@ -34,7 +34,7 @@ export class ParcelService {
   bulk(ids: string[], action: 'receive' | 'cancel' | 'dispatch' | 'arrive' | 'load' | 'unassign'): Observable<{ done: number; errors: string[] }> {
     return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelsBulk, { ids, action }).pipe(map(r => r.data ?? r));
   }
-  expedition(params: { trip?: string; destination?: string }): Observable<{ ready: Parcel[]; assigned: Parcel[]; totals: { count: number; weight: number } }> {
+  expedition(params: { trip?: string; destination?: string; route?: string }): Observable<{ ready: Parcel[]; onboard: ParcelShipment[]; totals: { count: number; weight: number } }> {
     let p = new HttpParams();
     Object.entries(params).forEach(([k, v]) => { if (v) p = p.set(k, v as string); });
     return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelExpedition, { params: p }).pipe(map(r => r.data ?? r));

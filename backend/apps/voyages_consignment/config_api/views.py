@@ -240,7 +240,15 @@ class ParcelExpeditionView(APIView):
         company = request.user.company
         trip_id = request.query_params.get("trip")
         destination = request.query_params.get("destination")
-        ready = selectors.ready_parcels(company, destination_point=destination, user=request.user)
+        # #1 : filtrer le pool par le trajet choisi (destination desservie par ce
+        # trajet). Le trajet vient du paramètre `route` ou, à défaut, du voyage choisi.
+        route_id = request.query_params.get("route")
+        if not route_id and trip_id:
+            from apps.voyages_trips.models import Trip
+            t = Trip.objects.filter(id=trip_id, company=company).first()
+            route_id = getattr(t, "route_id", None)
+        ready = selectors.ready_parcels(company, destination_point=destination,
+                                        route_id=route_id, user=request.user)
         # #11 : à bord = expéditions (shipments) du voyage, pré-départ incluses, pour
         # pouvoir retirer / valider / dévalider par expédition. Agence d'origine (#10).
         onboard = []

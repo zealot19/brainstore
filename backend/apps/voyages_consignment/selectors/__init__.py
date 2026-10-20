@@ -86,7 +86,7 @@ def pending_for_trip(company, route_id=None, user=None):
     return qs
 
 
-def ready_parcels(company, destination_point=None, user=None):
+def ready_parcels(company, destination_point=None, route_id=None, user=None):
     """Pool « à expédier » : colis encore expédiables (restant > 0)."""
     from django.db.models import Sum, F, Value, Q as _Q
     from django.db.models.functions import Coalesce
@@ -101,7 +101,16 @@ def ready_parcels(company, destination_point=None, user=None):
           .annotate(_shipped=shipped).filter(quantity__gt=F("_shipped"))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("-created_at"))
-    if destination_point:
+    if route_id:
+        # Un trajet est choisi : ne montrer que les colis dont la destination est
+        # desservie par ce trajet (origine → escales → destination).
+        from apps.voyages_pricing.selectors.fare_selectors import route_points
+        from apps.voyages_config.models import Route
+        route = Route.objects.filter(id=route_id).filter(
+            Q(company=company) | Q(company__isnull=True)).first()
+        pts = [p.id for p in route_points(route)] if route else []
+        qs = qs.filter(destination_point_id__in=pts)
+    elif destination_point:
         qs = qs.filter(destination_point_id=destination_point)
     return qs
 

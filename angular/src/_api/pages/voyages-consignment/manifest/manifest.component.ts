@@ -78,9 +78,11 @@ export class VcgManifestComponent implements OnInit {
   refresh(): void {
     this.selReady.clear();
     const st = this.selectedTrip;
-    // Pool « à expédier » restreint à la destination du voyage sélectionné (ou au filtre destination).
-    const destination = st?.destination || this.fDest || undefined;
-    this.parcels.expedition({ trip: this.tripId || undefined, destination }).subscribe(d => {
+    // #1 : pool restreint aux colis dont la destination est desservie par le trajet choisi
+    // (trajet du voyage sélectionné, ou filtre Trajet). Repli sur une destination précise.
+    const route = (st?.route as string) || this.fRoute || undefined;
+    const destination = route ? undefined : (st?.destination || this.fDest || undefined);
+    this.parcels.expedition({ trip: this.tripId || undefined, destination, route }).subscribe(d => {
       this.ready = d.ready ?? []; this.onboard = (d as any).onboard ?? [];
       this.totals = d.totals ?? { count: 0, weight: 0 };
       // Quantité par défaut = restant de chaque colis du pool ; retrait = qté chargée.
