@@ -85,17 +85,24 @@ export class VcgManifestComponent implements OnInit {
       this.totals = d.totals ?? { count: 0, weight: 0 };
       // Quantité par défaut = restant de chaque colis du pool ; retrait = qté chargée.
       this.shipQty = {};
-      for (const p of this.ready) this.shipQty[p.id] = p.remaining_pieces ?? p.quantity;
+      for (const p of this.ready) this.shipQty[p.id] = this.rem(p);
       this.wdQty = {};
       for (const s of this.onboard) this.wdQty[s.id] = s.quantity;
     });
   }
-  rem(p: Parcel): number { return p.remaining_pieces ?? p.quantity; }
-  /** Pool = colis pas encore chargés sur ce voyage (évite le double chargement). */
-  get pool(): Parcel[] {
-    const ob = new Set(this.onboard.map(s => s.parcel));
-    return this.ready.filter(p => !ob.has(p.id));
+  /** #4 Restant « vivant » à charger = enregistré − (validé/compté) − (chargé en brouillon
+   *  sur CE voyage). Permet de voir en direct : 10/10 → charger 5 → 5 restants ; retirer 2
+   *  du chargé → 7 restants, 3 dans le véhicule. */
+  rem(p: Parcel): number {
+    const base = p.remaining_pieces ?? p.quantity;
+    const draftLoaded = this.onboard
+      .filter(s => s.parcel === p.id && s.status === 'draft')
+      .reduce((n, s) => n + (s.quantity || 0), 0);
+    return base - draftLoaded;
   }
+  /** Pool = colis avec encore des pièces à charger (le colis reste visible tant qu'il
+   *  reste des pièces ; il ne disparaît qu'une fois tout chargé). */
+  get pool(): Parcel[] { return this.ready.filter(p => this.rem(p) > 0); }
   isAdmin(): boolean { const u: any = this.auth.currentUser; return !!(u && (u.is_superuser || u.is_institution_admin)); }
   canWithdraw(s: ParcelShipment): boolean { return !['in_transit', 'arrived', 'received', 'cancelled'].includes(s.status); }
   get hasDraft(): boolean { return this.onboard.some(s => s.status === 'draft'); }
