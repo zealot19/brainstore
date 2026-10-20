@@ -77,6 +77,8 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .rhead .rname{{font-weight:800;font-size:9pt;line-height:1.1}}
   .rhead .rslo{{font-style:italic;font-size:7pt}}
   .rhead .rids{{font-size:7pt;line-height:1.3}}
+  /* N° de ticket : même taille que le nom de la société, gras, centré */
+  .rtn{{font-size:9pt;font-weight:800;text-align:center;margin:1.5mm 0}}
   /* #4 : libellé puis petite espace puis valeur, alignés à gauche (pas justifié à droite) */
   .rf{{display:flex;gap:4mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
   .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
@@ -147,7 +149,6 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         return f'<div class="rf"><span>{k}</span><b>{v}</b></div>'
 
     fields = "".join([
-        rf("Ticket Number", e(parcel.reference)),
         rf("Sender Name", e(parcel.sender_name)),
         rf("Sender Number", e(parcel.sender_phone)),
         rf("Receiver Name", e(parcel.recipient_name)),
@@ -167,6 +168,7 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
     )
     inner = f"""<div class="doc rcpt">
       {head}
+      <div class="rtn">Ticket N&deg;: {e(parcel.reference)}</div>
       {fields}
       <div class="rby">By: {e(by)} &nbsp;&nbsp; on the {when}</div>
       {note}
