@@ -22,6 +22,13 @@ def _assert_destination_agency(parcel, user):
             _("Seule l'agence de destination peut réceptionner ou remettre ce colis."))
 
 
+def _assert_origin_agency(parcel, user):
+    """#10 : seule l'agence d'ORIGINE (celle qui a enregistré le colis) peut l'expédier
+    (charger / dispatcher). Admin institution et acteur système (user=None) exemptés."""
+    if not agency_allowed(user, parcel.agency_id):
+        raise ApplicationError(_("Seule l'agence d'origine peut expédier ce colis."))
+
+
 def _parcel_reference(company_id, origin, destination=None, when=None):
     """Référence colis : CODE-AGENCE-EXPEDITRICE/NNNN/MM/AAAA (séquence mensuelle par agence).
 

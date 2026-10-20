@@ -68,10 +68,11 @@ def parcel_detail(company, pk, user=None):
 
 
 def pending_for_trip(company, route_id=None, user=None):
-    """Colis prêts sans voyage — candidats au chargement/expédition."""
+    """Colis prêts sans voyage — candidats au chargement/expédition.
+    #10 : expédition réservée à l'agence d'origine -> on ne montre que ses colis."""
     qs = (Parcel.objects.filter(is_deleted=False, company=company,
                                 status=Parcel.Status.READY_FOR_TRAVEL, trip__isnull=True)
-          .filter(_parcel_visibility_q(user))
+          .filter(_parcel_sent_q(user))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("created_at"))
     return qs
@@ -88,7 +89,7 @@ def ready_parcels(company, destination_point=None, user=None):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
           .exclude(status__in=[Parcel.Status.PICKED_UP, Parcel.Status.CANCELLED,
                                Parcel.Status.AVAILABLE_FOR_PICKUP])
-          .filter(_parcel_visibility_q(user))
+          .filter(_parcel_sent_q(user))  # #10 : pool d'expédition = agence d'origine
           .annotate(_shipped=shipped).filter(quantity__gt=F("_shipped"))
           .select_related("origin_point", "destination_point", "consignment_type")
           .order_by("-created_at"))
@@ -98,9 +99,9 @@ def ready_parcels(company, destination_point=None, user=None):
 
 
 def trip_parcels(company, trip_id, user=None):
-    """Colis (non annulés) affectés à un voyage."""
+    """Colis (non annulés) affectés à un voyage — vue Expédition de l'agence d'origine (#10)."""
     return (Parcel.objects.filter(is_deleted=False, company=company, trip_id=trip_id)
-            .filter(_parcel_visibility_q(user))
+            .filter(_parcel_sent_q(user))
             .exclude(status=Parcel.Status.CANCELLED)
             .select_related("origin_point", "destination_point", "consignment_type")
             .order_by("-created_at"))

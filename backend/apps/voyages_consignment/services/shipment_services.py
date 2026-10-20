@@ -62,6 +62,8 @@ def recompute_parcel_state(parcel):
 
 @transaction.atomic
 def create_shipment(parcel, *, trip, quantity, note="", user=None):
+    from apps.voyages_consignment.services.parcel_services import _assert_origin_agency
+    _assert_origin_agency(parcel, user)  # #10 : seule l'agence d'origine expédie
     if parcel.status in (Parcel.Status.PICKED_UP, Parcel.Status.CANCELLED):
         raise ApplicationError(_("Ce colis ne peut plus être expédié."))
     if trip.status not in _PRE_DEPARTURE:
