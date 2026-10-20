@@ -155,6 +155,48 @@ def cancel_shipment(shipment, *, user=None):
 
 
 @transaction.atomic
+def withdraw_shipment(shipment, *, quantity, user=None):
+    """#11 : retirer des pièces chargées dans le véhicule avant le départ.
+
+    `quantity` = nombre de pièces à retirer de l'expédition. Si cela retire la
+    totalité, l'expédition est annulée (retrait complet). Les pièces retirées
+    redeviennent disponibles (restant du colis). Réservé à l'agence d'origine ;
+    impossible une fois le colis parti (en transit / arrivé / réceptionné)."""
+    from apps.voyages_consignment.services.parcel_services import _assert_origin_agency
+    _assert_origin_agency(shipment.parcel, user)
+    if shipment.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED,
+                           ParcelShipment.Status.RECEIVED, ParcelShipment.Status.CANCELLED):
+        raise ApplicationError(_("Cette expédition est partie ou clôturée : retrait impossible."))
+    qty = int(quantity or 0)
+    if qty < 1 or qty > shipment.quantity:
+        raise ApplicationError(_("Quantité à retirer invalide (1 à %(n)s).") % {"n": shipment.quantity})
+    if qty == shipment.quantity:
+        return cancel_shipment(shipment, user=user)  # retrait total = annulation
+    shipment.quantity -= qty
+    shipment.updated_by = user
+    shipment.save(update_fields=["quantity", "updated_by", "updated_at"])
+    recompute_parcel_state(shipment.parcel)
+    return shipment
+
+
+@transaction.atomic
+def unvalidate_shipment(shipment, *, user=None):
+    """#11 : dévalider une expédition (VALIDATED -> DRAFT). Réservé à l'admin."""
+    is_admin = bool(getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False))
+    if not is_admin:
+        raise ApplicationError(_("Seul un administrateur peut dévalider une expédition."))
+    if shipment.status != ParcelShipment.Status.VALIDATED:
+        raise ApplicationError(_("Seule une expédition validée peut être dévalidée."))
+    shipment.status = ParcelShipment.Status.DRAFT
+    shipment.validated_by = None
+    shipment.validated_at = None
+    shipment.updated_by = user
+    shipment.save(update_fields=["status", "validated_by", "validated_at", "updated_by", "updated_at"])
+    recompute_parcel_state(shipment.parcel)
+    return shipment
+
+
+@transaction.atomic
 def ship_pieces(parcel, *, trip, quantity=None, note="", user=None):
     """Expédier N pièces (défaut = restant) sur un voyage, en un geste :
     crée l'expédition, la valide et la met en transit."""

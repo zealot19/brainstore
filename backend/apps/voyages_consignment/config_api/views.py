@@ -631,8 +631,22 @@ class _ShipmentActionView(APIView):
         return success_response(S.ParcelShipmentSerializer(s).data)
 
 
-class ShipmentValidateView(_ShipmentActionView): service_fn = staticmethod(services.validate_shipment)
+class ShipmentValidateView(_ShipmentActionView):   service_fn = staticmethod(services.validate_shipment)
+class ShipmentUnvalidateView(_ShipmentActionView): service_fn = staticmethod(services.unvalidate_shipment)  # admin only (service-enforced)
 class ShipmentLoadView(_ShipmentActionView):     service_fn = staticmethod(services.load_shipment)
+
+
+class ShipmentWithdrawView(_ShipmentActionView):
+    """#11 : retirer une quantité de pièces chargées (body: quantity). Retrait total => annulation."""
+    def post(self, request, pk):
+        s = self._get(request, pk)
+        if not s:
+            return error_response("Expédition introuvable.", status_code=404)
+        try:
+            s = services.withdraw_shipment(s, quantity=request.data.get("quantity"), user=request.user)
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(S.ParcelShipmentSerializer(s).data)
 class ShipmentDispatchView(_ShipmentActionView): service_fn = staticmethod(services.dispatch_shipment)
 class ShipmentArriveView(_ShipmentActionView):   service_fn = staticmethod(services.arrive_shipment)
 

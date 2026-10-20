@@ -10,7 +10,7 @@ from .baggage_services import (
 from .shipment_services import (
     create_shipment, validate_shipment, load_shipment, dispatch_shipment,
     arrive_shipment, cancel_shipment, recompute_parcel_state,
-    ship_pieces, receive_shipment,
+    ship_pieces, receive_shipment, withdraw_shipment, unvalidate_shipment,
 )
 
 __all__ = ["register_parcel", "edit_parcel", "assign_to_trip", "unassign_from_trip",
@@ -20,4 +20,4 @@ __all__ = ["register_parcel", "edit_parcel", "assign_to_trip", "unassign_from_tr
            "add_baggage", "edit_baggage", "load_baggage", "deliver_baggage", "cancel_baggage",
            "create_shipment", "validate_shipment", "load_shipment", "dispatch_shipment",
            "arrive_shipment", "cancel_shipment", "recompute_parcel_state",
-           "ship_pieces", "receive_shipment"]
+           "ship_pieces", "receive_shipment", "withdraw_shipment", "unvalidate_shipment"]
