@@ -68,7 +68,7 @@ export class VcgParcelsComponent implements OnInit {
       origin_point_id: [null], destination_point_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
       sender_name: [null], sender_phone: [null],   // create: driven by the shared client fieldset (senderClient)
-      recipient_name: [''], recipient_phone: [''],
+      recipient_name: ['', Validators.required], recipient_phone: [''],
       recipient_id_number: [''], description: ['', Validators.required], content: ['', Validators.required],
       weight_kg: [null], quantity: [1],
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],

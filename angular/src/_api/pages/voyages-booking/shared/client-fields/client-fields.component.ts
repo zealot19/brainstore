@@ -18,6 +18,8 @@ export class ClientFieldsComponent {
   @Input({ required: true }) row!: PassengerSpec;
   /** Clé i18n du libellé du champ « Nom » (surchargée p.ex. en « Nom de l'expéditeur »). */
   @Input() nameLabelKey = 'shared.client.name';
+  /** Affiche un astérisque « requis » sur le libellé du champ « Nom ». */
+  @Input() nameRequired = false;
   private svc = inject(PassengerService);
   private host = inject(ElementRef<HTMLElement>);
   results: Passenger[] = [];

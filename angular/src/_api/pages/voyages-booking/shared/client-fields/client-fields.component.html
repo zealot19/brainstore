@@ -1,7 +1,7 @@
 <!-- client-fields.component.html -->
 <div class="row g-3">
   <div class="col-md-6 position-relative">
-    <label class="form-label">{{ nameLabelKey | transloco }}</label>
+    <label class="form-label">{{ nameLabelKey | transloco }}@if (nameRequired) { <span class="text-danger">*</span> }</label>
     <input class="form-control" [ngModel]="row.name" (ngModelChange)="onInput($event)" (blur)="hide()"
            [placeholder]="'shared.client.name_ph' | transloco" autocomplete="off" />
     @if (open) {
