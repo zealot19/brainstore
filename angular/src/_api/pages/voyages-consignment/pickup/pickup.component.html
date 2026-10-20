@@ -1,12 +1,12 @@
 <div class="page-header">
-  <div class="add-item d-flex"><div class="page-title"><h4>Retrait des colis</h4></div></div>
+  <div class="add-item d-flex"><div class="page-title"><h4>{{ 'cons.pickup.title' | transloco }}</h4></div></div>
 </div>
 
 <div class="card table-list-card">
   <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
     <ul class="nav nav-pills gap-1">
-      <li class="nav-item"><a class="nav-link" [class.active]="tab === 'awaiting'" href="javascript:void(0)" (click)="setTab('awaiting')">À retirer</a></li>
-      <li class="nav-item"><a class="nav-link" [class.active]="tab === 'done'" href="javascript:void(0)" (click)="setTab('done')">Retirés</a></li>
+      <li class="nav-item"><a class="nav-link" [class.active]="tab === 'awaiting'" href="javascript:void(0)" (click)="setTab('awaiting')">{{ 'cons.pickup.tab_awaiting' | transloco }}</a></li>
+      <li class="nav-item"><a class="nav-link" [class.active]="tab === 'done'" href="javascript:void(0)" (click)="setTab('done')">{{ 'cons.pickup.tab_done' | transloco }}</a></li>
     </ul>
     <div class="d-flex align-items-center gap-2 flex-wrap">
       <input type="text" class="form-control" style="min-width:220px" [placeholder]="'cons.common.search_ref' | transloco" [(ngModel)]="q" (keyup.enter)="reload()" />
@@ -36,12 +36,12 @@
               <td class="action-table-data"><div class="edit-delete-action d-flex align-items-center">
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#pickup-detail" (click)="showDetail(p)"><i class="ti ti-eye me-1"></i>{{ 'cons.parcels.act_detail' | transloco }}</a>
                 @if (tab === 'awaiting') {
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" *hasPermission="'ticketing.parcel.manage'" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="openPickup(p)"><i class="ti ti-user-check me-1"></i>Retrait</a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" data-bs-toggle="modal" data-bs-target="#mandate-modal" (click)="openMandate(p)"><i class="ti ti-users me-1"></i>Mandat</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" *hasPermission="'ticketing.parcel.manage'" data-bs-toggle="modal" data-bs-target="#pickup-modal" (click)="openPickup(p)"><i class="ti ti-user-check me-1"></i>{{ 'cons.pickup.act_pickup' | transloco }}</a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary" *hasPermission="'ticketing.parcel.manage'" data-bs-toggle="modal" data-bs-target="#mandate-modal" (click)="openMandate(p)"><i class="ti ti-users me-1"></i>{{ 'cons.pickup.act_mandate' | transloco }}</a>
                 }
               </div></td>
             </tr>
-          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">Aucun colis.</td></tr> }
+          } @empty { <tr><td colspan="6" class="text-center py-4 text-muted">{{ 'cons.pickup.empty' | transloco }}</td></tr> }
         </tbody>
       </table></div>
       <app-table-paginator [total]="rows.length" [state]="pg"></app-table-paginator>
@@ -51,39 +51,39 @@
 
 <!-- Retrait par le destinataire -->
 <div class="modal fade" id="pickup-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Retrait par le destinataire</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'cons.pickup.modal_pickup_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (target) {
-      <p class="mb-2"><span class="text-muted">Colis</span> <span class="fw-bold">{{ target.reference }}</span></p>
+      <p class="mb-2"><span class="text-muted">{{ 'cons.pickup.f_parcel' | transloco }}</span> <span class="fw-bold">{{ target.reference }}</span></p>
       <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_recipient' | transloco }}</label><input class="form-control" [(ngModel)]="pName" /></div>
       <div class="mb-2"><label class="form-label">{{ 'cons.parcels.f_recipient_phone' | transloco }}</label><input class="form-control" [(ngModel)]="pPhone" /></div>
-      <div class="mb-2"><label class="form-label">Pièce (CNI) <span class="text-danger">*</span></label>
-        <input class="form-control" [(ngModel)]="pCni" placeholder="N° CNI" />
-        @if (recipientHasCni()) { <small class="text-success">Pièce déjà au dossier — vérifiez et validez.</small> }
-        @else { <small class="text-danger">Pièce non renseignée : saisie obligatoire.</small> }
+      <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_cni' | transloco }} <span class="text-danger">*</span></label>
+        <input class="form-control" [(ngModel)]="pCni" [placeholder]="'cons.pickup.cni_ph' | transloco" />
+        @if (recipientHasCni()) { <small class="text-success">{{ 'cons.pickup.cni_on_file' | transloco }}</small> }
+        @else { <small class="text-danger">{{ 'cons.pickup.cni_required_hint' | transloco }}</small> }
       </div>
     }
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
-    <button type="button" class="btn btn-primary" [disabled]="saving" (click)="confirm('pickup-modal')"><i class="ti ti-user-check me-1"></i>Valider le retrait</button>
+    <button type="button" class="btn btn-primary" [disabled]="saving" (click)="confirm('pickup-modal')"><i class="ti ti-user-check me-1"></i>{{ 'cons.pickup.btn_confirm' | transloco }}</button>
   </div>
 </div></div></div>
 
 <!-- Retrait par un mandataire -->
 <div class="modal fade" id="mandate-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Retrait par un mandataire</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-header"><h5 class="modal-title">{{ 'cons.pickup.modal_mandate_title' | transloco }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
   <div class="modal-body">
     @if (target) {
-      <p class="mb-2"><span class="text-muted">Colis</span> <span class="fw-bold">{{ target.reference }}</span></p>
-      <div class="mb-2"><label class="form-label">Nom du mandataire <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pName" /></div>
-      <div class="mb-2"><label class="form-label">Téléphone</label><input class="form-control" [(ngModel)]="pPhone" /></div>
-      <div class="mb-2"><label class="form-label">Pièce (CNI) <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pCni" placeholder="N° CNI" /></div>
+      <p class="mb-2"><span class="text-muted">{{ 'cons.pickup.f_parcel' | transloco }}</span> <span class="fw-bold">{{ target.reference }}</span></p>
+      <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_mandate_name' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pName" /></div>
+      <div class="mb-2"><label class="form-label">{{ 'shared.client.phone' | transloco }}</label><input class="form-control" [(ngModel)]="pPhone" /></div>
+      <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_cni' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pCni" [placeholder]="'cons.pickup.cni_ph' | transloco" /></div>
     }
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button>
-    <button type="button" class="btn btn-primary" [disabled]="saving" (click)="confirm('mandate-modal')"><i class="ti ti-users me-1"></i>Valider le retrait</button>
+    <button type="button" class="btn btn-primary" [disabled]="saving" (click)="confirm('mandate-modal')"><i class="ti ti-users me-1"></i>{{ 'cons.pickup.btn_confirm' | transloco }}</button>
   </div>
 </div></div></div>
 

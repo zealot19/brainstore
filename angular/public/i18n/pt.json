@@ -128,6 +128,7 @@
     "colis": "Encomendas",
     "nouveau_colis": "Nova encomenda",
     "reception_colis": "Receção de encomendas",
+    "retrait_colis": "Retirada de encomendas",
     "manifeste_voyage": "Manifesto de viagem",
     "bagages": "Bagagem",
     "nouveau_bagage": "Nova bagagem",
@@ -2148,6 +2149,26 @@
     }
   },
   "cons": {
+    "pickup": {
+      "title": "Retirada de encomendas",
+      "tab_awaiting": "A retirar",
+      "tab_done": "Retiradas",
+      "act_pickup": "Retirada",
+      "act_mandate": "Procurador",
+      "empty": "Nenhuma encomenda.",
+      "modal_pickup_title": "Retirada pelo destinatário",
+      "modal_mandate_title": "Retirada por um procurador",
+      "f_parcel": "Encomenda",
+      "f_cni": "Documento (CNI)",
+      "cni_ph": "N.º do documento",
+      "cni_on_file": "Documento já registado — verifique e valide.",
+      "cni_required_hint": "Documento não registado: preenchimento obrigatório.",
+      "f_mandate_name": "Nome do procurador",
+      "btn_confirm": "Validar a retirada",
+      "err_cni_recipient": "O documento (CNI) do destinatário é obrigatório.",
+      "err_mandate": "O nome e o documento (CNI) do procurador são obrigatórios.",
+      "toast_done": "Encomenda retirada."
+    },
     "shipment": {
       "title": "Expedições", "act": "Expedições", "total": "Total", "shipped": "Expedido", "remaining": "Restante",
       "trip": "Viagem", "qty": "Quantidade", "new": "Nova expedição", "note": "Nota (opcional)",

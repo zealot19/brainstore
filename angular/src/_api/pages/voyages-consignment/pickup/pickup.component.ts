@@ -9,7 +9,7 @@ import { HasPermissionDirective } from '../../../../app/shared/directives/has-pe
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 type Tab = 'awaiting' | 'done';
 
@@ -23,6 +23,7 @@ type Tab = 'awaiting' | 'done';
 })
 export class VcgPickupComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   tab: Tab = 'awaiting';
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false;
@@ -74,13 +75,13 @@ export class VcgPickupComponent implements OnInit {
   confirm(modalId: string): void {
     if (!this.target || this.saving) return;
     const name = this.pName.trim(), cni = this.pCni.trim();
-    if (this.kind === 'destinataire' && !cni) { this.toast.error('La pièce (CNI) du destinataire est obligatoire.'); return; }
-    if (this.kind === 'mandataire' && (!name || !cni)) { this.toast.error('Nom et pièce (CNI) du mandataire sont obligatoires.'); return; }
+    if (this.kind === 'destinataire' && !cni) { this.toast.error(this.t.translate('cons.pickup.err_cni_recipient')); return; }
+    if (this.kind === 'mandataire' && (!name || !cni)) { this.toast.error(this.t.translate('cons.pickup.err_mandate')); return; }
     this.saving = true;
     this.svc.pickup(this.target.id, {
       picked_up_kind: this.kind, picked_up_by: name, picked_up_phone: this.pPhone.trim(), picked_up_id_number: cni,
     }).subscribe({
-      next: () => { this.saving = false; this.target = null; this.toast.success('Colis retiré.'); this.close(modalId); this.reload(); },
+      next: () => { this.saving = false; this.target = null; this.toast.success(this.t.translate('cons.pickup.toast_done')); this.close(modalId); this.reload(); },
       error: e => { this.saving = false; this.err(e); } });
   }
 

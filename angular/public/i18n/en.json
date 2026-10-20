@@ -128,6 +128,7 @@
     "colis": "Parcels",
     "nouveau_colis": "New parcel",
     "reception_colis": "Parcel reception",
+    "retrait_colis": "Parcel pickup",
     "manifeste_voyage": "Trip manifest",
     "bagages": "Luggage",
     "nouveau_bagage": "New luggage",
@@ -2148,6 +2149,26 @@
     }
   },
   "cons": {
+    "pickup": {
+      "title": "Parcel pickup",
+      "tab_awaiting": "To pick up",
+      "tab_done": "Picked up",
+      "act_pickup": "Pickup",
+      "act_mandate": "Proxy",
+      "empty": "No parcel.",
+      "modal_pickup_title": "Pickup by recipient",
+      "modal_mandate_title": "Pickup by proxy",
+      "f_parcel": "Parcel",
+      "f_cni": "ID (CNI)",
+      "cni_ph": "ID no.",
+      "cni_on_file": "ID already on file — verify and confirm.",
+      "cni_required_hint": "No ID on file: entry required.",
+      "f_mandate_name": "Proxy name",
+      "btn_confirm": "Confirm pickup",
+      "err_cni_recipient": "The recipient's ID (CNI) is required.",
+      "err_mandate": "The proxy's name and ID (CNI) are required.",
+      "toast_done": "Parcel picked up."
+    },
     "shipment": {
       "title": "Shipments", "act": "Shipments", "total": "Total", "shipped": "Shipped", "remaining": "Remaining",
       "trip": "Trip", "qty": "Quantity", "new": "New shipment", "note": "Note (optional)",

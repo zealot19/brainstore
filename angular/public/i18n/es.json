@@ -128,6 +128,7 @@
     "colis": "Paquetes",
     "nouveau_colis": "Nuevo paquete",
     "reception_colis": "Recepción de paquetes",
+    "retrait_colis": "Retiro de paquetes",
     "manifeste_voyage": "Manifiesto de viaje",
     "bagages": "Equipaje",
     "nouveau_bagage": "Nuevo equipaje",
@@ -2148,6 +2149,26 @@
     }
   },
   "cons": {
+    "pickup": {
+      "title": "Retiro de paquetes",
+      "tab_awaiting": "Por retirar",
+      "tab_done": "Retirados",
+      "act_pickup": "Retiro",
+      "act_mandate": "Apoderado",
+      "empty": "Ningún paquete.",
+      "modal_pickup_title": "Retiro por el destinatario",
+      "modal_mandate_title": "Retiro por un apoderado",
+      "f_parcel": "Paquete",
+      "f_cni": "Documento (CNI)",
+      "cni_ph": "N.º de documento",
+      "cni_on_file": "Documento ya registrado — verifique y valide.",
+      "cni_required_hint": "Documento no registrado: entrada obligatoria.",
+      "f_mandate_name": "Nombre del apoderado",
+      "btn_confirm": "Validar el retiro",
+      "err_cni_recipient": "El documento (CNI) del destinatario es obligatorio.",
+      "err_mandate": "El nombre y el documento (CNI) del apoderado son obligatorios.",
+      "toast_done": "Paquete retirado."
+    },
     "shipment": {
       "title": "Expediciones", "act": "Expediciones", "total": "Total", "shipped": "Expedido", "remaining": "Restante",
       "trip": "Viaje", "qty": "Cantidad", "new": "Nueva expedición", "note": "Nota (opcional)",

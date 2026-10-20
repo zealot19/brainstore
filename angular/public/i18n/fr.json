@@ -128,6 +128,7 @@
     "colis": "Colis",
     "nouveau_colis": "Nouveau colis",
     "reception_colis": "Réception colis",
+    "retrait_colis": "Retrait colis",
     "manifeste_voyage": "Manifeste voyage",
     "bagages": "Bagages",
     "nouveau_bagage": "Nouveau bagage",
@@ -2148,6 +2149,26 @@
     }
   },
   "cons": {
+    "pickup": {
+      "title": "Retrait des colis",
+      "tab_awaiting": "À retirer",
+      "tab_done": "Retirés",
+      "act_pickup": "Retrait",
+      "act_mandate": "Mandat",
+      "empty": "Aucun colis.",
+      "modal_pickup_title": "Retrait par le destinataire",
+      "modal_mandate_title": "Retrait par un mandataire",
+      "f_parcel": "Colis",
+      "f_cni": "Pièce (CNI)",
+      "cni_ph": "N° CNI",
+      "cni_on_file": "Pièce déjà au dossier — vérifiez et validez.",
+      "cni_required_hint": "Pièce non renseignée : saisie obligatoire.",
+      "f_mandate_name": "Nom du mandataire",
+      "btn_confirm": "Valider le retrait",
+      "err_cni_recipient": "La pièce (CNI) du destinataire est obligatoire.",
+      "err_mandate": "Nom et pièce (CNI) du mandataire sont obligatoires.",
+      "toast_done": "Colis retiré."
+    },
     "shipment": {
       "title": "Expéditions", "act": "Expéditions", "total": "Total", "shipped": "Expédié", "remaining": "Restant",
       "trip": "Voyage", "qty": "Quantité", "new": "Nouvelle expédition", "note": "Note (facultatif)",
