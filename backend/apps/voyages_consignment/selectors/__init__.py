@@ -17,13 +17,19 @@ def _parcel_visibility_q(user):
     return scope_by_agency_q(user_agency_ids(user), *_PARCEL_AGENCY_FIELDS)
 
 
+def _parcel_sent_q(user):
+    # Liste « Colis envoyés » (Tout Afficher) : uniquement l'agence d'origine,
+    # c.-à-d. les colis que l'agence a elle-même enregistrés. Admin = tout.
+    return scope_by_agency_q(user_agency_ids(user), "agency_id")
+
+
 def list_parcels(company, status=None, trip_id=None, q=None, consignment_type=None,
                  origin_point=None, destination_point=None,
                  date_field=None, date_from=None, date_to=None,
                  delivered_home=None, delivery_payment_method=None, user=None,
                  include_archived=False):
     qs = (Parcel.objects.filter(is_deleted=False, company=company)
-          .filter(_parcel_visibility_q(user))
+          .filter(_parcel_sent_q(user))
           .select_related("origin_point", "destination_point", "trip", "trip__route",
                           "trip__vehicle", "consignment_type")
           .order_by("-created_at"))

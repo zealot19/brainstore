@@ -30,11 +30,12 @@ def test_model_has_content_and_nature():
     assert "content" in fields and "nature" in fields
 
 
-def test_parcel_write_requires_description_content_nature():
+def test_parcel_write_requires_description_and_content():
+    # #7 : la nature a été retirée du formulaire -> nature_id devient facultatif.
     s = ParcelWrite()
     assert s.fields["description"].required
     assert s.fields["content"].required
-    assert s.fields["nature_id"].required
+    assert not s.fields["nature_id"].required
 
 
 @pytest.mark.django_db

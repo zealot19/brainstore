@@ -93,6 +93,7 @@ def test_create_parcel_without_recipient_via_api():
     r = c.post("/api/v1/voyages/consignment/parcels/", {
         "origin_point_id": str(a.id), "destination_point_id": str(b.id),
         "consignment_type_id": str(ct.id), "sender_name": "S", "sender_phone": "1",
+        "description": "Carton", "content": "Divers",  # obligatoires (M24), indépendants du destinataire
         "amount_due": "0",  # 0 → pas d'encaissement, pas de session requise
     }, format="json")
     assert r.status_code in (200, 201), r.content

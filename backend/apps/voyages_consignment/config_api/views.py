@@ -24,7 +24,13 @@ def _user_base_station(user, company_id):
 
     #1 : à l'enregistrement d'un colis, l'origine est imposée = la station de
     l'agence à laquelle l'agent est rattaché (default_agency). Chaque agence a
-    sa station (cf. ensure_agency_station)."""
+    sa station (cf. ensure_agency_station).
+
+    Les admins (institution / super) ne sont PAS restreints : ils supervisent
+    toutes les agences et choisissent librement l'origine (repli sur la valeur
+    fournie)."""
+    if getattr(user, "is_superuser", False) or getattr(user, "is_institution_admin", False):
+        return None
     aid = getattr(user, "default_agency_id", None)
     if not aid:
         return None
@@ -650,9 +656,14 @@ class ArrivedShipmentListView(APIView):
 
     def get(self, request):
         from apps.voyages_consignment.models import ParcelShipment
+        from apps.core.agency_scope import user_agency_ids, scope_by_agency_q
+        # Réception : seule l'agence de DESTINATION du colis voit/réceptionne
+        # (les agences intermédiaires d'un trajet ne le voient pas). Admin = tout.
         qs = (ParcelShipment.objects
               .filter(is_deleted=False, parcel__company=request.user.company,
                       status=ParcelShipment.Status.ARRIVED)
+              .filter(scope_by_agency_q(user_agency_ids(request.user),
+                                        "parcel__destination_point__agency_id"))
               .select_related("parcel", "parcel__destination_point", "trip", "trip__route")
               .order_by("arrived_at"))
         return success_response(S.ParcelShipmentSerializer(qs, many=True).data)

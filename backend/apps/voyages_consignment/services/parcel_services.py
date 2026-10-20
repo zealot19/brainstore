@@ -60,7 +60,8 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
         raise ApplicationError(_("Le colis ne peut être envoyé que vers un lieu rattaché à une agence."))
     if nature is not None and consignment_type.nature_id != nature.id:
         raise ApplicationError(_("Le type choisi n'appartient pas à la nature sélectionnée."))
-    if consignment_type.nature.is_prohibited:
+    # La nature a été retirée de la config/du formulaire : elle peut être absente.
+    if consignment_type.nature and consignment_type.nature.is_prohibited:
         raise ApplicationError(_("Cette nature de colis est interdite au transport."))
     if consignment_type.max_weight_kg and weight_kg and weight_kg > consignment_type.max_weight_kg:
         raise ApplicationError(_("Poids supérieur au maximum autorisé pour ce type de colis."))

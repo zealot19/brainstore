@@ -1,5 +1,6 @@
 """Cloisonnement par agence des colis : un colis va de A (origine) vers B (destination).
-Seules A et B le voient ; seule B peut réceptionner / remettre. L'admin institution voit tout."""
+Liste « Tout Afficher » (envois) : seule A voit ses colis. Réception/retrait : seule B
+(destination) les voit et les traite. Le détail reste ouvrable par A et B. Admin = tout."""
 import pytest
 from apps.core.exceptions import ApplicationError
 from apps.voyages_consignment.models import Parcel
@@ -58,15 +59,18 @@ def _setup(email="scope@x.com"):
 
 # ── Visibilité (A et B seulement) ────────────────────────────────────────────
 
-def test_origin_and_destination_agencies_see_parcel():
+def test_only_origin_agency_sees_sent_parcel_in_list():
+    # #3 : « Tout Afficher » = colis envoyés par l'agence => seule l'origine (A) les voit.
     company, admin, a, b, c, sp_a, sp_b, ct = _setup()
     p = _parcel(company, sp_a, sp_b, ct)
     user_a = _user(admin, company, "ua@x.com", a)
     user_b = _user(admin, company, "ub@x.com", b)
     ids_a = list(selectors.list_parcels(company, user=user_a).values_list("id", flat=True))
     ids_b = list(selectors.list_parcels(company, user=user_b).values_list("id", flat=True))
-    assert p.id in ids_a
-    assert p.id in ids_b
+    assert p.id in ids_a                      # l'origine voit ses envois
+    assert p.id not in ids_b                  # la destination ne les voit pas dans « Tout Afficher »
+    # …mais la destination peut toujours ouvrir le détail (pour réception/retrait).
+    assert selectors.parcel_detail(company, p.id, user_b) is not None
 
 
 def test_third_agency_does_not_see_parcel():
