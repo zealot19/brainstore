@@ -89,9 +89,13 @@ if not exist "%ENVFILE%" (
     echo SYNC_MASTER_URL=!MASTER_URL!
     echo SYNC_TOKEN=!TOKEN!
     echo SYNC_INTERVAL=90
+    echo PRINT_HELPER_URL=http://127.0.0.1:9113
   )> "%ENVFILE%"
   echo [ok] Configuration enregistree dans backend\.env
 )
+
+REM ---- impression : s'assurer que PRINT_HELPER_URL est present (installs existants) ----
+findstr /C:"PRINT_HELPER_URL" "%ENVFILE%" >nul 2>&1 || echo PRINT_HELPER_URL=http://127.0.0.1:9113>> "%ENVFILE%"
 
 REM ---- 5) migrations : TOUJOURS (idempotent : ne fait rien si a jour).
 REM     A executer a chaque demarrage, sinon les nouvelles migrations
@@ -128,6 +132,10 @@ start "ERP - API" cmd /k "cd /d "%BACKEND%" && "%PY%" manage.py runserver 0.0.0.
 
 echo [demarrage] Synchronisation en arriere-plan ^(toutes les 90s^)
 start "ERP - Sync" "%~f0" --syncloop
+
+REM ---- Agent d'impression (recu sur son imprimante, etiquette sur la sienne) ----
+echo [demarrage] Agent d'impression ^(port 9113^)
+start "ERP - Impression" cmd /k "cd /d "%ROOT%tools\print-helper" && "%PY%" print_helper.py"
 
 echo [demarrage] Interface ^(compilation ~30s, le navigateur s'ouvre seul^)
 pushd "%ANGULAR%"

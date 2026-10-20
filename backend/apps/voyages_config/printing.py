@@ -32,7 +32,10 @@ def helper_printers(timeout=4):
         return []
 
 
-def send_to_helper(printer_name, pdf_bytes, timeout=20):
+def send_to_helper(printer_name, html, timeout=40):
+    """Envoie le HTML du document à l'agent d'impression local qui le rend en PDF
+    (Edge/Chrome sans tête) puis l'imprime en silence sur `printer_name`.
+    On n'envoie plus un PDF rendu côté serveur -> plus aucune dépendance WeasyPrint."""
     url = helper_url()
     if not url or not printer_name:
         return False
@@ -40,7 +43,7 @@ def send_to_helper(printer_name, pdf_bytes, timeout=20):
         import requests
         r = requests.post(f"{url}/print", timeout=timeout, json={
             "printer": printer_name,
-            "pdf_base64": base64.b64encode(pdf_bytes).decode("ascii"),
+            "html": html,
         })
         r.raise_for_status()
         return True
@@ -126,8 +129,8 @@ def print_or_fallback(company, doc_code, obj_id, request=None):
     printer = mapped_printer(company, doc_code)
     if printer and helper_url():
         try:
-            if send_to_helper(printer, _html_to_pdf(html)):
+            if send_to_helper(printer, html):
                 return {"printed": True, "html": None}
         except Exception:
-            logger.warning("Rendu/impression serveur impossible, repli navigateur.", exc_info=True)
+            logger.warning("Impression via l'agent impossible, repli navigateur.", exc_info=True)
     return {"printed": False, "html": html}

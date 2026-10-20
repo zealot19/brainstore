@@ -1,48 +1,40 @@
-# Agent d'impression Windows — BrainStore ERP
+# Agent d'impression — BrainStore ERP
 
-Petit service à lancer sur **le PC serveur de l'agence** (celui qui héberge l'instance
-Docker locale). Il reçoit les PDF de l'instance Django et les imprime **en silence** sur
-l'imprimante Windows mappée à chaque document.
+Petit service lancé sur **le PC de l'agence**. Il reçoit le **HTML** des documents
+(reçu colis, étiquette colis, bordereau…) depuis l'ERP, le **rend en PDF** avec Edge/Chrome
+sans tête, puis l'**imprime en silence** sur l'imprimante **mappée à chaque document**.
+Ainsi le reçu part sur son imprimante et l'étiquette sur la sienne, sans boîte de dialogue.
 
-Un seul agent par serveur d'agence (pas par poste guichet). Les imprimantes réseau doivent
-être installées **sur ce PC Windows** (avec leurs pilotes) pour apparaître dans la liste.
+> Aucune dépendance WeasyPrint côté serveur : c'est l'agent qui fabrique le PDF.
 
-## Installation
-1. Installer Python 3 et pywin32 :
-   ```
-   pip install pywin32
-   ```
-2. Télécharger **SumatraPDF** (version *portable*, gratuite) et placer `SumatraPDF.exe`
-   dans ce dossier (ou définir la variable `SUMATRA_PATH`).
-3. Lancer l'agent :
-   ```
-   python print_helper.py
-   ```
-   Port par défaut : **9113** (modifiable via `PRINT_HELPER_PORT`).
+## Pré-requis
+1. **Python 3** (rien d'autre à installer : la liste des imprimantes passe par PowerShell).
+2. **Microsoft Edge** (présent par défaut sur Windows) ou **Google Chrome** — pour le rendu
+   HTML → PDF. Détecté automatiquement, ou via `EDGE_PATH` / `CHROME_PATH`.
+3. **SumatraPDF** (version *portable*, gratuite) : placer `SumatraPDF.exe` dans ce dossier
+   (ou définir `SUMATRA_PATH`) — pour l'impression silencieuse sur une imprimante nommée.
 
-## Démarrage automatique (recommandé)
-Installer en service Windows avec [NSSM](https://nssm.cc/) :
-```
-nssm install BrainStorePrintHelper "C:\Python3\python.exe" "C:\...\print_helper.py"
-nssm start BrainStorePrintHelper
-```
-ou via le Planificateur de tâches (au démarrage / à l'ouverture de session).
+Les imprimantes doivent être installées **sur ce PC** (avec leurs pilotes) pour apparaître
+dans la liste. Un seul agent par PC.
 
-## Connexion de l'instance Docker
-Dans le `.env` (ou docker-compose) de l'instance locale :
-```
-PRINT_HELPER_URL=http://host.docker.internal:9113
-```
-`host.docker.internal` pointe vers l'hôte Windows depuis le conteneur (Docker Desktop).
-Laisser vide sur le master en ligne → repli sur la boîte d'impression du navigateur.
+## Démarrage
+- **Mode dev (recommandé)** : `start-erp.bat` lance l'agent automatiquement (fenêtre
+  « ERP - Impression », port 9113) et écrit `PRINT_HELPER_URL=http://127.0.0.1:9113`
+  dans `backend/.env`. Rien à faire de plus — il suffit d'ajouter `SumatraPDF.exe` ici.
+- **Manuel** : `python print_helper.py` (port **9113**, modifiable via `PRINT_HELPER_PORT`).
+- **Sous Docker** : mettre `PRINT_HELPER_URL=http://host.docker.internal:9113` dans le `.env`
+  de l'instance locale (laisser vide sur le master en ligne → repli navigateur).
 
 ## Vérification
 ```
-curl http://localhost:9113/printers      # liste des imprimantes Windows
+curl http://localhost:9113/printers      # liste des imprimantes du PC
 ```
-Dans l'ERP : **Configuration → Modèles de documents → Mappage des imprimantes**, choisir une
-imprimante par document, puis enregistrer une réservation de colis/bagage pour tester.
+Dans l'ERP : **Configuration → Modèles de documents → Mappage des imprimantes**, choisir
+une imprimante pour **Reçu de colis** et une autre pour **Étiquette de colis**, enregistrer,
+puis créer un colis : le reçu et l'étiquette s'impriment chacun sur son imprimante.
+Sans mappage (ou agent indisponible) → repli sur la boîte d'impression du navigateur.
 
-## Endpoints
+## Endpoints (serveur → agent)
 - `GET  /printers` → `{"printers": [...]}`
-- `POST /print` → `{"printer": "<nom>", "pdf_base64": "<...>"}` → impression silencieuse.
+- `POST /print` → `{"printer": "<nom>", "html": "<...>"}` → rendu + impression silencieuse.
+  (Rétro-compat : `{"printer", "pdf_base64"}` est aussi accepté.)
