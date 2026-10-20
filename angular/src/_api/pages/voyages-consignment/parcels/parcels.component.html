@@ -103,8 +103,8 @@
   <form [formGroup]="form" (ngSubmit)="submit()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-2">{{ errorMsg }}</div> }
     <div class="row">
-      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_origin' | transloco }} <span class="text-danger">*</span></label>
-        <app-searchable-select formControlName="origin_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
+      <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_origin' | transloco }}</label>
+        <input class="form-control" [value]="baseOriginName" disabled readonly /></div>
       <div class="col-md-6 mb-3"><label class="form-label">{{ 'cons.parcels.f_dest' | transloco }} <span class="text-danger">*</span></label>
         <app-searchable-select formControlName="destination_point_id" [items]="points" labelKey="name" valueKey="id" [placeholder]="'cons.common.opt_choose' | transloco"></app-searchable-select></div>
     </div>

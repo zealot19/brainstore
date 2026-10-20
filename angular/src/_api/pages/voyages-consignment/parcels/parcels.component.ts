@@ -19,6 +19,7 @@ import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pi
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
 import { PrintRouterService } from '../../../../app/shared/print/print-router.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { SearchableSelectDirective } from '../../shared/searchable-select/searchable-select.directive';
 import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.component';
@@ -31,6 +32,10 @@ import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.
 export class VcgParcelsComponent implements OnInit {
   private toast = inject(ToastService);
   private printRouter = inject(PrintRouterService);
+  private auth = inject(AuthService);
+  // #1 : l'origine d'un colis est toujours la station de l'agence de l'agent.
+  baseOriginId: string | null = null;
+  baseOriginName = '';
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false; statusFilter = ''; q = '';
   tripFilter = ''; typeFilter = ''; originFilter = ''; destFilter = '';
@@ -60,7 +65,7 @@ export class VcgParcelsComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      origin_point_id: [null, Validators.required], destination_point_id: [null, Validators.required],
+      origin_point_id: [null], destination_point_id: [null, Validators.required],
       consignment_type_id: [null, Validators.required],
       sender_name: [null], sender_phone: [null],   // create: driven by the shared client fieldset (senderClient)
       recipient_name: [''], recipient_phone: [''],
@@ -69,7 +74,7 @@ export class VcgParcelsComponent implements OnInit {
       declared_value: [null], amount_due: [null, [Validators.required, Validators.min(0)]],
       payment_method: [''],
     });
-    this.spSvc.list().subscribe(d => this.points = d);
+    this.spSvc.list().subscribe(d => { this.points = d; this.resolveBaseOrigin(); });
     this.ctSvc.list().subscribe(d => {
       this.types = d;
       this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
@@ -129,7 +134,15 @@ export class VcgParcelsComponent implements OnInit {
       this.form.patchValue({ consignment_type_id: null });
     }
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '' }); this.form.enable(); }
+  /** #1 : origine = station de l'agence de l'agent (résolue depuis le profil courant). */
+  private resolveBaseOrigin(): void {
+    const aid = this.auth.currentUser?.default_agency?.id;
+    const st = aid ? this.points.find(p => (p as any).agency === aid) : undefined;
+    this.baseOriginId = st?.id ?? null;
+    this.baseOriginName = st?.name ?? '';
+    if (this.baseOriginId) this.form?.patchValue({ origin_point_id: this.baseOriginId });
+  }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '', origin_point_id: this.baseOriginId }); this.form.enable(); }
   openEdit(p: Parcel): void {
     this.editId = p.id; this.errorMsg = '';
     this.form.reset({

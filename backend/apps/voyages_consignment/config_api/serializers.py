@@ -97,10 +97,12 @@ class ParcelWrite(_EmptyNormalizeMixin, serializers.Serializer):
     null_blank_fields = ("recipient_name", "recipient_phone", "recipient_address",
                          "recipient_id_number", "payment_method",
                          "sender_civility", "sender_id_number")
-    origin_point_id = serializers.UUIDField()
+    # Origine imposée côté serveur (station de l'agence de base de l'agent) : facultative ici.
+    origin_point_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     destination_point_id = serializers.UUIDField()
     consignment_type_id = serializers.UUIDField()
-    nature_id = serializers.UUIDField()
+    # Nature de colis retirée du formulaire : facultative.
+    nature_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     content = serializers.CharField(max_length=255)
     sender_name = serializers.CharField(max_length=150)
     sender_phone = serializers.CharField(max_length=30)

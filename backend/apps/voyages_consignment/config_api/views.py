@@ -19,6 +19,19 @@ def _cfg(model, company_id, pk):
         Q(company_id=company_id) | Q(company__isnull=True)).first()
 
 
+def _user_base_station(user, company_id):
+    """Station (ServicePoint) de l'agence de base de l'utilisateur, ou None.
+
+    #1 : à l'enregistrement d'un colis, l'origine est imposée = la station de
+    l'agence à laquelle l'agent est rattaché (default_agency). Chaque agence a
+    sa station (cf. ensure_agency_station)."""
+    aid = getattr(user, "default_agency_id", None)
+    if not aid:
+        return None
+    return ServicePoint.objects.filter(
+        is_deleted=False, company_id=company_id, agency_id=aid).first()
+
+
 class ParcelListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.create'}
@@ -50,13 +63,17 @@ class ParcelListView(APIView):
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
         cid = company.id
-        origin = _cfg(ServicePoint, cid, d["origin_point_id"])
+        # #1 : l'origine est TOUJOURS la station de l'agence de base de l'agent
+        # expéditeur (on n'utilise pas la valeur envoyée par le client). Repli sur
+        # l'origine fournie uniquement si l'utilisateur n'a pas d'agence par défaut
+        # (ex. admin d'institution).
+        origin = _user_base_station(request.user, cid) or _cfg(ServicePoint, cid, d.get("origin_point_id"))
         dest = _cfg(ServicePoint, cid, d["destination_point_id"])
         ctype = _cfg(ConsignmentType, cid, d["consignment_type_id"])
         from apps.voyages_config.models import ConsignmentNature
-        nature = _cfg(ConsignmentNature, cid, d["nature_id"])
-        if not origin or not dest or not ctype or not nature:
-            return error_response("Référence introuvable (point, type ou nature).", status_code=404)
+        nature = _cfg(ConsignmentNature, cid, d["nature_id"]) if d.get("nature_id") else None
+        if not origin or not dest or not ctype:
+            return error_response("Référence introuvable (point ou type).", status_code=404)
         try:
             parcel = services.register_parcel(
                 company, origin_point=origin, destination_point=dest, consignment_type=ctype,
