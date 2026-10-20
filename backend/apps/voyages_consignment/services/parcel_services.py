@@ -380,8 +380,18 @@ def mark_arrived_batch(parcels, *, user):
 
 @transaction.atomic
 def dispatch_parcels_for_trip(trip, *, user):
-    qs = trip.parcels.filter(status__in=(Parcel.Status.READY_FOR_TRAVEL, Parcel.Status.LOADED))
-    return [dispatch_parcel(p, user=user) for p in qs]
+    """Départ du voyage : passe en transit les EXPÉDITIONS validées/chargées de ce
+    voyage (modèle expéditions), plus les colis entiers legacy (sans expédition)."""
+    from apps.voyages_consignment.models import ParcelShipment
+    from apps.voyages_consignment.services.shipment_services import dispatch_shipment
+    results = [dispatch_shipment(s, user=user) for s in
+               ParcelShipment.objects.filter(
+                   trip=trip, is_deleted=False,
+                   status__in=(ParcelShipment.Status.VALIDATED, ParcelShipment.Status.LOADED))]
+    results += [dispatch_parcel(p, user=user) for p in
+                trip.parcels.filter(status__in=(Parcel.Status.READY_FOR_TRAVEL, Parcel.Status.LOADED),
+                                    shipments__isnull=True)]
+    return results
 
 
 @transaction.atomic

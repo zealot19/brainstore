@@ -128,3 +128,36 @@ def test_receive_blocked_until_all_arrived():
     validate_shipment(s1, user=g["admin"])
     with pytest.raises(ApplicationError):
         receive_parcel(g["parcel"], received_pieces=10, user=g["admin"])
+
+
+@pytest.mark.django_db
+def test_create_shipment_merges_same_parcel_same_trip():
+    # Fix A : recharger le même colis sur le même voyage additionne la quantité
+    # (une seule ligne d'expédition, pas de doublon).
+    from apps.voyages_consignment.services import create_shipment
+    from apps.voyages_consignment.models import ParcelShipment
+    g = _setup("merge@x.com")
+    s1 = create_shipment(g["parcel"], trip=g["trip1"], quantity=3, user=g["admin"])
+    s2 = create_shipment(g["parcel"], trip=g["trip1"], quantity=2, user=g["admin"])
+    assert s1.id == s2.id
+    s1.refresh_from_db()
+    assert s1.quantity == 5
+    assert ParcelShipment.objects.filter(parcel=g["parcel"], trip=g["trip1"], is_deleted=False).count() == 1
+
+
+@pytest.mark.django_db
+def test_trip_dispatch_then_arrive_advances_shipments():
+    # Fix B : au départ les expéditions validées passent EN TRANSIT ; à l'arrivée
+    # (voyage terminé) elles passent ARRIVÉES et deviennent réceptionnables.
+    from apps.voyages_consignment.services import (create_shipment, validate_shipment,
+                                                   dispatch_parcels_for_trip, arrive_parcels_for_trip)
+    from apps.voyages_consignment.models import ParcelShipment
+    g = _setup("tripflow@x.com")
+    s = create_shipment(g["parcel"], trip=g["trip1"], quantity=5, user=g["admin"])
+    validate_shipment(s, user=g["admin"])            # VALIDATED, voyage primaire = trip1
+    dispatch_parcels_for_trip(g["trip1"], user=g["admin"])
+    s.refresh_from_db()
+    assert s.status == ParcelShipment.Status.IN_TRANSIT
+    arrive_parcels_for_trip(g["trip1"], user=g["admin"])
+    s.refresh_from_db()
+    assert s.status == ParcelShipment.Status.ARRIVED   # réceptionnable

@@ -73,10 +73,27 @@ def create_shipment(parcel, *, trip, quantity, note="", user=None):
     quantity = int(quantity or 0)
     if quantity < 1:
         raise ApplicationError(_("La quantité expédiée doit être au moins 1."))
-    if quantity > parcel.remaining_pieces:
+    # Restant « libre » à charger = restant (hors validé/compté) − déjà chargé en brouillon
+    # (toutes expéditions), pour ne pas dépasser le colis en empilant des chargements.
+    from django.db.models import Sum
+    draft_qty = (ParcelShipment.objects.filter(parcel=parcel, is_deleted=False,
+                 status=ParcelShipment.Status.DRAFT).aggregate(s=Sum("quantity"))["s"] or 0)
+    free = parcel.remaining_pieces - draft_qty
+    if quantity > free:
         raise ApplicationError(_("Quantité (%(q)s) supérieure au restant (%(r)s).")
-                               % {"q": quantity, "r": parcel.remaining_pieces})
+                               % {"q": quantity, "r": free})
     _capacity_ok(trip, parcel.company, parcel.weight_kg)
+    # Fusion : si ce colis a déjà une expédition en brouillon sur CE voyage, on
+    # additionne la quantité au lieu de créer une nouvelle ligne.
+    existing = ParcelShipment.objects.filter(
+        parcel=parcel, trip=trip, is_deleted=False,
+        status=ParcelShipment.Status.DRAFT).order_by("created_at").first()
+    if existing:
+        existing.quantity += quantity
+        existing.updated_by = user
+        existing.save(update_fields=["quantity", "updated_by", "updated_at"])
+        recompute_parcel_state(parcel)
+        return existing
     return ParcelShipment.objects.create(parcel=parcel, trip=trip, quantity=quantity,
                                          status=ParcelShipment.Status.DRAFT, note=note, created_by=user)
 
