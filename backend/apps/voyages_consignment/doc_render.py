@@ -155,9 +155,9 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         rf("Receiver Number", e(parcel.recipient_phone)),
         rf("Destination", e(dest)),
         rf("Parcel Description", e(parcel.description) or "&mdash;"),
-        rf("Value", f"{_money(parcel.declared_value)} frs"),
-        rf("Qty", str(parcel.quantity)),
         rf("Content", e(parcel.content) or "&mdash;"),
+        rf("Qty", str(parcel.quantity)),
+        rf("Value", f"{_money(parcel.declared_value)} frs"),
         rf("Amount", f"{_money(parcel.amount_due)} frs"),
     ])
     note = (
