@@ -77,11 +77,13 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .rhead .rname{{font-weight:800;font-size:9pt;line-height:1.1}}
   .rhead .rslo{{font-style:italic;font-size:7pt}}
   .rhead .rids{{font-size:7pt;line-height:1.3}}
-  .rf{{display:flex;justify-content:space-between;gap:3mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
-  .rf b{{text-align:right}}
+  /* #4 : libellé puis petite espace puis valeur, alignés à gauche (pas justifié à droite) */
+  .rf{{display:flex;gap:1.5mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
   .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
   .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #000;padding-top:1mm}}
   .rnote div{{margin:0.4mm 0}}
+  .rbc{{text-align:center;margin-top:2mm}}
+  .rbc svg{{max-width:70mm;height:auto}}
   /* Tout le texte du reçu en gras et en noir (#4) */
   .rcpt,.rcpt *{{color:#000;font-weight:700}}
   /* Étiquette colis */
@@ -127,6 +129,9 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
     e = _html.escape
     dest = _safe(parcel, "destination_point.name", "")
     when = _dt(getattr(parcel, "created_at", None))
+    by = (agent or "").split()[-1] if (agent or "").strip() else ""   # #3 : nom de famille seul
+    phone = getattr(tpl, "phone", "") or getattr(tpl, "phones", "")
+    barcode = _barcode_svg(parcel.reference)
     logo = f'<img src="{logo_url}" alt="">' if logo_url else ""
     head = f"""<div class="rhead">
       <div class="rlogo">{logo}</div>
@@ -134,6 +139,7 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         <div class="rname">{e(tpl.brand_name)}</div>
         <div class="rslo">{e(tpl.slogan)}</div>
         <div class="rids"><b>Head Office</b>: {e(tpl.address)}</div>
+        <div class="rids"><b>Tel</b>: {e(phone)}</div>
       </div>
     </div>"""
 
@@ -162,9 +168,10 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
     inner = f"""<div class="doc rcpt">
       {head}
       {fields}
-      <div class="rby">By: {e(agent)} &nbsp;&nbsp; on the {when}</div>
+      <div class="rby">By: {e(by)} &nbsp;&nbsp; on the {when}</div>
       {note}
       <div class="sign"><div>Client Signature</div><div>Agent Signature</div></div>
+      <div class="rbc">{barcode}</div>
     </div>"""
     return render_80mm([inner], width_mm=width_mm, height_mm=height_mm)
 
