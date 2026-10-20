@@ -78,7 +78,7 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .rhead .rslo{{font-style:italic;font-size:7pt}}
   .rhead .rids{{font-size:7pt;line-height:1.3}}
   /* #4 : libellé puis petite espace puis valeur, alignés à gauche (pas justifié à droite) */
-  .rf{{display:flex;gap:1.5mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
+  .rf{{display:flex;gap:4mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
   .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
   .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #000;padding-top:1mm}}
   .rnote div{{margin:0.4mm 0}}
@@ -147,7 +147,7 @@ def build_parcel_receipt(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, h
         return f'<div class="rf"><span>{k}</span><b>{v}</b></div>'
 
     fields = "".join([
-        rf("Sending Ticket N&deg;", e(parcel.reference)),
+        rf("Ticket Number", e(parcel.reference)),
         rf("Sender Name", e(parcel.sender_name)),
         rf("Sender Number", e(parcel.sender_phone)),
         rf("Receiver Name", e(parcel.recipient_name)),
