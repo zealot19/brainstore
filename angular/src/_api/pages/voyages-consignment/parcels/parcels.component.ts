@@ -75,6 +75,9 @@ export class VcgParcelsComponent implements OnInit {
       payment_method: [''],
     });
     this.spSvc.list().subscribe(d => { this.points = d; this.resolveBaseOrigin(); });
+    // #2 : afficher l'origine (agence de l'agent) dès que le profil est dispo,
+    // même avant le chargement des points (BehaviorSubject -> émet tout de suite).
+    this.auth.currentUser$.subscribe(() => this.resolveBaseOrigin());
     this.ctSvc.list().subscribe(d => {
       this.types = d;
       this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
