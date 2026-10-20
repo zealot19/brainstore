@@ -136,10 +136,11 @@ export class VcgParcelsComponent implements OnInit {
   }
   /** #1 : origine = station de l'agence de l'agent (résolue depuis le profil courant). */
   private resolveBaseOrigin(): void {
-    const aid = this.auth.currentUser?.default_agency?.id;
-    const st = aid ? this.points.find(p => (p as any).agency === aid) : undefined;
+    const ag = this.auth.currentUser?.default_agency;
+    const st = ag?.id ? this.points.find(p => (p as any).agency === ag.id) : undefined;
     this.baseOriginId = st?.id ?? null;
-    this.baseOriginName = st?.name ?? '';
+    // Toujours afficher l'origine : station si trouvée, sinon le nom de l'agence du profil.
+    this.baseOriginName = st?.name ?? ag?.name ?? '';
     if (this.baseOriginId) this.form?.patchValue({ origin_point_id: this.baseOriginId });
   }
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '', origin_point_id: this.baseOriginId }); this.form.enable(); }
