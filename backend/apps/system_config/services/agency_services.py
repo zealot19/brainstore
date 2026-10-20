@@ -3,6 +3,27 @@ from apps.core.exceptions import ApplicationError
 from ..models import Agency, Company
 
 
+def ensure_agency_station(agency):
+    """Crée (idempotent) la Station correspondant à une agence.
+
+    Les Villes/Lieux ne sont plus configurés : chaque agence EST une station
+    (un ServicePoint rattaché à l'agence, sans ville). Appelé à la création
+    d'une agence et par une data-migration pour l'existant.
+    """
+    from apps.voyages_config.models import ServicePoint
+    sp = ServicePoint.objects.filter(
+        company_id=agency.company_id, agency_id=agency.id, is_deleted=False).first()
+    if sp:
+        return sp
+    return ServicePoint.objects.create(
+        company_id=agency.company_id,
+        agency_id=agency.id,
+        town=None,
+        code=(agency.code or "")[:20],
+        name=(agency.name or "")[:150],
+    )
+
+
 def _check_agency_limit(company):
     if not company.plan:
         return
@@ -34,13 +55,15 @@ def create_agency(*, company_id, name, code, agency_type=Agency.AgencyType.BRANC
         except Agency.DoesNotExist:
             raise ApplicationError(_("Agence parente introuvable."))
 
-    return Agency.objects.create(
+    agency = Agency.objects.create(
         company=company, name=name, code=code,
         agency_type=agency_type, parent=parent,
         email=email, phone=phone,
         manager_id=manager_id, currency_id=currency_id,
         is_active=is_active, created_by=created_by,
     )
+    ensure_agency_station(agency)
+    return agency
 
 
 def update_agency(agency, *, updated_by=None, **fields):

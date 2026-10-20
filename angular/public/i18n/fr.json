@@ -1044,10 +1044,10 @@
       "stops_header": "Escales",
       "save_first": "Enregistrez d'abord le trajet pour ajouter des escales.",
       "st_order": "Ordre",
-      "st_sp": "Lieu",
+      "st_sp": "Station",
       "remove": "Retirer",
       "no_stops": "Aucune escale.",
-      "f_stop_sp": "Escale (lieu)",
+      "f_stop_sp": "Escale (station)",
       "f_stop_distance": "Distance depuis origine (km)",
       "add_stop": "+ Ajouter"
     },
@@ -1447,7 +1447,7 @@
       "seat_hint": "Cliquez un siège disponible pour le bloquer (ou l'inverse). Les sièges vendus/réservés arriveront avec les réservations.",
       "stops": "Escales",
       "stop_order": "Ordre",
-      "stop_sp": "Lieu",
+      "stop_sp": "Station",
       "stop_arrival": "Arrivée prévue",
       "no_stops": "Aucune escale.",
       "depart_blocked": "Des dépenses de ce voyage ne sont pas encore décaissées — à régler avant le départ."

@@ -154,8 +154,8 @@ export class SidebarService {
           icon2: 'settings-cog',
           base: 'configuration',
           subMenus: [
-            { menuValue: 'Villes',               route: routes.vcTowns,             base: 'towns',               permission: 'transport.city.view',         module: 'voyage' },
-            { menuValue: 'Lieux',    route: routes.vcServicePoints,     base: 'service-points',      permission: 'transport.terminal.view',     module: 'voyage' },
+            // Villes & Lieux ne sont plus configurés : chaque Agence EST une Station
+            // (créée automatiquement). Les Trajets pointent directement sur ces stations.
             { menuValue: 'Trajets',              route: routes.vcRoutes,            base: 'routes',              permission: 'transport.route.view',        module: 'voyage' },
             { menuValue: 'Plages horaires',      route: routes.vcTimeSlots,         base: 'time-slots',          permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Planifications',       route: routes.vcServicePatterns,   base: 'service-patterns',    permission: 'transport.config.view',       module: 'voyage' },

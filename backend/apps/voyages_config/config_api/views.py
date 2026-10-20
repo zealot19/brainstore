@@ -242,7 +242,8 @@ class ServicePointListView(_ConfigListView):
 
     def _create(self, company, data, user):
         cid = company.id if company else None
-        town = cfg_lookup(Town, data.pop("town_id", None), cid)
+        tid = data.pop("town_id", None)
+        town = cfg_lookup(Town, tid, cid) if tid else None
         return ServicePoint.objects.create(company=company, created_by=user, town=town, **data)
 
 
@@ -256,7 +257,8 @@ class ServicePointDetailView(_ConfigDetailView):
 
     def _apply(self, obj, data):
         if "town_id" in data:
-            obj.town = cfg_lookup(Town, data.pop("town_id"), obj.company_id)
+            tid = data.pop("town_id")
+            obj.town = cfg_lookup(Town, tid, obj.company_id) if tid else None
         for k, v in data.items():
             setattr(obj, k, v)
 

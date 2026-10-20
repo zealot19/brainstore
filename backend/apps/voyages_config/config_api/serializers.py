@@ -146,7 +146,8 @@ class ServicePointRead(_ScopeMixin):
 
 
 class ServicePointWrite(serializers.Serializer):
-    town_id = serializers.UUIDField()
+    # Ville facultative : les Stations sont rattachées à une agence, pas à une ville.
+    town_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     code = serializers.CharField(max_length=20)
     name = serializers.CharField(max_length=150)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True, default=None)

@@ -18,8 +18,12 @@ class Town(_CompanyScoped):
 
 
 class ServicePoint(_CompanyScoped):
+    # Les "Stations" ne sont plus configurées à la main : chaque Agence EST une
+    # station (créée automatiquement avec l'agence). La Ville (Town) devient
+    # facultative/interne et n'est plus exposée dans la configuration.
     town = models.ForeignKey("voyages_config.Town", verbose_name=_("ville"),
-                             on_delete=models.PROTECT, related_name="service_points")
+                             on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name="service_points")
     code = models.CharField(_("code"), max_length=20)
     name = models.CharField(_("nom"), max_length=150)
     latitude = models.DecimalField(_("latitude"), max_digits=9, decimal_places=6, null=True, blank=True)
@@ -30,8 +34,8 @@ class ServicePoint(_CompanyScoped):
                                on_delete=models.SET_NULL, related_name="service_points")
 
     class Meta(_CompanyScoped.Meta):
-        verbose_name = _("lieu")
-        ordering = ["town__name", "name"]
+        verbose_name = _("station")
+        ordering = ["name"]
 
     def __str__(self):
         return f"{self.name} ({self.code})"

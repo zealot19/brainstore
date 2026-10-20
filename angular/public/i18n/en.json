@@ -1044,10 +1044,10 @@
       "stops_header": "Stops",
       "save_first": "Save the route first to add stops.",
       "st_order": "Order",
-      "st_sp": "Place",
+      "st_sp": "Station",
       "remove": "Remove",
       "no_stops": "No stops.",
-      "f_stop_sp": "Stop (place)",
+      "f_stop_sp": "Stop (station)",
       "f_stop_distance": "Distance from origin (km)",
       "add_stop": "+ Add"
     },
@@ -1447,7 +1447,7 @@
       "seat_hint": "Click an available seat to block it (or vice versa). Sold/held seats will come with bookings.",
       "stops": "Stops",
       "stop_order": "Order",
-      "stop_sp": "Place",
+      "stop_sp": "Station",
       "stop_arrival": "Scheduled arrival",
       "no_stops": "No stops.",
       "depart_blocked": "This trip has undisbursed expenses — settle them before departure."

@@ -137,6 +137,9 @@ def _bootstrap_company(*, company, admin_email, admin_first_name, admin_last_nam
         is_active=True,
         created_by=created_by,
     )
+    # Chaque agence est aussi une Station (les Villes/Lieux ne sont plus configurés).
+    from apps.system_config.services.agency_services import ensure_agency_station
+    ensure_agency_station(hq)
 
     user, temp_password = create_user(
         created_by=created_by,
