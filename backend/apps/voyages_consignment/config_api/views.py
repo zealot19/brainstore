@@ -239,13 +239,22 @@ class ParcelExpeditionView(APIView):
         trip_id = request.query_params.get("trip")
         destination = request.query_params.get("destination")
         ready = selectors.ready_parcels(company, destination_point=destination, user=request.user)
-        assigned = selectors.trip_parcels(company, trip_id, user=request.user) if trip_id else Parcel.objects.none()
-        assigned = list(assigned)
-        weight = sum(float(p.weight_kg or 0) for p in assigned)
+        # #11 : à bord = expéditions (shipments) du voyage, pré-départ incluses, pour
+        # pouvoir retirer / valider / dévalider par expédition. Agence d'origine (#10).
+        onboard = []
+        if trip_id:
+            from apps.voyages_consignment.models import ParcelShipment
+            from apps.core.agency_scope import user_agency_ids, scope_by_agency_q
+            onboard = list(ParcelShipment.objects
+                           .filter(is_deleted=False, parcel__company=company, trip_id=trip_id)
+                           .exclude(status=ParcelShipment.Status.CANCELLED)
+                           .filter(scope_by_agency_q(user_agency_ids(request.user), "parcel__agency_id"))
+                           .select_related("parcel", "parcel__destination_point", "trip"))
+        weight = sum(float(s.parcel.weight_kg or 0) for s in onboard)
         return success_response({
             "ready": S.ParcelRead(ready, many=True).data,
-            "assigned": S.ParcelRead(assigned, many=True).data,
-            "totals": {"count": len(assigned), "weight": weight},
+            "onboard": S.ParcelShipmentSerializer(onboard, many=True).data,
+            "totals": {"count": len(onboard), "weight": weight},
         })
 
 

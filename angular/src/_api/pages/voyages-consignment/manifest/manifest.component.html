@@ -43,9 +43,9 @@
     <!-- Pool : colis à expédier (restant > 0) -->
     <div class="col-lg-7 mb-3">
       <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between py-2">
-        <h6 class="mb-0">{{ 'cons.expedition.ready_pool' | transloco }} <small class="text-muted">({{ ready.length }})</small></h6>
+        <h6 class="mb-0">{{ 'cons.expedition.ready_pool' | transloco }} <small class="text-muted">({{ pool.length }})</small></h6>
         <div>
-          @if (selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipSelected()"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_selection' | transloco }} ({{ selReady.size }})</button> }
+          @if (selReady.size) { <button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="loadSelected()"><i class="ti ti-truck-loading me-1"></i>Charger la sélection ({{ selReady.size }})</button> }
         </div>
       </div>
         <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
@@ -58,7 +58,7 @@
             <th style="width:90px">{{ 'cons.expedition.qty' | transloco }}</th>
             <th class="no-sort"></th></tr></thead>
           <tbody>
-            @for (p of ready; track p.id) {
+            @for (p of pool; track p.id) {
               <tr>
                 <td><input type="checkbox" class="form-check-input" [checked]="isSel(p.id)" (change)="toggle(p.id)" /></td>
                 <td class="fw-medium">{{ p.reference }}</td>
@@ -66,7 +66,7 @@
                 <td>{{ p.destination_point_name }}</td>
                 <td class="text-center">{{ rem(p) }} / {{ p.quantity }}</td>
                 <td><input type="number" class="form-control form-control-sm" min="1" [max]="rem(p)" [(ngModel)]="shipQty[p.id]" /></td>
-                <td class="text-end"><button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="shipOne(p)" [title]="'cons.expedition.ship_n' | transloco"><i class="ti ti-send me-1"></i>{{ 'cons.expedition.ship_n' | transloco }}</button></td>
+                <td class="text-end"><button class="btn btn-sm btn-primary" *hasPermission="'ticketing.parcel.manage'" [disabled]="!tripId" (click)="loadOne(p)" title="Charger sur le véhicule"><i class="ti ti-truck-loading me-1"></i>Charger</button></td>
               </tr>
             } @empty { <tr><td colspan="7" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_ready' | transloco }}</td></tr> }
           </tbody>
@@ -76,25 +76,41 @@
 
     <!-- Colis déjà sur le voyage (lecture seule) -->
       <div class="col-lg-5 mb-3">
-        <div class="card"><div class="card-header d-flex align-items-center justify-content-between py-2">
+        <div class="card"><div class="card-header d-flex align-items-center justify-content-between py-2 flex-wrap gap-2">
           <h6 class="mb-0">{{ 'cons.expedition.onboard' | transloco }} <small class="text-muted">· {{ totals.count }} · {{ totals.weight }} kg</small></h6>
-          <button class="btn btn-sm btn-outline-secondary" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
+          <div class="d-flex gap-2">
+            @if (hasDraft) { <button class="btn btn-sm btn-success" *hasPermission="'ticketing.parcel.manage'" (click)="validateAll()" title="Valider : bon pour le départ"><i class="ti ti-circle-check me-1"></i>Valider (bon pour le départ)</button> }
+            <button class="btn btn-sm btn-outline-secondary" [disabled]="!tripId" (click)="printManifest()"><i class="ti ti-printer me-1"></i>{{ 'cons.expedition.print_manifest' | transloco }}</button>
+          </div>
         </div>
           <div class="card-body p-0"><div class="table-responsive"><table class="table table-sm table-hover mb-0 text-nowrap" style="font-size:.78rem">
             <thead class="thead-light"><tr>
               <th>{{ 'cons.manifest.col_ref_short' | transloco }}</th>
               <th>{{ 'cons.common.col_recipient' | transloco }}</th>
               <th class="text-center">{{ 'cons.common.pieces' | transloco }}</th>
-              <th>{{ 'cons.common.col_status' | transloco }}</th></tr></thead>
+              <th>{{ 'cons.common.col_status' | transloco }}</th>
+              <th class="no-sort"></th></tr></thead>
             <tbody>
-              @for (p of assigned; track p.id) {
+              @for (s of onboard; track s.id) {
                 <tr>
-                  <td class="fw-medium">{{ p.reference }}</td>
-                  <td>{{ p.recipient_name }}<br><small class="text-muted">{{ p.recipient_phone }}</small></td>
-                  <td class="text-center">{{ p.shipped_pieces ?? p.quantity }} / {{ p.quantity }}</td>
-                  <td><span class="badge {{ statusClass(p.status) }}">{{ p.status_display }}</span></td>
+                  <td class="fw-medium">{{ s.parcel_reference }}</td>
+                  <td>{{ s.parcel_recipient }}</td>
+                  <td class="text-center">{{ s.quantity }}</td>
+                  <td><span class="badge {{ statusClass(s.status) }}">{{ s.status_display }}</span></td>
+                  <td class="text-end">
+                    @if (canWithdraw(s)) {
+                      <div class="d-inline-flex align-items-center gap-1" *hasPermission="'ticketing.parcel.manage'">
+                        <input type="number" class="form-control form-control-sm" style="width:64px" min="1" [max]="s.quantity" [(ngModel)]="wdQty[s.id]" title="Quantité à retirer" />
+                        <button class="btn btn-sm btn-outline-danger" (click)="withdraw(s)" title="Retirer du véhicule"><i class="ti ti-arrow-back-up"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="withdrawAll(s)" title="Tout retirer">Tout</button>
+                      </div>
+                    }
+                    @if (s.status === 'validated' && isAdmin()) {
+                      <button class="btn btn-sm btn-outline-warning ms-1" (click)="unvalidate(s)" title="Dévalider (admin)"><i class="ti ti-lock-open me-1"></i>Dévalider</button>
+                    }
+                  </td>
                 </tr>
-              } @empty { <tr><td colspan="4" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
+              } @empty { <tr><td colspan="5" class="text-center py-3 text-muted">{{ 'cons.expedition.empty_onboard' | transloco }}</td></tr> }
             </tbody>
           </table></div></div>
         </div>

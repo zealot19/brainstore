@@ -107,5 +107,5 @@ def test_expedition_lists_endpoint(api_ctx):
     r = c.get("/api/v1/voyages/consignment/parcels/expedition/")
     assert r.status_code == 200, r.content
     body = r.json()["data"]
-    assert "ready" in body and "assigned" in body and "totals" in body
+    assert "ready" in body and "onboard" in body and "totals" in body
     assert len(body["ready"]) == 1

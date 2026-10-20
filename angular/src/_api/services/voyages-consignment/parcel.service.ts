@@ -46,6 +46,8 @@ export class ParcelService {
   // M25 — expéditions partielles
   shipments(id: string): Observable<ParcelShipment[]> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelShipments(id)).pipe(map(r => r.data ?? r)); }
   createShipment(id: string, body: { trip_id: string; quantity: number; note?: string }): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcelShipments(id), body).pipe(map(r => r.data ?? r)); }
+  withdrawShipment(sid: string, quantity: number): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentWithdraw(sid), { quantity }).pipe(map(r => r.data ?? r)); }
+  unvalidateShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentUnvalidate(sid), {}).pipe(map(r => r.data ?? r)); }
   validateShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentValidate(sid), {}).pipe(map(r => r.data ?? r)); }
   loadShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentLoad(sid), {}).pipe(map(r => r.data ?? r)); }
   dispatchShipment(sid: string): Observable<ParcelShipment> { return this.http.post<any>(VOYAGES_CONSIGNMENT.shipmentDispatch(sid), {}).pipe(map(r => r.data ?? r)); }

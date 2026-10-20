@@ -8,7 +8,8 @@ import { RouteService } from '../../../services/voyages-config/route.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { printBlob } from '../../../../app/shared/print/print.util';
-import { Parcel } from '../../../models/voyages-consignment.models';
+import { Parcel, ParcelShipment } from '../../../models/voyages-consignment.models';
+import { AuthService } from '../../../services/auth/auth.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, ServicePoint, TimeSlot } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -24,15 +25,17 @@ import { TranslocoModule } from '@jsverse/transloco';
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
+  private auth = inject(AuthService);
   allTrips: Trip[] = [];
   routes: Route[] = []; destinations: ServicePoint[] = []; timeslots: TimeSlot[] = [];
   // Filtres : options issues de la config (trajets, destinations, plages) ;
   // « Véhicule / Code » identifie directement le voyage (pas de champ Voyage séparé).
   fRoute = ''; fDest = ''; fDay = ''; fTime = ''; tripId = '';
-  ready: Parcel[] = []; assigned: Parcel[] = [];
+  ready: Parcel[] = []; onboard: ParcelShipment[] = [];
   totals = { count: 0, weight: 0 };
   selReady = new Set<string>();
-  shipQty: Record<string, number> = {};   // pièces à expédier par colis (défaut = restant)
+  shipQty: Record<string, number> = {};   // pièces à charger par colis (défaut = restant)
+  wdQty: Record<string, number> = {};     // pièces à retirer par expédition (#11)
 
   constructor(private parcels: ParcelService, private tripSvc: TripService,
               private roadmap: RoadmapService, private routeSvc: RouteService,
@@ -76,19 +79,29 @@ export class VcgManifestComponent implements OnInit {
     // Pool « à expédier » restreint à la destination du voyage sélectionné (ou au filtre destination).
     const destination = st?.destination || this.fDest || undefined;
     this.parcels.expedition({ trip: this.tripId || undefined, destination }).subscribe(d => {
-      this.ready = d.ready ?? []; this.assigned = d.assigned ?? [];
+      this.ready = d.ready ?? []; this.onboard = (d as any).onboard ?? [];
       this.totals = d.totals ?? { count: 0, weight: 0 };
-      // Quantité par défaut = restant de chaque colis du pool.
+      // Quantité par défaut = restant de chaque colis du pool ; retrait = qté chargée.
       this.shipQty = {};
       for (const p of this.ready) this.shipQty[p.id] = p.remaining_pieces ?? p.quantity;
+      this.wdQty = {};
+      for (const s of this.onboard) this.wdQty[s.id] = s.quantity;
     });
   }
   rem(p: Parcel): number { return p.remaining_pieces ?? p.quantity; }
+  /** Pool = colis pas encore chargés sur ce voyage (évite le double chargement). */
+  get pool(): Parcel[] {
+    const ob = new Set(this.onboard.map(s => s.parcel));
+    return this.ready.filter(p => !ob.has(p.id));
+  }
+  isAdmin(): boolean { const u: any = this.auth.currentUser; return !!(u && (u.is_superuser || u.is_institution_admin)); }
+  canWithdraw(s: ParcelShipment): boolean { return !['in_transit', 'arrived', 'received', 'cancelled'].includes(s.status); }
+  get hasDraft(): boolean { return this.onboard.some(s => s.status === 'draft'); }
 
   isSel(id: string): boolean { return this.selReady.has(id); }
   toggle(id: string): void { this.selReady.has(id) ? this.selReady.delete(id) : this.selReady.add(id); }
-  get allReadySel(): boolean { return this.ready.length > 0 && this.ready.every(p => this.selReady.has(p.id)); }
-  toggleAllReady(): void { if (this.allReadySel) this.selReady.clear(); else this.ready.forEach(p => this.selReady.add(p.id)); }
+  get allReadySel(): boolean { return this.pool.length > 0 && this.pool.every(p => this.selReady.has(p.id)); }
+  toggleAllReady(): void { if (this.allReadySel) this.selReady.clear(); else this.pool.forEach(p => this.selReady.add(p.id)); }
 
   statusClass(s: string): string {
     return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
@@ -97,24 +110,50 @@ export class VcgManifestComponent implements OnInit {
   }
   private err = (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.");
 
-  // Expédier N pièces d'un colis du pool sur le voyage sélectionné (1 clic).
-  shipOne(p: Parcel): void {
+  // #11 Phase 1 — charger N pièces d'un colis du pool sur le véhicule (expédition en brouillon).
+  loadOne(p: Parcel): void {
     if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
     const qty = this.shipQty[p.id] ?? this.rem(p);
     if (qty < 1 || qty > this.rem(p)) { this.toast.error('Quantité invalide.'); return; }
-    this.parcels.ship(p.id, { trip_id: this.tripId, quantity: qty })
-      .subscribe({ next: () => { this.toast.success('Colis expédié.'); this.refresh(); }, error: this.err });
+    this.parcels.createShipment(p.id, { trip_id: this.tripId, quantity: qty })
+      .subscribe({ next: () => { this.toast.success('Colis chargé.'); this.refresh(); }, error: this.err });
   }
-  shipSelected(): void {
+  loadSelected(): void {
     if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
     if (!this.selReady.size) { this.toast.error('Aucun colis sélectionné.'); return; }
     const ids = [...this.selReady]; let left = ids.length;
     ids.forEach(id => {
       const qty = this.shipQty[id];
-      this.parcels.ship(id, { trip_id: this.tripId, quantity: qty }).subscribe({
-        next: () => { if (--left === 0) { this.toast.success('Colis expédiés.'); this.refresh(); } },
+      this.parcels.createShipment(id, { trip_id: this.tripId, quantity: qty }).subscribe({
+        next: () => { if (--left === 0) { this.toast.success('Colis chargés.'); this.refresh(); } },
         error: e => { this.err(e); if (--left === 0) this.refresh(); } });
     });
+  }
+
+  // #11 Phase 2 — retrait de pièces chargées (véhicule), validation « bon pour le départ », dévalidation (admin).
+  withdraw(s: ParcelShipment): void {
+    const qty = this.wdQty[s.id];
+    if (!qty || qty < 1 || qty > s.quantity) { this.toast.error('Quantité à retirer invalide.'); return; }
+    const all = qty === s.quantity;
+    if (!confirm(all ? `Retirer tout le colis ${s.parcel_reference} du véhicule ?`
+                     : `Retirer ${qty} pièce(s) de ${s.parcel_reference} ?`)) return;
+    this.parcels.withdrawShipment(s.id, qty)
+      .subscribe({ next: () => { this.toast.success('Retiré.'); this.refresh(); }, error: this.err });
+  }
+  withdrawAll(s: ParcelShipment): void { this.wdQty[s.id] = s.quantity; this.withdraw(s); }
+  validateAll(): void {
+    const drafts = this.onboard.filter(s => s.status === 'draft');
+    if (!drafts.length) { this.toast.error('Aucun colis à valider.'); return; }
+    if (!confirm('Valider ces colis « bon pour le départ » ?')) return;
+    let left = drafts.length;
+    drafts.forEach(s => this.parcels.validateShipment(s.id).subscribe({
+      next: () => { if (--left === 0) { this.toast.success('Manifeste validé.'); this.refresh(); } },
+      error: e => { this.err(e); if (--left === 0) this.refresh(); } }));
+  }
+  unvalidate(s: ParcelShipment): void {
+    if (!confirm(`Dévalider l'expédition ${s.parcel_reference} ?`)) return;
+    this.parcels.unvalidateShipment(s.id)
+      .subscribe({ next: () => { this.toast.success('Dévalidé.'); this.refresh(); }, error: this.err });
   }
   printManifest(): void {
     if (!this.tripId) return;
