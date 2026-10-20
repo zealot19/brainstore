@@ -17,22 +17,32 @@ Ainsi le reçu part sur son imprimante et l'étiquette sur la sienne, sans boît
 Les imprimantes doivent être installées **sur ce PC** (avec leurs pilotes) pour apparaître
 dans la liste. Un seul agent par PC.
 
-## Démarrage
-- **Mode dev (recommandé)** : `start-erp.bat` lance l'agent automatiquement (fenêtre
-  « ERP - Impression », port 9113) et écrit `PRINT_HELPER_URL=http://127.0.0.1:9113`
-  dans `backend/.env`. Rien à faire de plus — il suffit d'ajouter `SumatraPDF.exe` ici.
-- **Manuel** : `python print_helper.py` (port **9113**, modifiable via `PRINT_HELPER_PORT`).
-- **Sous Docker** : mettre `PRINT_HELPER_URL=http://host.docker.internal:9113` dans le `.env`
-  de l'instance locale (laisser vide sur le master en ligne → repli navigateur).
+## Impression PAR POSTE (recommandé)
+Chaque **poste guichet** fait tourner cet agent ; son **navigateur** parle à son agent local
+(`http://127.0.0.1:9113`). Ainsi chaque poste imprime sur SES imprimantes.
+
+Sur chaque poste :
+1. Installer **Python 3** (cocher « Add to PATH »), déposer **`SumatraPDF.exe`** dans ce dossier.
+2. Double-cliquer **`start-print-agent.bat`** (laisse une fenêtre ouverte, port 9113).
+3. Dans l'ERP, sur ce poste : **Configuration → Imprimantes (ce poste)** — choisir une
+   imprimante pour **Reçu de colis** et une pour **Étiquette de colis** (enregistré dans ce
+   navigateur uniquement). Imprimer un colis → chacun part sur son imprimante.
+
+> Le poste serveur fait aussi tourner l'agent via `start-erp.bat` (fenêtre « ERP - Impression ») ;
+> les autres postes utilisent `start-print-agent.bat`.
+
+Sans imprimante choisie (ou agent injoignable) → repli sur la boîte d'impression du navigateur.
+
+## Variante : agent central côté serveur (facultatif)
+Un seul agent sur le serveur, imprimantes rattachées au serveur, mappage central dans
+**Configuration → Modèles de documents → Mappage des imprimantes**. Nécessite
+`PRINT_HELPER_URL` côté serveur (`http://127.0.0.1:9113` en dev, `http://host.docker.internal:9113`
+sous Docker).
 
 ## Vérification
 ```
-curl http://localhost:9113/printers      # liste des imprimantes du PC
+curl http://localhost:9113/printers      # liste des imprimantes de CE poste
 ```
-Dans l'ERP : **Configuration → Modèles de documents → Mappage des imprimantes**, choisir
-une imprimante pour **Reçu de colis** et une autre pour **Étiquette de colis**, enregistrer,
-puis créer un colis : le reçu et l'étiquette s'impriment chacun sur son imprimante.
-Sans mappage (ou agent indisponible) → repli sur la boîte d'impression du navigateur.
 
 ## Endpoints (serveur → agent)
 - `GET  /printers` → `{"printers": [...]}`

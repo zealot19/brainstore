@@ -435,6 +435,7 @@ export const routes={
   vcTimeSlots:          '/voyages-config/time-slots',
   vcConsignmentNatures: '/voyages-config/consignment-natures',
   vcConsignmentTypes:   '/voyages-config/consignment-types',
+  vcWorkstationPrinters: '/voyages-config/workstation-printers',
   vcServicePatterns:    '/voyages-config/service-patterns',
   vcLoyalty:            '/voyages-config/loyalty-rules',
   vcSettings:           '/voyages-config/settings',

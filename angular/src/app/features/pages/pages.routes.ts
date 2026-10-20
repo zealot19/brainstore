@@ -103,6 +103,7 @@ export const Pages_routes: Routes = [
                 { path: 'time-slots',          loadComponent: () => import('../../../_api/pages/voyages-config/time-slots/time-slots.component').then(m => m.VcTimeSlotsComponent) },
                 { path: 'consignment-natures', loadComponent: () => import('../../../_api/pages/voyages-config/consignment-natures/consignment-natures.component').then(m => m.VcConsignmentNaturesComponent) },
                 { path: 'consignment-types',   loadComponent: () => import('../../../_api/pages/voyages-config/consignment-types/consignment-types.component').then(m => m.VcConsignmentTypesComponent) },
+                { path: 'workstation-printers', loadComponent: () => import('../../../_api/pages/voyages-config/workstation-printers/workstation-printers.component').then(m => m.WorkstationPrintersComponent) },
                 { path: 'loyalty-rules',       loadComponent: () => import('../../../_api/pages/voyages-config/loyalty-rules/loyalty-rules.component').then(m => m.VcLoyaltyRulesComponent) },
                 { path: 'routes',              loadComponent: () => import('../../../_api/pages/voyages-config/routes/routes.component').then(m => m.VcRoutesComponent) },
                 { path: 'seating-plans',       loadComponent: () => import('../../../_api/pages/voyages-config/seating-plans/seating-plans.component').then(m => m.VcSeatingPlansComponent) },

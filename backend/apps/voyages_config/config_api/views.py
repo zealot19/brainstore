@@ -792,6 +792,27 @@ class DocumentPrintView(APIView):
         return success_response(res)
 
 
+class DocumentHtmlView(APIView):
+    """HTML brut d'un document (sans impression serveur). Utilisé par l'impression
+    par poste : le navigateur récupère le HTML puis l'envoie à l'agent local du poste
+    (http://127.0.0.1:9113) qui imprime sur l'imprimante de CE poste. POST {doc,id} -> {html}."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        company = getattr(request.user, "company", None)
+        if company is None:
+            return error_response("Aucune institution.", status_code=400)
+        from apps.voyages_config import printing
+        doc = request.data.get("doc")
+        obj_id = request.data.get("id")
+        if not doc or not obj_id:
+            return error_response("Paramètres 'doc' et 'id' requis.")
+        html = printing.build_doc_html(company, doc, obj_id, request)
+        if html is None:
+            return error_response("Document introuvable.", status_code=404)
+        return success_response({"html": html})
+
+
 class TicketTemplateResetView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {"GET": "transport.config.view", "POST": "transport.config.manage", "PATCH": "transport.config.manage", "PUT": "transport.config.manage", "DELETE": "transport.config.manage"}

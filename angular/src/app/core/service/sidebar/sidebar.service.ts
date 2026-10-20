@@ -176,6 +176,7 @@ export class SidebarService {
             { menuValue: 'Barème dépenses',      route: routes.vcExpenseSchedules,  base: 'expense-schedules',   permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Fidélité',             route: routes.vcLoyalty,           base: 'loyalty-rules',       permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Types de colis',       route: routes.vcConsignmentTypes,  base: 'consignment-types',   permission: 'transport.config.view',       module: 'colis'  },
+            { menuValue: 'Imprimantes (ce poste)', route: routes.vcWorkstationPrinters, base: 'workstation-printers', permission: 'transport.config.view',     module: 'colis'  },
             { menuValue: 'Caisses',              route: routes.trzRegisters,        base: 'registers',           permission: 'treasury.register.view',      module: 'treasury' },
             { menuValue: 'Types de dépense',     route: routes.vcExpenseTypes,      base: 'expense-types',       permission: 'transport.config.view',       module: 'treasury' },
             { menuValue: 'Remboursement',        route: routes.trzRefundRate,       base: 'refund-rate',         permission: 'treasury.config.view',        module: 'treasury' },

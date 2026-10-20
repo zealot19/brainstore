@@ -1,0 +1,49 @@
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Imprimantes de ce poste</h4></div></div>
+</div>
+
+<div class="card"><div class="card-body">
+  <p class="text-muted">
+    Chaque poste imprime sur SES imprimantes. L'agent d'impression doit tourner sur CE poste
+    (<code>print_helper.py</code>). Le choix ci-dessous est enregistré sur ce poste uniquement.
+  </p>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-auto">
+      <label class="form-label mb-1">Agent local</label>
+      <input class="form-control" style="min-width:260px" [(ngModel)]="agentUrl" placeholder="http://127.0.0.1:9113" />
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" (click)="saveAgentUrl()"><i class="ti ti-refresh me-1"></i>Tester / rafraîchir</button>
+    </div>
+    <div class="col-auto">
+      @if (loading) { <span class="text-muted">Recherche des imprimantes…</span> }
+      @else if (agentOk) { <span class="badge bg-success">Agent OK — {{ printers.length }} imprimante(s)</span> }
+      @else { <span class="badge bg-danger">Agent injoignable</span> }
+    </div>
+  </div>
+
+  @if (!loading && !agentOk) {
+    <div class="alert alert-warning py-2">
+      Agent injoignable sur <b>{{ agentUrl }}</b>. Lancez <code>print_helper.py</code> sur ce poste
+      (et placez <code>SumatraPDF.exe</code> à côté). Sans agent, l'impression ouvre la boîte du navigateur.
+    </div>
+  }
+
+  <div class="table-responsive"><table class="table table-sm align-middle">
+    <thead class="thead-light"><tr><th>Document</th><th style="min-width:280px">Imprimante de ce poste</th></tr></thead>
+    <tbody>
+      @for (d of docs; track d.code) {
+        <tr>
+          <td>{{ d.label }}</td>
+          <td>
+            <select class="form-select" [ngModel]="printerFor(d.code)" (ngModelChange)="onPick(d.code, $event)" [disabled]="!agentOk">
+              <option value="">— Boîte d'impression du navigateur —</option>
+              @for (p of printers; track p) { <option [value]="p">{{ p }}</option> }
+            </select>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table></div>
+</div></div>

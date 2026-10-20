@@ -297,6 +297,7 @@ export const VOYAGES_CONFIG = {
   documentFormats:       `${VC}/document-formats/`,
   printerMapping:        `${VC}/printer-mapping/`,
   printDocument:         `${VC}/print/`,
+  printDocumentHtml:     `${VC}/print-html/`,
   ticketTemplate:        `${VC}/ticket-template/`,
   ticketTemplateReset:   `${VC}/ticket-template/reset/`,
   ticketTemplatePreview: `${VC}/ticket-template/preview/`,

@@ -72,6 +72,7 @@ urlpatterns = [
     # ── Impression : mappage document → imprimante + impression serveur ──────────
     path("printer-mapping/", v.PrinterMappingView.as_view()),
     path("print/", v.DocumentPrintView.as_view()),
+    path("print-html/", v.DocumentHtmlView.as_view()),
     # ── Config billets (modèle de billet HTML) ──────────────────────────────────
     path("ticket-template/", v.TicketTemplateView.as_view()),
     path("ticket-template/reset/", v.TicketTemplateResetView.as_view()),
