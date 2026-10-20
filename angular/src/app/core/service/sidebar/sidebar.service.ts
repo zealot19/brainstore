@@ -207,10 +207,10 @@ export class SidebarService {
           icon2: 'steering-wheel',
           base: 'fleet-vehicles',
           subMenus: [
-            { menuValue: 'Tout Afficher', route: routes.fleetVehicles, base: 'vehicles', permission: 'fleet.vehicle.view' },
             { menuValue: 'Nouveau véhicule', route: routes.fleetVehicles, queryParams: { new: 1 }, base: 'vehicles', permission: 'fleet.vehicle.create' },
             { menuValue: 'Parkings',  route: routes.fleetParking,  base: 'parking',  permission: 'fleet.parking.view' },
             { menuValue: 'Documents', route: routes.fleetDocuments, base: 'documents', permission: 'fleet.document.view' },
+            { menuValue: 'Tout Afficher', route: routes.fleetVehicles, base: 'vehicles', permission: 'fleet.vehicle.view' },
           ],
         },
         {
@@ -240,9 +240,9 @@ export class SidebarService {
           icon2: 'bus',
           base: 'voyages',
           subMenus: [
-            { menuValue: 'Tout Afficher', route: routes.voyagesList, base: 'list', permission: 'voyage.trip.view' },
             { menuValue: 'Nouveau voyage', route: routes.voyagesList, queryParams: { new: 1 }, base: 'list', permission: 'voyage.trip.create' },
             { menuValue: 'Transbordement', route: routes.vtTransbordement, base: 'transbordement', permission: 'voyage.trip.update' },
+            { menuValue: 'Tout Afficher', route: routes.voyagesList, base: 'list', permission: 'voyage.trip.view' },
           ],
         },
         {
@@ -252,11 +252,11 @@ export class SidebarService {
           icon2: 'ticket',
           base: 'voyages-booking',
           subMenus: [
-            { menuValue: 'Tout Afficher',        route: routes.vbBookings,       base: 'bookings',         permission: 'ticketing.booking.view' },
             { menuValue: 'Vendre un billet',     route: routes.vbBookingNew,     base: 'bookings/new',     permission: 'ticketing.booking.create' },
             { menuValue: 'Réservations',         route: routes.vbReservations,   base: 'reservations',     permission: 'ticketing.booking.view' },
             { menuValue: 'Retours à traiter',    route: routes.vbOpenReturns,    base: 'open-returns',     permission: 'ticketing.booking.view' },
             { menuValue: 'Tickets annulés',      route: routes.vbCancelled,      base: 'cancelled',        permission: 'ticketing.booking.cancel' },
+            { menuValue: 'Tout Afficher',        route: routes.vbBookings,       base: 'bookings',         permission: 'ticketing.booking.view' },
           ],
         },
         {
@@ -288,9 +288,9 @@ export class SidebarService {
           icon2: 'luggage',
           base: 'voyages-consignment-baggage',
           subMenus: [
-            { menuValue: 'Tout Afficher',  route: routes.vcgBaggage, base: 'baggage', permission: 'ticketing.luggage.view' },
             { menuValue: 'Nouveau bagage', route: routes.vcgBaggage, queryParams: { new: 1 }, base: 'baggage', permission: 'ticketing.luggage.manage' },
             { menuValue: 'Retrait',        route: routes.vcgBaggageRetrait, base: 'baggage-retrait', permission: 'ticketing.luggage.view' },
+            { menuValue: 'Tout Afficher',  route: routes.vcgBaggage, base: 'baggage', permission: 'ticketing.luggage.view' },
           ],
         },
       ],
@@ -310,11 +310,11 @@ export class SidebarService {
           icon2: 'luggage',
           base: 'voyages-consignment',
           subMenus: [
-            { menuValue: 'Tout Afficher',    route: routes.vcgParcels,   base: 'parcels',   permission: 'ticketing.parcel.view' },
             { menuValue: 'Nouveau colis',    route: routes.vcgParcels,   queryParams: { new: 1 }, base: 'parcels', permission: 'ticketing.parcel.manage' },
             { menuValue: 'Expédition',       route: routes.vcgManifest,  base: 'manifest',  permission: 'ticketing.parcel.view' },
             { menuValue: 'Réception colis',  route: routes.vcgReception, base: 'reception', permission: 'ticketing.parcel.view' },
             { menuValue: 'Livraison colis',  route: routes.vcgLivraison, base: 'livraison', permission: 'ticketing.parcel.manage' },
+            { menuValue: 'Tout Afficher',    route: routes.vcgParcels,   base: 'parcels',   permission: 'ticketing.parcel.view' },
           ],
         },
       ],
