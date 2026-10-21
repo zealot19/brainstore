@@ -46,6 +46,7 @@
   <form [formGroup]="form" (ngSubmit)="save()"><div class="modal-body">
     @if (errorMsg) { <div class="alert alert-danger py-1 px-2 small">{{ errorMsg }}</div> }
     <div class="mb-2"><label class="form-label small">{{ 'treasury.common.name' | transloco }}</label><input class="form-control" formControlName="name" placeholder="ex. Orange Money" /></div>
+    <div class="mb-2"><label class="form-label small">{{ 'shared.common.name_en' | transloco }}</label><input class="form-control" formControlName="name_en" placeholder="e.g. Orange Money" /><small class="text-muted">{{ 'shared.common.translate_hint' | transloco }}</small></div>
     <div class="mb-2"><label class="form-label small">{{ 'treasury.pm.f_code' | transloco }}</label><input class="form-control" formControlName="code" [placeholder]="'treasury.pm.ph_code' | transloco" /></div>
     <div class="mb-2"><label class="form-label small">{{ 'treasury.pm.col_mode' | transloco }}</label>
       <select class="form-select" formControlName="mode">

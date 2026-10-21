@@ -26,7 +26,7 @@ export class PaymentMethodsComponent implements OnInit {
     { v: 'transfer', l: 'Virement' }, { v: 'check', l: 'Chèque' },
   ];
   form = this.fb.group({
-    name: ['', Validators.required], code: [''],
+    name: ['', Validators.required], name_en: [''], code: [''],
     mode: ['cash', Validators.required], requires_payment: [true], is_active: [true],
   });
 
@@ -38,7 +38,7 @@ export class PaymentMethodsComponent implements OnInit {
   openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ mode: 'cash', requires_payment: true, is_active: true }); }
   openEdit(r: any): void {
     this.editId = r.id; this.errorMsg = '';
-    this.form.patchValue({ name: r.name, code: r.code, mode: r.mode, requires_payment: r.requires_payment, is_active: r.is_active });
+    this.form.patchValue({ name: r.name_fr ?? r.name, name_en: r.name_en, code: r.code, mode: r.mode, requires_payment: r.requires_payment, is_active: r.is_active });
   }
   save(): void {
     if (this.form.invalid || this.saving) return;

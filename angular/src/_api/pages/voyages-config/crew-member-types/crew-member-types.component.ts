@@ -21,11 +21,11 @@ export class VcCrewMemberTypesComponent implements OnInit {
   rows: CrewMemberType[] = []; filtered: CrewMemberType[] = []; loading = true; search = '';
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: CrewMemberTypeService, private fb: FormBuilder) {}
-  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], is_driver: [false], is_active: [true] }); this.load(); }
+  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], name_en: [''], is_driver: [false], is_active: [true] }); this.load(); }
   load(): void { this.loading = true; this.svc.list().subscribe({ next: d => { this.rows = d; this.applyFilter(); this.loading = false; }, error: () => this.loading = false }); }
   applyFilter(): void { const q = this.search.toLowerCase(); this.filtered = this.rows.filter(r => !q || r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)); }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', is_driver: false, is_active: true }); }
-  openEdit(r: CrewMemberType): void { this.editId = r.id; this.errorMsg = ''; this.form.reset({ code: r.code, name: r.name, is_driver: r.is_driver, is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', name_en: '', is_driver: false, is_active: true }); }
+  openEdit(r: CrewMemberType): void { this.editId = r.id; this.errorMsg = ''; this.form.reset({ code: r.code, name: (r as any).name_fr ?? r.name, name_en: (r as any).name_en ?? '', is_driver: r.is_driver, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);

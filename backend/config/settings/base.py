@@ -47,6 +47,8 @@ WHATSAPP_SESSION_TTL_MIN = env.int("WHATSAPP_SESSION_TTL_MIN", default=30)
 
 # ── Applications ─────────────────────────────────────────────────────────────
 DJANGO_APPS = [
+    # modeltranslation DOIT précéder django.contrib.admin (intégration admin i18n).
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -62,7 +64,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "drf_spectacular",
-    "modeltranslation",
     "rosetta",
 ]
 
@@ -192,6 +193,14 @@ TIME_ZONE = env("TIME_ZONE", default="Africa/Douala")
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+# ── modeltranslation : données de référence traduisibles (FR + EN) ─────────────
+# Les valeurs intégrées (modes de paiement, types de dépense, types/natures de
+# colis, types d'équipage…) ont une colonne par langue (name_fr/name_en). En
+# l'absence de traduction EN, on retombe sur le FR (idem es/pt non gérés ici).
+MODELTRANSLATION_DEFAULT_LANGUAGE = "fr"
+MODELTRANSLATION_LANGUAGES = ("fr", "en")
+MODELTRANSLATION_FALLBACK_LANGUAGES = ("fr",)
 
 LOCALE_PATHS = [
     BASE_DIR / "locale",

@@ -1102,6 +1102,8 @@ class IncomeReceiptView(APIView):
 
 from apps.treasury.serializers import PaymentMethodReadSerializer, PaymentMethodWriteSerializer  # noqa: E402
 from django.utils.text import slugify  # noqa: E402
+from django.conf import settings as _settings  # noqa: E402
+from django.utils.translation import override as _lang_override  # noqa: E402
 
 
 class PaymentMethodListView(APIView):
@@ -1124,10 +1126,13 @@ class PaymentMethodListView(APIView):
         code = d.get("code") or slugify(d["name"])
         if PaymentMethod.objects.filter(company=company, code=code, is_deleted=False).exists():
             return error_response("Un moyen de paiement avec ce code existe déjà.")
-        pm = PaymentMethod.objects.create(
-            company=company, code=code, name=d["name"],
-            requires_payment=d.get("requires_payment", True), mode=d.get("mode", "cash"),
-            is_active=d.get("is_active", True), created_by=request.user)
+        # Force le contexte FR : `name` alimente la colonne name_fr de façon
+        # déterministe ; name_en (optionnel) est posé séparément.
+        with _lang_override(_settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
+            pm = PaymentMethod.objects.create(
+                company=company, code=code, name=d["name"], name_en=d.get("name_en", ""),
+                requires_payment=d.get("requires_payment", True), mode=d.get("mode", "cash"),
+                is_active=d.get("is_active", True), created_by=request.user)
         return created_response(PaymentMethodReadSerializer(pm).data)
 
 
@@ -1150,12 +1155,13 @@ class PaymentMethodDetailView(APIView):
             return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
         ser = PaymentMethodWriteSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        for k, v in ser.validated_data.items():
-            if k == "code" and obj.is_system:
-                continue
-            setattr(obj, k, v)
-        obj.updated_by = request.user
-        obj.save()
+        with _lang_override(_settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
+            for k, v in ser.validated_data.items():
+                if k == "code" and obj.is_system:
+                    continue
+                setattr(obj, k, v)
+            obj.updated_by = request.user
+            obj.save()
         return success_response(PaymentMethodReadSerializer(obj).data)
 
     def delete(self, request, pk):

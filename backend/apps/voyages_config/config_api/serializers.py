@@ -27,13 +27,14 @@ class TownRead(_ScopeMixin):
 class CrewMemberTypeRead(_ScopeMixin):
     class Meta:
         model = CrewMemberType
-        fields = ["id", "code", "name", "is_driver", "company", "scope",
+        fields = ["id", "code", "name", "name_fr", "name_en", "is_driver", "company", "scope",
                   "is_active", "created_at", "updated_at"]
 
 
 class CrewMemberTypeWrite(serializers.Serializer):
     code      = serializers.CharField(max_length=20)
     name      = serializers.CharField(max_length=100)
+    name_en   = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     is_driver = serializers.BooleanField(required=False, default=False)
     is_active = serializers.BooleanField(required=False, default=True)
 
@@ -55,13 +56,14 @@ class VoyageTypeWrite(serializers.Serializer):
 class ExpenseTypeRead(_ScopeMixin):
     class Meta:
         model = ExpenseType
-        fields = ["id", "code", "name", "account_code", "company", "scope",
+        fields = ["id", "code", "name", "name_fr", "name_en", "account_code", "company", "scope",
                   "is_active", "created_at", "updated_at"]
 
 
 class ExpenseTypeWrite(serializers.Serializer):
     code         = serializers.CharField(max_length=30)
     name         = serializers.CharField(max_length=150)
+    name_en      = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     account_code = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
     is_active    = serializers.BooleanField(required=False, default=True)
 
@@ -194,13 +196,14 @@ class TimeSlotWrite(serializers.Serializer):
 class ConsignmentNatureRead(_ScopeMixin):
     class Meta:
         model = ConsignmentNature
-        fields = ["id", "code", "name", "is_fragile", "requires_declaration",
+        fields = ["id", "code", "name", "name_fr", "name_en", "is_fragile", "requires_declaration",
                   "is_prohibited", "company", "scope", "is_active", "created_at", "updated_at"]
 
 
 class ConsignmentNatureWrite(serializers.Serializer):
     code = serializers.CharField(max_length=20)
     name = serializers.CharField(max_length=100)
+    name_en = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     is_fragile = serializers.BooleanField(required=False, default=False)
     requires_declaration = serializers.BooleanField(required=False, default=False)
     is_prohibited = serializers.BooleanField(required=False, default=False)
@@ -214,7 +217,7 @@ class ConsignmentTypeRead(_ScopeMixin):
 
     class Meta:
         model = ConsignmentType
-        fields = ["id", "code", "label", "nature", "nature_name", "max_weight_kg",
+        fields = ["id", "code", "label", "label_fr", "label_en", "nature", "nature_name", "max_weight_kg",
                   "max_volume_m3", "applies_to", "applies_to_display",
                   "company", "scope", "is_active", "created_at", "updated_at"]
 
@@ -222,6 +225,7 @@ class ConsignmentTypeRead(_ScopeMixin):
 class ConsignmentTypeWrite(serializers.Serializer):
     code = serializers.CharField(max_length=20)
     label = serializers.CharField(max_length=150)
+    label_en = serializers.CharField(max_length=150, required=False, allow_blank=True, default="")
     # Nature retirée du formulaire : facultative.
     nature_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     max_weight_kg = serializers.DecimalField(max_digits=8, decimal_places=2, required=False, allow_null=True, default=None)

@@ -55,7 +55,10 @@
       "loading": "Loading…",
       "no_data": "No data",
       "all": "All",
-      "actions": "Actions"
+      "actions": "Actions",
+      "name_en": "Name (English)",
+      "label_en": "Label (English)",
+      "translate_hint": "Leave empty to use French."
     },
     "language": {
       "label": "Language",

@@ -25,7 +25,7 @@ export class VcConsignmentTypesComponent implements OnInit {
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: ConsignmentTypeService, private natureSvc: ConsignmentNatureService, private fb: FormBuilder) {}
   ngOnInit(): void {
-    this.form = this.fb.group({ code: ['', Validators.required], label: ['', Validators.required], max_weight_kg: [null], max_volume_m3: [null], applies_to: ['BOTH'], is_active: [true] });
+    this.form = this.fb.group({ code: ['', Validators.required], label: ['', Validators.required], label_en: [''], max_weight_kg: [null], max_volume_m3: [null], applies_to: ['BOTH'], is_active: [true] });
     this.natureSvc.list().subscribe(d => this.natures = d);
     this.load();
   }
@@ -42,8 +42,8 @@ export class VcConsignmentTypesComponent implements OnInit {
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
   natureName(id: string): string { return this.natures.find(n => n.id === id)?.name ?? '—'; }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', label: '', nature_id: null, max_weight_kg: null, max_volume_m3: null, applies_to: 'BOTH', is_active: true }); }
-  openEdit(r: ConsignmentType): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, label: r.label, nature_id: r.nature, max_weight_kg: r.max_weight_kg, max_volume_m3: r.max_volume_m3, applies_to: r.applies_to, is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', label: '', label_en: '', nature_id: null, max_weight_kg: null, max_volume_m3: null, applies_to: 'BOTH', is_active: true }); }
+  openEdit(r: ConsignmentType): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, label: (r as any).label_fr ?? r.label, label_en: (r as any).label_en ?? '', nature_id: r.nature, max_weight_kg: r.max_weight_kg, max_volume_m3: r.max_volume_m3, applies_to: r.applies_to, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const v = { ...this.form.value, max_weight_kg: this.form.value.max_weight_kg || null, max_volume_m3: this.form.value.max_volume_m3 || null };

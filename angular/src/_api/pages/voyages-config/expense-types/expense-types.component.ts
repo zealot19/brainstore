@@ -28,15 +28,15 @@ export class VcExpenseTypesComponent implements OnInit {
   constructor(private svc: ExpenseTypeService, private accSvc: AccountService, private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], account_code: [''], is_active: [true] });
+    this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], name_en: [''], account_code: [''], is_active: [true] });
     this.accSvc.list().subscribe({ next: a => this.accounts = a.filter(x => x.account_type === 'expense') });
     this.load();
   }
   accountLabel(code: string): string { const a = this.accounts.find(x => x.code === code); return a ? `${a.code} — ${a.name}` : (code || '—'); }
   load(): void { this.loading = true; this.svc.list().subscribe({ next: d => { this.rows = d; this.applyFilter(); this.loading = false; }, error: () => this.loading = false }); }
   applyFilter(): void { const q = this.search.toLowerCase(); this.filtered = this.rows.filter(r => !q || r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)); }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', account_code: '', is_active: true }); }
-  openEdit(r: ExpenseType): void { this.editId = r.id; this.errorMsg = ''; this.form.reset({ code: r.code, name: r.name, account_code: r.account_code, is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', name_en: '', account_code: '', is_active: true }); }
+  openEdit(r: ExpenseType): void { this.editId = r.id; this.errorMsg = ''; this.form.reset({ code: r.code, name: (r as any).name_fr ?? r.name, name_en: (r as any).name_en ?? '', account_code: r.account_code, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);

@@ -55,7 +55,10 @@
       "loading": "Chargement…",
       "no_data": "Aucune donnée",
       "all": "Tous",
-      "actions": "Actions"
+      "actions": "Actions",
+      "name_en": "Nom (anglais)",
+      "label_en": "Libellé (anglais)",
+      "translate_hint": "Laisser vide pour utiliser le français."
     },
     "language": {
       "label": "Langue",

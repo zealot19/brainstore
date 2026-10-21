@@ -5,7 +5,9 @@ from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModule
 from apps.core.responses import success_response, created_response, error_response, no_content_response
 from apps.core.exceptions import ApplicationError
 from apps.core.pagination import StandardResultsSetPagination
+from django.conf import settings
 from django.db import transaction
+from django.utils.translation import override as _lang_override
 from apps.voyages_config.models import (
     Town, ServicePoint, FareClass, TimeSlot, CrewMemberType, VoyageType, ExpenseType, ExpenseSchedule,
     ConsignmentNature, ConsignmentType, LoyaltyRule,
@@ -51,7 +53,11 @@ class _ConfigListView(APIView):
         data = dict(payload.validated_data)
         try:
             ensure_unique(self.model, company, self.unique_field, data[self.unique_field])
-            obj = self._create(company, data, request.user)
+            # Écrit les libellés traduisibles de façon déterministe : `name` →
+            # colonne FR (name_fr), peu importe la langue d'affichage de l'admin ;
+            # `name_en` (optionnel) est posé tel quel par le serializer Write.
+            with _lang_override(settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
+                obj = self._create(company, data, request.user)
         except ApplicationError as e:
             return error_response(str(e))
         return created_response(self.read(obj).data)
@@ -86,9 +92,10 @@ class _ConfigDetailView(APIView):
         try:
             if self.unique_field in data:
                 ensure_unique(self.model, obj.company, self.unique_field, data[self.unique_field], exclude_id=obj.id)
-            self._apply(obj, data)
-            obj.updated_by = request.user
-            obj.save()
+            with _lang_override(settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
+                self._apply(obj, data)
+                obj.updated_by = request.user
+                obj.save()
         except ApplicationError as e:
             return error_response(str(e))
         return success_response(self.read(obj).data)

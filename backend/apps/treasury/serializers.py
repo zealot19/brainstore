@@ -544,13 +544,14 @@ class PaymentMethodReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PaymentMethod
-        fields = ["id", "code", "name", "requires_payment", "mode", "mode_display",
+        fields = ["id", "code", "name", "name_fr", "name_en", "requires_payment", "mode", "mode_display",
                   "is_active", "is_system", "created_at"]
 
 
 class PaymentMethodWriteSerializer(serializers.Serializer):
     code = serializers.SlugField(max_length=40, required=False, allow_blank=True)
     name = serializers.CharField(max_length=100)
+    name_en = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     requires_payment = serializers.BooleanField(required=False, default=True)
     mode = serializers.ChoiceField(choices=Transaction.PaymentMode.choices, required=False,
                                    default=Transaction.PaymentMode.CASH)
