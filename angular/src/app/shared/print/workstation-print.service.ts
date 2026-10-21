@@ -6,6 +6,7 @@ export interface PrintDocDef { code: string; label: string; }
 export const WS_PRINT_DOCS: PrintDocDef[] = [
   { code: 'recu_colis', label: 'Reçu de colis' },
   { code: 'etiquette_colis', label: 'Étiquette de colis' },
+  { code: 'bordereau_colis', label: 'Bordereau / Manifeste colis' },
   { code: 'ticket_bagage', label: 'Ticket de bagage' },
   { code: 'etiquette_bagage', label: 'Étiquette de bagage' },
 ];

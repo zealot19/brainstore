@@ -2,7 +2,7 @@ import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
+import { ParcelService, ParcelNumbering } from '../../../services/voyages-consignment/parcel.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
 import { ConsignmentTypeService } from '../../../services/voyages-config/consignment-type.service';
 import { ConsignmentNatureService } from '../../../services/voyages-config/consignment-nature.service';
@@ -62,6 +62,12 @@ export class VcgParcelsComponent implements OnInit {
   // Client expéditeur (création) — piloté par le fieldset partagé app-client-fields
   senderClient: PassengerSpec = { id_type: 'cni' };
   cashRegisterId: string | null = null;
+
+  // Reprise de numérotation après coupure (saut en avant du prochain numéro).
+  numbering: ParcelNumbering | null = null;
+  numberingValue: number | null = null;
+  numberingSaving = false;
+  numberingError = '';
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -183,10 +189,12 @@ export class VcgParcelsComponent implements OnInit {
         if (wasCreate && res?.id) {
           this.printReceipt(res.id);
           setTimeout(() => this.printLabel(res.id), 1200);
-          // #9 : on reste sur le formulaire « Nouveau colis » avec les mêmes infos
-          // (trajet, type, montant, expéditeur…) ; l'agent n'a qu'à ajuster pour
-          // le client suivant. Le formulaire n'est pas réinitialisé ni fermé.
+          // Après enregistrement + impression : on repart sur un formulaire VIDE,
+          // prêt pour le colis suivant. On conserve seulement ce qui est propre à
+          // la session : la station de départ (collée) et la caisse sélectionnée.
           this.editId = null;
+          this.senderClient = { id_type: 'cni' };
+          this.form.reset({ quantity: 1, payment_method: '', origin_point_id: this.baseOriginId });
           this.form.enable();
         } else {
           this.close('parcel-modal');
@@ -226,6 +234,19 @@ export class VcgParcelsComponent implements OnInit {
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 
   // Impression via l'agent (imprimante mappée) avec repli navigateur.
+  openNumbering(): void {
+    this.numbering = null; this.numberingValue = null; this.numberingError = '';
+    this.svc.getNumbering().subscribe({ next: n => this.numbering = n, error: () => {} });
+  }
+  saveNumbering(): void {
+    if (!this.numberingValue || this.numberingSaving) return;
+    this.numberingSaving = true; this.numberingError = '';
+    this.svc.setNumbering(this.numberingValue).subscribe({
+      next: n => { this.numbering = n; this.numberingValue = null; this.numberingSaving = false;
+                   this.toast.success('Numérotation mise à jour.'); this.close('numbering-modal'); },
+      error: e => { this.numberingSaving = false;
+                    this.numberingError = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué."; } });
+  }
   printReceipt(id: string): void { this.printRouter.print('recu_colis', id); }
   printLabel(id: string): void { this.printRouter.print('etiquette_colis', id); }
 }

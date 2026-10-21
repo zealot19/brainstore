@@ -38,6 +38,44 @@ def _user_base_station(user, company_id):
         is_deleted=False, company_id=company_id, agency_id=aid).first()
 
 
+def _numbering_station(request, cid):
+    """Station dont on pilote la numérotation colis : la station de l'agent, ou —
+    pour un admin — la station passée en paramètre (`station_id`)."""
+    station = _user_base_station(request.user, cid)
+    if station:
+        return station
+    pid = request.query_params.get("station_id") or request.data.get("station_id")
+    return _cfg(ServicePoint, cid, pid) if pid else None
+
+
+class ParcelNumberingView(APIView):
+    """Reprise de numérotation colis après coupure (M : « démarrer à partir d'un
+    certain numéro »). GET lit le prochain numéro du mois en cours pour la station
+    de l'agent ; POST le fixe (saut en avant uniquement) pour l'aligner sur les
+    reçus papier remplis hors-ligne."""
+    permission_classes = [IsAuthenticated, HasModulePermission]
+    permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.manage'}
+
+    def get(self, request):
+        cid = request.user.company_id
+        station = _numbering_station(request, cid)
+        if not station:
+            return error_response("Aucune station rattachée : précisez une agence.", status_code=400)
+        return success_response(services.get_parcel_numbering(request.user.company, station.agency))
+
+    def post(self, request):
+        cid = request.user.company_id
+        station = _numbering_station(request, cid)
+        if not station:
+            return error_response("Aucune station rattachée : précisez une agence.", status_code=400)
+        try:
+            data = services.set_parcel_next_number(
+                request.user.company, station.agency, request.data.get("next_number"))
+        except ApplicationError as e:
+            return error_response(str(e))
+        return success_response(data)
+
+
 class ParcelListView(APIView):
     permission_classes = [IsAuthenticated, HasModulePermission]
     permission_map = {'GET': 'ticketing.parcel.view', 'POST': 'ticketing.parcel.create'}

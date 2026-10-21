@@ -3,6 +3,7 @@ from .config_api import views as v
 
 urlpatterns = [
     path("stats/", v.ParcelStatsView.as_view()),
+    path("numbering/", v.ParcelNumberingView.as_view()),
     path("parcels/", v.ParcelListView.as_view()),
     path("parcels/pending/", v.ParcelPendingView.as_view()),
     path("parcels/bulk/", v.ParcelBulkView.as_view()),

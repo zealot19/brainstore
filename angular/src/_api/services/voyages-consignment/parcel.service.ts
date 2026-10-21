@@ -5,6 +5,10 @@ import { map } from 'rxjs/operators';
 import { VOYAGES_CONSIGNMENT } from '../../config/api.config';
 import { Parcel, ParcelCreate, ParcelReceive, Manifest, ParcelShipment } from '../../models/voyages-consignment.models';
 
+export interface ParcelNumbering {
+  period: string; agency_code: string; next_number: number; padding: number; preview: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ParcelService {
   constructor(private http: HttpClient) {}
@@ -19,6 +23,10 @@ export class ParcelService {
     return this.http.get<any>(VOYAGES_CONSIGNMENT.parcels, { params: p }).pipe(map(r => r.results ?? r.data ?? r));
   }
   pending(): Observable<Parcel[]> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcelsPending).pipe(map(r => r.data ?? r)); }
+  /** Reprise de numérotation après coupure : lecture du prochain numéro du mois. */
+  getNumbering(): Observable<ParcelNumbering> { return this.http.get<any>(VOYAGES_CONSIGNMENT.numbering).pipe(map(r => r.data ?? r)); }
+  /** Fixe le prochain numéro colis (saut en avant uniquement). */
+  setNumbering(next_number: number): Observable<ParcelNumbering> { return this.http.post<any>(VOYAGES_CONSIGNMENT.numbering, { next_number }).pipe(map(r => r.data ?? r)); }
   get(id: string): Observable<Parcel> { return this.http.get<any>(VOYAGES_CONSIGNMENT.parcel(id)).pipe(map(r => r.data ?? r)); }
   create(body: ParcelCreate): Observable<Parcel> { return this.http.post<any>(VOYAGES_CONSIGNMENT.parcels, body).pipe(map(r => r.data ?? r)); }
   edit(id: string, body: Partial<ParcelCreate>): Observable<Parcel> { return this.http.patch<any>(VOYAGES_CONSIGNMENT.parcel(id), body).pipe(map(r => r.data ?? r)); }

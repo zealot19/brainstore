@@ -381,6 +381,7 @@ const VCG = `${API_BASE}/voyages/consignment`;
 
 export const VOYAGES_CONSIGNMENT = {
   stats: `${VCG}/stats/`,
+  numbering: `${VCG}/numbering/`,
   parcels: `${VCG}/parcels/`,
   parcel: (id: string) => `${VCG}/parcels/${id}/`,
   parcelsPending: `${VCG}/parcels/pending/`,

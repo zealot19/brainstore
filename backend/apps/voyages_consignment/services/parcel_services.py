@@ -29,24 +29,77 @@ def _assert_origin_agency(parcel, user):
         raise ApplicationError(_("Seule l'agence d'origine peut expédier ce colis."))
 
 
+def _parcel_seq(company_id, agency, when=None):
+    """Clé de séquence colis (société + agence + mois) + éléments de format.
+
+    Sequence.code fait 50 caractères max : on compacte les UUID (10 hex chacun) pour
+    garder une clé par société+agence+mois sans dépasser la limite.
+    Ex. COL-ab12cd34ef-9f00112233-202610. Retourne (seq_code, agcode, now)."""
+    now = timezone.localtime(when or timezone.now())
+    agcode = (getattr(agency, "code", "") or "XX")
+    ym = now.strftime("%Y%m")
+    cid = str(company_id).replace("-", "")[:10]
+    aid = (str(getattr(agency, "id", "") or "").replace("-", "")[:10]) or "X"
+    seq_code = f"COL-{cid}-{aid}-{ym}"
+    Sequence.objects.get_or_create(
+        code=seq_code,
+        defaults={"name": f"Colis {agcode} {ym}", "prefix": "", "padding": 4, "reset_yearly": False})
+    return seq_code, agcode, now
+
+
 def _parcel_reference(company_id, origin, destination=None, when=None):
     """Référence colis : CODE-AGENCE-EXPEDITRICE/NNNN/MM/AAAA (séquence mensuelle par agence).
 
     Ex. DLA/0001/10/2026. Code agence = celui de l'agence du point de départ (à défaut le
     code du point, sinon 'XX'). La séquence repart par agence + mois."""
-    now = timezone.localtime(when or timezone.now())
     agency = getattr(origin, "agency", None)
-    agcode = (getattr(agency, "code", "") or getattr(origin, "code", "") or "XX")
-    ym = now.strftime("%Y%m")
-    # Sequence.code fait 50 caractères max : on compacte les UUID (10 hex chacun) pour
-    # garder une clé par société+agence+mois sans dépasser la limite. Ex. COL-ab12cd34ef-9f00112233-202610
-    cid = str(company_id).replace("-", "")[:10]
-    aid = (str(getattr(agency, "id", "") or "").replace("-", "")[:10]) or "X"
-    seq_code = f"COL-{cid}-{aid}-{ym}"
-    Sequence.objects.get_or_create(
-        code=seq_code, defaults={"name": f"Colis {agcode} {ym}", "prefix": "", "padding": 4, "reset_yearly": False})
+    # Repli sur le code du point si l'agence n'a pas de code.
+    seq_code, agcode, now = _parcel_seq(company_id, agency, when)
+    if agcode == "XX":
+        agcode = getattr(origin, "code", "") or "XX"
     n = next_number(seq_code)   # préfixe/année vides -> numéro « 0001 »
     return f"{agcode}/{n}/{now.strftime('%m')}/{now.strftime('%Y')}"
+
+
+def get_parcel_numbering(company, agency, when=None):
+    """Lecture de la numérotation colis courante pour une agence (mois en cours).
+
+    Utilisé pour la « reprise après coupure » : affiche le prochain numéro qui sera
+    attribué par le système afin de l'aligner sur les reçus papier."""
+    seq_code, agcode, now = _parcel_seq(company.id, agency, when)
+    seq = Sequence.objects.get(code=seq_code)
+    nxt = seq.next_number
+    preview = f"{agcode}/{str(nxt).zfill(seq.padding)}/{now.strftime('%m')}/{now.strftime('%Y')}"
+    return {
+        "period":       now.strftime("%Y-%m"),
+        "agency_code":  agcode,
+        "next_number":  nxt,
+        "padding":      seq.padding,
+        "preview":      preview,
+    }
+
+
+@transaction.atomic
+def set_parcel_next_number(company, agency, value, when=None):
+    """Reprise de numérotation : fixe le prochain numéro colis du mois en cours pour
+    une agence. Sécurité : interdiction de reculer (on ne réutilise jamais un numéro
+    déjà émis) — on ne peut que sauter en avant pour coller aux reçus papier."""
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        raise ApplicationError(_("Numéro invalide."))
+    if value < 1:
+        raise ApplicationError(_("Le numéro doit être supérieur ou égal à 1."))
+    seq_code, _agcode, _now = _parcel_seq(company.id, agency, when)
+    seq = Sequence.objects.select_for_update().get(code=seq_code)
+    if value < seq.next_number:
+        raise ApplicationError(_(
+            "Impossible de revenir en arrière : le prochain numéro est déjà %(n)d. "
+            "On ne peut que sauter en avant pour éviter les doublons.")
+            % {"n": seq.next_number})
+    seq.next_number = value
+    seq.save(update_fields=["next_number"])
+    return get_parcel_numbering(company, agency, when)
 
 
 def _event(parcel, kind, *, from_status="", to_status="", trip=None, user=None, note=""):
