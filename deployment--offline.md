@@ -54,8 +54,8 @@ Prérequis : avoir cloné le dépôt sur la machine (`git clone …`), donc `bac
 > Pour un **vrai** déploiement portable (copier un seul dossier sur un serveur),
 > gardez les `docker-compose.yml` d'origine (build depuis GitHub).
 
----
-
+-------
+vvbv
 ## Méthode recommandée : une seule VM (les deux piles)
 
 VM **Linux** avec Docker déjà installé. Le vieux Mac ne sert qu'à ouvrir le
