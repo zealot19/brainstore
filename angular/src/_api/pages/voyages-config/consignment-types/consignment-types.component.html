@@ -60,6 +60,12 @@
         <select formControlName="applies_to" class="form-select"><option value="BOTH">{{ 'vcfg.ct.opt_both' | transloco }}</option><option value="BAGGAGE">{{ 'vcfg.ct.opt_baggage' | transloco }}</option><option value="PARCEL">{{ 'vcfg.ct.opt_parcel' | transloco }}</option></select>
       </div>
     </div>
+    <div class="row">
+      <div class="col-12"><small class="text-muted d-block mb-2">{{ 'vcfg.pricing.price_hint' | transloco }}</small></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.pricing.fixed_price' | transloco }}</label><input formControlName="fixed_price" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.pricing.min_price' | transloco }}</label><input formControlName="min_price" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-4 mb-3"><label class="form-label">{{ 'vcfg.pricing.max_price' | transloco }}</label><input formControlName="max_price" type="number" min="0" class="form-control" /></div>
+    </div>
     <div class="form-check form-switch"><input formControlName="is_active" type="checkbox" class="form-check-input" id="vc-active" /><label class="form-check-label" for="vc-active">{{ 'vcfg.common.active' | transloco }}</label></div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (editId ? 'shared.actions.save' : 'shared.actions.create') | transloco }}</button></div></form>
 </div></div></div>

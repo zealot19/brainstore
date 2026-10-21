@@ -126,18 +126,16 @@ def register_parcel(company, *, origin_point, destination_point, consignment_typ
     if consignment_type.max_weight_kg and weight_kg and weight_kg > consignment_type.max_weight_kg:
         raise ApplicationError(_("Poids supérieur au maximum autorisé pour ce type de colis."))
     due = Decimal(str(amount_due))
-    # Tarification par nature : prix fixe imposé, sinon bornes min/max.
-    nat = nature or consignment_type.nature
-    if nat is not None:
-        if nat.fixed_price is not None:
-            due = nat.fixed_price
-        else:
-            if nat.min_price is not None and due < nat.min_price:
-                raise ApplicationError(
-                    _("Le prix est inférieur au minimum autorisé (%(m)s).") % {"m": nat.min_price})
-            if nat.max_price is not None and due > nat.max_price:
-                raise ApplicationError(
-                    _("Le prix est supérieur au maximum autorisé (%(m)s).") % {"m": nat.max_price})
+    # Tarification par type de colis : prix fixe imposé, sinon bornes min/max.
+    if consignment_type.fixed_price is not None:
+        due = consignment_type.fixed_price
+    else:
+        if consignment_type.min_price is not None and due < consignment_type.min_price:
+            raise ApplicationError(
+                _("Le prix est inférieur au minimum autorisé (%(m)s).") % {"m": consignment_type.min_price})
+        if consignment_type.max_price is not None and due > consignment_type.max_price:
+            raise ApplicationError(
+                _("Le prix est supérieur au maximum autorisé (%(m)s).") % {"m": consignment_type.max_price})
     received = Decimal(str(amount_received)) if amount_received is not None else due
     if received < due:
         raise ApplicationError(

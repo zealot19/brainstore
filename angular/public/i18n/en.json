@@ -971,8 +971,8 @@
     }
   },
   "vcfg": {
-    "nature": {
-      "price_hint": "Pricing: a fixed price forces the amount (not editable at registration). Otherwise, the minimum and maximum bound the entered price. Leave empty = free price.",
+    "pricing": {
+      "price_hint": "Type pricing: a fixed price forces the amount (not editable at registration). Otherwise, the minimum and maximum bound the entered price. Leave empty = free price.",
       "fixed_price": "Fixed price",
       "min_price": "Minimum price",
       "max_price": "Maximum price"
@@ -2347,7 +2347,7 @@
       "numbering_next": "Next system number",
       "numbering_set": "Set next number to",
       "numbering_fwd": "Forward only — you cannot reuse a number already issued.",
-      "price_fixed": "Fixed price set by the nature (not editable).",
+      "price_fixed": "Fixed price set by the type (not editable).",
       "price_range": "Allowed range",
       "empty": "No parcels.",
       "modal_edit": "Edit parcel",

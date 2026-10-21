@@ -91,8 +91,8 @@ export class VcgParcelsComponent implements OnInit {
       this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
     });
     this.cnSvc.list().subscribe(d => this.natures = d);
-    // Tarification par nature : quand le type change, appliquer le prix de sa nature.
-    this.form.get('consignment_type_id')!.valueChanges.subscribe(() => this.applyNaturePricing());
+    // Tarification par type : quand le type change, appliquer son prix.
+    this.form.get('consignment_type_id')!.valueChanges.subscribe(() => this.applyTypePricing());
     this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
@@ -156,27 +156,26 @@ export class VcgParcelsComponent implements OnInit {
     this.baseOriginName = st?.name ?? ag?.name ?? '';
     if (this.baseOriginId) this.form?.patchValue({ origin_point_id: this.baseOriginId });
   }
-  /** Applique la tarification de la nature du type sélectionné : prix fixe (champ
+  /** Applique la tarification du type de colis sélectionné : prix fixe (champ
    * verrouillé) ou bornes min/max (champ libre dans l'intervalle). */
   priceFixed = false; priceHint = '';
-  applyNaturePricing(): void {
+  applyTypePricing(): void {
     if (this.isEdit) return;   // repricing = action dédiée, pas à l'édition
     const type = this.types.find(t => t.id === this.form.value.consignment_type_id);
-    const nat = type?.nature ? this.natures.find(n => n.id === type.nature) : undefined;
     const amt = this.form.get('amount_due')!;
     this.priceFixed = false; this.priceHint = '';
-    if (nat?.fixed_price != null) {
+    if (type?.fixed_price != null) {
       this.priceFixed = true;
-      amt.setValue(nat.fixed_price, { emitEvent: false });
+      amt.setValue(type.fixed_price, { emitEvent: false });
       amt.setValidators([Validators.required]);
       amt.disable({ emitEvent: false });
     } else {
       amt.enable({ emitEvent: false });
-      const v = [Validators.required, Validators.min(nat?.min_price ?? 0)];
-      if (nat?.max_price != null) v.push(Validators.max(nat.max_price));
+      const v = [Validators.required, Validators.min(type?.min_price ?? 0)];
+      if (type?.max_price != null) v.push(Validators.max(type.max_price));
       amt.setValidators(v);
-      if (nat?.min_price != null || nat?.max_price != null) {
-        this.priceHint = `${nat?.min_price ?? 0} – ${nat?.max_price ?? '∞'}`;
+      if (type?.min_price != null || type?.max_price != null) {
+        this.priceHint = `${type?.min_price ?? 0} – ${type?.max_price ?? '∞'}`;
       }
     }
     amt.updateValueAndValidity({ emitEvent: false });
