@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
@@ -26,6 +27,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 })
 export class VcgManifestComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   private auth = inject(AuthService);
   private printRouter = inject(PrintRouterService);
   allTrips: Trip[] = [];
@@ -119,24 +121,24 @@ export class VcgManifestComponent implements OnInit {
              partial_transit: 'bg-warning', in_transit: 'bg-primary', arrived: 'bg-primary', available_for_pickup: 'bg-info',
              picked_up: 'bg-success', cancelled: 'bg-danger' }[s] ?? 'bg-secondary';
   }
-  private err = (e: any) => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.");
+  private err = (e: any) => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed'));
 
   // #11 Phase 1 — charger N pièces d'un colis du pool sur le véhicule (expédition en brouillon).
   loadOne(p: Parcel): void {
-    if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
+    if (!this.tripId) { this.toast.error(this.t.translate('cons.msg.select_trip')); return; }
     const qty = this.shipQty[p.id] ?? this.rem(p);
-    if (qty < 1 || qty > this.rem(p)) { this.toast.error('Quantité invalide.'); return; }
+    if (qty < 1 || qty > this.rem(p)) { this.toast.error(this.t.translate('cons.msg.invalid_qty')); return; }
     this.parcels.createShipment(p.id, { trip_id: this.tripId, quantity: qty })
-      .subscribe({ next: () => { this.toast.success('Colis chargé.'); this.refresh(); }, error: this.err });
+      .subscribe({ next: () => { this.toast.success(this.t.translate('cons.msg.parcel_loaded')); this.refresh(); }, error: this.err });
   }
   loadSelected(): void {
-    if (!this.tripId) { this.toast.error('Sélectionnez un voyage (véhicule / code).'); return; }
-    if (!this.selReady.size) { this.toast.error('Aucun colis sélectionné.'); return; }
+    if (!this.tripId) { this.toast.error(this.t.translate('cons.msg.select_trip')); return; }
+    if (!this.selReady.size) { this.toast.error(this.t.translate('cons.msg.no_parcel_selected')); return; }
     const ids = [...this.selReady]; let left = ids.length;
     ids.forEach(id => {
       const qty = this.shipQty[id];
       this.parcels.createShipment(id, { trip_id: this.tripId, quantity: qty }).subscribe({
-        next: () => { if (--left === 0) { this.toast.success('Colis chargés.'); this.refresh(); } },
+        next: () => { if (--left === 0) { this.toast.success(this.t.translate('cons.msg.parcels_loaded')); this.refresh(); } },
         error: e => { this.err(e); if (--left === 0) this.refresh(); } });
     });
   }
@@ -144,27 +146,27 @@ export class VcgManifestComponent implements OnInit {
   // #11 Phase 2 — retrait de pièces chargées (véhicule), validation « bon pour le départ », dévalidation (admin).
   withdraw(s: ParcelShipment): void {
     const qty = this.wdQty[s.id];
-    if (!qty || qty < 1 || qty > s.quantity) { this.toast.error('Quantité à retirer invalide.'); return; }
+    if (!qty || qty < 1 || qty > s.quantity) { this.toast.error(this.t.translate('cons.msg.invalid_remove_qty')); return; }
     const all = qty === s.quantity;
     if (!confirm(all ? `Retirer tout le colis ${s.parcel_reference} du véhicule ?`
                      : `Retirer ${qty} pièce(s) de ${s.parcel_reference} ?`)) return;
     this.parcels.withdrawShipment(s.id, qty)
-      .subscribe({ next: () => { this.toast.success('Retiré.'); this.refresh(); }, error: this.err });
+      .subscribe({ next: () => { this.toast.success(this.t.translate('cons.msg.removed')); this.refresh(); }, error: this.err });
   }
   withdrawAll(s: ParcelShipment): void { this.wdQty[s.id] = s.quantity; this.withdraw(s); }
   validateAll(): void {
     const drafts = this.onboard.filter(s => s.status === 'draft');
-    if (!drafts.length) { this.toast.error('Aucun colis à valider.'); return; }
+    if (!drafts.length) { this.toast.error(this.t.translate('cons.msg.no_parcel_to_validate')); return; }
     if (!confirm('Valider ces colis « bon pour le départ » ?')) return;
     let left = drafts.length;
     drafts.forEach(s => this.parcels.validateShipment(s.id).subscribe({
-      next: () => { if (--left === 0) { this.toast.success('Manifeste validé.'); this.refresh(); } },
+      next: () => { if (--left === 0) { this.toast.success(this.t.translate('cons.msg.manifest_validated')); this.refresh(); } },
       error: e => { this.err(e); if (--left === 0) this.refresh(); } }));
   }
   unvalidate(s: ParcelShipment): void {
-    if (!confirm(`Dévalider l'expédition ${s.parcel_reference} ?`)) return;
+    if (!confirm(this.t.translate('cons.msg.confirm_unvalidate_shipment', { ref: s.parcel_reference }))) return;
     this.parcels.unvalidateShipment(s.id)
-      .subscribe({ next: () => { this.toast.success('Dévalidé.'); this.refresh(); }, error: this.err });
+      .subscribe({ next: () => { this.toast.success(this.t.translate('cons.msg.unvalidated')); this.refresh(); }, error: this.err });
   }
   printManifest(): void {
     if (!this.tripId) return;

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject} from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -28,6 +29,7 @@ import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.
 })
 export class VcgBaggageComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   private printRouter = inject(PrintRouterService);
   pg: PageState = { page: 1, size: 25 };
   rows: Baggage[] = []; loading = false; q = ''; statusFilter = '';
@@ -156,14 +158,14 @@ export class VcgBaggageComponent implements OnInit {
     const req = this.isEdit ? this.svc.edit(this.editId!, v as BaggageCreate) : this.svc.create(v as BaggageCreate);
     req.subscribe({
       next: (res: any) => {
-        this.saving = false; this.reload(); this.toast.success('Enregistré.'); this.close('baggage-modal');
+        this.saving = false; this.reload(); this.toast.success(this.t.translate('cons.msg.saved')); this.close('baggage-modal');
         // À l'enregistrement : impression auto du ticket + de l'étiquette (× quantité, côté serveur).
         if (wasCreate && res?.id) {
           this.printTicket(res.id);
           setTimeout(() => this.printLabel(res.id), 1200);
         }
       },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? this.t.translate('cons.msg.op_failed'); } });
   }
 
   // Sélection multiple + actions groupées
@@ -174,10 +176,10 @@ export class VcgBaggageComponent implements OnInit {
   toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.selectable.forEach(r => this.selected.add(r.id)); }
   bulk(action: 'load' | 'deliver' | 'cancel'): void {
     if (!this.selected.size) return;
-    if (action === 'cancel' && !confirm(`Annuler ${this.selected.size} bagage(s) ?`)) return;
+    if (action === 'cancel' && !confirm(this.t.translate('cons.msg.confirm_cancel_n_baggage', { n: this.selected.size }))) return;
     this.svc.bulk([...this.selected], action).subscribe({
       next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
-      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+      error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
 
   askDeliver(b: Baggage): void { this.deliverTarget = b; this.deliverComment = ''; }
@@ -185,11 +187,11 @@ export class VcgBaggageComponent implements OnInit {
     if (!this.deliverTarget) return;
     this.svc.deliver(this.deliverTarget.id, { comment: this.deliverComment }).subscribe({
       next: () => { this.deliverTarget = null; this.reload(); this.close('deliver-modal'); },
-      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+      error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
   cancel(b: Baggage): void {
-    if (!confirm('Annuler ce bagage ?')) return;
-    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success('Bagage annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+    if (!confirm(this.t.translate('cons.msg.confirm_cancel_baggage'))) return;
+    this.svc.cancel(b.id).subscribe({ next: () => { this.reload(); this.toast.success(this.t.translate('cons.msg.baggage_cancelled')); }, error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 

@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from apps.core.permissions import IsInstitutionAdmin, IsAuthenticated, HasModulePermission
 from apps.core.responses import success_response, created_response, error_response, no_content_response
@@ -60,14 +61,14 @@ class ParcelNumberingView(APIView):
         cid = request.user.company_id
         station = _numbering_station(request, cid)
         if not station:
-            return error_response("Aucune station rattachée : précisez une agence.", status_code=400)
+            return error_response(_("Aucune station rattachée : précisez une agence."), status_code=400)
         return success_response(services.get_parcel_numbering(request.user.company, station.agency))
 
     def post(self, request):
         cid = request.user.company_id
         station = _numbering_station(request, cid)
         if not station:
-            return error_response("Aucune station rattachée : précisez une agence.", status_code=400)
+            return error_response(_("Aucune station rattachée : précisez une agence."), status_code=400)
         try:
             data = services.set_parcel_next_number(
                 request.user.company, station.agency, request.data.get("next_number"))
@@ -118,7 +119,7 @@ class ParcelListView(APIView):
         from apps.voyages_config.models import ConsignmentNature
         nature = _cfg(ConsignmentNature, cid, d["nature_id"]) if d.get("nature_id") else None
         if not origin or not dest or not ctype:
-            return error_response("Référence introuvable (point ou type).", status_code=404)
+            return error_response(_("Référence introuvable (point ou type)."), status_code=404)
         try:
             parcel = services.register_parcel(
                 company, origin_point=origin, destination_point=dest, consignment_type=ctype,
@@ -144,12 +145,12 @@ class ParcelDetailView(APIView):
 
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
-        return success_response(S.ParcelRead(p).data) if p else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.ParcelRead(p).data) if p else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.ParcelEditSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         try:
@@ -161,7 +162,7 @@ class ParcelDetailView(APIView):
     def delete(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             services.cancel_parcel(p, user=request.user)
         except ApplicationError as e:
@@ -185,13 +186,13 @@ class ParcelAssignTripView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.AssignTripSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
                                    id=payload.validated_data["trip_id"]).first()
         if not trip:
-            return error_response("Voyage introuvable.", status_code=404)
+            return error_response(_("Voyage introuvable."), status_code=404)
         try:
             p = services.assign_to_trip(p, trip, user=request.user)
         except ApplicationError as e:
@@ -207,7 +208,7 @@ class ParcelArrivedView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.ParcelReceiveSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -228,7 +229,7 @@ class ParcelUnloadView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             p = services.unassign_from_trip(p, user=request.user)
         except ApplicationError as e:
@@ -245,7 +246,7 @@ class _ParcelActionView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             p = type(self).service_fn(p, user=request.user)
         except ApplicationError as e:
@@ -313,7 +314,7 @@ class ParcelPickupView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.ParcelPickupSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         d = payload.validated_data
@@ -335,7 +336,7 @@ class ParcelDeliverHomeView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.ParcelDeliverSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -358,7 +359,7 @@ class ParcelCancelView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             p = services.cancel_parcel(p, user=request.user)
         except ApplicationError as e:
@@ -393,17 +394,17 @@ class BaggageListView(APIView):
         d = payload.validated_data
         trip = Trip.objects.filter(is_deleted=False, company=company, id=d["trip_id"]).first()
         if not trip:
-            return error_response("Voyage introuvable.", status_code=404)
+            return error_response(_("Voyage introuvable."), status_code=404)
         ticket = None
         if d["ticket_id"]:
             ticket = Ticket.objects.filter(is_deleted=False, booking__company=company, id=d["ticket_id"]).first()
             if not ticket:
-                return error_response("Billet introuvable.", status_code=404)
+                return error_response(_("Billet introuvable."), status_code=404)
         ctype = None
         if d["consignment_type_id"]:
             ctype = _cfg(ConsignmentType, company.id, d["consignment_type_id"])
             if not ctype:
-                return error_response("Type introuvable.", status_code=404)
+                return error_response(_("Type introuvable."), status_code=404)
         try:
             bag = services.add_baggage(
                 company, trip=trip, ticket=ticket, consignment_type=ctype, description=d["description"],
@@ -427,12 +428,12 @@ class BaggageDetailView(APIView):
 
     def get(self, request, pk):
         b = self._get(request, pk)
-        return success_response(S.BaggageRead(b).data) if b else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.BaggageRead(b).data) if b else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         b = self._get(request, pk)
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.BaggageEditSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         try:
@@ -444,7 +445,7 @@ class BaggageDetailView(APIView):
     def delete(self, request, pk):
         b = self._get(request, pk)
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             services.cancel_baggage(b, user=request.user)
         except ApplicationError as e:
@@ -459,7 +460,7 @@ class BaggageLoadView(APIView):
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             b = services.load_baggage(b, user=request.user)
         except ApplicationError as e:
@@ -474,7 +475,7 @@ class BaggageDeliverView(APIView):
     def post(self, request, pk):
         b = Baggage.objects.filter(is_deleted=False, company=request.user.company, id=pk).first()
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.BaggageDeliverSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -505,14 +506,14 @@ class ParcelBulkView(APIView):
         ids = request.data.get("ids") or []
         action = request.data.get("action")
         if not ids:
-            return error_response("Aucun colis sélectionné.")
+            return error_response(_("Aucun colis sélectionné."))
         qs = Parcel.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
         fn = {"dispatch": services.dispatch_parcel, "arrive": services.mark_arrived,
               "receive": services.receive_parcel, "load": services.load_parcel,
               "unassign": services.unassign_from_trip,
               "cancel": services.cancel_parcel}.get(action)
         if not fn:
-            return error_response("Action inconnue.")
+            return error_response(_("Action inconnue."))
         done, errors = _bulk_apply(list(qs), fn, request.user)
         return success_response({"done": done, "errors": errors})
 
@@ -525,12 +526,12 @@ class BaggageBulkView(APIView):
         ids = request.data.get("ids") or []
         action = request.data.get("action")
         if not ids:
-            return error_response("Aucun bagage sélectionné.")
+            return error_response(_("Aucun bagage sélectionné."))
         qs = Baggage.objects.filter(is_deleted=False, company=request.user.company, id__in=ids)
         fn = {"load": services.load_baggage, "deliver": services.deliver_baggage,
               "cancel": services.cancel_baggage}.get(action)
         if not fn:
-            return error_response("Action inconnue.")
+            return error_response(_("Action inconnue."))
         done, errors = _bulk_apply(list(qs), fn, request.user)
         return success_response({"done": done, "errors": errors})
 
@@ -542,7 +543,7 @@ class TripManifestView(APIView):
     def get(self, request, trip_id):
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company, id=trip_id).first()
         if not trip:
-            return error_response("Voyage introuvable.", status_code=404)
+            return error_response(_("Voyage introuvable."), status_code=404)
         m = selectors.trip_manifest(trip)
         return success_response({
             "parcels": S.ParcelRead(m["parcels"], many=True).data,
@@ -567,7 +568,7 @@ class ParcelReceiptView(APIView):
         p = (Parcel.objects.filter(is_deleted=False, company=request.user.company, id=pk)
              .select_related("origin_point", "destination_point").first())
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         logo_url = ticket_render._abs(request, tpl.logo)
         w, h = resolve_doc_format(request.user.company, "recu_colis")
@@ -585,7 +586,7 @@ class BaggageTicketView(APIView):
              .select_related("trip", "trip__route", "trip__destination", "trip__vehicle",
                              "ticket", "ticket__passenger").first())
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         logo_url = ticket_render._abs(request, tpl.logo)
         w, h = resolve_doc_format(request.user.company, "ticket_bagage")
@@ -603,7 +604,7 @@ class BaggageLabelView(APIView):
              .select_related("trip", "trip__route", "trip__destination",
                              "ticket", "ticket__passenger").first())
         if not b:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         w, h = resolve_doc_format(request.user.company, "etiquette_bagage")
         html = doc_render.build_baggage_label(b, tpl, agent=_agent(request.user), width_mm=w, height_mm=h,
@@ -619,7 +620,7 @@ class ParcelLabelView(APIView):
         p = (Parcel.objects.filter(is_deleted=False, company=request.user.company, id=pk)
              .select_related("origin_point", "destination_point").first())
         if not p:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         tpl = ticket_render.get_or_create_template(request.user.company)
         logo_url = ticket_render._abs(request, tpl.logo)
         w, h = resolve_doc_format(request.user.company, "etiquette_colis")
@@ -635,7 +636,7 @@ class ParcelStatsView(APIView):
     def get(self, request):
         from apps.voyages_consignment.stats import get_parcel_stats
         if not request.user.company_id:
-            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
+            return error_response(_("Votre compte n'est lié à aucune institution."), status_code=400)
         return success_response(get_parcel_stats(request.user.company_id))
 
 
@@ -647,18 +648,18 @@ class ParcelShipmentListView(APIView):
     def get(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Colis introuvable.", status_code=404)
+            return error_response(_("Colis introuvable."), status_code=404)
         qs = p.shipments.filter(is_deleted=False)
         return success_response(S.ParcelShipmentSerializer(qs, many=True).data)
 
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Colis introuvable.", status_code=404)
+            return error_response(_("Colis introuvable."), status_code=404)
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
                                    id=request.data.get("trip_id")).first()
         if not trip:
-            return error_response("Voyage introuvable.", status_code=404)
+            return error_response(_("Voyage introuvable."), status_code=404)
         try:
             s = services.create_shipment(p, trip=trip, quantity=request.data.get("quantity"),
                                          note=request.data.get("note", ""), user=request.user)
@@ -680,7 +681,7 @@ class _ShipmentActionView(APIView):
     def post(self, request, pk):
         s = self._get(request, pk)
         if not s:
-            return error_response("Expédition introuvable.", status_code=404)
+            return error_response(_("Expédition introuvable."), status_code=404)
         try:
             s = type(self).service_fn(s, user=request.user)
         except ApplicationError as e:
@@ -698,7 +699,7 @@ class ShipmentWithdrawView(_ShipmentActionView):
     def post(self, request, pk):
         s = self._get(request, pk)
         if not s:
-            return error_response("Expédition introuvable.", status_code=404)
+            return error_response(_("Expédition introuvable."), status_code=404)
         try:
             s = services.withdraw_shipment(s, quantity=request.data.get("quantity"), user=request.user)
         except ApplicationError as e:
@@ -712,7 +713,7 @@ class ShipmentCancelView(_ShipmentActionView):
     def delete(self, request, pk):
         s = self._get(request, pk)
         if not s:
-            return error_response("Expédition introuvable.", status_code=404)
+            return error_response(_("Expédition introuvable."), status_code=404)
         try:
             services.cancel_shipment(s, user=request.user)
         except ApplicationError as e:
@@ -748,11 +749,11 @@ class ParcelShipView(APIView):
     def post(self, request, pk):
         p = selectors.parcel_detail(request.user.company, pk, request.user)
         if not p:
-            return error_response("Colis introuvable.", status_code=404)
+            return error_response(_("Colis introuvable."), status_code=404)
         trip = Trip.objects.filter(is_deleted=False, company=request.user.company,
                                    id=request.data.get("trip_id")).first()
         if not trip:
-            return error_response("Voyage introuvable.", status_code=404)
+            return error_response(_("Voyage introuvable."), status_code=404)
         try:
             s = services.ship_pieces(p, trip=trip, quantity=request.data.get("quantity"), user=request.user)
         except ApplicationError as e:
@@ -765,7 +766,7 @@ class ShipmentReceiveView(_ShipmentActionView):
     def post(self, request, pk):
         s = self._get(request, pk)
         if not s:
-            return error_response("Expédition introuvable.", status_code=404)
+            return error_response(_("Expédition introuvable."), status_code=404)
         try:
             s = services.receive_shipment(
                 s, received_pieces=request.data.get("received_pieces"),

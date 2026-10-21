@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaggageService } from '../../../services/voyages-consignment/baggage.service';
@@ -15,6 +16,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 })
 export class VcgBaggageRetraitComponent {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   ref = '';
   bag: Baggage | null = null;
   searched = false;
@@ -41,8 +43,8 @@ export class VcgBaggageRetraitComponent {
     if (!this.bag || this.saving) return;
     this.saving = true;
     this.svc.deliver(this.bag.id, { comment: this.comment.trim() }).subscribe({
-      next: b => { this.saving = false; this.bag = b; this.toast.success('Bagage remis au propriétaire.'); },
-      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); },
+      next: b => { this.saving = false; this.bag = b; this.toast.success(this.t.translate('cons.msg.baggage_delivered')); },
+      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')); },
     });
   }
 

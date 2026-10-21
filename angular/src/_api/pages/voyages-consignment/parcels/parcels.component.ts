@@ -1,4 +1,5 @@
 import { Component, OnInit, inject} from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -31,6 +32,7 @@ import { CaisseSelectComponent } from '../../shared/caisse-select/caisse-select.
 })
 export class VcgParcelsComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   private printRouter = inject(PrintRouterService);
   private auth = inject(AuthService);
   // #1 : l'origine d'un colis est toujours la station de l'agence de l'agent.
@@ -120,10 +122,10 @@ export class VcgParcelsComponent implements OnInit {
   get allSelected(): boolean { return this.selectable.length > 0 && this.selectable.every(r => this.selected.has(r.id)); }
   toggleAll(): void { if (this.allSelected) this.selected.clear(); else this.selectable.forEach(r => this.selected.add(r.id)); }
   bulkCancel(): void {
-    if (!this.selected.size || !confirm(`Annuler ${this.selected.size} colis ?`)) return;
+    if (!this.selected.size || !confirm(this.t.translate('cons.msg.confirm_cancel_n_parcels', { n: this.selected.size }))) return;
     this.svc.bulk([...this.selected], 'cancel').subscribe({
       next: r => { if (r.errors?.length) this.toast.error(r.errors.join('\n')); this.reload(); },
-      error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+      error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
   statusClass(s: string): string {
     return { registered: 'bg-secondary', ready_for_travel: 'bg-warning', loaded: 'bg-info',
@@ -170,7 +172,7 @@ export class VcgParcelsComponent implements OnInit {
   submit(): void {
     if (this.form.invalid || this.saving) return;
     if (!this.isEdit && (!this.senderClient.name || !this.senderClient.phone)) {
-      this.errorMsg = 'Expéditeur requis (nom et téléphone).'; return;
+      this.errorMsg = this.t.translate('cons.msg.sender_required'); return;
     }
     this.saving = true; this.errorMsg = '';
     const createBody = {
@@ -184,7 +186,7 @@ export class VcgParcelsComponent implements OnInit {
     const req = this.isEdit ? this.svc.edit(this.editId!, this.form.getRawValue()) : this.svc.create(createBody);
     req.subscribe({
       next: (res: any) => {
-        this.saving = false; this.reload(); this.toast.success('Enregistré.');
+        this.saving = false; this.reload(); this.toast.success(this.t.translate('cons.msg.saved'));
         // À l'enregistrement : impression auto du reçu + de l'étiquette (× quantité, côté serveur).
         if (wasCreate && res?.id) {
           this.printReceipt(res.id);
@@ -200,7 +202,7 @@ export class VcgParcelsComponent implements OnInit {
           this.close('parcel-modal');
         }
       },
-      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué. Réessayez ou contactez un administrateur."; } });
+      error: e => { this.saving = false; this.errorMsg = e?.error?.detail ?? e?.error?.message ?? this.t.translate('cons.msg.op_failed'); } });
   }
   showDetail(p: Parcel): void { this.svc.get(p.id).subscribe(d => this.detail = d); }
   /** Vrai si un destinataire a été renseigné à la création (retrait = simple confirmation). */
@@ -215,21 +217,21 @@ export class VcgParcelsComponent implements OnInit {
       // Destinataire déjà connu : simple confirmation (pièce présentée facultative).
       this.svc.pickup(this.pickupTarget.id, { picked_up_id_number: this.pickupId.trim() }).subscribe({
         next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
-        error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
+        error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? this.t.translate('cons.msg.op_failed_short')) });
       return;
     }
     // Aucun destinataire : on capture qui retire (destinataire ou mandataire).
     const name = this.pickupName.trim(), phone = this.pickupPhone.trim(), idn = this.pickupId.trim();
-    if (!name || !phone || !idn) { this.toast.error('Nom, téléphone et pièce sont requis.'); return; }
+    if (!name || !phone || !idn) { this.toast.error(this.t.translate('cons.msg.name_phone_id_required')); return; }
     this.svc.pickup(this.pickupTarget.id, {
       picked_up_by: name, picked_up_phone: phone, picked_up_id_number: idn, picked_up_kind: this.pickupKind,
     }).subscribe({
       next: () => { this.pickupTarget = null; this.reload(); this.close('pickup-modal'); },
-      error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? "L'opération a échoué.") });
+      error: e => this.toast.error(e?.error?.detail ?? e?.error?.error?.message ?? this.t.translate('cons.msg.op_failed_short')) });
   }
   cancel(p: Parcel): void {
-    if (!confirm('Annuler ce colis ?')) return;
-    this.svc.cancel(p.id).subscribe({ next: () => { this.reload(); this.toast.success('Colis annulé.'); }, error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+    if (!confirm(this.t.translate('cons.msg.confirm_cancel_parcel'))) return;
+    this.svc.cancel(p.id).subscribe({ next: () => { this.reload(); this.toast.success(this.t.translate('cons.msg.parcel_cancelled')); }, error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
   private close(id: string): void { document.getElementById(id)?.querySelector('[data-bs-dismiss="modal"]')?.dispatchEvent(new MouseEvent('click')); }
 
@@ -243,9 +245,9 @@ export class VcgParcelsComponent implements OnInit {
     this.numberingSaving = true; this.numberingError = '';
     this.svc.setNumbering(this.numberingValue).subscribe({
       next: n => { this.numbering = n; this.numberingValue = null; this.numberingSaving = false;
-                   this.toast.success('Numérotation mise à jour.'); this.close('numbering-modal'); },
+                   this.toast.success(this.t.translate('cons.msg.numbering_updated')); this.close('numbering-modal'); },
       error: e => { this.numberingSaving = false;
-                    this.numberingError = e?.error?.detail ?? e?.error?.message ?? "L'opération a échoué."; } });
+                    this.numberingError = e?.error?.detail ?? e?.error?.message ?? this.t.translate('cons.msg.op_failed_short'); } });
   }
   printReceipt(id: string): void { this.printRouter.print('recu_colis', id); }
   printLabel(id: string): void { this.printRouter.print('etiquette_colis', id); }

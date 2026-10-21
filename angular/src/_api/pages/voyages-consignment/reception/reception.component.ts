@@ -1,4 +1,5 @@
 import { Component, OnInit, inject} from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
@@ -19,6 +20,7 @@ interface RowState { received: number; missing: number; damaged: number; }
 })
 export class VcgReceptionComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   pg: PageState = { page: 1, size: 25 };
   rows: ParcelShipment[] = []; loading = false; q = '';
   fRoute = ''; fDest = '';
@@ -51,7 +53,7 @@ export class VcgReceptionComponent implements OnInit {
   receiveOne(s: ParcelShipment): void {
     const st = this.state[s.id];
     this.svc.receiveShipment(s.id, { received_pieces: st.received, missing_pieces: st.missing, damaged_pieces: st.damaged })
-      .subscribe({ next: () => { this.toast.success('Expédition réceptionnée.'); this.reload(); },
-        error: e => this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur.") });
+      .subscribe({ next: () => { this.toast.success(this.t.translate('cons.msg.shipment_received')); this.reload(); },
+        error: e => this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')) });
   }
 }

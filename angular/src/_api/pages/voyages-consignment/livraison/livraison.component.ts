@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ParcelService } from '../../../services/voyages-consignment/parcel.service';
@@ -23,6 +24,7 @@ type Tab = 'awaiting' | 'delivered';
 })
 export class VcgLivraisonComponent implements OnInit {
   private toast = inject(ToastService);
+  private t = inject(TranslocoService);
   tab: Tab = 'awaiting';
   pg: PageState = { page: 1, size: 25 };
   rows: Parcel[] = []; loading = false;
@@ -79,15 +81,15 @@ export class VcgLivraisonComponent implements OnInit {
 
   deliver(): void {
     if (!this.target || this.saving) return;
-    if (!this.amount || this.amount <= 0) { this.toast.error('Indiquez le montant de la livraison.'); return; }
-    if (!this.deliveredTo.trim() || !this.deliveredToId.trim()) { this.toast.error('Indiquez le nom et la pièce du destinataire.'); return; }
+    if (!this.amount || this.amount <= 0) { this.toast.error(this.t.translate('cons.msg.enter_delivery_amount')); return; }
+    if (!this.deliveredTo.trim() || !this.deliveredToId.trim()) { this.toast.error(this.t.translate('cons.msg.enter_recipient_name_id')); return; }
     this.saving = true;
     this.svc.deliverHome(this.target.id, {
       delivery_amount: this.amount, delivery_address: this.address.trim(), payment_method: this.paymentMethod,
       delivered_to: this.deliveredTo.trim(), delivered_to_id: this.deliveredToId.trim(),
     }).subscribe({
-      next: () => { this.saving = false; this.target = null; this.toast.success('Colis livré. Recette enregistrée.'); this.reload(); },
-      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? "L'opération a échoué. Réessayez ou contactez un administrateur."); },
+      next: () => { this.saving = false; this.target = null; this.toast.success(this.t.translate('cons.msg.parcel_delivered')); this.reload(); },
+      error: e => { this.saving = false; this.toast.error(e?.error?.detail ?? this.t.translate('cons.msg.op_failed')); },
     });
   }
 }
