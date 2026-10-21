@@ -18,9 +18,9 @@ def _setup(fixed=None, lo=None, hi=None):
     d = ServicePoint.objects.create(company=c, name="D", agency=a2)
     # Mode sans encaissement : évite d'ouvrir une session de caisse dans le test.
     PaymentMethod.objects.create(company=c, code="free", name="Gratuit", requires_payment=False)
-    nat = ConsignmentNature.objects.create(company=c, code="N", name="Normal",
-                                           fixed_price=fixed, min_price=lo, max_price=hi)
-    typ = ConsignmentType.objects.create(company=c, code="T", label="T", nature=nat)
+    nat = ConsignmentNature.objects.create(company=c, code="N", name="Normal")
+    typ = ConsignmentType.objects.create(company=c, code="T", label="T", nature=nat,
+                                         fixed_price=fixed, min_price=lo, max_price=hi)
     return c, o, d, typ
 
 
