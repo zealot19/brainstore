@@ -971,6 +971,12 @@
     }
   },
   "vcfg": {
+    "nature": {
+      "price_hint": "Tarification : un prix fixe impose le montant (non modifiable à l'enregistrement). Sinon, le minimum et le maximum bornent le prix saisi. Laisser vide = prix libre.",
+      "fixed_price": "Prix fixe",
+      "min_price": "Prix minimum",
+      "max_price": "Prix maximum"
+    },
     "common": {
       "subtitle": "Référentiel configurable",
       "new_f": "Nouvelle",
@@ -2340,6 +2346,8 @@
       "numbering_next": "Prochain numéro système",
       "numbering_set": "Fixer le prochain numéro à",
       "numbering_fwd": "Saut en avant uniquement — impossible de réutiliser un numéro déjà émis.",
+      "price_fixed": "Prix fixe imposé par la nature (non modifiable).",
+      "price_range": "Fourchette autorisée",
       "empty": "Aucun colis.",
       "modal_edit": "Modifier le colis",
       "sec_route": "Trajet",

@@ -197,7 +197,8 @@ class ConsignmentNatureRead(_ScopeMixin):
     class Meta:
         model = ConsignmentNature
         fields = ["id", "code", "name", "name_fr", "name_en", "is_fragile", "requires_declaration",
-                  "is_prohibited", "company", "scope", "is_active", "created_at", "updated_at"]
+                  "is_prohibited", "fixed_price", "min_price", "max_price",
+                  "company", "scope", "is_active", "created_at", "updated_at"]
 
 
 class ConsignmentNatureWrite(serializers.Serializer):
@@ -207,7 +208,17 @@ class ConsignmentNatureWrite(serializers.Serializer):
     is_fragile = serializers.BooleanField(required=False, default=False)
     requires_declaration = serializers.BooleanField(required=False, default=False)
     is_prohibited = serializers.BooleanField(required=False, default=False)
+    fixed_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
+    min_price   = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
+    max_price   = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, default=None)
     is_active = serializers.BooleanField(required=False, default=True)
+
+    def validate(self, attrs):
+        lo, hi = attrs.get("min_price"), attrs.get("max_price")
+        if lo is not None and hi is not None and lo > hi:
+            raise serializers.ValidationError(
+                {"max_price": "Le prix maximum doit être ≥ au prix minimum."})
+        return attrs
 
 
 # ── ConsignmentType ──────────────────────────────────────────────────────────

@@ -39,6 +39,12 @@ class ConsignmentNature(_CompanyScoped):
     is_fragile = models.BooleanField(_("fragile"), default=False)
     requires_declaration = models.BooleanField(_("déclaration requise"), default=False)
     is_prohibited = models.BooleanField(_("interdit"), default=False)
+    # Tarification par nature. Si `fixed_price` est défini, le prix du colis est
+    # imposé (non modifiable). Sinon, `min_price`/`max_price` (optionnels) bornent
+    # le prix saisi. Tous nuls = saisie libre.
+    fixed_price = models.DecimalField(_("prix fixe"), max_digits=12, decimal_places=2, null=True, blank=True)
+    min_price   = models.DecimalField(_("prix minimum"), max_digits=12, decimal_places=2, null=True, blank=True)
+    max_price   = models.DecimalField(_("prix maximum"), max_digits=12, decimal_places=2, null=True, blank=True)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("nature de colis")

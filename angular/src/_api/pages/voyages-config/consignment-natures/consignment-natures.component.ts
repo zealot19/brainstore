@@ -21,7 +21,7 @@ export class VcConsignmentNaturesComponent implements OnInit {
   rows: ConsignmentNature[] = []; filtered: ConsignmentNature[] = []; loading = true; search = ''; selected = new Set<string>();
   form!: FormGroup; saving = false; errorMsg = ''; editId: string | null = null;
   constructor(private svc: ConsignmentNatureService, private fb: FormBuilder) {}
-  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], name_en: [''], is_active: [true] }); this.load(); }
+  ngOnInit(): void { this.form = this.fb.group({ code: ['', Validators.required], name: ['', Validators.required], name_en: [''], fixed_price: [null], min_price: [null], max_price: [null], is_active: [true] }); this.load(); }
   load(): void { this.loading = true; this.selected.clear(); this.svc.list().subscribe({ next: d => { this.rows = d; this.applyFilter(); this.loading = false; }, error: () => this.loading = false }); }
   applyFilter(): void { const q = this.search.toLowerCase(); this.filtered = this.rows.filter(r => !q || r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)); }
   get selectable(): ConsignmentNature[] { return this.filtered.filter(r => r.scope !== 'global'); }
@@ -34,8 +34,8 @@ export class VcConsignmentNaturesComponent implements OnInit {
     if (!confirm(`Supprimer ${this.selected.size} élément(s) ?`)) return;
     this.svc.bulkDelete([...this.selected]).subscribe({ next: () => { this.selected.clear(); this.load(); }, error: e => this.toast.error(e?.error?.detail ?? 'Suppression impossible.') });
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', name_en: '', is_active: true }); }
-  openEdit(r: ConsignmentNature): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, name: (r as any).name_fr ?? r.name, name_en: (r as any).name_en ?? '', is_active: r.is_active }); }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.form.reset({ code: '', name: '', name_en: '', fixed_price: null, min_price: null, max_price: null, is_active: true }); }
+  openEdit(r: ConsignmentNature): void { this.editId = r.id; this.errorMsg = ''; this.form.patchValue({ code: r.code, name: (r as any).name_fr ?? r.name, name_en: (r as any).name_en ?? '', fixed_price: r.fixed_price ?? null, min_price: r.min_price ?? null, max_price: r.max_price ?? null, is_active: r.is_active }); }
   submit(): void {
     if (this.form.invalid || this.saving) return; this.saving = true; this.errorMsg = '';
     const a = this.editId ? this.svc.update(this.editId, this.form.value) : this.svc.create(this.form.value);

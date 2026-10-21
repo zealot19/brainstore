@@ -90,7 +90,9 @@ export class VcgParcelsComponent implements OnInit {
       this.types = d;
       this.typeOptions = d.map(t => ({ ...t, label_nature: t.nature_name ? `${t.label} - ${t.nature_name}` : t.label }));
     });
-    this.cnSvc.list().subscribe(d => this.natures = d.filter(n => n.is_active));
+    this.cnSvc.list().subscribe(d => this.natures = d);
+    // Tarification par nature : quand le type change, appliquer le prix de sa nature.
+    this.form.get('consignment_type_id')!.valueChanges.subscribe(() => this.applyNaturePricing());
     this.tripSvc.list().subscribe(d => this.trips = d as any);
     this.pmSvc.list(true).subscribe(d => this.paymentMethods = d);
     this.reload();
@@ -154,7 +156,32 @@ export class VcgParcelsComponent implements OnInit {
     this.baseOriginName = st?.name ?? ag?.name ?? '';
     if (this.baseOriginId) this.form?.patchValue({ origin_point_id: this.baseOriginId });
   }
-  openCreate(): void { this.editId = null; this.errorMsg = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '', origin_point_id: this.baseOriginId }); this.form.enable(); }
+  /** Applique la tarification de la nature du type sélectionné : prix fixe (champ
+   * verrouillé) ou bornes min/max (champ libre dans l'intervalle). */
+  priceFixed = false; priceHint = '';
+  applyNaturePricing(): void {
+    if (this.isEdit) return;   // repricing = action dédiée, pas à l'édition
+    const type = this.types.find(t => t.id === this.form.value.consignment_type_id);
+    const nat = type?.nature ? this.natures.find(n => n.id === type.nature) : undefined;
+    const amt = this.form.get('amount_due')!;
+    this.priceFixed = false; this.priceHint = '';
+    if (nat?.fixed_price != null) {
+      this.priceFixed = true;
+      amt.setValue(nat.fixed_price, { emitEvent: false });
+      amt.setValidators([Validators.required]);
+      amt.disable({ emitEvent: false });
+    } else {
+      amt.enable({ emitEvent: false });
+      const v = [Validators.required, Validators.min(nat?.min_price ?? 0)];
+      if (nat?.max_price != null) v.push(Validators.max(nat.max_price));
+      amt.setValidators(v);
+      if (nat?.min_price != null || nat?.max_price != null) {
+        this.priceHint = `${nat?.min_price ?? 0} – ${nat?.max_price ?? '∞'}`;
+      }
+    }
+    amt.updateValueAndValidity({ emitEvent: false });
+  }
+  openCreate(): void { this.editId = null; this.errorMsg = ''; this.priceFixed = false; this.priceHint = ''; this.senderClient = { id_type: 'cni' }; this.form.reset({ quantity: 1, payment_method: '', origin_point_id: this.baseOriginId }); this.form.enable(); }
   openEdit(p: Parcel): void {
     this.editId = p.id; this.errorMsg = '';
     this.form.reset({
@@ -176,7 +203,7 @@ export class VcgParcelsComponent implements OnInit {
     }
     this.saving = true; this.errorMsg = '';
     const createBody = {
-      ...this.form.value,
+      ...this.form.getRawValue(),   // getRawValue : inclut amount_due même s'il est désactivé (prix fixe)
       sender_name: this.senderClient.name, sender_phone: this.senderClient.phone,
       sender_civility: this.senderClient.civility, sender_id_type: this.senderClient.id_type,
       sender_id_number: this.senderClient.id_number,

@@ -137,7 +137,9 @@
           <option value="" disabled selected>{{ 'cons.common.opt_choose' | transloco }}</option>
           @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
-      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.col_amount' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
+      <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.col_amount' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" />
+        @if (priceFixed) { <small class="text-success">{{ 'cons.parcels.price_fixed' | transloco }}</small> }
+        @else if (priceHint) { <small class="text-muted">{{ 'cons.parcels.price_range' | transloco }} : {{ priceHint }}</small> }</div>
       <div class="col-md-6 mb-3"><app-caisse-select [(value)]="cashRegisterId"></app-caisse-select></div>
     </div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (isEdit ? 'cons.common.submit_edit' : 'cons.common.submit_new') | transloco }}</button></div></form>

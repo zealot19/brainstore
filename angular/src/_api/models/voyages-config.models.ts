@@ -78,6 +78,9 @@ export interface ConsignmentNature extends VcBase {
   is_fragile: boolean;
   requires_declaration: boolean;
   is_prohibited: boolean;
+  fixed_price?: number | null;
+  min_price?: number | null;
+  max_price?: number | null;
 }
 
 export interface ConsignmentType extends VcBase {

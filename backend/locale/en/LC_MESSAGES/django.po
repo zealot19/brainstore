@@ -259,3 +259,9 @@ msgid "Pièces reçues supérieures aux pièces expédiées."
 msgstr "Received pieces exceed dispatched pieces."
 msgid "Reçues + manquantes dépassent les pièces expédiées."
 msgstr "Received + missing exceed the dispatched pieces."
+
+msgid "Le prix est inférieur au minimum autorisé (%(m)s)."
+msgstr "The price is below the minimum allowed (%(m)s)."
+
+msgid "Le prix est supérieur au maximum autorisé (%(m)s)."
+msgstr "The price is above the maximum allowed (%(m)s)."
