@@ -80,7 +80,9 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   /* N° de ticket : même taille que le nom de la société, gras, centré */
   .rtn{{font-size:9pt;font-weight:800;text-align:center;margin:1.5mm 0}}
   /* #4 : libellé puis petite espace puis valeur, alignés à gauche (pas justifié à droite) */
-  .rf{{display:flex;gap:4mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
+  .rf{{display:flex;justify-content:space-between;gap:4mm;font-size:8.5pt;padding:0.4mm 0;border-bottom:1px dotted #999}}
+  .rf span{{text-align:left}}
+  .rf b{{text-align:right}}
   .rby{{font-size:8pt;font-style:italic;margin:1.5mm 0}}
   .rnote{{font-size:7.5pt;margin:1.5mm 0;border-top:1px solid #000;padding-top:1mm}}
   .rnote div{{margin:0.4mm 0}}
