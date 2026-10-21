@@ -140,10 +140,11 @@ export class SidebarService {
       ],
     },
     {
-      // M01 — Module Configuration centralisé (sous le Tableau de bord, ordre Annexe A).
-      // PAS de `module` : la section traverse filteredSidebar ; l'entitlement est PAR ITEM
-      // (chaque subMenu porte son `module`, filtré via moduleAllowed dans sidebar-one).
+      // Configuration TRANSPORT : voyages, bagages, colis, flotte, billets. Section
+      // tagguée `voyage` -> visible dans l'app Transport (filteredSidebar). L'entitlement
+      // reste PAR ITEM (chaque subMenu porte son `module`, filtré dans sidebar-one).
       tittle: 'Configuration',
+      module: 'voyage',
       showAsTab: false,
       separateRoute: false,
       menu: [
@@ -177,6 +178,29 @@ export class SidebarService {
             { menuValue: 'Fidélité',             route: routes.vcLoyalty,           base: 'loyalty-rules',       permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Types de colis',       route: routes.vcConsignmentTypes,  base: 'consignment-types',   permission: 'transport.config.view',       module: 'colis'  },
             { menuValue: 'Imprimantes (ce poste)', route: routes.vcWorkstationPrinters, base: 'workstation-printers', permission: 'transport.config.view',     module: 'colis'  },
+            { menuValue: 'Config billets',       route: routes.vcTicketTemplate,    base: 'ticket-template',     permission: 'transport.config.view',       module: 'voyage' },
+            { menuValue: 'Paramètres Voyages',   route: routes.vcSettings,          base: 'settings',            permission: 'transport.config.view',       module: 'voyage' },
+          ],
+        },
+      ],
+    },
+    {
+      // Configuration ADMINISTRATION : documents, caisse / trésorerie, finance.
+      // Section tagguée `administration` -> visible uniquement dans l'app Administration
+      // (filteredSidebar). L'entitlement reste PAR ITEM (hasModule, ex. treasury).
+      tittle: 'Configuration',
+      module: 'administration',
+      showAsTab: false,
+      separateRoute: false,
+      menu: [
+        {
+          menuValue: 'Configuration',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon2: 'settings-cog',
+          base: 'admin-config',
+          subMenus: [
+            { menuValue: 'Modèles de documents', route: routes.admDocuments,        base: 'documents',           permission: 'transport.config.view'                           },
             { menuValue: 'Caisses',              route: routes.trzRegisters,        base: 'registers',           permission: 'treasury.register.view',      module: 'treasury' },
             { menuValue: 'Types de dépense',     route: routes.vcExpenseTypes,      base: 'expense-types',       permission: 'transport.config.view',       module: 'treasury' },
             { menuValue: 'Remboursement',        route: routes.trzRefundRate,       base: 'refund-rate',         permission: 'treasury.config.view',        module: 'treasury' },
@@ -184,9 +208,6 @@ export class SidebarService {
             { menuValue: 'Types de valeurs',     route: routes.trzValueTypes,       base: 'value-types',         permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: "Types d'opération",    route: routes.trzOperationTypes,   base: 'operation-types',     permission: 'treasury.config.view',        module: 'treasury' },
             { menuValue: 'Moyens de paiement',   route: routes.trzPaymentMethods,   base: 'payment-methods',     permission: 'treasury.paymentmethod.view', module: 'treasury' },
-            { menuValue: 'Config billets',       route: routes.vcTicketTemplate,    base: 'ticket-template',     permission: 'transport.config.view',       module: 'voyage' },
-            { menuValue: 'Modèles de documents', route: routes.admDocuments,        base: 'documents',           permission: 'transport.config.view'                           },
-            { menuValue: 'Paramètres Voyages',   route: routes.vcSettings,          base: 'settings',            permission: 'transport.config.view',       module: 'voyage' },
             { menuValue: 'Partenaires',          route: routes.trzPartners,         base: 'partners',            permission: 'treasury.partner.view',       module: 'treasury' },
           ],
         },
