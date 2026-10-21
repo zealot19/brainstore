@@ -84,7 +84,6 @@
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printReceipt(p.id)" [title]="'cons.parcels.act_receipt_title' | transloco"><i class="ti ti-printer me-1"></i>{{ 'cons.parcels.act_receipt' | transloco }}</a>
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary me-1" *hasPermission="'ticketing.parcel.view'" (click)="printLabel(p.id)" [title]="'cons.parcels.act_label_title' | transloco"><i class="ti ti-tag me-1"></i>{{ 'cons.parcels.act_label' | transloco }}</a>
                 @if (p.status !== 'picked_up' && p.status !== 'cancelled') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parcel-modal" *hasPermission="'ticketing.parcel.manage'" (click)="openEdit(p)" [title]="'shared.actions.edit' | transloco"><i class="ti ti-edit me-1"></i>{{ 'shared.actions.edit' | transloco }}</a> }
-                @if (p.status === 'available_for_pickup') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#pickup-modal" *hasPermission="'ticketing.parcel.manage'" (click)="askPickup(p)" [title]="'cons.parcels.act_deliver' | transloco"><i class="ti ti-package-export me-1"></i>{{ 'cons.parcels.act_deliver' | transloco }}</a> }
                 @if (p.status === 'registered' || p.status === 'ready_for_travel') { <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger" *hasPermission="'ticketing.parcel.manage'" (click)="cancel(p)" [title]="'shared.actions.cancel' | transloco"><i class="ti ti-x me-1"></i>{{ 'shared.actions.cancel' | transloco }}</a> }
               </div></td>
             </tr>
@@ -138,7 +137,7 @@
           @for (m of paymentMethods; track m.id) { <option [value]="m.code">{{ m.name }}</option> }
         </select></div>
       <div class="col-md-3 mb-3"><label class="form-label">{{ 'cons.common.col_amount' | transloco }} <span class="text-danger">*</span></label><input formControlName="amount_due" type="number" min="0" class="form-control" /></div>
-      <div class="col-md-3 mb-3"><app-caisse-select [(value)]="cashRegisterId"></app-caisse-select></div>
+      <div class="col-md-6 mb-3"><app-caisse-select [(value)]="cashRegisterId"></app-caisse-select></div>
     </div>
   </div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ 'shared.actions.cancel' | transloco }}</button><button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">{{ (isEdit ? 'cons.common.submit_edit' : 'cons.common.submit_new') | transloco }}</button></div></form>
 </div></div></div>

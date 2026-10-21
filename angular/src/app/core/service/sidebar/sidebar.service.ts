@@ -134,7 +134,7 @@ export class SidebarService {
           icon2: 'chart-bar',
           route: routes.voyagesDashboard,
           base: 'dashboard',
-          permission: 'voyage.trip.view',
+          permission: 'voyage.dashboard.view',
           subMenus: [],
         },
       ],

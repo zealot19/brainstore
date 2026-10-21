@@ -62,9 +62,12 @@ def _role_specs(codes):
             "transport.fareclass.view"}),
         ("Gestionnaire de flotte", "Gestion complète de la flotte",
          _allof(codes, "fleet")),
+        # L'agent colis n'a PAS accès au tableau de bord : on retire les
+        # permissions « dashboard » du référentiel voyages (voyage.trip.view reste
+        # pour choisir un voyage lors de l'expédition).
         ("Agent colis & bagages", "Enregistrement et suivi des colis et bagages",
          _allof(codes, "ticketing.parcel") | _allof(codes, "ticketing.luggage")
-         | {"ticketing.dashboard.view"} | config_voyages | sales_caisse),
+         | (config_voyages - {"voyage.dashboard.view"}) | sales_caisse),
         ("Comptable (lecture)", "Consultation générale, impressions et rapports",
          {c for c in codes if c.endswith(".view")}
          | {"ticketing.ticket.print", "scig.report.view", "scig.report.export"}),

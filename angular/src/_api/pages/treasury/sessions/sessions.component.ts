@@ -10,6 +10,7 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { CashSession, CashRegister, CurrencyDenomination, CashValueType } from '../../../models/treasury.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
+import { PermissionService } from '../../../services/auth/permission.service';
 import { PaginatePipe } from '../../../../app/shared/table-paginator/paginate.pipe';
 import { TablePaginatorComponent, PageState } from '../../../../app/shared/table-paginator/table-paginator.component';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
@@ -24,6 +25,7 @@ import { SearchableSelectDirective } from '../../shared/searchable-select/search
 })
 export class TrzSessionsComponent implements OnInit {
   private toast = inject(ToastService);
+  private perm = inject(PermissionService);
   pg: PageState = { page: 1, size: 25 };
   rows: CashSession[] = []; loading = true; statusFilter = '';
   registers: CashRegister[] = [];
@@ -80,7 +82,12 @@ export class TrzSessionsComponent implements OnInit {
 
   private get me(): any { return this.auth.currentUser; }
   get isAdmin(): boolean { const u = this.me; return !!u && (!!u.is_superuser || !!u.is_institution_admin); }
-  canManage(s: CashSession): boolean { return this.isAdmin || s.opened_by === this.me?.id; }
+  // Gérer le cycle de vie de la session (ouvrir/suspendre/reprendre/prolonger/clôturer)
+  // exige `treasury.session.manage`. Par défaut, guichetier et agent colis ne font
+  // qu'OPÉRER leur session (vente/billetage) ; ils ne gèrent que si ce droit est coché.
+  canManage(s: CashSession): boolean {
+    return this.isAdmin || (this.perm.has('treasury.session.manage') && s.opened_by === this.me?.id);
+  }
   // Le guichetier assigné n'ouvre pas la session : un gestionnaire le fait.
   canOpenDraft(s: CashSession): boolean { return this.isAdmin || s.assigned_to !== this.me?.id; }
   // La clôture (billetage de fin) est aussi permise au guichetier assigné.

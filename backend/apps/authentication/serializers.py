@@ -84,9 +84,19 @@ def _company_ref(c):
     }
 
 
+def _agency_ref(a):
+    """Représentation `AgencyRef` (objet {id, name}) attendue par le frontend —
+    pas un UUID brut, sinon le frontend ne peut pas afficher le nom de l'agence/
+    station d'affectation (point de départ des colis)."""
+    if not a:
+        return None
+    return {"id": str(a.id), "name": a.name}
+
+
 class UserCompactSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
-    company   = serializers.SerializerMethodField()
+    full_name      = serializers.SerializerMethodField()
+    company        = serializers.SerializerMethodField()
+    default_agency = serializers.SerializerMethodField()
 
     class Meta:
         model  = User
@@ -104,10 +114,14 @@ class UserCompactSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         return _company_ref(obj.company)
 
+    def get_default_agency(self, obj):
+        return _agency_ref(obj.default_agency)
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
-    company   = serializers.SerializerMethodField()
+    full_name      = serializers.SerializerMethodField()
+    company        = serializers.SerializerMethodField()
+    default_agency = serializers.SerializerMethodField()
 
     class Meta:
         model  = User
@@ -122,7 +136,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id", "email", "is_superuser", "is_institution_admin", "is_agency_admin",
             "is_2fa_enabled", "must_change_password",
-            "last_login", "date_joined", "default_agency",
+            "last_login", "date_joined",
         ]
 
     def get_full_name(self, obj):
@@ -130,6 +144,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_company(self, obj):
         return _company_ref(obj.company)
+
+    def get_default_agency(self, obj):
+        return _agency_ref(obj.default_agency)
 
 
 class TokenOutputSerializer(serializers.Serializer):
