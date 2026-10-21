@@ -410,6 +410,9 @@ def build_roadmap_data(trip, request):
         "reference": p.reference, "sender_name": p.sender_name, "sender_phone": p.sender_phone,
         "recipient_name": p.recipient_name, "recipient_phone": p.recipient_phone,
         "description": p.description, "quantity": p.quantity, "sent": _sent_on_trip(p),
+        "destination_point_name": (p.destination_point.name if p.destination_point_id else ""),
+        "type_code": (p.consignment_type.code if p.consignment_type_id else ""),
+        "type_label": (p.consignment_type.label if p.consignment_type_id else ""),
     } for p in manifest["parcels"]]
 
     crew = [{"role_display": (c.member.member_type.name if (c.member_id and c.member.member_type_id) else ""),
