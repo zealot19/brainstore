@@ -1307,6 +1307,7 @@
       "delayed": "Delayed",
       "open": "Open",
       "roadmap": "Roadmap",
+      "act_parcel_manifest": "Print parcel manifest",
       "empty": "No trips.",
       "f_pattern": "Schedule",
       "opt_no_pattern": "— None (manual entry) —",

@@ -10,6 +10,7 @@ import { SeatingPlanService } from '../../../services/voyages-config/seating-pla
 import { VoyageTypeService } from '../../../services/voyages-config/voyage-type.service';
 import { CrewMemberService } from '../../../services/voyages/crew-member.service';
 import { VehicleService } from '../../../services/fleet/vehicle.service';
+import { PrintRouterService } from '../../../../app/shared/print/print-router.service';
 import { Trip } from '../../../models/voyages.models';
 import { Route, FareClass, ServicePattern, VoyageType } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
@@ -58,7 +59,11 @@ export class VoyagesListComponent implements OnInit {
               private spSvc: ServicePatternService, private vehicleSvc: VehicleService,
               private planSvc: SeatingPlanService, private crewSvc: CrewMemberService,
               private vtSvc: VoyageTypeService, private toast: ToastService,
-              private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {}
+              private fb: FormBuilder, private router: Router, private route: ActivatedRoute,
+              private printRouter: PrintRouterService) {}
+
+  /** Imprime le bordereau / manifeste colis du voyage (infos société = config billet). */
+  printManifest(t: Trip): void { this.printRouter.print('bordereau_colis', t.id); }
 
   ngOnInit(): void {
     this.form = this.fb.group({

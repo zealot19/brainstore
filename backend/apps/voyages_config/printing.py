@@ -106,18 +106,48 @@ def build_doc_html(company, doc_code, obj_id, request=None):
 
     if doc_code == "bordereau_colis":
         # Bordereau / Manifeste colis d'un voyage, en HTML (impression navigateur) —
-        # évite la dépendance WeasyPrint côté serveur. En-tête / pied configurables
-        # via ManifestTemplate (resolve_doc_template).
+        # évite la dépendance WeasyPrint côté serveur. Les infos société (en-tête /
+        # pied) viennent de la CONFIG BILLET (TicketTemplate) : logo, nom, slogan,
+        # NIU, RCCM, téléphone, adresse, agences.
         from apps.voyages_trips.models import Trip
         from apps.voyages_booking.config_api.views import build_roadmap_data
         from apps.voyages_booking.parcel_manifest import render_parcel_manifest_html
-        from apps.voyages_config.doc_template import resolve_doc_template
         trip = Trip.objects.filter(company=company, id=obj_id, is_deleted=False).first()
         if not trip:
             return None
         return render_parcel_manifest_html(
-            build_roadmap_data(trip, request), resolve_doc_template(company, request))
+            build_roadmap_data(trip, request), _manifest_header_from_ticket(company))
     return None
+
+
+def _manifest_header_from_ticket(company):
+    """Dict d'en-tête du manifeste colis construit à partir de la config BILLET
+    (TicketTemplate), à la demande : nom/slogan/logo + siège (adresse+NIU+RCCM) +
+    téléphones + agences + pied légal (Contribuable / Registre de Commerce)."""
+    from apps.voyages_config import ticket_render
+    from apps.core.media_uri import file_to_data_uri
+    from django.utils import timezone
+    t = ticket_render.get_or_create_template(company)
+    logo = ""
+    if getattr(t, "logo", None):
+        logo = file_to_data_uri(t.logo)
+    if not logo and getattr(company, "logo", None):
+        logo = file_to_data_uri(company.logo)
+    head = [p for p in [t.address, (f"NIU: {t.niu}" if t.niu else ""),
+                        (f"RCCM: {t.rccm}" if t.rccm else "")] if p]
+    agencies = " / ".join(a.get("name", "") for a in (t.agencies_list or []) if a.get("name"))
+    foot = [p for p in [(f"N° de Contribuable : {t.niu}" if t.niu else ""),
+                        (f"N° Registre de Commerce : {t.rccm}" if t.rccm else "")] if p]
+    return {
+        "logo_url":      logo,
+        "brand_name":    t.brand_name or company.name,
+        "slogan":        t.slogan or (company.slogan or ""),
+        "head_office":   "   ".join(head),
+        "phones":        t.phone or "",
+        "agencies_line": agencies,
+        "footer_text":   "   ".join(foot),
+        "printed_at":    timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M"),
+    }
 
 
 def print_or_fallback(company, doc_code, obj_id, request=None):
