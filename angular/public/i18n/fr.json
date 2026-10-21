@@ -2977,6 +2977,7 @@
     }
   },
   "trdash": {
+    "welcome": "Bienvenue {{name}}",
     "title": "Tableau de bord",
     "from": "Du",
     "to": "Au",

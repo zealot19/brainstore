@@ -2977,6 +2977,7 @@
     }
   },
   "trdash": {
+    "welcome": "Welcome {{name}}",
     "title": "Dashboard",
     "from": "From",
     "to": "To",

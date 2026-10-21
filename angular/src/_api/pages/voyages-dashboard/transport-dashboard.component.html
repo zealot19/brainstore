@@ -1,3 +1,4 @@
+@if (canView) {
 <div class="page-header">
   <div class="page-title"><h4>{{ 'trdash.title' | transloco }}</h4></div>
 </div>
@@ -61,3 +62,9 @@
     </div></div>
   }
 </div>
+} @else {
+  <!-- Accès sans tableau de bord (ex. agent colis) : simple message d'accueil. -->
+  <div class="d-flex flex-column align-items-center justify-content-center text-center" style="min-height:70vh">
+    <h2 class="fw-semibold mb-0">{{ 'trdash.welcome' | transloco: { name: displayName } }}</h2>
+  </div>
+}

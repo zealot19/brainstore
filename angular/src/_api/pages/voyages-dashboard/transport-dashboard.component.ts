@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { TransportDashboardService, TripCard } from '../../services/voyages/transport-dashboard.service';
+import { PermissionService } from '../../services/auth/permission.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 interface ChartModel {
   metric: string; title: string; year: number;
@@ -21,6 +23,16 @@ interface ChartModel {
 export class TransportDashboardComponent implements OnInit {
   private svc = inject(TransportDashboardService);
   private t = inject(TranslocoService);
+  private perm = inject(PermissionService);
+  private auth = inject(AuthService);
+
+  /** Le tableau de bord n'est visible qu'avec `voyage.dashboard.view`. Les autres
+   * (ex. agent colis) n'ont qu'un message d'accueil. */
+  get canView(): boolean { return this.perm.has('voyage.dashboard.view'); }
+  get displayName(): string {
+    const u: any = this.auth.currentUser;
+    return (u?.first_name || u?.full_name || u?.username || '').trim();
+  }
 
   private localToday(): string {
     const d = new Date();
@@ -41,6 +53,7 @@ export class TransportDashboardComponent implements OnInit {
   get totalRevenue(): number { return this.trips.reduce((s, t) => s + (t.total_revenue || 0), 0); }
 
   ngOnInit(): void {
+    if (!this.canView) return;   // agent colis : juste un accueil, aucune donnée chargée
     this.reloadTrips();
     const defs = [
       { metric: 'tickets', title: 'trdash.chart_tickets', color: '#4361ee' },
