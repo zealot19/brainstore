@@ -265,3 +265,12 @@ msgstr "The price is below the minimum allowed (%(m)s)."
 
 msgid "Le prix est supérieur au maximum autorisé (%(m)s)."
 msgstr "The price is above the maximum allowed (%(m)s)."
+
+msgid "Retrait partiel désactivé : attendez l'arrivée complète du colis."
+msgstr "Partial pickup disabled: wait for the parcel to fully arrive."
+
+msgid "La quantité à retirer doit être au moins 1."
+msgstr "The quantity to pick up must be at least 1."
+
+msgid "Quantité à retirer supérieure aux pièces disponibles (%(n)s)."
+msgstr "Quantity to pick up exceeds the available pieces (%(n)s)."

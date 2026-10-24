@@ -317,15 +317,17 @@ def receive_parcel(parcel, *, received_pieces=None, missing_pieces=0, damaged_pi
 
 @transaction.atomic
 def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_number="",
-                  picked_up_kind="", user):
-    """Retrait du colis.
+                  picked_up_kind="", quantity=None, user):
+    """Retrait du colis (total ou partiel).
 
     - Destinataire renseigné à la création → simple confirmation (retrait par le
       destinataire ; pièce présentée facultative).
     - Sinon → on capture qui retire (destinataire OU mandataire) avec nom,
       téléphone et pièce (obligatoires). Un destinataire capturé ici renseigne
       aussi le destinataire du colis.
+    - `quantity` : nombre de pièces à retirer (défaut = toutes les disponibles).
     """
+    from apps.voyages_consignment.services.shipment_services import _allow_partial_pickup
     _assert_destination_agency(parcel, user)
     avail = (parcel.received_pieces or 0) - (parcel.picked_up_pieces or 0)
     # Flux colis entier (sans suivi par pièce) : un colis marqué disponible rend
@@ -334,6 +336,21 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
         avail = parcel.quantity - (parcel.picked_up_pieces or 0)
     if avail <= 0:
         raise ApplicationError(_("Aucune pièce disponible au retrait."))
+    # Garde-fou : si le retrait partiel est désactivé, on exige que TOUT soit arrivé
+    # (reçu ou déclaré manquant) avant d'autoriser le moindre retrait.
+    received = parcel.received_pieces or 0
+    missing = parcel.missing_pieces or 0
+    fully_here = parcel.quantity and (received + missing) >= parcel.quantity
+    if not _allow_partial_pickup(parcel.company) and not fully_here:
+        raise ApplicationError(
+            _("Retrait partiel désactivé : attendez l'arrivée complète du colis."))
+    # Retrait partiel : on peut retirer tout ou partie des pièces disponibles.
+    take = avail if quantity is None else int(quantity)
+    if take < 1:
+        raise ApplicationError(_("La quantité à retirer doit être au moins 1."))
+    if take > avail:
+        raise ApplicationError(
+            _("Quantité à retirer supérieure aux pièces disponibles (%(n)s).") % {"n": avail})
 
     # #12 : CNI obligatoire pour tracer qui retire le colis.
     kind = picked_up_kind or Parcel.PickupKind.DESTINATAIRE
@@ -360,9 +377,9 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
     else:
         raise ApplicationError(_("Précisez si le retrait est fait par le destinataire ou un mandataire."))
 
-    # Retrait incrémental : on retire les pièces actuellement disponibles.
+    # Retrait (total ou partiel) : on retire `take` pièces parmi les disponibles.
     prev = parcel.status
-    parcel.picked_up_pieces = (parcel.picked_up_pieces or 0) + avail
+    parcel.picked_up_pieces = (parcel.picked_up_pieces or 0) + take
     parcel.picked_up_by = picked_up_by
     parcel.picked_up_phone = picked_up_phone or ""
     parcel.picked_up_id_number = picked_up_id_number or ""
@@ -373,7 +390,7 @@ def pickup_parcel(parcel, *, picked_up_by="", picked_up_phone="", picked_up_id_n
     from apps.voyages_consignment.services.shipment_services import recompute_parcel_state
     recompute_parcel_state(parcel)
     who = "mandataire" if kind == Parcel.PickupKind.MANDATAIRE else "destinataire"
-    note = f"{picked_up_by} ({who}) — {avail} pièce(s)" + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
+    note = f"{picked_up_by} ({who}) — {take} pièce(s)" + (f" · pièce {picked_up_id_number}" if picked_up_id_number else "")
     _event(parcel, ParcelEvent.Kind.PICKED_UP, from_status=prev,
            to_status=parcel.status, user=user, note=note)
     return parcel

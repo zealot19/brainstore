@@ -62,6 +62,12 @@
         @if (recipientHasCni()) { <small class="text-success">{{ 'cons.pickup.cni_on_file' | transloco }}</small> }
         @else { <small class="text-danger">{{ 'cons.pickup.cni_required_hint' | transloco }}</small> }
       </div>
+      @if (availablePieces(target) > 1) {
+        <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_qty' | transloco }}</label>
+          <input class="form-control" type="number" min="1" [max]="availablePieces(target)" [(ngModel)]="pQty" />
+          <small class="text-muted">{{ 'cons.pickup.qty_hint' | transloco: { n: availablePieces(target) } }}</small>
+        </div>
+      }
     }
   </div>
   <div class="modal-footer">
@@ -79,6 +85,12 @@
       <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_mandate_name' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pName" /></div>
       <div class="mb-2"><label class="form-label">{{ 'shared.client.phone' | transloco }}</label><input class="form-control" [(ngModel)]="pPhone" /></div>
       <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_cni' | transloco }} <span class="text-danger">*</span></label><input class="form-control" [(ngModel)]="pCni" [placeholder]="'cons.pickup.cni_ph' | transloco" /></div>
+      @if (availablePieces(target) > 1) {
+        <div class="mb-2"><label class="form-label">{{ 'cons.pickup.f_qty' | transloco }}</label>
+          <input class="form-control" type="number" min="1" [max]="availablePieces(target)" [(ngModel)]="pQty" />
+          <small class="text-muted">{{ 'cons.pickup.qty_hint' | transloco: { n: availablePieces(target) } }}</small>
+        </div>
+      }
     }
   </div>
   <div class="modal-footer">

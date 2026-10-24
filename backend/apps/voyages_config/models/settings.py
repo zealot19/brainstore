@@ -16,6 +16,10 @@ class VoyagesSettings(_CompanyScoped):
     parcel_trip_max_weight_kg = models.DecimalField(_("capacité colis max/voyage (kg)"),
                                                     max_digits=8, decimal_places=2, null=True, blank=True)
     parcel_trip_max_count = models.PositiveIntegerField(_("nombre max de colis/voyage"), null=True, blank=True)
+    # Retrait partiel : si activé, un colis multi-pièces est retirable dès qu'une
+    # partie est arrivée (retrait pièce par pièce). Sinon, il n'est retirable que
+    # lorsque toutes les pièces sont arrivées (ou déclarées manquantes).
+    allow_partial_pickup = models.BooleanField(_("retrait partiel autorisé"), default=True)
 
     class Meta(_CompanyScoped.Meta):
         verbose_name = _("paramètres voyages")

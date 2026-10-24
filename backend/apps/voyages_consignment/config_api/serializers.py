@@ -131,6 +131,8 @@ class ParcelPickupSerializer(serializers.Serializer):
     picked_up_id_number = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
     picked_up_kind = serializers.ChoiceField(choices=["destinataire", "mandataire"],
                                              required=False, allow_blank=True, default="")
+    # Retrait partiel : nombre de pièces à retirer (null/absent = toutes disponibles).
+    quantity = serializers.IntegerField(required=False, allow_null=True, default=None, min_value=1)
 
 
 class ParcelDeliverSerializer(serializers.Serializer):

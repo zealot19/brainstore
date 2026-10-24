@@ -8,6 +8,14 @@ from apps.voyages_consignment.models import Parcel, ParcelShipment
 _PRE_DEPARTURE = ("draft", "pending")
 
 
+def _allow_partial_pickup(company):
+    """Paramètre société : retrait partiel autorisé (défaut True si non configuré)."""
+    from apps.voyages_config.models import VoyagesSettings
+    s = (VoyagesSettings.objects.filter(is_deleted=False, company=company).first()
+         or VoyagesSettings.objects.filter(is_deleted=False, company__isnull=True).first())
+    return True if s is None else bool(s.allow_partial_pickup)
+
+
 def _route_covers(route, from_point, to_point):
     from apps.voyages_pricing.selectors.fare_selectors import route_points
     ids = [p.id for p in route_points(route)]
@@ -45,14 +53,20 @@ def recompute_parcel_state(parcel):
     picked = parcel.picked_up_pieces or 0
     missing = parcel.missing_pieces or 0
     available = received - picked
+    # « Tout arrivé » = plus rien en route : toutes les pièces sont reçues ou
+    # déclarées manquantes. Sert à bloquer le retrait partiel si l'option est OFF.
+    fully_here = parcel.quantity and (received + missing) >= parcel.quantity
+    can_offer = available > 0 and (_allow_partial_pickup(parcel.company) or fully_here)
     if parcel.quantity and (picked + missing) >= parcel.quantity:
         parcel.status = Parcel.Status.PICKED_UP
-    elif available > 0:
+    elif can_offer:
         parcel.status = Parcel.Status.AVAILABLE_FOR_PICKUP
     elif moving and shipped < parcel.quantity:
         # Une partie seulement a été expédiée : colis « à moitié envoyé ».
         parcel.status = Parcel.Status.PARTIAL_TRANSIT
     elif moving:
+        # Pièces arrivées mais retrait partiel désactivé et pas encore tout arrivé :
+        # on garde « en transit » jusqu'à l'arrivée complète.
         parcel.status = Parcel.Status.IN_TRANSIT
     else:
         parcel.status = Parcel.Status.READY_FOR_TRAVEL

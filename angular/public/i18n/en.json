@@ -1172,6 +1172,8 @@
       "f_autoprint": "Auto-print by default",
       "f_auto_manage": "Auto start/stop trips",
       "f_auto_manage_hint": "Uses the departure lead (h) and arrival grace (h) above.",
+      "f_partial_pickup": "Partial pickup allowed",
+      "f_partial_pickup_hint": "If enabled, a multi-piece parcel can be picked up as soon as part of it arrives. Otherwise, only once all pieces have arrived.",
       "f_sms": "SMS notifications by default"
     },
     "plan": {
@@ -2207,6 +2209,9 @@
       "btn_confirm": "Confirm pickup",
       "err_cni_recipient": "The recipient's ID (CNI) is required.",
       "err_mandate": "The proxy's name and ID (CNI) are required.",
+      "f_qty": "Pieces to pick up",
+      "qty_hint": "{{n}} piece(s) available.",
+      "err_qty": "Invalid quantity to pick up.",
       "toast_done": "Parcel picked up."
     },
     "shipment": {

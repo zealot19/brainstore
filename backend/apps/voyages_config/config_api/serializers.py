@@ -382,6 +382,7 @@ class VoyagesSettingsRead(_ScopeMixin):
                   "shift_duration_hours", "document_alert_days",
                   "auto_print_default", "sms_notification_default", "auto_manage_trips",
                   "baggage_free_allowance_kg", "parcel_trip_max_weight_kg", "parcel_trip_max_count",
+                  "allow_partial_pickup",
                   "company", "scope", "created_at", "updated_at"]
 
 
@@ -397,6 +398,7 @@ class VoyagesSettingsWrite(serializers.Serializer):
     baggage_free_allowance_kg = serializers.IntegerField(required=False, min_value=0)
     parcel_trip_max_weight_kg = serializers.DecimalField(required=False, allow_null=True, max_digits=8, decimal_places=2)
     parcel_trip_max_count = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    allow_partial_pickup = serializers.BooleanField(required=False)
 
 
 import json

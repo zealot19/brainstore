@@ -19,7 +19,7 @@ export class VcSettingsComponent implements OnInit {
       departure_lead_hours: [24], arrival_grace_hours: [48], ticket_expiry_days: [7],
       shift_duration_hours: [8], document_alert_days: [30],
       auto_print_default: [false], sms_notification_default: [false],
-      auto_manage_trips: [false],
+      auto_manage_trips: [false], allow_partial_pickup: [true],
     });
     this.svc.get().subscribe({ next: s => { this.form.patchValue(s); this.loading = false; }, error: () => this.loading = false });
   }

@@ -323,6 +323,7 @@ class ParcelPickupView(APIView):
                                        picked_up_phone=d["picked_up_phone"],
                                        picked_up_id_number=d["picked_up_id_number"],
                                        picked_up_kind=d["picked_up_kind"],
+                                       quantity=d.get("quantity"),
                                        user=request.user)
         except ApplicationError as e:
             return error_response(str(e))

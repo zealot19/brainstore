@@ -33,7 +33,14 @@ export class VcgPickupComponent implements OnInit {
 
   target: Parcel | null = null;
   kind: 'destinataire' | 'mandataire' = 'destinataire';
-  pName = ''; pPhone = ''; pCni = ''; saving = false;
+  pName = ''; pPhone = ''; pCni = ''; pQty: number | null = null; saving = false;
+
+  /** Pièces encore retirables = reçues − déjà retirées (repli : quantité totale). */
+  availablePieces(p: Parcel | null): number {
+    if (!p) return 0;
+    const recv = p.received_pieces ?? p.quantity ?? 0;
+    return Math.max(0, recv - (p.picked_up_pieces ?? 0));
+  }
 
   constructor(private svc: ParcelService, private spSvc: ServicePointService) {}
 
@@ -65,11 +72,11 @@ export class VcgPickupComponent implements OnInit {
   recipientHasCni(): boolean { return !!this.target?.recipient_id_number; }
 
   openPickup(p: Parcel): void {
-    this.target = p; this.kind = 'destinataire';
+    this.target = p; this.kind = 'destinataire'; this.pQty = this.availablePieces(p);
     this.pName = p.recipient_name || ''; this.pPhone = p.recipient_phone || ''; this.pCni = p.recipient_id_number || '';
   }
   openMandate(p: Parcel): void {
-    this.target = p; this.kind = 'mandataire';
+    this.target = p; this.kind = 'mandataire'; this.pQty = this.availablePieces(p);
     this.pName = ''; this.pPhone = ''; this.pCni = '';
   }
   confirm(modalId: string): void {
@@ -77,9 +84,12 @@ export class VcgPickupComponent implements OnInit {
     const name = this.pName.trim(), cni = this.pCni.trim();
     if (this.kind === 'destinataire' && !cni) { this.toast.error(this.t.translate('cons.pickup.err_cni_recipient')); return; }
     if (this.kind === 'mandataire' && (!name || !cni)) { this.toast.error(this.t.translate('cons.pickup.err_mandate')); return; }
+    const avail = this.availablePieces(this.target);
+    const qty = this.pQty ?? avail;
+    if (qty < 1 || qty > avail) { this.toast.error(this.t.translate('cons.pickup.err_qty')); return; }
     this.saving = true;
     this.svc.pickup(this.target.id, {
-      picked_up_kind: this.kind, picked_up_by: name, picked_up_phone: this.pPhone.trim(), picked_up_id_number: cni,
+      picked_up_kind: this.kind, picked_up_by: name, picked_up_phone: this.pPhone.trim(), picked_up_id_number: cni, quantity: qty,
     }).subscribe({
       next: () => { this.saving = false; this.target = null; this.toast.success(this.t.translate('cons.pickup.toast_done')); this.close(modalId); this.reload(); },
       error: e => { this.saving = false; this.err(e); } });

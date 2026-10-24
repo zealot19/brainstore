@@ -22,6 +22,8 @@
         <div class="form-check form-switch mb-2"><input formControlName="sms_notification_default" type="checkbox" class="form-check-input" id="vc-sms" /><label class="form-check-label" for="vc-sms">{{ 'vcfg.set.f_sms' | transloco }}</label></div>
         <div class="form-check form-switch mb-1"><input formControlName="auto_manage_trips" type="checkbox" class="form-check-input" id="vc-automanage" /><label class="form-check-label" for="vc-automanage">{{ 'vcfg.set.f_auto_manage' | transloco }}</label></div>
         <p class="text-muted small mb-3">{{ 'vcfg.set.f_auto_manage_hint' | transloco }}</p>
+        <div class="form-check form-switch mb-1"><input formControlName="allow_partial_pickup" type="checkbox" class="form-check-input" id="vc-partialpickup" /><label class="form-check-label" for="vc-partialpickup">{{ 'vcfg.set.f_partial_pickup' | transloco }}</label></div>
+        <p class="text-muted small mb-3">{{ 'vcfg.set.f_partial_pickup_hint' | transloco }}</p>
         <button type="submit" class="btn btn-primary" [disabled]="saving"><span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>{{ 'shared.actions.save' | transloco }}</button>
       </form>
     }
