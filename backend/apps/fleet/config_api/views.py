@@ -10,6 +10,7 @@ from apps.fleet.models import (
 )
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensure_unique
+from django.utils.translation import gettext_lazy as _
 
 
 class _ConfigListView(APIView):
@@ -64,12 +65,12 @@ class _ConfigDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(self.read(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(self.read(obj).data) if obj else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = self.write(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         data = dict(payload.validated_data)
@@ -90,7 +91,7 @@ class _ConfigDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -105,7 +106,7 @@ class _ConfigBulkDeleteView(APIView):
     def post(self, request):
         ids = request.data.get("ids") or []
         if not isinstance(ids, list) or not ids:
-            return error_response("Aucun élément sélectionné.")
+            return error_response(_("Aucun élément sélectionné."))
         company_id = scope_company_id(request)
         # Only company-owned rows may be bulk-deleted; globals are read-only.
         qs = self.model.objects.filter(is_deleted=False, id__in=ids)

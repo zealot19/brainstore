@@ -19,6 +19,7 @@ from apps.voyages_config.models import (
 from apps.voyages_config import ticket_render
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global, scoped_qs, ensure_unique, cfg_lookup
+from django.utils.translation import gettext_lazy as _
 
 
 # ── Generic scoped-config views (mirrors apps.fleet.config_api) ────────────────
@@ -80,12 +81,12 @@ class _ConfigDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(self.read(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(self.read(obj).data) if obj else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = self.write(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         data = dict(payload.validated_data)
@@ -107,7 +108,7 @@ class _ConfigDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -122,7 +123,7 @@ class _ConfigBulkDeleteView(APIView):
     def post(self, request):
         ids = request.data.get("ids") or []
         if not isinstance(ids, list) or not ids:
-            return error_response("Aucun élément sélectionné.")
+            return error_response(_("Aucun élément sélectionné."))
         company_id = scope_company_id(request)
         qs = self.model.objects.filter(is_deleted=False, id__in=ids)
         if company_id:
@@ -211,13 +212,13 @@ class ExpenseScheduleDetailView(APIView):
     def get(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Barème introuvable.", status_code=404)
+            return error_response(_("Barème introuvable."), status_code=404)
         return success_response(S.ExpenseScheduleSerializer(obj).data)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Barème introuvable.", status_code=404)
+            return error_response(_("Barème introuvable."), status_code=404)
         payload = S.ExpenseScheduleWriteSerializer(obj, data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         obj = payload.save(updated_by=request.user)
@@ -226,7 +227,7 @@ class ExpenseScheduleDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Barème introuvable.", status_code=404)
+            return error_response(_("Barème introuvable."), status_code=404)
         obj.soft_delete(user=request.user)
         return success_response(message="Barème supprimé.")
 
@@ -335,7 +336,7 @@ class RouteListView(APIView):
         if not origin or not dest:
             return error_response("Lieu introuvable.", status_code=404)
         if origin.id == dest.id:
-            return error_response("Origine et destination doivent différer.")
+            return error_response(_("Origine et destination doivent différer."))
         try:
             ensure_unique(Route, company, "code", d["code"])
         except ApplicationError as e:
@@ -356,12 +357,12 @@ class RouteDetailView(APIView):
 
     def get(self, request, pk):
         route = self._get(request, pk)
-        return success_response(S.RouteRead(route).data) if route else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.RouteRead(route).data) if route else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         route = self._get(request, pk)
         if not route:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.RouteWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -376,7 +377,7 @@ class RouteDetailView(APIView):
                 return error_response("Lieu introuvable.", status_code=404)
             route.destination = dest
         if route.origin_id == route.destination_id:
-            return error_response("Origine et destination doivent différer.")
+            return error_response(_("Origine et destination doivent différer."))
         try:
             if "code" in d:
                 ensure_unique(Route, route.company, "code", d["code"], exclude_id=route.id)
@@ -391,7 +392,7 @@ class RouteDetailView(APIView):
     def delete(self, request, pk):
         route = self._get(request, pk)
         if not route:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         route.is_deleted = True
         route.updated_by = request.user
         route.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -583,12 +584,12 @@ class ServicePatternDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._get(request, pk)
-        return success_response(S.ServicePatternRead(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.ServicePatternRead(obj).data) if obj else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.ServicePatternWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
@@ -604,7 +605,7 @@ class ServicePatternDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         obj.is_deleted = True
         obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -735,7 +736,7 @@ class DocumentFormatsView(APIView):
             except (TypeError, ValueError):
                 return error_response("Dimensions invalides.")
             if w <= 0 or h < 0:
-                return error_response("La largeur doit être positive et la hauteur ≥ 0 (0 = auto).")
+                return error_response(_("La largeur doit être positive et la hauteur ≥ 0 (0 = auto)."))
             DocumentFormat.objects.update_or_create(
                 company=company, code=code, defaults={"width_mm": w, "height_mm": h})
         return self.get(request)
@@ -792,7 +793,7 @@ class DocumentPrintView(APIView):
         doc = request.data.get("doc")
         obj_id = request.data.get("id")
         if not doc or not obj_id:
-            return error_response("Paramètres 'doc' et 'id' requis.")
+            return error_response(_("Paramètres 'doc' et 'id' requis."))
         res = printing.print_or_fallback(company, doc, obj_id, request=request)
         if res.get("error") == "not_found":
             return error_response("Document introuvable.", status_code=404)
@@ -813,7 +814,7 @@ class DocumentHtmlView(APIView):
         doc = request.data.get("doc")
         obj_id = request.data.get("id")
         if not doc or not obj_id:
-            return error_response("Paramètres 'doc' et 'id' requis.")
+            return error_response(_("Paramètres 'doc' et 'id' requis."))
         html = printing.build_doc_html(company, doc, obj_id, request)
         if html is None:
             return error_response("Document introuvable.", status_code=404)

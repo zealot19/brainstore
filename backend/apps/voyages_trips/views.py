@@ -10,6 +10,7 @@ from apps.system_config.selectors.archiving import wants_archived
 from . import selectors, services, serializers as S
 from .models import TripCrew, TripSeat, CrewMember, TripExpense
 from apps.voyages_config.models import CrewMemberType
+from django.utils.translation import gettext_lazy as _
 
 
 # Un voyage terminé ou annulé est figé : on n'ajoute/retire plus d'équipage.
@@ -21,11 +22,11 @@ def _scope(request):
     if request.user.is_superuser:
         cid = request.query_params.get("company_id") or request.data.get("company_id")
         if not cid:
-            return None, error_response("Veuillez préciser l'institution concernée (paramètre company_id).")
+            return None, error_response(_("Veuillez préciser l'institution concernée (paramètre company_id)."))
         c = Company.objects.filter(id=cid).first()
         return (c, None) if c else (None, error_response("Institution introuvable.", status_code=404))
     if not request.user.company_id:
-        return None, error_response("Votre compte n'est lié à aucune institution.")
+        return None, error_response(_("Votre compte n'est lié à aucune institution."))
     return request.user.company, None
 
 
@@ -89,7 +90,7 @@ class TripListCreateView(APIView):
             return error_response("Trajet introuvable.", status_code=404)
         fare_class = _cfg(FareClass, d["fare_class_id"], company)
         if not fare_class:
-            return error_response("Catégorie tarifaire introuvable.", status_code=404)
+            return error_response(_("Catégorie tarifaire introuvable."), status_code=404)
         service_pattern = _cfg(ServicePattern, d.get("service_pattern_id"), company)
         origin = _cfg(ServicePoint, d.get("origin_id"), company)
         destination = _cfg(ServicePoint, d.get("destination_id"), company)
@@ -165,7 +166,7 @@ class TripDetailView(APIView):
         if err:
             return err
         if trip.status != trip.Status.DRAFT:
-            return error_response("Seul un brouillon peut être modifié.")
+            return error_response(_("Seul un brouillon peut être modifié."))
         payload = S.TripUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         data = dict(payload.validated_data)
@@ -225,7 +226,7 @@ class TripAssignVehicleView(APIView):
         if vehicle_id:
             vehicle = Vehicle.objects.filter(id=vehicle_id, company=company, is_deleted=False).first()
             if not vehicle:
-                return error_response("Véhicule introuvable.", status_code=404)
+                return error_response(_("Véhicule introuvable."), status_code=404)
         # vehicle_id absent/null -> désaffectation (vehicle=None).
         try:
             warnings = services.assign_vehicle(trip, vehicle, user=request.user)
@@ -257,13 +258,13 @@ class TripCrewView(APIView):
         payload = S.TripCrewWriteSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         if trip.status in _CREW_LOCKED_STATUSES:
-            return error_response("Impossible de modifier l'équipage d'un voyage terminé ou annulé.")
+            return error_response(_("Impossible de modifier l'équipage d'un voyage terminé ou annulé."))
         member = CrewMember.objects.filter(id=payload.validated_data["member_id"],
                                            company=company, is_deleted=False).first()
         if not member:
-            return error_response("Membre d'équipage introuvable.", status_code=404)
+            return error_response(_("Membre d'équipage introuvable."), status_code=404)
         if trip.crew.filter(is_deleted=False, member=member).exists():
-            return error_response("Ce membre est déjà affecté à ce voyage.")
+            return error_response(_("Ce membre est déjà affecté à ce voyage."))
         conflict = selectors.crew_member_conflict(
             company, member, window_start=trip.scheduled_departure,
             window_end=trip.scheduled_arrival, exclude_trip=trip)
@@ -287,10 +288,10 @@ class TripCrewDetailView(APIView):
         if not trip:
             return error_response("Voyage introuvable.", status_code=404)
         if trip.status in _CREW_LOCKED_STATUSES:
-            return error_response("Impossible de modifier l'équipage d'un voyage terminé ou annulé.")
+            return error_response(_("Impossible de modifier l'équipage d'un voyage terminé ou annulé."))
         crew = trip.crew.filter(id=crew_id, is_deleted=False).first()
         if not crew:
-            return error_response("Équipage introuvable.", status_code=404)
+            return error_response(_("Équipage introuvable."), status_code=404)
         crew.is_deleted = True
         crew.updated_by = request.user
         crew.save(update_fields=["is_deleted", "updated_by", "updated_at"])
@@ -446,7 +447,7 @@ class TripTransbordView(APIView):
         vehicle = Vehicle.objects.filter(id=request.data.get("vehicle_id"),
                                          company=company, is_deleted=False).first()
         if not vehicle:
-            return error_response("Véhicule introuvable.", status_code=404)
+            return error_response(_("Véhicule introuvable."), status_code=404)
         overflow_trip = None
         oid = request.data.get("overflow_trip_id")
         if oid:
@@ -528,7 +529,7 @@ class TripTransbordSelectionView(APIView):
             from apps.fleet.models import Vehicle
             dest_vehicle = Vehicle.objects.filter(id=vid, company=company, is_deleted=False).first()
             if not dest_vehicle:
-                return error_response("Véhicule introuvable.", status_code=404)
+                return error_response(_("Véhicule introuvable."), status_code=404)
         try:
             res = transbord_selection(
                 trip,
@@ -557,7 +558,7 @@ class VehicleTransbordEligibleView(APIView):
         from apps.fleet.models import Vehicle
         vehicle = Vehicle.objects.filter(id=vehicle_id, company=company, is_deleted=False).first()
         if not vehicle:
-            return error_response("Véhicule introuvable.", status_code=404)
+            return error_response(_("Véhicule introuvable."), status_code=404)
         return success_response(selectors.vehicle_transbord_options(company, vehicle))
 
 
@@ -574,7 +575,7 @@ class VehicleTransbordView(APIView):
         to_vehicle = Vehicle.objects.filter(id=request.data.get("to_vehicle_id"),
                                             company=company, is_deleted=False).first()
         if not from_vehicle or not to_vehicle:
-            return error_response("Véhicule introuvable.", status_code=404)
+            return error_response(_("Véhicule introuvable."), status_code=404)
         try:
             res = transbord_vehicle(company, from_vehicle=from_vehicle, to_vehicle=to_vehicle,
                                     reason=request.data.get("reason", ""), user=request.user)
@@ -627,12 +628,12 @@ class CrewMemberDetailView(APIView):
 
     def get(self, request, pk):
         o = self._get(request, pk)
-        return success_response(S.CrewMemberSerializer(o).data) if o else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.CrewMemberSerializer(o).data) if o else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         d = request.data
         if "id_card_number" in d:
             from apps.voyages_trips.services.crew_services import assert_crew_id_card_unique
@@ -657,7 +658,7 @@ class CrewMemberDetailView(APIView):
     def delete(self, request, pk):
         o = self._get(request, pk)
         if not o:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         o.is_deleted = True; o.updated_by = request.user
         o.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message="Membre supprimé.")
@@ -713,7 +714,7 @@ class CrewDocumentDetailView(APIView):
         att = Attachment.objects.filter(id=att_id, content_type=ct, object_id=pk,
                                         is_deleted=False).first()
         if not att:
-            return error_response("Pièce jointe introuvable.", status_code=404)
+            return error_response(_("Pièce jointe introuvable."), status_code=404)
         att.soft_delete(user=request.user)
         return no_content_response()
 
@@ -746,9 +747,9 @@ class TripExpenseDetailView(APIView):
     def patch(self, request, trip_id, pk):
         exp = self._get(trip_id, pk)
         if not exp:
-            return error_response("Dépense introuvable.", status_code=404)
+            return error_response(_("Dépense introuvable."), status_code=404)
         if exp.status == TripExpense.Status.PAID:
-            return error_response("Dépense déjà décaissée.")
+            return error_response(_("Dépense déjà décaissée."))
         payload = S.TripExpenseWriteSerializer(exp, data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         for k, v in payload.validated_data.items():
@@ -760,7 +761,7 @@ class TripExpenseDetailView(APIView):
     def delete(self, request, trip_id, pk):
         exp = self._get(trip_id, pk)
         if not exp:
-            return error_response("Dépense introuvable.", status_code=404)
+            return error_response(_("Dépense introuvable."), status_code=404)
         exp.is_deleted = True; exp.updated_by = request.user
         exp.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return success_response(message="Dépense supprimée.")
@@ -775,14 +776,14 @@ class TripExpenseDisburseView(APIView):
         from apps.treasury.models import CashSession
         exp = TripExpense.objects.filter(trip_id=trip_id, pk=pk, is_deleted=False).select_related("trip").first()
         if not exp:
-            return error_response("Dépense introuvable.", status_code=404)
+            return error_response(_("Dépense introuvable."), status_code=404)
         session = None
         sid = request.data.get("cash_session_id")
         if sid:
             session = CashSession.objects.filter(id=sid, company_id=exp.trip.company_id,
                                                  status=CashSession.Status.OPEN, is_deleted=False).first()
             if not session:
-                return error_response("Caisse introuvable ou déjà fermée.")
+                return error_response(_("Caisse introuvable ou déjà fermée."))
         try:
             exp = disburse_trip_expense(exp, user=request.user, cash_session=session)
         except ApplicationError as e:
@@ -812,5 +813,5 @@ class TripStatsView(APIView):
     def get(self, request):
         from apps.voyages_trips.stats import get_trip_stats
         if not request.user.company_id:
-            return error_response("Votre compte n'est lié à aucune institution.", status_code=400)
+            return error_response(_("Votre compte n'est lié à aucune institution."), status_code=400)
         return success_response(get_trip_stats(request.user.company_id))

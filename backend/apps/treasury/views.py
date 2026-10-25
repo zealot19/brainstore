@@ -11,6 +11,7 @@ from apps.treasury import selectors, services
 from apps.core.agency_scope import user_agency_ids
 from apps.system_config.selectors.archiving import wants_archived
 from apps.treasury.models import CashRegister, BankAccount, CashSession, Transaction, Transfer
+from django.utils.translation import gettext_lazy as _
 from apps.treasury.serializers import (
     CashRegisterReadSerializer, CashRegisterWriteSerializer, CashRegisterUpdateSerializer,
     BankAccountReadSerializer, BankAccountWriteSerializer, BankAccountUpdateSerializer,
@@ -342,7 +343,7 @@ class _AdminClosureActionView(APIView):
 
     def post(self, request, session_id):
         if not _is_admin_user(request.user):
-            return error_response("Action réservée à l'administrateur.",
+            return error_response(_("Action réservée à l'administrateur."),
                                   status_code=status.HTTP_403_FORBIDDEN)
         company = _company(request)
         session = selectors.get_session(session_id, company.id)
@@ -805,7 +806,7 @@ class GeneralExpenseListView(APIView):
         company = _company(request)
         et = ExpenseType.objects.filter(company=company, id=d["expense_type_id"], is_deleted=False).first()
         if not et:
-            return error_response("Type de dépense introuvable.", status_code=404)
+            return error_response(_("Type de dépense introuvable."), status_code=404)
         agency = None
         if d.get("agency_id"):
             agency = Agency.objects.filter(company=company, id=d["agency_id"], is_deleted=False).first()
@@ -829,12 +830,12 @@ class GeneralExpenseDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._obj(request, pk)
-        return success_response(GeneralExpenseReadSerializer(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(GeneralExpenseReadSerializer(obj).data) if obj else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         obj = self._obj(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         ser = GeneralExpenseWriteSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
@@ -852,7 +853,7 @@ class GeneralExpenseDetailView(APIView):
     def delete(self, request, pk):
         obj = self._obj(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         try:
             gx.delete_general_expense(obj, deleted_by=request.user)
         except ApplicationError as ex:
@@ -868,7 +869,7 @@ class GeneralExpenseDisburseView(APIView):
         from apps.treasury.models import GeneralExpense, CashSession
         obj = GeneralExpense.objects.filter(company=_company(request), id=pk, is_deleted=False).first()
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         session = None
         sid = request.data.get("cash_session_id")
         if sid:
@@ -918,7 +919,7 @@ class GeneralExpenseVoucherView(APIView):
             "expense_type", "agency", "cash_session__cash_register", "created_by", "updated_by"
         ).filter(company=company, id=pk, is_deleted=False).first()
         if not e:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         caisse = e.cash_session.cash_register.name if e.cash_session_id else None
         try:
             pdf = render_expense_voucher(
@@ -949,7 +950,7 @@ class VoyageExpenseVoucherView(APIView):
             "expense_type", "trip", "cash_session__cash_register", "created_by", "updated_by"
         ).filter(trip__company=company, id=pk, is_deleted=False).first()
         if not e:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         caisse = e.cash_session.cash_register.name if e.cash_session_id else None
         try:
             pdf = render_expense_voucher(
@@ -1076,7 +1077,7 @@ class IncomeReceiptView(APIView):
         ).filter(company=company, id=pk, is_deleted=False,
                  transaction_type=Transaction.Type.INCOME).first()
         if not txn:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         row = IncomeRowSerializer(txn).data
         source_label = f"{txn.get_category_display()} {row['source_ref']}".strip()
         caisse = txn.cash_session.cash_register.name if txn.cash_session_id else None
@@ -1125,7 +1126,7 @@ class PaymentMethodListView(APIView):
         company = _company(request)
         code = d.get("code") or slugify(d["name"])
         if PaymentMethod.objects.filter(company=company, code=code, is_deleted=False).exists():
-            return error_response("Un moyen de paiement avec ce code existe déjà.")
+            return error_response(_("Un moyen de paiement avec ce code existe déjà."))
         # Force le contexte FR : `name` alimente la colonne name_fr de façon
         # déterministe ; name_en (optionnel) est posé séparément.
         with _lang_override(_settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
@@ -1147,12 +1148,12 @@ class PaymentMethodDetailView(APIView):
 
     def get(self, request, pk):
         obj = self._obj(request, pk)
-        return success_response(PaymentMethodReadSerializer(obj).data) if obj else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(PaymentMethodReadSerializer(obj).data) if obj else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         obj = self._obj(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         ser = PaymentMethodWriteSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         with _lang_override(_settings.MODELTRANSLATION_DEFAULT_LANGUAGE):
@@ -1167,9 +1168,9 @@ class PaymentMethodDetailView(APIView):
     def delete(self, request, pk):
         obj = self._obj(request, pk)
         if not obj:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         if obj.is_system:
-            return error_response("Ce moyen de paiement système ne peut pas être supprimé (désactivez-le).")
+            return error_response(_("Ce moyen de paiement système ne peut pas être supprimé (désactivez-le)."))
         obj.soft_delete(user=request.user)
         return no_content_response()
 
@@ -1237,7 +1238,7 @@ class DenominationListView(APIView):
                       "display_order": d.get("display_order", 0),
                       "created_by": request.user})
         if not created:
-            return error_response("Cette coupure existe déjà.")
+            return error_response(_("Cette coupure existe déjà."))
         return created_response(DenominationSerializer(obj).data)
 
 
@@ -1289,7 +1290,7 @@ class CashValueTypeListView(APIView):
             defaults={"label": d["label"], "is_active": d.get("is_active", True),
                       "display_order": d.get("display_order", 0), "created_by": request.user})
         if not created:
-            return error_response("Ce type de valeur existe déjà.")
+            return error_response(_("Ce type de valeur existe déjà."))
         return created_response(CashValueTypeSerializer(obj).data)
 
 
@@ -1340,7 +1341,7 @@ class OperationTypeListView(APIView):
             defaults={"label": d["label"], "sens": d["sens"], "is_active": d.get("is_active", True),
                       "display_order": d.get("display_order", 0), "created_by": request.user})
         if not created:
-            return error_response("Ce type d'opération existe déjà.")
+            return error_response(_("Ce type d'opération existe déjà."))
         return created_response(OperationTypeSerializer(obj).data)
 
 
@@ -1355,7 +1356,7 @@ class OperationTypeDetailView(APIView):
     def patch(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Type d'opération introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+            return error_response(_("Type d'opération introuvable."), status_code=status.HTTP_404_NOT_FOUND)
         for f in ("code", "label", "sens", "is_active", "display_order"):
             if f in request.data:
                 setattr(obj, f, request.data[f])
@@ -1365,7 +1366,7 @@ class OperationTypeDetailView(APIView):
     def delete(self, request, pk):
         obj = self._get(request, pk)
         if not obj:
-            return error_response("Type d'opération introuvable.", status_code=status.HTTP_404_NOT_FOUND)
+            return error_response(_("Type d'opération introuvable."), status_code=status.HTTP_404_NOT_FOUND)
         obj.is_deleted = True; obj.updated_by = request.user
         obj.save(update_fields=["is_deleted", "updated_by", "updated_at"])
         return no_content_response()
@@ -1454,7 +1455,7 @@ class RefundLookupView(APIView):
         reference = request.query_params.get("reference", "")
         desc = services.lookup_refundable(_company(request), reference)
         if not desc:
-            return error_response("Aucun billet, colis ou bagage ne correspond à cette référence.",
+            return error_response(_("Aucun billet, colis ou bagage ne correspond à cette référence."),
                                   status_code=status.HTTP_404_NOT_FOUND)
         return success_response(_serialize_refund_descriptor(desc))
 
@@ -1467,7 +1468,7 @@ class RefundByReferenceView(APIView):
         kind = request.data.get("kind")
         obj_id = request.data.get("id")
         if not kind or not obj_id:
-            return error_response("Référence à rembourser manquante.")
+            return error_response(_("Référence à rembourser manquante."))
         try:
             services.refund_by_reference(_company(request), kind=kind, obj_id=obj_id, user=request.user)
         except ApplicationError as ex:

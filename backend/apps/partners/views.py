@@ -5,6 +5,7 @@ from apps.core.responses import (success_response, created_response, error_respo
                                  no_content_response)
 from apps.partners.models import Partner
 from apps.partners.serializers import PartnerReadSerializer, PartnerWriteSerializer
+from django.utils.translation import gettext_lazy as _
 
 _NOT_FOUND = "Élément introuvable : il a peut-être été supprimé ou déplacé."
 
@@ -29,7 +30,7 @@ class PartnerListView(APIView):
         d = ser.validated_data
         company = _company(request)
         if Partner.objects.filter(company=company, code=d["code"], is_deleted=False).exists():
-            return error_response("Un partenaire avec ce code existe déjà.")
+            return error_response(_("Un partenaire avec ce code existe déjà."))
         partner = Partner.objects.create(company=company, created_by=request.user, **d)
         return created_response(PartnerReadSerializer(partner).data)
 
@@ -56,7 +57,7 @@ class PartnerDetailView(APIView):
         new_code = d.get("code", obj.code)
         if new_code != obj.code and Partner.objects.filter(
                 company=obj.company, code=new_code, is_deleted=False).exclude(id=obj.id).exists():
-            return error_response("Un partenaire avec ce code existe déjà.")
+            return error_response(_("Un partenaire avec ce code existe déjà."))
         for k, v in d.items():
             setattr(obj, k, v)
         obj.updated_by = request.user

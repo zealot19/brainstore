@@ -8,6 +8,7 @@ from apps.voyages_pricing.models import Fare
 from apps.voyages_pricing import selectors, services
 from . import serializers as S
 from .common import scope_company_id, resolve_company_or_global, scoped_qs, cfg_lookup
+from django.utils.translation import gettext_lazy as _
 
 
 class FareListView(APIView):
@@ -40,7 +41,7 @@ class FareListView(APIView):
         dest = cfg_lookup(ServicePoint, d["destination_point_id"], cid)
         fare_class = cfg_lookup(FareClass, d["fare_class_id"], cid)
         if not origin or not dest or not fare_class:
-            return error_response("Référence introuvable (point ou catégorie).", status_code=404)
+            return error_response(_("Référence introuvable (point ou catégorie)."), status_code=404)
         try:
             fare = services.create_fare(
                 company=company, route=route, origin_point=origin, destination_point=dest,
@@ -61,19 +62,19 @@ class FareDetailView(APIView):
 
     def get(self, request, pk):
         fare = self._get(request, pk)
-        return success_response(S.FareRead(fare).data) if fare else error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+        return success_response(S.FareRead(fare).data) if fare else error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
 
     def patch(self, request, pk):
         fare = self._get(request, pk)
         if not fare:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         payload = S.FareWrite(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         d = dict(payload.validated_data)
         cid = fare.company_id
         fields = {}
         if "route_id" in d:
-            return error_response("Le trajet d'un tarif ne peut pas être changé.")
+            return error_response(_("Le trajet d'un tarif ne peut pas être changé."))
         if "origin_point_id" in d:
             sp = cfg_lookup(ServicePoint, d.pop("origin_point_id"), cid)
             if not sp:
@@ -87,7 +88,7 @@ class FareDetailView(APIView):
         if "fare_class_id" in d:
             fc = cfg_lookup(FareClass, d.pop("fare_class_id"), cid)
             if not fc:
-                return error_response("Catégorie introuvable.", status_code=404)
+                return error_response(_("Catégorie introuvable."), status_code=404)
             fields["fare_class"] = fc
         for k in ("amount", "currency", "valid_from", "valid_to", "is_active", "trip_type"):
             if k in d:
@@ -101,7 +102,7 @@ class FareDetailView(APIView):
     def delete(self, request, pk):
         fare = self._get(request, pk)
         if not fare:
-            return error_response("Élément introuvable : il a peut-être été supprimé ou déplacé.", status_code=404)
+            return error_response(_("Élément introuvable : il a peut-être été supprimé ou déplacé."), status_code=404)
         services.delete_fare(fare, user=request.user)
         return no_content_response()
 
@@ -113,7 +114,7 @@ class FareBulkDeleteView(APIView):
     def post(self, request):
         ids = request.data.get("ids") or []
         if not isinstance(ids, list) or not ids:
-            return error_response("Aucun élément sélectionné.")
+            return error_response(_("Aucun élément sélectionné."))
         company_id = scope_company_id(request)
         qs = Fare.objects.filter(is_deleted=False, id__in=ids)
         qs = qs.filter(company_id=company_id) if company_id else qs.filter(company__isnull=False)

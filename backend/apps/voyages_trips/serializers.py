@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.voyages_trips.models import Trip, TripStop, TripCrew, TripSeat, CrewMember, TripExpense
+from django.utils.translation import gettext_lazy as _
 
 
 class TripExpenseSerializer(serializers.ModelSerializer):
@@ -129,7 +130,7 @@ class TripCreateSerializer(serializers.Serializer):
                        if not attrs.get(f)]
             if missing:
                 raise serializers.ValidationError(
-                    "Sans planification, le trajet, la catégorie et les horaires sont requis.")
+                    _("Sans planification, le trajet, la catégorie et les horaires sont requis."))
         return attrs
 
 
@@ -150,7 +151,7 @@ class GenerateTripsSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs["end_date"] < attrs["start_date"]:
-            raise serializers.ValidationError("La date de fin doit être postérieure ou égale à la date de début.")
+            raise serializers.ValidationError(_("La date de fin doit être postérieure ou égale à la date de début."))
         return attrs
 
 

@@ -28,6 +28,7 @@ from apps.sync_scig_sage.models import (
     SageConnection,
 )
 from apps.sync_scig_sage.sage.client import SageClient, SageConnectionError, SageQueryError
+from django.utils.translation import gettext_lazy as _
 from apps.sync_scig_sage.sage.mapper import (
     map_depots, map_articles, map_variants, map_stock, build_prices_index,
 )
@@ -270,11 +271,11 @@ def sync_full(company, triggered_by=None) -> dict:
 def create_inventory_session(company, name: str, depot_id, created_by, notes: str = "") -> InventorySession:
     depot = Depot.objects.filter(id=depot_id, company=company, is_deleted=False).first()
     if not depot:
-        raise ApplicationError("Dépôt introuvable.")
+        raise ApplicationError(_("Dépôt introuvable."))
     if InventorySession.objects.filter(
         company=company, depot=depot, status=InventorySession.Status.OPEN, is_deleted=False
     ).exists():
-        raise ApplicationError("Un inventaire est déjà ouvert sur ce dépôt.")
+        raise ApplicationError(_("Un inventaire est déjà ouvert sur ce dépôt."))
     return InventorySession.objects.create(
         company=company,
         name=name.strip(),
@@ -291,7 +292,7 @@ def create_inventory_zone(session_id, name: str, created_by) -> InventoryZone:
         id=session_id, is_deleted=False, status=InventorySession.Status.OPEN
     ).first()
     if not session:
-        raise ApplicationError("Session d'inventaire introuvable ou déjà clôturée.")
+        raise ApplicationError(_("Session d'inventaire introuvable ou déjà clôturée."))
     if InventoryZone.objects.filter(
         session=session, name=name.strip(), is_deleted=False
     ).exists():
@@ -316,9 +317,9 @@ def open_inventory_zone(zone_id, device_id: str, user) -> InventoryZone:
             f"Zone déjà ouverte par l'appareil '{zone.locked_by_device}'."
         )
     if zone.status == ZoneStatus.VALIDATED:
-        raise ApplicationError("Cette zone a déjà été validée.")
+        raise ApplicationError(_("Cette zone a déjà été validée."))
     if zone.session.status != InventorySession.Status.OPEN:
-        raise ApplicationError("La session d'inventaire est clôturée.")
+        raise ApplicationError(_("La session d'inventaire est clôturée."))
 
     # Snapshot theoretical stock from Sage cache at open time
     _snapshot_theoretical_stock(zone)
@@ -363,7 +364,7 @@ def unlock_inventory_zone(zone_id, user) -> InventoryZone:
     if not zone:
         raise ApplicationError("Zone introuvable.")
     if zone.status != ZoneStatus.IN_PROGRESS:
-        raise ApplicationError("Seules les zones en cours (verrou actif) peuvent être déverrouillées.")
+        raise ApplicationError(_("Seules les zones en cours (verrou actif) peuvent être déverrouillées."))
 
     previous_device = zone.locked_by_device
     zone.status = ZoneStatus.NOT_STARTED
@@ -543,7 +544,7 @@ def submit_inventory_to_sage(session_id, user) -> InventorySession:
         id=session_id, is_deleted=False, status=InventorySession.Status.OPEN
     ).first()
     if not session:
-        raise ApplicationError("Session introuvable ou déjà clôturée.")
+        raise ApplicationError(_("Session introuvable ou déjà clôturée."))
 
     non_validated = session.zones.filter(is_deleted=False).exclude(
         status=ZoneStatus.VALIDATED
@@ -620,9 +621,9 @@ def create_transfer(company, source_depot_id, destination_depot_id, user) -> Sto
     source = Depot.objects.filter(id=source_depot_id, company=company, is_deleted=False).first()
     dest = Depot.objects.filter(id=destination_depot_id, company=company, is_deleted=False).first()
     if not source or not dest:
-        raise ApplicationError("Dépôt source ou destination introuvable.")
+        raise ApplicationError(_("Dépôt source ou destination introuvable."))
     if source == dest:
-        raise ApplicationError("Les dépôts source et destination doivent être différents.")
+        raise ApplicationError(_("Les dépôts source et destination doivent être différents."))
     return StockTransfer.objects.create(
         company=company,
         reference=_generate_transfer_reference(company),
@@ -686,7 +687,7 @@ def validate_transfer(transfer_id, user) -> StockTransfer:
         id=transfer_id, is_deleted=False, status=StockTransfer.Status.DRAFT
     ).first()
     if not transfer:
-        raise ApplicationError("Transfert introuvable ou déjà validé.")
+        raise ApplicationError(_("Transfert introuvable ou déjà validé."))
     if not transfer.lines.filter(is_deleted=False).exists():
         raise ApplicationError("Impossible de valider un transfert sans articles.")
     transfer.status = StockTransfer.Status.VALIDATED
@@ -709,7 +710,7 @@ def ship_transfer(transfer_id, user) -> StockTransfer:
         id=transfer_id, is_deleted=False, status=StockTransfer.Status.VALIDATED
     ).first()
     if not transfer:
-        raise ApplicationError("Transfert introuvable ou non validé.")
+        raise ApplicationError(_("Transfert introuvable ou non validé."))
     # Copy qty_planned → qty_shipped for all lines
     transfer.lines.filter(is_deleted=False).update(qty_shipped=models.F("qty_planned"))
     transfer.status = StockTransfer.Status.SHIPPED
@@ -733,7 +734,7 @@ def receive_transfer_line(transfer_id, barcode: str, qty_received, user) -> Stoc
         id=transfer_id, is_deleted=False, status=StockTransfer.Status.SHIPPED
     ).first()
     if not transfer:
-        raise ApplicationError("Transfert introuvable ou non expédié.")
+        raise ApplicationError(_("Transfert introuvable ou non expédié."))
 
     variant = (
         ArticleVariant.objects.filter(barcode=barcode, is_deleted=False).first()
@@ -769,7 +770,7 @@ def close_transfer_reception(transfer_id, user) -> StockTransfer:
         id=transfer_id, is_deleted=False, status=StockTransfer.Status.SHIPPED
     ).first()
     if not transfer:
-        raise ApplicationError("Transfert introuvable ou non expédié.")
+        raise ApplicationError(_("Transfert introuvable ou non expédié."))
     transfer.status = StockTransfer.Status.RECEIVED
     transfer.received_at = timezone.now()
     transfer.received_by = user
@@ -810,7 +811,7 @@ def create_print_job(company, variant_ids: list, qty_per_variant: dict, print_ty
         id__in=variant_ids, article__company=company, is_deleted=False
     )
     if not variants.exists():
-        raise ApplicationError("Aucune variante valide trouvée.")
+        raise ApplicationError(_("Aucune variante valide trouvée."))
 
     campaign = None
     if campaign_id:
