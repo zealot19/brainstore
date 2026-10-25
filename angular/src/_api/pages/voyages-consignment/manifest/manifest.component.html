@@ -3,7 +3,9 @@
 </div>
 
 <div class="card"><div class="card-body">
-  <!-- Bandeau de filtres du voyage (options issues de la config). -->
+  <!-- Étape 1 : ces filtres servent à TROUVER LE VOYAGE à charger (pas les colis). -->
+  <h6 class="fw-bold text-primary mb-1"><i class="ti ti-bus me-1"></i>{{ 'cons.expedition.step1' | transloco }}</h6>
+  <p class="text-muted small mb-2">{{ 'cons.expedition.step1_hint' | transloco }}</p>
   <div class="row g-2 mb-3">
       <div class="col-6 col-md">
         <label class="form-label small mb-1">{{ 'cons.expedition.f_route' | transloco }}</label>
@@ -39,6 +41,9 @@
       </div>
     </div>
 
+  <!-- Étape 2 : les colis à charger sur le voyage choisi ci-dessus. -->
+  <h6 class="fw-bold text-primary mb-1 mt-2"><i class="ti ti-package me-1"></i>{{ 'cons.expedition.step2' | transloco }}</h6>
+  <p class="text-muted small mb-2">{{ 'cons.expedition.step2_hint' | transloco }}</p>
   <div class="row">
     <!-- Pool : colis à expédier (restant > 0) -->
     <div class="col-lg-7 mb-3">

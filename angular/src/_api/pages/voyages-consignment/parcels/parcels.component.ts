@@ -164,13 +164,15 @@ export class VcgParcelsComponent implements OnInit {
     const type = this.types.find(t => t.id === this.form.value.consignment_type_id);
     const amt = this.form.get('amount_due')!;
     this.priceFixed = false; this.priceHint = '';
+    // Prix fixe : on pose la valeur et le champ devient read-only côté template
+    // (`[readonly]="priceFixed"`). On N'UTILISE PAS disable()/enable() : basculer
+    // l'état désactivé d'un FormControl recalcule toute la validité du formulaire
+    // et déclenche un cycle de détection supplémentaire (lag perçu au choix du type).
     if (type?.fixed_price != null) {
       this.priceFixed = true;
       amt.setValue(type.fixed_price, { emitEvent: false });
       amt.setValidators([Validators.required]);
-      amt.disable({ emitEvent: false });
     } else {
-      amt.enable({ emitEvent: false });
       const v = [Validators.required, Validators.min(type?.min_price ?? 0)];
       if (type?.max_price != null) v.push(Validators.max(type.max_price));
       amt.setValidators(v);
