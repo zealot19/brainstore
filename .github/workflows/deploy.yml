@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          # Les dépendances sont sous backend/requirements/*.txt (pas de
+          # requirements.txt à la racine) : sans ce chemin, setup-python@v5
+          # échoue ("No file matched to **/requirements.txt") et bloque le déploiement.
+          cache-dependency-path: backend/requirements/*.txt
       - name: Install dependencies
         run: pip install -r requirements/local.txt
       - name: Run tests
@@ -53,6 +57,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          # Les dépendances sont sous backend/requirements/*.txt (pas de
+          # requirements.txt à la racine) : sans ce chemin, setup-python@v5
+          # échoue ("No file matched to **/requirements.txt") et bloque le déploiement.
+          cache-dependency-path: backend/requirements/*.txt
       - name: Install dependencies
         run: pip install -r requirements/local.txt
       - name: makemigrations --check + migrate (Postgres)
