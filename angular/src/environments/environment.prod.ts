@@ -3,7 +3,8 @@
 // ⚠️ Remplacer apiUrl par l'URL du backend Railway, suffixée par /api/v1.
 export const environment = {
   production: true,
-  apiUrl: 'http://13.61.100.94:8000/api/v1',
+  apiUrl: 'https://brainstore-test.up.railway.app/api/v1',
   // Institution servie par la PWA de réservation en ligne (définir au déploiement).
   onlineCompanyId: '00000000-0000-0000-0000-000000000000',
 };
+
