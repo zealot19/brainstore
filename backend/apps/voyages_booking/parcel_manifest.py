@@ -129,9 +129,10 @@ def render_parcel_manifest_html(data: dict, tpl: dict) -> str:
       .title .num {{ background:#dfe9fb; padding:0 5px; }}
       .meta {{ display:flex; justify-content:space-between; gap:20px; margin:6px 0 8px; }}
       .meta-l div, .meta-m {{ line-height:1.55; }}
-      table {{ width:100%; border-collapse:collapse; }}
-      th, td {{ border:1px solid #333; padding:3px 5px; vertical-align:top; }}
+      table {{ width:100%; border-collapse:collapse; font-size:10px; }}
+      th, td {{ border:1px solid #333; padding:3px 5px; vertical-align:top; font-size:10px; }}
       th {{ background:#eee; text-align:left; font-size:9.5px; }}
+      tr.grp td {{ font-size:10px; }}
       td.c {{ text-align:center; }}
       td.sig {{ min-width:90px; }}
       tr.grp td {{ background:#f3f3f3; font-weight:bold; border-top:2px solid #000; }}
