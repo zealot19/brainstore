@@ -58,6 +58,7 @@
           <th>{{ 'trips.list.col_arrival' | transloco }}</th>
           <th>{{ 'trips.list.col_seats' | transloco }}</th>
           <th>{{ 'trips.list.f_all_status' | transloco }}</th>
+          <th class="no-sort text-center">{{ 'trips.list.col_manifests' | transloco }}</th>
           <th class="no-sort">{{ 'shared.common.actions' | transloco }}</th>
         </tr></thead>
         <tbody>
@@ -76,13 +77,16 @@
                 <span class="badge" [class]="statusCss(t.status)">{{ statusLabel(t.status) }}</span>
                 @if (t.is_delayed) { <span class="badge bg-warning ms-1">{{ 'trips.list.delayed' | transloco }}</span> }
               </td>
+              <td class="text-center">
+                <!-- Manifestes du voyage (icônes). Colis maintenant ; bagages & passagers à venir. -->
+                <button class="btn btn-sm btn-outline-secondary" (click)="printManifest(t)" [title]="'trips.list.act_parcel_manifest' | transloco"><i class="ti ti-package"></i></button>
+              </td>
               <td class="action-table-data">
                 <div class="dropdown">
                   <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
                   <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="javascript:void(0);" (click)="open(t)"><i class="ti ti-eye me-2"></i>{{ 'trips.list.detail' | transloco }}</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0);" (click)="roadmap(t)"><i class="ti ti-clipboard-list me-2"></i>{{ 'trips.list.roadmap' | transloco }}</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0);" (click)="printManifest(t)"><i class="ti ti-package me-2"></i>{{ 'trips.list.act_parcel_manifest' | transloco }}</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0);" (click)="goReservations(t)"><i class="ti ti-ticket me-2"></i>{{ 'trips.list.act_reservations' | transloco }}</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0);" (click)="goExpenses(t)"><i class="ti ti-receipt me-2"></i>{{ 'trips.list.act_expenses' | transloco }}</a></li>
                     <li><hr class="dropdown-divider" /></li>

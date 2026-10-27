@@ -115,7 +115,7 @@ def render_parcel_manifest_html(data: dict, tpl: dict) -> str:
     return f"""<html><head><meta charset="utf-8"><style>
       @page {{ size: A4 portrait; margin: 10mm; }}
       * {{ box-sizing: border-box; }}
-      body {{ font-family: DejaVu Sans, Arial, sans-serif; font-size: 10px; color:#111; }}
+      body {{ font-family: DejaVu Sans, Arial, sans-serif; font-size: 10px; color:#111; padding-bottom:14mm; }}
       .hdr {{ display:flex; gap:10px; align-items:flex-start; }}
       .hdr-side {{ width:120px; }}
       .logo {{ max-height:66px; max-width:120px; object-fit:contain; }}
@@ -132,13 +132,15 @@ def render_parcel_manifest_html(data: dict, tpl: dict) -> str:
       table {{ width:100%; border-collapse:collapse; font-size:10px; }}
       th, td {{ border:1px solid #333; padding:3px 5px; vertical-align:top; font-size:10px; }}
       th {{ background:#eee; text-align:left; font-size:9.5px; }}
-      tr.grp td {{ font-size:10px; }}
       td.c {{ text-align:center; }}
       td.sig {{ min-width:90px; }}
-      tr.grp td {{ background:#f3f3f3; font-weight:bold; border-top:2px solid #000; }}
+      tr.grp td {{ background:#f3f3f3; font-weight:bold; border-top:2px solid #000; font-size:10px; }}
       td.empty {{ text-align:center; color:#777; }}
       small {{ color:#555; }}
-      .foot {{ margin-top:10px; padding-top:5px; border-top:2px solid #000; font-size:9px; }}
+      /* Pied de page légal collé au bas de la page (et répété sur chaque page à
+         l'impression) — plus directement sous le tableau. */
+      .foot {{ position:fixed; bottom:0; left:0; right:0; padding-top:4px;
+               border-top:2px solid #000; font-size:9px; background:#fff; }}
     </style></head><body>
       {head}
       <hr class="sep">

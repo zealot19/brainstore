@@ -1310,6 +1310,7 @@
       "open": "Ouvrir",
       "roadmap": "Feuille de route",
       "act_parcel_manifest": "Imprimer le manifeste colis",
+      "col_manifests": "Manifestes",
       "empty": "Aucun voyage.",
       "f_pattern": "Planification",
       "opt_no_pattern": "— Aucune (saisie manuelle) —",
