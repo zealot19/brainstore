@@ -2409,9 +2409,7 @@
       "subtitle": "Assign parcels to a voyage and dispatch",
       "info": "Pick a voyage then assign parcels, or dispatch without a voyage.",
       "step1": "1. Choose the trip",
-      "step1_hint": "These filters are used to find the TRIP to load (they do not filter the parcels).",
       "step2": "2. Parcels to load",
-      "step2_hint": "Parcels to dispatch on the trip chosen above.",
       "mode_voyage": "With voyage",
       "mode_sans": "Without voyage",
       "filter_dest": "Filter by destination",
@@ -2426,7 +2424,7 @@
       "empty_onboard": "No parcels on this voyage",
       "f_route": "Route",
       "f_dest": "Destination",
-      "f_day": "Voyage day",
+      "f_day": "Trip day",
       "f_time": "Time slot",
       "f_vehicle": "Vehicle / Code",
       "all": "All"

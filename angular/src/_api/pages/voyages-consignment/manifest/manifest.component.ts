@@ -7,13 +7,12 @@ import { TripService } from '../../../services/voyages/trip.service';
 import { RoadmapService } from '../../../services/voyages-booking/roadmap.service';
 import { RouteService } from '../../../services/voyages-config/route.service';
 import { ServicePointService } from '../../../services/voyages-config/service-point.service';
-import { TimeSlotService } from '../../../services/voyages-config/time-slot.service';
 import { printBlob } from '../../../../app/shared/print/print.util';
 import { Parcel, ParcelShipment } from '../../../models/voyages-consignment.models';
 import { AuthService } from '../../../services/auth/auth.service';
 import { PrintRouterService } from '../../../../app/shared/print/print-router.service';
 import { Trip } from '../../../models/voyages.models';
-import { Route, ServicePoint, TimeSlot } from '../../../models/voyages-config.models';
+import { Route, ServicePoint } from '../../../models/voyages-config.models';
 import { InfoBannerComponent } from '../../shared/info-banner/info-banner.component';
 import { HasPermissionDirective } from '../../../../app/shared/directives/has-permission.directive';
 import { ToastService } from '../../../../app/shared/toast/toast.service';
@@ -31,10 +30,10 @@ export class VcgManifestComponent implements OnInit {
   private auth = inject(AuthService);
   private printRouter = inject(PrintRouterService);
   allTrips: Trip[] = [];
-  routes: Route[] = []; destinations: ServicePoint[] = []; timeslots: TimeSlot[] = [];
-  // Filtres : options issues de la config (trajets, destinations, plages) ;
+  routes: Route[] = []; destinations: ServicePoint[] = [];
+  // Filtres : options issues de la config (trajets, destinations, jour) ;
   // « Véhicule / Code » identifie directement le voyage (pas de champ Voyage séparé).
-  fRoute = ''; fDest = ''; fDay = ''; fTime = ''; tripId = '';
+  fRoute = ''; fDest = ''; fDay = ''; tripId = '';
   ready: Parcel[] = []; onboard: ParcelShipment[] = [];
   totals = { count: 0, weight: 0 };
   selReady = new Set<string>();
@@ -43,27 +42,39 @@ export class VcgManifestComponent implements OnInit {
 
   constructor(private parcels: ParcelService, private tripSvc: TripService,
               private roadmap: RoadmapService, private routeSvc: RouteService,
-              private spSvc: ServicePointService, private tsSvc: TimeSlotService) {}
+              private spSvc: ServicePointService) {}
 
   ngOnInit(): void {
+    // Jour du voyage : par défaut aujourd'hui (jour local).
+    this.fDay = this.localToday();
     this.tripSvc.list({ status: 'pending' }).subscribe(t => this.allTrips = t ?? []);
     this.routeSvc.list().subscribe(r => this.routes = r ?? []);
     // M09 : destinations de colis = lieux rattachés à une agence.
     this.spSvc.list().subscribe(s => this.destinations = (s ?? []).filter(x => !!x.agency));
-    this.tsSvc.list().subscribe(t => this.timeslots = t ?? []);
     this.refresh();
   }
 
+  private localToday(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
   private dtDay(t: Trip): string { return (t.scheduled_departure || '').slice(0, 10); }
-  private dtTime(t: Trip): string { return (t.scheduled_departure || '').slice(11, 16); }
+
+  /** Un voyage dessert une destination si son trajet passe par ce point
+   *  (origine, escales ou terminus) — pas seulement si c'est son terminus. */
+  private routeServes(routeId: string, pointId: string): boolean {
+    const r = this.routes.find(x => x.id === routeId);
+    if (!r) return false;
+    if (r.origin === pointId || r.destination === pointId) return true;
+    return (r.stops ?? []).some(s => s.service_point === pointId);
+  }
 
   /** Voyages chargeables correspondant aux filtres (leur liste = le sélecteur Véhicule/Code). */
   get filteredTrips(): Trip[] {
     return this.allTrips.filter(t =>
       (!this.fRoute || t.route === this.fRoute) &&
-      (!this.fDest || t.destination === this.fDest) &&
-      (!this.fDay || this.dtDay(t) === this.fDay) &&
-      (!this.fTime || this.dtTime(t) === this.fTime.slice(0, 5)));
+      (!this.fDest || this.routeServes(t.route, this.fDest)) &&
+      (!this.fDay || this.dtDay(t) === this.fDay));
   }
   tripLabel(t: Trip): string {
     const ref = t.vehicle_plate || t.code || t.number;
