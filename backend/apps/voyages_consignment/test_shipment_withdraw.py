@@ -69,3 +69,33 @@ def test_unvalidate_requires_admin():
                                 company=g["company"], is_institution_admin=False)
     with pytest.raises(ApplicationError):
         unvalidate_shipment(s, user=clerk)
+
+
+@pytest.mark.django_db
+def test_validated_withdraw_is_admin_only():
+    """Un guichetier (non-admin) retire un brouillon mais PAS une expédition validée ;
+    seul l'admin peut retirer une expédition validée."""
+    from apps.system_config.models import Agency
+    from apps.users.services.user_services import create_user
+    g = _setup("wd5@x.com")
+    # Rattache le colis à une agence et crée un guichetier (non-admin) de cette agence.
+    ag = Agency.objects.create(company=g["company"], name="DLA", code="DLA")
+    g["parcel"].agency = ag
+    g["parcel"].save(update_fields=["agency"])
+    clerk, _ = create_user(created_by=g["admin"], company=g["company"], email="clerk-wd@x.com",
+                           first_name="G", last_name="U", is_institution_admin=False,
+                           default_agency_id=ag.id, agency_ids=[ag.id])
+    # Brouillon (trip1) : le guichetier peut retirer.
+    s_draft = create_shipment(g["parcel"], trip=g["trip1"], quantity=3, user=clerk)
+    withdraw_shipment(s_draft, quantity=1, user=clerk)
+    s_draft.refresh_from_db()
+    assert s_draft.quantity == 2
+    # Validé (trip2, expédition distincte) : le guichetier ne peut plus retirer…
+    s = create_shipment(g["parcel"], trip=g["trip2"], quantity=4, user=clerk)
+    validate_shipment(s, user=clerk)
+    with pytest.raises(ApplicationError):
+        withdraw_shipment(s, quantity=1, user=clerk)
+    # … mais l'admin le peut.
+    withdraw_shipment(s, quantity=1, user=g["admin"])
+    s.refresh_from_db()
+    assert s.quantity == 3

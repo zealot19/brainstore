@@ -119,7 +119,11 @@ export class VcgManifestComponent implements OnInit {
    *  reste des pièces ; il ne disparaît qu'une fois tout chargé). */
   get pool(): Parcel[] { return this.ready.filter(p => this.rem(p) > 0); }
   isAdmin(): boolean { const u: any = this.auth.currentUser; return !!(u && (u.is_superuser || u.is_institution_admin)); }
-  canWithdraw(s: ParcelShipment): boolean { return !['in_transit', 'arrived', 'received', 'cancelled'].includes(s.status); }
+  canWithdraw(s: ParcelShipment): boolean {
+    if (['in_transit', 'arrived', 'received', 'cancelled'].includes(s.status)) return false;
+    // Un brouillon est retirable par le guichetier ; une fois validé, admin seulement.
+    return s.status === 'draft' || this.isAdmin();
+  }
   get hasDraft(): boolean { return this.onboard.some(s => s.status === 'draft'); }
 
   isSel(id: string): boolean { return this.selReady.has(id); }

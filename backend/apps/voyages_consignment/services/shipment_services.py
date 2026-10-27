@@ -198,6 +198,12 @@ def withdraw_shipment(shipment, *, quantity, user=None):
     if shipment.status in (ParcelShipment.Status.IN_TRANSIT, ParcelShipment.Status.ARRIVED,
                            ParcelShipment.Status.RECEIVED, ParcelShipment.Status.CANCELLED):
         raise ApplicationError(_("Cette expédition est partie ou clôturée : retrait impossible."))
+    # Une fois l'expédition VALIDÉE (« bon pour le départ »), seul un administrateur
+    # peut la retirer. Le guichetier ne peut retirer qu'un chargement en brouillon.
+    is_admin = (user is None or getattr(user, "is_superuser", False)
+                or getattr(user, "is_institution_admin", False))
+    if shipment.status != ParcelShipment.Status.DRAFT and not is_admin:
+        raise ApplicationError(_("Seul un administrateur peut retirer un colis déjà validé."))
     qty = int(quantity or 0)
     if qty < 1 or qty > shipment.quantity:
         raise ApplicationError(_("Quantité à retirer invalide (1 à %(n)s).") % {"n": shipment.quantity})

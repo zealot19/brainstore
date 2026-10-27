@@ -1097,3 +1097,6 @@ msgid "company_id requis pour les super administrateurs."
 msgstr "company_id required for super administrators."
 msgid "Équipage introuvable."
 msgstr "Crew not found."
+
+msgid "Seul un administrateur peut retirer un colis déjà validé."
+msgstr "Only an administrator can remove a parcel that is already validated."
