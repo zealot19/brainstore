@@ -94,8 +94,8 @@ def _style_80(width_mm=80.0, height_mm=0.0):
   .lbl{{text-align:center}}
   .lbl-logo{{margin-bottom:1.5mm}}
   .lbl-logo img{{max-height:14mm;max-width:40mm;object-fit:contain}}
-  .lbl-ref{{font-weight:800;font-size:18pt;margin-bottom:1.5mm}}
-  .lbl-f{{font-size:14pt;font-weight:700;text-align:left;margin:1mm 0}}
+  .lbl-ref{{font-weight:800;font-size:16pt;margin-bottom:1.5mm}}
+  .lbl-f{{font-size:9pt;font-weight:600;text-align:center;margin:0.5mm 0;line-height:1.25}}
   .lbl-bc{{margin-top:1.5mm}}
   .lbl-bc svg{{max-width:70mm;height:auto}}
 </style>"""
@@ -245,9 +245,7 @@ def build_parcel_label(parcel, tpl, *, agent="", logo_url="", width_mm=80.0, hei
     one = lambda i: f"""<div class="doc lbl">
       <div class="lbl-logo">{logo}</div>
       <div class="lbl-ref">{e(parcel.reference)}{'' if n == 1 else f' &middot; {i}/{n}'}</div>
-      <div class="lbl-f"><b>Sender</b>: {e(parcel.sender_name)}</div>
-      <div class="lbl-f"><b>Receiver</b>: {e(parcel.recipient_name)}</div>
-      <div class="lbl-f"><b>Destination</b>: {e(dest)}</div>
+      <div class="lbl-f">{e(parcel.sender_name)} &rarr; {e(parcel.recipient_name)} &middot; {e(dest)}</div>
       <div class="lbl-bc">{barcode}</div>
     </div>"""
     cut = '<div class="cutline">- - - - - - decouper - - - - - -</div>'
