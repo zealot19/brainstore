@@ -1,0 +1,33 @@
+# Serveur central (online master) — variante NGINX.
+#
+# Docker ne lance QUE la base + le backend Django. Le frontend Angular et le HTTPS
+# sont servis par NGINX installé sur l'HÔTE Ubuntu (voir « vps online hosting.md »
+# à la racine du dépôt). Le backend n'est publié que sur 127.0.0.1 : il n'est joignable
+# que par NGINX (jamais exposé directement sur Internet).
+#
+#   docker compose -f docker-compose.nginx.yml up -d --build
+#   docker compose -f docker-compose.nginx.yml exec web python manage.py createsuperuser
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:                      # Django + Gunicorn (le Dockerfile applique migrate au démarrage)
+    build: ../../backend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"   # UNIQUEMENT local : seul NGINX (hôte) y accède
+    volumes:
+      - ./media:/app/media        # fichiers téléversés, servis directement par NGINX
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
