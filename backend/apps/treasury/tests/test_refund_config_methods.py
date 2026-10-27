@@ -67,3 +67,25 @@ def test_refund_on_cancel_uses_fixed_amount():
     assert txn.transaction_type == Transaction.Type.EXPENSE
     assert txn.category == Transaction.Category.REFUND
     assert txn.amount == Decimal("300")
+
+
+@pytest.mark.django_db
+def test_no_company_cannot_write_global_params():
+    """Régression : un utilisateur sans institution ne doit PAS écrire de paramètre
+    de remboursement GLOBAL (company=None), sinon il fuite vers toutes les sociétés."""
+    from apps.core.exceptions import ApplicationError
+    from apps.system_config.models import Parameter
+    with pytest.raises(ApplicationError):
+        set_refund_config(None, {"ticket": {"method": "fixed", "amount": "100"}})
+    assert not Parameter.objects.filter(
+        key__startswith="treasury.refund_", company__isnull=True).exists()
+
+
+@pytest.mark.django_db
+def test_all_kinds_default_to_percentage():
+    """Régression : sans config ni paramètre global parasite, les trois types
+    partent en 'percentage' (et non 'fixed' qui donnerait un remboursement nul)."""
+    c = _company("RefundDefaults")
+    cfg = get_refund_config(c)
+    for kind in ("ticket", "colis", "bagage"):
+        assert cfg[kind]["method"] == METHOD_PERCENTAGE

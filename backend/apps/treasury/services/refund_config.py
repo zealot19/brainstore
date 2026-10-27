@@ -134,8 +134,17 @@ def _set_amount(company, kind: str, amount) -> Decimal:
     return amount
 
 
+def _require_company(company):
+    # Les paramètres de remboursement sont TOUJOURS par société. Interdire company=None
+    # évite d'écrire un paramètre GLOBAL (company IS NULL) qui fuiterait vers toutes
+    # les institutions via le repli global de get_param.
+    if company is None:
+        raise ApplicationError(_("Votre compte n'est pas associé à une institution."))
+
+
 def set_refund_rates(company, rates: dict, user=None) -> dict:
     """Définit les taux (%) fournis (clés ticket/colis/bagage) ; conserve les autres."""
+    _require_company(company)
     out = {}
     for kind in KINDS:
         if kind in rates and rates[kind] is not None:
@@ -154,6 +163,7 @@ def set_refund_rate(company, rate, user=None) -> Decimal:
 def set_refund_config(company, cfg: dict, user=None) -> dict:
     """Définit méthode/taux/montant par type. `cfg` = {kind: {method?, rate?, amount?}} ;
     seuls les champs fournis sont écrits, les autres sont conservés."""
+    _require_company(company)
     for kind, v in cfg.items():
         if kind not in KINDS or not isinstance(v, dict):
             continue

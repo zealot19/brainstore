@@ -1189,7 +1189,10 @@ class RefundRateView(APIView):
 
     def get(self, request):
         from apps.treasury.services.refund_config import get_refund_config
-        return success_response(self._serialize(get_refund_config(_company(request))))
+        company = _company(request)
+        if company is None:
+            return error_response(_("Votre compte n'est pas associé à une institution."), status_code=400)
+        return success_response(self._serialize(get_refund_config(company)))
 
     def put(self, request):
         from apps.treasury.services.refund_config import (
@@ -1198,6 +1201,12 @@ class RefundRateView(APIView):
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         company = _company(request)
+        # Garde-fou : un utilisateur sans institution (super-admin plateforme) ne doit
+        # PAS écrire la config de remboursement, sinon elle est enregistrée en paramètre
+        # GLOBAL (company=None) qui fuite vers toutes les sociétés (bug : méthode « fixed »
+        # imposée à tout le monde, remboursements silencieusement à 0).
+        if company is None:
+            return error_response(_("Votre compte n'est pas associé à une institution."), status_code=400)
         try:
             per_kind = {k: d[k] for k in ("ticket", "colis", "bagage") if k in d}
             if per_kind:
