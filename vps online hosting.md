@@ -16,6 +16,53 @@ Throughout, replace **`erp.mondomaine.com`** with your real domain and
 
 ---
 
+## Two modes: pick one
+
+- **Mode B — Domain + HTTPS** (recommended, the main steps below). You own a domain and
+  get a real certificate from Let's Encrypt.
+- **Mode A — IP only, HTTP** (no domain yet). You reach the app at `http://YOUR_VPS_IP`.
+  **No HTTPS**: Let's Encrypt does **not** issue certificates for a bare IP. Use this to
+  get running now, then switch to Mode B when you buy a domain.
+
+### Mode A — IP only (HTTP, no domain yet)
+
+Follow all the steps below **with these changes**, and **skip steps 1 and 10** (DNS +
+certbot):
+
+1. **Step 5 (frontend API URL)** — set it to a relative path so it works on any IP:
+   ```ts
+   apiUrl: '/api/v1',
+   ```
+2. **Step 7 (`.env`)** — use your IP and **disable the HTTPS enforcement** (otherwise Django
+   force‑redirects to https and login breaks):
+   ```dotenv
+   ALLOWED_HOSTS=203.0.113.10
+   CSRF_TRUSTED_ORIGINS=http://203.0.113.10
+   SECURE_SSL_REDIRECT=0
+   SESSION_COOKIE_SECURE=0
+   CSRF_COOKIE_SECURE=0
+   ```
+   (Replace `203.0.113.10` with your real VPS IP.)
+3. **Step 9 (NGINX)** — install the **IP** vhost instead of the domain one:
+   ```bash
+   sudo cp /opt/erp/deploy/vps/nginx-erp-ip.conf /etc/nginx/sites-available/erp
+   ```
+   (No domain to edit — `server_name _;` already catches any IP. Fix the `/opt/erp` paths
+   only if you cloned elsewhere.)
+4. **Skip step 10** (certbot). You're done after step 9 — open `http://YOUR_VPS_IP`.
+
+**Later, to upgrade to a domain + HTTPS:** buy the domain, do step 1 (DNS A record), set
+`apiUrl` back to `https://your.domain/api/v1` and rebuild (steps 5–6), put the domain back
+in `.env` and **remove** the three `SECURE_*=0` / cookie lines (step 7), swap the vhost to
+`nginx-erp.conf` with your domain (step 9), then run certbot (step 10).
+
+> ⚠️ **If `docker compose ... up --build` fails on `apt-get` with
+> `Temporary failure resolving 'deb.debian.org'`** — that's a Docker **DNS** problem on the
+> VPS, not a config issue. Fix it before anything else: see **Troubleshooting → Docker build
+> can't resolve apt mirrors**.
+
+---
+
 ## 0. Prerequisites
 
 - An **Ubuntu 22.04 / 24.04** VPS with root or sudo access, **≥ 2 GB RAM** recommended
@@ -325,8 +372,34 @@ Copy these off the VPS regularly (e.g. `scp` to your machine or an object store)
 | `DisallowedHost` / 400 from Django | `ALLOWED_HOSTS` in `.env` doesn't match your domain. Fix, then `docker compose -f docker-compose.nginx.yml up -d`. |
 | CSRF errors in admin/forms | `CSRF_TRUSTED_ORIGINS=https://erp.mondomaine.com` in `.env`. |
 | Media (logos) 404 | The `/media/` `alias` path in the NGINX config must match the compose bind‑mount `deploy/vps/media`. |
-| Redirect loop (too many redirects) | NGINX must send `proxy_set_header X-Forwarded-Proto $scheme;` (it's in the shipped config). |
-| Frontend calls the wrong API | You forgot step 5 (set `apiUrl` to your domain) **before** building in step 6. Rebuild. |
+| Redirect loop (too many redirects) | **IP‑only (Mode A):** you must set `SECURE_SSL_REDIRECT=0`, `SESSION_COOKIE_SECURE=0`, `CSRF_COOKIE_SECURE=0` in `.env` (Django forces https otherwise). **Domain:** NGINX must send `proxy_set_header X-Forwarded-Proto $scheme;` (shipped config does). |
+| Frontend calls the wrong API | You forgot step 5 (set `apiUrl`) **before** building in step 6. For IP‑only use `'/api/v1'`. Rebuild. |
+| **Build fails: `Temporary failure resolving 'deb.debian.org'`** | Docker **DNS** problem on the VPS — see the fix just below. |
+
+### Docker build can't resolve apt mirrors (`deb.debian.org`)
+
+The image pulls fine but `apt-get` inside the build times out / can't resolve DNS. Give the
+Docker daemon public DNS resolvers:
+
+```bash
+# Create/append Docker daemon DNS config
+echo '{ "dns": ["8.8.8.8", "1.1.1.1"] }' | sudo tee /etc/docker/daemon.json
+sudo systemctl restart docker
+
+# Then rebuild
+cd /opt/erp/deploy/vps
+sudo docker compose -f docker-compose.nginx.yml build --no-cache web
+sudo docker compose -f docker-compose.nginx.yml up -d
+```
+
+If it still fails, it's usually a VPS network MTU issue (common on some providers). Try
+lowering the Docker MTU:
+```bash
+echo '{ "dns": ["8.8.8.8","1.1.1.1"], "mtu": 1400 }' | sudo tee /etc/docker/daemon.json
+sudo systemctl restart docker
+```
+…then rebuild. As a last resort, confirm the host itself has outbound DNS/HTTP
+(`curl -I http://deb.debian.org` from the VPS shell, not inside Docker).
 
 Useful commands:
 ```bash
@@ -342,8 +415,9 @@ docker compose -f docker-compose.nginx.yml restart
 
 ### Files used by this guide (in the repo)
 - `deploy/vps/docker-compose.nginx.yml` — DB + backend (NGINX variant).
-- `deploy/vps/nginx-erp.conf` — host NGINX site config (HTTP; certbot adds HTTPS).
-- `deploy/vps/.env.example` — environment template (copy to `.env`).
+- `deploy/vps/nginx-erp.conf` — host NGINX site config for a **domain** (HTTP; certbot adds HTTPS).
+- `deploy/vps/nginx-erp-ip.conf` — host NGINX site config for **IP only** (HTTP, no domain).
+- `deploy/vps/.env.example` — environment template (copy to `.env`; includes the IP‑only toggles).
 
 > The repo also ships a **Caddy** variant (`deploy/vps/docker-compose.yml` + `Caddyfile`)
 > that does HTTPS automatically in a container. This guide intentionally uses **NGINX**

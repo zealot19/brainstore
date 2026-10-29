@@ -32,12 +32,15 @@ STORAGES = {
 # ── Sécurité HTTP ─────────────────────────────────────────────────────────────
 # Render/Vercel terminent le TLS en amont : sans ce header, SECURE_SSL_REDIRECT boucle.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000
+# HTTPS imposé par défaut (Railway/Vercel, ou VPS avec domaine + certificat). Sur un VPS
+# servi en HTTP SUR UNE IP (sans domaine, sans TLS), mettre SECURE_SSL_REDIRECT=0 et les
+# cookies non-sécurisés dans .env, sinon redirection https infinie et connexion cassée.
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 # Tant qu'aucun SMTP n'est configuré (EMAIL_HOST vide), on n'échoue pas au démarrage :
