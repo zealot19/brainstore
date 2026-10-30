@@ -428,6 +428,7 @@ Copy these off the VPS regularly (e.g. `scp` to your machine or an object store)
 | Redirect loop (too many redirects) | **IP‑only (Mode A):** you must set `SECURE_SSL_REDIRECT=0`, `SESSION_COOKIE_SECURE=0`, `CSRF_COOKIE_SECURE=0` in `.env` (Django forces https otherwise). **Domain:** NGINX must send `proxy_set_header X-Forwarded-Proto $scheme;` (shipped config does). |
 | Frontend calls the wrong API | You forgot step 5 (set `apiUrl`) **before** building in step 6. For IP‑only use `'/api/v1'`. Rebuild. |
 | **Build fails: `Temporary failure resolving 'deb.debian.org'`** | Docker **DNS** problem on the VPS — see the fix just below. |
+| `password authentication failed for user "erp"` | The `pgdata` volume was created with a different password than `.env` now has (Postgres sets it only on first init). See the fix just below. |
 
 ### Docker build network failures (DNS, MTU, registry timeouts)
 
@@ -474,6 +475,30 @@ DOCKER_BUILDKIT=0 COMPOSE_DOCKER_CLI_BUILD=0 sudo -E docker compose -f docker-co
 
 As a sanity check, confirm the host itself has outbound access (outside Docker):
 `curl -I https://public.ecr.aws` and `curl -I http://deb.debian.org`.
+
+### `password authentication failed for user "erp"`
+
+Postgres sets the password **only when it first initializes an empty data volume**. If you
+ran `up` once before setting the real password (or with a placeholder), the `pgdata` volume
+now holds the **old** password — editing `.env` afterwards doesn't change it.
+
+First make sure the password is **identical** in both places in `.env` (`POSTGRES_PASSWORD`
+and inside `DATABASE_URL`) and that special chars are URL‑encoded in `DATABASE_URL`
+(`@`→`%40`, `:`→`%3A`, `/`→`%2F`). Then:
+
+```bash
+# Fresh deploy (no data to keep) — recreate the DB volume so it picks up the new password:
+cd /opt/erp/deploy/vps
+docker compose -f docker-compose.nginx.yml down -v      # -v DELETES the DB volume
+docker compose -f docker-compose.nginx.yml up -d
+```
+
+```bash
+# OR keep existing data — reset the role's password in place (local socket = trust):
+docker compose -f docker-compose.nginx.yml exec db \
+  psql -U erp -d erp -c "ALTER USER erp WITH PASSWORD 'EXACT_PASSWORD_FROM_ENV';"
+docker compose -f docker-compose.nginx.yml restart web
+```
 
 Useful commands:
 ```bash
