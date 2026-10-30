@@ -56,6 +56,59 @@ certbot):
 in `.env` and **remove** the three `SECURE_*=0` / cookie lines (step 7), swap the vhost to
 `nginx-erp.conf` with your domain (step 9), then run certbot (step 10).
 
+### Want HTTPS without a domain? (securing an IP deploy)
+
+"No domain" doesn't have to mean "no HTTPS". Two options:
+
+#### Option 1 — Trusted HTTPS via a free `sslip.io` hostname (recommended)
+
+`sslip.io` (and `nip.io`) resolve `203-0-113-10.sslip.io` → `203.0.113.10` automatically,
+with no DNS setup. Because it's a real hostname, **Let's Encrypt issues a normal trusted
+certificate** for it. You get a real padlock + auto‑renew, for free.
+
+Just do the **Mode B** steps (the main guide), using `YOUR-IP-with-dashes.sslip.io` as the
+"domain" everywhere:
+- **Step 5:** `apiUrl: 'https://203-0-113-10.sslip.io/api/v1'`
+- **Step 7 `.env`:** `ALLOWED_HOSTS=203-0-113-10.sslip.io` /
+  `CSRF_TRUSTED_ORIGINS=https://203-0-113-10.sslip.io` (keep the `SECURE_*` at their secure
+  defaults — do **not** set them to 0).
+- **Step 9:** use `nginx-erp.conf`, set `server_name 203-0-113-10.sslip.io;`
+- **Step 10:** `sudo certbot --nginx -d 203-0-113-10.sslip.io -m you@email --agree-tos --redirect`
+
+That's genuine, browser‑trusted HTTPS pointing at your IP, no purchase.
+
+#### Option 2 — Self‑signed certificate on the raw IP (`https://YOUR_IP`)
+
+Real encryption, URL stays the bare IP, but **browsers show a "Not secure / proceed anyway"
+warning** (the cert isn't signed by a trusted authority). OK for internal/admin use.
+
+Follow Mode A, but at **step 9** do this instead:
+
+```bash
+# 1) Generate a self-signed cert for your IP (replace 203.0.113.10)
+sudo mkdir -p /etc/ssl/erp
+sudo openssl req -x509 -nodes -days 825 -newkey rsa:2048 \
+  -keyout /etc/ssl/erp/selfsigned.key -out /etc/ssl/erp/selfsigned.crt \
+  -subj "/CN=203.0.113.10" -addext "subjectAltName=IP:203.0.113.10"
+
+# 2) Install the HTTPS (self-signed) vhost
+sudo cp /opt/erp/deploy/vps/nginx-erp-ip-https.conf /etc/nginx/sites-available/erp
+sudo ln -sf /etc/nginx/sites-available/erp /etc/nginx/sites-enabled/erp
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+In **step 7 `.env`** for Option 2, the connection *is* HTTPS, so keep secure cookies but
+turn **off HSTS** (never pin a self‑signed cert) and let NGINX do the redirect:
+```dotenv
+ALLOWED_HOSTS=203.0.113.10
+CSRF_TRUSTED_ORIGINS=https://203.0.113.10
+SECURE_SSL_REDIRECT=0          # NGINX already redirects 80 -> 443
+SECURE_HSTS_SECONDS=0          # do NOT HSTS-pin a self-signed cert
+# leave SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE at their secure defaults (1)
+```
+Open `https://203.0.113.10` and accept the browser warning once.
+
 > ⚠️ **If `docker compose ... up --build` fails on `apt-get` with
 > `Temporary failure resolving 'deb.debian.org'`** — that's a Docker **DNS** problem on the
 > VPS, not a config issue. Fix it before anything else: see **Troubleshooting → Docker build
@@ -417,6 +470,7 @@ docker compose -f docker-compose.nginx.yml restart
 - `deploy/vps/docker-compose.nginx.yml` — DB + backend (NGINX variant).
 - `deploy/vps/nginx-erp.conf` — host NGINX site config for a **domain** (HTTP; certbot adds HTTPS).
 - `deploy/vps/nginx-erp-ip.conf` — host NGINX site config for **IP only** (HTTP, no domain).
+- `deploy/vps/nginx-erp-ip-https.conf` — **IP only** over **HTTPS** with a self‑signed cert.
 - `deploy/vps/.env.example` — environment template (copy to `.env`; includes the IP‑only toggles).
 
 > The repo also ships a **Caddy** variant (`deploy/vps/docker-compose.yml` + `Caddyfile`)
