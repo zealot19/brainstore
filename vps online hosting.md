@@ -329,7 +329,7 @@ sudo ln -sf /etc/nginx/sites-available/erp /etc/nginx/sites-enabled/erp
 sudo rm -f /etc/nginx/sites-enabled/default
 
 # NGINX (www-data) must be able to read the Angular build + media
-sudo chmod o+x /opt /opt/erp /opt/erp/angular /opt/erp/deploy /opt/erp/deploy/vps
+sudo chmod o+x /opt /opt/erp /opt/erp/brainstore /opt/erp/brainstore/angular /opt/erp/brainstore/deploy /opt/erp/brainstore/deploy/vps
 
 # Test config and reload
 sudo nginx -t
@@ -401,16 +401,52 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## 13. Backups (do this!)
 
-```bash
-# Database dump
-cd /opt/erp/deploy/vps
-docker compose -f docker-compose.nginx.yml exec -T db \
-  pg_dump -U erp erp | gzip > ~/erp-db-$(date +%F).sql.gz
+Two ready scripts ship in `deploy/vps/`: **`backup.sh`** (dumps the DB + media, timestamped,
+auto‑rotated) and **`restore.sh`**.
 
-# Uploaded media
-tar czf ~/erp-media-$(date +%F).tar.gz -C /opt/erp/deploy/vps media
+### Local backups on the VPS (automated)
+
+```bash
+cd /opt/erp/deploy/vps
+
+# One-off backup -> /opt/erp/backups/db_<stamp>.dump + media_<stamp>.tar.gz
+sudo ./backup.sh
+
+# See what you've got
+ls -lh /opt/erp/backups
 ```
-Copy these off the VPS regularly (e.g. `scp` to your machine or an object store).
+
+**Schedule it daily** (cron runs as root because Docker here runs as root):
+```bash
+sudo crontab -e
+# add this line — every day at 02:30, keep 14 days (default):
+30 2 * * * /opt/erp/deploy/vps/backup.sh >> /opt/erp/backups/backup.log 2>&1
+```
+Tune retention with `KEEP_DAYS` (e.g. `KEEP_DAYS=30 ./backup.sh`) or the folder with
+`BACKUP_DIR=/mnt/disk/backups ./backup.sh`.
+
+### Keep a copy OFF the VPS (important)
+
+Backups on the same server don't help if the VPS dies. Pull them to your own machine
+regularly — run this **on your laptop**:
+```bash
+rsync -avz --progress USER@YOUR_VPS_IP:/opt/erp/backups/ ~/erp-backups/
+# or a single file:
+scp USER@YOUR_VPS_IP:/opt/erp/backups/db_2026-10-30_0230.dump ~/erp-backups/
+```
+(For a bigger company, also push to object storage — S3/Backblaze/etc.)
+
+### Restore (test it at least once!)
+
+```bash
+cd /opt/erp/deploy/vps
+# DB only:
+sudo ./restore.sh /opt/erp/backups/db_2026-10-30_0230.dump
+# DB + media:
+sudo ./restore.sh /opt/erp/backups/db_2026-10-30_0230.dump /opt/erp/backups/media_2026-10-30_0230.tar.gz
+```
+`restore.sh` stops `web`, restores the dump (dropping/recreating objects), restores media if
+given, then brings `web` back up. A backup you've never restored is a guess — try it once.
 
 ---
 
@@ -518,6 +554,7 @@ docker compose -f docker-compose.nginx.yml restart
 - `deploy/vps/nginx-erp-ip.conf` — host NGINX site config for **IP only** (HTTP, no domain).
 - `deploy/vps/nginx-erp-ip-https.conf` — **IP only** over **HTTPS** with a self‑signed cert.
 - `deploy/vps/.env.example` — environment template (copy to `.env`; includes the IP‑only toggles).
+- `deploy/vps/backup.sh` / `deploy/vps/restore.sh` — local DB + media backup / restore.
 
 > The repo also ships a **Caddy** variant (`deploy/vps/docker-compose.yml` + `Caddyfile`)
 > that does HTTPS automatically in a container. This guide intentionally uses **NGINX**
