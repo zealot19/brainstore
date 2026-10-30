@@ -429,30 +429,51 @@ Copy these off the VPS regularly (e.g. `scp` to your machine or an object store)
 | Frontend calls the wrong API | You forgot step 5 (set `apiUrl`) **before** building in step 6. For IP‑only use `'/api/v1'`. Rebuild. |
 | **Build fails: `Temporary failure resolving 'deb.debian.org'`** | Docker **DNS** problem on the VPS — see the fix just below. |
 
-### Docker build can't resolve apt mirrors (`deb.debian.org`)
+### Docker build network failures (DNS, MTU, registry timeouts)
 
-The image pulls fine but `apt-get` inside the build times out / can't resolve DNS. Give the
-Docker daemon public DNS resolvers:
+Symptoms during `up -d --build`, all caused by the VPS's outbound network, **not** the app:
+- `Temporary failure resolving 'deb.debian.org'` (apt can't resolve) → **DNS**.
+- `failed to resolve source metadata … dial tcp …:443: i/o timeout` when pulling the base
+  image → **TCP connection stalls**, almost always an **MTU** problem (large TLS packets
+  dropped on a tunneled/NAT'd VPS).
 
+**Step 1 — Is it MTU?** Test whether full‑size (1500) packets pass:
 ```bash
-# Create/append Docker daemon DNS config
-echo '{ "dns": ["8.8.8.8", "1.1.1.1"] }' | sudo tee /etc/docker/daemon.json
-sudo systemctl restart docker
-
-# Then rebuild
-cd /opt/erp/deploy/vps
-sudo docker compose -f docker-compose.nginx.yml build --no-cache web
-sudo docker compose -f docker-compose.nginx.yml up -d
+ping -M do -s 1472 -c 3 1.1.1.1      # 1472 + 28 = 1500
+# If that fails but this works, your path MTU is < 1500 (the cause):
+ping -M do -s 1372 -c 3 1.1.1.1      # 1372 + 28 = 1400
 ```
 
-If it still fails, it's usually a VPS network MTU issue (common on some providers). Try
-lowering the Docker MTU:
+**Step 2 — Give Docker public DNS + a smaller MTU, then restart:**
 ```bash
 echo '{ "dns": ["8.8.8.8","1.1.1.1"], "mtu": 1400 }' | sudo tee /etc/docker/daemon.json
 sudo systemctl restart docker
 ```
-…then rebuild. As a last resort, confirm the host itself has outbound DNS/HTTP
-(`curl -I http://deb.debian.org` from the VPS shell, not inside Docker).
+(If step 1 only passed at `-s 1372` or lower, use `"mtu": 1280` — the safest value.)
+
+**Step 3 — Build with the _classic_ builder.** The `daemon.json` MTU applies to the normal
+Docker bridge, but **BuildKit** (lines like "load local bake definitions") uses its own
+network and ignores it. Force the old builder so the MTU applies, and pre‑pull the base
+image through the daemon first:
+```bash
+sudo docker pull public.ecr.aws/docker/library/python:3.12-slim
+cd /opt/erp/deploy/vps
+export DOCKER_BUILDKIT=0 COMPOSE_DOCKER_CLI_BUILD=0
+sudo -E docker compose -f docker-compose.nginx.yml build web
+sudo docker compose -f docker-compose.nginx.yml up -d
+```
+With BuildKit off, once the base image is local the build won't re‑contact the registry.
+
+**Fallback — ECR unreachable:** pull the same image from Docker Hub and retag it to the
+name the Dockerfile expects:
+```bash
+sudo docker pull python:3.12-slim
+sudo docker tag python:3.12-slim public.ecr.aws/docker/library/python:3.12-slim
+DOCKER_BUILDKIT=0 COMPOSE_DOCKER_CLI_BUILD=0 sudo -E docker compose -f docker-compose.nginx.yml build web
+```
+
+As a sanity check, confirm the host itself has outbound access (outside Docker):
+`curl -I https://public.ecr.aws` and `curl -I http://deb.debian.org`.
 
 Useful commands:
 ```bash
