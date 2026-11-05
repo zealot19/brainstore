@@ -11,7 +11,7 @@ import os
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.db import IntegrityError, transaction
-from django.db.models import ForeignKey
+from django.db.models import DateField, DateTimeField, ForeignKey
 from django.utils.dateparse import parse_datetime
 
 from apps.sync import membership
@@ -77,6 +77,14 @@ def _to_python(field, value):
         return None
     if isinstance(field, ForeignKey):
         return field.target_field.to_python(value)
+    # Un DateField PUR (pas un DateTimeField, qui en hérite) peut recevoir une valeur
+    # datetime ISO complète (ex. « 2026-10-12T08:44:45.124265+00:00 ») : DateField.to_python
+    # n'accepte que AAAA-MM-JJ et lèverait une ValidationError qui bloque tout le cycle de
+    # synchro. On conserve la partie date.
+    if isinstance(field, DateField) and not isinstance(field, DateTimeField) and isinstance(value, str):
+        dt = parse_datetime(value)
+        if dt is not None:
+            value = dt.date().isoformat()
     return field.to_python(value)
 
 
