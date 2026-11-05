@@ -182,17 +182,20 @@ REM  --install-autostart : demarrage auto a l'ouverture de session
 REM  + ouverture du pare-feu (lancer en tant qu'administrateur)
 REM ============================================================
 :install
-echo [config] Demarrage automatique a l'ouverture de session ...
-powershell -NoProfile -Command "$w=New-Object -ComObject WScript.Shell; $p=[Environment]::GetFolderPath('Startup')+'\ERP SCIG.lnk'; $s=$w.CreateShortcut($p); $s.TargetPath='%~f0'; $s.WorkingDirectory='%~dp0'; $s.Save()"
-echo [config] Raccourci cree dans le dossier Demarrage.
+echo [config] Demarrage automatique a l'ouverture de session (en arriere-plan, sans fenetre) ...
+powershell -NoProfile -Command "$w=New-Object -ComObject WScript.Shell; $p=[Environment]::GetFolderPath('Startup')+'\ERP SCIG.lnk'; $s=$w.CreateShortcut($p); $s.TargetPath='%~dp0start-erp-background.vbs'; $s.WorkingDirectory='%~dp0'; $s.Save()"
+echo [config] Raccourci cree dans le dossier Demarrage (lance start-erp-background.vbs).
 echo [config] Ouverture du pare-feu (ports %UI_PORT% et %API_PORT%) ...
 netsh advfirewall firewall delete rule name="ERP UI" >nul 2>&1
 netsh advfirewall firewall delete rule name="ERP API" >nul 2>&1
 netsh advfirewall firewall add rule name="ERP UI" dir=in action=allow protocol=TCP localport=%UI_PORT% >nul 2>&1 && echo   - port %UI_PORT% autorise || echo   - [!] port %UI_PORT% : relancez en tant qu'administrateur
 netsh advfirewall firewall add rule name="ERP API" dir=in action=allow protocol=TCP localport=%API_PORT% >nul 2>&1 && echo   - port %API_PORT% autorise || echo   - [!] port %API_PORT% : relancez en tant qu'administrateur
 echo.
-echo [ok] L'ERP demarrera tout seul a la prochaine ouverture de session.
-echo      Pour l'enlever : start-erp.bat --remove-autostart
+echo [ok] L'ERP demarrera tout seul (en arriere-plan, sans fenetre) a la prochaine
+echo      ouverture de session.
+echo      - Demarrer maintenant sans fenetre : double-cliquez start-erp-background.vbs
+echo      - Arreter : stop-erp.bat
+echo      - Enlever le demarrage auto : start-erp.bat --remove-autostart
 echo.
 pause
 exit /b 0
