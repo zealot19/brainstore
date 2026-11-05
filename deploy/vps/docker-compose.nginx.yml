@@ -9,7 +9,7 @@
 #   docker compose -f docker-compose.nginx.yml exec web python manage.py createsuperuser
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine     # aligné sur Railway (PG 18) pour les dump/restore
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
