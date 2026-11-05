@@ -16,7 +16,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql       # PG18+ : monter /var/lib/postgresql (données dans sous-dossier 18/), PAS /data
 
   web:                      # Django + Gunicorn (le Dockerfile applique migrate au démarrage)
     build: ../../backend
