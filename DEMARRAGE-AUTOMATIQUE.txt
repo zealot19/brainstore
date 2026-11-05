@@ -1,0 +1,99 @@
+===========================================================
+  ERP SCIG - DEMARRAGE AUTOMATIQUE A L'ALLUMAGE DU PC
+===========================================================
+
+Ce guide fait en sorte que l'ERP se lance TOUT SEUL quand on
+allume l'ordinateur, EN ARRIERE-PLAN (sans les fenetres noires).
+
+A faire UNE SEULE FOIS, sur le PC serveur de l'agence.
+
+-----------------------------------------------------------
+AVANT DE COMMENCER
+-----------------------------------------------------------
+L'application doit avoir ete lancee et configuree au moins une
+fois normalement : double-cliquez start-erp.bat, repondez aux
+3 questions (URL du serveur, jeton, ID de l'agence), et attendez
+que tout demarre. (Voir LANCER-ERP.txt.)
+Ensuite seulement, suivez ce guide.
+
+-----------------------------------------------------------
+ETAPE 1 - ACTIVER LE DEMARRAGE AUTOMATIQUE
+-----------------------------------------------------------
+Clic droit sur :   activer-demarrage-auto.bat
+Puis :             "Executer en tant qu'administrateur"
+(Une demande d'autorisation Windows peut apparaitre : acceptez.)
+
+Cela installe le demarrage automatique EN ARRIERE-PLAN et ouvre
+le pare-feu. A la prochaine ouverture de session, l'ERP demarre
+tout seul, SANS aucune fenetre.
+
+-----------------------------------------------------------
+ETAPE 2 - OUVRIR LA SESSION AUTOMATIQUEMENT (recommande)
+-----------------------------------------------------------
+Pour que l'ERP demarre meme sans taper de mot de passe apres
+l'allumage (sinon il attend que quelqu'un ouvre la session) :
+
+  1. Touche Windows + R
+  2. Tapez :  netplwiz   puis Entree
+  3. Decochez : "Les utilisateurs doivent entrer un nom et un
+     mot de passe pour utiliser cet ordinateur"
+  4. Cliquez Appliquer, puis tapez le mot de passe du compte 2 fois.
+
+Resultat : on allume le PC -> Windows ouvre la session tout seul
+-> l'ERP demarre en arriere-plan. Plus rien a faire.
+
+-----------------------------------------------------------
+ETAPE 3 - (CONSEILLE) RALLUMAGE APRES COUPURE DE COURANT
+-----------------------------------------------------------
+- Dans le BIOS/UEFI du PC : option "Restore on AC Power"
+  (ou "After Power Loss") = ON  -> le PC se rallume apres une
+  coupure de courant.
+- Empecher la mise en veille : Parametres Windows > Systeme >
+  Alimentation > Mise en veille = Jamais (quand branche au secteur).
+
+-----------------------------------------------------------
+DEMARRER MAINTENANT EN ARRIERE-PLAN (sans redemarrer le PC)
+-----------------------------------------------------------
+Double-cliquez :   start-erp-background.vbs
+L'ERP demarre sans aucune fenetre.
+
+POUR L'ARRETER :
+Double-cliquez :   stop-erp.bat
+
+-----------------------------------------------------------
+VERIFIER QUE CA MARCHE
+-----------------------------------------------------------
+Redemarrez le PC. Apres 1 a 2 minutes, SANS rien faire :
+  - sur ce PC :        ouvrez le navigateur sur  http://localhost:4200
+  - depuis un autre PC : http://ADRESSE-IP-DU-SERVEUR:4200
+Si l'application s'affiche, le demarrage automatique fonctionne.
+
+-----------------------------------------------------------
+ENLEVER LE DEMARRAGE AUTOMATIQUE
+-----------------------------------------------------------
+Clic droit sur :   desactiver-demarrage-auto.bat
+Puis :             "Executer en tant qu'administrateur"
+
+-----------------------------------------------------------
+DIFFERENCE AVEC LE LANCEMENT NORMAL
+-----------------------------------------------------------
+- start-erp.bat (double-clic)   : ouvre 3 fenetres VISIBLES
+  (ERP - API / Sync / Interface). Pour arreter : fermer les fenetres.
+- Demarrage automatique / .vbs  : tourne EN ARRIERE-PLAN, AUCUNE
+  fenetre. Pour arreter : stop-erp.bat.
+
+Les deux font tourner la meme application ; ne lancez pas les deux
+en meme temps.
+
+-----------------------------------------------------------
+EN CAS DE PROBLEME
+-----------------------------------------------------------
+- Rien ne demarre apres l'allumage : verifiez que la session
+  s'ouvre automatiquement (ETAPE 2) ; le demarrage auto se
+  declenche a l'OUVERTURE DE SESSION.
+- L'application ne repond pas : double-cliquez start-erp.bat une
+  fois (fenetres visibles) pour lire les messages d'erreur.
+- Depuis un autre PC rien ne charge : lancez une fois
+  activer-demarrage-auto.bat en administrateur (ouverture du
+  pare-feu), et verifiez que les 2 PC sont sur le meme reseau.
+===========================================================
